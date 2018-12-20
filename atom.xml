@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2018-12-20T20:22:18Z</updated>
+  <updated>2018-12-20T21:21:58Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -36,7 +36,7 @@
       <link href="https://adamsheffer.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Discrete geometry and other typos</subtitle>
       <title>Some Plane Truths</title>
-      <updated>2018-12-20T20:20:11Z</updated>
+      <updated>2018-12-20T21:20:13Z</updated>
     </source>
   </entry>
 
@@ -321,7 +321,7 @@
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>By Emanuele Viola</subtitle>
       <title>Thoughts</title>
-      <updated>2018-12-20T20:20:07Z</updated>
+      <updated>2018-12-20T21:20:09Z</updated>
     </source>
   </entry>
 
@@ -615,6 +615,171 @@ first polynomial-time approximation algorithm for a non-trivial metric.
   </entry>
 
   <entry xml:lang="en">
+    <id>http://windowsontheory.org/?p=6358</id>
+    <link href="https://windowsontheory.org/2018/12/19/quantum-hamiltonian-complexity/" rel="alternate" type="text/html"/>
+    <title>What is Quantum Hamiltonian Complexity?</title>
+    <summary>by Ben Edelman This is the first installment of a three-part series of posts on quantum Hamiltonian complexity based on lectures given the authors in Boaz and Tselil’s seminar. The third installment has apparently already been posted, but if you were confused by it, fear not! This post and the next will provide the necessary […]
+      <div class="commentbar">
+        <p/>
+      </div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><strong>by Ben Edelman</strong></p>
+<p><em>This is the first installment of a three-part series of posts on quantum Hamiltonian complexity based on lectures given the authors in <a href="https://www.boazbarak.org/fall18seminar/">Boaz and Tselil’s seminar</a>. The <a href="https://windowsontheory.org/2018/12/18/a-1d-area-law-for-gapped-local-hamiltonians/">third installment</a> has apparently already been posted, but if you were confused by it, fear not! This post and the next will provide the necessary background.</em></p>
+<p>Quantum Hamiltonian complexity is a growing area of study that has important ramifications for both physics and computation. Our hope is that these three posts will provide an accessible (and incomplete) preview of the subject for readers who know the basics of theoretical computer science and quantum information. Much of the material is adapted from an <a href="https://arxiv.org/abs/1401.3916">excellent survey by Gharibian et al.</a>.</p>
+<p>In a nutshell, quantum Hamiltonian complexity is the study of the <em>local Hamiltonian problem</em>. Why is this problem important enough to justify the existence of an entire subfield? To illustrate why, here are two informal characterizations of it:</p>
+<ol>
+<li>To a <strong>physicist</strong>, the local Hamiltonian problem is a formalization of the difficulty of simulating and understanding many-particle quantum systems. There are deep connections between the complexity of this problem and the amount of quantum entanglement in a system. In practical terms, physicists would love to be able to solve this problem on a regular basis, and they’ve developed a rich theory of heuristics to that end.</li>
+<li>To a <strong>computer scientist</strong>, local Hamiltonian problem is the quantum version of constraint satisfaction problems. Any CSP can be written as a local Hamiltonian problem; and just as constraint satisfaction is the prototypical NP-complete problem by the Cook-Levin theorem, the local Hamiltonian problem plays the equivalent role for QMA (a quantum analogue of NP) by the “quantum Cook-Levin theorem.” The connections to classical complexity go on… there is even a [quantum PCP conjecture](<a href="https://arxiv.org/pdf/1309.7495.pdf" rel="nofollow">https://arxiv.org/pdf/1309.7495.pdf</a>).</li>
+</ol>
+<p>But let’s take a step back and start at the beginning. To make sure we understand what a quantum Hamiltonian is and why it is important, it will be instructive to briefly rehash some of the <a href="https://windowsontheory.org/2018/09/15/statistical-physics-an-introduction-in-two-parts/">fundamentals of classical statistical mechanics</a>.</p>
+<h2>Classical energy and ground states</h2>
+<p>In the classical world, a physical system can be in any one of various states <img alt="x \in \mathcal{X}" class="latex" src="https://s0.wp.com/latex.php?latex=x+%5Cin+%5Cmathcal%7BX%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x \in \mathcal{X}"/>, each of which is a vector, with different coordinates representing different particles. Every state of the system has an <em>energy</em>, given by an energy function <img alt="E: \mathcal{X} \to \mathbb{R}" class="latex" src="https://s0.wp.com/latex.php?latex=E%3A+%5Cmathcal%7BX%7D+%5Cto+%5Cmathbb%7BR%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="E: \mathcal{X} \to \mathbb{R}"/>. For example, in the classic Ising model of ferromagnetism, <img alt="\mathcal{X} = \{\pm 1\}^n" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BX%7D+%3D+%5C%7B%5Cpm+1%5C%7D%5En&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{X} = \{\pm 1\}^n"/>. Each coordinate <img alt="x_i" class="latex" src="https://s0.wp.com/latex.php?latex=x_i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x_i"/> represents the spin of atom <img alt="i" class="latex" src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i"/>, and atoms <img alt="i" class="latex" src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i"/> and <img alt="j" class="latex" src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j"/> interact with each other whenever <img alt="(i,j)" class="latex" src="https://s0.wp.com/latex.php?latex=%28i%2Cj%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(i,j)"/> is an edge in a graph <img alt="G" class="latex" src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="G"/>, which is usually a low-dimensional lattice. Energy for this system is defined as <img alt="E(x) = \sum_{(i,j) \in G}-x_i x_j" class="latex" src="https://s0.wp.com/latex.php?latex=E%28x%29+%3D+%5Csum_%7B%28i%2Cj%29+%5Cin+G%7D-x_i+x_j&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="E(x) = \sum_{(i,j) \in G}-x_i x_j"/>.</p>
+<p>Suppose we ignore our system for a long time, letting it interact with its external environment until, in the limit, it reaches thermal equilibrium at temperature <img alt="T" class="latex" src="https://s0.wp.com/latex.php?latex=T&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="T"/>. Then the probability the system is in state <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x"/> is given by Boltzmann’s distribution: <img alt="\Pr[x] = \frac{e^{-\beta E(x)}}{Z}" class="latex" src="https://s0.wp.com/latex.php?latex=%5CPr%5Bx%5D+%3D+%5Cfrac%7Be%5E%7B-%5Cbeta+E%28x%29%7D%7D%7BZ%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\Pr[x] = \frac{e^{-\beta E(x)}}{Z}"/>, where <img alt="\beta \propto 1/T" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbeta+%5Cpropto+1%2FT&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\beta \propto 1/T"/> and <img alt="Z" class="latex" src="https://s0.wp.com/latex.php?latex=Z&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="Z"/> is the partition function required to normalize the probabilities. As the temperature tends to infinity, this distribution will approach the uniform distribution over <img alt="\mathcal{X}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BX%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{X}"/>, and as the temperature tends to absolute zero, the distribution will approach the uniform distribution over the states with minimum energy. We call these minimum energy states <em>ground states</em>, and we call their energy the <em>ground state energy</em>. If we want to calculate something about a system, then it is often crucial to know the ground states and ground state energy of the system. Going back to our example, the Ising model has two ground states whenever <img alt="G" class="latex" src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="G"/> is connected. These are the states <img alt="(+1,+1,\ldots,+1)" class="latex" src="https://s0.wp.com/latex.php?latex=%28%2B1%2C%2B1%2C%5Cldots%2C%2B1%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(+1,+1,\ldots,+1)"/> and <img alt="(-1,-1,\ldots,-1)" class="latex" src="https://s0.wp.com/latex.php?latex=%28-1%2C-1%2C%5Cldots%2C-1%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(-1,-1,\ldots,-1)"/> in which all atoms have the same spin. The ground state energy is <img alt="-|\{i,j:(i,j) \in G\}|" class="latex" src="https://s0.wp.com/latex.php?latex=-%7C%5C%7Bi%2Cj%3A%28i%2Cj%29+%5Cin+G%5C%7D%7C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="-|\{i,j:(i,j) \in G\}|"/>.</p>
+<h2>Quantum Hamiltonians</h2>
+<p>A quantum Hamiltonian is essentially the quantum analogue of the classical energy function. Unlike with classical systems, when a quantum system is in a given <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/>-qubit state <img alt="\left|\psi\right\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft%7C%5Cpsi%5Cright%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\left|\psi\right\rangle"/>, it doesn’t have a determinate energy. Instead, when we measure the energy, the value we obtain may be probabilistic and will correspond to one of the eigenvalues of the observable matrix for energy. This Hermitian matrix, denoted <img alt="H \in (\mathbb{C}^2)^{\otimes n} \times (\mathbb{C}^2)^{\otimes n}" class="latex" src="https://s0.wp.com/latex.php?latex=H+%5Cin+%28%5Cmathbb%7BC%7D%5E2%29%5E%7B%5Cotimes+n%7D+%5Ctimes+%28%5Cmathbb%7BC%7D%5E2%29%5E%7B%5Cotimes+n%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H \in (\mathbb{C}^2)^{\otimes n} \times (\mathbb{C}^2)^{\otimes n}"/>, is the quantum Hamiltonian, and just as the energy function characterizes a classical system, the Hamiltonian characterizes a quantum system. For a given eigenvector <img alt="|\lambda_i\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Clambda_i%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\lambda_i\rangle"/> of <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> with eigenvalue <img alt="\lambda_i" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clambda_i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\lambda_i"/>, when we measure the energy of <img alt="|\psi\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi\rangle"/> we obtain the result <img alt="\lambda_i" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clambda_i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\lambda_i"/> with probability <img alt="\langle\psi|\lambda_i\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clangle%5Cpsi%7C%5Clambda_i%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\langle\psi|\lambda_i\rangle"/>, and the system collapses to the state <img alt="|\lambda_i\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Clambda_i%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\lambda_i\rangle"/> (assuming the eigenvalue <img alt="\lambda_i" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clambda_i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\lambda_i"/> has multiplicity 1). Thus, the ground state and ground state energy of a quantum system with eigenvalue <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> are the minimum eigenvalue <img alt="\lambda_0" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clambda_0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\lambda_0"/> of <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> and the corresponding eigenvector <img alt="|\lambda_0\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Clambda_0%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\lambda_0\rangle"/>.</p>
+<p>The Boltzmann distribution also has a quantum analogue. A quantum system at thermal equilibrium will be in the following mixed state: <img alt="\rho_{\text{eq}} = \frac{e^{-\beta H}}{Z}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Crho_%7B%5Ctext%7Beq%7D%7D+%3D+%5Cfrac%7Be%5E%7B-%5Cbeta+H%7D%7D%7BZ%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\rho_{\text{eq}} = \frac{e^{-\beta H}}{Z}"/>. As the temperature approaches absolute zero, <img alt="\rho_{\text{eq}}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Crho_%7B%5Ctext%7Beq%7D%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\rho_{\text{eq}}"/> will approach a superposition over the ground states.</p>
+<p>Not only does the Hamiltonian tell us the energy of a system, it also describes the time evolution of the system (as long as it is closed). Schrödinger’s equation states that <img alt="-i \hbar \frac{d|\psi\rangle}{dt} = H|\psi\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=-i+%5Chbar+%5Cfrac%7Bd%7C%5Cpsi%5Crangle%7D%7Bdt%7D+%3D+H%7C%5Cpsi%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="-i \hbar \frac{d|\psi\rangle}{dt} = H|\psi\rangle"/>, where <img alt="\hbar" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chbar&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\hbar"/> is Planck’s constant and <img alt="t" class="latex" src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t"/> is time. Thus, if a closed system is in the state <img alt="|\psi\rangle_0" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%5Crangle_0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi\rangle_0"/> at time 0, its state at time <img alt="t" class="latex" src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t"/> will be <img alt="|\psi\rangle_t = e^{-itH/\hbar}|\psi\rangle_0" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%5Crangle_t+%3D+e%5E%7B-itH%2F%5Chbar%7D%7C%5Cpsi%5Crangle_0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi\rangle_t = e^{-itH/\hbar}|\psi\rangle_0"/>. Since <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> is Hermitian, <img alt="e^{-itH/\hbar}" class="latex" src="https://s0.wp.com/latex.php?latex=e%5E%7B-itH%2F%5Chbar%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="e^{-itH/\hbar}"/> is unitary, which is another way of saying that quantum mechanical states are subject to unitary evolution.</p>
+<h1>The Local Hamiltonian problem</h1>
+<p>As we have seen, understanding the Hamiltonian of a quantum system is crucial for understanding both the system’s equilibrium behavior and its time evolution. There are a huge variety of questions physicists are interested in asking about systems, all of which boil down to questions about equilibrium behavior, time evolution, or both. There is a single problem that captures the complexity of many of these questions, in the sense that most of the questions can’t be answered without solving it. This is the problem of estimating the ground state energy of the Hamiltonian. Especially in condensed matter physics, this problem is ubiquitous.</p>
+<p>Formally, we will study the following promise problem: (note: this will not be our final formulation)</p>
+<hr/>
+<p><strong>The “Hamiltonian Problem”</strong></p>
+<p>Given a Hermitian matrix <img alt="H \in (\mathbb{C}^2)^{\otimes n} \times (\mathbb{C}^2)^{\otimes n}" class="latex" src="https://s0.wp.com/latex.php?latex=H+%5Cin+%28%5Cmathbb%7BC%7D%5E2%29%5E%7B%5Cotimes+n%7D+%5Ctimes+%28%5Cmathbb%7BC%7D%5E2%29%5E%7B%5Cotimes+n%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H \in (\mathbb{C}^2)^{\otimes n} \times (\mathbb{C}^2)^{\otimes n}"/> and non-negative reals <img alt="a, b" class="latex" src="https://s0.wp.com/latex.php?latex=a%2C+b&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="a, b"/> with <img alt="b \geq a+1" class="latex" src="https://s0.wp.com/latex.php?latex=b+%5Cgeq+a%2B1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="b \geq a+1"/>,</p>
+<ul>
+<li>If <img alt="\lambda_0(H) \leq a" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clambda_0%28H%29+%5Cleq+a&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\lambda_0(H) \leq a"/>, output YES<p/>
+</li>
+<li>
+<p>If <img alt="\lambda_0(H) \geq b" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clambda_0%28H%29+%5Cgeq+b&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\lambda_0(H) \geq b"/>, output NO</p>
+</li>
+</ul>
+<hr/>
+<p>One issue with this definition is that the input includes an enormous <img alt="2^n \times 2^n" class="latex" src="https://s0.wp.com/latex.php?latex=2%5En+%5Ctimes+2%5En&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^n \times 2^n"/> matrix. For a reasonable-sized system, there’d be no use in even trying to solve this problem through classical computation, and how to deal with it in the quantum computing setting is far from obvious. Luckily, physicists have found that in real-life systems, interactions tend to be <em>local</em>, and if we consider the special case of <em>local Hamiltonians</em>, the input for the problem is of reasonable size.</p>
+<div class="wp-caption aligncenter" id="attachment_6361" style="width: 295px;"><img alt="circle_diagram0" class="aligncenter size-medium wp-image-6361" height="300" src="https://windowsontheory.files.wordpress.com/2018/12/circle_diagram0.png?w=285&amp;h=300" width="285"/><p class="wp-caption-text">Hamiltonians are too big to work with. What if we restrict our focus to local Hamiltonians?</p></div>
+<p>A <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-local Hamiltonian is a Hamiltonian that is decomposed into a sum of terms, each of which represents a Hamiltonian acting on a <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-unit subset of the <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/> qubits in the system. In other words, <img alt="H = \sum_i (H_i)_{S_i} \otimes I_{[n]\backslash S_i}" class="latex" src="https://s0.wp.com/latex.php?latex=H+%3D+%5Csum_i+%28H_i%29_%7BS_i%7D+%5Cotimes+I_%7B%5Bn%5D%5Cbackslash+S_i%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H = \sum_i (H_i)_{S_i} \otimes I_{[n]\backslash S_i}"/>, where each <img alt="S_i" class="latex" src="https://s0.wp.com/latex.php?latex=S_i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="S_i"/> is a subset of <img alt="[n]" class="latex" src="https://s0.wp.com/latex.php?latex=%5Bn%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="[n]"/> of size <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>. For brevity’s sake, we abuse notation and write <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> as <img alt="\sum_i H_i" class="latex" src="https://s0.wp.com/latex.php?latex=%5Csum_i+H_i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\sum_i H_i"/>. We can think of the <img alt="H_i" class="latex" src="https://s0.wp.com/latex.php?latex=H_i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_i"/>’s as local constraints, and the ground state as the state that simultaneously satisfies the constraints to the maximal possible extent. Here, then, is the new-and-improved problem definition:</p>
+<hr/>
+<p><strong><img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-Local Hamiltonian Problem</strong></p>
+<p>Given a Hamiltonian <img alt="H \in (\mathbb{C}^2)^{\otimes n} \times (\mathbb{C}^2)^{\otimes n}" class="latex" src="https://s0.wp.com/latex.php?latex=H+%5Cin+%28%5Cmathbb%7BC%7D%5E2%29%5E%7B%5Cotimes+n%7D+%5Ctimes+%28%5Cmathbb%7BC%7D%5E2%29%5E%7B%5Cotimes+n%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H \in (\mathbb{C}^2)^{\otimes n} \times (\mathbb{C}^2)^{\otimes n}"/> specified as a collection of <img alt="r" class="latex" src="https://s0.wp.com/latex.php?latex=r&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="r"/> local interactions <img alt="\{H_i\}" class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7BH_i%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\{H_i\}"/>, and non-negative reals <img alt="a, b" class="latex" src="https://s0.wp.com/latex.php?latex=a%2C+b&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="a, b"/> with <img alt="b \geq a+1" class="latex" src="https://s0.wp.com/latex.php?latex=b+%5Cgeq+a%2B1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="b \geq a+1"/>,</p>
+<ul>
+<li>If <img alt="\lambda_0(H) \leq a" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clambda_0%28H%29+%5Cleq+a&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\lambda_0(H) \leq a"/>, output YES</li>
+<li>If <img alt="\lambda_0(H) \geq b" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clambda_0%28H%29+%5Cgeq+b&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\lambda_0(H) \geq b"/>, output NO</li>
+</ul>
+<hr/>
+<p>Presuming the matrices <img alt="\{H_i\}" class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7BH_i%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\{H_i\}"/> and the reals <img alt="a, b" class="latex" src="https://s0.wp.com/latex.php?latex=a%2C+b&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="a, b"/> are specified to polynomial precision, then the input size is polynomial in <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/>, since <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/> is a constant and each of the matrices <img alt="H_i" class="latex" src="https://s0.wp.com/latex.php?latex=H_i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_i"/> has <img alt="2^k \cdot 2^k" class="latex" src="https://s0.wp.com/latex.php?latex=2%5Ek+%5Ccdot+2%5Ek&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^k \cdot 2^k"/> entries. Thus, not only is our new problem physically realistic, it is also a problem we might hope to attack with classical computation. However, we will later see that in fact this problem is likely hard even for quantum computers. The remaining installments in this series of notes will deal with further restrictions of the class of Hamiltonians for which the local Hamiltonian problem may be tractable.</p>
+<h2>Computer science motivation</h2>
+<p>As we mentioned in the intro, the <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-local Hamiltonian problem (henceforth denoted <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-LH) doesn’t just have myriad applications in physics—it is also important from a computer science perspective because it is a quantum generalization of constraint satisfiability (you may have noticed that quantum analogues of classical concepts are a running theme). Specifically, <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-CSP is a special case of <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-LH.</p>
+<p>Suppose we have a <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-CSP instance <img alt="\varphi" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvarphi&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\varphi"/>, and we want to turn it into a <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-LH instance. A clause <img alt="C" class="latex" src="https://s0.wp.com/latex.php?latex=C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C"/> with constituent variables <img alt="x_1, \ldots, x_k" class="latex" src="https://s0.wp.com/latex.php?latex=x_1%2C+%5Cldots%2C+x_k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x_1, \ldots, x_k"/> becomes a <img alt="2^k \times 2^k" class="latex" src="https://s0.wp.com/latex.php?latex=2%5Ek+%5Ctimes+2%5Ek&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^k \times 2^k"/> diagonal <img alt="\{0,1\}" class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7B0%2C1%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\{0,1\}"/> matrix <img alt="H_C" class="latex" src="https://s0.wp.com/latex.php?latex=H_C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_C"/> acting on the qubits <img alt="|x_1\rangle,\ldots,|x_k\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7Cx_1%5Crangle%2C%5Cldots%2C%7Cx_k%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|x_1\rangle,\ldots,|x_k\rangle"/>. Note that the rows and columns of this matrix are indexed by the assignment vectors <img alt="x \in \{0,1\}^k" class="latex" src="https://s0.wp.com/latex.php?latex=x+%5Cin+%5C%7B0%2C1%5C%7D%5Ek&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x \in \{0,1\}^k"/>. Formally, <img alt="H_C" class="latex" src="https://s0.wp.com/latex.php?latex=H_C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_C"/> encodes the truth table of <img alt="C" class="latex" src="https://s0.wp.com/latex.php?latex=C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C"/> in the following manner: <img alt="(H_C)_{x,x} = 1 - C(x)" class="latex" src="https://s0.wp.com/latex.php?latex=%28H_C%29_%7Bx%2Cx%7D+%3D+1+-+C%28x%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(H_C)_{x,x} = 1 - C(x)"/>. Another way of stating this is <img alt="H_C = \sum_{x \in \{0,1\}^k\text{ s.t. }C(x)=0}|x\rangle\langle{x}|" class="latex" src="https://s0.wp.com/latex.php?latex=H_C+%3D+%5Csum_%7Bx+%5Cin+%5C%7B0%2C1%5C%7D%5Ek%5Ctext%7B+s.t.+%7DC%28x%29%3D0%7D%7Cx%5Crangle%5Clangle%7Bx%7D%7C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_C = \sum_{x \in \{0,1\}^k\text{ s.t. }C(x)=0}|x\rangle\langle{x}|"/>.</p>
+<p>Informally, <img alt="H_C" class="latex" src="https://s0.wp.com/latex.php?latex=H_C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_C"/> takes the clauses of <img alt="\varphi" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvarphi&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\varphi"/> and turns them into local quantum interactions. We’ve constructed <img alt="H_C" class="latex" src="https://s0.wp.com/latex.php?latex=H_C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_C"/> so that it has two eigenvalues: 0 and 1. The eigenspace corresponding to 0 is spanned by the set of computational basis vectors <img alt="|x\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7Cx%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|x\rangle"/> that satisfy <img alt="C" class="latex" src="https://s0.wp.com/latex.php?latex=C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C"/>, and the eigenspace corresponding to 1 is spanned by the computational basis vectors that don’t satisfy <img alt="C" class="latex" src="https://s0.wp.com/latex.php?latex=C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C"/>. In effect, when we consider <img alt="H_C" class="latex" src="https://s0.wp.com/latex.php?latex=H_C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_C"/> as a term of <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/>, we are giving an energy penalty to any variable assignment that doesn’t satisfy <img alt="C" class="latex" src="https://s0.wp.com/latex.php?latex=C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C"/>. <img alt="H = \sum_{C}H_C" class="latex" src="https://s0.wp.com/latex.php?latex=H+%3D+%5Csum_%7BC%7DH_C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H = \sum_{C}H_C"/> will have the eigenvalue 0 (in other words, a ground state energy of 0) if and only if there is some assignment of the variables <img alt="x_1,\ldots,x_n" class="latex" src="https://s0.wp.com/latex.php?latex=x_1%2C%5Cldots%2Cx_n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x_1,\ldots,x_n"/> that satisfies all of the clauses (in other words, iff <img alt="\varphi" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvarphi&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\varphi"/> is satisfiable). Otherwise, the ground state energy of <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> will be at least 1, so determining whether <img alt="\varphi" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvarphi&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\varphi"/> is satisfiable is equivalent to solving <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-LH with inputs <img alt="a = 0" class="latex" src="https://s0.wp.com/latex.php?latex=a+%3D+0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="a = 0"/>, and <img alt="b = 1" class="latex" src="https://s0.wp.com/latex.php?latex=b+%3D+1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="b = 1"/>. (In fact, <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-LH generalizes MAX-<img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-CSP, since the ground state energy of <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> is exactly the number of clauses minus the maximum number of satisfiable clauses.)</p>
+<p><span id="more-6358"/></p>
+<p><!--more--></p>
+<p><!--more--></p>
+<p>Let’s work through an example. Consider the following 2-SAT formula:</p>
+<p><img alt="\varphi(x_1,x_2,x_3) = (x_1 \vee x_2) \wedge (\overline{x_1} \vee x_3)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvarphi%28x_1%2Cx_2%2Cx_3%29+%3D+%28x_1+%5Cvee+x_2%29+%5Cwedge+%28%5Coverline%7Bx_1%7D+%5Cvee+x_3%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\varphi(x_1,x_2,x_3) = (x_1 \vee x_2) \wedge (\overline{x_1} \vee x_3)"/></p>
+<p>The truth table for the first clause <img alt="C_1 = (x_1 \vee x_2)" class="latex" src="https://s0.wp.com/latex.php?latex=C_1+%3D+%28x_1+%5Cvee+x_2%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_1 = (x_1 \vee x_2)"/> is:</p>
+<table>
+<tbody>
+<tr>
+<th style="text-align: center;"> <img alt="x_1" class="latex" src="https://s0.wp.com/latex.php?latex=x_1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x_1"/></th>
+<th style="text-align: center;"> <img alt="x_2" class="latex" src="https://s0.wp.com/latex.php?latex=x_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x_2"/></th>
+<th style="text-align: center;"> <img alt="x_1 \vee x_2" class="latex" src="https://s0.wp.com/latex.php?latex=x_1+%5Cvee+x_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x_1 \vee x_2"/></th>
+</tr>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table>
+<p>So <img alt="H_1" class="latex" src="https://s0.wp.com/latex.php?latex=H_1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_1"/> is the following matrix:</p>
+<p><img alt="H_1 = \begin{pmatrix} 1 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 0 \end{pmatrix}" class="latex" src="https://s0.wp.com/latex.php?latex=H_1+%3D+%5Cbegin%7Bpmatrix%7D+1+%26+0+%26+0+%26+0+%5C%5C+0+%26+0+%26+0+%26+0+%5C%5C+0+%26+0+%26+0+%26+0+%5C%5C+0+%26+0+%26+0+%26+0+%5Cend%7Bpmatrix%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_1 = \begin{pmatrix} 1 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 0 \end{pmatrix}"/></p>
+<p>We also have</p>
+<p><img alt="H_2 = \begin{pmatrix} 0 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 1 &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 0 \end{pmatrix}" class="latex" src="https://s0.wp.com/latex.php?latex=H_2+%3D+%5Cbegin%7Bpmatrix%7D+0+%26+0+%26+0+%26+0+%5C%5C+0+%26+0+%26+0+%26+0+%5C%5C+0+%26+0+%26+1+%26+0+%5C%5C+0+%26+0+%26+0+%26+0+%5Cend%7Bpmatrix%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_2 = \begin{pmatrix} 0 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 1 &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 0 \end{pmatrix}"/></p>
+<p>Then,<br/>
+<img alt="\begin{aligned} H &amp;= (H_1)_{1,2} \otimes I_{3} + (H_2)_{1,3} \otimes I_{2} \\ &amp;= \begin{pmatrix} 1&amp;&amp;&amp;&amp;&amp;&amp;&amp; \\ &amp;1&amp;&amp;&amp;&amp;&amp;&amp; \\ &amp;&amp;0&amp;&amp;&amp;&amp;&amp; \\ &amp;&amp;&amp;0&amp;&amp;&amp;&amp; \\ &amp;&amp;&amp;&amp;0&amp;&amp;&amp; \\ &amp;&amp;&amp;&amp;&amp;0&amp;&amp; \\ &amp;&amp;&amp;&amp;&amp;&amp;0&amp; \\ &amp;&amp;&amp;&amp;&amp;&amp;&amp;0 \end{pmatrix} + \begin{pmatrix} 0&amp;&amp;&amp;&amp;&amp;&amp;&amp; \\ &amp;0&amp;&amp;&amp;&amp;&amp;&amp; \\ &amp;&amp;0&amp;&amp;&amp;&amp;&amp; \\ &amp;&amp;&amp;0&amp;&amp;&amp;&amp; \\ &amp;&amp;&amp;&amp;1&amp;&amp;&amp; \\ &amp;&amp;&amp;&amp;&amp;0&amp;&amp; \\ &amp;&amp;&amp;&amp;&amp;&amp;1&amp; \\ &amp;&amp;&amp;&amp;&amp;&amp;&amp;0 \end{pmatrix} \\ &amp;= \begin{pmatrix} 1&amp;&amp;&amp;&amp;&amp;&amp;&amp; \\ &amp;1&amp;&amp;&amp;&amp;&amp;&amp; \\ &amp;&amp;0&amp;&amp;&amp;&amp;&amp; \\ &amp;&amp;&amp;0&amp;&amp;&amp;&amp; \\ &amp;&amp;&amp;&amp;1&amp;&amp;&amp; \\ &amp;&amp;&amp;&amp;&amp;0&amp;&amp; \\ &amp;&amp;&amp;&amp;&amp;&amp;1&amp; \\ &amp;&amp;&amp;&amp;&amp;&amp;&amp;0 \end{pmatrix}\end{aligned}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+H+%26%3D+%28H_1%29_%7B1%2C2%7D+%5Cotimes+I_%7B3%7D+%2B+%28H_2%29_%7B1%2C3%7D+%5Cotimes+I_%7B2%7D+%5C%5C+%26%3D+%5Cbegin%7Bpmatrix%7D+1%26%26%26%26%26%26%26+%5C%5C+%261%26%26%26%26%26%26+%5C%5C+%26%260%26%26%26%26%26+%5C%5C+%26%26%260%26%26%26%26+%5C%5C+%26%26%26%260%26%26%26+%5C%5C+%26%26%26%26%260%26%26+%5C%5C+%26%26%26%26%26%260%26+%5C%5C+%26%26%26%26%26%26%260+%5Cend%7Bpmatrix%7D+%2B+%5Cbegin%7Bpmatrix%7D+0%26%26%26%26%26%26%26+%5C%5C+%260%26%26%26%26%26%26+%5C%5C+%26%260%26%26%26%26%26+%5C%5C+%26%26%260%26%26%26%26+%5C%5C+%26%26%26%261%26%26%26+%5C%5C+%26%26%26%26%260%26%26+%5C%5C+%26%26%26%26%26%261%26+%5C%5C+%26%26%26%26%26%26%260+%5Cend%7Bpmatrix%7D+%5C%5C+%26%3D+%5Cbegin%7Bpmatrix%7D+1%26%26%26%26%26%26%26+%5C%5C+%261%26%26%26%26%26%26+%5C%5C+%26%260%26%26%26%26%26+%5C%5C+%26%26%260%26%26%26%26+%5C%5C+%26%26%26%261%26%26%26+%5C%5C+%26%26%26%26%260%26%26+%5C%5C+%26%26%26%26%26%261%26+%5C%5C+%26%26%26%26%26%26%260+%5Cend%7Bpmatrix%7D%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned} H &amp;= (H_1)_{1,2} \otimes I_{3} + (H_2)_{1,3} \otimes I_{2} \\ &amp;= \begin{pmatrix} 1&amp;&amp;&amp;&amp;&amp;&amp;&amp; \\ &amp;1&amp;&amp;&amp;&amp;&amp;&amp; \\ &amp;&amp;0&amp;&amp;&amp;&amp;&amp; \\ &amp;&amp;&amp;0&amp;&amp;&amp;&amp; \\ &amp;&amp;&amp;&amp;0&amp;&amp;&amp; \\ &amp;&amp;&amp;&amp;&amp;0&amp;&amp; \\ &amp;&amp;&amp;&amp;&amp;&amp;0&amp; \\ &amp;&amp;&amp;&amp;&amp;&amp;&amp;0 \end{pmatrix} + \begin{pmatrix} 0&amp;&amp;&amp;&amp;&amp;&amp;&amp; \\ &amp;0&amp;&amp;&amp;&amp;&amp;&amp; \\ &amp;&amp;0&amp;&amp;&amp;&amp;&amp; \\ &amp;&amp;&amp;0&amp;&amp;&amp;&amp; \\ &amp;&amp;&amp;&amp;1&amp;&amp;&amp; \\ &amp;&amp;&amp;&amp;&amp;0&amp;&amp; \\ &amp;&amp;&amp;&amp;&amp;&amp;1&amp; \\ &amp;&amp;&amp;&amp;&amp;&amp;&amp;0 \end{pmatrix} \\ &amp;= \begin{pmatrix} 1&amp;&amp;&amp;&amp;&amp;&amp;&amp; \\ &amp;1&amp;&amp;&amp;&amp;&amp;&amp; \\ &amp;&amp;0&amp;&amp;&amp;&amp;&amp; \\ &amp;&amp;&amp;0&amp;&amp;&amp;&amp; \\ &amp;&amp;&amp;&amp;1&amp;&amp;&amp; \\ &amp;&amp;&amp;&amp;&amp;0&amp;&amp; \\ &amp;&amp;&amp;&amp;&amp;&amp;1&amp; \\ &amp;&amp;&amp;&amp;&amp;&amp;&amp;0 \end{pmatrix}\end{aligned}"/></p>
+<p><img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> has diagonal entries that are zero, so it has 0 as an eigenvalue. We can therefore conclude that <img alt="\varphi" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvarphi&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\varphi"/> is satisfiable. (In this example it was easy to write out <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> and see that it has zeros on the diagonal, but when <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/> is large, <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> becomes exponentially big, so we can’t just compute it explicitly and look through its diagonal entries.)</p>
+<h1>Quantum Cook-Levin Theorem</h1>
+<p>We’ve seen that any <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-CSP problem can be thought of as a <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-LH problem (with a diagonal Hamiltonian matrix). And the analogy can be drawn even further. One reason <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-CSP is so useful is that it (and in particular 3-SAT) is NP-complete, according to the Cook-Levin Theorem. 3-SAT captures the difficulty of classical efficiently verifiable computation. It may not come as a surprise, then, that <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-LH captures the difficulty of <em>quantum</em> efficiently verifiable computation. This result is the “quantum Cook-Levin theorem”, but before we see it we need to define the complexity class QMA, the quantum analogue of NP.</p>
+<p>Because quantum computation is probabilistic, QMA is more precisely the quantum analogue of MA (Merlin Arthur), which allows the verifier to have a chance of error:</p>
+<hr/>
+<p><strong>MA</strong></p>
+<p><img alt="L \in \text{MA}" class="latex" src="https://s0.wp.com/latex.php?latex=L+%5Cin+%5Ctext%7BMA%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="L \in \text{MA}"/> iff there exists a probabilistic poly-time verifier <img alt="V" class="latex" src="https://s0.wp.com/latex.php?latex=V&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="V"/> and a polynomial <img alt="p(n)" class="latex" src="https://s0.wp.com/latex.php?latex=p%28n%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p(n)"/> such that</p>
+<ul>
+<li><img alt="\forall x \in L, \exists y \in \{0,1\}^{p(n)},\quad \Pr[V(x,y) = 1] \geq \frac{2}{3}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cforall+x+%5Cin+L%2C+%5Cexists+y+%5Cin+%5C%7B0%2C1%5C%7D%5E%7Bp%28n%29%7D%2C%5Cquad+%5CPr%5BV%28x%2Cy%29+%3D+1%5D+%5Cgeq+%5Cfrac%7B2%7D%7B3%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\forall x \in L, \exists y \in \{0,1\}^{p(n)},\quad \Pr[V(x,y) = 1] \geq \frac{2}{3}"/><p/>
+</li>
+<li>
+<p><img alt="\forall x \notin L" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cforall+x+%5Cnotin+L&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\forall x \notin L"/>, <img alt="\forall |y\rangle \in \{0,1\}^{p(n)},\quad \Pr[V(x,y) = 1] \leq \frac{1}{3}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cforall+%7Cy%5Crangle+%5Cin+%5C%7B0%2C1%5C%7D%5E%7Bp%28n%29%7D%2C%5Cquad+%5CPr%5BV%28x%2Cy%29+%3D+1%5D+%5Cleq+%5Cfrac%7B1%7D%7B3%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\forall |y\rangle \in \{0,1\}^{p(n)},\quad \Pr[V(x,y) = 1] \leq \frac{1}{3}"/></p>
+</li>
+</ul>
+<hr/>
+<p>For QMA, the verifier is a quantum computer and the witness is a quantum state. Moreover, we’re interested in the complexity of promise problems:</p>
+<hr/>
+<p><strong>QMA</strong></p>
+<p>A promise problem <img alt="L = L_{yes} \cup L_{no} \in \text{QMA}" class="latex" src="https://s0.wp.com/latex.php?latex=L+%3D+L_%7Byes%7D+%5Ccup+L_%7Bno%7D+%5Cin+%5Ctext%7BQMA%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="L = L_{yes} \cup L_{no} \in \text{QMA}"/> iff there exists a quantum poly-time verifier <img alt="V" class="latex" src="https://s0.wp.com/latex.php?latex=V&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="V"/> and a polynomial <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p"/> such that</p>
+<ul>
+<li><img alt="\forall x \in L_{yes}, \exists |y\rangle \in (\mathbb{C}^2)^{\otimes p(|x|)},\quad \Pr[V(|x\rangle|y\rangle) = 1] \geq \frac{2}{3}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cforall+x+%5Cin+L_%7Byes%7D%2C+%5Cexists+%7Cy%5Crangle+%5Cin+%28%5Cmathbb%7BC%7D%5E2%29%5E%7B%5Cotimes+p%28%7Cx%7C%29%7D%2C%5Cquad+%5CPr%5BV%28%7Cx%5Crangle%7Cy%5Crangle%29+%3D+1%5D+%5Cgeq+%5Cfrac%7B2%7D%7B3%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\forall x \in L_{yes}, \exists |y\rangle \in (\mathbb{C}^2)^{\otimes p(|x|)},\quad \Pr[V(|x\rangle|y\rangle) = 1] \geq \frac{2}{3}"/><p/>
+</li>
+<li>
+<p><img alt="\forall x \notin L_{no}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cforall+x+%5Cnotin+L_%7Bno%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\forall x \notin L_{no}"/>, <img alt="\forall |y\rangle \in (\mathbb{C}^2)^{\otimes p(|x|)},\quad \Pr[V(|x\rangle|y\rangle) = 1] \leq \frac{1}{3}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cforall+%7Cy%5Crangle+%5Cin+%28%5Cmathbb%7BC%7D%5E2%29%5E%7B%5Cotimes+p%28%7Cx%7C%29%7D%2C%5Cquad+%5CPr%5BV%28%7Cx%5Crangle%7Cy%5Crangle%29+%3D+1%5D+%5Cleq+%5Cfrac%7B1%7D%7B3%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\forall |y\rangle \in (\mathbb{C}^2)^{\otimes p(|x|)},\quad \Pr[V(|x\rangle|y\rangle) = 1] \leq \frac{1}{3}"/></p>
+</li>
+</ul>
+<hr/>
+<p>A problem is QMA-complete if it is in QMA and if any problem in QMA can be reduced to it in polynomial time. In 2002, Kitaev proved that <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-LH is QMA-complete for all <img alt="k \geq 5" class="latex" src="https://s0.wp.com/latex.php?latex=k+%5Cgeq+5&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k \geq 5"/>. This was the first time a natural problem was shown to be QMA-complete. In 2003 Kempe and Regev proved that 3-LH is QMA-complete, and finally in 2006 Kempe, Kitaev and Regev proved that 2-LH is QMA complete, achieving the best possible result unless P = QMA. (3-SAT is NP-complete but 2-SAT is in P, so it may seem curious that 2-LH is QMA-complete. But in fact, this isn’t too surprising, because as we mentioned earlier, <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-LH corresponds to MAX-<img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-SAT, and MAX-2-SAT is NP-complete.)</p>
+<hr/>
+<p><strong>“Quantum Cook-Levin Theorem”</strong></p>
+<p>The 2-local Hamiltonian problem is QMA-complete.</p>
+<hr/>
+<p><em>A very sketchy proof sketch.    </em>This theorem is called the quantum Cook-Levin theorem not just because of the result, but also because the proof is along the same lines as the proof of the Cook-Levin theorem.</p>
+<p>Recall that in the proof of the Cook-Levin theorem, we start with a verifier Turing machine that takes as input <img alt="(x,y)" class="latex" src="https://s0.wp.com/latex.php?latex=%28x%2Cy%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(x,y)"/> and, in time <img alt="p(n)" class="latex" src="https://s0.wp.com/latex.php?latex=p%28n%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p(n)"/> accepts iff <img alt="y" class="latex" src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="y"/> is a valid witness for <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x"/> being in the language. We then devise (for each <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/>) a 3-SAT formula such that any satisfying solution to the instance must be an encoding of a valid history of the Turing machine from start to finish on the input <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x"/>. The constraints must guarantee that (a) the input indeed starts with <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x"/>, (b) at every time step <img alt="t \in [1,p(n)]" class="latex" src="https://s0.wp.com/latex.php?latex=t+%5Cin+%5B1%2Cp%28n%29%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t \in [1,p(n)]"/> the state of the machine correctly follows from its state at time <img alt="t-1" class="latex" src="https://s0.wp.com/latex.php?latex=t-1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t-1"/>, and that (c) the final state of the machine indicates acceptance. The constraints for (a) and (c) are trivial, and the reason we can do (b) is because Turing machines compute <em>locally</em>.</p>
+<p>For our quantum Cook-Levin proof, we follow the same template. Given a quantum circuit, we construct a local Hamiltonian that has ground energy below some constant only if there is a quantum encoding of the circuit that includes the proper (a) initial state, (b) intermediate computation, and (c) final state. As before, (a) and (c) are easy, because the parts of the initial and final states we need to ‘inspect’ (with the local terms of the Hamiltonian) are essentially classical. But when we try to compute local constraints for (b), we run into a big problem: entanglement.</p>
+<p>Consider some step of the computation. This will consist of applying a quantum gate <img alt="U" class="latex" src="https://s0.wp.com/latex.php?latex=U&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U"/> to a state <img alt="|\psi\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi\rangle"/> to obtain <img alt="|\psi'\rangle = U|\psi\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%27%5Crangle+%3D+U%7C%5Cpsi%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi'\rangle = U|\psi\rangle"/>. Even assuming we’ve already written down constraints to verify that <img alt="|\psi\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi\rangle"/> is correct, it is non-trivial to write down constraints to verify that <img alt="|\psi'\rangle = U|\psi\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%27%5Crangle+%3D+U%7C%5Cpsi%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi'\rangle = U|\psi\rangle"/> because <img alt="|\psi'\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%27%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi'\rangle"/> may differ from <img alt="U|\psi\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=U%7C%5Cpsi%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U|\psi\rangle"/> in a highly <em>non-local</em> way if there is entanglement between far-flung qubits. For example, suppose for the sake of illustration that <img alt="|\psi\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |11\rangle)" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%5Crangle+%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7B2%7D%7D%28%7C00%5Crangle+%2B+%7C11%5Crangle%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |11\rangle)"/> and <img alt="U = I" class="latex" src="https://s0.wp.com/latex.php?latex=U+%3D+I&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U = I"/>. And suppose we want to check that <img alt="|\psi'\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |11\rangle)" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%27%5Crangle+%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7B2%7D%7D%28%7C00%5Crangle+%2B+%7C11%5Crangle%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi'\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |11\rangle)"/> with 1-local constraints. Unfortunately, there is no way to distinguish <img alt="\frac{1}{\sqrt{2}}(|00\rangle + |11\rangle)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7B%5Csqrt%7B2%7D%7D%28%7C00%5Crangle+%2B+%7C11%5Crangle%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\frac{1}{\sqrt{2}}(|00\rangle + |11\rangle)"/> from <img alt="\frac{1}{\sqrt{2}}(|00\rangle - |11\rangle)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7B%5Csqrt%7B2%7D%7D%28%7C00%5Crangle+-+%7C11%5Crangle%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\frac{1}{\sqrt{2}}(|00\rangle - |11\rangle)"/> by looking at one qubit at a time: the reduced density matrix of either state for either qubit is the same: <img alt="I" class="latex" src="https://s0.wp.com/latex.php?latex=I&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="I"/>/2. There are examples like this that apply for <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-local constraints for any <img alt="k &gt;1" class="latex" src="https://s0.wp.com/latex.php?latex=k+%3E1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k &gt;1"/>, so we can’t even verify the ‘trivial’ gate <img alt="I" class="latex" src="https://s0.wp.com/latex.php?latex=I&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="I"/>, let alone gates that actually change the state. It would seem that we are stuck.</p>
+<p>Luckily, although quantum superposition makes this problem more difficult, we can actually use superposition in a clever manner in order to surmount the difficulty. Instead of encoding the states <img alt="|\psi\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi\rangle"/> and <img alt="|\psi'\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%27%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi'\rangle"/> separately, we can put them in superposition in a way that will allow us to verify that <img alt="|\psi'\rangle = U|\psi\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%27%5Crangle+%3D+U%7C%5Cpsi%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi'\rangle = U|\psi\rangle"/>. Suppose again that <img alt="U = I" class="latex" src="https://s0.wp.com/latex.php?latex=U+%3D+I&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U = I"/>, so we want to check that <img alt="|\psi'\rangle = |\psi\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%27%5Crangle+%3D+%7C%5Cpsi%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi'\rangle = |\psi\rangle"/>. Let <img alt="|\eta\rangle = \frac{1}{\sqrt{2}}(|\psi\rangle|0\rangle + |\psi'\rangle|1\rangle)" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ceta%5Crangle+%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7B2%7D%7D%28%7C%5Cpsi%5Crangle%7C0%5Crangle+%2B+%7C%5Cpsi%27%5Crangle%7C1%5Crangle%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\eta\rangle = \frac{1}{\sqrt{2}}(|\psi\rangle|0\rangle + |\psi'\rangle|1\rangle)"/>. Then, just by looking at the last qubit of <img alt="|\eta\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ceta%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\eta\rangle"/>, we can tell how close <img alt="|\psi'\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%27%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi'\rangle"/> is to <img alt="|\psi\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi\rangle"/>: the reduced density matrix of the last qubit contains information about the angle between <img alt="|\psi\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi\rangle"/> and <img alt="|\psi'\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%27%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi'\rangle"/>:</p>
+<p><img alt="\begin{pmatrix} 1 &amp; \langle\psi|\psi'\rangle \\ \langle\psi|\psi'\rangle &amp; 1 \end{pmatrix}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Bpmatrix%7D+1+%26+%5Clangle%5Cpsi%7C%5Cpsi%27%5Crangle+%5C%5C+%5Clangle%5Cpsi%7C%5Cpsi%27%5Crangle+%26+1+%5Cend%7Bpmatrix%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{pmatrix} 1 &amp; \langle\psi|\psi'\rangle \\ \langle\psi|\psi'\rangle &amp; 1 \end{pmatrix}"/></p>
+<p>The challenge is to describe a <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-local Hamiltonian <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> that has a state with energy below some parameter <img alt="a" class="latex" src="https://s0.wp.com/latex.php?latex=a&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="a"/> whenever <img alt="y" class="latex" src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="y"/> is a valid witness for <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x"/>, and otherwise has no state with energy below <img alt="b&gt;a" class="latex" src="https://s0.wp.com/latex.php?latex=b%3Ea&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="b&gt;a"/>. We won’t cover the details here, but the crucial idea is that when <img alt="y" class="latex" src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="y"/> is a valid witness for <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x"/>, the following ‘witness state’ (which is a superposition of the states of the quantum computer over all the time steps) will have low energy for a carefully-devised <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/>:</p>
+<p><img alt="|\eta\rangle = \frac{1}{p(n)}\sum_{t=0}^{p(n)}(U_t\cdots U_1|\psi_0\rangle)\otimes|t\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ceta%5Crangle+%3D+%5Cfrac%7B1%7D%7Bp%28n%29%7D%5Csum_%7Bt%3D0%7D%5E%7Bp%28n%29%7D%28U_t%5Ccdots+U_1%7C%5Cpsi_0%5Crangle%29%5Cotimes%7Ct%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\eta\rangle = \frac{1}{p(n)}\sum_{t=0}^{p(n)}(U_t\cdots U_1|\psi_0\rangle)\otimes|t\rangle"/></p>
+<p>where <img alt="|\psi_0\rangle = |x\rangle|y\rangle|0\rangle^{\otimes m}" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi_0%5Crangle+%3D+%7Cx%5Crangle%7Cy%5Crangle%7C0%5Crangle%5E%7B%5Cotimes+m%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi_0\rangle = |x\rangle|y\rangle|0\rangle^{\otimes m}"/> is the initial state of the computation, and <img alt="|t\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7Ct%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|t\rangle"/> is called the “clock register”. Note that because the size of the clock register is logarithmic in <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/>, we actually need to use <img alt="\log(n)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clog%28n%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\log(n)"/>-local constraints. For 5-local constraints to suffice, the witness state will need to be a little more complicated (the proof for 2-local constraints is even more difficult). Even for the case of <img alt="\log(n)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clog%28n%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\log(n)"/>-LH, the complete proof must demonstrate that no state besides the witness state has low energy.</p>
+<p style="text-align: right;">□</p>
+<h1>Roadmap</h1>
+<p>The upshot is that 2-LH is the canonical QMA-complete problem. This is a beautiful result from a quantum complexity theory perspective, but from a physics perspective it is very bad news. The QMA-completeness of the local Hamiltonian problem means that (presuming BQP <img alt="\neq" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cneq&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\neq"/> QMA) we can’t solve 2-LH, and we couldn’t even solve it with a quantum computer. Because of the central importance of finding the ground energy, this in turn means that <em>almost anything a physicist would like to compute about a system is intractable</em>.</p>
+<p>So is all hope lost? No! Just as we started out wanting to understand Hamiltonians in general and restricted our focus to <em>local</em> Hamiltonians, the approach the physics community has taken is to focus on even more restricted classes of Hamiltonians that still capture interesting physical systems. One route is to restrict the topology of the system encoded by the Hamiltonian: for example, in many physics models, the particles form a low-dimensional lattice and the only interactions between them are 2-local interactions along edges. Even this isn’t enough, though: the problem remains QMA-hard on many simple topologies like lattices (for example, 2-LH on the 2-D lattice is QMA-complete, and 2-LH on even the 1-D lattice is QMA-complete when instead of qubits we are dealing with 8-dimensional qudits). So we add a further restriction, which is to focus on <em>gapped</em> Hamiltonians: these are Hamiltonians for which there is a constant gap between the ground energy and the second-lowest energy.</p>
+<div class="wp-caption aligncenter" id="attachment_6405" style="width: 392px;"><img alt="circle_diagram1.png" class="  wp-image-6405 aligncenter" height="336" src="https://windowsontheory.files.wordpress.com/2018/12/circle_diagram1.png?w=382&amp;h=336" width="382"/><p class="wp-caption-text">Even local Hamiltonians are intractable in general. Gapped Hamiltonians on low-dimensional lattices, though, may be tractable.</p></div>
+<p>Thus, in the notes to follow, we will focus our energies on trying to solve the gapped local Hamiltonian problem for 1-D and 2-D lattices. The reason there is hope in these settings is that entanglement is (or is conjectured to be) limited by ‘area laws’. In the next post, Fred Zhang will describe a diagrammatic language (‘tensor networks’) for thinking about low-entanglement quantum states, and he’ll show how physicists solve the local Hamiltonian problem for gapped 1-D systems.</p></div>
+    </content>
+    <updated>2018-12-19T22:53:11Z</updated>
+    <published>2018-12-19T22:53:11Z</published>
+    <category term="physics"/>
+    <category term="cs229r"/>
+    <category term="quantum hamiltonian complexity"/>
+    <author>
+      <name>benedelman</name>
+    </author>
+    <source>
+      <id>https://windowsontheory.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://windowsontheory.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://windowsontheory.org" rel="alternate" type="text/html"/>
+      <link href="https://windowsontheory.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>A Research Blog</subtitle>
+      <title>Windows On Theory</title>
+      <updated>2018-12-20T21:20:36Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
     <id>http://cstheory-jobs.org/2018/12/19/goldstine-postdoctoral-fellow-at-ibm-t-j-watson-research-center-apply-by-january-31-2019/</id>
     <link href="https://cstheory-jobs.org/2018/12/19/goldstine-postdoctoral-fellow-at-ibm-t-j-watson-research-center-apply-by-january-31-2019/" rel="alternate" type="text/html"/>
     <title>Goldstine Postdoctoral Fellow at IBM T.J. Watson Research Center (apply by January 31, 2019)</title>
@@ -641,7 +806,7 @@ Email: gldpost2@us.ibm.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-20T20:21:05Z</updated>
+      <updated>2018-12-20T21:21:06Z</updated>
     </source>
   </entry>
 
@@ -700,7 +865,7 @@ Email: gldpost2@us.ibm.com</p></div>
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2018-12-20T20:21:12Z</updated>
+      <updated>2018-12-20T21:21:12Z</updated>
     </source>
   </entry>
 
@@ -1158,6 +1323,8 @@ such that <img alt="|p(x)| \leq 1" class="latex" src="https://s0.wp.com/latex.ph
     <updated>2018-12-18T18:01:43Z</updated>
     <published>2018-12-18T18:01:43Z</published>
     <category term="physics"/>
+    <category term="cs229r"/>
+    <category term="quantum hamiltonian complexity"/>
     <author>
       <name>prayaagvenkat</name>
     </author>
@@ -1170,7 +1337,7 @@ such that <img alt="|p(x)| \leq 1" class="latex" src="https://s0.wp.com/latex.ph
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-20T20:20:36Z</updated>
+      <updated>2018-12-20T21:20:37Z</updated>
     </source>
   </entry>
 
@@ -1201,7 +1368,7 @@ Email: lreyzin@uic.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-20T20:21:05Z</updated>
+      <updated>2018-12-20T21:21:05Z</updated>
     </source>
   </entry>
 
@@ -1232,7 +1399,7 @@ Email: slovett@ucsd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-20T20:21:05Z</updated>
+      <updated>2018-12-20T21:21:05Z</updated>
     </source>
   </entry>
 
@@ -1263,7 +1430,7 @@ Email: slovett@ucsd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-20T20:21:05Z</updated>
+      <updated>2018-12-20T21:21:06Z</updated>
     </source>
   </entry>
 
@@ -2014,7 +2181,7 @@ Email: slovett@ucsd.edu</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-20T20:20:33Z</updated>
+      <updated>2018-12-20T21:20:34Z</updated>
     </source>
   </entry>
 
@@ -2162,7 +2329,7 @@ We don’t think the photo used by this online Alchetron <a href="https://alchet
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2018-12-20T20:22:04Z</updated>
+      <updated>2018-12-20T21:21:43Z</updated>
     </source>
   </entry>
 
@@ -2193,7 +2360,7 @@ Email: jschmidt@cs.duke.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-20T20:21:05Z</updated>
+      <updated>2018-12-20T21:21:06Z</updated>
     </source>
   </entry>
 
@@ -2225,7 +2392,7 @@ Email: sergeg@cse.unsw.edu.au</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-20T20:21:05Z</updated>
+      <updated>2018-12-20T21:21:06Z</updated>
     </source>
   </entry>
 
@@ -2347,7 +2514,7 @@ The diagram also shows the nature of the expected assortment of the solutions of
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-20T20:20:33Z</updated>
+      <updated>2018-12-20T21:20:35Z</updated>
     </source>
   </entry>
 
@@ -2379,7 +2546,7 @@ Email: meel@comp.nus.edu.sg</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-20T20:21:04Z</updated>
+      <updated>2018-12-20T21:21:05Z</updated>
     </source>
   </entry>
 
@@ -2409,7 +2576,7 @@ Gusfield (1980) and Dean (2009) showed that the number of break points for an $n
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-20T20:22:15Z</updated>
+      <updated>2018-12-20T21:21:55Z</updated>
     </source>
   </entry>
 
@@ -2468,7 +2635,7 @@ Milena Mihail and Umesh Vazirani</span></strong></p>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2018-12-20T20:21:03Z</updated>
+      <updated>2018-12-20T21:21:04Z</updated>
     </source>
   </entry>
 
@@ -2559,7 +2726,7 @@ Email: marek@cs.ucr.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-20T20:21:05Z</updated>
+      <updated>2018-12-20T21:21:06Z</updated>
     </source>
   </entry>
 
@@ -2644,7 +2811,7 @@ I like this proof quite a bit. Can this argument be used to prove the basic fact
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2018-12-20T20:22:03Z</updated>
+      <updated>2018-12-20T21:21:42Z</updated>
     </source>
   </entry>
 
@@ -2686,7 +2853,7 @@ At the heart of all our proofs is the construction of a dense bipartite graph wi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-20T20:22:15Z</updated>
+      <updated>2018-12-20T21:21:55Z</updated>
     </source>
   </entry>
 
@@ -2724,7 +2891,7 @@ this context.
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-20T20:22:15Z</updated>
+      <updated>2018-12-20T21:21:55Z</updated>
     </source>
   </entry>
 
@@ -3047,7 +3214,7 @@ Recall that, up to regularization, the capacity of a quantum channel is given by
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-20T20:20:38Z</updated>
+      <updated>2018-12-20T21:20:39Z</updated>
     </source>
   </entry>
 
@@ -3078,7 +3245,7 @@ Email: raphael.clifford@bristol.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-20T20:21:04Z</updated>
+      <updated>2018-12-20T21:21:05Z</updated>
     </source>
   </entry>
 
@@ -3115,7 +3282,7 @@ Email: raphael.clifford@bristol.ac.uk</p></div>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2018-12-20T20:22:18Z</updated>
+      <updated>2018-12-20T21:21:58Z</updated>
     </source>
   </entry>
 
@@ -3145,7 +3312,7 @@ Email: raphael.clifford@bristol.ac.uk</p></div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>By Emanuele Viola</subtitle>
       <title>Thoughts</title>
-      <updated>2018-12-20T20:20:08Z</updated>
+      <updated>2018-12-20T21:20:09Z</updated>
     </source>
   </entry>
 
@@ -3177,7 +3344,7 @@ We also define new communication complexity classes that correspond to different
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-20T20:22:15Z</updated>
+      <updated>2018-12-20T21:21:55Z</updated>
     </source>
   </entry>
 
@@ -3551,7 +3718,7 @@ We also define new communication complexity classes that correspond to different
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2018-12-20T20:21:03Z</updated>
+      <updated>2018-12-20T21:21:04Z</updated>
     </source>
   </entry>
 
@@ -3585,7 +3752,7 @@ In all known constructions of probabilistic polynomials for the OR function (inc
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-20T20:22:16Z</updated>
+      <updated>2018-12-20T21:21:56Z</updated>
     </source>
   </entry>
 
@@ -3617,37 +3784,7 @@ Email: ilias.diakonikolas@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-20T20:21:05Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://emanueleviola.wordpress.com/?p=598</id>
-    <link href="https://emanueleviola.wordpress.com/2018/12/03/i-am-looking-for-students/" rel="alternate" type="text/html"/>
-    <title>I am looking for students</title>
-    <summary>If you are applying for a PhD in theoretical computer science, you may want to check out my homepage, to see what my team and I are up to, the theory group at Northeastern University, and where we stand in the rankings. (For a discussion of csrankings see this previous post.) If you think there […]
-      <div class="commentbar">
-        <p/>
-      </div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>If you are applying for a PhD in theoretical computer science, you may want to check out <a href="http://www.ccs.neu.edu/home/viola/">my homepage</a>, to see what my team and I are up to, <a href="https://www2.ccs.neu.edu/theory/index.html">the theory group at Northeastern University</a>, and <a href="http://csrankings.org/">where we stand in the rankings</a>. (For a discussion of csrankings see this <a href="https://emanueleviola.wordpress.com/2016/07/21/csrankings/">previous post</a>.) If you think there is a match write my name on the application.</p></div>
-    </content>
-    <updated>2018-12-03T22:24:01Z</updated>
-    <published>2018-12-03T22:24:01Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>Emanuele</name>
-    </author>
-    <source>
-      <id>https://emanueleviola.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://emanueleviola.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://emanueleviola.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://emanueleviola.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>By Emanuele Viola</subtitle>
-      <title>Thoughts</title>
-      <updated>2018-12-20T20:20:08Z</updated>
+      <updated>2018-12-20T21:21:06Z</updated>
     </source>
   </entry>
 </feed>
