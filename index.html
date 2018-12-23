@@ -129,7 +129,7 @@ Stay up to date
 <a href="http://learningwitherrors.org" title="Learning With Errors">Learning with Errors: Student Theory Blog</a>
 <br>
 <a class="feedlink" href="http://processalgebra.blogspot.com/feeds/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
-<a href="http://processalgebra.blogspot.com/" class="message" title="internal server error">Luca Aceto</a>
+<a href="http://processalgebra.blogspot.com/" class="message" title="403: forbidden">Luca Aceto</a>
 <br>
 <a class="feedlink" href="https://lucatrevisan.wordpress.com/feed/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="https://lucatrevisan.wordpress.com" title="in   theory">Luca Trevisan</a>
@@ -216,7 +216,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at December 23, 2018 05:22 PM UTC</span>.
+Last updated <span class="datestr">at December 23, 2018 06:21 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -224,6 +224,396 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://windowsontheory.org/?p=7021">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/wot.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://windowsontheory.org/2018/12/23/introduction-to-quantum-walks/">Introduction to Quantum Walks</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://windowsontheory.org" title="Windows On Theory">Windows on Theory</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<hr class="wp-block-separator" />
+
+
+
+<p>author: Beatrice Nash</p>
+
+
+
+<p>Abstract</p>
+
+
+
+<p>In this blog post, we give a broad overview of quantum walks and some quantum walks-based algorithms, including traversal of the glued trees graph, search, and element distinctness [3; 7; 1]. Quantum walks can be viewed as a model for quantum computation, providing an advantage over classical and other non-quantum walks based algorithms for certain applications.</p>
+
+
+
+<h1>Continuous time quantum walks</h1>
+
+
+
+<p>We begin our discussion of quantum walks by introducing the quantum analog of the continuous random walk. First, we review the behavior of the classical continuous random walk in order to develop the definition of the continuous quantum walk.</p>
+
+
+
+<p>Take a graph <img src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="G" class="latex" title="G" /> with vertices <img src="https://s0.wp.com/latex.php?latex=V&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="V" class="latex" title="V" /> and edges <img src="https://s0.wp.com/latex.php?latex=E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="E" class="latex" title="E" />. The adjacency matrix <img src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="A" class="latex" title="A" /> of <img src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="G" class="latex" title="G" /> is defined as follows:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=A_%7Bi%2Cj%7D+%3D+%5Cbegin%7Bcases%7D+1+%5Cquad+%26%5Ctext%7Bif+++%7D+%28i%2Cj%29+%5Cin+E+%5C%5C+0+%5Cquad+%26%5Ctext%7Botherwise%7D.+%5Cend%7Bcases%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="A_{i,j} = \begin{cases} 1 \quad &amp;\text{if   } (i,j) \in E \\ 0 \quad &amp;\text{otherwise}. \end{cases}" class="latex" title="A_{i,j} = \begin{cases} 1 \quad &amp;\text{if   } (i,j) \in E \\ 0 \quad &amp;\text{otherwise}. \end{cases}" /></p>
+
+
+
+<p>And the Laplacian <img src="https://s0.wp.com/latex.php?latex=L&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="L" class="latex" title="L" /> is given by:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=L_%7Bi%2Cj%7D+%3D+%5Cbegin%7Bcases%7D+-%5Ctext%7Bdegree%7D%28i%29+%5Cquad+%26%5Ctext%7Bif+++%7D++i+%3D+j+%5C%5C+1+%5Cquad+%26%5Ctext%7Bif+++%7D+%28i%2Cj%29+%5Cin+E+%5C%5C+0+%5Cquad+%26%5Ctext%7Botherwise%7D.+%5Cend%7Bcases%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="L_{i,j} = \begin{cases} -\text{degree}(i) \quad &amp;\text{if   }  i = j \\ 1 \quad &amp;\text{if   } (i,j) \in E \\ 0 \quad &amp;\text{otherwise}. \end{cases}" class="latex" title="L_{i,j} = \begin{cases} -\text{degree}(i) \quad &amp;\text{if   }  i = j \\ 1 \quad &amp;\text{if   } (i,j) \in E \\ 0 \quad &amp;\text{otherwise}. \end{cases}" /></p>
+
+
+
+<p>The Laplacian determines the behavior of the classical continuous random walk, which is described by a length <img src="https://s0.wp.com/latex.php?latex=%7CV%7C&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="|V|" class="latex" title="|V|" /> vector of probabilities, <strong>p</strong>(t). The <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i" class="latex" title="i" />th entry of <strong>p</strong>(t) represents the probability of being at vertex <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i" class="latex" title="i" /> at time <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t" class="latex" title="t" />. <strong>p</strong>(t) is given by the following differential equation:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+%5Cfrac%7B%5Ctext%7Bd%7D%7D%7B%5Ctext%7Bdt%7D%7D+%5Ctext%7Bp%7D%7Bi%7D%28%5Ctext%7Bt%7D%29+%3D+%5Cunderset%7B%28i%2Cj%29+%5Cin+E%7D%7B%5Csum%7D+L%7Bi%2Cj%7D+%5Ctext%7Bp%7D_%7Bj%7D%28%5Ctext%7Bt%7D%29%2C%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\begin{aligned} \frac{\text{d}}{\text{dt}} \text{p}{i}(\text{t}) = \underset{(i,j) \in E}{\sum} L{i,j} \text{p}_{j}(\text{t}),\end{aligned}" class="latex" title="\begin{aligned} \frac{\text{d}}{\text{dt}} \text{p}{i}(\text{t}) = \underset{(i,j) \in E}{\sum} L{i,j} \text{p}_{j}(\text{t}),\end{aligned}" /></p>
+
+
+
+<p>which gives the solution <img src="https://s0.wp.com/latex.php?latex=%5Ctextbf%7Bp%7D%28t%29+%3D+e%5E%7BLt%7D%5Ctextbf%7Bp%7D%280%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\textbf{p}(t) = e^{Lt}\textbf{p}(0)" class="latex" title="\textbf{p}(t) = e^{Lt}\textbf{p}(0)" />.</p>
+
+
+
+<p>Recalling the Schrödinger equation <img src="https://s0.wp.com/latex.php?latex=i+%5Cfrac%7B%5Ctext%7Bd%7D%7D%7B%5Ctext%7Bdt%7D%7D+%5Cleft%7C%5Cpsi%5Cright%3E%3D+H+%5Cleft%7C%5Cpsi%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i \frac{\text{d}}{\text{dt}} \left|\psi\right&gt;= H \left|\psi\right&gt;" class="latex" title="i \frac{\text{d}}{\text{dt}} \left|\psi\right&gt;= H \left|\psi\right&gt;" />, one can see that by inserting a factor of <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i" class="latex" title="i" /> on the left hand side of the equation for <strong>p</strong>(t) above, the Laplacian can be treated as a Hamiltonian. One can see that the Laplacian preserves the normalization of the state of the system. Then, the solution to the differential equation:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+i+%5Cfrac%7B%5Ctext%7Bd%7D%7D%7B%5Ctext%7Bdt%7D%7D+%5Cpsi_%7Bi%7D%28%5Ctext%7Bt%7D%29+%3D+%5Cunderset%7B%28i%2Cj%29+%5Cin+E%7D%7B%5Csum%7D+L_%7Bi%2Cj%7D+%5Cpsi_%7Bj%7D%28%5Ctext%7Bt%7D%29%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\begin{aligned} i \frac{\text{d}}{\text{dt}} \psi_{i}(\text{t}) = \underset{(i,j) \in E}{\sum} L_{i,j} \psi_{j}(\text{t})\end{aligned}" class="latex" title="\begin{aligned} i \frac{\text{d}}{\text{dt}} \psi_{i}(\text{t}) = \underset{(i,j) \in E}{\sum} L_{i,j} \psi_{j}(\text{t})\end{aligned}" />,</p>
+
+
+
+<p>which is <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7C%5Cpsi%28t%29%5Cright%3E+%3D+e%5E%7B-iLt%7D+%5Cleft%7C%5Cpsi%280%29%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|\psi(t)\right&gt; = e^{-iLt} \left|\psi(0)\right&gt;" class="latex" title="\left|\psi(t)\right&gt; = e^{-iLt} \left|\psi(0)\right&gt;" />, determines the behavior of the quantum analog of the continuous random walk defined previously. A general quantum walk does not necessarily have to be defined by the Laplacian; it can be defined by any operator which “respects the structure of the graph,” that is, only allows transitions to between neighboring vertices in the graph or remain stationary [7]. To get a sense of how the behavior of the quantum walk differs from the classical one, we first discuss the example of the continuous time quantum walk on the line, before moving on to the discrete case.</p>
+
+
+
+<h2>Continuous time quantum walk on the line</h2>
+
+
+
+<p>An important example of the continuous time quantum walk is that defined on the infinite line. The eigenstates of the Laplacian operator for the graph representing the infinite line are the momentum states with eigenvalues <img src="https://s0.wp.com/latex.php?latex=2%28%5Ctext%7Bcos%7D%28p%29+-+1%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="2(\text{cos}(p) - 1)" class="latex" title="2(\text{cos}(p) - 1)" />, for <img src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="p" class="latex" title="p" /> in range <img src="https://s0.wp.com/latex.php?latex=%5B-%5Cpi%2C%5Cpi%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="[-\pi,\pi]" class="latex" title="[-\pi,\pi]" />. This can be seen by representing the momentum states in terms of the position states and applying the Laplacian operator:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+%5Cleft%7Cp%5Cright%3E+%26%3D+%5Cunderset%7Bx%7D%7B%5Csum%7D+e%5E%7Bipx%7D+%5Cleft%7Cx%5Cright%3E+%5C%5C+L%5Cleft%7Cp%5Cright%3E+%26%3D+%5Cunderset%7Bx%7D%7B%5Csum%7D+e%5E%7Bipx%7D+%5Cleft%7Cx%2B1%5Cright%3E%2B+e%5E%7Bipx%7D+%5Cleft%7Cx-1%5Cright%3E+-+2e%5E%7Bipx%7D+%5Cleft%7Cx%5Cright%3E+%5C%5C+%26%3D+%5Cunderset%7Bx%7D%7B%5Csum%7D+%28e%5E%7Bip%7D+%2B+e%5E%7B-ip%7D+-+2%29+e%5E%7Bipx%7D+%5Cleft%7Cx%5Cright%3E+%5C%5C+%26%3D+2%28%5Ctext%7Bcos%7D%28p%29+-+1%29+%5Cleft%7Cp%5Cright%3E.%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\begin{aligned} \left|p\right&gt; &amp;= \underset{x}{\sum} e^{ipx} \left|x\right&gt; \\ L\left|p\right&gt; &amp;= \underset{x}{\sum} e^{ipx} \left|x+1\right&gt;+ e^{ipx} \left|x-1\right&gt; - 2e^{ipx} \left|x\right&gt; \\ &amp;= \underset{x}{\sum} (e^{ip} + e^{-ip} - 2) e^{ipx} \left|x\right&gt; \\ &amp;= 2(\text{cos}(p) - 1) \left|p\right&gt;.\end{aligned}" class="latex" title="\begin{aligned} \left|p\right&gt; &amp;= \underset{x}{\sum} e^{ipx} \left|x\right&gt; \\ L\left|p\right&gt; &amp;= \underset{x}{\sum} e^{ipx} \left|x+1\right&gt;+ e^{ipx} \left|x-1\right&gt; - 2e^{ipx} \left|x\right&gt; \\ &amp;= \underset{x}{\sum} (e^{ip} + e^{-ip} - 2) e^{ipx} \left|x\right&gt; \\ &amp;= 2(\text{cos}(p) - 1) \left|p\right&gt;.\end{aligned}" /></p>
+
+
+
+<p>Hence the probability distribution at time <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t" class="latex" title="t" />, <img src="https://s0.wp.com/latex.php?latex=p%28x%2Ct%29+%3D+%7C%5Cleft%3C+x%5Cright%7C+e%5E%7B-iLt%7D+%5Cleft%7C%5Cpsi%280%29%5Cright%3E+%7C+%5E%7B2%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="p(x,t) = |\left&lt; x\right| e^{-iLt} \left|\psi(0)\right&gt; | ^{2}" class="latex" title="p(x,t) = |\left&lt; x\right| e^{-iLt} \left|\psi(0)\right&gt; | ^{2}" />, with initial position <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7C%5Cpsi%280%29%5Cright%3E+%3D+%5Cleft%7C0%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|\psi(0)\right&gt; = \left|0\right&gt;" class="latex" title="\left|\psi(0)\right&gt; = \left|0\right&gt;" /> is given by:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+%7C%5Cleft%3C+x%5Cright%7C+e%5E%7B-iLt%7D+%5Cleft%7C0%5Cright%3E+%7C+%5E%7B2%7D+%26%3D++%5Cbigg%7C+%5Cfrac%7B1%7D%7B2%5Cpi%7D+%5Cint_%7B-%5Cpi%7D%5E%7B%5Cpi%7D+e%5E%7B-2it%28%5Ctext%7Bcos%7Dp+-+1%29%7D+%5Cleft%3C+x%7Cp%5Cright%3E+%5Ctext%7Bd%7Dp+%5Cbigg%7C%5E%7B2%7D+%5C%5C+%26%3D+%5Cbigg%7C+%5Cfrac%7B1%7D%7B2%5Cpi%7D+%5Cint_%7B-%5Cpi%7D%5E%7B%5Cpi%7D+e%5E%7B-2it%28%5Ctext%7Bcos%7Dp+-+1%29%7D+e%5E%7Bipx%7D+%5Ctext%7Bd%7Dp+%5Cbigg%7C%5E%7B2%7D+%5C%5C+%26%3D+%7C+J_%7Bx%7D%282t%29+%7C%5E%7B2%7D.%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\begin{aligned} |\left&lt; x\right| e^{-iLt} \left|0\right&gt; | ^{2} &amp;=  \bigg| \frac{1}{2\pi} \int_{-\pi}^{\pi} e^{-2it(\text{cos}p - 1)} \left&lt; x|p\right&gt; \text{d}p \bigg|^{2} \\ &amp;= \bigg| \frac{1}{2\pi} \int_{-\pi}^{\pi} e^{-2it(\text{cos}p - 1)} e^{ipx} \text{d}p \bigg|^{2} \\ &amp;= | J_{x}(2t) |^{2}.\end{aligned}" class="latex" title="\begin{aligned} |\left&lt; x\right| e^{-iLt} \left|0\right&gt; | ^{2} &amp;=  \bigg| \frac{1}{2\pi} \int_{-\pi}^{\pi} e^{-2it(\text{cos}p - 1)} \left&lt; x|p\right&gt; \text{d}p \bigg|^{2} \\ &amp;= \bigg| \frac{1}{2\pi} \int_{-\pi}^{\pi} e^{-2it(\text{cos}p - 1)} e^{ipx} \text{d}p \bigg|^{2} \\ &amp;= | J_{x}(2t) |^{2}.\end{aligned}" /></p>
+
+
+
+<figure class="wp-block-image is-resized"><img src="https://windowsontheory.files.wordpress.com/2018/12/quantum-1.png?w=451" alt="" class="wp-image-7071" width="451" />Figure 1.a) Probability distribution for continuous time quantum walk on the infinite line at time <img src="https://s0.wp.com/latex.php?latex=t+%3D+80&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t = 80" class="latex" title="t = 80" />.</figure>
+
+
+
+<figure class="wp-block-image is-resized"><img src="https://windowsontheory.files.wordpress.com/2018/12/classical-1.png?w=451&amp;h=300" alt="" height="300" class="wp-image-7073" width="451" /><br />Figure 1.b) Approximate probability<br /> distribution of the continuous time random walk on the infinite line at<br /> time <img src="https://s0.wp.com/latex.php?latex=t%3D30&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t=30" class="latex" title="t=30" />.<br /></figure>
+
+
+
+<p>While the probability distribution for the classical continuous time<br /> random walk on the same graph approaches, for large <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t" class="latex" title="t" />, <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7B%5Csqrt%7B4%5Cpi+t%7D%7D+e%5E%7B%5Cfrac%7B-x%5E%7B2%7D%7D%7B4t%7D%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\frac{1}{\sqrt{4\pi t}} e^{\frac{-x^{2}}{4t}}" class="latex" title="\frac{1}{\sqrt{4\pi t}} e^{\frac{-x^{2}}{4t}}" />, or a Gaussian of width <img src="https://s0.wp.com/latex.php?latex=2%5Csqrt%7Bt%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="2\sqrt{t}" class="latex" title="2\sqrt{t}" />. One can see that the quantum walk has its largest peaks at the extrema, with oscillations in between that decrease in amplitude as one approaches the starting position at <img src="https://s0.wp.com/latex.php?latex=x%3D0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x=0" class="latex" title="x=0" />. This is due to the destructive interference between states of different phases that does not occur in the classical case. The probability distribution of the classical walk, on the other hand, has no oscillations and instead a single peak centered at <img src="https://s0.wp.com/latex.php?latex=x%3D0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x=0" class="latex" title="x=0" />, which widens and flattens as <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t" class="latex" title="t" /> increases.</p>
+
+
+
+<h2>Walk on the glued trees graph</h2>
+
+
+
+<p>A <em>glued tree</em> is a graph obtained by taking two binary trees of equal height and connecting each of the leaves of one of the trees to exactly two leaves of the other tree so that each node that was a leaf in one of the original trees now has degree exactly <img src="https://s0.wp.com/latex.php?latex=3&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="3" class="latex" title="3" />. An example of such a graph is shown in Figure 2.</p>
+
+
+
+<figure class="wp-block-image"><img src="https://windowsontheory.files.wordpress.com/2018/12/glued-1.png?w=1024" alt="" class="wp-image-7077" />Figure 2: An example of a glued tree graph, from [2].</figure>
+
+
+
+<p>The time for the quantum walk on this graph to reach the right root from the left one is exponentially faster than in the classical case. Consider the classical random walk on this graph. While in the left tree, the probability of transitioning to a node in the level one to the right is twice that of transitioning to a node in the level one to the left. However, while in the right tree, the opposite is true. Therefore, one can see that in the middle of the graph, the walk will get lost, as, locally, there is no way to determine which node is part of which tree. It will instead get stuck in the cycles of identical nodes and will have exponentially small probability of reaching the right node.</p>
+
+
+
+<p>To construct a continuous time quantum walk on this graph, we consider the graph in terms of <em>columns</em>. One can visualize the columns of Figure 2 as consisting of all the nodes equidistant from the entrance and exit nodes. If each tree is height <img src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n" class="latex" title="n" />, then we label the columns <img src="https://s0.wp.com/latex.php?latex=0%2C1%2C%5Ctext%7B...%7D%2C2n%2C2n%2B1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="0,1,\text{...},2n,2n+1" class="latex" title="0,1,\text{...},2n,2n+1" />, where column <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i" class="latex" title="i" /> contains the nodes with shortest path of length <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i" class="latex" title="i" /> from the leftmost root node. We describe the state of each column as a superposition of the states of each node in that column. The number of nodes in column <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i" class="latex" title="i" />, <img src="https://s0.wp.com/latex.php?latex=N_%7Bi%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="N_{i}" class="latex" title="N_{i}" />, will be <img src="https://s0.wp.com/latex.php?latex=2%5E%7Bi%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="2^{i}" class="latex" title="2^{i}" /> for <img src="https://s0.wp.com/latex.php?latex=i+%5Cin+%5B0%2Cn%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i \in [0,n]" class="latex" title="i \in [0,n]" /> and <img src="https://s0.wp.com/latex.php?latex=2%5E%7B2n%2B1-i%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="2^{2n+1-i}" class="latex" title="2^{2n+1-i}" /> for <img src="https://s0.wp.com/latex.php?latex=i+%5Cin+%5Bn%2B1%2C2n%2B1%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i \in [n+1,2n+1]" class="latex" title="i \in [n+1,2n+1]" />. Then, we can define the state <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7C%5Ctext%7Bcol%7D+%5C%3B+i%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|\text{col} \; i\right&gt;" class="latex" title="\left|\text{col} \; i\right&gt;" /> as:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+%5Cleft%7C%5Ctext%7Bcol%7D+%5C%3B+i%5Cright%3E+%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7BN_%7Bi%7D%7D%7D+%5Cunderset%7Bj+%5Cin+%5Ctext%7Bcol%7D+%5C%3B+i%7D%7B%5Csum%7D+%5Cleft%7Cj%5Cright%3E.%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\begin{aligned} \left|\text{col} \; i\right&gt; = \frac{1}{\sqrt{N_{i}}} \underset{j \in \text{col} \; i}{\sum} \left|j\right&gt;.\end{aligned}" class="latex" title="\begin{aligned} \left|\text{col} \; i\right&gt; = \frac{1}{\sqrt{N_{i}}} \underset{j \in \text{col} \; i}{\sum} \left|j\right&gt;.\end{aligned}" /></p>
+
+
+
+<p>The factor of <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7B%5Csqrt%7BN_%7Bi%7D%7D%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\frac{1}{\sqrt{N_{i}}} " class="latex" title="\frac{1}{\sqrt{N_{i}}} " />latex  ensures that the state is normalized. Since the adjacency matrix <img src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="A" class="latex" title="A" /> of the glued tree is Hermitian, then we can treat <img src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="A" class="latex" title="A" /> as the Hamiltonian of the system determining the behavior of the quantum walk. By acting on this state with the adjacency matrix operator <img src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="A" class="latex" title="A" />, we get the result (for <img src="https://s0.wp.com/latex.php?latex=i+%5Cin+%5B1%2Cn-1%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i \in [1,n-1]" class="latex" title="i \in [1,n-1]" />):</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+A%5Cleft%7C%5Ctext%7Bcol%7D+%5C%3B+i%5Cright%3E++%26%3D+2%5Cfrac%7B%5Csqrt%7BN_%7Bi-1%7D%7D%7D%7B%5Csqrt%7BN_%7Bi%7D%7D%7D+%5Cleft%7C%5Ctext%7Bcol%7D+%5C%3B+i-1%5Cright%3E+%2B+%5Cfrac%7B%5Csqrt%7BN_%7Bi%2B1%7D%7D%7D%7B%5Csqrt%7BN_%7Bi%7D%7D%7D+%5Cleft%7C%5Ctext%7Bcol%7D+%5C%3B+i%2B1%5Cright%3E+%5C%5C+%26%3D+%5Csqrt%7B2%7D+%5Cleft%7C%5Ctext%7Bcol%7D+%5C%3B+i-1%5Cright%3E+%2B+%5Csqrt%7B2%7D+%5Cleft%7C%5Ctext%7Bcol%7D+%5C%3B+i%2B1%5Cright%3E.%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\begin{aligned} A\left|\text{col} \; i\right&gt;  &amp;= 2\frac{\sqrt{N_{i-1}}}{\sqrt{N_{i}}} \left|\text{col} \; i-1\right&gt; + \frac{\sqrt{N_{i+1}}}{\sqrt{N_{i}}} \left|\text{col} \; i+1\right&gt; \\ &amp;= \sqrt{2} \left|\text{col} \; i-1\right&gt; + \sqrt{2} \left|\text{col} \; i+1\right&gt;.\end{aligned}" class="latex" title="\begin{aligned} A\left|\text{col} \; i\right&gt;  &amp;= 2\frac{\sqrt{N_{i-1}}}{\sqrt{N_{i}}} \left|\text{col} \; i-1\right&gt; + \frac{\sqrt{N_{i+1}}}{\sqrt{N_{i}}} \left|\text{col} \; i+1\right&gt; \\ &amp;= \sqrt{2} \left|\text{col} \; i-1\right&gt; + \sqrt{2} \left|\text{col} \; i+1\right&gt;.\end{aligned}" /><br /></p>
+
+
+
+<p>Then for <img src="https://s0.wp.com/latex.php?latex=i+%5Cin+%5Bn%2B2%2C2n%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i \in [n+2,2n]" class="latex" title="i \in [n+2,2n]" />, we get the same result, because of symmetry.<br /></p>
+
+
+
+<p>For <img src="https://s0.wp.com/latex.php?latex=i+%3D+n&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i = n" class="latex" title="i = n" />:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+A%5Cleft%7C%5Ctext%7Bcol%7D+%5C%3B+n%5Cright%3E+%3D+%5Csqrt%7B2%7D+%5Cleft%7C%5Ctext%7Bcol%7D+%5C%3Bn-1%5Cright%3E+%2B+2+%5Cleft%7C%5Ctext%7Bcol%7D+%5C%3B+n%5Cright%3E.%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\begin{aligned} A\left|\text{col} \; n\right&gt; = \sqrt{2} \left|\text{col} \;n-1\right&gt; + 2 \left|\text{col} \; n\right&gt;.\end{aligned}" class="latex" title="\begin{aligned} A\left|\text{col} \; n\right&gt; = \sqrt{2} \left|\text{col} \;n-1\right&gt; + 2 \left|\text{col} \; n\right&gt;.\end{aligned}" /></p>
+
+
+
+<p>The case of <img src="https://s0.wp.com/latex.php?latex=i+%3D+n%2B1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i = n+1" class="latex" title="i = n+1" /> is symmetric. One can see that the walk on this graph is equivalent to the quantum walk on the finite line with nodes corresponding to the columns. All of the edges, excluding that between columns <img src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n" class="latex" title="n" /> and <img src="https://s0.wp.com/latex.php?latex=n%2B1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n+1" class="latex" title="n+1" />, have weight <img src="https://s0.wp.com/latex.php?latex=%5Csqrt%7B2%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\sqrt{2}" class="latex" title="\sqrt{2}" />. The edge between column <img src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n" class="latex" title="n" /> and <img src="https://s0.wp.com/latex.php?latex=n%2B1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n+1" class="latex" title="n+1" /> has weight <img src="https://s0.wp.com/latex.php?latex=2&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="2" class="latex" title="2" />.</p>
+
+
+
+<p>The probability distribution of the quantum walk on this line can be roughly approximated using the infinite line. In the case of the infinite line, the probability distribution can be seen as a wave propagating with speed linear in the time <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t" class="latex" title="t" />. Thus, in time linear in <img src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n" class="latex" title="n" />, the probability that the state is measured at distance <img src="https://s0.wp.com/latex.php?latex=2n%2B1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="2n+1" class="latex" title="2n+1" /> from the starting state is <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7B%5Ctext%7Bpoly%7D+%5C%3B+n%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\frac{1}{\text{poly} \; n}" class="latex" title="\frac{1}{\text{poly} \; n}" />. In [3] it is shown that the fact that the line is finite and has a single differently weighted edge from the others (that between <img src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n" class="latex" title="n" /> and <img src="https://s0.wp.com/latex.php?latex=n%2B1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n+1" class="latex" title="n+1" />) does not change the fact that in polynomial time, the quantum walk will travel from the left root node to the right one, although in this case there is no limiting distribution as the peaks oscillate. This was the first result that gives an exponential speed up over the classical case using quantum walks.</p>
+
+
+
+<figure class="wp-block-image is-resized"><img src="https://windowsontheory.files.wordpress.com/2018/12/glued-tree-1.png?w=451&amp;h=291" alt="" height="291" class="wp-image-7082" width="451" />Figure 3: Although the quantum walk on the glued trees graph does not have a limiting distribution, this is an example of the resulting probability distribution at time <img src="https://s0.wp.com/latex.php?latex=t%3D30&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t=30" class="latex" title="t=30" /> for a <img src="https://s0.wp.com/latex.php?latex=n%3D4&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n=4" class="latex" title="n=4" /> column glued tree graph.  The x-axis corresponds to the columns.  One can see that the probability of being at the columns at either extremes is significantly larger than that of being in the middle of the graph. In contrast, the classical random walk takes exponential time to ever reach the exit root node.</figure>
+
+
+
+<h1>Discrete time quantum walks</h1>
+
+
+
+<p>In this section, we will first give an introduction to the discrete quantum walk, including the discrete quantum walk on the line and the Markov chain quantum walk, as defined in [7]. Next, we discuss how Grover search can be viewed as a quantum walk algorithm, which leads us into Ambainis’s quantum-walks based algorithm from [1] for the element distinctness problem, which gives a speed up over classical and other quantum non-walks based algorithms.</p>
+
+
+
+<p>The discrete time quantum walk is defined by two operators: the <em>coin flip</em> operator, and the <em>shift</em> operator. The coin flip operator <img src="https://s0.wp.com/latex.php?latex=C&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="C" class="latex" title="C" /> determines the direction of the walk, while the shift operator <img src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="S" class="latex" title="S" /> makes the transition to the new state conditioned on the result of the coin flip. The Hilbert space governing the walk is <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D+%3D+%5Cmathcal%7BH%7D%7BC%7D+%5Cotimes+%5Cmathcal%7BH%7D%7BS%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\mathcal{H} = \mathcal{H}{C} \otimes \mathcal{H}{S}" class="latex" title="\mathcal{H} = \mathcal{H}{C} \otimes \mathcal{H}{S}" />, where <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D%7BC%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\mathcal{H}{C}" class="latex" title="\mathcal{H}{C}" /> corresponds to the space associated with the result of the coin flip operator, and <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D%7BS%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\mathcal{H}{S}" class="latex" title="\mathcal{H}{S}" /> corresponds to the locations in the graph on which the walk is defined.</p>
+
+
+
+<p>For example, consider the discrete time walk on the infinite line. Since there are two possible directions (left or right), then the Hilbert space associated with the coin flip operator is two dimensional. In the unbiased case, the coin flip is the Hadamard operator,</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+H+%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7B2%7D%7D+%5Cbegin%7Bbmatrix%7D+1+%26+1+%5C%5C+1+%26+-1++%5Cend%7Bbmatrix%7D%2C%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\begin{aligned} H = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 &amp; 1 \\ 1 &amp; -1  \end{bmatrix},\end{aligned}" class="latex" title="\begin{aligned} H = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 &amp; 1 \\ 1 &amp; -1  \end{bmatrix},\end{aligned}" /></p>
+
+
+
+<p>and shift operator that produces the transition from state <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7Cj%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|j\right&gt;" class="latex" title="\left|j\right&gt;" /> to <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7Cj%2B1%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|j+1\right&gt;" class="latex" title="\left|j+1\right&gt;" /> or <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7Cj-1%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|j-1\right&gt;" class="latex" title="\left|j-1\right&gt;" />,<br /> conditioned on the result of the coin flip, is <img src="https://s0.wp.com/latex.php?latex=S+%3D+%5Cleft%7C0%5Cright%3E%5Cleft%3C+0%5Cright%7C+%5Cotimes+%5Cunderset%7Bj%7D%7B%5Csum%7D+%5Cleft%7Cj%2B1%5Cright%3E+%5Cleft%3C+j%5Cright%7C+%2B+%5Cleft%7C1%5Cright%3E%5Cleft%3C+1%5Cright%7C+%5Cotimes+%5Cunderset%7Bj%7D%7B%5Csum%7D+%5Cleft%7Cj+-+1%5Cright%3E+%5Cleft%3C+j%5Cright%7C&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="S = \left|0\right&gt;\left&lt; 0\right| \otimes \underset{j}{\sum} \left|j+1\right&gt; \left&lt; j\right| + \left|1\right&gt;\left&lt; 1\right| \otimes \underset{j}{\sum} \left|j - 1\right&gt; \left&lt; j\right|" class="latex" title="S = \left|0\right&gt;\left&lt; 0\right| \otimes \underset{j}{\sum} \left|j+1\right&gt; \left&lt; j\right| + \left|1\right&gt;\left&lt; 1\right| \otimes \underset{j}{\sum} \left|j - 1\right&gt; \left&lt; j\right|" />.</p>
+
+
+
+<p>Each step of the walk is determined by an application of the unitary<br /> operator <img src="https://s0.wp.com/latex.php?latex=U+%3D+S+%5Ccdot+%28H+%5Cotimes+I%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="U = S \cdot (H \otimes I)" class="latex" title="U = S \cdot (H \otimes I)" />. If the walk starts at position<br /> <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7Cx%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|x\right&gt;" class="latex" title="\left|x\right&gt;" />, then measuring the state after one application of <img src="https://s0.wp.com/latex.php?latex=U&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="U" class="latex" title="U" /> gives <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7Cx%2B1%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|x+1\right&gt;" class="latex" title="\left|x+1\right&gt;" /> with probability <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7B2%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\frac{1}{2}" class="latex" title="\frac{1}{2}" /> and <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7Cx-1%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|x-1\right&gt;" class="latex" title="\left|x-1\right&gt;" /> with probability <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7B2%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\frac{1}{2}" class="latex" title="\frac{1}{2}" />. This is exactly the same as the case of the classical random walk on the infinite line; the difference between the two walks becomes apparent after a few steps.</p>
+
+
+
+<p>For example, the result of the walk starting at state <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7C%5Cpsi%280%29%5Cright%3E+%3D+%5Cleft%7C0%5Cright%3E%5Cleft%7C0%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|\psi(0)\right&gt; = \left|0\right&gt;\left|0\right&gt;" class="latex" title="\left|\psi(0)\right&gt; = \left|0\right&gt;\left|0\right&gt;" /> after 4 steps gives:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+%5Cleft%7C%5Cpsi%281%29%5Cright%3E+%26%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7B2%7D%7D%5Cleft%28+%5Cleft%7C0%5Cright%3E%5Cleft%7C1%5Cright%3E+%2B+%5Cleft%7C1%5Cright%3E%5Cleft%7C-1%5Cright%3E+%5Cright%29+%5C%5C+%5Cleft%7C%5Cpsi%282%29%5Cright%3E+%26%3D+%5Cfrac%7B1%7D%7B2%7D%5Cleft%28+%5Cleft%7C0%5Cright%3E%5Cleft%7C2%5Cright%3E+%2B+%5Cleft%7C1%5Cright%3E%5Cleft%7C0%5Cright%3E+%2B+%5Cleft%7C0%5Cright%3E%5Cleft%7C0%5Cright%3E+-+%5Cleft%7C1%5Cright%3E%5Cleft%7C-2%5Cright%3E+%5Cright%29+%5C%5C+%5Cleft%7C%5Cpsi%283%29%5Cright%3E+%26%3D+%5Cfrac%7B1%7D%7B2%5Csqrt%7B2%7D%7D%5Cleft%28%5Cleft%7C0%5Cright%3E%5Cleft%7C3%5Cright%3E+%2B+%5Cleft%7C1%5Cright%3E%5Cleft%7C1%5Cright%3E+%2B+2%5Cleft%7C0%5Cright%3E%5Cleft%7C1%5Cright%3E+-%5Cleft%7C0%5Cright%3E%5Cleft%7C-1%5Cright%3E+%2B+%5Cleft%7C1%5Cright%3E%5Cleft%7C-3%5Cright%3E+%5Cright%29+%5C%5C+%5Cleft%7C%5Cpsi%284%29%5Cright%3E+%26%3D++%5Cfrac%7B1%7D%7B4%7D+%28%5Cleft%7C0%5Cright%3E%5Cleft%7C4%5Cright%3E+%2B+%5Cleft%7C1%5Cright%3E%5Cleft%7C2%5Cright%3E+%2B+3%5Cleft%7C0%5Cright%3E%5Cleft%7C2%5Cright%3E+%2B+%5Cleft%7C1%5Cright%3E%5Cleft%7C0%5Cright%3E+-%5Cleft%7C0%5Cright%3E%5Cleft%7C0%5Cright%3E+-%5Cleft%7C1%5Cright%3E%5Cleft%7C-2%5Cright%3E+%2B%5Cleft%7C0%5Cright%3E%5Cleft%7C-2%5Cright%3E-%5Cleft%7C1%5Cright%3E%5Cleft%7C-4%5Cright%3E%29.%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\begin{aligned} \left|\psi(1)\right&gt; &amp;= \frac{1}{\sqrt{2}}\left( \left|0\right&gt;\left|1\right&gt; + \left|1\right&gt;\left|-1\right&gt; \right) \\ \left|\psi(2)\right&gt; &amp;= \frac{1}{2}\left( \left|0\right&gt;\left|2\right&gt; + \left|1\right&gt;\left|0\right&gt; + \left|0\right&gt;\left|0\right&gt; - \left|1\right&gt;\left|-2\right&gt; \right) \\ \left|\psi(3)\right&gt; &amp;= \frac{1}{2\sqrt{2}}\left(\left|0\right&gt;\left|3\right&gt; + \left|1\right&gt;\left|1\right&gt; + 2\left|0\right&gt;\left|1\right&gt; -\left|0\right&gt;\left|-1\right&gt; + \left|1\right&gt;\left|-3\right&gt; \right) \\ \left|\psi(4)\right&gt; &amp;=  \frac{1}{4} (\left|0\right&gt;\left|4\right&gt; + \left|1\right&gt;\left|2\right&gt; + 3\left|0\right&gt;\left|2\right&gt; + \left|1\right&gt;\left|0\right&gt; -\left|0\right&gt;\left|0\right&gt; -\left|1\right&gt;\left|-2\right&gt; +\left|0\right&gt;\left|-2\right&gt;-\left|1\right&gt;\left|-4\right&gt;).\end{aligned}" class="latex" title="\begin{aligned} \left|\psi(1)\right&gt; &amp;= \frac{1}{\sqrt{2}}\left( \left|0\right&gt;\left|1\right&gt; + \left|1\right&gt;\left|-1\right&gt; \right) \\ \left|\psi(2)\right&gt; &amp;= \frac{1}{2}\left( \left|0\right&gt;\left|2\right&gt; + \left|1\right&gt;\left|0\right&gt; + \left|0\right&gt;\left|0\right&gt; - \left|1\right&gt;\left|-2\right&gt; \right) \\ \left|\psi(3)\right&gt; &amp;= \frac{1}{2\sqrt{2}}\left(\left|0\right&gt;\left|3\right&gt; + \left|1\right&gt;\left|1\right&gt; + 2\left|0\right&gt;\left|1\right&gt; -\left|0\right&gt;\left|-1\right&gt; + \left|1\right&gt;\left|-3\right&gt; \right) \\ \left|\psi(4)\right&gt; &amp;=  \frac{1}{4} (\left|0\right&gt;\left|4\right&gt; + \left|1\right&gt;\left|2\right&gt; + 3\left|0\right&gt;\left|2\right&gt; + \left|1\right&gt;\left|0\right&gt; -\left|0\right&gt;\left|0\right&gt; -\left|1\right&gt;\left|-2\right&gt; +\left|0\right&gt;\left|-2\right&gt;-\left|1\right&gt;\left|-4\right&gt;).\end{aligned}" /></p>
+
+
+
+<p>One can see that the distribution is becoming increasingly skewed<br /> towards the right, while in the classical case the distribution will be<br /> symmetric around the starting position. This is due to the destructive<br /> interference discussed earlier. The distribution after <img src="https://s0.wp.com/latex.php?latex=t+%3D+20&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t = 20" class="latex" title="t = 20" /> time<br /> steps is shown in Figure 4.</p>
+
+
+
+<figure class="wp-block-image is-resized"><img src="https://windowsontheory.files.wordpress.com/2018/12/discrete.png?w=451&amp;h=291" alt="" height="291" class="wp-image-7090" width="451" />Figure 4: Distribution at time <img src="https://s0.wp.com/latex.php?latex=t+%3D+20&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t = 20" class="latex" title="t = 20" />, with <img src="https://s0.wp.com/latex.php?latex=20&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="20" class="latex" title="20" /> on the x-axis corresponding to position <img src="https://s0.wp.com/latex.php?latex=0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="0" class="latex" title="0" />.</figure>
+
+
+
+<p>Now, consider the walk starting at state <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7C%5Cpsi%280%29%5Cright%3E+%3D+-%5Cleft%7C1%5Cright%3E%5Cleft%7C0%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|\psi(0)\right&gt; = -\left|1\right&gt;\left|0\right&gt;" class="latex" title="\left|\psi(0)\right&gt; = -\left|1\right&gt;\left|0\right&gt;" />:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D%5Cleft%7C%5Cpsi%281%29%5Cright%3E+%26%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7B2%7D%7D%5Cleft%28+-%5Cleft%7C0%5Cright%3E%5Cleft%7C1%5Cright%3E+%2B+%5Cleft%7C1%5Cright%3E%5Cleft%7C-1%5Cright%3E+%5Cright%29+%5C%5C+%5Cleft%7C%5Cpsi%282%29%5Cright%3E+%26%3D+%5Cfrac%7B1%7D%7B2%7D%5Cleft%28+-%5Cleft%7C0%5Cright%3E%5Cleft%7C2%5Cright%3E+-+%5Cleft%7C1%5Cright%3E%5Cleft%7C0%5Cright%3E+%2B+%5Cleft%7C0%5Cright%3E%5Cleft%7C0%5Cright%3E+-+%5Cleft%7C1%5Cright%3E%5Cleft%7C-2%5Cright%3E+%5Cright%29+%5C%5C+%5Cleft%7C%5Cpsi%283%29%5Cright%3E+%26%3D+%5Cfrac%7B1%7D%7B2%5Csqrt%7B2%7D%7D%5Cleft%28-%5Cleft%7C0%5Cright%3E%5Cleft%7C3%5Cright%3E+-+%5Cleft%7C1%5Cright%3E%5Cleft%7C1%5Cright%3E+%2B+2%5Cleft%7C1%5Cright%3E%5Cleft%7C-1%5Cright%3E+-+%5Cleft%7C0%5Cright%3E%5Cleft%7C-1%5Cright%3E+%2B+%5Cleft%7C1%5Cright%3E%5Cleft%7C-3%5Cright%3E+%5Cright%29+%5C%5C+%5Cleft%7C%5Cpsi%284%29%5Cright%3E+%26%3D++%5Cfrac%7B1%7D%7B4%7D+%28-%5Cleft%7C0%5Cright%3E%5Cleft%7C4%5Cright%3E+-%5Cleft%7C1%5Cright%3E%5Cleft%7C2%5Cright%3E+-+%5Cleft%7C0%5Cright%3E%5Cleft%7C2%5Cright%3E+%2B+%5Cleft%7C1%5Cright%3E%5Cleft%7C0%5Cright%3E+%2B+%5Cleft%7C0%5Cright%3E%5Cleft%7C0%5Cright%3E+-3%5Cleft%7C1%5Cright%3E%5Cleft%7C-2%5Cright%3E+%2B+%5Cleft%7C0%5Cright%3E%5Cleft%7C-2%5Cright%3E+-+%5Cleft%7C1%5Cright%3E%5Cleft%7C-4%5Cright%3E%29.%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\begin{aligned}\left|\psi(1)\right&gt; &amp;= \frac{1}{\sqrt{2}}\left( -\left|0\right&gt;\left|1\right&gt; + \left|1\right&gt;\left|-1\right&gt; \right) \\ \left|\psi(2)\right&gt; &amp;= \frac{1}{2}\left( -\left|0\right&gt;\left|2\right&gt; - \left|1\right&gt;\left|0\right&gt; + \left|0\right&gt;\left|0\right&gt; - \left|1\right&gt;\left|-2\right&gt; \right) \\ \left|\psi(3)\right&gt; &amp;= \frac{1}{2\sqrt{2}}\left(-\left|0\right&gt;\left|3\right&gt; - \left|1\right&gt;\left|1\right&gt; + 2\left|1\right&gt;\left|-1\right&gt; - \left|0\right&gt;\left|-1\right&gt; + \left|1\right&gt;\left|-3\right&gt; \right) \\ \left|\psi(4)\right&gt; &amp;=  \frac{1}{4} (-\left|0\right&gt;\left|4\right&gt; -\left|1\right&gt;\left|2\right&gt; - \left|0\right&gt;\left|2\right&gt; + \left|1\right&gt;\left|0\right&gt; + \left|0\right&gt;\left|0\right&gt; -3\left|1\right&gt;\left|-2\right&gt; + \left|0\right&gt;\left|-2\right&gt; - \left|1\right&gt;\left|-4\right&gt;).\end{aligned}" class="latex" title="\begin{aligned}\left|\psi(1)\right&gt; &amp;= \frac{1}{\sqrt{2}}\left( -\left|0\right&gt;\left|1\right&gt; + \left|1\right&gt;\left|-1\right&gt; \right) \\ \left|\psi(2)\right&gt; &amp;= \frac{1}{2}\left( -\left|0\right&gt;\left|2\right&gt; - \left|1\right&gt;\left|0\right&gt; + \left|0\right&gt;\left|0\right&gt; - \left|1\right&gt;\left|-2\right&gt; \right) \\ \left|\psi(3)\right&gt; &amp;= \frac{1}{2\sqrt{2}}\left(-\left|0\right&gt;\left|3\right&gt; - \left|1\right&gt;\left|1\right&gt; + 2\left|1\right&gt;\left|-1\right&gt; - \left|0\right&gt;\left|-1\right&gt; + \left|1\right&gt;\left|-3\right&gt; \right) \\ \left|\psi(4)\right&gt; &amp;=  \frac{1}{4} (-\left|0\right&gt;\left|4\right&gt; -\left|1\right&gt;\left|2\right&gt; - \left|0\right&gt;\left|2\right&gt; + \left|1\right&gt;\left|0\right&gt; + \left|0\right&gt;\left|0\right&gt; -3\left|1\right&gt;\left|-2\right&gt; + \left|0\right&gt;\left|-2\right&gt; - \left|1\right&gt;\left|-4\right&gt;).\end{aligned}" /></p>
+
+
+
+<p><br /> This distribution given by this walk is the mirror image of the first.<br /> To generate a symmetric distribution, consider the start state <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7C%5Cpsi%280%29%5Cright%3E+%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7B2%7D%7D%28%5Cleft%7C0%5Cright%3E+-i%5Cleft%7C1%5Cright%3E%29%5Cleft%7C0%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|\psi(0)\right&gt; = \frac{1}{\sqrt{2}}(\left|0\right&gt; -i\left|1\right&gt;)\left|0\right&gt;" class="latex" title="\left|\psi(0)\right&gt; = \frac{1}{\sqrt{2}}(\left|0\right&gt; -i\left|1\right&gt;)\left|0\right&gt;" />. The resulting distribution after <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t" class="latex" title="t" /> steps will be <img src="https://s0.wp.com/latex.php?latex=p%28x%2Ct%29+%3D+%5Cfrac%7B1%7D%7B2%7D+p_%7B0%7D%28x%2Ct%29+%2B+%5Cfrac%7B1%7D%7B2%7D+p_%7B1%7D%28x%2Ct%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="p(x,t) = \frac{1}{2} p_{0}(x,t) + \frac{1}{2} p_{1}(x,t)" class="latex" title="p(x,t) = \frac{1}{2} p_{0}(x,t) + \frac{1}{2} p_{1}(x,t)" />, where <img src="https://s0.wp.com/latex.php?latex=p_%7B0%7D%28x%2Ct%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="p_{0}(x,t)" class="latex" title="p_{0}(x,t)" /> is the probability distribution after <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t" class="latex" title="t" /> steps resulting from the start state <img src="https://s0.wp.com/latex.php?latex=%5Cpsi%280%29+%3D+%5Cleft%7C0%5Cright%3E%5Cleft%7C0%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\psi(0) = \left|0\right&gt;\left|0\right&gt;" class="latex" title="\psi(0) = \left|0\right&gt;\left|0\right&gt;" /> and <img src="https://s0.wp.com/latex.php?latex=p_%7B1%7D%28x%2Ct%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="p_{1}(x,t)" class="latex" title="p_{1}(x,t)" /> is the probability distribution after <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t" class="latex" title="t" /> steps resulting from the start state <img src="https://s0.wp.com/latex.php?latex=%5Cpsi%280%29+%3D+-%5Cleft%7C1%5Cright%3E%5Cleft%7C0%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\psi(0) = -\left|1\right&gt;\left|0\right&gt;" class="latex" title="\psi(0) = -\left|1\right&gt;\left|0\right&gt;" />. The result will be symmetric, with peaks near the extrema, as we saw in the continuous case.</p>
+
+
+
+<h2>Markov chain quantum walk</h2>
+
+
+
+<p>A reversible, ergodic Markov chain with <img src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n" class="latex" title="n" /> states can be represented by a <img src="https://s0.wp.com/latex.php?latex=n+%5Ctimes+n&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n \times n" class="latex" title="n \times n" /> transition matrix <img src="https://s0.wp.com/latex.php?latex=P&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P" class="latex" title="P" /> with <img src="https://s0.wp.com/latex.php?latex=P_%7Bj%2Ci%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P_{j,i}" class="latex" title="P_{j,i}" /> equal to the probability of transitioning from state <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i" class="latex" title="i" /> to state <img src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="j" class="latex" title="j" /> and <img src="https://s0.wp.com/latex.php?latex=P+%3D+P%5E%7B%2A%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P = P^{*}" class="latex" title="P = P^{*}" />. Then, <img src="https://s0.wp.com/latex.php?latex=p_%7B0%7DP&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="p_{0}P" class="latex" title="p_{0}P" />, where <img src="https://s0.wp.com/latex.php?latex=p_%7B0%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="p_{0}" class="latex" title="p_{0}" /> is an initial probability distribution over the states, gives the distribution after one step.<br />Since <img src="https://s0.wp.com/latex.php?latex=%5Csum_%7Bj%7D+P_%7Bi%2Cj%7D+%3D+1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\sum_{j} P_{i,j} = 1" class="latex" title="\sum_{j} P_{i,j} = 1" /> for all <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i" class="latex" title="i" />, <img src="https://s0.wp.com/latex.php?latex=P&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P" class="latex" title="P" /> is stochastic and thus preserves normalization.</p>
+
+
+
+<p>There are multiple ways to define a discrete quantum walk, depending on the properties of the transition matrix and the graph on which it is defined (overview provided in [4]). Here we look at the quantum walk on a Markov chain as given in [2]. For the quantum walk on this graph, we define state <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7Ci%5Cright%3E%5Cleft%7Cj%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|i\right&gt;\left|j\right&gt;" class="latex" title="\left|i\right&gt;\left|j\right&gt;" /> as the state that represents currently being at position <img src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="j" class="latex" title="j" /> and facing in the direction of <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i" class="latex" title="i" />. Then, we define the state <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7C%5Cpsi_%7Bj%7D%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|\psi_{j}\right&gt;" class="latex" title="\left|\psi_{j}\right&gt;" /> as a superposition of the states associated with position <img src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="j" class="latex" title="j" />:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+%5Cleft%7C%5Cpsi_%7Bi%7D%5Cright%3E+%3D+%5Cunderset%7Bj%7D%7B%5Csum%7D+%5Csqrt%7BP_%7Bj%2Ci%7D%7D+%5Cleft%7Ci%5Cright%3E%5Cleft%7Cj%5Cright%3E.%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\begin{aligned} \left|\psi_{i}\right&gt; = \underset{j}{\sum} \sqrt{P_{j,i}} \left|i\right&gt;\left|j\right&gt;.\end{aligned}" class="latex" title="\begin{aligned} \left|\psi_{i}\right&gt; = \underset{j}{\sum} \sqrt{P_{j,i}} \left|i\right&gt;\left|j\right&gt;.\end{aligned}" /></p>
+
+
+
+<p>The unitary operator,</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=D+%3D+2+%5Cunderset%7Bi%7D%7B%5Csum%7D+%5Cleft%7C%5Cpsi_%7Bi%7D%5Cright%3E%5Cleft%3C+%5Cpsi_%7Bi%7D%5Cright%7C+-+I&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="D = 2 \underset{i}{\sum} \left|\psi_{i}\right&gt;\left&lt; \psi_{i}\right| - I" class="latex" title="D = 2 \underset{i}{\sum} \left|\psi_{i}\right&gt;\left&lt; \psi_{i}\right| - I" />,</p>
+
+
+
+<p>acts as a coin flip for the walk on this graph. Since <img src="https://s0.wp.com/latex.php?latex=P&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P" class="latex" title="P" /> is reversible, we can let the shift operator be the unitary <img src="https://s0.wp.com/latex.php?latex=SWAP&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="SWAP" class="latex" title="SWAP" /> operator:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=SWAP+%3D+%5Cunderset%7Bi%2Cj%7D%7B%5Csum%7D+%5Cleft%7Ci%2Cj%5Cright%3E%5Cleft%3C+j%2Ci%5Cright%7C&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="SWAP = \underset{i,j}{\sum} \left|i,j\right&gt;\left&lt; j,i\right|" class="latex" title="SWAP = \underset{i,j}{\sum} \left|i,j\right&gt;\left&lt; j,i\right|" />.</p>
+
+
+
+<p>A quantum walk can also be defined for a non-reversible Markov chain using a pair of reflection operators (the coin flip operator is an example of a reflection operator). This corresponds to the construction given in [7].</p>
+
+
+
+<h2>Search as a quantum walk algorithm</h2>
+
+
+
+<p>Given a black box function <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f" class="latex" title="f" /> and a set of inputs <img src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="S" class="latex" title="S" /> with <img src="https://s0.wp.com/latex.php?latex=%7CS%7C+%3D+N&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="|S| = N" class="latex" title="|S| = N" />, say we want to find whether an input <img src="https://s0.wp.com/latex.php?latex=x+%5Cin+S&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x \in S" class="latex" title="x \in S" /> exists for which <img src="https://s0.wp.com/latex.php?latex=f%28x%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(x)" class="latex" title="f(x)" /> equals some output value. We refer to the set of inputs <img src="https://s0.wp.com/latex.php?latex=M&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="M" class="latex" title="M" /> for which this is true as marked. Classically, this requires <img src="https://s0.wp.com/latex.php?latex=O%28N%2F%7CM%7C%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="O(N/|M|)" class="latex" title="O(N/|M|)" /> queries, for nonempty <img src="https://s0.wp.com/latex.php?latex=M&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="M" class="latex" title="M" />. Using the Grover search algorithm, this problem requires <img src="https://s0.wp.com/latex.php?latex=O%28%5Csqrt%7BN%2F%7CM%7C%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="O(\sqrt{N/|M|})" class="latex" title="O(\sqrt{N/|M|})" /> quantum queries. In this section, we give a quantum walks based algorithm that also solves this problem in <img src="https://s0.wp.com/latex.php?latex=O%28%5Csqrt%7BN%2F%7CM%7C%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="O(\sqrt{N/|M|})" class="latex" title="O(\sqrt{N/|M|})" /> time. If we define a doubly stochastic matrix <img src="https://s0.wp.com/latex.php?latex=P&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P" class="latex" title="P" /> with uniform transitions, then we can construct a new transition matrix <img src="https://s0.wp.com/latex.php?latex=P%27&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P'" class="latex" title="P'" /> from <img src="https://s0.wp.com/latex.php?latex=P&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P" class="latex" title="P" /> as:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=P_%7Bi%2Cj%7D%27+%3D+%5Cbegin%7Bcases%7D+%5Cfrac%7B1%7D%7BN-1%7D+%5Cquad+%26%5Ctext%7Bif+%7D+i+%5Cneq+j+%5Ctext%7B+and+%7D+i+%5Cnotin+M+%5C%5C0+%5Cquad+%26%5Ctext%7Bif+%7D+i+%3D+j+%5Ctext%7B+and+%7D+i+%5Cnotin+M+%5C%5C+1+%5Cquad+%26%5Ctext%7Bif+%7D+i+%3D+j+%5Ctext%7B+and+%7D+i+%5Cin+M+%5C%5C+0+%5Cquad+%26%5Ctext%7Bif+%7D+i+%5Cneq+j+%5Ctext%7B+and+%7D+i+%5Cin+M.+%5Cend%7Bcases%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P_{i,j}' = \begin{cases} \frac{1}{N-1} \quad &amp;\text{if } i \neq j \text{ and } i \notin M \\0 \quad &amp;\text{if } i = j \text{ and } i \notin M \\ 1 \quad &amp;\text{if } i = j \text{ and } i \in M \\ 0 \quad &amp;\text{if } i \neq j \text{ and } i \in M. \end{cases}" class="latex" title="P_{i,j}' = \begin{cases} \frac{1}{N-1} \quad &amp;\text{if } i \neq j \text{ and } i \notin M \\0 \quad &amp;\text{if } i = j \text{ and } i \notin M \\ 1 \quad &amp;\text{if } i = j \text{ and } i \in M \\ 0 \quad &amp;\text{if } i \neq j \text{ and } i \in M. \end{cases}" /></p>
+
+
+
+<p>Then, when the state of the first register is unmarked, the operator <img src="https://s0.wp.com/latex.php?latex=D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="D" class="latex" title="D" /> defined in the previous section acts as a diffusion over its neighbors. When the state in the first register is marked, then <img src="https://s0.wp.com/latex.php?latex=D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="D" class="latex" title="D" /> will act as the operator <img src="https://s0.wp.com/latex.php?latex=-I&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="-I" class="latex" title="-I" />, and the walk stops, as a marked state has been reached. This requires two queries to the black box function: one to check whether the input is marked, and then another to uncompute. By rearranging the order of the columns in <img src="https://s0.wp.com/latex.php?latex=P&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P" class="latex" title="P" /> so that the columns corresponding to the non-marked elements come before the columns corresponding to the marked elements, we get:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+P%27+%3D+%5Cbegin%7Bpmatrix%7D+P_%7B0%7D+%26+0+%5C%5C+P_%7B1%7D+%26+I+%5Cend%7Bpmatrix%7D%2C%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\begin{aligned} P' = \begin{pmatrix} P_{0} &amp; 0 \\ P_{1} &amp; I \end{pmatrix},\end{aligned}" class="latex" title="\begin{aligned} P' = \begin{pmatrix} P_{0} &amp; 0 \\ P_{1} &amp; I \end{pmatrix},\end{aligned}" /></p>
+
+
+
+<p>where <img src="https://s0.wp.com/latex.php?latex=P_%7B0%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P_{0}" class="latex" title="P_{0}" /> gives the transitions between non-marked elements and <img src="https://s0.wp.com/latex.php?latex=P_%7B1%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P_{1}" class="latex" title="P_{1}" /> gives the transitions from non-marked to marked elements.</p>
+
+
+
+<p>We now look at the hitting time of the classical random walk. Assume<br /> that there is zero probability of starting at a marked vertex. Then, we<br /> can write the starting distribution <img src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="p" class="latex" title="p" />, where the last <img src="https://s0.wp.com/latex.php?latex=%7CM%7C&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="|M|" class="latex" title="|M|" /> elements of <img src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="p" class="latex" title="p" />, corresponding to the marked elements, are zero, as<br /> <img src="https://s0.wp.com/latex.php?latex=p+%3D+%5Cunderset%7B%5Clambda%7D%7B%5Csum%7D+%5Calpha_%7B%5Clambda%7D+%5Cleft%7C%5Clambda%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="p = \underset{\lambda}{\sum} \alpha_{\lambda} \left|\lambda\right&gt;" class="latex" title="p = \underset{\lambda}{\sum} \alpha_{\lambda} \left|\lambda\right&gt;" />, where <img src="https://s0.wp.com/latex.php?latex=%5Clambda&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\lambda" class="latex" title="\lambda" /> are the eigenvalues of <img src="https://s0.wp.com/latex.php?latex=P_%7B0%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P_{0}" class="latex" title="P_{0}" />, and <img src="https://s0.wp.com/latex.php?latex=%5Cleft%7C%5Clambda%5Cright%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|\lambda\right&gt;" class="latex" title="\left|\lambda\right&gt;" /> are the corresponding eigenvectors, with the last <img src="https://s0.wp.com/latex.php?latex=%7CM%7C&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="|M|" class="latex" title="|M|" /> entries zero. Let <img src="https://s0.wp.com/latex.php?latex=%5Clambda%5E%7B%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\lambda^{}" class="latex" title="\lambda^{}" /> be the principal (largest) eigenvalue. Then, the probability that, after <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t" class="latex" title="t" /> steps, a marked element has not yet been reached will be <img src="https://s0.wp.com/latex.php?latex=%5Csum+%28P_%7B0%7D%5E%7Bt%7Dp%29_%7Bi%7D+%5Cleq+%5Clambda%5E%7B%2At%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\sum (P_{0}^{t}p)_{i} \leq \lambda^{*t}" class="latex" title="\sum (P_{0}^{t}p)_{i} \leq \lambda^{*t}" />. Then, the<br /> probability that a marked element has been reached in that time will be<br /> <img src="https://s0.wp.com/latex.php?latex=%5Cgeq+1+-+%5Clambda%5E%7Bt%7D+%5Cgeq+1+-+t+%5Clambda%5E%7B%2A%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\geq 1 - \lambda^{t} \geq 1 - t \lambda^{*}" class="latex" title="\geq 1 - \lambda^{t} \geq 1 - t \lambda^{*}" />. Setting<br /> <img src="https://s0.wp.com/latex.php?latex=t+%3D+%5Cfrac%7B1%7D%7B1-%5Clambda%5E%7B%2A%7D%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t = \frac{1}{1-\lambda^{*}}" class="latex" title="t = \frac{1}{1-\lambda^{*}}" /> gives probability <img src="https://s0.wp.com/latex.php?latex=%5COmega%281%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\Omega(1)" class="latex" title="\Omega(1)" /> that a marked element will be reached in that time.</p>
+
+
+
+<p>The eigenvalues of <img src="https://s0.wp.com/latex.php?latex=P_%7B0%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P_{0}" class="latex" title="P_{0}" /> will be <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7BN-%7CM%7C-1%7D%7BN-1%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\frac{N-|M|-1}{N-1}" class="latex" title="\frac{N-|M|-1}{N-1}" /> and<br /> <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B-1%7D%7BN-%7CM%7C-1%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\frac{-1}{N-|M|-1}" class="latex" title="\frac{-1}{N-|M|-1}" />. Then, the classical hitting time will be:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+t+%26%3D+%5Cfrac%7B1%7D%7B1-%5Clambda%5E%7B%2A%7D%7D+%5C%5C+%26%3D+%5Cfrac%7B1%7D%7B1-%5Cfrac%7BN-%7CM%7C-1%7D%7BN-1%7D%7D+%5C%5C+%26%3D+O%5Cleft%28%5Cfrac%7BN%7D%7B%7CM%7C%7D%5Cright%29.%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\begin{aligned} t &amp;= \frac{1}{1-\lambda^{*}} \\ &amp;= \frac{1}{1-\frac{N-|M|-1}{N-1}} \\ &amp;= O\left(\frac{N}{|M|}\right).\end{aligned}" class="latex" title="\begin{aligned} t &amp;= \frac{1}{1-\lambda^{*}} \\ &amp;= \frac{1}{1-\frac{N-|M|-1}{N-1}} \\ &amp;= O\left(\frac{N}{|M|}\right).\end{aligned}" /></p>
+
+
+
+<p>It can be showed that for a walk defined by a Markov chain, the<br /> classical hitting time will be <img src="https://s0.wp.com/latex.php?latex=O%28%5Cfrac%7B1%7D%7B%5Cdelta+%5Cepsilon%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="O(\frac{1}{\delta \epsilon})" class="latex" title="O(\frac{1}{\delta \epsilon})" />, where <img src="https://s0.wp.com/latex.php?latex=%5Cdelta+%3D+1+-+%5Clambda%5E%7B%2A%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\delta = 1 - \lambda^{*}" class="latex" title="\delta = 1 - \lambda^{*}" />, the <em>spectral gap</em>, and <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon+%5Cleq+%5Cfrac%7B%7CM%7C%7D%7BN%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\epsilon \leq \frac{|M|}{N}" class="latex" title="\epsilon \leq \frac{|M|}{N}" /> [2].</p>
+
+
+
+<p>Magniez <em>et al</em> proved in [6] that for a reversible, ergodic<br /> Markov chain, the quantum hitting time for a walk on this chain is<br /> within a factor of the square root of the classical hitting time. Since<br /> the walk on this input acts as a walk on a reversible Markov chain until<br /> a marked element is reached, then this is also true for a walk defined<br /> by our transition matrix <img src="https://s0.wp.com/latex.php?latex=P%27&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P'" class="latex" title="P'" />. This arises from the fact that the<br /> spectral gap of the matrix describing the quantum walk corresponding to<br /> stochastic matrix <img src="https://s0.wp.com/latex.php?latex=P&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P" class="latex" title="P" /> is quadratically larger than the spectral gap of<br /> the matrix describing the classical random walk corresponding to <img src="https://s0.wp.com/latex.php?latex=P&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P" class="latex" title="P" />, the proof of which is given in [2]. Thus, the quantum hitting time<br /> is <img src="https://s0.wp.com/latex.php?latex=O%28%5Csqrt%7BN%2F%7CM%7C%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="O(\sqrt{N/|M|})" class="latex" title="O(\sqrt{N/|M|})" />, which exactly matches the quantum query complexity of Grover search.</p>
+
+
+
+<h2>Element distinctness problem</h2>
+
+
+
+<p>Now, we describe Ambainis’s algorithm given in [1] for solving<br /> the <em>element distinctness problem</em> in <img src="https://s0.wp.com/latex.php?latex=O%28N%5E%7B%5Cfrac%7B2%7D%7B3%7D%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="O(N^{\frac{2}{3}})" class="latex" title="O(N^{\frac{2}{3}})" /> time, which<br /> produces a speed up over the classical algorithm, which requires <img src="https://s0.wp.com/latex.php?latex=O%28N%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="O(N)" class="latex" title="O(N)" /> queries, and also over other known quantum algorithms that do not make use of quantum walks, which require <img src="https://s0.wp.com/latex.php?latex=O%28N%5E%7B%5Cfrac%7B3%7D%7B4%7D%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="O(N^{\frac{3}{4}})" class="latex" title="O(N^{\frac{3}{4}})" /> queries. The element distinctness problem is defined as follows: given a function <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f" class="latex" title="f" /> on a size <img src="https://s0.wp.com/latex.php?latex=N&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="N" class="latex" title="N" /> set of inputs</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=S%3D%5C%7Bx_%7B1%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="S=\{x_{1}" class="latex" title="S=\{x_{1}" />,…,<img src="https://s0.wp.com/latex.php?latex=x_%7BN%7D%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x_{N}\}" class="latex" title="x_{N}\}" />,</p>
+
+
+
+<p>determine whether there exists a pair <img src="https://s0.wp.com/latex.php?latex=x_%7B1%7D%2C%5C%3B+x_%7B2%7D+%5Cin+S&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x_{1},\; x_{2} \in S" class="latex" title="x_{1},\; x_{2} \in S" /> for which <img src="https://s0.wp.com/latex.php?latex=f%28x_%7B1%7D%29+%3D+f%28x_%7B2%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(x_{1}) = f(x_{2})" class="latex" title="f(x_{1}) = f(x_{2})" />.  As in the search problem defined in the previous section, this is a decision problem; we are not concerned with finding the values of these pairs, only whether at least one exists.</p>
+
+
+
+<p>The algorithm is similar to the search algorithm described in the previous section, except we define the walk on a <em>Hamming graph</em>. A Hamming graph <img src="https://s0.wp.com/latex.php?latex=H%28N%2Cm%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="H(N,m)" class="latex" title="H(N,m)" /> is defined as follows: each vertex <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i" class="latex" title="i" /> corresponds to an <img src="https://s0.wp.com/latex.php?latex=m&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m" class="latex" title="m" />-tuple, (<img src="https://s0.wp.com/latex.php?latex=i_%7B1%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i_{1}" class="latex" title="i_{1}" />,…,<img src="https://s0.wp.com/latex.php?latex=i_%7Bm%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i_{m}" class="latex" title="i_{m}" />), where <img src="https://s0.wp.com/latex.php?latex=i_%7Bk%7D+%5Cin+S&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i_{k} \in S" class="latex" title="i_{k} \in S" /> for all <img src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="k" class="latex" title="k" /> and repetition is allowed (that is, <img src="https://s0.wp.com/latex.php?latex=i_%7Bk%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i_{k}" class="latex" title="i_{k}" /> may equal <img src="https://s0.wp.com/latex.php?latex=i_%7Bj%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i_{j}" class="latex" title="i_{j}" /> for <img src="https://s0.wp.com/latex.php?latex=k+%5Cneq+j&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="k \neq j" class="latex" title="k \neq j" />), and <img src="https://s0.wp.com/latex.php?latex=m&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m" class="latex" title="m" /> is a parameter we will choose. Edges will exist between vertices that differ in exactly one coordinate (order matters in this graph). We describe the state of each vertex as:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cleft%7Ci+%5Cright%3E%3D%7C+i_%7B1%7D%2Ci_%7B2%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\left|i \right&gt;=| i_{1},i_{2}" class="latex" title="\left|i \right&gt;=| i_{1},i_{2}" />,…,<img src="https://s0.wp.com/latex.php?latex=i_%7Bm%7D%2Cf%28i_%7B1%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i_{m},f(i_{1})" class="latex" title="i_{m},f(i_{1})" />,…,<img src="https://s0.wp.com/latex.php?latex=f%28i_%7Bm%7D%29%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(i_{m})&gt;" class="latex" title="f(i_{m})&gt;" /></p>
+
+
+
+<p>Then, moving along each edge that replaces the <img src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="j" class="latex" title="j" />th coordinate with <img src="https://s0.wp.com/latex.php?latex=x_%7Bk%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x_{k}" class="latex" title="x_{k}" /> such that <img src="https://s0.wp.com/latex.php?latex=i_%7Bj%7D+%5Cneq+x_%7Bk%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i_{j} \neq x_{k}" class="latex" title="i_{j} \neq x_{k}" />  requires two queries to the black box function to erase <img src="https://s0.wp.com/latex.php?latex=f%28i_%7Bj%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(i_{j})" class="latex" title="f(i_{j})" /> and compute <img src="https://s0.wp.com/latex.php?latex=f%28x_%7Bk%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(x_{k})" class="latex" title="f(x_{k})" />. In the case, the marked vertices will be those that contain some <img src="https://s0.wp.com/latex.php?latex=f%28i_%7Bk%7D%29+%3D+f%28i_%7Bj%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(i_{k}) = f(i_{j})" class="latex" title="f(i_{k}) = f(i_{j})" /> for <img src="https://s0.wp.com/latex.php?latex=i_%7Bj%7D+%5Cneq+i_%7Bk%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i_{j} \neq i_{k}" class="latex" title="i_{j} \neq i_{k}" />. Since the function values are stored in the description of the state, then no additional queries to the black box are required to check if in a marked state.</p>
+
+
+
+<p>The transition matrix is given by <img src="https://s0.wp.com/latex.php?latex=P+%3D+%5Cfrac%7B1%7D%7Bm%28n-1%29%7D+%5Cunderset%7Bi+%5Cin+%5B1%2Cm%5D%7D%7B%5Csum%7D+%28J+-+I%29%5E%7B%28i%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="P = \frac{1}{m(n-1)} \underset{i \in [1,m]}{\sum} (J - I)^{(i)}" class="latex" title="P = \frac{1}{m(n-1)} \underset{i \in [1,m]}{\sum} (J - I)^{(i)}" />. <img src="https://s0.wp.com/latex.php?latex=J&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="J" class="latex" title="J" /> is the <img src="https://s0.wp.com/latex.php?latex=n+%5Ctimes+n&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n \times n" class="latex" title="n \times n" /> all one matrix, and the superscript <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i" class="latex" title="i" /> denotes the operator acting on the <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i" class="latex" title="i" />th coordinate. The factor of <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7Bm%28n-1%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\frac{1}{m(n-1)}" class="latex" title="\frac{1}{m(n-1)}" /> normalizes the degree, since the graph is regular. We can compute the spectral gap of this graph to be <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7Bn%7D%7Bm%28n-1%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\frac{n}{m(n-1)}" class="latex" title="\frac{n}{m(n-1)}" /> (for details of this computation, see [2]). Then, noting that that the fraction of marked vertices, <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\epsilon" class="latex" title="\epsilon" />, is<br /> <img src="https://s0.wp.com/latex.php?latex=%5Cgeq+%5Cfrac%7Bm%28m-1%29%28n-2%29%5E%7Bm-2%7D%7D%7Bn%5E%7Bm%7D%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\geq \frac{m(m-1)(n-2)^{m-2}}{n^{m}}" class="latex" title="\geq \frac{m(m-1)(n-2)^{m-2}}{n^{m}}" />, classically, the query complexity is <img src="https://s0.wp.com/latex.php?latex=m+%2B+O%28%5Cfrac%7B1%7D%7B%5Cdelta+%5Cepsilon%7D%29+%3D+m+%2B+O%28%5Cfrac%7Bn%5E%7B2%7D%7D%7Bm%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m + O(\frac{1}{\delta \epsilon}) = m + O(\frac{n^{2}}{m})" class="latex" title="m + O(\frac{1}{\delta \epsilon}) = m + O(\frac{n^{2}}{m})" />, where <img src="https://s0.wp.com/latex.php?latex=m&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m" class="latex" title="m" /> is the queries required to construct the initial state. Setting the parameters equal to minimize with respect to <img src="https://s0.wp.com/latex.php?latex=m&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m" class="latex" title="m" /> gives classical query complexity <img src="https://s0.wp.com/latex.php?latex=O%28N%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="O(N)" class="latex" title="O(N)" />, as expected.</p>
+
+
+
+<p>Then in the quantum case, <img src="https://s0.wp.com/latex.php?latex=m&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m" class="latex" title="m" /> queries are still required to set up the state. <img src="https://s0.wp.com/latex.php?latex=O%28%5Cfrac%7Bn%7D%7B%5Csqrt%7Bm%7D%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="O(\frac{n}{\sqrt{m}})" class="latex" title="O(\frac{n}{\sqrt{m}})" /> queries are required to perform the walk until a marked state is reached, by [6]. Setting parameters equal gives <img src="https://s0.wp.com/latex.php?latex=O%28N%5E%7B%5Cfrac%7B2%7D%7B3%7D%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="O(N^{\frac{2}{3}})" class="latex" title="O(N^{\frac{2}{3}})" /> queries, as desired.</p>
+
+
+
+<p>[1] Ambainis, A. Quantum walk algorithm for element distinctness, SIAM Journal on Computing 37(1):210-239 (2007). arXiv:quant-ph/0311001</p>
+
+
+
+<p>[2] Childs, A. Lecture Notes on Quantum Algorithms (2017). <a href="https://www.cs.umd.edu/ amchilds/qa/qa.pdf" rel="nofollow">https://www.cs.umd.edu/ amchilds/qa/qa.pdf</a></p>
+
+
+
+<p>[3] Childs, A., Farhi, E. Gutmann, S. An example of the difference between<br /> quantum and classical random walks. Journal of Quantum Information<br /> Processing, 1:35, 2002. Also quant-ph/0103020.</p>
+
+
+
+<p>[4] Godsil, C., Hanmeng, Z. Discrete-Time Quantum Walks and Graph Structures<br /> (2018). arXiv:1701.04474</p>
+
+
+
+<p>[5] Kempe, J. Quantum random walks: an introductory overview, Contemporary<br /> Physics, Vol. 44 (4) (2003) 307:327. arXiv:quant-ph/0303081</p>
+
+
+
+<p>[6] Magniez, F., Nayak, A., Richter, P.C. et al. On the hitting times of<br /> quantum versus random walks, Algorithmica (2012) 63:91.<br /> <a href="https://doi.org/10.1007/s00453-011-9521-6" rel="nofollow">https://doi.org/10.1007/s00453-011-9521-6</a></p>
+
+
+
+<p>[7] Szegedy, M. Quantum Speed-up of Markov Chain Based Algorithms, 45th<br /> Annual IEEE Symposium on Foundations of Computer Science (2004).<br /> <a href="https://ieeexplore.ieee.org/abstract/document/1366222" rel="nofollow">https://ieeexplore.ieee.org/abstract/document/1366222</a></p></div>
+
+
+
+
+
+
+
+<p class="date">
+by beanash <a href="https://windowsontheory.org/2018/12/23/introduction-to-quantum-walks/"><span class="datestr">at December 23, 2018 05:45 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -5163,133 +5553,6 @@ We also define new communication complexity classes that correspond to different
 
 <p class="date">
 <a href="https://eccc.weizmann.ac.il/report/2018/208"><span class="datestr">at December 06, 2018 10:32 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://gilkalai.wordpress.com/?p=16599">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/kalai.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://gilkalai.wordpress.com/2018/12/05/igor-pak-will-give-the-2018-erdos-lectures/">Igor Pak will give the 2018 Erdős Lectures</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://gilkalai.wordpress.com" title="Combinatorics and more">Gil Kalai</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p><a href="https://gilkalai.files.wordpress.com/2018/06/pak.jpg"><img src="https://gilkalai.files.wordpress.com/2018/06/pak.jpg?w=640" alt="" class="alignnone size-full wp-image-16201" /></a></p>
-<p> </p>
-<h3>Next week Igor Pak will give the 2018 Erdős Lectures (delayed from June)</h3>
-<p>Here is the poster</p>
-<p> </p>
-<article id="node-56026" class="node node-event node-teaser article event-start clearfix">
-<div class="event-content">
-<header class="node-header">
-<h2 class="node-title">Combinatorics — Erdos lecture: Igor Pak (UCLA) “Counting linear extensions”</h2>
-</header>
-<div class="node-content">
-<div class="field field-name-field-date field-type-datetime field-label-hidden view-mode-teaser">
-<div class="field-items">
-<div class="field-item even">
-<h3 class="event-start"><span class="event-year">Monday December 10  11:00-13:00</span></h3>
-</div>
-</div>
-</div>
-<section class="field field-name-field-event-location field-type-text field-label-inline clearfix view-mode-teaser">
-<h3 class="field-label">Location:  <span class="event-year">IIAS Hall 130, Feldman building, </span> Givat Ram</h3>
-<p> </p>
-</section>
-<div class="field field-name-body field-type-text-with-summary field-label-hidden view-mode-teaser">
-<div class="field-items">
-<p> </p>
-<p class="field-item even">I will survey various known and recent results on counting the number of linear extensions of finite posets. I will emphasize the asymptotic and complexity aspects for special families, where the problem is especially elegant yet remains #P-complete.</p>
-<div></div>
-<div></div>
-</div>
-</div>
-</div>
-</div>
-</article>
-<article id="node-58788" class="node node-event node-teaser article event-start clearfix">
-<div class="event-content">
-<header class="node-header">
-<h2 class="node-title">CS Theory — Erdős Lecture: Igor Pak (UCLA) “Counting Young tableaux”</h2>
-</header>
-<div class="node-content">
-<section class="field field-name-field-lecturer field-type-text field-label-above view-mode-_custom_display">
-<div class="field-items">
-<div class="field-item even">
-<h3 class="event-start"><span class="event-year">Wednesday, Dec. 12,  2018, <span class="date-display-single"><span class="date-display-start">10:30am</span> to <span class="date-display-end">12:00pm</span></span></span></h3>
-</div>
-</div>
-</section>
-<div class="field-items">
-<div class="field-item even"></div>
-</div>
-<section class="field field-name-field-event-location field-type-text field-label-inline clearfix view-mode-teaser">
-<h3 class="field-label">Location: Rothberg (CS building) B-220</h3>
-</section>
-<div class="field field-name-body field-type-text-with-summary field-label-hidden view-mode-teaser">
-<div class="field-items">
-<div class="field-item even">
-<p>The number of standard Young tableaux of skew shape is a mesmerizing special case of the number of linear extensions of posets, that is important for applications in representation theory and algebraic geometry.  In this case there is a determinant formula, but finding their asymptotics is a difficult challenge.  I will survey some of the many beautiful result on the subject, explain some surprising product formulas, connections to Selberg integral, lozenge tilings and certain particle systems.</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</article>
-<article id="node-51625" class="node node-event node-teaser article event-start clearfix">
-<div class="event-content">
-<header class="node-header">
-<h2 class="node-title">Colloquium: Erdos lecture – Igor Pak (UCLA) “Counting integer points in polytopes”</h2>
-</header>
-<div class="node-content">
-<div class="field field-name-field-date field-type-datetime field-label-hidden view-mode-teaser">
-<div class="field-items">
-<div class="field-item even">
-<h3 class="event-start"><span class="event-year">Thursday, </span><span class="event-start-day"> Dec 13, 2018 <span class="date-display-single"><span class="date-display-start">2:30pm</span> to <span class="date-display-end">3:30pm</span></span></span></h3>
-</div>
-</div>
-</div>
-<section class="field field-name-field-event-location field-type-text field-label-inline clearfix view-mode-teaser">
-<h3 class="field-label">Location: Manchester Building (Hall 2), Hebrew University Jerusalem</h3>
-</section>
-<div class="field field-name-body field-type-text-with-summary field-label-hidden view-mode-teaser">
-<div class="field-items">
-<p class="field-item even">Given a convex polytope P, what is the number of integer points in P? This problem is of great interest in combinatorics and discrete geometry, with many important applications ranging from integer programming to statistics. From a computational point of view it is hopeless in any dimensions, as the knapsack problem is a special case. Perhaps surprisingly, in bounded dimension the problem becomes tractable. How far can one go? Can one count points in projections of P, finite intersections of such projections, etc.?</p>
-</div>
-</div>
-</div>
-</div>
-</article></div>
-
-
-
-
-
-
-
-<p class="date">
-by Gil Kalai <a href="https://gilkalai.wordpress.com/2018/12/05/igor-pak-will-give-the-2018-erdos-lectures/"><span class="datestr">at December 05, 2018 04:17 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
