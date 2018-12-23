@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2018-12-22T23:21:57Z</updated>
+  <updated>2018-12-23T00:22:23Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,112 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://windowsontheory.org/?p=6948</id>
+    <link href="https://windowsontheory.org/2018/12/22/quantum-approximate-optimization-algorithm-and-applications/" rel="alternate" type="text/html"/>
+    <title>Quantum Approximate Optimization Algorithm and Applications</title>
+    <summary>Motivation   Quantum computers have demonstrated great potential for solving certain problems more efficiently than their classical counterpart. Algorithms based on the quantum Fourier transform (QFT) such as Shor’s algorithm offer an exponential speed-up, while amplitude-amplification algorithms such as Grover’s search algorithm provide us with a polynomial speedup. The concept of “quantum supremacy” (quantum computers […]
+      <div class="commentbar">
+        <p/>
+      </div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><h2>Motivation</h2>
+<p> </p>
+<p>Quantum computers have demonstrated great potential for solving certain problems more efficiently than their classical counterpart. Algorithms based on the quantum Fourier transform (QFT) such as Shor’s algorithm offer an exponential speed-up, while amplitude-amplification algorithms such as Grover’s search algorithm provide us with a polynomial speedup. The concept of “quantum supremacy” (quantum computers outperforming classical computers) has been explored for three general groups of problems:</p>
+<ol>
+<li>Structured problems, such as factoring and discrete logarithm. Out quantum computer takes advantage of the structure of these classes of problems to offer an exponential speedup compared to the best known classical alternative. While these speedups are the most promising, they require a large number of resources and are cannot be feasibly implemented in the near future.</li>
+<li>Quantum Simulations, originally proposed by Richard Feynman in the late 80s was thought to be the first motivation behind exploring quantum computation. Due to the fact that the space of all possible states of the system scales exponentially with the addition of a new element (eg. an atom), complex systems are very difficult to simulate classically. It has been shown that we can use a quantum computer to tackle interesting problems in quantum chemistry and chemical engineering. Furthermore, there are results on sampling the output of random quantum circuits which have been used for “quantum supremacy experiments”.</li>
+<li>General constraint satisfaction and optimization problems. Since these problems are NP-hard it is widely believed that we cannot gain an exponential speedup using a quantum computer, however, we can obtain quadratic speedup but utilizing a variation of Grover’s algorithm.</li>
+</ol>
+<p>While these quantum algorithms are very exciting, they are beyond the capabilities of our near-term quantum computers; for example, any useful application of Shor’s factoring algorithm requires anywhere between tens of thousands to millions of qubits with error correction compared to quantum devices with hundreds of qubits that we might have available in the next few years.</p>
+<p>Recently there has been increasing interest in hybrid classical-quantum algorithms among the community. The general idea behind this approach is to supplement the noisy intermediate-scale quantum (NISQ) devices with classical computers. In this blog post, we discuss the Quantum Approximate Optimization Algorithm (QAOA), which is a hybrid algorithm, alongside some of its applications.</p>
+<h2>Introduction</h2>
+<p>QAOA is used for optimizing combinatorial problems. Let’s assume a problem with <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/> bits and <img alt="m" class="latex" src="https://s0.wp.com/latex.php?latex=m&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="m"/> clauses. Each clause is a constraint on a subset of the bits which satisfies a certain assignment. We can define a cost function as follows:</p>
+<p><img alt="C(z)=\sum_{\alpha=1}^m C_\alpha (z) " class="latex" src="https://s0.wp.com/latex.php?latex=C%28z%29%3D%5Csum_%7B%5Calpha%3D1%7D%5Em+C_%5Calpha+%28z%29+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C(z)=\sum_{\alpha=1}^m C_\alpha (z) "/></p>
+<p>where <img alt="z=z_1z_2...z_n" class="latex" src="https://s0.wp.com/latex.php?latex=z%3Dz_1z_2...z_n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="z=z_1z_2...z_n"/> is the bit string. In this article we consider a minimization problem, therefore we want <img alt="C_\alpha(z)=0" class="latex" src="https://s0.wp.com/latex.php?latex=C_%5Calpha%28z%29%3D0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_\alpha(z)=0"/> if <img alt="z" class="latex" src="https://s0.wp.com/latex.php?latex=z&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="z"/> satisfies clause <img alt="\alpha" class="latex" src="https://s0.wp.com/latex.php?latex=%5Calpha&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\alpha"/> and 1 otherwise. Note that in the case of a maximization problem we only need to switch the value assigned to a satisfactory clause to 1. Our objective is to find a (qu)bit string that minimizes (or maximizes) our cost function.</p>
+<p>At a higher level, we start with a quantum state in a uniform superposition of all possible inputs <img alt="z" class="latex" src="https://s0.wp.com/latex.php?latex=z&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="z"/>. This can be accomplished with <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/> qubits which span a space of size <img alt="2^n" class="latex" src="https://s0.wp.com/latex.php?latex=2%5En&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^n"/>. Our goal is to come up with a series of operations that would evolve our initial quantum state into a superposition of states in which the valid solutions would have a significantly higher probability than other states. In manner, upon sampling the quantum state we are likely to get the correct solution with high probability. QAOA uses the cost function to construct a set of operations that would be able to efficiently map the unifrom superposition state into the desired quantum state. These operators involve single qubits rotations around the x-axis, and multiqubit rotations around the z-axis of our qubits.</p>
+<p>Now let’s discuss the details of QAOA. For this algorithm we assume that our quantum computer works in the computation basis of <img alt="\left |0 \right &gt; , \left | 1 \right &gt; " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft+%7C0+%5Cright+%3E+%2C+%5Cleft+%7C+1+%5Cright+%3E+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\left |0 \right &gt; , \left | 1 \right &gt; "/>. We start by setting our initial state to a uniform superposition over computational basis states:</p>
+<p><img alt="\left |s \right &gt; = \frac{1}{\sqrt{2^n}}\sum_{z \in \{0,1\}^n} \left |z \right &gt; " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft+%7Cs+%5Cright+%3E+%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7B2%5En%7D%7D%5Csum_%7Bz+%5Cin+%5C%7B0%2C1%5C%7D%5En%7D+%5Cleft+%7Cz+%5Cright+%3E+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\left |s \right &gt; = \frac{1}{\sqrt{2^n}}\sum_{z \in \{0,1\}^n} \left |z \right &gt; "/></p>
+<p>Next, we define a unitary operator using the cost function as follows:</p>
+<p><img alt="U(\hat{C},\gamma) = e^{i\gamma \hat{C}}= \prod_{\alpha = 1}^m e^{-i\gamma \hat{C}_\alpha}&#xA0;" class="latex" src="https://s0.wp.com/latex.php?latex=U%28%5Chat%7BC%7D%2C%5Cgamma%29+%3D+e%5E%7Bi%5Cgamma+%5Chat%7BC%7D%7D%3D+%5Cprod_%7B%5Calpha+%3D+1%7D%5Em+e%5E%7B-i%5Cgamma+%5Chat%7BC%7D_%5Calpha%7D%C2%A0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U(\hat{C},\gamma) = e^{i\gamma \hat{C}}= \prod_{\alpha = 1}^m e^{-i\gamma \hat{C}_\alpha}&#xA0;"/></p>
+<p>Here we convert every clause <img alt="C_\alpha" class="latex" src="https://s0.wp.com/latex.php?latex=C_%5Calpha&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_\alpha"/> to a Hamiltonian <img alt="\hat{C_\alpha}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7BC_%5Calpha%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\hat{C_\alpha}"/> consisting of Pauli Z ($\sigma^z$) operators. Just as a review, the two Pauli operators (X and Z) used in this blog post are representated as follows:</p>
+<p><img alt="\sigma^x = \begin{pmatrix}&#xA0;&#xA0;&#xA0; 0 &amp; 1 \\&#xA0;&#xA0;&#xA0; 1 &amp; 0 \\\end{pmatrix} \: \: \: \:  \sigma^z = \begin{pmatrix}&#xA0;&#xA0;&#xA0; 1 &amp; 0 \\&#xA0;&#xA0;&#xA0; 0 &amp; -1 \\\end{pmatrix} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csigma%5Ex+%3D+%5Cbegin%7Bpmatrix%7D%C2%A0%C2%A0%C2%A0+0+%26+1+%5C%5C%C2%A0%C2%A0%C2%A0+1+%26+0+%5C%5C%5Cend%7Bpmatrix%7D+%5C%3A+%5C%3A+%5C%3A+%5C%3A++%5Csigma%5Ez+%3D+%5Cbegin%7Bpmatrix%7D%C2%A0%C2%A0%C2%A0+1+%26+0+%5C%5C%C2%A0%C2%A0%C2%A0+0+%26+-1+%5C%5C%5Cend%7Bpmatrix%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\sigma^x = \begin{pmatrix}&#xA0;&#xA0;&#xA0; 0 &amp; 1 \\&#xA0;&#xA0;&#xA0; 1 &amp; 0 \\\end{pmatrix} \: \: \: \:  \sigma^z = \begin{pmatrix}&#xA0;&#xA0;&#xA0; 1 &amp; 0 \\&#xA0;&#xA0;&#xA0; 0 &amp; -1 \\\end{pmatrix} "/></p>
+<p>For example if <img alt="C_\alpha=x \oplus y" class="latex" src="https://s0.wp.com/latex.php?latex=C_%5Calpha%3Dx+%5Coplus+y&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_\alpha=x \oplus y"/> we can map the clause to <img alt="\hat{C_\alpha}=\frac{1}{2}(1+\sigma^z_x \sigma^z_y)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7BC_%5Calpha%7D%3D%5Cfrac%7B1%7D%7B2%7D%281%2B%5Csigma%5Ez_x+%5Csigma%5Ez_y%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\hat{C_\alpha}=\frac{1}{2}(1+\sigma^z_x \sigma^z_y)"/> for a minimization problem. If <img alt="x=\left |0 \right &gt; &#xA0;" class="latex" src="https://s0.wp.com/latex.php?latex=x%3D%5Cleft+%7C0+%5Cright+%3E+%C2%A0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x=\left |0 \right &gt; &#xA0;"/> , then <img alt="\sigma^z_x" class="latex" src="https://s0.wp.com/latex.php?latex=%5Csigma%5Ez_x&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\sigma^z_x"/> will return a value of 1, and if <img alt="x=\left |1 \right &gt; " class="latex" src="https://s0.wp.com/latex.php?latex=x%3D%5Cleft+%7C1+%5Cright+%3E+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x=\left |1 \right &gt; "/> the operator will return -1. The same applies to qubit <img alt="y" class="latex" src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="y"/> as well. Therefore it is not hard to see that if <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="x"/> and <img alt="y" class="latex" src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="y"/> have the same value, then the operator <img alt="\hat{C_\alpha}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7BC_%5Calpha%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\hat{C_\alpha}"/> as defined above will result in a 1, and it’ll result in 0 otherwise. Furthermore, since <img alt="\hat{C}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7BC%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\hat{C}"/> has integer eigenvalues we can restrict the angle <img alt="\gamma" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cgamma&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\gamma"/> to lie in <img alt="[0,2\pi]" class="latex" src="https://s0.wp.com/latex.php?latex=%5B0%2C2%5Cpi%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="[0,2\pi]"/>.</p>
+<p>Next, we define the admixing Hamiltonian:</p>
+<p><img alt="B=\sum_{j=1}^n \sigma^x_j " class="latex" src="https://s0.wp.com/latex.php?latex=B%3D%5Csum_%7Bj%3D1%7D%5En+%5Csigma%5Ex_j+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="B=\sum_{j=1}^n \sigma^x_j "/></p>
+<p>and use it to define a unitary operator which consists of a product of commuting one qubit operations:</p>
+<p><img alt="U(B,\beta) = e^{-i\beta B}= \prod_{j=1}^n e^{-i \beta \sigma_j^x}&#xA0;&#xA0;" class="latex" src="https://s0.wp.com/latex.php?latex=U%28B%2C%5Cbeta%29+%3D+e%5E%7B-i%5Cbeta+B%7D%3D+%5Cprod_%7Bj%3D1%7D%5En+e%5E%7B-i+%5Cbeta+%5Csigma_j%5Ex%7D%C2%A0%C2%A0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U(B,\beta) = e^{-i\beta B}= \prod_{j=1}^n e^{-i \beta \sigma_j^x}&#xA0;&#xA0;"/></p>
+<p>where <img alt="\beta \in [0,\pi]" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbeta+%5Cin+%5B0%2C%5Cpi%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\beta \in [0,\pi]"/>. It’s easy to see that <img alt="U(\Hat{C},\gamma)" class="latex" src="https://s0.wp.com/latex.php?latex=U%28%5CHat%7BC%7D%2C%5Cgamma%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U(\Hat{C},\gamma)"/> couples 2 or more qubits, while <img alt="U(B,\beta)" class="latex" src="https://s0.wp.com/latex.php?latex=U%28B%2C%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U(B,\beta)"/> performs a single qubit rotation on the qubits in our system. Using these unitaries and our initial state we define a QAOA angle-dependent “ansatz” state as follows:</p>
+<p><img alt="\left | &#xA0;\boldsymbol{\gamma},\boldsymbol{\beta} \right &gt;= U(B,\beta_p)U(\Hat{C},\gamma_p)...U(B,\beta_1)U(\Hat{C},\gamma_1) \left |s \right &gt; " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft+%7C+%C2%A0%5Cboldsymbol%7B%5Cgamma%7D%2C%5Cboldsymbol%7B%5Cbeta%7D+%5Cright+%3E%3D+U%28B%2C%5Cbeta_p%29U%28%5CHat%7BC%7D%2C%5Cgamma_p%29...U%28B%2C%5Cbeta_1%29U%28%5CHat%7BC%7D%2C%5Cgamma_1%29+%5Cleft+%7Cs+%5Cright+%3E+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\left | &#xA0;\boldsymbol{\gamma},\boldsymbol{\beta} \right &gt;= U(B,\beta_p)U(\Hat{C},\gamma_p)...U(B,\beta_1)U(\Hat{C},\gamma_1) \left |s \right &gt; "/></p>
+<p>Here <img alt="p\geq 1" class="latex" src="https://s0.wp.com/latex.php?latex=p%5Cgeq+1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p\geq 1"/> is the “depth” of our QAOA circuit, and <img alt="\boldsymbol{\gamma}=(\gamma_p,...,\gamma_1)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cboldsymbol%7B%5Cgamma%7D%3D%28%5Cgamma_p%2C...%2C%5Cgamma_1%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\boldsymbol{\gamma}=(\gamma_p,...,\gamma_1)"/>, <img alt="\boldsymbol{\beta}=(\beta_p,...,\beta_1)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cboldsymbol%7B%5Cbeta%7D%3D%28%5Cbeta_p%2C...%2C%5Cbeta_1%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\boldsymbol{\beta}=(\beta_p,...,\beta_1)"/> are each a vector of length <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p"/> controlling the angles for each layer. In the worst case scenario this state can be produce by a quantum circuit of depth <img alt="mp+p" class="latex" src="https://s0.wp.com/latex.php?latex=mp%2Bp&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="mp+p"/>, however by taking advantage of the structure of the instance we can further reduce the number of layers required. Let <img alt="F_p" class="latex" src="https://s0.wp.com/latex.php?latex=F_p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="F_p"/> be the expectation of <img alt="\hat{C}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7BC%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\hat{C}"/> in our ansatz:</p>
+<p><img alt="F_p(\boldsymbol{\gamma},\boldsymbol{\beta})=\left &lt; \boldsymbol{\gamma},\boldsymbol{\beta} \right | \hat{C} \left | \boldsymbol{\gamma},\boldsymbol{\beta} \right &gt;  " class="latex" src="https://s0.wp.com/latex.php?latex=F_p%28%5Cboldsymbol%7B%5Cgamma%7D%2C%5Cboldsymbol%7B%5Cbeta%7D%29%3D%5Cleft+%3C+%5Cboldsymbol%7B%5Cgamma%7D%2C%5Cboldsymbol%7B%5Cbeta%7D+%5Cright+%7C+%5Chat%7BC%7D+%5Cleft+%7C+%5Cboldsymbol%7B%5Cgamma%7D%2C%5Cboldsymbol%7B%5Cbeta%7D+%5Cright+%3E++&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="F_p(\boldsymbol{\gamma},\boldsymbol{\beta})=\left &lt; \boldsymbol{\gamma},\boldsymbol{\beta} \right | \hat{C} \left | \boldsymbol{\gamma},\boldsymbol{\beta} \right &gt;  "/></p>
+<p>and let <img alt="M_p" class="latex" src="https://s0.wp.com/latex.php?latex=M_p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="M_p"/> be the minimum of <img alt="F_p" class="latex" src="https://s0.wp.com/latex.php?latex=F_p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="F_p"/> over angles,</p>
+<p><img alt="M_p=\min_{\boldsymbol{\gamma},\boldsymbol{\beta}} F_p(\boldsymbol{\gamma},\boldsymbol{\beta}).  " class="latex" src="https://s0.wp.com/latex.php?latex=M_p%3D%5Cmin_%7B%5Cboldsymbol%7B%5Cgamma%7D%2C%5Cboldsymbol%7B%5Cbeta%7D%7D+F_p%28%5Cboldsymbol%7B%5Cgamma%7D%2C%5Cboldsymbol%7B%5Cbeta%7D%29.++&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="M_p=\min_{\boldsymbol{\gamma},\boldsymbol{\beta}} F_p(\boldsymbol{\gamma},\boldsymbol{\beta}).  "/></p>
+<p>Note that minimization at <img alt="p-1" class="latex" src="https://s0.wp.com/latex.php?latex=p-1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p-1"/> layers can be viewed as a constrained minimization at <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p"/> layers, therefore</p>
+<p><img alt="M_p \leq M_{p-1}  " class="latex" src="https://s0.wp.com/latex.php?latex=M_p+%5Cleq+M_%7Bp-1%7D++&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="M_p \leq M_{p-1}  "/></p>
+<p>Using an adiabatic approach [1] We can show that</p>
+<p><img alt="\lim_{p \rightarrow \infty} M_p = \min_z C(z) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Clim_%7Bp+%5Crightarrow+%5Cinfty%7D+M_p+%3D+%5Cmin_z+C%28z%29+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\lim_{p \rightarrow \infty} M_p = \min_z C(z) "/></p>
+<p>Based on these results our QAOA algorithm will look like the following:</p>
+<ul>
+<li> c: pick a <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p"/></li>
+<li>c: choose a set of angles <img alt="(\Vec{\gamma}_0,\Vec{\beta}_0)" class="latex" src="https://s0.wp.com/latex.php?latex=%28%5CVec%7B%5Cgamma%7D_0%2C%5CVec%7B%5Cbeta%7D_0%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(\Vec{\gamma}_0,\Vec{\beta}_0)"/></li>
+<li>q: prepare <img alt="\left | \Vec{\gamma},\Vec{\beta} \right &gt; &#xA0;" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft+%7C+%5CVec%7B%5Cgamma%7D%2C%5CVec%7B%5Cbeta%7D+%5Cright+%3E+%C2%A0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\left | \Vec{\gamma},\Vec{\beta} \right &gt; &#xA0;"/></li>
+<li>q: compute <img alt="F_p" class="latex" src="https://s0.wp.com/latex.php?latex=F_p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="F_p"/></li>
+<li>c: perform gradient descend/ascend on <img alt="F_p" class="latex" src="https://s0.wp.com/latex.php?latex=F_p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="F_p"/> and get a new set of angles <img alt="(\Vec{\gamma},\Vec{\beta})" class="latex" src="https://s0.wp.com/latex.php?latex=%28%5CVec%7B%5Cgamma%7D%2C%5CVec%7B%5Cbeta%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(\Vec{\gamma},\Vec{\beta})"/></li>
+<li>repeat from step 3 till convergence</li>
+<li>report the measurement result of <img alt="\left | \Vec{\gamma},\Vec{\beta} \right &gt; &#xA0;" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft+%7C+%5CVec%7B%5Cgamma%7D%2C%5CVec%7B%5Cbeta%7D+%5Cright+%3E+%C2%A0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\left | \Vec{\gamma},\Vec{\beta} \right &gt; &#xA0;"/> in computational basis</li>
+</ul>
+<p>If <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p"/> does not asymptotically grow with <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/> <img alt="F_p(\Vec{\gamma},\Vec{\beta})" class="latex" src="https://s0.wp.com/latex.php?latex=F_p%28%5CVec%7B%5Cgamma%7D%2C%5CVec%7B%5Cbeta%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="F_p(\Vec{\gamma},\Vec{\beta})"/> can be efficiently computed in <img alt="O(m^2+mn)" class="latex" src="https://s0.wp.com/latex.php?latex=O%28m%5E2%2Bmn%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="O(m^2+mn)"/></p>
+<h2>Application: MaxCut</h2>
+<p>In this section we apply the QAOA algorithm to the MaxCut problem with bounded degree. MaxCut is an NP-hard problem that asks for a subset <img alt="S" class="latex" src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="S"/> of the vertex set such that the number of edges between <img alt="S" class="latex" src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="S"/> and the complementary subset is as large as possible. While QAOA does not offer a theoretical guarantee to solve MaxCut in polynomial time, it offers a path to utilizing NISQ devices for tackling such optimization problems and discuss patterns in such problems that can be used for reducing the number of steps required.</p>
+<p>For this section, let’s assume <img alt="p=O(1)" class="latex" src="https://s0.wp.com/latex.php?latex=p%3DO%281%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p=O(1)"/>, and we have a graph with <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/> vertices and an edge set <img alt="\{&lt;jk&gt;\}" class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7B%3Cjk%3E%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\{&lt;jk&gt;\}"/> of size <img alt="m" class="latex" src="https://s0.wp.com/latex.php?latex=m&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="m"/>. We can construct a cost function to be maximized as follows:</p>
+<p><img alt="C = \sum_{&lt;jk&gt;} C_{&lt;jk&gt;} " class="latex" src="https://s0.wp.com/latex.php?latex=C+%3D+%5Csum_%7B%3Cjk%3E%7D+C_%7B%3Cjk%3E%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C = \sum_{&lt;jk&gt;} C_{&lt;jk&gt;} "/></p>
+<p><img alt="C_{&lt;jk&gt;} = \frac{1}{2} (1-\sigma^z_j \sigma^z_k)  " class="latex" src="https://s0.wp.com/latex.php?latex=C_%7B%3Cjk%3E%7D+%3D+%5Cfrac%7B1%7D%7B2%7D+%281-%5Csigma%5Ez_j+%5Csigma%5Ez_k%29++&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_{&lt;jk&gt;} = \frac{1}{2} (1-\sigma^z_j \sigma^z_k)  "/></p>
+<p>We can the compute the angle dependent cost of our ansatz as follows:</p>
+<p><img alt="F_p(\Vec{\gamma},\Vec{\beta})=\sum_{&lt;jk&gt;}\left &lt;{s} \right | U^\dagger(C,\gamma_1)...U^\dagger(B,\beta_p) C_{&lt;jk&gt;}U(B,\beta_p) ... U(C,\gamma_1) \left |s \right &gt;  " class="latex" src="https://s0.wp.com/latex.php?latex=F_p%28%5CVec%7B%5Cgamma%7D%2C%5CVec%7B%5Cbeta%7D%29%3D%5Csum_%7B%3Cjk%3E%7D%5Cleft+%3C%7Bs%7D+%5Cright+%7C+U%5E%5Cdagger%28C%2C%5Cgamma_1%29...U%5E%5Cdagger%28B%2C%5Cbeta_p%29+C_%7B%3Cjk%3E%7DU%28B%2C%5Cbeta_p%29+...+U%28C%2C%5Cgamma_1%29+%5Cleft+%7Cs+%5Cright+%3E++&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="F_p(\Vec{\gamma},\Vec{\beta})=\sum_{&lt;jk&gt;}\left &lt;{s} \right | U^\dagger(C,\gamma_1)...U^\dagger(B,\beta_p) C_{&lt;jk&gt;}U(B,\beta_p) ... U(C,\gamma_1) \left |s \right &gt;  "/></p>
+<p>Let’s consider the operation associated with some edge <img alt="&lt;jk&gt;" class="latex" src="https://s0.wp.com/latex.php?latex=%3Cjk%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="&lt;jk&gt;"/>:</p>
+<p><img alt="U ^\dagger(C,\gamma_1)...U^\dagger(B,\beta_p) C_{&lt;jk&gt;}U(B,\beta_p) ... U(C,\gamma_1)  " class="latex" src="https://s0.wp.com/latex.php?latex=U+%5E%5Cdagger%28C%2C%5Cgamma_1%29...U%5E%5Cdagger%28B%2C%5Cbeta_p%29+C_%7B%3Cjk%3E%7DU%28B%2C%5Cbeta_p%29+...+U%28C%2C%5Cgamma_1%29++&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U ^\dagger(C,\gamma_1)...U^\dagger(B,\beta_p) C_{&lt;jk&gt;}U(B,\beta_p) ... U(C,\gamma_1)  "/></p>
+<p>Since QAOA consists of local operations, we may take advantage by thinking about the problem in terms of subproblems (or subgraphs) involving certain nodes. This property will allow us to simplify our clauses even further depending on the desired depth <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p"/> of our quantum circuit, therefore decreasing the amount of resources necessary to implement the algorithm.</p>
+<p>The operator <img alt="C_{&lt;jk&gt;}" class="latex" src="https://s0.wp.com/latex.php?latex=C_%7B%3Cjk%3E%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_{&lt;jk&gt;}"/> includes qubits (nodes) <img alt="j" class="latex" src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j"/> and <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>, therefore the sequence of operators above will only involve qubits that are at most distance <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p"/> away from qubits <img alt="j" class="latex" src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j"/> and <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>. Let’s consider the example of <img alt="p=1" class="latex" src="https://s0.wp.com/latex.php?latex=p%3D1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p=1"/>:</p>
+<p><img alt="\rightarrow U^\dagger(C,\gamma_1)e^{i\beta_1(\sigma^x_j + \sigma^x_k)} C_{&lt;jk&gt;} e^{-i\beta_1(\sigma^x_j + \sigma^x_k)} U(C,\gamma_1).  " class="latex" src="https://s0.wp.com/latex.php?latex=%5Crightarrow+U%5E%5Cdagger%28C%2C%5Cgamma_1%29e%5E%7Bi%5Cbeta_1%28%5Csigma%5Ex_j+%2B+%5Csigma%5Ex_k%29%7D+C_%7B%3Cjk%3E%7D+e%5E%7B-i%5Cbeta_1%28%5Csigma%5Ex_j+%2B+%5Csigma%5Ex_k%29%7D+U%28C%2C%5Cgamma_1%29.++&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\rightarrow U^\dagger(C,\gamma_1)e^{i\beta_1(\sigma^x_j + \sigma^x_k)} C_{&lt;jk&gt;} e^{-i\beta_1(\sigma^x_j + \sigma^x_k)} U(C,\gamma_1).  "/></p>
+<p>It’s easy to see that any factor of <img alt="U(C,\gamma_1)" class="latex" src="https://s0.wp.com/latex.php?latex=U%28C%2C%5Cgamma_1%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U(C,\gamma_1)"/> that does not depend on <img alt="j" class="latex" src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j"/> or <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/> will commute through and cancel out. Since the degree is bounded, each subgraph contains a number of qubits that is independent of <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/>, which allows for the evaluation of <img alt="F_p" class="latex" src="https://s0.wp.com/latex.php?latex=F_p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="F_p"/> in terms of subsystems of size independent of <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/>.</p>
+<p>For an subgraph <img alt="G" class="latex" src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="G"/> define:</p>
+<p><img alt="C_G=\sum_{&lt;l l^\prime&gt;} C_{&lt;l l^\prime&gt;}&#xA0; \: \: \: \: U(C_G,\gamma)=e^{-i \gamma C_G} " class="latex" src="https://s0.wp.com/latex.php?latex=C_G%3D%5Csum_%7B%3Cl+l%5E%5Cprime%3E%7D+C_%7B%3Cl+l%5E%5Cprime%3E%7D%C2%A0+%5C%3A+%5C%3A+%5C%3A+%5C%3A+U%28C_G%2C%5Cgamma%29%3De%5E%7B-i+%5Cgamma+C_G%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_G=\sum_{&lt;l l^\prime&gt;} C_{&lt;l l^\prime&gt;}&#xA0; \: \: \: \: U(C_G,\gamma)=e^{-i \gamma C_G} "/></p>
+<p><img alt="B_G = \sum_{j \in G} \sigma^x_j&#xA0; \: \: \: \: U(B_G,\beta) = e^{-i \beta B_G} " class="latex" src="https://s0.wp.com/latex.php?latex=B_G+%3D+%5Csum_%7Bj+%5Cin+G%7D+%5Csigma%5Ex_j%C2%A0+%5C%3A+%5C%3A+%5C%3A+%5C%3A+U%28B_G%2C%5Cbeta%29+%3D+e%5E%7B-i+%5Cbeta+B_G%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="B_G = \sum_{j \in G} \sigma^x_j&#xA0; \: \: \: \: U(B_G,\beta) = e^{-i \beta B_G} "/></p>
+<p><img alt="\left | s,G \right &gt; &#xA0;&#xA0;= \prod_{l \in G} \left |+ \right &gt; _l  " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft+%7C+s%2CG+%5Cright+%3E+%C2%A0%C2%A0%3D+%5Cprod_%7Bl+%5Cin+G%7D+%5Cleft+%7C%2B+%5Cright+%3E+_l++&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\left | s,G \right &gt; &#xA0;&#xA0;= \prod_{l \in G} \left |+ \right &gt; _l  "/></p>
+<p>We can define our total cost as a sum over the cost of each subgraph:</p>
+<p><img alt="f_g(\Vec{\gamma},\Vec{\beta})=\left &lt; s,g(j,k) \right |&#xA0; U ^\dagger(C_{g(j,k)},\gamma_1)...U^\dagger(B_{g(j,k)},\beta_p) C_{&lt;jk&gt;}U(B_{g(j,k)},\beta_p) ... U(C_{g(j,k)},\gamma_1) \left |s,g(j,k) \right &gt;  " class="latex" src="https://s0.wp.com/latex.php?latex=f_g%28%5CVec%7B%5Cgamma%7D%2C%5CVec%7B%5Cbeta%7D%29%3D%5Cleft+%3C+s%2Cg%28j%2Ck%29+%5Cright+%7C%C2%A0+U+%5E%5Cdagger%28C_%7Bg%28j%2Ck%29%7D%2C%5Cgamma_1%29...U%5E%5Cdagger%28B_%7Bg%28j%2Ck%29%7D%2C%5Cbeta_p%29+C_%7B%3Cjk%3E%7DU%28B_%7Bg%28j%2Ck%29%7D%2C%5Cbeta_p%29+...+U%28C_%7Bg%28j%2Ck%29%7D%2C%5Cgamma_1%29+%5Cleft+%7Cs%2Cg%28j%2Ck%29+%5Cright+%3E++&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="f_g(\Vec{\gamma},\Vec{\beta})=\left &lt; s,g(j,k) \right |&#xA0; U ^\dagger(C_{g(j,k)},\gamma_1)...U^\dagger(B_{g(j,k)},\beta_p) C_{&lt;jk&gt;}U(B_{g(j,k)},\beta_p) ... U(C_{g(j,k)},\gamma_1) \left |s,g(j,k) \right &gt;  "/></p>
+<p>where <img alt="g(j,k)" class="latex" src="https://s0.wp.com/latex.php?latex=g%28j%2Ck%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="g(j,k)"/> is a subgraph of type <img alt="g" class="latex" src="https://s0.wp.com/latex.php?latex=g&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="g"/> and “…” is used to omit the sequence of angle depending unitaries constructed using the elements of <img alt="\Vec{\gamma}" class="latex" src="https://s0.wp.com/latex.php?latex=%5CVec%7B%5Cgamma%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\Vec{\gamma}"/> and <img alt="\Vec{\beta}" class="latex" src="https://s0.wp.com/latex.php?latex=%5CVec%7B%5Cbeta%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\Vec{\beta}"/>. <img alt="F_p" class="latex" src="https://s0.wp.com/latex.php?latex=F_p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="F_p"/> is then</p>
+<p><img alt="F_p(\Vec{\gamma},\Vec{\beta})=\sum_g w_g f_g(\Vec{\gamma},\Vec{\beta})  " class="latex" src="https://s0.wp.com/latex.php?latex=F_p%28%5CVec%7B%5Cgamma%7D%2C%5CVec%7B%5Cbeta%7D%29%3D%5Csum_g+w_g+f_g%28%5CVec%7B%5Cgamma%7D%2C%5CVec%7B%5Cbeta%7D%29++&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="F_p(\Vec{\gamma},\Vec{\beta})=\sum_g w_g f_g(\Vec{\gamma},\Vec{\beta})  "/></p>
+<p>where <img alt="w_g" class="latex" src="https://s0.wp.com/latex.php?latex=w_g&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="w_g"/> is the number of occurrence of the subgraph <img alt="g" class="latex" src="https://s0.wp.com/latex.php?latex=g&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="g"/> in the original edge sum. The function <img alt="f_g" class="latex" src="https://s0.wp.com/latex.php?latex=f_g&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="f_g"/> does not depend on <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/> and <img alt="m" class="latex" src="https://s0.wp.com/latex.php?latex=m&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="m"/>, and the only dependence on these variables comes through the weights <img alt="w_g" class="latex" src="https://s0.wp.com/latex.php?latex=w_g&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="w_g"/> from the original graph. The maximum number of qubits that can appear in our sequence of operators comes when the subgraph is a tree. For a graph with maximum degree <img alt="v" class="latex" src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="v"/>, the number of qubits in this tree is</p>
+<p><img alt="q_{tree}=2[\frac{(v-1)^{p+1}-1}{(v-1)-1}]  " class="latex" src="https://s0.wp.com/latex.php?latex=q_%7Btree%7D%3D2%5B%5Cfrac%7B%28v-1%29%5E%7Bp%2B1%7D-1%7D%7B%28v-1%29-1%7D%5D++&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="q_{tree}=2[\frac{(v-1)^{p+1}-1}{(v-1)-1}]  "/></p>
+<p>(or <img alt="2p+2" class="latex" src="https://s0.wp.com/latex.php?latex=2p%2B2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2p+2"/> if <img alt="v=2" class="latex" src="https://s0.wp.com/latex.php?latex=v%3D2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="v=2"/>), which is independent of <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/> and <img alt="m" class="latex" src="https://s0.wp.com/latex.php?latex=m&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="m"/>. Therefore we can see that for constant <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p"/> <img alt="F_p" class="latex" src="https://s0.wp.com/latex.php?latex=F_p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="F_p"/> can be efficiently computed.</p>
+<p>Next, let’s consider the spread of C measured in the state <img alt="\left | \Vec{\gamma},\Vec{\beta} \right &gt; &#xA0;" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft+%7C+%5CVec%7B%5Cgamma%7D%2C%5CVec%7B%5Cbeta%7D+%5Cright+%3E+%C2%A0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\left | \Vec{\gamma},\Vec{\beta} \right &gt; &#xA0;"/>.</p>
+<p><img alt="\left &lt;\Vec{\gamma},\Vec{\beta} \right | C^2\left |\Vec{\gamma},\Vec{\beta}\right &gt; &#xA0;-\left &lt; \Vec{\gamma},\Vec{\beta} \right | C \left | \Vec{\gamma},\Vec{\beta} \right &gt; ^2 \leq 2[\frac{(v-1)^{2p+2}-1}{(v-1)-1}].m  " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft+%3C%5CVec%7B%5Cgamma%7D%2C%5CVec%7B%5Cbeta%7D+%5Cright+%7C+C%5E2%5Cleft+%7C%5CVec%7B%5Cgamma%7D%2C%5CVec%7B%5Cbeta%7D%5Cright+%3E+%C2%A0-%5Cleft+%3C+%5CVec%7B%5Cgamma%7D%2C%5CVec%7B%5Cbeta%7D+%5Cright+%7C+C+%5Cleft+%7C+%5CVec%7B%5Cgamma%7D%2C%5CVec%7B%5Cbeta%7D+%5Cright+%3E+%5E2+%5Cleq+2%5B%5Cfrac%7B%28v-1%29%5E%7B2p%2B2%7D-1%7D%7B%28v-1%29-1%7D%5D.m++&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\left &lt;\Vec{\gamma},\Vec{\beta} \right | C^2\left |\Vec{\gamma},\Vec{\beta}\right &gt; &#xA0;-\left &lt; \Vec{\gamma},\Vec{\beta} \right | C \left | \Vec{\gamma},\Vec{\beta} \right &gt; ^2 \leq 2[\frac{(v-1)^{2p+2}-1}{(v-1)-1}].m  "/></p>
+<p>For fixed <img alt="v" class="latex" src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="v"/> and <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p"/> we see that the standard deviation of <img alt="C(z)" class="latex" src="https://s0.wp.com/latex.php?latex=C%28z%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C(z)"/> is upper-bounded by <img alt="O(\sqrt{m})" class="latex" src="https://s0.wp.com/latex.php?latex=O%28%5Csqrt%7Bm%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="O(\sqrt{m})"/>. Using this fact and the appropriate probability bounds we can see that the result of measuring the cost function of the state <img alt="\left | \vec{\gamma_{opt}},vec{\beta_{opt}} \right &gt; &#xA0;" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft+%7C+%5Cvec%7B%5Cgamma_%7Bopt%7D%7D%2Cvec%7B%5Cbeta_%7Bopt%7D%7D+%5Cright+%3E+%C2%A0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\left | \vec{\gamma_{opt}},vec{\beta_{opt}} \right &gt; &#xA0;"/> will be very close to the intended value of <img alt="F_p(\vec{\gamma_{opt}},\vec{\beta_{opt}})" class="latex" src="https://s0.wp.com/latex.php?latex=F_p%28%5Cvec%7B%5Cgamma_%7Bopt%7D%7D%2C%5Cvec%7B%5Cbeta_%7Bopt%7D%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="F_p(\vec{\gamma_{opt}},\vec{\beta_{opt}})"/> which bounds the uncertainty present in quantum measurement.</p>
+<h2>Bibliography</h2>
+<p>[1] E. Farhi, J. Goldstone, and S. Gutmann, “A Quantum Approximate Optimization Algorithm,” 2014.</p>
+<p>[2] J. S. Otterbach, et. al, “Unsupervised Machine Learning on a Hybrid Quantum Computer,” 2017.</p></div>
+    </content>
+    <updated>2018-12-22T23:36:23Z</updated>
+    <published>2018-12-22T23:36:23Z</published>
+    <category term="physics"/>
+    <author>
+      <name>karamlou</name>
+    </author>
+    <source>
+      <id>https://windowsontheory.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://windowsontheory.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://windowsontheory.org" rel="alternate" type="text/html"/>
+      <link href="https://windowsontheory.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>A Research Blog</subtitle>
+      <title>Windows On Theory</title>
+      <updated>2018-12-23T00:20:44Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>https://11011110.github.io/blog/2018/12/22/circles-crossing-equal</id>
@@ -207,7 +313,7 @@ This is our <img alt="{801^{st}}" class="latex" src="https://s0.wp.com/latex.php
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2018-12-22T23:21:43Z</updated>
+      <updated>2018-12-23T00:22:10Z</updated>
     </source>
   </entry>
 
@@ -358,7 +464,7 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-22T23:20:37Z</updated>
+      <updated>2018-12-23T00:20:41Z</updated>
     </source>
   </entry>
 
@@ -1104,7 +1210,7 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-22T23:20:34Z</updated>
+      <updated>2018-12-23T00:20:38Z</updated>
     </source>
   </entry>
 
@@ -1136,7 +1242,7 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-22T23:20:39Z</updated>
+      <updated>2018-12-23T00:20:44Z</updated>
     </source>
   </entry>
 
@@ -1144,13 +1250,13 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
     <id>http://windowsontheory.org/?p=6358</id>
     <link href="https://windowsontheory.org/2018/12/20/quantum-hamiltonian-complexity/" rel="alternate" type="text/html"/>
     <title>What is Quantum Hamiltonian Complexity?</title>
-    <summary>by Ben Edelman This is the first installment of a three-part series of posts on quantum Hamiltonian complexity based on lectures given the authors in Boaz and Tselil’s seminar. The third installment has apparently already been posted, but if you were confused by it, fear not! This post and the next will provide the necessary […]
+    <summary>by Ben Edelman This is the first installment of a three-part series of posts on quantum Hamiltonian complexity based on lectures given the authors in Boaz and Tselil’s seminar. The second installment is here, and the third installment is here. Quantum Hamiltonian complexity is a growing area of study that has important ramifications for both […]
       <div class="commentbar">
         <p/>
       </div>
     </summary>
     <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><strong>by Ben Edelman</strong></p>
-<p><em>This is the first installment of a three-part series of posts on quantum Hamiltonian complexity based on lectures given the authors in <a href="https://www.boazbarak.org/fall18seminar/">Boaz and Tselil’s seminar</a>. The <a href="https://windowsontheory.org/2018/12/18/a-1d-area-law-for-gapped-local-hamiltonians/">third installment</a> has apparently already been posted, but if you were confused by it, fear not! This post and the next will provide the necessary background.</em></p>
+<p><em>This is the first installment of a three-part series of posts on quantum Hamiltonian complexity based on lectures given the authors in <a href="https://www.boazbarak.org/fall18seminar/">Boaz and Tselil’s seminar</a>. The second installment is <a href="https://windowsontheory.org/2018/12/20/tensor-networks-matrix-product-states-dmrg/">here</a>, and the third installment is <a href="https://windowsontheory.org/2018/12/18/a-1d-area-law-for-gapped-local-hamiltonians/">here</a>.</em></p>
 <p>Quantum Hamiltonian complexity is a growing area of study that has important ramifications for both physics and computation. Our hope is that these three posts will provide an accessible (and incomplete) preview of the subject for readers who know the basics of theoretical computer science and quantum information. Much of the material is adapted from an <a href="https://arxiv.org/abs/1401.3916">excellent survey by Gharibian et al.</a>.</p>
 <p>In a nutshell, quantum Hamiltonian complexity is the study of the <em>local Hamiltonian problem</em>. Why is this problem important enough to justify the existence of an entire subfield? To illustrate why, here are two informal characterizations of it:</p>
 <ol>
@@ -1301,7 +1407,7 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-22T23:20:35Z</updated>
+      <updated>2018-12-23T00:20:39Z</updated>
     </source>
   </entry>
 
@@ -1330,7 +1436,7 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
       <link href="https://adamsheffer.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Discrete geometry and other typos</subtitle>
       <title>Some Plane Truths</title>
-      <updated>2018-12-22T23:20:12Z</updated>
+      <updated>2018-12-23T00:20:14Z</updated>
     </source>
   </entry>
 
@@ -1360,7 +1466,7 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>By Emanuele Viola</subtitle>
       <title>Thoughts</title>
-      <updated>2018-12-22T23:20:08Z</updated>
+      <updated>2018-12-23T00:20:08Z</updated>
     </source>
   </entry>
 
@@ -1391,7 +1497,7 @@ Email: gldpost2@us.ibm.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-22T23:21:06Z</updated>
+      <updated>2018-12-23T00:21:09Z</updated>
     </source>
   </entry>
 
@@ -1450,7 +1556,7 @@ Email: gldpost2@us.ibm.com</p></div>
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2018-12-22T23:21:13Z</updated>
+      <updated>2018-12-23T00:21:15Z</updated>
     </source>
   </entry>
 
@@ -1463,7 +1569,7 @@ Email: gldpost2@us.ibm.com</p></div>
         <p/>
       </div>
     </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>(<em>This post is based on part of a lecture delivered by Boriana Gjura and Prayaag Venkat. See also posts by Ben Edelman and Fred Zhang for more context on Quantum Hamiltonian Complexity.</em>)</p>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>(<em>This post is based on part of a lecture delivered by Boriana Gjura and Prayaag Venkat. See also posts by <a href="https://windowsontheory.org/2018/12/20/quantum-hamiltonian-complexity/">Ben Edelman</a> and <a href="https://windowsontheory.org/2018/12/20/tensor-networks-matrix-product-states-dmrg/">Fred Zhang</a> for more context on Quantum Hamiltonian Complexity.</em>)</p>
 <h1>Introduction</h1>
 <p>In this post we present the Area Law conjecture and prove it rigorously,<br/>
 emphasizing the emergence of approximate ground state projectors as a<br/>
@@ -1922,7 +2028,7 @@ such that <img alt="|p(x)| \leq 1" class="latex" src="https://s0.wp.com/latex.ph
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-22T23:20:36Z</updated>
+      <updated>2018-12-23T00:20:40Z</updated>
     </source>
   </entry>
 
@@ -1953,7 +2059,7 @@ Email: lreyzin@uic.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-22T23:21:05Z</updated>
+      <updated>2018-12-23T00:21:08Z</updated>
     </source>
   </entry>
 
@@ -1984,7 +2090,7 @@ Email: slovett@ucsd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-22T23:21:05Z</updated>
+      <updated>2018-12-23T00:21:08Z</updated>
     </source>
   </entry>
 
@@ -2015,7 +2121,7 @@ Email: slovett@ucsd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-22T23:21:06Z</updated>
+      <updated>2018-12-23T00:21:09Z</updated>
     </source>
   </entry>
 
@@ -2770,7 +2876,7 @@ Email: slovett@ucsd.edu</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-22T23:20:31Z</updated>
+      <updated>2018-12-23T00:20:35Z</updated>
     </source>
   </entry>
 
@@ -2991,7 +3097,7 @@ We don’t think the photo used by this online Alchetron <a href="https://alchet
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2018-12-22T23:21:42Z</updated>
+      <updated>2018-12-23T00:22:09Z</updated>
     </source>
   </entry>
 
@@ -3022,7 +3128,7 @@ Email: jschmidt@cs.duke.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-22T23:21:06Z</updated>
+      <updated>2018-12-23T00:21:09Z</updated>
     </source>
   </entry>
 
@@ -3054,7 +3160,7 @@ Email: sergeg@cse.unsw.edu.au</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-22T23:21:06Z</updated>
+      <updated>2018-12-23T00:21:09Z</updated>
     </source>
   </entry>
 
@@ -3176,7 +3282,7 @@ The diagram also shows the nature of the expected assortment of the solutions of
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-22T23:20:32Z</updated>
+      <updated>2018-12-23T00:20:36Z</updated>
     </source>
   </entry>
 
@@ -3208,7 +3314,7 @@ Email: meel@comp.nus.edu.sg</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-22T23:21:05Z</updated>
+      <updated>2018-12-23T00:21:08Z</updated>
     </source>
   </entry>
 
@@ -3238,7 +3344,7 @@ Gusfield (1980) and Dean (2009) showed that the number of break points for an $n
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-22T23:21:54Z</updated>
+      <updated>2018-12-23T00:22:20Z</updated>
     </source>
   </entry>
 
@@ -3297,7 +3403,7 @@ Milena Mihail and Umesh Vazirani</span></strong></p>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2018-12-22T23:21:04Z</updated>
+      <updated>2018-12-23T00:21:07Z</updated>
     </source>
   </entry>
 
@@ -3388,7 +3494,7 @@ Email: marek@cs.ucr.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-22T23:21:06Z</updated>
+      <updated>2018-12-23T00:21:09Z</updated>
     </source>
   </entry>
 
@@ -3473,7 +3579,7 @@ I like this proof quite a bit. Can this argument be used to prove the basic fact
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2018-12-22T23:21:43Z</updated>
+      <updated>2018-12-23T00:22:10Z</updated>
     </source>
   </entry>
 
@@ -3515,7 +3621,7 @@ At the heart of all our proofs is the construction of a dense bipartite graph wi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-22T23:21:54Z</updated>
+      <updated>2018-12-23T00:22:20Z</updated>
     </source>
   </entry>
 
@@ -3600,7 +3706,7 @@ this context.
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-22T23:21:54Z</updated>
+      <updated>2018-12-23T00:22:20Z</updated>
     </source>
   </entry>
 
@@ -3923,7 +4029,7 @@ Recall that, up to regularization, the capacity of a quantum channel is given by
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-22T23:20:39Z</updated>
+      <updated>2018-12-23T00:20:43Z</updated>
     </source>
   </entry>
 
@@ -3954,7 +4060,7 @@ Email: raphael.clifford@bristol.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-22T23:21:05Z</updated>
+      <updated>2018-12-23T00:21:08Z</updated>
     </source>
   </entry>
 
@@ -3991,7 +4097,7 @@ Email: raphael.clifford@bristol.ac.uk</p></div>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2018-12-22T23:21:56Z</updated>
+      <updated>2018-12-23T00:22:22Z</updated>
     </source>
   </entry>
 
@@ -4021,7 +4127,7 @@ Email: raphael.clifford@bristol.ac.uk</p></div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>By Emanuele Viola</subtitle>
       <title>Thoughts</title>
-      <updated>2018-12-22T23:20:08Z</updated>
+      <updated>2018-12-23T00:20:09Z</updated>
     </source>
   </entry>
 
@@ -4053,7 +4159,7 @@ We also define new communication complexity classes that correspond to different
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-22T23:21:54Z</updated>
+      <updated>2018-12-23T00:22:20Z</updated>
     </source>
   </entry>
 
@@ -4173,7 +4279,7 @@ We also define new communication complexity classes that correspond to different
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2018-12-22T23:21:04Z</updated>
+      <updated>2018-12-23T00:21:07Z</updated>
     </source>
   </entry>
 
@@ -4207,7 +4313,7 @@ In all known constructions of probabilistic polynomials for the OR function (inc
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-22T23:21:55Z</updated>
+      <updated>2018-12-23T00:22:21Z</updated>
     </source>
   </entry>
 
@@ -4239,7 +4345,7 @@ Email: ilias.diakonikolas@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-22T23:21:06Z</updated>
+      <updated>2018-12-23T00:21:09Z</updated>
     </source>
   </entry>
 
@@ -4269,37 +4375,7 @@ Email: ilias.diakonikolas@gmail.com</p></div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>By Emanuele Viola</subtitle>
       <title>Thoughts</title>
-      <updated>2018-12-22T23:20:09Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2018/206</id>
-    <link href="https://eccc.weizmann.ac.il/report/2018/206" rel="alternate" type="text/html"/>
-    <title>TR18-206 |  Equality Alone Does Not Simulate Randomness | 
-
-	Arkadev Chattopadhyay, 
-
-	Shachar Lovett, 
-
-	Marc Vinyals</title>
-    <summary>The canonical problem that gives an exponential separation between deterministic and randomized communication complexity in the classical two-party communication model is `Equality'. In this work, we show that even allowing access to an `Equality' oracle, deterministic protocols remain exponentially weaker than randomized ones. More precisely, we exhibit a total function on $n$ bits with randomized one-sided communication complexity $O(\log n)$, but such that every deterministic protocol with access to `Equality' oracle needs $\Omega(n/\log n)$ cost to compute it.
-      <div class="commentbar">
-        <p/>
-      </div>
-    </summary>
-    <updated>2018-12-03T20:54:45Z</updated>
-    <published>2018-12-03T20:54:45Z</published>
-    <source>
-      <id>https://example.com/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://example.com/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2018-12-22T23:21:55Z</updated>
+      <updated>2018-12-23T00:20:09Z</updated>
     </source>
   </entry>
 </feed>
