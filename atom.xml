@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2018-12-23T01:21:54Z</updated>
+  <updated>2018-12-23T02:22:16Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,326 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://windowsontheory.org/?p=6939</id>
+    <link href="https://windowsontheory.org/2018/12/22/towards-quantum-pcp-a-proof-of-the-nlets-theorem/" rel="alternate" type="text/html"/>
+    <title>Towards Quantum PCP: A Proof of the NLETS Theorem</title>
+    <summary>By Abhijit Mudigonda, Richard Wang, and Lisa Yang This is part of a series of blog posts for CS 229r: Physics and Computation. In this post, we will talk about progress made towards resolving the quantum PCP conjecture. We’ll briefly talk about the progression from the quantum PCP conjecture to the NLTS conjecture to the […]
+      <div class="commentbar">
+        <p/>
+      </div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>By Abhijit Mudigonda, Richard Wang, and Lisa Yang</p>
+
+
+
+<p><i>This is part of a series of blog posts for <a href="https://www.boazbarak.org/fall18seminar/">CS 229r: Physics and Computation</a>. In this post, we will talk about progress made towards resolving the quantum PCP conjecture. We’ll briefly talk about the progression from the quantum PCP conjecture to the NLTS conjecture to the NLETS theorem, and then settle on providing a proof of the NLETS theorem. This new proof, due to Nirkhe, Vazirani, and Yuen, makes it clear that the Hamiltonian family used to resolve the NLETS theorem cannot help us in resolving the NLTS conjecture.</i></p>
+
+
+
+<h2>Introduction</h2>
+<p>We are all too familiar with <b>NP</b> problems. Consider now an upgrade to <b>NP</b> problems, where an omniscient prover (we’ll call this prover Merlin) can send a polynomial-sized proof to a <b>BPP</b> (<a href="https://complexityzoo.uwaterloo.ca/Petting_Zoo#BPP">bounded-error probabilistic polynomial-time</a>) verifier (and we’ll call this verifier Arthur). Now, we have more decision problems in another complexity class, <b>MA</b> (<a href="https://complexityzoo.uwaterloo.ca/Petting_Zoo#MA">Merlin-Arthur</a>). Consider again, the analogue in the quantum realm where now the prover sends over qubits instead and the verifier is in <b>BQP</b> (<a href="https://complexityzoo.uwaterloo.ca/Complexity_Zoo:B#bqp">bounded-error quantum polynomial-time</a>). And now we have <b>QMA</b> (<a href="https://complexityzoo.uwaterloo.ca/Complexity_Zoo:Q#qma">quantum Merlin-Arthur</a>).</p>
+
+<p>We can show that there is a hierarchy to these classes, where <b>NP</b> <img alt="\subseteq " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csubseteq+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\subseteq "/> <b>MA</b> <img alt="\subseteq " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csubseteq+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\subseteq "/> <b>QMA</b>.</p>
+
+<p>Our goal is to talk about progress towards a <b>quantum PCP theorem</b> (and since nobody has proved it in the positive or negative, we’ll refer to it as a quantum PCP <i>conjecture</i> for now), so it might be a good idea to first talk about the PCP theorem. Suppose we take a Boolean formula, and we want to verify that it is satisfiable. Then someone comes along and presents us with a certificate — in this case, a satisfying assignment — and we can check in polynomial time that either this is indeed a satisfying assignment to the formula (a correct certificate) or it is not (an incorrect certificate).</p>
+
+<p>But this requires that we check the entire certificate that is presented to us. Now, in comes the <b>PCP Theorem</b> (for <i>probabilistically checkable proofs</i>), which tells us that a certificate can be presented to us such that we can read a constant number of bits from the certificate, and have two things guaranteed: one, if this certificate is correct, then we will never think that it is incorrect even if we are not reading the entire certificate, and two, if we are presented with an incorrect certificate, we will reject it with high probability [<a href="https://windowsontheory.org/feed/#arora2009computational">1</a>].</p>
+
+<p>In short, one formulation of the PCP theorem tells us that, puzzingly, we might not need to read the entirety of a proof in order to be convinced with high probability that it is a good proof or a bad proof. But a natural question arises, which is to ask: is there a quantum analogue of the PCP theorem?</p>
+
+<h2>Progress</h2>
+
+<p>The answer is, we’re still not sure. But to make progress towards resolving this question, we will present the work of <a href="https://arxiv.org/pdf/1802.07419.pdf">Nirkhe, Vazirani, and Yuen</a> in providing an alternate proof of an earlier result of <a href="https://arxiv.org/pdf/1510.02082.pdf">Eldar and Harrow</a> on the NLETS theorem.
+
+</p><p>Before we state the quantum PCP conjecture, it would be helpful to review information about local Hamiltonians and the <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-local Hamiltonian problem. <a href="https://windowsontheory.org/2018/12/20/quantum-hamiltonian-complexity/">A previous blog post by Ben Edelman</a> covers these topics. Now, let’s state the quantum PCP conjecture:</p>
+
+<p><b>(<i>Quantum PCP Conjecture</i>)</b>: It is QMA-hard to decide whether a given local Hamiltonian <img alt="H = H_{1} + ... + H_{m} " class="latex" src="https://s0.wp.com/latex.php?latex=H+%3D+H_%7B1%7D+%2B+...+%2B+H_%7Bm%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H = H_{1} + ... + H_{m} "/> (where each <img alt="||H_{i}|| \leq 1" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%7CH_%7Bi%7D%7C%7C+%5Cleq+1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="||H_{i}|| \leq 1"/>) has ground state energy at most <img alt="a " class="latex" src="https://s0.wp.com/latex.php?latex=a+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="a "/> or at least <img alt="b " class="latex" src="https://s0.wp.com/latex.php?latex=b+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="b "/> when <img alt="b-a \geq c||H|| " class="latex" src="https://s0.wp.com/latex.php?latex=b-a+%5Cgeq+c%7C%7CH%7C%7C+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="b-a \geq c||H|| "/> for some universal constant <img alt="c &gt; 0" class="latex" src="https://s0.wp.com/latex.php?latex=c+%3E+0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="c &gt; 0"/>.</p>
+
+<p>Recall that MAX-<img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-SAT being NP-hard corresponds to the <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-local Hamiltonian problem being QMA-hard when <img alt="b-a \geq 1/poly(n)" class="latex" src="https://s0.wp.com/latex.php?latex=b-a+%5Cgeq+1%2Fpoly%28n%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="b-a \geq 1/poly(n)"/>. (We can refer to <a href="https://www.cs.cmu.edu/~odonnell/quantum15/lecture24.pdf">Theorem 4.1 in these scribed notes of Ryan O’Donnell’s lecture</a>, and more specifically to  <a href="https://arxiv.org/pdf/quant-ph/0406180.pdf">Kempe-Kitaev-Regev’s original paper</a> for proof of this fact.) The quantum PCP conjecture asks if this is still the case when the gap is <img alt="c||H||" class="latex" src="https://s0.wp.com/latex.php?latex=c%7C%7CH%7C%7C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="c||H||"/>.</p>
+
+<p>Going back to the PCP theorem, an implication of the PCP theorem is that it is NP-hard to approximate certain problems to within some factor. Just like its classical analogue, the qPCP conjecture can be seen as stating that it is QMA-hard to approximate the ground state energy to a factor better than <img alt="c||H||" class="latex" src="https://s0.wp.com/latex.php?latex=c%7C%7CH%7C%7C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="c||H||"/>.</p>
+
+<h3>Reformulation: NLTS conjecture</h3>
+<p>Let’s make the observation that, taking <img alt="a " class="latex" src="https://s0.wp.com/latex.php?latex=a+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="a "/> to be the ground state energy, the qPCP conjecture sort of says that there exists a family of Hamiltonians for which there is no trivial state (a state generated by a low depth circuit) such that the energy is at most <img alt="c||H|| " class="latex" src="https://s0.wp.com/latex.php?latex=c%7C%7CH%7C%7C+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="c||H|| "/> above the ground state energy.</p>
+
+<p>Freedman and Hastings came up with an easier goal called the <b>No Low-Energy Trivial States conjecture</b>, or <b>NLTS conjecture</b>. We expect that ground states of local Hamiltonians are sufficiently hard to describe (if NP <img alt="\neq " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cneq+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\neq "/> QMA). So low-energy states might not be generated by a quantum circuit of constant depth. More formally:</p>
+
+<p><b>(<i>NLTS Conjecture</i>)</b>: <i>There exists a universal constant <img alt="\epsilon &gt; 0 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon+%3E+0+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon &gt; 0 "/> and a family of local Hamiltonians <img alt="\{H^{(n)}\}_{n=1}^{\infty} " class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7BH%5E%7B%28n%29%7D%5C%7D_%7Bn%3D1%7D%5E%7B%5Cinfty%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\{H^{(n)}\}_{n=1}^{\infty} "/> where <img alt="H^{(n)} " class="latex" src="https://s0.wp.com/latex.php?latex=H%5E%7B%28n%29%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H^{(n)} "/> acts on <img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/> particles and consists of <img alt="m_{n} " class="latex" src="https://s0.wp.com/latex.php?latex=m_%7Bn%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="m_{n} "/> local terms, s.t. any family of states <img alt="\{|\psi_{n}\rangle\} " class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7B%7C%5Cpsi_%7Bn%7D%5Crangle%5C%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\{|\psi_{n}\rangle\} "/> satisfying <img alt="\langle \psi_{n} | H^{(n)} | \psi_{n}\rangle \leq \epsilon||H^{(n)}|| + \lambda_{min}(H^{(n)}) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Clangle+%5Cpsi_%7Bn%7D+%7C+H%5E%7B%28n%29%7D+%7C+%5Cpsi_%7Bn%7D%5Crangle+%5Cleq+%5Cepsilon%7C%7CH%5E%7B%28n%29%7D%7C%7C+%2B+%5Clambda_%7Bmin%7D%28H%5E%7B%28n%29%7D%29+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\langle \psi_{n} | H^{(n)} | \psi_{n}\rangle \leq \epsilon||H^{(n)}|| + \lambda_{min}(H^{(n)}) "/> requires circuit depth that grows faster than any constant.</i></p>
+
+<p>To reiterate, if we did have such a family of NLTS Hamiltonians, then it we wouldn’t be able to give “easy proofs” for the minimal energy of a Hamiltonian, because we couldn’t just give a small circuit which produced a low energy state.</p>
+
+<h2>Progress: NLETS theorem</h2>
+<p><img alt="\epsilon " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon "/>-error states are states that differ from the ground state in at most <img alt="\epsilon n " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon+n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon n "/> qubits. Now, consider <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon"/>-error states (which “agree” with the ground state on most qubits). Then for bounded-degree local Hamiltonians (analogously in the classical case, those where each variable participates in a bounded number of clauses), these states are also low energy. So any theorem which applies to low energy states (such as the NLTS conjecture), should also apply to states with <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon"/>-error (as in the NLETS theorem).</p>
+
+<p>To define low-error states more formally:</p>
+
+<p><b>Definition 2.1</b> (<img alt="\epsilon " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon "/>-error states): <i>Let <img alt="\rho, \sigma \in D((\mathbb{C}^{d})^{\otimes n}) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Crho%2C+%5Csigma+%5Cin+D%28%28%5Cmathbb%7BC%7D%5E%7Bd%7D%29%5E%7B%5Cotimes+n%7D%29+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\rho, \sigma \in D((\mathbb{C}^{d})^{\otimes n}) "/> (the space of positive semidefinite operators of trace norm equal to 1 on <img alt="(\mathbb{C}^{d})^{\otimes n}" class="latex" src="https://s0.wp.com/latex.php?latex=%28%5Cmathbb%7BC%7D%5E%7Bd%7D%29%5E%7B%5Cotimes+n%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(\mathbb{C}^{d})^{\otimes n}"/>). Let <img alt="H " class="latex" src="https://s0.wp.com/latex.php?latex=H+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H "/> be a local Hamiltonian acting on <img alt="(\mathbb{C}^{d})^{\otimes n}" class="latex" src="https://s0.wp.com/latex.php?latex=%28%5Cmathbb%7BC%7D%5E%7Bd%7D%29%5E%7B%5Cotimes+n%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(\mathbb{C}^{d})^{\otimes n}"/>. Then:</i></p>
+
+<p/><ul>
+    <li><img alt="\sigma " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csigma+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\sigma "/> is an <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon"/>-error state of <img alt="\rho " class="latex" src="https://s0.wp.com/latex.php?latex=%5Crho+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\rho "/> if <img alt="\exists S \subseteq [n] " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cexists+S+%5Csubseteq+%5Bn%5D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\exists S \subseteq [n] "/> of size at most <img alt="\epsilon n " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon+n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon n "/> s.t. <img alt="\text{Tr}_{S}(\rho) = \text{Tr}_{S}(\sigma)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BTr%7D_%7BS%7D%28%5Crho%29+%3D+%5Ctext%7BTr%7D_%7BS%7D%28%5Csigma%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{Tr}_{S}(\rho) = \text{Tr}_{S}(\sigma)"/>.</li>
+    <li><img alt="\sigma " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csigma+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\sigma "/> is an <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon"/>-error state for <img alt="H " class="latex" src="https://s0.wp.com/latex.php?latex=H+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H "/> if <img alt="\exists \rho " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cexists+%5Crho+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\exists \rho "/> s.t. <img alt="\text{Tr}(H\rho) = \lambda_{min}(H) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BTr%7D%28H%5Crho%29+%3D+%5Clambda_%7Bmin%7D%28H%29+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{Tr}(H\rho) = \lambda_{min}(H) "/> and <img alt="\sigma " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csigma+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\sigma "/> is an <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon"/>-error state for <img alt="\rho" class="latex" src="https://s0.wp.com/latex.php?latex=%5Crho&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\rho"/>.</li>
+</ul><p/>
+
+<p>Here, see that <img alt="\text{Tr}_{S} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BTr%7D_%7BS%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{Tr}_{S} "/> is just the partial trace on some subset of integers <img alt="S " class="latex" src="https://s0.wp.com/latex.php?latex=S+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="S "/>, like we’re tracing out or “disregarding” some subset of <img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/> qubits.</p>
+
+<p>In 2017, Eldar and Harrow showed the following result which is the NLETS theorem.</p>
+
+<p><b>Theorem 1</b> (NLETS Theorem): <i>There exists a family of 16-local Hamiltonians <img alt="\{H^{(n)}\} " class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7BH%5E%7B%28n%29%7D%5C%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\{H^{(n)}\} "/> s.t. any family of <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon"/>-error states <img alt="\{|\Phi_{n}\rangle\} " class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7B%7C%5CPhi_%7Bn%7D%5Crangle%5C%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\{|\Phi_{n}\rangle\} "/> for <img alt="\{H^{(n)}\} " class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7BH%5E%7B%28n%29%7D%5C%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\{H^{(n)}\} "/> requires circuit depth <img alt="\Omega(\log n) " class="latex" src="https://s0.wp.com/latex.php?latex=%5COmega%28%5Clog+n%29+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\Omega(\log n) "/> where <img alt="\epsilon = 10^{-9}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon+%3D+10%5E%7B-9%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon = 10^{-9}"/>.</i></p>
+
+<p>In the next two sections, we will provide background for an alternate proof of the NLETS theorem due to Nirkhe, Vazirani, and Yuen. After this, we will explain why the proof of NLETS cannot be used to prove NLTS, since the local Hamiltonian family we construct for NLETS can be linearized. Nirkhe, Vazirani, and Yuen’s proof of NLETS makes use of the Feynman-Kitaev clock Hamiltonian corresponding to the circuit generating the cat state (Eldar and Harrow make use of the Tillich-Zemor hypergraph product construction; refer to section 8 of <a href="https://arxiv.org/pdf/1510.02082.pdf">their paper</a>). What is this circuit? It is this one:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter is-resized"><img alt="" class="wp-image-6977" height="210" src="https://windowsontheory.files.wordpress.com/2018/12/cat_state.png?w=326&amp;h=210" width="326"/>Image from [2]</figure></div>
+
+
+
+<p>First, we apply the Hadamard gate (drawn as <img alt="\boxed{H}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cboxed%7BH%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\boxed{H}"/>) which maps the first qubit <img alt="|0\rangle \rightarrow \frac{|0\rangle + |1\rangle}{\sqrt{2}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7C0%5Crangle+%5Crightarrow+%5Cfrac%7B%7C0%5Crangle+%2B+%7C1%5Crangle%7D%7B%5Csqrt%7B2%7D%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|0\rangle \rightarrow \frac{|0\rangle + |1\rangle}{\sqrt{2}}"/>. Then we can think of the CNOT gates (drawn as <img alt="\bullet-\oplus" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbullet-%5Coplus&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\bullet-\oplus"/>) as propagating whatever happens to the first qubit to the rest of the qubits. If we had the first qubit mapping to 0, then the rest of the qubits map to 0, and likewise for 1. This generates the cat state <img alt="|\textsf{CAT}_{n}\rangle = \frac{|0\rangle^{\otimes n} + |1\rangle^{\otimes n}}{\sqrt{2}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ctextsf%7BCAT%7D_%7Bn%7D%5Crangle+%3D+%5Cfrac%7B%7C0%5Crangle%5E%7B%5Cotimes+n%7D+%2B+%7C1%5Crangle%5E%7B%5Cotimes+n%7D%7D%7B%5Csqrt%7B2%7D%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\textsf{CAT}_{n}\rangle = \frac{|0\rangle^{\otimes n} + |1\rangle^{\otimes n}}{\sqrt{2}}"/>, which is highly entangled.</p>
+
+<p>Why do we want a highly entangled state? Roughly our intuition for using the cat state is this: if the ground state of a Hamiltonian is highly entangled, then any quantum circuit which generates it has non-trivial depth. So if our goal is to show the existence of local Hamiltonians which have low energy or low error states that need deep circuits to generate, it makes sense to use a highly entangled state like the cat state.</p>
+
+<h2>Quantum circuits</h2>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter is-resized"><img alt="" class="wp-image-6978" height="221" src="https://windowsontheory.files.wordpress.com/2018/12/operators.png?w=446&amp;h=221" width="446"/>Image from [2]</figure></div>
+
+
+
+<p>(We’ll write that the state of a qudit – a generalization of a qubit to more than two dimensions, and in this case <img alt="q " class="latex" src="https://s0.wp.com/latex.php?latex=q+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="q "/> dimensions – is a vector in <img alt="\mathbb{C}^{q}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BC%7D%5E%7Bq%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathbb{C}^{q}"/>. In our diagram above, we’ll see 4 qudits, labelled appropriately.)</p>
+
+<p>Let’s briefly cover the definitions for the quantum circuits we’ll be using.</p>
+
+<p>Let <img alt="U " class="latex" src="https://s0.wp.com/latex.php?latex=U+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U "/> be a unitary operator acting on a system of <img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/> qudits (in other words, acting on <img alt="(\mathbb{C}^{q})^{\otimes n}" class="latex" src="https://s0.wp.com/latex.php?latex=%28%5Cmathbb%7BC%7D%5E%7Bq%7D%29%5E%7B%5Cotimes+n%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(\mathbb{C}^{q})^{\otimes n}"/>), where <img alt="U = U_{m} \hdots U_{1}" class="latex" src="https://s0.wp.com/latex.php?latex=U+%3D+U_%7Bm%7D+%5Chdots+U_%7B1%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U = U_{m} \hdots U_{1}"/>. Here, each <img alt="U_{i} " class="latex" src="https://s0.wp.com/latex.php?latex=U_%7Bi%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U_{i} "/> is a unitary operator (a gate) acting on at most two qudits, and <img alt="U " class="latex" src="https://s0.wp.com/latex.php?latex=U+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U "/> is a product of <img alt="m " class="latex" src="https://s0.wp.com/latex.php?latex=m+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="m "/> such operators.</p>
+
+<p>If there exists a partition <img alt="U " class="latex" src="https://s0.wp.com/latex.php?latex=U+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U "/> into products of non-overlapping two-qudit unitaries (we call these layers and denote them as <img alt="L_{i} = \bigotimes_{j}U_{ij}" class="latex" src="https://s0.wp.com/latex.php?latex=L_%7Bi%7D+%3D+%5Cbigotimes_%7Bj%7DU_%7Bij%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="L_{i} = \bigotimes_{j}U_{ij}"/>, where each <img alt="U_{j} " class="latex" src="https://s0.wp.com/latex.php?latex=U_%7Bj%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U_{j} "/> here is in layer <img alt="L_{i}" class="latex" src="https://s0.wp.com/latex.php?latex=L_%7Bi%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="L_{i}"/>) such that <img alt="U = L_{d} \hdots L_{1} " class="latex" src="https://s0.wp.com/latex.php?latex=U+%3D+L_%7Bd%7D+%5Chdots+L_%7B1%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U = L_{d} \hdots L_{1} "/> then we say <img alt="U " class="latex" src="https://s0.wp.com/latex.php?latex=U+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U "/> has <img alt="d " class="latex" src="https://s0.wp.com/latex.php?latex=d+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="d "/> layers.</p>
+
+<p>In other words, <img alt="U " class="latex" src="https://s0.wp.com/latex.php?latex=U+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U "/> has size <img alt="m " class="latex" src="https://s0.wp.com/latex.php?latex=m+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="m "/> and circuit depth <img alt="d" class="latex" src="https://s0.wp.com/latex.php?latex=d&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="d"/>.</p>
+
+<h3>Lightcones, effect zones, shadow zones</h3>
+<p>Consider <img alt="U = L_{d} \hdots L_{1} " class="latex" src="https://s0.wp.com/latex.php?latex=U+%3D+L_%7Bd%7D+%5Chdots+L_%7B1%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U = L_{d} \hdots L_{1} "/> and <img alt="A " class="latex" src="https://s0.wp.com/latex.php?latex=A+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="A "/> an operator.</p>
+
+<p>For <img alt="j &lt; d " class="latex" src="https://s0.wp.com/latex.php?latex=j+%3C+d+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j &lt; d "/> define <img alt="K^{(j)} " class="latex" src="https://s0.wp.com/latex.php?latex=K%5E%7B%28j%29%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="K^{(j)} "/> as the gates in layer <img alt="j " class="latex" src="https://s0.wp.com/latex.php?latex=j+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j "/> whose supports overlap that of any gate in <img alt="K^{(j+1)}" class="latex" src="https://s0.wp.com/latex.php?latex=K%5E%7B%28j%2B1%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="K^{(j+1)}"/>, …, <img alt="K^{(d)} " class="latex" src="https://s0.wp.com/latex.php?latex=K%5E%7B%28d%29%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="K^{(d)} "/> or with <img alt="A" class="latex" src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="A"/>.</p>
+
+<p><b>Definition 3.1</b> (lightcone): <i>The <i>lightcone</i> of <img alt="A " class="latex" src="https://s0.wp.com/latex.php?latex=A+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="A "/> with respect to <img alt="U " class="latex" src="https://s0.wp.com/latex.php?latex=U+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U "/> is the union of <img alt="K^{(j)}" class="latex" src="https://s0.wp.com/latex.php?latex=K%5E%7B%28j%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="K^{(j)}"/>: <img alt="K_{U} \triangleq \bigcup_{j} K^{(j)}" class="latex" src="https://s0.wp.com/latex.php?latex=K_%7BU%7D+%5Ctriangleq+%5Cbigcup_%7Bj%7D+K%5E%7B%28j%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="K_{U} \triangleq \bigcup_{j} K^{(j)}"/>.</i></p>
+
+<p>So we can think of the lightcone as the set of gates spreading out of <img alt="A " class="latex" src="https://s0.wp.com/latex.php?latex=A+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="A "/> all the way to the first layer of the circuit. In our diagram, the lightcone of <img alt="A " class="latex" src="https://s0.wp.com/latex.php?latex=A+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="A "/> is the dash-dotted region. We have <img alt="K^{(3)} = \varnothing" class="latex" src="https://s0.wp.com/latex.php?latex=K%5E%7B%283%29%7D+%3D+%5Cvarnothing&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="K^{(3)} = \varnothing"/>, <img alt="K^{(2)} = \{U_{21}\}" class="latex" src="https://s0.wp.com/latex.php?latex=K%5E%7B%282%29%7D+%3D+%5C%7BU_%7B21%7D%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="K^{(2)} = \{U_{21}\}"/>, and <img alt="K^{(1)} = \{U_{11}, U_{12}\}" class="latex" src="https://s0.wp.com/latex.php?latex=K%5E%7B%281%29%7D+%3D+%5C%7BU_%7B11%7D%2C+U_%7B12%7D%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="K^{(1)} = \{U_{11}, U_{12}\}"/>.</p>
+
+<p>We also want a definition for what comes back from the lightcone: the set of gates from the first layer (the widest part of the cone) back to the last layer.</p>
+
+<p>Define <img alt="E^{(1)} = K^{(1)}" class="latex" src="https://s0.wp.com/latex.php?latex=E%5E%7B%281%29%7D+%3D+K%5E%7B%281%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="E^{(1)} = K^{(1)}"/>. For <img alt="j \geq 2" class="latex" src="https://s0.wp.com/latex.php?latex=j+%5Cgeq+2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j \geq 2"/>, let <img alt="E^{(j)} " class="latex" src="https://s0.wp.com/latex.php?latex=E%5E%7B%28j%29%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="E^{(j)} "/> be the set of gates whose supports overlap with any gate in <img alt="E^{(j-1)}" class="latex" src="https://s0.wp.com/latex.php?latex=E%5E%7B%28j-1%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="E^{(j-1)}"/>.</p>
+
+<p><b>Definition 3.2</b> (effect zone): <i>The <i>effect zone</i> of <img alt="A " class="latex" src="https://s0.wp.com/latex.php?latex=A+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="A "/> with respect to <img alt="U " class="latex" src="https://s0.wp.com/latex.php?latex=U+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U "/> is the union <img alt="E_{U}(A) \triangleq \bigcup_{j} E^{(j)}" class="latex" src="https://s0.wp.com/latex.php?latex=E_%7BU%7D%28A%29+%5Ctriangleq+%5Cbigcup_%7Bj%7D+E%5E%7B%28j%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="E_{U}(A) \triangleq \bigcup_{j} E^{(j)}"/>.</i></p>
+
+<p>In our diagram, see that <img alt="E^{(1)} = \{U_{11}, U_{12}\}" class="latex" src="https://s0.wp.com/latex.php?latex=E%5E%7B%281%29%7D+%3D+%5C%7BU_%7B11%7D%2C+U_%7B12%7D%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="E^{(1)} = \{U_{11}, U_{12}\}"/>, <img alt="E^{(2)} = \{U_{21}\}" class="latex" src="https://s0.wp.com/latex.php?latex=E%5E%7B%282%29%7D+%3D+%5C%7BU_%7B21%7D%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="E^{(2)} = \{U_{21}\}"/>, and <img alt="E^{(3)} = \{U_{31}\}" class="latex" src="https://s0.wp.com/latex.php?latex=E%5E%7B%283%29%7D+%3D+%5C%7BU_%7B31%7D%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="E^{(3)} = \{U_{31}\}"/>. The effect zone of <img alt="A " class="latex" src="https://s0.wp.com/latex.php?latex=A+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="A "/> is the dotted region.</p>
+
+<p><b>Definition 3.3</b> (shadow of the effect zone): <i>The <i>shadow of the effect zone</i> <img alt="W_{U}(A) " class="latex" src="https://s0.wp.com/latex.php?latex=W_%7BU%7D%28A%29+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="W_{U}(A) "/> of <img alt="A " class="latex" src="https://s0.wp.com/latex.php?latex=A+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="A "/> with respect to <img alt="U " class="latex" src="https://s0.wp.com/latex.php?latex=U+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U "/> is the set of qudits acted on by the gates in the effect zone.</i></p>
+
+<p>In our diagram, the first three qudits are effected by gates in the effect zone. So <img alt="W_{U}(A) = \{1, 2, 3\}" class="latex" src="https://s0.wp.com/latex.php?latex=W_%7BU%7D%28A%29+%3D+%5C%7B1%2C+2%2C+3%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="W_{U}(A) = \{1, 2, 3\}"/>.</p>
+
+<p>Given all of these definitions, we make the following claim which will be important later, in a proof of a generalization of NLETS.</p>
+
+<p><b><a id="claim3"/>Claim 3.1</b> (Disjoint lightcones): <i>Let <img alt="U " class="latex" src="https://s0.wp.com/latex.php?latex=U+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U "/> be a circuit and <img alt="A, B " class="latex" src="https://s0.wp.com/latex.php?latex=A%2C+B+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="A, B "/> operators. If the qudits <img alt="B " class="latex" src="https://s0.wp.com/latex.php?latex=B+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="B "/> acts on are disjoint from <img alt="W_{U}(A)" class="latex" src="https://s0.wp.com/latex.php?latex=W_%7BU%7D%28A%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="W_{U}(A)"/>, then the lightcones of <img alt="A " class="latex" src="https://s0.wp.com/latex.php?latex=A+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="A "/> and <img alt="B " class="latex" src="https://s0.wp.com/latex.php?latex=B+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="B "/> in <img alt="U " class="latex" src="https://s0.wp.com/latex.php?latex=U+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U "/> are disjoint.</i></p>
+
+<h2>Toward the Feynman-Kitaev clock</h2>
+<p>Now we’ll give some definitions that will become necessary when we make use of the Feynman-Kitaev Hamiltonian in our later proofs.</p>
+
+<p>Let’s define a unary clock. It will basically help us determine whatever happened at any time little <img alt="t " class="latex" src="https://s0.wp.com/latex.php?latex=t+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t "/> along the total time big <img alt="T" class="latex" src="https://s0.wp.com/latex.php?latex=T&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="T"/>. Let <img alt="|\textsf{unary}(t, T)\rangle = |0\rangle^{\otimes(T-t)} \otimes |1\rangle^{\otimes t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ctextsf%7Bunary%7D%28t%2C+T%29%5Crangle+%3D+%7C0%5Crangle%5E%7B%5Cotimes%28T-t%29%7D+%5Cotimes+%7C1%5Crangle%5E%7B%5Cotimes+t%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\textsf{unary}(t, T)\rangle = |0\rangle^{\otimes(T-t)} \otimes |1\rangle^{\otimes t}"/>. For our purposes today, we won’t worry about higher dimensional clocks. So we’ll write <img alt="|\textsf{clock}_{k}(t, T)\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ctextsf%7Bclock%7D_%7Bk%7D%28t%2C+T%29%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\textsf{clock}_{k}(t, T)\rangle"/>, but we’ll really only consider the case where <img alt="k = 1" class="latex" src="https://s0.wp.com/latex.php?latex=k+%3D+1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k = 1"/>, which corresponds to <img alt="|\textsf{unary}(t, T)\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ctextsf%7Bunary%7D%28t%2C+T%29%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\textsf{unary}(t, T)\rangle"/>. For simplicity’s sake, we will henceforth just write <img alt="|\textsf{unary}(t)\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ctextsf%7Bunary%7D%28t%29%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\textsf{unary}(t)\rangle"/>.</p>
+
+<p>Our goal is to construct something a little similar to the tableaux in the Cook-Levin theorem, so we also want to define a history state:</p>
+
+<p><b>Definition 4.1</b> (History state): <i>Let <img alt="C " class="latex" src="https://s0.wp.com/latex.php?latex=C+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C "/> be a quantum circuit that acts on a witness register and an ancilla register. Let <img alt="C_{1}, ..., C_{T} " class="latex" src="https://s0.wp.com/latex.php?latex=C_%7B1%7D%2C+...%2C+C_%7BT%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_{1}, ..., C_{T} "/> denote the sequence of two-local gates in <img alt="C" class="latex" src="https://s0.wp.com/latex.php?latex=C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C"/>. Then for all <img alt="k \in \mathbb{N}" class="latex" src="https://s0.wp.com/latex.php?latex=k+%5Cin+%5Cmathbb%7BN%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k \in \mathbb{N}"/>, a state <img alt="|\Psi\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5CPsi%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\Psi\rangle "/> is a <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-dimensional history state of <img alt="C " class="latex" src="https://s0.wp.com/latex.php?latex=C+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C "/> if:</i></p>
+
+<div style="text-align: center;"><p><img alt="\begin{aligned}|\Psi\rangle = \frac{1}{\sqrt{T+1}}\sum_{t=0}^{T}|\textsf{clock}_{k}(t, T)\rangle \otimes |\psi_{t}\rangle\end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D%7C%5CPsi%5Crangle+%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7BT%2B1%7D%7D%5Csum_%7Bt%3D0%7D%5E%7BT%7D%7C%5Ctextsf%7Bclock%7D_%7Bk%7D%28t%2C+T%29%5Crangle+%5Cotimes+%7C%5Cpsi_%7Bt%7D%5Crangle%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned}|\Psi\rangle = \frac{1}{\sqrt{T+1}}\sum_{t=0}^{T}|\textsf{clock}_{k}(t, T)\rangle \otimes |\psi_{t}\rangle\end{aligned} "/></p></div>
+
+<p>where we have the clock state to keep track of time and <img alt="\psi_{t} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cpsi_%7Bt%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\psi_{t} "/> is some state such that <img alt="|\psi_{t}\rangle = C_{t}|\psi_{t-1}\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi_%7Bt%7D%5Crangle+%3D+C_%7Bt%7D%7C%5Cpsi_%7Bt-1%7D%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi_{t}\rangle = C_{t}|\psi_{t-1}\rangle "/> and <img alt="|\psi_{0}\rangle = |\xi\rangle_{witness} \otimes |0\rangle_{ancilla}" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi_%7B0%7D%5Crangle+%3D+%7C%5Cxi%5Crangle_%7Bwitness%7D+%5Cotimes+%7C0%5Crangle_%7Bancilla%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi_{0}\rangle = |\xi\rangle_{witness} \otimes |0\rangle_{ancilla}"/>. With this construction, we should be able to make a measurement to get back the state at time <img alt="t" class="latex" src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t"/>.</p>
+
+<h2>Proof of NLETS</h2>
+<p>We provide a proof of (a simplified case of) the NLETS theorem proved by Nirkhe, Vazirani, and Yuen in [<a href="https://windowsontheory.org/feed/#nirkhe2018approximate">2</a>].</p>
+
+<p><b>Theorem 2</b> (NLETS): <i>There exists a family of <img alt="3" class="latex" src="https://s0.wp.com/latex.php?latex=3&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="3"/>-local Hamiltonians <img alt="\{H^{(n)}\} " class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7BH%5E%7B%28n%29%7D%5C%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\{H^{(n)}\} "/> on a line (Each Hamiltonian <img alt="H^{(n)} " class="latex" src="https://s0.wp.com/latex.php?latex=H%5E%7B%28n%29%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H^{(n)} "/> can be defined on <img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/> particles arranged on a line such that each local Hamiltonian acts on a particle and its two neighbors) such that for all <img alt="n \in \mathbb{N}" class="latex" src="https://s0.wp.com/latex.php?latex=n+%5Cin+%5Cmathbb%7BN%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n \in \mathbb{N}"/>, the circuit depth of any <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon"/>-error ground state for <img alt="H^{(n)} " class="latex" src="https://s0.wp.com/latex.php?latex=H%5E%7B%28n%29%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H^{(n)} "/> is at least logarithmic in <img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/>.</i></p>
+
+<p>First, we’ll show the circuit lower bound.  Then we’ll explain why these Hamiltonians can act on particles on a line and what this implies about the potential of these techniques for proving NLTS.</p>
+
+<p><i>Proof</i>: We will use the <b>Feynman-Kitaev clock construction</b> to construct a <img alt="5" class="latex" src="https://s0.wp.com/latex.php?latex=5&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="5"/>-local Hamiltonian <img alt="\mathcal{H}^{(n)} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D%5E%7B%28n%29%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{H}^{(n)} "/> for the circuit <img alt="C_n" class="latex" src="https://s0.wp.com/latex.php?latex=C_n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_n"/>: <img alt="|0^n\rangle \to |\textsf{CAT}_n\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C0%5En%5Crangle+%5Cto+%7C%5Ctextsf%7BCAT%7D_n%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|0^n\rangle \to |\textsf{CAT}_n\rangle "/>.</p>
+
+<p>Fix <img alt="n \in \mathbb{N} " class="latex" src="https://s0.wp.com/latex.php?latex=n+%5Cin+%5Cmathbb%7BN%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n \in \mathbb{N} "/> and let <img alt="C_n " class="latex" src="https://s0.wp.com/latex.php?latex=C_n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_n "/> have size <img alt="T" class="latex" src="https://s0.wp.com/latex.php?latex=T&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="T"/>.  The Hamiltonian <img alt="\mathcal{H} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{H} "/> acts on <img alt="T+n " class="latex" src="https://s0.wp.com/latex.php?latex=T%2Bn+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="T+n "/> qubits and consists of several local terms depending on <img alt="C_n" class="latex" src="https://s0.wp.com/latex.php?latex=C_n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_n"/>:</p>
+
+<div style="text-align: center;"><p><img alt="\begin{aligned}\mathcal{H} = H_{in} + \sum_{t=1}^T H_t + H_{out} + H_{stab}\end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D%5Cmathcal%7BH%7D+%3D+H_%7Bin%7D+%2B+%5Csum_%7Bt%3D1%7D%5ET+H_t+%2B+H_%7Bout%7D+%2B+H_%7Bstab%7D%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned}\mathcal{H} = H_{in} + \sum_{t=1}^T H_t + H_{out} + H_{stab}\end{aligned} "/></p></div>
+
+<p>We can think of a <img alt="T+n " class="latex" src="https://s0.wp.com/latex.php?latex=T%2Bn+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="T+n "/> qubit state as representing a <img alt="T " class="latex" src="https://s0.wp.com/latex.php?latex=T+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="T "/> step computation on <img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/> qubits (i.e. for each time <img alt="t \in [0,T]" class="latex" src="https://s0.wp.com/latex.php?latex=t+%5Cin+%5B0%2CT%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t \in [0,T]"/>, we have a <img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/> bit computation state <img alt="\textsf{state}_t " class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctextsf%7Bstate%7D_t+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\textsf{state}_t "/> of <img alt="C_n" class="latex" src="https://s0.wp.com/latex.php?latex=C_n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_n"/>).  Intuitively, a <img alt="T+n " class="latex" src="https://s0.wp.com/latex.php?latex=T%2Bn+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="T+n "/> qubit state has energy <img alt="0 " class="latex" src="https://s0.wp.com/latex.php?latex=0+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="0 "/> with respect to <img alt="\mathcal{H} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{H} "/> iff it is the history state of <img alt="C_n" class="latex" src="https://s0.wp.com/latex.php?latex=C_n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_n"/>.  This is because <img alt="H_{in} " class="latex" src="https://s0.wp.com/latex.php?latex=H_%7Bin%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_{in} "/> checks that at time <img alt="t=0" class="latex" src="https://s0.wp.com/latex.php?latex=t%3D0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t=0"/>, <img alt="\textsf{state}_0 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctextsf%7Bstate%7D_0+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\textsf{state}_0 "/> consists of the input <img alt="|0\rangle^n " class="latex" src="https://s0.wp.com/latex.php?latex=%7C0%5Crangle%5En+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|0\rangle^n "/> to <img alt="C_n" class="latex" src="https://s0.wp.com/latex.php?latex=C_n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_n"/>.  Each <img alt="H_t " class="latex" src="https://s0.wp.com/latex.php?latex=H_t+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_t "/> checks that <img alt="\textsf{state}_{t} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctextsf%7Bstate%7D_%7Bt%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\textsf{state}_{t} "/> proceed correctly from <img alt="\textsf{state}_{t-1} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctextsf%7Bstate%7D_%7Bt-1%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\textsf{state}_{t-1} "/> (i.e. that the <img alt="t" class="latex" src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t"/>th gate of <img alt="C_n " class="latex" src="https://s0.wp.com/latex.php?latex=C_n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_n "/> is applied correctly).  Then <img alt="H_{out} " class="latex" src="https://s0.wp.com/latex.php?latex=H_%7Bout%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_{out} "/> checks that at time <img alt="t=T" class="latex" src="https://s0.wp.com/latex.php?latex=t%3DT&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t=T"/>, the output is <img alt="1" class="latex" src="https://s0.wp.com/latex.php?latex=1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="1"/>.  Finally, <img alt="H_{stab} " class="latex" src="https://s0.wp.com/latex.php?latex=H_%7Bstab%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_{stab} "/> checks that the <img alt="T+n " class="latex" src="https://s0.wp.com/latex.php?latex=T%2Bn+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="T+n "/> qubit state is a superposition only over states where the first <img alt="T " class="latex" src="https://s0.wp.com/latex.php?latex=T+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="T "/> qubits represent “correct times” (i.e. a unary clock state where time <img alt="t " class="latex" src="https://s0.wp.com/latex.php?latex=t+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t "/> is represented by <img alt="T-t " class="latex" src="https://s0.wp.com/latex.php?latex=T-t+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="T-t "/> zeros followed by <img alt="t " class="latex" src="https://s0.wp.com/latex.php?latex=t+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t "/> ones).</p>
+
+<p>Therefore, <img alt="\mathcal{H} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{H} "/> has a unique ground state, the history state of <img alt="C_n|0^n\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=C_n%7C0%5En%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_n|0^n\rangle"/>, with energy <img alt="0" class="latex" src="https://s0.wp.com/latex.php?latex=0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="0"/>:</p>
+
+<div style="text-align: center;"><p><img alt="\begin{aligned}|\Psi\rangle = \frac{1}{\sqrt{n+1}}\sum_{t=0}^n |\textsf{unary}(t)\rangle\otimes |\psi_t\rangle = \frac{1}{\sqrt{n+1}}\sum_{t=0}^n |\textsf{unary}(t)\rangle\otimes|\textsf{CAT}_{t}\rangle\otimes |0\rangle^{\otimes (n-t)}\end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D%7C%5CPsi%5Crangle+%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7Bn%2B1%7D%7D%5Csum_%7Bt%3D0%7D%5En+%7C%5Ctextsf%7Bunary%7D%28t%29%5Crangle%5Cotimes+%7C%5Cpsi_t%5Crangle+%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7Bn%2B1%7D%7D%5Csum_%7Bt%3D0%7D%5En+%7C%5Ctextsf%7Bunary%7D%28t%29%5Crangle%5Cotimes%7C%5Ctextsf%7BCAT%7D_%7Bt%7D%5Crangle%5Cotimes+%7C0%5Crangle%5E%7B%5Cotimes+%28n-t%29%7D%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned}|\Psi\rangle = \frac{1}{\sqrt{n+1}}\sum_{t=0}^n |\textsf{unary}(t)\rangle\otimes |\psi_t\rangle = \frac{1}{\sqrt{n+1}}\sum_{t=0}^n |\textsf{unary}(t)\rangle\otimes|\textsf{CAT}_{t}\rangle\otimes |0\rangle^{\otimes (n-t)}\end{aligned} "/></p></div>
+
+<p>Later we will show how to transform <img alt="\mathcal{H} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{H} "/> into a Hamiltonian <img alt="H " class="latex" src="https://s0.wp.com/latex.php?latex=H+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H "/> on <img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/> qutrits on a line.  Intuitively, the structure of <img alt="C_n " class="latex" src="https://s0.wp.com/latex.php?latex=C_n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C_n "/> allows us to fuse the <img alt="T=n " class="latex" src="https://s0.wp.com/latex.php?latex=T%3Dn+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="T=n "/> time qubits and <img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/> state qubits and represent unused state qubits by <img alt="2" class="latex" src="https://s0.wp.com/latex.php?latex=2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2"/>.  For the Hamiltonian <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/>, the ground state becomes</p>
+
+<div style="text-align: center;"><p><img alt="\begin{aligned}|\Psi\rangle = \frac{1}{\sqrt{n+1}}\sum_{t=0}^n |\psi_t\rangle = \sum_{t=0}^n |\textsf{CAT}_{t}\rangle\otimes|2\rangle^{\otimes(n-t)}\end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D%7C%5CPsi%5Crangle+%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7Bn%2B1%7D%7D%5Csum_%7Bt%3D0%7D%5En+%7C%5Cpsi_t%5Crangle+%3D+%5Csum_%7Bt%3D0%7D%5En+%7C%5Ctextsf%7BCAT%7D_%7Bt%7D%5Crangle%5Cotimes%7C2%5Crangle%5E%7B%5Cotimes%28n-t%29%7D%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned}|\Psi\rangle = \frac{1}{\sqrt{n+1}}\sum_{t=0}^n |\psi_t\rangle = \sum_{t=0}^n |\textsf{CAT}_{t}\rangle\otimes|2\rangle^{\otimes(n-t)}\end{aligned} "/></p></div>
+
+<p>For the rest of this proof, we work with respect to <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/>.</p>
+
+<p>Let <img alt="\sigma " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csigma+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\sigma "/> be an <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon"/>-error state and let <img alt="S \subseteq [n] " class="latex" src="https://s0.wp.com/latex.php?latex=S+%5Csubseteq+%5Bn%5D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="S \subseteq [n] "/> be the subset of qutrits such that <img alt="\text{Tr}_S(\sigma) = \text{Tr}_S(|\Psi\rangle\langle\Psi|)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BTr%7D_S%28%5Csigma%29+%3D+%5Ctext%7BTr%7D_S%28%7C%5CPsi%5Crangle%5Clangle%5CPsi%7C%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{Tr}_S(\sigma) = \text{Tr}_S(|\Psi\rangle\langle\Psi|)"/>.  We define two projection operators which, when applied to <img alt="\sigma " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csigma+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\sigma "/> alone, produce nontrivial measurements, but when applied to <img alt="\sigma " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csigma+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\sigma "/> together, produce trivial measurements.</p>
+
+<p><b>Definition 5.1</b>: <i>For any <img alt="i\in[n]" class="latex" src="https://s0.wp.com/latex.php?latex=i%5Cin%5Bn%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i\in[n]"/>, the projection operator</i></p>
+
+<div style="text-align: center;"><p><img alt="\begin{aligned}A_i = |0\rangle\langle 0|_i \end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7DA_i+%3D+%7C0%5Crangle%5Clangle+0%7C_i+%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned}A_i = |0\rangle\langle 0|_i \end{aligned} "/></p></div>
+
+<p><i>projects onto the subspace spanned by <img alt="0 " class="latex" src="https://s0.wp.com/latex.php?latex=0+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="0 "/> on the <img alt="i" class="latex" src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i"/>th qutrit.</i></p>
+
+<p><i>For any <img alt="j\in[n]" class="latex" src="https://s0.wp.com/latex.php?latex=j%5Cin%5Bn%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j\in[n]"/>, the projection operator</i></p>
+
+<div style="text-align: center;"><p><img alt="\begin{aligned} B_j = |1\rangle\langle 1|_i\end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+B_j+%3D+%7C1%5Crangle%5Clangle+1%7C_i%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned} B_j = |1\rangle\langle 1|_i\end{aligned} "/></p></div>
+
+<p><i>projects onto the subspace spanned by <img alt="1 " class="latex" src="https://s0.wp.com/latex.php?latex=1+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="1 "/> on the <img alt="j" class="latex" src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j"/>th qutrit.</i></p>
+
+<p><b>Claim 5.1</b>:
+<i>For <img alt="i\not\in S" class="latex" src="https://s0.wp.com/latex.php?latex=i%5Cnot%5Cin+S&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i\not\in S"/>, <img alt="\text{Tr}(A_i\sigma) = \frac{1}{2} + \frac{-i}{2(n+1)}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BTr%7D%28A_i%5Csigma%29+%3D+%5Cfrac%7B1%7D%7B2%7D+%2B+%5Cfrac%7B-i%7D%7B2%28n%2B1%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{Tr}(A_i\sigma) = \frac{1}{2} + \frac{-i}{2(n+1)}"/>.  For <img alt="j\not\in S" class="latex" src="https://s0.wp.com/latex.php?latex=j%5Cnot%5Cin+S&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j\not\in S"/>, <img alt="\text{Tr}(B_j\sigma) = \frac{1}{2} + \frac{-j}{2(n+1)}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BTr%7D%28B_j%5Csigma%29+%3D+%5Cfrac%7B1%7D%7B2%7D+%2B+%5Cfrac%7B-j%7D%7B2%28n%2B1%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{Tr}(B_j\sigma) = \frac{1}{2} + \frac{-j}{2(n+1)}"/>.  Note that these values are positive for any <img alt="i,j\in [n]" class="latex" src="https://s0.wp.com/latex.php?latex=i%2Cj%5Cin+%5Bn%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i,j\in [n]"/>.</i></p>
+
+<p><i>Proof</i>: If <img alt="i \not\in S" class="latex" src="https://s0.wp.com/latex.php?latex=i+%5Cnot%5Cin+S&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i \not\in S"/>, then measurements on the <img alt="i" class="latex" src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i"/>th qutrit are the same for <img alt="\sigma " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csigma+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\sigma "/> and <img alt="|\Psi\rangle\langle\Psi|" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5CPsi%5Crangle%5Clangle%5CPsi%7C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\Psi\rangle\langle\Psi|"/>.</p>
+
+<div style="text-align: center;"><p><img alt="\begin{aligned}     \text{Tr}(A_i\sigma) &amp;= \text{Tr}(A_i|\Psi\rangle\langle\Psi|)\\     &amp;= \text{Tr}\left(A_i \frac{1}{n+1}\sum_{t,t'}|\psi_t\rangle\langle\psi_{t'}|\right)\\     &amp;= \frac{1}{n+1}\sum_{t,t'} \text{Tr}(A_i|\psi_t\rangle\langle\psi_{t'}|)   \end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+++++%5Ctext%7BTr%7D%28A_i%5Csigma%29+%26%3D+%5Ctext%7BTr%7D%28A_i%7C%5CPsi%5Crangle%5Clangle%5CPsi%7C%29%5C%5C+++++%26%3D+%5Ctext%7BTr%7D%5Cleft%28A_i+%5Cfrac%7B1%7D%7Bn%2B1%7D%5Csum_%7Bt%2Ct%27%7D%7C%5Cpsi_t%5Crangle%5Clangle%5Cpsi_%7Bt%27%7D%7C%5Cright%29%5C%5C+++++%26%3D+%5Cfrac%7B1%7D%7Bn%2B1%7D%5Csum_%7Bt%2Ct%27%7D+%5Ctext%7BTr%7D%28A_i%7C%5Cpsi_t%5Crangle%5Clangle%5Cpsi_%7Bt%27%7D%7C%29+++%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned}     \text{Tr}(A_i\sigma) &amp;= \text{Tr}(A_i|\Psi\rangle\langle\Psi|)\\     &amp;= \text{Tr}\left(A_i \frac{1}{n+1}\sum_{t,t'}|\psi_t\rangle\langle\psi_{t'}|\right)\\     &amp;= \frac{1}{n+1}\sum_{t,t'} \text{Tr}(A_i|\psi_t\rangle\langle\psi_{t'}|)   \end{aligned} "/></p></div>
+
+<p>If <img alt="t=t'" class="latex" src="https://s0.wp.com/latex.php?latex=t%3Dt%27&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t=t'"/>, then any <img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/> qutrit pure state cannot have nonzero weight in both <img alt="\psi_t " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cpsi_t+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\psi_t "/> and <img alt="\psi_{t'} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cpsi_%7Bt%27%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\psi_{t'} "/> (every pure state ends in some number of <img alt="2" class="latex" src="https://s0.wp.com/latex.php?latex=2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2"/>s which tells which <img alt="\psi_t " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cpsi_t+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\psi_t "/> (if any) it can be a part of). Therefore,</p>
+
+<div style="text-align: center;"><p><img alt="\begin{aligned}     \text{Tr}(A_i\sigma) = \frac{1}{n+1}\sum_{t} \text{Tr}(A_i|\psi_t\rangle\langle\psi_{t}|) = \frac{1}{n+1}\sum_t \langle \psi_t|A_i|\psi_t\rangle \enspace. \end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+++++%5Ctext%7BTr%7D%28A_i%5Csigma%29+%3D+%5Cfrac%7B1%7D%7Bn%2B1%7D%5Csum_%7Bt%7D+%5Ctext%7BTr%7D%28A_i%7C%5Cpsi_t%5Crangle%5Clangle%5Cpsi_%7Bt%7D%7C%29+%3D+%5Cfrac%7B1%7D%7Bn%2B1%7D%5Csum_t+%5Clangle+%5Cpsi_t%7CA_i%7C%5Cpsi_t%5Crangle+%5Censpace.+%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned}     \text{Tr}(A_i\sigma) = \frac{1}{n+1}\sum_{t} \text{Tr}(A_i|\psi_t\rangle\langle\psi_{t}|) = \frac{1}{n+1}\sum_t \langle \psi_t|A_i|\psi_t\rangle \enspace. \end{aligned} "/></p></div>
+
+<p>If <img alt="i \le t" class="latex" src="https://s0.wp.com/latex.php?latex=i+%5Cle+t&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i \le t"/>, then projecting onto the <img alt="i" class="latex" src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i"/>th qutrit gives <img alt="0 " class="latex" src="https://s0.wp.com/latex.php?latex=0+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="0 "/> with probability <img alt="1/2" class="latex" src="https://s0.wp.com/latex.php?latex=1%2F2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="1/2"/>. Therefore, <img alt="\text{Tr}(A_i\sigma) = \frac{1}{n+1}\left(\frac{n-i+1}{2}\right) = \frac{1}{2} + \frac{-i}{2(n+1)}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BTr%7D%28A_i%5Csigma%29+%3D+%5Cfrac%7B1%7D%7Bn%2B1%7D%5Cleft%28%5Cfrac%7Bn-i%2B1%7D%7B2%7D%5Cright%29+%3D+%5Cfrac%7B1%7D%7B2%7D+%2B+%5Cfrac%7B-i%7D%7B2%28n%2B1%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{Tr}(A_i\sigma) = \frac{1}{n+1}\left(\frac{n-i+1}{2}\right) = \frac{1}{2} + \frac{-i}{2(n+1)}"/>.</p>
+
+<p>Similarly, <img alt="\text{Tr}(B_j\sigma) = \frac{1}{2} + \frac{-j}{2(n+1)}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BTr%7D%28B_j%5Csigma%29+%3D+%5Cfrac%7B1%7D%7B2%7D+%2B+%5Cfrac%7B-j%7D%7B2%28n%2B1%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{Tr}(B_j\sigma) = \frac{1}{2} + \frac{-j}{2(n+1)}"/>. <img alt="\square " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csquare+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\square "/></p>
+
+<p><b>Claim 5.2</b>: <i>For <img alt="i,j \not\in S " class="latex" src="https://s0.wp.com/latex.php?latex=i%2Cj+%5Cnot%5Cin+S+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i,j \not\in S "/> such that <img alt="i &lt; j" class="latex" src="https://s0.wp.com/latex.php?latex=i+%3C+j&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i &lt; j"/>, <img alt="\text{Tr}(A_i \otimes B_j \sigma) = 0" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BTr%7D%28A_i+%5Cotimes+B_j+%5Csigma%29+%3D+0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{Tr}(A_i \otimes B_j \sigma) = 0"/>.</i></p>
+
+<p><i>Proof</i>:
+As before, we can calculate</p>
+
+<div style="text-align: center;"><p><img alt="\begin{aligned} \text{Tr}(A_i \otimes B_j \sigma) &amp;= \text{Tr}(A_i \otimes B_j |\Psi\rangle \langle\Psi|) = \frac{1}{n+1}\sum_t \langle\psi_t|A_i\otimes B_j|\psi_t\rangle \end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+%5Ctext%7BTr%7D%28A_i+%5Cotimes+B_j+%5Csigma%29+%26%3D+%5Ctext%7BTr%7D%28A_i+%5Cotimes+B_j+%7C%5CPsi%5Crangle+%5Clangle%5CPsi%7C%29+%3D+%5Cfrac%7B1%7D%7Bn%2B1%7D%5Csum_t+%5Clangle%5Cpsi_t%7CA_i%5Cotimes+B_j%7C%5Cpsi_t%5Crangle+%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned} \text{Tr}(A_i \otimes B_j \sigma) &amp;= \text{Tr}(A_i \otimes B_j |\Psi\rangle \langle\Psi|) = \frac{1}{n+1}\sum_t \langle\psi_t|A_i\otimes B_j|\psi_t\rangle \end{aligned} "/></p></div>
+
+<p>If <img alt="j &gt; t" class="latex" src="https://s0.wp.com/latex.php?latex=j+%3E+t&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j &gt; t"/>, then the <img alt="j" class="latex" src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j"/>th qutrit of <img alt="\psi_t " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cpsi_t+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\psi_t "/> is <img alt="2 " class="latex" src="https://s0.wp.com/latex.php?latex=2+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2 "/> so <img alt="B_j|\psi_t\rangle = 0" class="latex" src="https://s0.wp.com/latex.php?latex=B_j%7C%5Cpsi_t%5Crangle+%3D+0&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="B_j|\psi_t\rangle = 0"/>. If <img alt="j \le t" class="latex" src="https://s0.wp.com/latex.php?latex=j+%5Cle+t&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j \le t"/>, then <img alt="A_i \otimes B_j|\psi_t\rangle = 0 " class="latex" src="https://s0.wp.com/latex.php?latex=A_i+%5Cotimes+B_j%7C%5Cpsi_t%5Crangle+%3D+0+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="A_i \otimes B_j|\psi_t\rangle = 0 "/> because the first <img alt="t " class="latex" src="https://s0.wp.com/latex.php?latex=t+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t "/> qutrits of <img alt="|\psi_t\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi_t%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi_t\rangle "/> contain the <img alt="|\textsf{CAT}_{t}\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ctextsf%7BCAT%7D_%7Bt%7D%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\textsf{CAT}_{t}\rangle "/> state so under any measurement, the <img alt="i " class="latex" src="https://s0.wp.com/latex.php?latex=i+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i "/> and <img alt="j" class="latex" src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j"/>th qutrits must be the same. <img alt="\square " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csquare+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\square "/></p>
+
+<p>Now we use these claims to prove a circuit lower bound.  Let <img alt="U " class="latex" src="https://s0.wp.com/latex.php?latex=U+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U "/> be a circuit generating (a state with density matrix) <img alt="\sigma" class="latex" src="https://s0.wp.com/latex.php?latex=%5Csigma&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\sigma"/>.  Let <img alt="d " class="latex" src="https://s0.wp.com/latex.php?latex=d+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="d "/> be the depth of <img alt="U" class="latex" src="https://s0.wp.com/latex.php?latex=U&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U"/>.</p>
+
+<p>Consider some <img alt="i\not\in S" class="latex" src="https://s0.wp.com/latex.php?latex=i%5Cnot%5Cin+S&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i\not\in S"/>.  For any operator acting on the <img alt="i" class="latex" src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i"/>th qutrit, its lightcone consists of at most <img alt="2^d " class="latex" src="https://s0.wp.com/latex.php?latex=2%5Ed+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^d "/> gates so its effect zone consists of at most <img alt="2^{2d} " class="latex" src="https://s0.wp.com/latex.php?latex=2%5E%7B2d%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^{2d} "/> gates which act on at most <img alt="2^{2d+1} " class="latex" src="https://s0.wp.com/latex.php?latex=2%5E%7B2d%2B1%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^{2d+1} "/> qudits (called the shadow of the effect zone).</p>
+
+<p>Assume towards contradiction that <img alt="2^{2d+1} &lt; n-\epsilon n" class="latex" src="https://s0.wp.com/latex.php?latex=2%5E%7B2d%2B1%7D+%3C+n-%5Cepsilon+n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^{2d+1} &lt; n-\epsilon n"/>. Then the shadow of any operator acting only on the <img alt="i" class="latex" src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i"/>th qutrit has size at most <img alt="2^{2d+1} \le n - |S| " class="latex" src="https://s0.wp.com/latex.php?latex=2%5E%7B2d%2B1%7D+%5Cle+n+-+%7CS%7C+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^{2d+1} \le n - |S| "/> since <img alt="|S| \le \epsilon n" class="latex" src="https://s0.wp.com/latex.php?latex=%7CS%7C+%5Cle+%5Cepsilon+n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|S| \le \epsilon n"/>.  So there is some <img alt="j " class="latex" src="https://s0.wp.com/latex.php?latex=j+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j "/> outside of the shadow which is in the complement of <img alt="S" class="latex" src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="S"/>.  By <a href="https://windowsontheory.org/feed/#claim3">Claim 3.1</a>, we have found two indices <img alt="i,j " class="latex" src="https://s0.wp.com/latex.php?latex=i%2Cj+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i,j "/> such that any pair of operators acting on <img alt="i " class="latex" src="https://s0.wp.com/latex.php?latex=i+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i "/> and <img alt="j " class="latex" src="https://s0.wp.com/latex.php?latex=j+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="j "/> have disjoint lightcones in <img alt="U" class="latex" src="https://s0.wp.com/latex.php?latex=U&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="U"/>. WLOG let <img alt="i &lt; j" class="latex" src="https://s0.wp.com/latex.php?latex=i+%3C+j&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i &lt; j"/>.  The lightcones of <img alt="A_i,B_j " class="latex" src="https://s0.wp.com/latex.php?latex=A_i%2CB_j+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="A_i,B_j "/> are disjoint which implies
+<img alt="\begin{aligned}\text{Tr}(A_i \otimes B_j \sigma) = \text{Tr}(A_i \sigma)\cdot\text{Tr}(B_j \sigma).\end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D%5Ctext%7BTr%7D%28A_i+%5Cotimes+B_j+%5Csigma%29+%3D+%5Ctext%7BTr%7D%28A_i+%5Csigma%29%5Ccdot%5Ctext%7BTr%7D%28B_j+%5Csigma%29.%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned}\text{Tr}(A_i \otimes B_j \sigma) = \text{Tr}(A_i \sigma)\cdot\text{Tr}(B_j \sigma).\end{aligned} "/></p>
+
+<p>By the two claims above, we get a contradiction.</p>
+
+<p>Therefore, <img alt="2^{2d+1} \ge n-\epsilon n" class="latex" src="https://s0.wp.com/latex.php?latex=2%5E%7B2d%2B1%7D+%5Cge+n-%5Cepsilon+n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^{2d+1} \ge n-\epsilon n"/>.  We can take any constant epsilon: letting <img alt="\epsilon = 1/2" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon+%3D+1%2F2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon = 1/2"/>, we get</p>
+
+<div style="text-align: center;"><p><img alt="\begin{aligned}d \ge \frac{1}{2}\left(\log \frac{n}{2} - 1\right)\end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7Dd+%5Cge+%5Cfrac%7B1%7D%7B2%7D%5Cleft%28%5Clog+%5Cfrac%7Bn%7D%7B2%7D+-+1%5Cright%29%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned}d \ge \frac{1}{2}\left(\log \frac{n}{2} - 1\right)\end{aligned} "/></p></div>
+
+<p><img alt="\square " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csquare+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\square "/></p>
+
+<p>This analysis relies crucially on the fact that any <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon"/>-error state matches the groundstate on most qudits.  However, NLTS is concerned with states which may differ from the groundstate on many qudits, as long as they have low energy.</p>
+
+<p><b>Remark 2.1</b>: <i>The paper of Nirkhe, Vazirani, and Yuen [<a href="https://windowsontheory.org/feed/#nirkhe2018approximate">2</a>] actually proves more:
+</i></p><ul><i>
+    </i><li><i>A more general lower bound: logarithmic lower bound on the circuit depth of any <img alt="\delta" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdelta&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\delta"/>-approximate (<img alt="\delta " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdelta+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\delta "/> far in L1 norm) <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon"/>-noisy state (probability distribution over <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon"/>-error states).</i></li><i>
+    </i><li><i>Assuming QCMA <img alt="\neq " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cneq+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\neq "/> QMA (QCMA takes a <img alt="m " class="latex" src="https://s0.wp.com/latex.php?latex=m+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="m "/> bit witness string instead of a <img alt="m " class="latex" src="https://s0.wp.com/latex.php?latex=m+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="m "/> qubit state as witness), they show a superpolynomial lower bound (on the circuit depth of any <img alt="\delta" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdelta&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\delta"/>-approximate <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon"/>-noisy state).</i></li><i>
+    </i><li><i>“Approximate qLWC codes”, using techniques from their superpolynomial lower bound.</i></li><i>
+</i></ul><p/>
+
+<h2>Back to NLTS – Tempering our Optimism</h2>
+
+<p>So far, we’ve shown a local Hamiltonian family for which all low-error (in “Hamming distance”) states require logarithmic quantum circuit depth to compute, thus resolving the NLETS conjecture. Now, let’s try to tie this back into the NLTS conjecture. Since it’s been a while, let’s recall the statement of the conjecture:</p>
+
+<p><b>Conjecture</b> (NLTS): <i>There exists a universal constant <img alt="\epsilon &gt; 0 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon+%3E+0+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon &gt; 0 "/> and a family of local Hamiltonians <img alt="\{H^{(n)}\}_{n=1}^{\infty} " class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7BH%5E%7B%28n%29%7D%5C%7D_%7Bn%3D1%7D%5E%7B%5Cinfty%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\{H^{(n)}\}_{n=1}^{\infty} "/> where <img alt="H^{(n)} " class="latex" src="https://s0.wp.com/latex.php?latex=H%5E%7B%28n%29%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H^{(n)} "/> acts on <img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/> particles and consists of <img alt="m_{n} " class="latex" src="https://s0.wp.com/latex.php?latex=m_%7Bn%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="m_{n} "/> local terms, s.t. any family of states <img alt="\{|\psi_{n}\rangle\} " class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7B%7C%5Cpsi_%7Bn%7D%5Crangle%5C%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\{|\psi_{n}\rangle\} "/> satisfying <img alt="\langle \psi_{n} | H^{(n)} | \psi_{n}\rangle \leq \epsilon||H^{(n)}|| + \lambda_{min}(H^{(n)}) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Clangle+%5Cpsi_%7Bn%7D+%7C+H%5E%7B%28n%29%7D+%7C+%5Cpsi_%7Bn%7D%5Crangle+%5Cleq+%5Cepsilon%7C%7CH%5E%7B%28n%29%7D%7C%7C+%2B+%5Clambda_%7Bmin%7D%28H%5E%7B%28n%29%7D%29+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\langle \psi_{n} | H^{(n)} | \psi_{n}\rangle \leq \epsilon||H^{(n)}|| + \lambda_{min}(H^{(n)}) "/> requires circuit depth that grows faster than any constant.</i></p>
+
+<p>In order to resolve the NLTS conjecture, it thus suffices to exhibit a local Hamiltonian family for which all low-energy states require logarithmic quantum circuit depth to compute. We might wonder if the local Hamiltonian family we used to resolve NLETS, which has “hard ground states”, might also have hard low-energy states. Unfortunately, as we shall show, this cannot be the case. We will start by showing that Hamiltonian families that lie on constant-dimensional lattices (in a sense that we will make precise momentarily) cannot possibly be used to resolve NLTS,  and then show that the Hamiltonian family we used to prove NLTS can be linearized (made to lie on a one-dimensional lattice!).</p>
+
+<h3>The Woes of Constant-Dimensional Lattices</h3>
+<p><b>Definition 6.1</b>: <i>A local Hamiltonian <img alt="H " class="latex" src="https://s0.wp.com/latex.php?latex=H+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H "/> acting on <img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/> qubits is said to <b>lie on a graph <img alt="G" class="latex" src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="G"/></b> if there is an injection of qubits into vertices of the graph such that the set of qubits in any interaction term correspond to a connected component in the graph</i>.</p>
+
+<p><b>Theorem 2</b>: <i>If <img alt="(H^{(n)}) " class="latex" src="https://s0.wp.com/latex.php?latex=%28H%5E%7B%28n%29%7D%29+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(H^{(n)}) "/> is a local Hamiltonian family that lies on an <img alt="O(1)" class="latex" src="https://s0.wp.com/latex.php?latex=O%281%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="O(1)"/>-dimensional lattice, then <img alt="(H^{(n)}) " class="latex" src="https://s0.wp.com/latex.php?latex=%28H%5E%7B%28n%29%7D%29+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(H^{(n)}) "/> has a family of low-energy states with low circuit complexity. In particular, if <img alt="H " class="latex" src="https://s0.wp.com/latex.php?latex=H+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H "/> is a local Hamiltonian on a <img alt="d" class="latex" src="https://s0.wp.com/latex.php?latex=d&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="d"/>-dimensional lattice acting on <img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/> qubits for large enough <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/>, then for any <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon"/>, there exists a state <img alt="|\psi\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi\rangle "/> that can be generated by a circuit of constant depth and such that <img alt="\langle \psi | H | \psi \rangle \leq H_0 + \epsilon ||H|| " class="latex" src="https://s0.wp.com/latex.php?latex=%5Clangle+%5Cpsi+%7C+H+%7C+%5Cpsi+%5Crangle+%5Cleq+H_0+%2B+%5Cepsilon+%7C%7CH%7C%7C+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\langle \psi | H | \psi \rangle \leq H_0 + \epsilon ||H|| "/> where <img alt="H_0 " class="latex" src="https://s0.wp.com/latex.php?latex=H_0+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_0 "/> is the ground-state energy.</i></p>
+
+<p><i>Proof</i>: In what follows, we’ll omit some of the more annoying computational details in the interest of communicating the high-level idea.</p>
+
+<p>Start by partitioning the <img alt="d" class="latex" src="https://s0.wp.com/latex.php?latex=d&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="d"/>-dimensional lattice (the one that <img alt="H^(n) " class="latex" src="https://s0.wp.com/latex.php?latex=H%5E%28n%29+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H^(n) "/> lives on) into hypercubes of side length <img alt="L" class="latex" src="https://s0.wp.com/latex.php?latex=L&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="L"/>. We can “restrict” <img alt="H^{(n)} " class="latex" src="https://s0.wp.com/latex.php?latex=H%5E%7B%28n%29%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H^{(n)} "/> to a given hypercube (let’s call it <img alt="\rho" class="latex" src="https://s0.wp.com/latex.php?latex=%5Crho&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\rho"/>) by throwing away all local terms containing a qubit not in <img alt="\rho" class="latex" src="https://s0.wp.com/latex.php?latex=%5Crho&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\rho"/>. This gives us a well-defined Hamiltonian <img alt="H_{\rho} " class="latex" src="https://s0.wp.com/latex.php?latex=H_%7B%5Crho%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_{\rho} "/> on the qubits in <img alt="\rho" class="latex" src="https://s0.wp.com/latex.php?latex=%5Crho&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\rho"/>. Define <img alt="|\phi_{\rho}\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cphi_%7B%5Crho%7D%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\phi_{\rho}\rangle "/> to be the <img alt="L^d" class="latex" src="https://s0.wp.com/latex.php?latex=L%5Ed&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="L^d"/>-qubit ground state of <img alt="H_{\rho}" class="latex" src="https://s0.wp.com/latex.php?latex=H_%7B%5Crho%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_{\rho}"/>, and define</p>
+
+<div style="text-align: center;"><p><img alt="\begin{aligned}|\phi\rangle := \bigotimes_{\text{hypercubes } \rho} |\phi_{\rho}\rangle\end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D%7C%5Cphi%5Crangle+%3A%3D+%5Cbigotimes_%7B%5Ctext%7Bhypercubes+%7D+%5Crho%7D+%7C%5Cphi_%7B%5Crho%7D%5Crangle%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned}|\phi\rangle := \bigotimes_{\text{hypercubes } \rho} |\phi_{\rho}\rangle\end{aligned} "/></p></div>
+
+<p>where <img alt="|\phi\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cphi%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\phi\rangle "/> is an <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/>-qubit state. Each <img alt="|\phi_{\rho}\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cphi_%7B%5Crho%7D%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\phi_{\rho}\rangle "/> can be generated by a circuit with at most <img alt="2^{L^d} " class="latex" src="https://s0.wp.com/latex.php?latex=2%5E%7BL%5Ed%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^{L^d} "/> gates, hence at most <img alt="2^{L^d} " class="latex" src="https://s0.wp.com/latex.php?latex=2%5E%7BL%5Ed%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^{L^d} "/> depth. Then, <img alt="|\phi\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cphi%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\phi\rangle "/> can be generated by putting all of these individual circuits in parallel – this doesn’t violate any sort of no-cloning condition because the individual circuits act on disjoint sets of qubits. Therefore, <img alt="|\phi\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cphi%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\phi\rangle "/> can be generated by a circuit of depth at most <img alt="2^{L^d}" class="latex" src="https://s0.wp.com/latex.php?latex=2%5E%7BL%5Ed%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^{L^d}"/>. <img alt="L " class="latex" src="https://s0.wp.com/latex.php?latex=L+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="L "/> and <img alt="d " class="latex" src="https://s0.wp.com/latex.php?latex=d+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="d "/> are both constants, so <img alt="|\phi\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cphi%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\phi\rangle "/> can be generated by a constant-depth circuit.</p>
+
+<p>We claim that, for the right choice of <img alt="L" class="latex" src="https://s0.wp.com/latex.php?latex=L&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="L"/>, <img alt="|\phi\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cphi%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\phi\rangle "/> is also a low-energy state. Intuitively, this is true because <img alt="\phi " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cphi+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\phi "/> can only be “worse” than a true ground state of <img alt="H^{(n)} " class="latex" src="https://s0.wp.com/latex.php?latex=H%5E%7B%28n%29%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H^{(n)} "/> on local Hamiltonian terms that do not lie entirely within a single hypercube (i.e. the boundary terms), and by choosing <img alt="L " class="latex" src="https://s0.wp.com/latex.php?latex=L+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="L "/> appropriately we can make this a vanishingly small fraction of the local terms of <img alt="H^{(n)}" class="latex" src="https://s0.wp.com/latex.php?latex=H%5E%7B%28n%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H^{(n)}"/>. Let’s work this out explicitly.</p>
+
+<p>Each hypercube has surface area <img alt="2dL^{d-1}" class="latex" src="https://s0.wp.com/latex.php?latex=2dL%5E%7Bd-1%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2dL^{d-1}"/>, and there are <img alt="n/L^d " class="latex" src="https://s0.wp.com/latex.php?latex=n%2FL%5Ed+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n/L^d "/> hypercubes in the lattice. Thus, the total number of qubits on boundaries is at most <img alt="2d\frac{n}{L}" class="latex" src="https://s0.wp.com/latex.php?latex=2d%5Cfrac%7Bn%7D%7BL%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2d\frac{n}{L}"/>. The number of size <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-connected components containing a given point in a <img alt="d" class="latex" src="https://s0.wp.com/latex.php?latex=d&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="d"/>-dimensional lattice is a function of <img alt="k " class="latex" src="https://s0.wp.com/latex.php?latex=k+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k "/> and <img alt="d" class="latex" src="https://s0.wp.com/latex.php?latex=d&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="d"/>. Both of these are constants. Therefore, the number of size <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/>-connected components containing a given vertex, and hence the number of local Hamiltonian terms containing a given qubit, is constant. Thus, the total number of violated local Hamiltonian terms is at most <img alt="O(\frac{n}{L})" class="latex" src="https://s0.wp.com/latex.php?latex=O%28%5Cfrac%7Bn%7D%7BL%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="O(\frac{n}{L})"/>. Taking <img alt="L " class="latex" src="https://s0.wp.com/latex.php?latex=L+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="L "/> to be <img alt="\frac{1}{\epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\frac{1}{\epsilon}"/>, we get the desired bound. Note that to be fully rigorous, we need to justify that the boundary terms don’t blow up the energy, but this is left as an exercise for the reader. <img alt="\square " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csquare+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\square "/></p>
+
+<h3>Linearizing the Hamiltonian</h3>
+<p>Now that we have shown that Hamiltonians that live on constant-dimensional lattices cannot be used to prove NLTS, we will put the final nail in the coffin by showing that our NLETS Hamiltonian (the Feynman-Kitaev clock Hamiltonian <img alt="\mathcal{H} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{H} "/> on the circuit <img alt="C" class="latex" src="https://s0.wp.com/latex.php?latex=C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C"/>) can be made to lie on a line (a <img alt="1" class="latex" src="https://s0.wp.com/latex.php?latex=1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="1"/>-dimensional lattice). To do so, we will need to understand the details of <img alt="\mathcal{H} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{H} "/> a bit better.</p>
+
+<p><b><a id="prop6">Proposition 6.1</a></b>: <i><img alt="\mathcal{H} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{H} "/> for the circuit <img alt="C " class="latex" src="https://s0.wp.com/latex.php?latex=C+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="C "/> is <img alt="5" class="latex" src="https://s0.wp.com/latex.php?latex=5&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="5"/>-local.</i></p>
+
+<p><i>Proof</i>: Recall that we defined</p>
+
+<div style="text-align: center;"><p><img alt="\begin{aligned}\mathcal{H} := H_{in} + \sum_{t=1}^T H_t+  H_{stab}\end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D%5Cmathcal%7BH%7D+%3A%3D+H_%7Bin%7D+%2B+%5Csum_%7Bt%3D1%7D%5ET+H_t%2B++H_%7Bstab%7D%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned}\mathcal{H} := H_{in} + \sum_{t=1}^T H_t+  H_{stab}\end{aligned} "/></p></div>
+
+<p>Let’s go through the right-hand-side term-by-term. We will use <img alt="|\mathsf{time}(t)\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cmathsf%7Btime%7D%28t%29%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\mathsf{time}(t)\rangle "/> to denote the <img alt="t^{\text{th}} " class="latex" src="https://s0.wp.com/latex.php?latex=t%5E%7B%5Ctext%7Bth%7D%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t^{\text{th}} "/> qubit of the time register and <img alt="|\mathsf{state}(s)\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cmathsf%7Bstate%7D%28s%29%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\mathsf{state}(s)\rangle "/> to denote the <img alt="s^{\text{th}} " class="latex" src="https://s0.wp.com/latex.php?latex=s%5E%7B%5Ctext%7Bth%7D%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="s^{\text{th}} "/> qubit of the state register.</p>
+
+<p>
+  </p><ul>
+    <li><img alt="H_{in} " class="latex" src="https://s0.wp.com/latex.php?latex=H_%7Bin%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_{in} "/> needs to serially access the qubit pairs
+
+    <img alt="\begin{aligned}|\mathsf{time}(0)\rangle\otimes\textsf{state}(s) \end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D%7C%5Cmathsf%7Btime%7D%280%29%5Crangle%5Cotimes%5Ctextsf%7Bstate%7D%28s%29+%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned}|\mathsf{time}(0)\rangle\otimes\textsf{state}(s) \end{aligned} "/>
+
+    for all <img alt="s " class="latex" src="https://s0.wp.com/latex.php?latex=s+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="s "/> and ensure that they are all set to <img alt="|0\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C0%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|0\rangle"/>. Thus, <img alt="H_{in} " class="latex" src="https://s0.wp.com/latex.php?latex=H_%7Bin%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_{in} "/> is <img alt="2" class="latex" src="https://s0.wp.com/latex.php?latex=2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2"/>-local.</li>
+    <li>Each <img alt="H_t " class="latex" src="https://s0.wp.com/latex.php?latex=H_t+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_t "/> term needs to access the states <img alt="|\textsf{time}(t-1)\rangle, |\textsf{time}(t)\rangle, |\textsf{time}(t+1)\rangle, |\textsf{state}(s)\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ctextsf%7Btime%7D%28t-1%29%5Crangle%2C+%7C%5Ctextsf%7Btime%7D%28t%29%5Crangle%2C+%7C%5Ctextsf%7Btime%7D%28t%2B1%29%5Crangle%2C+%7C%5Ctextsf%7Bstate%7D%28s%29%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\textsf{time}(t-1)\rangle, |\textsf{time}(t)\rangle, |\textsf{time}(t+1)\rangle, |\textsf{state}(s)\rangle"/>, and  <img alt="|\textsf{state}(t)\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ctextsf%7Bstate%7D%28t%29%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\textsf{state}(t)\rangle "/> and ensure that the state transitions are correct. Thus, <img alt="H_{t} " class="latex" src="https://s0.wp.com/latex.php?latex=H_%7Bt%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_{t} "/> is <img alt="5" class="latex" src="https://s0.wp.com/latex.php?latex=5&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="5"/>-local.</li>
+    <li><img alt="H_{stab} " class="latex" src="https://s0.wp.com/latex.php?latex=H_%7Bstab%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_{stab} "/> needs to access the states
+
+    <img alt="\begin{aligned}|\textsf{time}(t)\rangle \otimes |\textsf{time}(t+1)\rangle \end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D%7C%5Ctextsf%7Btime%7D%28t%29%5Crangle+%5Cotimes+%7C%5Ctextsf%7Btime%7D%28t%2B1%29%5Crangle+%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned}|\textsf{time}(t)\rangle \otimes |\textsf{time}(t+1)\rangle \end{aligned} "/>
+
+    and ensure that the progression of the time register is correct. Thus, <img alt="H_{stab} " class="latex" src="https://s0.wp.com/latex.php?latex=H_%7Bstab%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H_{stab} "/> is <img alt="2" class="latex" src="https://s0.wp.com/latex.php?latex=2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2"/>-local. <img alt="\square " class="latex" src="https://s0.wp.com/latex.php?latex=%5Csquare+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\square "/></li>
+  </ul>
+<p/>
+
+
+<p>Now, we follow an approach of [<a href="https://windowsontheory.org/feed/#aharonov2017">3</a>] to embed <img alt="\mathcal{H} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{H} "/> into a line.</p>
+
+<p><b>Theorem 3</b>: <i>The Feynman-Kitaev clock Hamiltonian <img alt="H " class="latex" src="https://s0.wp.com/latex.php?latex=H+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H "/> can be manipulated into a <img alt="3" class="latex" src="https://s0.wp.com/latex.php?latex=3&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="3"/>-local Hamiltonian acting on qutrits on a line.</i></p>
+
+<p><i>Proof</i>: Rather than having <img alt="\mathcal{H} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{H} "/> act on <img alt="2n " class="latex" src="https://s0.wp.com/latex.php?latex=2n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2n "/> total qubits (<img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/> time qubits and <img alt="n " class="latex" src="https://s0.wp.com/latex.php?latex=n+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n "/> state qubits), let’s fuse each <img alt="|\textsf{time}(i)\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ctextsf%7Btime%7D%28i%29%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\textsf{time}(i)\rangle "/> and <img alt="|\textsf{state}(i)\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ctextsf%7Bstate%7D%28i%29%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\textsf{state}(i)\rangle "/> pair into a single qudit of dimension <img alt="4" class="latex" src="https://s0.wp.com/latex.php?latex=4&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="4"/>. If we view <img alt="\mathcal{H} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{H} "/> as acting on the space of particles <img alt="|\textsf{time}(i)\rangle \otimes |\textsf{state}(i)\rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ctextsf%7Btime%7D%28i%29%5Crangle+%5Cotimes+%7C%5Ctextsf%7Bstate%7D%28i%29%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\textsf{time}(i)\rangle \otimes |\textsf{state}(i)\rangle"/>, we observe that, following <a href="https://windowsontheory.org/feed/#prop6">Proposition 6.1</a>, each local term needs to check at most the particles corresponding to times <img alt="t-1" class="latex" src="https://s0.wp.com/latex.php?latex=t-1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t-1"/>, <img alt="t" class="latex" src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t"/>, and <img alt="t+1" class="latex" src="https://s0.wp.com/latex.php?latex=t%2B1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t+1"/>. Therefore, <img alt="\mathcal{H} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{H} "/> is <img alt="3" class="latex" src="https://s0.wp.com/latex.php?latex=3&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="3"/>-local and on a line, as desired.</p>
+
+
+
+<figure class="wp-block-image"><img alt="" class="wp-image-6979" src="https://windowsontheory.files.wordpress.com/2018/12/qutrits.png?w=600"/>Image from [2]</figure>
+
+
+
+<p>To see that we can have <img alt="\mathcal{H} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\mathcal{H} "/> act on particles of dimension <img alt="3 " class="latex" src="https://s0.wp.com/latex.php?latex=3+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="3 "/> (qutrits) rather than particles of dimension <img alt="4" class="latex" src="https://s0.wp.com/latex.php?latex=4&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="4"/>, note that the degree of freedom corresponding to <img alt="|\textsf{time}(t)\rangle \otimes |\textsf{state}(t)\rangle = |0\rangle \otimes |1\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Ctextsf%7Btime%7D%28t%29%5Crangle+%5Cotimes+%7C%5Ctextsf%7Bstate%7D%28t%29%5Crangle+%3D+%7C0%5Crangle+%5Cotimes+%7C1%5Crangle+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\textsf{time}(t)\rangle \otimes |\textsf{state}(t)\rangle = |0\rangle \otimes |1\rangle "/> is unused, as the <img alt="t^{\text{th}} " class="latex" src="https://s0.wp.com/latex.php?latex=t%5E%7B%5Ctext%7Bth%7D%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t^{\text{th}} "/> qubit of the state is never nonzero until timestamp <img alt="t" class="latex" src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="t"/>. Thus, we can take the vectors</p>
+
+<div style="text-align: center;"><p><img alt="\begin{aligned} |0\rangle := |1\rangle\otimes|0\rangle, |1\rangle := |1\rangle\otimes|1\rangle, |2\rangle := |0\rangle\otimes|0\rangle \end{aligned} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D+%7C0%5Crangle+%3A%3D+%7C1%5Crangle%5Cotimes%7C0%5Crangle%2C+%7C1%5Crangle+%3A%3D+%7C1%5Crangle%5Cotimes%7C1%5Crangle%2C+%7C2%5Crangle+%3A%3D+%7C0%5Crangle%5Cotimes%7C0%5Crangle+%5Cend%7Baligned%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\begin{aligned} |0\rangle := |1\rangle\otimes|0\rangle, |1\rangle := |1\rangle\otimes|1\rangle, |2\rangle := |0\rangle\otimes|0\rangle \end{aligned} "/></p></div>
+
+<p>as a basis for each qutrit.</p>
+
+<p>Even though we’ve shown that the clock Hamiltonian for our original circuit cannot be used to prove NLTS (which is still weaker than the original Quantum PCP conjecture) this does not necessarily rule out the use of this approach for other “hard” circuits which might then allow us to prove NLTS. Furthermore, NLETS is independently interesting, as the notion of being low “Hamming distance” away from vectors is exactly what is used in error-correcting codes.</p>
+
+<h1>References</h1>
+<ul>
+<li><a id="arora2009computational">[1]</a> Sanjeev Arora and Boaz Barak. <i>Computational complexity: a modern approach.</i> Cambridge University Press, 2009.</li>
+<li><a id="nirkhe2018approximate">[2]</a> Chinmay Nirkhe, Umesh Vazirani,  and Henry Yuen. Approximate low-weight check codes and circuit lower bounds for noisy ground states. <i>arXiv preprint arXiv:1802.07419</i>, 2018.</li>
+<li><a id="aharonov2017">[3]</a> Dorit Aharonov, Wim van Dam, Julia Kempe, Zeph Landau, Seth Lloyd, and Oded Regev. Adiabatic quantum computation is equivalent to standard quantum computation. <i>SIAM J. Comput.</i>, 2007.</li></ul></div>
+    </content>
+    <updated>2018-12-23T01:45:21Z</updated>
+    <published>2018-12-23T01:45:21Z</published>
+    <category term="physics"/>
+    <author>
+      <name>richardmwang</name>
+    </author>
+    <source>
+      <id>https://windowsontheory.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://windowsontheory.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://windowsontheory.org" rel="alternate" type="text/html"/>
+      <link href="https://windowsontheory.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>A Research Blog</subtitle>
+      <title>Windows On Theory</title>
+      <updated>2018-12-23T02:20:34Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://windowsontheory.org/?p=6948</id>
@@ -113,7 +433,7 @@
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-23T01:20:44Z</updated>
+      <updated>2018-12-23T02:20:41Z</updated>
     </source>
   </entry>
 
@@ -313,7 +633,7 @@ This is our <img alt="{801^{st}}" class="latex" src="https://s0.wp.com/latex.php
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2018-12-23T01:21:43Z</updated>
+      <updated>2018-12-23T02:22:03Z</updated>
     </source>
   </entry>
 
@@ -336,18 +656,18 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
 <p class="p1">We are interested in computing the ground state—the minimum eigenvector—of a quantum Hamiltonian, a <img alt="2^n \times 2^n" class="latex" src="https://s0.wp.com/latex.php?latex=2%5En+%5Ctimes+2%5En&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^n \times 2^n"/> complex matrix that governs the evolution of a quantum system of <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/> qubits. We restrict our attention to the local Hamiltonian, where the matrix is a sum of Hamiltonians each acting only on <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/> qubits.  In the previous article, we discussed some hardness results. Namely, a local Hamiltonian can be used to encode SAT instances, and we further gave a proof that computing the ground state is QMA-Complete.</p>
 <p>Despite the hardness results, physicists have come up with a variety of heuristics for solving this problem. If quantum interactions occur locally, we would hope that its ground state has low entanglement and thus admits a succinct classical representation. Further, we hope to find such a representation efficiently, using classical computers.</p>
 <p>In this note, we will see <i>tensor networks</i> and <i>matrix product states</i> that formalize the idea of succinctly representing quantum states of low entanglement. As a side remark for the theoretical computer scientists here, one motivation to study tensor network is that it provides a powerful visual tool for thinking about linear algebra. It turns indices into edges in a graph and summations over indices into contractions of edges. In particular, we will soon see that the most useful inequality in TCS and mathematics can be drawn as a cute tensor network.</p>
-<div class="wp-caption aligncenter" id="attachment_6535" style="width: 276px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note0x.png"><img alt="" class="wp-image-6535 size-full" src="https://windowsontheory.files.wordpress.com/2018/12/note0x.png?w=600"/></a><p class="wp-caption-text">Guess what this is?</p></div>
+<p/><div class="wp-caption aligncenter" id="attachment_6535" style="width: 276px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note0x.png"><img alt="" class="wp-image-6535 size-full" src="https://windowsontheory.files.wordpress.com/2018/12/note0x.png?w=600"/></a><p class="wp-caption-text">Guess what this is?</p></div><p/>
 <p>In the end, we will discuss the density matrix renormalization group (DMRG), which has established itself as “the most powerful tool for treating 1D quantum systems” over the last decade [<a href="https://windowsontheory.org/feed/#Xfehske2007computational">FSW07</a>]. For many 1D systems that arise from practice, the heuristic efficiently finds an (approximate) ground state in its matrix product state, specified only by a small number of parameters.</p>
 <p><b>2. Tensor Networks </b></p>
 <p>Now let us discuss our first subject, <i>tensor networks</i>. If you have not seen <i>tensors</i> before, it is a generalization of matrices. In computer scientists’ language, a matrix is a two-dimensional array, and a tensor is a multi-dimensional array. In other words, if we think of a matrix as a square, then a 3 dimensional tensor looks like a cube. Formally, a (complex) n dimensional tensor <img alt="{T}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BT%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="{T}"/> maps <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/> indices to complex values, namely, to its entries:</p>
 <p align="center"><img alt="\displaystyle T : [d_1] \times [d_2] \times \cdots \times [d_n] \rightarrow \mathbb{C}." class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+T+%3A+%5Bd_1%5D+%5Ctimes+%5Bd_2%5D+%5Ctimes+%5Ccdots+%5Ctimes+%5Bd_n%5D+%5Crightarrow+%5Cmathbb%7BC%7D.&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\displaystyle T : [d_1] \times [d_2] \times \cdots \times [d_n] \rightarrow \mathbb{C}."/></p>
 <p>The simplest tensor network is a graphical notation for a tensor. For an <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="{n}"/>-dimensional tensor <img alt="{T}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BT%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{T}"/>, we draw a star graph and label the center as <img alt="{T}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BT%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{T}"/> and the edges as the indices. To evaluate this tensor network, we put values on the edges, <i>i.e.</i>, indices, and then the tensor network would spit out its entry specified by the indices.</p>
-<div class="wp-caption aligncenter" id="attachment_6550" style="width: 170px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note2x.png"><img alt="" class="wp-image-6550 size-full" src="https://windowsontheory.files.wordpress.com/2018/12/note2x.png?w=600"/></a><p class="wp-caption-text">A simple tensor network of 4 dimensions <a name="figsimp-1"/></p></div>
-<div class="wp-caption aligncenter" id="attachment_6551" style="width: 354px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note3x.png"><img alt="" class="wp-image-6551 size-full" src="https://windowsontheory.files.wordpress.com/2018/12/note3x.png?w=600"/></a><p class="wp-caption-text">Evaluating a simple tensor network, <img alt="{T(1,5,3,1)=1/\sqrt{2}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BT%281%2C5%2C3%2C1%29%3D1%2F%5Csqrt%7B2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{T(1,5,3,1)=1/\sqrt{2}}"/>. The numbers are chosen arbitrarily.<a name="figsimp-2"/></p></div>
+<p/><div class="wp-caption aligncenter" id="attachment_6550" style="width: 170px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note2x.png"><img alt="" class="wp-image-6550 size-full" src="https://windowsontheory.files.wordpress.com/2018/12/note2x.png?w=600"/></a><p class="wp-caption-text">A simple tensor network of 4 dimensions <a name="figsimp-1"/></p></div><p/>
+<p/><div class="wp-caption aligncenter" id="attachment_6551" style="width: 354px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note3x.png"><img alt="" class="wp-image-6551 size-full" src="https://windowsontheory.files.wordpress.com/2018/12/note3x.png?w=600"/></a><p class="wp-caption-text">Evaluating a simple tensor network, <img alt="{T(1,5,3,1)=1/\sqrt{2}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BT%281%2C5%2C3%2C1%29%3D1%2F%5Csqrt%7B2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{T(1,5,3,1)=1/\sqrt{2}}"/>. The numbers are chosen arbitrarily.<a name="figsimp-2"/></p></div><p/>
 <p>Notice that the degree of the center is the number of indices. Hence, a tensor network of degree <img alt="{1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1}"/> is a vector, and that of degree <img alt="{2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{2}"/> is a matrix, and so forth.<a name="figsimple-tn"/></p>
-<div class="wp-caption aligncenter" id="attachment_6574" style="width: 34px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note6x.png"><img alt="" class="wp-image-6574 size-full" src="https://windowsontheory.files.wordpress.com/2018/12/note6x.png?w=600"/></a><p class="wp-caption-text">A vector</p></div>
-<div class="wp-caption aligncenter" id="attachment_6575" style="width: 106px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note7x.png"><img alt="" class="wp-image-6575 size-full" src="https://windowsontheory.files.wordpress.com/2018/12/note7x.png?w=600"/></a><p class="wp-caption-text">A matrix</p></div>
-<div class="wp-caption aligncenter" id="attachment_6576" style="width: 158px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note8x.png"><img alt="" class="wp-image-6576 size-full" src="https://windowsontheory.files.wordpress.com/2018/12/note8x.png?w=600"/></a><p class="wp-caption-text">A 3d tensor</p></div>
+<p/><div class="wp-caption aligncenter" id="attachment_6574" style="width: 34px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note6x.png"><img alt="" class="wp-image-6574 size-full" src="https://windowsontheory.files.wordpress.com/2018/12/note6x.png?w=600"/></a><p class="wp-caption-text">A vector</p></div><p/>
+<p/><div class="wp-caption aligncenter" id="attachment_6575" style="width: 106px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note7x.png"><img alt="" class="wp-image-6575 size-full" src="https://windowsontheory.files.wordpress.com/2018/12/note7x.png?w=600"/></a><p class="wp-caption-text">A matrix</p></div><p/>
+<p/><div class="wp-caption aligncenter" id="attachment_6576" style="width: 158px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note8x.png"><img alt="" class="wp-image-6576 size-full" src="https://windowsontheory.files.wordpress.com/2018/12/note8x.png?w=600"/></a><p class="wp-caption-text">A 3d tensor</p></div><p/>
 <p>How is this related to quantum information? For the sake of genearlity we will deal with qudits in <img alt="{\mathbb{C}^d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BC%7D%5Ed%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="{\mathbb{C}^d}"/>, instead of qubits in <img alt="{\mathbb{C}^2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BC%7D%5E2%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="{\mathbb{C}^2}"/>. Now recall that a quantum state <img alt="{|\psi_n\rangle}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7C%5Cpsi_n%5Crangle%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="{|\psi_n\rangle}"/> of <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="{n}"/> qudits can be encoded as an <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n}"/> dimensional tensor. It can be written as</p>
 <p style="text-align: center;"><img alt="|\psi_n\rangle = \displaystyle\sum_{i_1,\cdots,i_n = 0}^{d-1} T(i_1,\cdots, i_n) |i_1,\cdots, i_n \rangle." class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi_n%5Crangle+%3D+%5Cdisplaystyle%5Csum_%7Bi_1%2C%5Ccdots%2Ci_n+%3D+0%7D%5E%7Bd-1%7D+T%28i_1%2C%5Ccdots%2C+i_n%29+%7Ci_1%2C%5Ccdots%2C+i_n+%5Crangle.&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi_n\rangle = \displaystyle\sum_{i_1,\cdots,i_n = 0}^{d-1} T(i_1,\cdots, i_n) |i_1,\cdots, i_n \rangle."/></p>
 <p>It is easy to see that all the information, namely, the amplitudes, is just the tensor <img alt="T" class="latex" src="https://s0.wp.com/latex.php?latex=T&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="T"/>. In the later sections, we will see more powerful examples of using tensor networks to represent a quantum state.</p>
@@ -355,18 +675,18 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
 <p><b> 2.1. Composition Rules </b></p>
 <p>We introduce two ways of joining two simple tensor networks. Roughly speaking, they correspond to multiplication and summation, and I will give the definitions by showing examples, instead of stating them in the full formalism</p>
 <p><strong>Rule #1: Tensor Product.</strong> The product rule allows us to put two tensor networks together and view them as a whole. The resulting tensor is the tensor product of the two if we think of them as vectors. More concretely, consider the following picture.</p>
-<div class="wp-caption aligncenter" id="attachment_6564" style="width: 364px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note10x.png"><img alt="" class="wp-image-6564 size-full" src="https://windowsontheory.files.wordpress.com/2018/12/note10x.png?w=600"/></a><p class="wp-caption-text">This is viewed as a single tensor network <img alt="{T}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BT%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{T}"/> of 7 edges<span> </span>.<a name="figtp"/></p></div>
+<p/><div class="wp-caption aligncenter" id="attachment_6564" style="width: 364px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note10x.png"><img alt="" class="wp-image-6564 size-full" src="https://windowsontheory.files.wordpress.com/2018/12/note10x.png?w=600"/></a><p class="wp-caption-text">This is viewed as a single tensor network <img alt="{T}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BT%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{T}"/> of 7 edges<span> </span>.<a name="figtp"/></p></div><p/>
 <p>The definition of this joint tensor <img alt="{T}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BT%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="{T}"/> is</p>
 <p style="text-align: center;"><img alt="T(i_1,i_2,\cdots, i_7) = T_1(i_1,i_2,i_3,i_4) T_2(i_5,i_6,i_7)." class="latex" src="https://s0.wp.com/latex.php?latex=T%28i_1%2Ci_2%2C%5Ccdots%2C+i_7%29+%3D+T_1%28i_1%2Ci_2%2Ci_3%2Ci_4%29+T_2%28i_5%2Ci_6%2Ci_7%29.&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="T(i_1,i_2,\cdots, i_7) = T_1(i_1,i_2,i_3,i_4) T_2(i_5,i_6,i_7)."/></p>
 <p><strong>Rule #2: Edge Contractions</strong>. At this moment, we can only make up disconnected tensor networks. Edge contractions allow us to link two tensor networks. Suppose we have two <img alt="{3}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{3}"/> dimensional tensor networks. Contracting two edges, one from each, gives us a tensor network of <img alt="{4}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B4%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{4}"/> <i>free edges</i>. This now corresponds a tensor of <img alt="{4}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B4%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{4}"/> dimensions.</p>
-<div class="wp-caption aligncenter" id="attachment_6579" style="width: 310px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note12x.png"><img alt="" class="size-medium wp-image-6579" height="116" src="https://windowsontheory.files.wordpress.com/2018/12/note12x.png?w=300&amp;h=116" width="300"/></a><p class="wp-caption-text">Two 3d tensors</p></div>
-<div class="wp-caption aligncenter" id="attachment_6563" style="width: 310px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note13x.png"><img alt="" class="size-medium wp-image-6563" height="116" src="https://windowsontheory.files.wordpress.com/2018/12/note13x.png?w=300&amp;h=116" width="300"/></a><p class="wp-caption-text">Join two tensor networks by contracting an edge</p></div>
+<p/><div class="wp-caption aligncenter" id="attachment_6579" style="width: 310px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note12x.png"><img alt="" class="size-medium wp-image-6579" height="116" src="https://windowsontheory.files.wordpress.com/2018/12/note12x.png?w=300&amp;h=116" width="300"/></a><p class="wp-caption-text">Two 3d tensors</p></div><p/>
+<p/><div class="wp-caption aligncenter" id="attachment_6563" style="width: 310px;"><a href="https://windowsontheory.files.wordpress.com/2018/12/note13x.png"><img alt="" class="size-medium wp-image-6563" height="116" src="https://windowsontheory.files.wordpress.com/2018/12/note13x.png?w=300&amp;h=116" width="300"/></a><p class="wp-caption-text">Join two tensor networks by contracting an edge</p></div><p/>
 <p>We name the contracted edge as <img alt="{k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{k}"/>. The definition of <img alt="{T}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BT%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{T}"/> is</p>
 <p style="text-align: center;"><img alt="\displaystyle T(i_1,i_2,j_1,j_2) =\sum_k T_1(i_1,i_2, k) T_2(j_1,j_2, k)." class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+T%28i_1%2Ci_2%2Cj_1%2Cj_2%29+%3D%5Csum_k+T_1%28i_1%2Ci_2%2C+k%29+T_2%28j_1%2Cj_2%2C+k%29.&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\displaystyle T(i_1,i_2,j_1,j_2) =\sum_k T_1(i_1,i_2, k) T_2(j_1,j_2, k)."/></p>
 <p><b> 2.2. Useful Examples </b></p>
 <p>Before we move on, let’s take some examples. Keep in mind that the degree of the vertex determines the number of indices (dimensions of this tensor).</p>
-<div class="wp-caption aligncenter" id="attachment_6584" style="width: 127px;"><img alt="note15x" class="alignnone size-full wp-image-6584" src="https://windowsontheory.files.wordpress.com/2018/12/note15x.png?w=600"/><p class="wp-caption-text">vector inner product <img alt="{\langle u,v \rangle}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clangle+u%2Cv+%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\langle u,v \rangle}"/></p></div>
-<div class="wp-caption aligncenter" id="attachment_6585" style="width: 178px;"><img alt="note16x" class="alignnone size-full wp-image-6585" src="https://windowsontheory.files.wordpress.com/2018/12/note16x.png?w=600"/><p class="wp-caption-text">Matrix inner product</p></div>
+<p/><div class="wp-caption aligncenter" id="attachment_6584" style="width: 127px;"><img alt="note15x" class="alignnone size-full wp-image-6584" src="https://windowsontheory.files.wordpress.com/2018/12/note15x.png?w=600"/><p class="wp-caption-text">vector inner product <img alt="{\langle u,v \rangle}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clangle+u%2Cv+%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\langle u,v \rangle}"/></p></div><p/>
+<p/><div class="wp-caption aligncenter" id="attachment_6585" style="width: 178px;"><img alt="note16x" class="alignnone size-full wp-image-6585" src="https://windowsontheory.files.wordpress.com/2018/12/note16x.png?w=600"/><p class="wp-caption-text">Matrix inner product</p></div><p/>
 <p>Here, one needs to remember that an edge between two tensor nodes is a summation over the index corresponding to the edge. For example, in the vector inner product picture, <img alt="{\langle u,v\rangle = \sum_i u_i \cdot v_i}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clangle+u%2Cv%5Crangle+%3D+%5Csum_i+u_i+%5Ccdot+v_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\langle u,v\rangle = \sum_i u_i \cdot v_i}"/>, where edge is labeled as <img alt="{i}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{i}"/>. Now you would realize that this picture</p>
 <p><img alt="" class="wp-image-6535 size-full aligncenter" src="https://windowsontheory.files.wordpress.com/2018/12/note0x.png?w=600"/></p>
 <p>is the famous</p>
@@ -374,9 +694,9 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
 <p>For us, the most important building block is matrix multiplication. Let <img alt="{H=MN}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BH%3DMN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{H=MN}"/>. By definition</p>
 <p style="text-align: center;"><img alt="H(i,j) = \sum_k M(i,k) N(k, j). " class="latex" src="https://s0.wp.com/latex.php?latex=H%28i%2Cj%29+%3D+%5Csum_k+M%28i%2Ck%29+N%28k%2C+j%29.+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H(i,j) = \sum_k M(i,k) N(k, j). "/></p>
 <p>This is precisely encoded in the picture below.</p>
-<div class="wp-caption aligncenter" id="attachment_6587" style="width: 276px;"><img alt="note20x.png" class="alignnone size-full wp-image-6587" src="https://windowsontheory.files.wordpress.com/2018/12/note20x.png?w=600"/><p class="wp-caption-text">Matrix multiplication, <img alt="{MN}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BMN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{MN}"/>.<span style="background-color: #ffffff; color: #3d596d; font-size: 16px;"> </span><a name="figmat-mul" style="color: #3d596d; font-size: 16px;"/><span style="background-color: #ffffff; color: #3d596d; font-size: 16px;"> </span></p></div>
+<p/><div class="wp-caption aligncenter" id="attachment_6587" style="width: 276px;"><img alt="note20x.png" class="alignnone size-full wp-image-6587" src="https://windowsontheory.files.wordpress.com/2018/12/note20x.png?w=600"/><p class="wp-caption-text">Matrix multiplication, <img alt="{MN}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BMN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{MN}"/>.<span style="background-color: #ffffff; color: #3d596d; font-size: 16px;"> </span><a name="figmat-mul" style="color: #3d596d; font-size: 16px;"/><span style="background-color: #ffffff; color: #3d596d; font-size: 16px;"> </span></p></div><p/>
 <p>We are ready to talk about matrix product states. In the language of tensor network, a matrix product state is the following picture.</p>
-<div class="wp-caption aligncenter" id="attachment_6588" style="width: 590px;"><img alt="note21x" class="alignnone size-full wp-image-6588" src="https://windowsontheory.files.wordpress.com/2018/12/note21x.png?w=600"/><p class="wp-caption-text">A matrix product state.</p></div>
+<p/><div class="wp-caption aligncenter" id="attachment_6588" style="width: 590px;"><img alt="note21x" class="alignnone size-full wp-image-6588" src="https://windowsontheory.files.wordpress.com/2018/12/note21x.png?w=600"/><p class="wp-caption-text">A matrix product state.</p></div><p/>
 <p>As the degrees indicate, the two boundary vertices <img alt="{A_1,A_n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BA_1%2CA_n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{A_1,A_n}"/> represent matrices and the internal vertices represent <img alt="{3}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{3}"/>-dimensional tensors. We can view each matrix as a set of (column) vectors and each <img alt="{3}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{3}"/>-dimensional tensor as a stack of matrices. Then each one of the free edges picks out a vector or a matrix, and the contracted edges multiply them together which gives out a scalar. If this confused you, move on to the next section. I will introduce the formal definition of matrix product states, and you will see that it is just the picture above.</p>
 <p><b>3. Matrix Product States </b></p>
 <p>Before giving the definition, let’s talk about how matrix product state (MPS) naturally arises from the study of quantum states with low entanglement. Matrix product state can be viewed as a generalization of <i>product state</i>—(pure) quantum state with no entanglement. Let’s consider a simple product state <img alt="{|\psi\rangle}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7C%5Cpsi%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{|\psi\rangle}"/> of <img alt="{2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{2}"/> qubits. It can be factorized: <a name="eqnmps0"/></p>
@@ -392,10 +712,10 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
 <p style="text-align: center;"><img alt="|\psi\rangle = \sum_{j_1,\cdots,j_n=1}^n A_1^{j_1} A_2^{j_2} \cdots A_n^{j_n} |j_1 j_2\cdots j_n\rangle." class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cpsi%5Crangle+%3D+%5Csum_%7Bj_1%2C%5Ccdots%2Cj_n%3D1%7D%5En+A_1%5E%7Bj_1%7D+A_2%5E%7Bj_2%7D+%5Ccdots+A_n%5E%7Bj_n%7D+%7Cj_1+j_2%5Ccdots+j_n%5Crangle.&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\psi\rangle = \sum_{j_1,\cdots,j_n=1}^n A_1^{j_1} A_2^{j_2} \cdots A_n^{j_n} |j_1 j_2\cdots j_n\rangle."/></p>
 <p>It is important to keep in mind that <img alt="{A_1^{j_1},A_n^{j_n}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BA_1%5E%7Bj_1%7D%2CA_n%5E%7Bj_n%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{A_1^{j_1},A_n^{j_n}}"/> are two vectors, and the other inner terms are matrices, and we get a scalar from the product. Thus, this represents the tensor <img alt="{T(j_1,j_2,\cdots, j_n) = A_1^{j_1} A_2^{j_2} \cdots A_n^{j_n}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BT%28j_1%2Cj_2%2C%5Ccdots%2C+j_n%29+%3D+A_1%5E%7Bj_1%7D+A_2%5E%7Bj_2%7D+%5Ccdots+A_n%5E%7Bj_n%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{T(j_1,j_2,\cdots, j_n) = A_1^{j_1} A_2^{j_2} \cdots A_n^{j_n}}"/>.</p>
 <p>Now back to the picture,</p>
-<div class="wp-caption aligncenter" id="attachment_6588" style="width: 590px;"><img alt="note21x" class="alignnone size-full wp-image-6588" src="https://windowsontheory.files.wordpress.com/2018/12/note21x.png?w=600"/><p class="wp-caption-text">MPS</p></div>
+<p/><div class="wp-caption aligncenter" id="attachment_6588" style="width: 590px;"><img alt="note21x" class="alignnone size-full wp-image-6588" src="https://windowsontheory.files.wordpress.com/2018/12/note21x.png?w=600"/><p class="wp-caption-text">MPS</p></div><p/>
 <p>notice that each amplitude <img alt="{ A_1^{j_1} A_2^{j_2} \cdots A_n^{j_n}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B+A_1%5E%7Bj_1%7D+A_2%5E%7Bj_2%7D+%5Ccdots+A_n%5E%7Bj_n%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{ A_1^{j_1} A_2^{j_2} \cdots A_n^{j_n}}"/> from the equation above is an output of the tensor in the picture, where the free edges take values <img alt="{j_1, j_2 ,\cdots, j_n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bj_1%2C+j_2+%2C%5Ccdots%2C+j_n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{j_1, j_2 ,\cdots, j_n}"/>. Also, as discussed earlier, the contracted edges in MPS tensor network correspond to matrix and vector multiplications, so the tensor <img alt="{T}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BT%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{T}"/> is precisely represented by the picture.</p>
 <p>The complexity of the MPS is closely related to the bond dimension <img alt="{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D}"/>. In particular, the number of parameters in this model is <img alt="{O(ndD^2)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28ndD%5E2%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(ndD^2)}"/>. We would expect that with higher <img alt="{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D}"/>, we may describe quantum states of more entanglement. In other words, the representation power of an MPS increases with <img alt="{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D}"/>. In principle, one can represent any quantum state as an MPS; however, <img alt="{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D}"/> can be exponentially large. See, <i>e.g.</i>, Section 4.1.3 of~\cite{schollwock2011density} for a proof. On the other extreme, the product state example shows that if <img alt="{D=1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD%3D1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D=1}"/>, one can represent and <i>only</i> represent unentangled states. To summarize, here is the picture you should keep in mind.</p>
-<div class="wp-caption alignnone" id="attachment_6594" style="width: 776px;"><img alt="note33x" class="alignnone size-full wp-image-6594" src="https://windowsontheory.files.wordpress.com/2018/12/note33x.png?w=600"/><p class="wp-caption-text">Representation power of MPS increases with bond dimension D.</p></div>
+<p/><div class="wp-caption alignnone" id="attachment_6594" style="width: 776px;"><img alt="note33x" class="alignnone size-full wp-image-6594" src="https://windowsontheory.files.wordpress.com/2018/12/note33x.png?w=600"/><p class="wp-caption-text">Representation power of MPS increases with bond dimension D.</p></div><p/>
 <p><a name="figpower"/></p>
 <p> </p>
 <p><b>4. Density Matrix Renormalization Group </b></p>
@@ -404,16 +724,16 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
 <p>Formally, the Hamiltonian problem can be phrased as a eigenvalue problem given a Hermitian matrix <img alt="{H}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BH%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{H}"/>, and thus we want to optimize over all <img alt="{|\psi\rangle}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7C%5Cpsi%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{|\psi\rangle}"/> in MPS of a fixed bond dimension <img alt="{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D}"/> <a name="eqnham"/></p>
 <p style="text-align: center;"><img alt="\min_{|\psi\rangle}\frac{\langle \psi| H | \psi \rangle}{\langle \psi ||\psi \rangle}. " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmin_%7B%7C%5Cpsi%5Crangle%7D%5Cfrac%7B%5Clangle+%5Cpsi%7C+H+%7C+%5Cpsi+%5Crangle%7D%7B%5Clangle+%5Cpsi+%7C%7C%5Cpsi+%5Crangle%7D.+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\min_{|\psi\rangle}\frac{\langle \psi| H | \psi \rangle}{\langle \psi ||\psi \rangle}. "/></p>
 <p>Here, we assume that the input Hamiltonian is in the product form. In particular, it means that it can be written as a tensor network as</p>
-<div class="wp-caption aligncenter" id="attachment_6596" style="width: 430px;"><img alt="note36x" class="alignnone size-full wp-image-6596" src="https://windowsontheory.files.wordpress.com/2018/12/note36x.png?w=600"/><p class="wp-caption-text">Input <img alt="{1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1}"/>D Hamiltonian is of the particular product form.</p></div>
+<p/><div class="wp-caption aligncenter" id="attachment_6596" style="width: 430px;"><img alt="note36x" class="alignnone size-full wp-image-6596" src="https://windowsontheory.files.wordpress.com/2018/12/note36x.png?w=600"/><p class="wp-caption-text">Input <img alt="{1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1}"/>D Hamiltonian is of the particular product form.</p></div><p/>
 <p>so the numerator of the optimization objective looks like</p>
 <p><img alt="note37x" class=" size-full wp-image-6597 aligncenter" src="https://windowsontheory.files.wordpress.com/2018/12/note37x.png?w=600"/><a name="figdmrg1"/></p>
 <p>The DMRG works with the Langrangian of the objective. For some <img alt="{\lambda&gt;0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clambda%3E0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\lambda&gt;0}"/>, we will consider <a name="eqndmrg2"/></p>
 <p align="center"><a name="eqndmrg2"/><img alt="\displaystyle \min_{|\psi\rangle}\,\, {\langle \psi| H | \psi \rangle} - \lambda {\langle \psi ||\psi \rangle}. \ \ \ \ \ (2)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+%5Cmin_%7B%7C%5Cpsi%5Crangle%7D%5C%2C%5C%2C+%7B%5Clangle+%5Cpsi%7C+H+%7C+%5Cpsi+%5Crangle%7D+-+%5Clambda+%7B%5Clangle+%5Cpsi+%7C%7C%5Cpsi+%5Crangle%7D.+%5C+%5C+%5C+%5C+%5C+%282%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle \min_{|\psi\rangle}\,\, {\langle \psi| H | \psi \rangle} - \lambda {\langle \psi ||\psi \rangle}. \ \ \ \ \ (2)"/></p>
 <p><a name="eqndmrg2"/><br/>
 <a name="eqndmrg2"/>DMRG optimizes over the set of matrices associated with one qudit. Both terms in (<a href="https://windowsontheory.org/feed/#eqndmrg2">2</a>) are quadratic in this set of matrices.</p>
-<div class="wp-caption aligncenter" id="attachment_6598" style="width: 919px;"><img alt="note39x" class="alignnone size-full wp-image-6598" src="https://windowsontheory.files.wordpress.com/2018/12/note39x.png?w=600"/><p class="wp-caption-text">The Langrangian <img alt="{{\langle \psi| H | \psi \rangle} - \lambda {\langle \psi ||\psi \rangle}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7B%5Clangle+%5Cpsi%7C+H+%7C+%5Cpsi+%5Crangle%7D+-+%5Clambda+%7B%5Clangle+%5Cpsi+%7C%7C%5Cpsi+%5Crangle%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{{\langle \psi| H | \psi \rangle} - \lambda {\langle \psi ||\psi \rangle}}"/> as a tensor network.</p></div>
+<p/><div class="wp-caption aligncenter" id="attachment_6598" style="width: 919px;"><img alt="note39x" class="alignnone size-full wp-image-6598" src="https://windowsontheory.files.wordpress.com/2018/12/note39x.png?w=600"/><p class="wp-caption-text">The Langrangian <img alt="{{\langle \psi| H | \psi \rangle} - \lambda {\langle \psi ||\psi \rangle}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7B%5Clangle+%5Cpsi%7C+H+%7C+%5Cpsi+%5Crangle%7D+-+%5Clambda+%7B%5Clangle+%5Cpsi+%7C%7C%5Cpsi+%5Crangle%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{{\langle \psi| H | \psi \rangle} - \lambda {\langle \psi ||\psi \rangle}}"/> as a tensor network.</p></div><p/>
 <p>Now to optimize over the set of parameters associated with one site, calculus tells you to set the (partial) derivative to <img alt="{0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{0}"/>, and the derivative of a quadratic thing is linear. Without going through any algebra, we can guess that the derivative of  with respect to a particular site, say the second one, is the same picture except removing the second site on one side.</p>
-<div class="wp-caption alignnone" id="attachment_6599" style="width: 919px;"><img alt="note40x" class="alignnone size-full wp-image-6599" src="https://windowsontheory.files.wordpress.com/2018/12/note40x.png?w=600"/><p class="wp-caption-text">The derivative that we set to <img alt="{0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{0}"/> and solve.</p></div>
+<p/><div class="wp-caption alignnone" id="attachment_6599" style="width: 919px;"><img alt="note40x" class="alignnone size-full wp-image-6599" src="https://windowsontheory.files.wordpress.com/2018/12/note40x.png?w=600"/><p class="wp-caption-text">The derivative that we set to <img alt="{0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{0}"/> and solve.</p></div><p/>
 <p>Notice that the unknown is still there, on the bottom side of each term. The trick of DMRG is to view the rest of the network as a linear map applied to the unknown.</p>
 <p><img alt="note41x" class="alignnone size-full wp-image-6600" src="https://windowsontheory.files.wordpress.com/2018/12/note41x.png?w=600"/></p>
 <p>Given <img alt="{H'}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BH%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{H'}"/> and <img alt="{B}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BB%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{B}"/>, we now have a clean numerical linear algebra problem of solving</p>
@@ -464,7 +784,7 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-23T01:20:41Z</updated>
+      <updated>2018-12-23T02:20:37Z</updated>
     </source>
   </entry>
 
@@ -1210,7 +1530,7 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-23T01:20:38Z</updated>
+      <updated>2018-12-23T02:20:40Z</updated>
     </source>
   </entry>
 
@@ -1242,7 +1562,7 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-23T01:20:44Z</updated>
+      <updated>2018-12-23T02:20:41Z</updated>
     </source>
   </entry>
 
@@ -1407,7 +1727,7 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-23T01:20:39Z</updated>
+      <updated>2018-12-23T02:20:35Z</updated>
     </source>
   </entry>
 
@@ -1436,7 +1756,7 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
       <link href="https://adamsheffer.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Discrete geometry and other typos</subtitle>
       <title>Some Plane Truths</title>
-      <updated>2018-12-23T01:20:14Z</updated>
+      <updated>2018-12-23T02:20:12Z</updated>
     </source>
   </entry>
 
@@ -1466,7 +1786,7 @@ We then discuss how to efficiently compute the ground states of the Hamiltonians
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>By Emanuele Viola</subtitle>
       <title>Thoughts</title>
-      <updated>2018-12-23T01:20:09Z</updated>
+      <updated>2018-12-23T02:20:07Z</updated>
     </source>
   </entry>
 
@@ -1497,7 +1817,7 @@ Email: gldpost2@us.ibm.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-23T01:21:05Z</updated>
+      <updated>2018-12-23T02:21:04Z</updated>
     </source>
   </entry>
 
@@ -1556,7 +1876,7 @@ Email: gldpost2@us.ibm.com</p></div>
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2018-12-23T01:21:12Z</updated>
+      <updated>2018-12-23T02:21:10Z</updated>
     </source>
   </entry>
 
@@ -2028,7 +2348,7 @@ such that <img alt="|p(x)| \leq 1" class="latex" src="https://s0.wp.com/latex.ph
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-23T01:20:40Z</updated>
+      <updated>2018-12-23T02:20:36Z</updated>
     </source>
   </entry>
 
@@ -2059,7 +2379,7 @@ Email: lreyzin@uic.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-23T01:21:05Z</updated>
+      <updated>2018-12-23T02:21:03Z</updated>
     </source>
   </entry>
 
@@ -2090,7 +2410,7 @@ Email: slovett@ucsd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-23T01:21:05Z</updated>
+      <updated>2018-12-23T02:21:03Z</updated>
     </source>
   </entry>
 
@@ -2121,7 +2441,7 @@ Email: slovett@ucsd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-23T01:21:05Z</updated>
+      <updated>2018-12-23T02:21:04Z</updated>
     </source>
   </entry>
 
@@ -2876,7 +3196,7 @@ Email: slovett@ucsd.edu</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-23T01:20:35Z</updated>
+      <updated>2018-12-23T02:20:32Z</updated>
     </source>
   </entry>
 
@@ -3097,7 +3417,7 @@ We don’t think the photo used by this online Alchetron <a href="https://alchet
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2018-12-23T01:21:42Z</updated>
+      <updated>2018-12-23T02:22:02Z</updated>
     </source>
   </entry>
 
@@ -3128,7 +3448,7 @@ Email: jschmidt@cs.duke.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-23T01:21:05Z</updated>
+      <updated>2018-12-23T02:21:04Z</updated>
     </source>
   </entry>
 
@@ -3160,7 +3480,7 @@ Email: sergeg@cse.unsw.edu.au</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-23T01:21:05Z</updated>
+      <updated>2018-12-23T02:21:04Z</updated>
     </source>
   </entry>
 
@@ -3282,7 +3602,7 @@ The diagram also shows the nature of the expected assortment of the solutions of
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-23T01:20:36Z</updated>
+      <updated>2018-12-23T02:20:33Z</updated>
     </source>
   </entry>
 
@@ -3314,7 +3634,7 @@ Email: meel@comp.nus.edu.sg</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-23T01:21:04Z</updated>
+      <updated>2018-12-23T02:21:03Z</updated>
     </source>
   </entry>
 
@@ -3344,7 +3664,7 @@ Gusfield (1980) and Dean (2009) showed that the number of break points for an $n
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-23T01:21:51Z</updated>
+      <updated>2018-12-23T02:22:13Z</updated>
     </source>
   </entry>
 
@@ -3403,7 +3723,7 @@ Milena Mihail and Umesh Vazirani</span></strong></p>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2018-12-23T01:21:03Z</updated>
+      <updated>2018-12-23T02:21:02Z</updated>
     </source>
   </entry>
 
@@ -3494,7 +3814,7 @@ Email: marek@cs.ucr.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-23T01:21:05Z</updated>
+      <updated>2018-12-23T02:21:03Z</updated>
     </source>
   </entry>
 
@@ -3579,7 +3899,7 @@ I like this proof quite a bit. Can this argument be used to prove the basic fact
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2018-12-23T01:21:42Z</updated>
+      <updated>2018-12-23T02:22:02Z</updated>
     </source>
   </entry>
 
@@ -3621,7 +3941,7 @@ At the heart of all our proofs is the construction of a dense bipartite graph wi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-23T01:21:51Z</updated>
+      <updated>2018-12-23T02:22:13Z</updated>
     </source>
   </entry>
 
@@ -3706,7 +4026,7 @@ this context.
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-23T01:21:51Z</updated>
+      <updated>2018-12-23T02:22:13Z</updated>
     </source>
   </entry>
 
@@ -4029,7 +4349,7 @@ Recall that, up to regularization, the capacity of a quantum channel is given by
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2018-12-23T01:20:43Z</updated>
+      <updated>2018-12-23T02:20:39Z</updated>
     </source>
   </entry>
 
@@ -4060,7 +4380,7 @@ Email: raphael.clifford@bristol.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-23T01:21:05Z</updated>
+      <updated>2018-12-23T02:21:03Z</updated>
     </source>
   </entry>
 
@@ -4097,7 +4417,7 @@ Email: raphael.clifford@bristol.ac.uk</p></div>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2018-12-23T01:21:53Z</updated>
+      <updated>2018-12-23T02:22:16Z</updated>
     </source>
   </entry>
 
@@ -4127,7 +4447,7 @@ Email: raphael.clifford@bristol.ac.uk</p></div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>By Emanuele Viola</subtitle>
       <title>Thoughts</title>
-      <updated>2018-12-23T01:20:10Z</updated>
+      <updated>2018-12-23T02:20:08Z</updated>
     </source>
   </entry>
 
@@ -4159,7 +4479,7 @@ We also define new communication complexity classes that correspond to different
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-23T01:21:51Z</updated>
+      <updated>2018-12-23T02:22:13Z</updated>
     </source>
   </entry>
 
@@ -4279,7 +4599,7 @@ We also define new communication complexity classes that correspond to different
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2018-12-23T01:21:03Z</updated>
+      <updated>2018-12-23T02:21:02Z</updated>
     </source>
   </entry>
 
@@ -4313,7 +4633,7 @@ In all known constructions of probabilistic polynomials for the OR function (inc
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2018-12-23T01:21:52Z</updated>
+      <updated>2018-12-23T02:22:14Z</updated>
     </source>
   </entry>
 
@@ -4345,37 +4665,7 @@ Email: ilias.diakonikolas@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2018-12-23T01:21:05Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://emanueleviola.wordpress.com/?p=598</id>
-    <link href="https://emanueleviola.wordpress.com/2018/12/03/i-am-looking-for-students/" rel="alternate" type="text/html"/>
-    <title>I am looking for students</title>
-    <summary>If you are applying for a PhD in theoretical computer science, you may want to check out my homepage, to see what my team and I are up to, the theory group at Northeastern University, and where we stand in the rankings. (For a discussion of csrankings see this previous post.) If you think there […]
-      <div class="commentbar">
-        <p/>
-      </div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>If you are applying for a PhD in theoretical computer science, you may want to check out <a href="http://www.ccs.neu.edu/home/viola/">my homepage</a>, to see what my team and I are up to, <a href="https://www2.ccs.neu.edu/theory/index.html">the theory group at Northeastern University</a>, and <a href="http://csrankings.org/">where we stand in the rankings</a>. (For a discussion of csrankings see this <a href="https://emanueleviola.wordpress.com/2016/07/21/csrankings/">previous post</a>.) If you think there is a match write my name on the application.</p></div>
-    </content>
-    <updated>2018-12-03T22:24:01Z</updated>
-    <published>2018-12-03T22:24:01Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>Emanuele</name>
-    </author>
-    <source>
-      <id>https://emanueleviola.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://emanueleviola.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://emanueleviola.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://emanueleviola.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>By Emanuele Viola</subtitle>
-      <title>Thoughts</title>
-      <updated>2018-12-23T01:20:10Z</updated>
+      <updated>2018-12-23T02:21:04Z</updated>
     </source>
   </entry>
 </feed>
