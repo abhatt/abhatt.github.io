@@ -129,7 +129,7 @@ Stay up to date
 <a href="http://learningwitherrors.org" title="Learning With Errors">Learning with Errors: Student Theory Blog</a>
 <br>
 <a class="feedlink" href="http://processalgebra.blogspot.com/feeds/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
-<a href="http://processalgebra.blogspot.com/" class="message" title="internal server error">Luca Aceto</a>
+<a href="http://processalgebra.blogspot.com/" title="Process Algebra Diary">Luca Aceto</a>
 <br>
 <a class="feedlink" href="https://lucatrevisan.wordpress.com/feed/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="https://lucatrevisan.wordpress.com" title="in   theory">Luca Trevisan</a>
@@ -219,7 +219,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at January 04, 2019 04:22 AM UTC</span>.
+Last updated <span class="datestr">at January 04, 2019 05:21 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -227,6 +227,1242 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://windowsontheory.org/?p=7217">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/wot.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://windowsontheory.org/2019/01/03/quantum-games/">Quantum Games</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://windowsontheory.org" title="Windows On Theory">Windows on Theory</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+Nilin Abrahamsen <font face="courier new">nilin@mit.edu</font>
+Daniel Alabi <font face="courier new">alabid@g.harvard.edu</font>
+Mitali Bafna <font face="courier new">mitalibafna@g.harvard.edu</font>
+Emil Khabiboulline <font face="courier new">ekhabiboulline@g.harvard.edu</font>
+Juspreet Sandhu <font face="courier new">jus065@g.harvard.edu</font>
+
+<br />
+<br />
+Two-prover one-round (2P-1R) games have been the subject of intensive study in classical complexity theory and quantum information theory. In a 2P-1R game, a <em>verifier</em> sends questions privately to each of two collaborating <em>provers</em> , who then aim to respond with a compatible pair of answers without communicating with each other. Sharing quantum entanglement allows the provers to improve their strategy without any communication, illustrating an apparent paradox of the quantum postulates. These notes aim to give an introduction to the role of entanglement in nonlocal games, as they are called in the quantum literature. We see how nonlocal games have rich connections within computer science and quantum physics, giving rise to theorems ranging from hardness of approximation to the resource theory of entanglement.
+<h2>Introduction</h2>
+In these notes we discuss 2-prover 1-round games and the classical complexity of approximating the value of such games in the setting where the provers can share entanglement. That is, given the description of a game, we ask how hard it is to estimate the winning probability of the best winning strategy of the entangled provers. Let us first formally define games and its relation to the label cover problem. We write <img src="https://s0.wp.com/latex.php?latex=%7B+%5Bn%5D%3D%5C%7B1%2C%5Cldots%2Cn%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ [n]=\{1,\ldots,n\}}" class="latex" title="{ [n]=\{1,\ldots,n\}}" />.
+<h4>Definition (Label cover)</h4>
+<em> A label cover instance <img src="https://s0.wp.com/latex.php?latex=%7B+I%3D%28S%2CT%2C%5CSigma%2C%5CPi%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ I=(S,T,\Sigma,\Pi)}" class="latex" title="{ I=(S,T,\Sigma,\Pi)}" /> consists of variable sets <img src="https://s0.wp.com/latex.php?latex=%7B+S%3D%5C%7Bs_i%5C%7D_%7Bi%5Cin%5Bn%5D%7D%2CT%3D%5C%7Bt_j%5C%7D_%7Bj%5Cin%5Bn%5D%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ S=\{s_i\}_{i\in[n]},T=\{t_j\}_{j\in[n]}}" class="latex" title="{ S=\{s_i\}_{i\in[n]},T=\{t_j\}_{j\in[n]}}" />, alphabet set <img src="https://s0.wp.com/latex.php?latex=%7B+%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \Sigma}" class="latex" title="{ \Sigma}" />, and a collection <img src="https://s0.wp.com/latex.php?latex=%7B+%5CPi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \Pi}" class="latex" title="{ \Pi}" /> of constraints of the form <img src="https://s0.wp.com/latex.php?latex=%7B+t_j%3Df_%7Bi%2Cj%7D%28s_i%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t_j=f_{i,j}(s_i)}" class="latex" title="{ t_j=f_{i,j}(s_i)}" />. Given an assignment (or coloring) <img src="https://s0.wp.com/latex.php?latex=%7B+c+%3A+S%5Ccup+T+%5Crightarrow+%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ c : S\cup T \rightarrow \Sigma}" class="latex" title="{ c : S\cup T \rightarrow \Sigma}" /> we define its value to be <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%28c%29%3D%5Cmathbb+P_%7Bf_%7Bij%7D%5Csim%5CPi%7D%5Cbig%28c%28t_j%29%3Df_%7Bij%7D%28c%28s_i%29%29%5Cbig%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega(c)=\mathbb P_{f_{ij}\sim\Pi}\big(c(t_j)=f_{ij}(c(s_i))\big)}" class="latex" title="{ \omega(c)=\mathbb P_{f_{ij}\sim\Pi}\big(c(t_j)=f_{ij}(c(s_i))\big)}" />. Define the value of <img src="https://s0.wp.com/latex.php?latex=%7B+I%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ I}" class="latex" title="{ I}" /> to be the maximum over all possible assignments, i.e. <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%28I%29+%3D+%5Cmax_%7Bc%7D+%5Comega%28c%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega(I) = \max_{c} \omega(c)}" class="latex" title="{ \omega(I) = \max_{c} \omega(c)}" />. </em>
+
+
+
+Many familiar computational problems can be formulated as a label cover, such as <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctextsc%7B3SAT%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \textsc{3SAT}}" class="latex" title="{ \textsc{3SAT}}" />, <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctextsc%7B3Lin%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \textsc{3Lin}}" class="latex" title="{ \textsc{3Lin}}" />, and <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctextsc%7BMaxCut%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \textsc{MaxCut}}" class="latex" title="{ \textsc{MaxCut}}" />.
+<figure style="width: 11em; margin: auto;">
+
+<a href="https://windowsontheory.org/?attachment_id=7236"><img src="https://windowsontheory.files.wordpress.com/2019/01/labelcover.png?w=110&amp;h=150" alt="" height="150" class="attachment-thumbnail size-thumbnail" width="110" /></a>
+Label cover graph</figure>
+<h4>Definition (2-prover 1-round game)</h4>
+<em> Let <img src="https://s0.wp.com/latex.php?latex=%7B+I+%3D+%28S%2CT%2C%5CSigma%2C%5CPi%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ I = (S,T,\Sigma,\Pi)}" class="latex" title="{ I = (S,T,\Sigma,\Pi)}" /> be a label cover instance. We can then associate the following two-prover one-round game <img src="https://s0.wp.com/latex.php?latex=%7B+G%28I%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ G(I)}" class="latex" title="{ G(I)}" /> with <img src="https://s0.wp.com/latex.php?latex=%7B+I%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ I}" class="latex" title="{ I}" />. Let <img src="https://s0.wp.com/latex.php?latex=%7B+P_1%2CP_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ P_1,P_2}" class="latex" title="{ P_1,P_2}" /> be two provers who cannot communicate, and let <img src="https://s0.wp.com/latex.php?latex=%7B+V%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ V}" class="latex" title="{ V}" /> be the verifier. Given the label cover instance <img src="https://s0.wp.com/latex.php?latex=%7B+I%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ I}" class="latex" title="{ I}" />, the verifier uniformly samples a constraint <img src="https://s0.wp.com/latex.php?latex=%7B+f_%7Bi%2Cj%7D+%5Cin+%5CPi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ f_{i,j} \in \Pi}" class="latex" title="{ f_{i,j} \in \Pi}" /> and sends <img src="https://s0.wp.com/latex.php?latex=%7B+s_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s_i}" class="latex" title="{ s_i}" /> to <img src="https://s0.wp.com/latex.php?latex=%7B+P_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ P_1}" class="latex" title="{ P_1}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+t_j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t_j}" class="latex" title="{ t_j}" /> to <img src="https://s0.wp.com/latex.php?latex=%7B+P_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ P_2}" class="latex" title="{ P_2}" />. The provers then reply with <img src="https://s0.wp.com/latex.php?latex=%7B+a+%5Cin+%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a \in \Sigma}" class="latex" title="{ a \in \Sigma}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+b%5Cin%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ b\in\Sigma}" class="latex" title="{ b\in\Sigma}" /> respectively to <img src="https://s0.wp.com/latex.php?latex=%7B+V%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ V}" class="latex" title="{ V}" />. Finally, <img src="https://s0.wp.com/latex.php?latex=%7B+V%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ V}" class="latex" title="{ V}" /> outputs <img src="https://s0.wp.com/latex.php?latex=%7B+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ 1}" class="latex" title="{ 1}" /> if and only if <img src="https://s0.wp.com/latex.php?latex=%7B+b+%3D+f_%7Bi%2Cj%7D%28a%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ b = f_{i,j}(a)}" class="latex" title="{ b = f_{i,j}(a)}" />. </em>
+
+
+<figure style="width: 25em; margin: auto;">
+ 
+<a href="https://windowsontheory.org/?attachment_id=7235"><img src="https://windowsontheory.files.wordpress.com/2019/01/game.png?w=150&amp;h=104" alt="" height="104" class="attachment-thumbnail size-thumbnail" width="150" /></a>
+
+
+The game view of label cover</figure>
+Any coloring of the label cover instance corresponds to a deterministic strategy for the corresponding game. Therefore, with an optimal strategy the provers win the game associated to label cover instance <img src="https://s0.wp.com/latex.php?latex=%7B+I%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ I}" class="latex" title="{ I}" /> with probability <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%28I%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega(I)}" class="latex" title="{ \omega(I)}" />. That is, the value of the game equals that of the label cover instance. However, this is with the assumption that provers can only use deterministic strategies or convex combinations of these (that is, using shared randomness). If the provers share an entangled quantum state, then the provers (who still cannot communicate) can enjoy correlations that allow them to win with a higher probability than classically. In the quantum literature, these 2P-1R games are known as nonlocal games referring to the fact that the correlations arise without signaling between the provers. We are concerned with the complexity of approximating the winning probability of this strategy.
+
+We refer to the optimal winning probability within some class (classical or entangled) of strategies as the classical and quantum value of the game, respectively, and we use the terms quantum strategy and entangled strategy interchangeably.
+
+Fixing different constraint families in the label cover game changes the complexity of finding the (classical and entangled) values of the game. We will show that approximating the entangled value of XOR games, or more generally <em>unique games</em> (to be defined later on), is possible in polynomial time. This is remarkable because a famous conjecture known as the <a href="https://en.wikipedia.org/wiki/Unique_games_conjecture"> <em>unique games conjecture</em> </a> says that approximating the classical value of unique games is NP-hard. In contrast, we will see that for unrestricted edge constraints, it is NP-hard to approximate the entangled value of a nonlocal game. Thus, hardness of approximation of the game’s value, established by the celebrated <em>PCP theorem</em> , still applies in the presence of entanglement. In the quantum world, we have new complexity classes such as QMA (which can be regarded as “quantum NP”), so one may conjecture whether approximating the entangled value of a general game is QMA-hard (the games formulation of the <em>quantum PCP conjecture</em> ). We will indicate progress in this direction but will explicitly demonstrate the NP-hardness result.
+
+Entanglement is often regarded as an expensive resource in quantum information because it is difficult to produce and maintain. Hence, even if sharing entanglement can improve the success probability of winning a game, the resource consumption may be costly. We will conclude by discussing lower bounds on the number of shared entangled bits required to achieve the optimal value of a game.
+<h2>Notation and quantum postulates</h2>
+Let us first establish notation and define what is meant by an entangled strategy. In keeping with physics notation we write a column vector as <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7Bv%7D%5Crangle+%5Cin%5Cmathbb+C%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{v}\rangle \in\mathbb C^d}" class="latex" title="{ |{v}\rangle \in\mathbb C^d}" /> and its conjugate-transpose (a row vector) as <img src="https://s0.wp.com/latex.php?latex=%7B+%5Clangle%7Bv%7D%7C+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \langle{v}| }" class="latex" title="{ \langle{v}| }" /> . More generally the conjugate-transpose (Hermitian conjugate) of a matrix <img src="https://s0.wp.com/latex.php?latex=%7B+A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A}" class="latex" title="{ A}" /> is written <img src="https://s0.wp.com/latex.php?latex=%7B+A%5E%5Cdag%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A^\dag}" class="latex" title="{ A^\dag}" />. Then <img src="https://s0.wp.com/latex.php?latex=%7B+%5Clangle%7Bv%7D%7C+w%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \langle{v}| w\rangle}" class="latex" title="{ \langle{v}| w\rangle}" /> is the inner product of two vectors (a scalar) and <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7Bv%7D%5Crangle+%5Clangle%7Bw%7D%7C+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{v}\rangle \langle{w}| }" class="latex" title="{ |{v}\rangle \langle{w}| }" /> the outer product (a rank-1 matrix). A matrix <img src="https://s0.wp.com/latex.php?latex=%7B+A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A}" class="latex" title="{ A}" /> is said to be <em>Hermitian</em> if <img src="https://s0.wp.com/latex.php?latex=%7B+A%5E%5Cdag%3DA%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A^\dag=A}" class="latex" title="{ A^\dag=A}" />. A matrix <img src="https://s0.wp.com/latex.php?latex=%7B+A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A}" class="latex" title="{ A}" /> is <em>positive semidefinite</em> , written <img src="https://s0.wp.com/latex.php?latex=%7B+A%5Csucceq+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A\succeq 0}" class="latex" title="{ A\succeq 0}" />, if <img src="https://s0.wp.com/latex.php?latex=%7B+A%3DB%5E%5Cdag+B%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A=B^\dag B}" class="latex" title="{ A=B^\dag B}" /> for some matrix <img src="https://s0.wp.com/latex.php?latex=%7B+B%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ B}" class="latex" title="{ B}" />. We write the identity matrix as <img src="https://s0.wp.com/latex.php?latex=%7B+%7B%5Cmathbb%7BI%7D%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ {\mathbb{I}}}" class="latex" title="{ {\mathbb{I}}}" />, denote by <img src="https://s0.wp.com/latex.php?latex=%7B+Herm%28%5Cmathbb%7BC%7D%5Ed%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ Herm(\mathbb{C}^d)}" class="latex" title="{ Herm(\mathbb{C}^d)}" /> the set of <img src="https://s0.wp.com/latex.php?latex=%7B+d%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ d}" class="latex" title="{ d}" />-by-<img src="https://s0.wp.com/latex.php?latex=%7B+d%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ d}" class="latex" title="{ d}" /> Hermitian matrices.
+<h3> Observables, states, and entanglement</h3>
+In a quantum theory the <em>observables</em> are Hermitian operators <img src="https://s0.wp.com/latex.php?latex=%7B+A%5Cin+Herm%28%5Cmathbb+C%5Ed%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A\in Herm(\mathbb C^d)}" class="latex" title="{ A\in Herm(\mathbb C^d)}" /> on a vector space <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathbb+C%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathbb C^d}" class="latex" title="{ \mathbb C^d}" />. It then makes sense to say that a <em>state</em> is a functional <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cvarphi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \varphi}" class="latex" title="{ \varphi}" /> on the set of observables. That is, to specify the state of a physical system means giving a (expected) value for each observable. It turns out states are <em>linear</em> functionals of the observables, and such functionals can be written <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cvarphi%28A%29%3D%5Clangle+A%2C%5Crho%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \varphi(A)=\langle A,\rho\rangle}" class="latex" title="{ \varphi(A)=\langle A,\rho\rangle}" /> for some <img src="https://s0.wp.com/latex.php?latex=%7B+d%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ d}" class="latex" title="{ d}" />-by-<img src="https://s0.wp.com/latex.php?latex=%7B+d%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ d}" class="latex" title="{ d}" /> matrix <img src="https://s0.wp.com/latex.php?latex=%7B+%5Crho%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \rho}" class="latex" title="{ \rho}" />. We call <img src="https://s0.wp.com/latex.php?latex=%7B+%5Crho%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \rho}" class="latex" title="{ \rho}" /> the density matrix and require moreover that <img src="https://s0.wp.com/latex.php?latex=%7B+%5Crho%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \rho}" class="latex" title="{ \rho}" /> is positive semidefinite and has trace <img src="https://s0.wp.com/latex.php?latex=%7B+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ 1}" class="latex" title="{ 1}" />. Every density matrix is a convex combination of rank-one projections <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5Cpsi%5Crangle%5Clangle%5Cpsi%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\psi\rangle\langle\psi|}" class="latex" title="{ |\psi\rangle\langle\psi|}" /> known as pure states. The unit vectors <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5Cpsi%5Crangle%5Cin%5Cmathbb+C%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\psi\rangle\in\mathbb C^d}" class="latex" title="{ |\psi\rangle\in\mathbb C^d}" /> are also themselves known as pure states.
+
+If the state of one particle is described by a vector in <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathbb+C%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathbb C^d}" class="latex" title="{ \mathbb C^d}" /> (referring here to pure states), then two particles are described by a vector in the tensor product <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathbb+C%5Ed%5Cotimes%5Cmathbb+C%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathbb C^d\otimes\mathbb C^d}" class="latex" title="{ \mathbb C^d\otimes\mathbb C^d}" />. The two particles are entangled if their state is not in the form of a pure tensor <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5Cphi%5Crangle%5Cotimes%7C%5Cpsi%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\phi\rangle\otimes|\psi\rangle}" class="latex" title="{ |\phi\rangle\otimes|\psi\rangle}" />. We also write product states as <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5Cphi%5Crangle%7C%5Cpsi%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\phi\rangle|\psi\rangle}" class="latex" title="{ |\phi\rangle|\psi\rangle}" />, omitting the tensor symbol.
+<h3> Quantum measurements</h3>
+A quantum measurement can be described in terms of a <em>projection-valued measure</em> (PVM).
+<b>Definition 1 (PVM)</b> <em><a name="measurement"></a> A projection-valued measure on vector space <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathbb+C%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathbb C^d}" class="latex" title="{ \mathbb C^d}" /> (where the quantum states live) is a list of projection matrices <img src="https://s0.wp.com/latex.php?latex=%7B+A_1%2C%5Cldots%2CA_k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A_1,\ldots,A_k}" class="latex" title="{ A_1,\ldots,A_k}" /> on <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathbb+C%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathbb C^d}" class="latex" title="{ \mathbb C^d}" /> such that <img src="https://s0.wp.com/latex.php?latex=%7B+A_iA_j%3D0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A_iA_j=0}" class="latex" title="{ A_iA_j=0}" /> for <img src="https://s0.wp.com/latex.php?latex=%7B+i%5Cneq+j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ i\neq j}" class="latex" title="{ i\neq j}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+%5Csum_i+A_i%3D%7B%5Cmathbb%7BI%7D%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \sum_i A_i={\mathbb{I}}}" class="latex" title="{ \sum_i A_i={\mathbb{I}}}" />. The PVM describes a measurement which, on state <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5Cpsi%5Crangle%5Cin%5Cmathbb+C%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\psi\rangle\in\mathbb C^d}" class="latex" title="{ |\psi\rangle\in\mathbb C^d}" /> outputs measurement outcome <img src="https://s0.wp.com/latex.php?latex=%7B+i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ i}" class="latex" title="{ i}" /> with probability <img src="https://s0.wp.com/latex.php?latex=%7B+%5Clangle%5Cpsi%7C+A_i%7C%5Cpsi%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \langle\psi| A_i|\psi\rangle}" class="latex" title="{ \langle\psi| A_i|\psi\rangle}" />. The quantum state after obtaining outcome <img src="https://s0.wp.com/latex.php?latex=%7B+i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ i}" class="latex" title="{ i}" /> is <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cfrac1%7B%5C%7CA_i%7C%5Cpsi%5Crangle%5C%7C%7DA_i%7C%5Cpsi%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \frac1{\|A_i|\psi\rangle\|}A_i|\psi\rangle}" class="latex" title="{ \frac1{\|A_i|\psi\rangle\|}A_i|\psi\rangle}" />. </em>
+When the projections are rank-one projections <img src="https://s0.wp.com/latex.php?latex=%7B+A_i%3D+%7C%7B%5Cbeta_i%7D%5Crangle+%5Clangle%7B%5Cbeta_i%7D%7C+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A_i= |{\beta_i}\rangle \langle{\beta_i}| }" class="latex" title="{ A_i= |{\beta_i}\rangle \langle{\beta_i}| }" /> we say that we measure in the basis <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7B+%7C%7B%5Cbeta_i%7D%5Crangle+%5C%7D_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{ |{\beta_i}\rangle \}_i}" class="latex" title="{ \{ |{\beta_i}\rangle \}_i}" />. In this case the probability of outcome <img src="https://s0.wp.com/latex.php?latex=%7B+i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ i}" class="latex" title="{ i}" /> in state <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5Cpsi%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\psi\rangle}" class="latex" title="{ |\psi\rangle}" /> is <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5Clangle%5Cbeta_i+%7C%7B%5Cpsi%7D%5Crangle+%7C%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\langle\beta_i |{\psi}\rangle |^2}" class="latex" title="{ |\langle\beta_i |{\psi}\rangle |^2}" />, and the post-measurement state is simply <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cbeta_i%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\beta_i}\rangle}" class="latex" title="{ |{\beta_i}\rangle}" /> .
+
+Applying the measurement <img src="https://s0.wp.com/latex.php?latex=%7B+%28A_i%29_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (A_i)_i}" class="latex" title="{ (A_i)_i}" /> on the left half of a two-particle state <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5CPsi%7D%5Crangle+%5Cin%5Cmathbb+C%5Ed%5Cotimes%5Cmathbb+C%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\Psi}\rangle \in\mathbb C^d\otimes\mathbb C^d}" class="latex" title="{ |{\Psi}\rangle \in\mathbb C^d\otimes\mathbb C^d}" /> means applying the PVM <img src="https://s0.wp.com/latex.php?latex=%7B+%28A_i%5Cotimes+%7B%5Cmathbb%7BI%7D%7D%29_%7Bi%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (A_i\otimes {\mathbb{I}})_{i}}" class="latex" title="{ (A_i\otimes {\mathbb{I}})_{i}}" /> on the two-particle state.
+<h3> Quantum strategies for nonlocal games</h3>
+We now introduce the notion of a quantum strategy for a nonlocal game. Each prover holds a particle, say with state space <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathbb+C%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathbb C^d}" class="latex" title="{ \mathbb C^d}" />, and Alices particle may be entangled with Bob’s. The global state is <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cphi%7D%5Crangle+_%7BAB%7D%5Cin%5Cmathbb+C%5Ed%5Cotimes%5Cmathbb+C%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\phi}\rangle _{AB}\in\mathbb C^d\otimes\mathbb C^d}" class="latex" title="{ |{\phi}\rangle _{AB}\in\mathbb C^d\otimes\mathbb C^d}" />. Each player receives a question from the verifier and then chooses a measurement (a PVM) depending on the question. The player applies the measurement to their own particle and responds to the verifier with their measurement outcome. Hence for Alice we specify <img src="https://s0.wp.com/latex.php?latex=%7B+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ n}" class="latex" title="{ n}" /> PVM’s <img src="https://s0.wp.com/latex.php?latex=%7B+A%5Es%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A^s}" class="latex" title="{ A^s}" /> where <img src="https://s0.wp.com/latex.php?latex=%7B+s%5Cin+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s\in S}" class="latex" title="{ s\in S}" /> is a question, and each PVM is a list <img src="https://s0.wp.com/latex.php?latex=%7B+A%5Es_%7Ba%3D1%7D%2C%5Cldots%2CA%5Es_k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A^s_{a=1},\ldots,A^s_k}" class="latex" title="{ A^s_{a=1},\ldots,A^s_k}" />. By definition <a href="https://windowsontheory.org/feed/#measurement">1</a>, given questions <img src="https://s0.wp.com/latex.php?latex=%7B+s%2Ct%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s,t}" class="latex" title="{ s,t}" /> the probability that Alice outputs <img src="https://s0.wp.com/latex.php?latex=%7B+a%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a}" class="latex" title="{ a}" /> and Bob outputs <img src="https://s0.wp.com/latex.php?latex=%7B+b%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ b}" class="latex" title="{ b}" /> is <a name="Qstrategy"></a>
+
+<a name="Qstrategy">
+</a><a name="Qstrategy"></a>
+<p align="center"><a name="Qstrategy"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++P%28a%2Cb%7Cs%2Ct%29%3D%5C%7C%28%7B%5Cmathbb%7BI%7D%7D%5Cotimes+B%5Et_b%29%28A%5Es_a%5Cotimes+%7B%5Cmathbb%7BI%7D%7D%29+%7C%7B%5Cphi%7D%5Crangle+_%7BAB%7D%5C%7C%5E2%3D+%5Clangle%7B%5Cphi%7D%7C+A%5Es_a%5Cotimes+B%5Et_b%7C%5Cphi%5Crangle%2C+%5C+%5C+%5C+%5C+%5C+%281%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  P(a,b|s,t)=\|({\mathbb{I}}\otimes B^t_b)(A^s_a\otimes {\mathbb{I}}) |{\phi}\rangle _{AB}\|^2= \langle{\phi}| A^s_a\otimes B^t_b|\phi\rangle, \ \ \ \ \ (1)" class="latex" title="\displaystyle  P(a,b|s,t)=\|({\mathbb{I}}\otimes B^t_b)(A^s_a\otimes {\mathbb{I}}) |{\phi}\rangle _{AB}\|^2= \langle{\phi}| A^s_a\otimes B^t_b|\phi\rangle, \ \ \ \ \ (1)" /></a></p>
+<a name="Qstrategy">
+</a><a name="Qstrategy"></a> where we have used that squaring a projection leaves it unchanged.
+<h2>Quantum strategies beat classical ones</h2>
+For any 2P-1R game <img src="https://s0.wp.com/latex.php?latex=%7B+G%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ G}" class="latex" title="{ G}" />, let <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega(G)}" class="latex" title="{ \omega(G)}" /> be the maximum probability — over the players’ classical strategies — that the verifier accepts and <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%5E%2A%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega^*(G)}" class="latex" title="{ \omega^*(G)}" /> the maximum probability that the verifier accepts when the provers use qubits such that player 1’s qubits are entangled with those of player 2.
+
+The game of Clauser, Horne, Shimony, and Holt (CHSH) has the property that the provers can increase their chance of winning by sharing an entangled pair of qubits, even when no messages are exchanged between the players. We show that there’s a characterization of the CHSH game’s value <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%5E%2A%28G%29%3D%5Ccos%5E2%28%5Cfrac%7B%5Cpi%7D%7B8%7D%29+%3D+%5Cfrac%7B1%7D%7B2%7D%2B%5Cfrac%7B%5Csqrt%7B2%7D%7D%7B4%7D%5Capprox+0.85%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega^*(G)=\cos^2(\frac{\pi}{8}) = \frac{1}{2}+\frac{\sqrt{2}}{4}\approx 0.85}" class="latex" title="{ \omega^*(G)=\cos^2(\frac{\pi}{8}) = \frac{1}{2}+\frac{\sqrt{2}}{4}\approx 0.85}" /> which is better than the classical value <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%28G%29%5Cleq+%5Cfrac%7B3%7D%7B4%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega(G)\leq \frac{3}{4}}" class="latex" title="{ \omega(G)\leq \frac{3}{4}}" />. Let us first define XOR games, of which the CHSH game is a special case.
+<h4>Definition (XOR game)</h4>
+<em> An XOR game is a 2-player classical game (the questions and answers are classical bits) where: </em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em>
+<ol>
+ 	<li> Questions <img src="https://s0.wp.com/latex.php?latex=%7B+%28s%2C+t%29%5Cin%5C%7B0%2C+1%2C+%5Cldots%2C+n-1%5C%7D%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (s, t)\in\{0, 1, \ldots, n-1\}^2}" class="latex" title="{ (s, t)\in\{0, 1, \ldots, n-1\}^2}" /> are asked according to some distribution <img src="https://s0.wp.com/latex.php?latex=%7B+%5CPi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \Pi}" class="latex" title="{ \Pi}" /> (e.g. uniform).</li>
+ 	<li> Answers <img src="https://s0.wp.com/latex.php?latex=%7B+a%2C+b%5Cin%5C%7B0%2C+1%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a, b\in\{0, 1\}}" class="latex" title="{ a, b\in\{0, 1\}}" /> are provided by players (call them Alice and Bob).</li>
+ 	<li> The verifier computes a predicate <img src="https://s0.wp.com/latex.php?latex=%7B+V%28a%2C+b%7Cs%2C+t%29+%3D+f_%7Bs%2C+t%7D%28a%5Coplus+b%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ V(a, b|s, t) = f_{s, t}(a\oplus b)}" class="latex" title="{ V(a, b|s, t) = f_{s, t}(a\oplus b)}" /> used to decide acceptance/rejection.</li>
+</ol>
+</em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em> </em>
+
+
+<h4>Definition (CHSH Game)</h4>
+<em> An XOR game with <img src="https://s0.wp.com/latex.php?latex=%7B+n%3D2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ n=2}" class="latex" title="{ n=2}" /> where <img src="https://s0.wp.com/latex.php?latex=%7B+s%2C+t%5Cin%5C%7B0%2C+1%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s, t\in\{0, 1\}}" class="latex" title="{ s, t\in\{0, 1\}}" /> are independent random bits and <img src="https://s0.wp.com/latex.php?latex=%7B+V%28a%2C+b+%7C+s%2C+t%29%3D1+%5CLongleftrightarrow+a%5Coplus+b+%3D+s%5Cwedge+t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ V(a, b | s, t)=1 \Longleftrightarrow a\oplus b = s\wedge t}" class="latex" title="{ V(a, b | s, t)=1 \Longleftrightarrow a\oplus b = s\wedge t}" />. </em>
+
+
+
+To win the CHSH game, Alice and Bob need to output bits <img src="https://s0.wp.com/latex.php?latex=%7B+a%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a}" class="latex" title="{ a}" /> (from Alice) and <img src="https://s0.wp.com/latex.php?latex=%7B+b%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ b}" class="latex" title="{ b}" /> (from Bob) that disagree if <img src="https://s0.wp.com/latex.php?latex=%7B+s%3Dt%3D1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s=t=1}" class="latex" title="{ s=t=1}" /> and agree otherwise.
+
+If Alice and Bob are classical then they can do no better than by always outputting <img src="https://s0.wp.com/latex.php?latex=%7B+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ 0}" class="latex" title="{ 0}" />, say, in which case they win in the three out of four cases when one of the questions is <img src="https://s0.wp.com/latex.php?latex=%7B+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ 0}" class="latex" title="{ 0}" />. Equivalently, <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%28G%29%3D%5Cfrac34%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega(G)=\frac34}" class="latex" title="{ \omega(G)=\frac34}" /> where <img src="https://s0.wp.com/latex.php?latex=%7B+G%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ G}" class="latex" title="{ G}" /> is the CHSH game. This is the content of <em>Bell’s inequality</em> :
+<h4>Lemma (Bell’s Inequality)</h4>
+<em> For any two functions <img src="https://s0.wp.com/latex.php?latex=%7B+g%2C+h%3A+%5C%7B0%2C+1%5C%7D%5Crightarrow%5C%7B0%2C+1%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ g, h: \{0, 1\}\rightarrow\{0, 1\}}" class="latex" title="{ g, h: \{0, 1\}\rightarrow\{0, 1\}}" />, we have </em>
+
+<em>
+<img src="https://s0.wp.com/latex.php?latex=%7B+%7B%5Cmathop%7B%5Cmathbb%7BP%7D%7D%7D_%7Bx%2C+y%5Cin%5C%7B0%2C+1%5C%7D%7D%5Cleft%5Bg%28x%29%5Coplus+h%28y%29+%3D+x%5Cwedge+y%5Cright%5D+%5Cleq+%5Cfrac%7B3%7D%7B4%7D+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ {\mathop{\mathbb{P}}}_{x, y\in\{0, 1\}}\left[g(x)\oplus h(y) = x\wedge y\right] \leq \frac{3}{4} }" class="latex" title="{ {\mathop{\mathbb{P}}}_{x, y\in\{0, 1\}}\left[g(x)\oplus h(y) = x\wedge y\right] \leq \frac{3}{4} }" /></em>
+
+<em>
+</em><em></em><em> where <img src="https://s0.wp.com/latex.php?latex=%7B+x%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ x}" class="latex" title="{ x}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+y%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ y}" class="latex" title="{ y}" /> are independent uniformly random bits. </em>
+
+
+
+<em><br /><b>Proof.</b></em> The probability of any event is a multiple of <img src="https://s0.wp.com/latex.php?latex=%7B+1%2F4%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ 1/4}" class="latex" title="{ 1/4}" /> so it suffices to show that <img src="https://s0.wp.com/latex.php?latex=%7B+%7B%5Cmathop%7B%5Cmathbb%7BP%7D%7D%7D_%7Bx%2C+y%5Cin%5C%7B0%2C+1%5C%7D%7D%5Cleft%5Bg%28x%29%5Coplus+h%28y%29+%3D+x%5Cwedge+y%5Cright%5D%5Cneq1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ {\mathop{\mathbb{P}}}_{x, y\in\{0, 1\}}\left[g(x)\oplus h(y) = x\wedge y\right]\neq1}" class="latex" title="{ {\mathop{\mathbb{P}}}_{x, y\in\{0, 1\}}\left[g(x)\oplus h(y) = x\wedge y\right]\neq1}" />. So assume for contradiction that <img src="https://s0.wp.com/latex.php?latex=%7B+g%28x%29%5Coplus+h%28y%29+%3D+x%5Cwedge+y%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ g(x)\oplus h(y) = x\wedge y}" class="latex" title="{ g(x)\oplus h(y) = x\wedge y}" /> for all pairs <img src="https://s0.wp.com/latex.php?latex=%7B+x%2Cy%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ x,y}" class="latex" title="{ x,y}" />. Then we have that <img src="https://s0.wp.com/latex.php?latex=%7B+g%280%29%5Coplus+h%280%29+%3D+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ g(0)\oplus h(0) = 0}" class="latex" title="{ g(0)\oplus h(0) = 0}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+g%280%29%5Coplus+h%281%29+%3D+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ g(0)\oplus h(1) = 0}" class="latex" title="{ g(0)\oplus h(1) = 0}" /> which implies that <img src="https://s0.wp.com/latex.php?latex=%7B+h%280%29%3Dh%281%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ h(0)=h(1)}" class="latex" title="{ h(0)=h(1)}" />. But then <img src="https://s0.wp.com/latex.php?latex=%7B+0%3Dg%281%29%5Coplus+h%280%29+%3Dg%281%29%5Coplus+h%281%29+%3D+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ 0=g(1)\oplus h(0) =g(1)\oplus h(1) = 1}" class="latex" title="{ 0=g(1)\oplus h(0) =g(1)\oplus h(1) = 1}" /> which is a contraction. 
+<div align="right">□</div>
+<h3> The strategy</h3>
+The entangled strategy for the CHSH game requires that Alice and Bob each hold a qubit, so that their two qubits together are described by a vector in <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathbb+C%5E2%5Cotimes%5Cmathbb+C%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathbb C^2\otimes\mathbb C^2}" class="latex" title="{ \mathbb C^2\otimes\mathbb C^2}" />. The two qubits together are in the state
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cphi%7D%5Crangle+%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7B2%7D%7D%5Cleft%28+%7C%7B0%7D%5Crangle+_A+%7C%7B0%7D%5Crangle+_B+%2B+%7C%7B1%7D%5Crangle+_A+%7C%7B1%7D%5Crangle+_B%5Cright%29%2C+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\phi}\rangle = \frac{1}{\sqrt{2}}\left( |{0}\rangle _A |{0}\rangle _B + |{1}\rangle _A |{1}\rangle _B\right), }" class="latex" title="{ |{\phi}\rangle = \frac{1}{\sqrt{2}}\left( |{0}\rangle _A |{0}\rangle _B + |{1}\rangle _A |{1}\rangle _B\right), }" />
+
+forming what is known as an EPR (Einstein-Podolsky-Rosen) pair. Now for <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctheta%5Cin%5B-%5Cpi%2C+%5Cpi%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \theta\in[-\pi, \pi]}" class="latex" title="{ \theta\in[-\pi, \pi]}" /> define <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cbeta_0%28%5Ctheta%29%7D%5Crangle+%3D+%5Ccos%5Ctheta+%7C%7B0%7D%5Crangle+%2B+%5Csin%5Ctheta+%7C%7B1%7D%5Crangle+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\beta_0(\theta)}\rangle = \cos\theta |{0}\rangle + \sin\theta |{1}\rangle }" class="latex" title="{ |{\beta_0(\theta)}\rangle = \cos\theta |{0}\rangle + \sin\theta |{1}\rangle }" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cbeta_1%28%5Ctheta%29%7D%5Crangle+%3D+-%5Csin%5Ctheta+%7C%7B0%7D%5Crangle+%2B+%5Ccos%5Ctheta+%7C%7B1%7D%5Crangle+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\beta_1(\theta)}\rangle = -\sin\theta |{0}\rangle + \cos\theta |{1}\rangle }" class="latex" title="{ |{\beta_1(\theta)}\rangle = -\sin\theta |{0}\rangle + \cos\theta |{1}\rangle }" /> .
+
+Now we describe a (quantum) strategy with winning probability <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ccos%5E2%28%5Cfrac%7B%5Cpi%7D%7B8%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \cos^2(\frac{\pi}{8})}" class="latex" title="{ \cos^2(\frac{\pi}{8})}" />. In each case Alice and Bob respond with their measurement outcome, where subscripts of the measurement basis vectors correspond to the answer to be sent back to the verifier.
+<ul>
+ 	<li> If <img src="https://s0.wp.com/latex.php?latex=%7B+s%3D0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s=0}" class="latex" title="{ s=0}" />, Alice measures in basis <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7B+%7C%7B%5Cbeta_0%280%29%7D%5Crangle+%2C+%7C%7B%5Cbeta_1%280%29%7D%5Crangle+%5C%7D+%3D+%5C%7B+%7C%7B0%7D%5Crangle+%2C+%7C%7B1%7D%5Crangle+%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{ |{\beta_0(0)}\rangle , |{\beta_1(0)}\rangle \} = \{ |{0}\rangle , |{1}\rangle \}}" class="latex" title="{ \{ |{\beta_0(0)}\rangle , |{\beta_1(0)}\rangle \} = \{ |{0}\rangle , |{1}\rangle \}}" />. If <img src="https://s0.wp.com/latex.php?latex=%7B+s%3D1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s=1}" class="latex" title="{ s=1}" />, Alice measures in <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7B+%7C%7B%5Cbeta_0%28%5Cfrac%7B%5Cpi%7D%7B4%7D%29%7D%5Crangle+%2C+%7C%7B%5Cbeta_1%28%5Cfrac%7B%5Cpi%7D%7B4%7D%29%7D%5Crangle+%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{ |{\beta_0(\frac{\pi}{4})}\rangle , |{\beta_1(\frac{\pi}{4})}\rangle \}}" class="latex" title="{ \{ |{\beta_0(\frac{\pi}{4})}\rangle , |{\beta_1(\frac{\pi}{4})}\rangle \}}" />. Alice answers bit <img src="https://s0.wp.com/latex.php?latex=%7B+a+%3D+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a = 0}" class="latex" title="{ a = 0}" /> if outcome is <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cbeta_0%28%5Ccdot%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \beta_0(\cdot)}" class="latex" title="{ \beta_0(\cdot)}" /> and answers <img src="https://s0.wp.com/latex.php?latex=%7B+a+%3D+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a = 1}" class="latex" title="{ a = 1}" /> otherwise.</li>
+ 	<li> If <img src="https://s0.wp.com/latex.php?latex=%7B+t%3D0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t=0}" class="latex" title="{ t=0}" />, Bob measures in basis <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7B+%7C%7B%5Cbeta_0%28%5Cfrac%7B%5Cpi%7D%7B8%7D%29%7D%5Crangle+%2C+%7C%7B%5Cbeta_1%28%5Cfrac%7B%5Cpi%7D%7B8%7D%29%7D%5Crangle%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{ |{\beta_0(\frac{\pi}{8})}\rangle , |{\beta_1(\frac{\pi}{8})}\rangle\}}" class="latex" title="{ \{ |{\beta_0(\frac{\pi}{8})}\rangle , |{\beta_1(\frac{\pi}{8})}\rangle\}}" />. If <img src="https://s0.wp.com/latex.php?latex=%7B+t%3D1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t=1}" class="latex" title="{ t=1}" />, Bob measures in <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7B+%7C%7B%5Cbeta_0%28-%5Cfrac%7B%5Cpi%7D%7B8%7D%29%7D%5Crangle+%2C+%7C%7B%5Cbeta_1%28-%5Cfrac%7B%5Cpi%7D%7B8%7D%29%7D%5Crangle+%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{ |{\beta_0(-\frac{\pi}{8})}\rangle , |{\beta_1(-\frac{\pi}{8})}\rangle \}}" class="latex" title="{ \{ |{\beta_0(-\frac{\pi}{8})}\rangle , |{\beta_1(-\frac{\pi}{8})}\rangle \}}" />.</li>
+ 	<li> Each player responds with their respective measurement outcome.</li>
+</ul>
+<b>Lemma 2</b> <em><a name="goodstrategy"></a> Alice and Bob win the CHSH game with probability <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ccos%5E2%28%5Cfrac%7B%5Cpi%7D%7B8%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \cos^2(\frac{\pi}{8})}" class="latex" title="{ \cos^2(\frac{\pi}{8})}" />. </em>
+<em><br /><b></b>Proof.</em> We will show that for each pair of questions <img src="https://s0.wp.com/latex.php?latex=%7B+s%2Ct%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s,t}" class="latex" title="{ s,t}" /> the pair of answers <img src="https://s0.wp.com/latex.php?latex=%7B+a%2Cb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a,b}" class="latex" title="{ a,b}" /> is correct with probability <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ccos%5E2%28%5Cpi%2F8%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \cos^2(\pi/8)}" class="latex" title="{ \cos^2(\pi/8)}" />. We can split the pairs of questions into the two cases <img src="https://s0.wp.com/latex.php?latex=%7B+s%5Cwedge+t%3D0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s\wedge t=0}" class="latex" title="{ s\wedge t=0}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+s%5Cwedge+t%3D1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s\wedge t=1}" class="latex" title="{ s\wedge t=1}" />:
+<ul>
+ 	<li> (<img src="https://s0.wp.com/latex.php?latex=%7B+s%5Cwedge+t%3D0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s\wedge t=0}" class="latex" title="{ s\wedge t=0}" />) The three cases <img src="https://s0.wp.com/latex.php?latex=%7B+%28s%2Ct%29%3D%280%2C0%29%2C%280%2C1%29%2C%281%2C0%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (s,t)=(0,0),(0,1),(1,0)}" class="latex" title="{ (s,t)=(0,0),(0,1),(1,0)}" /> are all analogous: in each case Alice an Bob must output the same answer, and in each case Bob’s measurement basis is almost the same as Alice’s except rotated by a small angle <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cpm%5Cpi%2F8%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \pm\pi/8}" class="latex" title="{ \pm\pi/8}" />.
+Of the three above cases we consider the one where <img src="https://s0.wp.com/latex.php?latex=%7B+s%2Ct%3D0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s,t=0}" class="latex" title="{ s,t=0}" /> and check that indeed the two measurement outcomes agree with probability <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ccos%5E2%28%5Cpi%2F8%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \cos^2(\pi/8)}" class="latex" title="{ \cos^2(\pi/8)}" />: When Alice measures her qubit and obtains some bit <img src="https://s0.wp.com/latex.php?latex=%7B+a%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a}" class="latex" title="{ a}" />, the shared pair <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cbeta%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\beta}\rangle}" class="latex" title="{ |{\beta}\rangle}" /> collapses to <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7Ba%7D%5Crangle+_A+%7C%7Ba%7D%5Crangle+_B%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{a}\rangle _A |{a}\rangle _B}" class="latex" title="{ |{a}\rangle _A |{a}\rangle _B}" />. Indeed, since the question was <img src="https://s0.wp.com/latex.php?latex=%7B+s%3D0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s=0}" class="latex" title="{ s=0}" />, Alice measures her qubit in the basis <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7B%7C0%5Crangle%2C%7C1%5Crangle%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{|0\rangle,|1\rangle\}}" class="latex" title="{ \{|0\rangle,|1\rangle\}}" />. This means that Alice applies the measurement <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7B%7C0%5Crangle%5Clangle+0%7C%5Cotimes+%7B%5Cmathbb%7BI%7D%7D%2C%7C1%5Crangle%5Clangle+1%7C%5Cotimes+%7B%5Cmathbb%7BI%7D%7D%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{|0\rangle\langle 0|\otimes {\mathbb{I}},|1\rangle\langle 1|\otimes {\mathbb{I}}\}}" class="latex" title="{ \{|0\rangle\langle 0|\otimes {\mathbb{I}},|1\rangle\langle 1|\otimes {\mathbb{I}}\}}" /> on the global state. The post-measurement state is the normalization of
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+%28+%7C%7Ba%7D%5Crangle+%5Clangle%7Ba%7D%7C+%5Cotimes+%7B%5Cmathbb%7BI%7D%7D%29+%7C%7B%5Cphi%7D%5Crangle+_%7BAB%7D%3D%5Cfrac%7B1%7D%7B%5Csqrt2%7D+%7C%7Ba%7D%5Crangle+%5Coverbrace%7B%5Clangle+a+%7C%7B0%7D%5Crangle+%7D%5E%7B%5Cdelta_%7Ba%2C0%7D%7D%5Cotimes+%7C+0%5Crangle+%2B+%7C%7Ba%7D%5Crangle+%5Coverbrace%7B%5Clangle+a+%7C%7B1%7D%5Crangle+%7D%5E%7B%5Cdelta_%7Ba%2C1%7D%7D%5Cotimes+%7C%7B1%7D%5Crangle+%3D%5Cfrac+%7B1%7D%7B%5Csqrt2%7D+%7C%7Ba%7D%5Crangle+_A+%7C%7Ba%7D%5Crangle+_B+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ ( |{a}\rangle \langle{a}| \otimes {\mathbb{I}}) |{\phi}\rangle _{AB}=\frac{1}{\sqrt2} |{a}\rangle \overbrace{\langle a |{0}\rangle }^{\delta_{a,0}}\otimes | 0\rangle + |{a}\rangle \overbrace{\langle a |{1}\rangle }^{\delta_{a,1}}\otimes |{1}\rangle =\frac {1}{\sqrt2} |{a}\rangle _A |{a}\rangle _B }" class="latex" title="{ ( |{a}\rangle \langle{a}| \otimes {\mathbb{I}}) |{\phi}\rangle _{AB}=\frac{1}{\sqrt2} |{a}\rangle \overbrace{\langle a |{0}\rangle }^{\delta_{a,0}}\otimes | 0\rangle + |{a}\rangle \overbrace{\langle a |{1}\rangle }^{\delta_{a,1}}\otimes |{1}\rangle =\frac {1}{\sqrt2} |{a}\rangle _A |{a}\rangle _B }" />
+
+because <img src="https://s0.wp.com/latex.php?latex=%7B+%5Clangle+a+%7C%7Ba%27%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \langle a |{a'}\rangle}" class="latex" title="{ \langle a |{a'}\rangle}" /> can be viewed as a Kronecker delta of <img src="https://s0.wp.com/latex.php?latex=%7B+a%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a}" class="latex" title="{ a}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+a%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a'}" class="latex" title="{ a'}" />. In particular, Bob is now in the pure state <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7Ba%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{a}\rangle}" class="latex" title="{ |{a}\rangle}" /> .
+
+Because Bob received question <img src="https://s0.wp.com/latex.php?latex=%7B+t%3D0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t=0}" class="latex" title="{ t=0}" /> he measures in the basis <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7B+%7C%7B%5Cbeta_b%28%5Cpi%2F8%29%7D%5Crangle+%5C%7D_b%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{ |{\beta_b(\pi/8)}\rangle \}_b}" class="latex" title="{ \{ |{\beta_b(\pi/8)}\rangle \}_b}" /> Therefore his probability of correctly outputting <img src="https://s0.wp.com/latex.php?latex=%7B+b%3Da%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ b=a}" class="latex" title="{ b=a}" /> is
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+%7B%5Cmathop%7B%5Cmathbb%7BP%7D%7D%7D%5B%5Ctext%7BBob+gets+outcome+%7Da%5D+%3D+%7C%5Clangle%5Cbeta_a%28%5Ctfrac%7B%5Cpi%7D%7B8%7D%29+%7C%7Ba%7D%5Crangle+%7C%5E2+%3D+%5Ccos%5E2%5Cleft%28%5Cfrac%7B%5Cpi%7D%7B8%7D%5Cright%29+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ {\mathop{\mathbb{P}}}[\text{Bob gets outcome }a] = |\langle\beta_a(\tfrac{\pi}{8}) |{a}\rangle |^2 = \cos^2\left(\frac{\pi}{8}\right) }" class="latex" title="{ {\mathop{\mathbb{P}}}[\text{Bob gets outcome }a] = |\langle\beta_a(\tfrac{\pi}{8}) |{a}\rangle |^2 = \cos^2\left(\frac{\pi}{8}\right) }" />
+
+</li>
+ 	<li> (<img src="https://s0.wp.com/latex.php?latex=%7B+s%5Cwedge+t%3D1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s\wedge t=1}" class="latex" title="{ s\wedge t=1}" />)
+Now consider the case <img src="https://s0.wp.com/latex.php?latex=%7B+s%3D1%2Ct%3D1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s=1,t=1}" class="latex" title="{ s=1,t=1}" /> where Alice and Bob are supposed to give different answers. Alice measures in basis consisting of <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cbeta_0%28%5Cpi%2F4%29%7D%5Crangle+%3D%5Cfrac%7B%7C0%5Crangle%2B%7C1%5Crangle%7D%7B%5Csqrt2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\beta_0(\pi/4)}\rangle =\frac{|0\rangle+|1\rangle}{\sqrt2}}" class="latex" title="{ |{\beta_0(\pi/4)}\rangle =\frac{|0\rangle+|1\rangle}{\sqrt2}}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cbeta_1%28%5Cpi%2F4%29%7D%5Crangle+%3D%5Cfrac%7B-%7C0%5Crangle%2B%7C1%5Crangle%7D%7B%5Csqrt2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\beta_1(\pi/4)}\rangle =\frac{-|0\rangle+|1\rangle}{\sqrt2}}" class="latex" title="{ |{\beta_1(\pi/4)}\rangle =\frac{-|0\rangle+|1\rangle}{\sqrt2}}" />. If Alice gets outcome <img src="https://s0.wp.com/latex.php?latex=%7B+a%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a}" class="latex" title="{ a}" /> then the post-measurement global state is <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cbeta_a%28%5Cfrac%5Cpi4%29%7D%5Crangle+%7C%7B%5Cbeta_a%28%5Cfrac%5Cpi4%29%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\beta_a(\frac\pi4)}\rangle |{\beta_a(\frac\pi4)}\rangle}" class="latex" title="{ |{\beta_a(\frac\pi4)}\rangle |{\beta_a(\frac\pi4)}\rangle}" /> . Therefore when Bob applies the measurement in basis <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7B+%7C%7B%5Cbeta_a%28-%5Cfrac%5Cpi8%29%7D%5Crangle+%5C%7D_a%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{ |{\beta_a(-\frac\pi8)}\rangle \}_a}" class="latex" title="{ \{ |{\beta_a(-\frac\pi8)}\rangle \}_a}" /> he mistakenly outputs <img src="https://s0.wp.com/latex.php?latex=%7B+a%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a}" class="latex" title="{ a}" /> only with probability <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5Clangle%5Cbeta_a%28%5Cfrac%5Cpi4%29+%7C%7B%5Cbeta_a%28-%5Cfrac%5Cpi8%29%7D%5Crangle+%7C%5E2%3D%5Csin%5E2%28%5Cfrac%5Cpi8%29%3D1-%5Ccos%5E2%28%5Cfrac%5Cpi8%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\langle\beta_a(\frac\pi4) |{\beta_a(-\frac\pi8)}\rangle |^2=\sin^2(\frac\pi8)=1-\cos^2(\frac\pi8)}" class="latex" title="{ |\langle\beta_a(\frac\pi4) |{\beta_a(-\frac\pi8)}\rangle |^2=\sin^2(\frac\pi8)=1-\cos^2(\frac\pi8)}" />.</li>
+</ul>
+
+<div align="right">□</div>
+Lemma <a href="https://windowsontheory.org/feed/#goodstrategy">2</a> implies a lower bound on the value of the CHSH game.
+<h4>Corollary</h4>
+<em> <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%5E%2A%28G%29%5Cge%5Ccos%5E2%28%5Cfrac%5Cpi8%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega^*(G)\ge\cos^2(\frac\pi8)}" class="latex" title="{ \omega^*(G)\ge\cos^2(\frac\pi8)}" /> </em>
+
+ 
+<br />It turns out that this lower bound is sharp, that is, the strategy just described is optimal.
+
+<h4>Lemma</h4><em> The value of the CHSH game using a quantum strategy is at most <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cfrac%7B1%7D%7B2%7D+%2B+%5Cfrac%7B%5Csqrt%7B2%7D%7D%7B4%7D+%3D+%5Ccos%5E2%5Cfrac%7B%5Cpi%7D%7B8%7D%5Capprox+0.85%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \frac{1}{2} + \frac{\sqrt{2}}{4} = \cos^2\frac{\pi}{8}\approx 0.85}" class="latex" title="{ \frac{1}{2} + \frac{\sqrt{2}}{4} = \cos^2\frac{\pi}{8}\approx 0.85}" />. </em>
+
+
+
+<em><b>Proof.</b></em>
+
+We can describe the quantum strategy of Alice and Bob in an XOR game by (i) a shared quantum state <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cphi%7D%5Crangle+_%7BAB%7D%5Cin%5Cmathbb%7BC%7D%5Ed%5Cotimes%5Cmathbb%7BC%7D%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\phi}\rangle _{AB}\in\mathbb{C}^d\otimes\mathbb{C}^d}" class="latex" title="{ |{\phi}\rangle _{AB}\in\mathbb{C}^d\otimes\mathbb{C}^d}" /> (note that for the CHSH game, <img src="https://s0.wp.com/latex.php?latex=%7B+d%3D2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ d=2}" class="latex" title="{ d=2}" />); (ii) measurements <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7BA%5E0_s%2C+A%5E1_s%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{A^0_s, A^1_s\}}" class="latex" title="{ \{A^0_s, A^1_s\}}" /> for every question <img src="https://s0.wp.com/latex.php?latex=%7B+s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s}" class="latex" title="{ s}" /> sent to Alice; (iii) measurements <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7BB%5E0_t%2C+B%5E1_t%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{B^0_t, B^1_t\}}" class="latex" title="{ \{B^0_t, B^1_t\}}" /> for every question <img src="https://s0.wp.com/latex.php?latex=%7B+t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t}" class="latex" title="{ t}" /> sent to Bob.
+
+The probability of answering <img src="https://s0.wp.com/latex.php?latex=%7B+%28a%2C+b%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (a, b)}" class="latex" title="{ (a, b)}" /> given questions <img src="https://s0.wp.com/latex.php?latex=%7B+%28s%2C+t%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (s, t)}" class="latex" title="{ (s, t)}" /> is <img src="https://s0.wp.com/latex.php?latex=%7B+%5Clangle%7B%5Cphi%7D%7C+A%5Ea_s%5Cotimes+B%5Eb_t+%7C%7B%5Cphi%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \langle{\phi}| A^a_s\otimes B^b_t |{\phi}\rangle}" class="latex" title="{ \langle{\phi}| A^a_s\otimes B^b_t |{\phi}\rangle}" /> . Now let us write <img src="https://s0.wp.com/latex.php?latex=%7B+A_s%3DA%5E0_s+-+A%5E1_s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A_s=A^0_s - A^1_s}" class="latex" title="{ A_s=A^0_s - A^1_s}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+B_t%3DB%5E0_t+-+B%5E1_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ B_t=B^0_t - B^1_t}" class="latex" title="{ B_t=B^0_t - B^1_t}" /> so that for any <img src="https://s0.wp.com/latex.php?latex=%7B+a%2C+b%5Cin%5C%7B0%2C+1%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a, b\in\{0, 1\}}" class="latex" title="{ a, b\in\{0, 1\}}" />, we can write
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+A_s%5Ea+%3D+%5Cfrac%7B%7B%5Cmathbb%7BI%7D%7D+%2B+%28-1%29%5EaA_s%7D%7B2%7D%2C+B_t%5Eb+%3D+%5Cfrac%7B%7B%5Cmathbb%7BI%7D%7D+%2B+%28-1%29%5EbB_t%7D%7B2%7D+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A_s^a = \frac{{\mathbb{I}} + (-1)^aA_s}{2}, B_t^b = \frac{{\mathbb{I}} + (-1)^bB_t}{2} }" class="latex" title="{ A_s^a = \frac{{\mathbb{I}} + (-1)^aA_s}{2}, B_t^b = \frac{{\mathbb{I}} + (-1)^bB_t}{2} }" />
+
+Note that since the possible outcomes here are finite, <img src="https://s0.wp.com/latex.php?latex=%7B+A_s%2C+B_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A_s, B_t}" class="latex" title="{ A_s, B_t}" /> are Hermitian and we may assume have bounded norm of 1. Furthermore, we assume that <img src="https://s0.wp.com/latex.php?latex=%7B+A_s%2C+B_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A_s, B_t}" class="latex" title="{ A_s, B_t}" /> are <em>observables</em> so that <img src="https://s0.wp.com/latex.php?latex=%7B+A_s%5E2+%3D+B_t%5E2+%3D+%7B%5Cmathbb%7BI%7D%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A_s^2 = B_t^2 = {\mathbb{I}}}" class="latex" title="{ A_s^2 = B_t^2 = {\mathbb{I}}}" /> .
+
+Now denoting <img src="https://s0.wp.com/latex.php?latex=%7B+f_%7Bs%2C+t%7D%28a%5Coplus+b%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ f_{s, t}(a\oplus b)}" class="latex" title="{ f_{s, t}(a\oplus b)}" /> as the XOR predicate to be computed, we can write the quantum game value as
+
+<img src="https://s0.wp.com/latex.php?latex=%5Comega%5E%2A%28G%29+%3D+%5Csup_%7B+%7C%7B%5Cphi%7D%5Crangle+%2C+%5C%7BA_s%5Ea%5C%7D%2C+%5C%7BB_t%5Eb%5C%7D%7D+%7B%5Cmathop%7B%5Cmathbb%7BE%7D%7D%7D_%7B%28s%2C+t%29%5Csim%5CPi%7D%5Csum_%7Ba%2C+b%7Df_%7Bs%2C+t%7D%28a%5Coplus+b%29+%5Clangle%7B%5Cphi%7D%7C+A%5Ea_s%5Cotimes+B%5Eb_t+%7C%7B%5Cphi%7D%5Crangle++%5C%5C+%3D+%5Csup_%7B+%7C%7B%5Cphi%7D%5Crangle+%2C+%5C%7BA_s%5C%7D%2C+%5C%7BB_t%5C%7D%7D+%7B%5Cmathop%7B%5Cmathbb%7BE%7D%7D%7D_%7B%28s%2C+t%29%5Csim%5CPi%7D%5Csum_%7Ba%2C+b%7Df_%7Bs%2C+t%7D%28a%5Coplus+b%29+%5Clangle%7B%5Cphi%7D%7C+%5Cfrac%7B%7B%5Cmathbb%7BI%7D%7D+%2B+%28-1%29%5EaA_s%7D%7B2%7D%5Cotimes++%5Cfrac%7B%7B%5Cmathbb%7BI%7D%7D+%2B+%28-1%29%5EbB_t%7D%7B2%7D+%7C%7B%5Cphi%7D%5Crangle++%5C%5C+%3D+%7B%5Cmathop%7B%5Cmathbb%7BE%7D%7D%7D_%7B%28s%2C+t%29%5Csim%5CPi%7D%5Csum_%7Ba%2C+b%7D%5Cfrac%7Bf_%7Bs%2C+t%7D%28a%5Coplus+b%29%7D%7B4%7D+%2B+%5Csup_%7B+%7C%7B%5Cphi%7D%5Crangle+%2C+%5C%7BA_s%5C%7D%2C+%5C%7BB_t%5C%7D%7D+%7B%5Cmathop%7B%5Cmathbb%7BE%7D%7D%7D_%7B%28s%2C+t%29%5Csim%5CPi%7D%5Csum_%7Ba%2C+b%7Df_%7Bs%2C+t%7D%28a%5Coplus+b%29+%5Clangle%7B%5Cphi%7D%7C+%5Cfrac%7B%7B%5Cmathbb%7BI%7D%7D+%2B+%28-1%29%5EaA_s%7D%7B2%7D%5Cotimes++%5Cfrac%7B%7B%5Cmathbb%7BI%7D%7D+%2B+%28-1%29%5EbB_t%7D%7B2%7D+%7C%7B%5Cphi%7D%5Crangle++%5C%5C+%3D+%7B%5Cmathop%7B%5Cmathbb%7BE%7D%7D%7D_%7B%28s%2C+t%29%5Csim%5CPi%7D%5Csum_%7Ba%2C+b%7D%5Cfrac%7Bf_%7Bs%2C+t%7D%28a%5Coplus+b%29%7D%7B4%7D+%2B+%5Csup_%7B+%7C%7B%5Cphi%7D%5Crangle+%2C+%5C%7BA_s%5C%7D%2C+%5C%7BB_t%5C%7D%7D+%7B%5Cmathop%7B%5Cmathbb%7BE%7D%7D%7D_%7B%28s%2C+t%29%5Csim%5CPi%7D%5Csum_%7Ba%2C+b%7D%5Cfrac%7Bf_%7Bs%2C+t%7D%28a%5Coplus+b%29%28-1%29%5E%7Bab%7D%7D%7B4%7D+%5Clangle%7B%5Cphi%7D%7C+A_s%5Cotimes+B_t+%7C%7B%5Cphi%7D%5Crangle++%5C%5C+%3D+%7B%5Cmathop%7B%5Cmathbb%7BE%7D%7D%7D_%7B%28s%2C+t%29%5Csim%5CPi%7D%5Csum_%7Ba%2C+b%7D%5Cfrac%7Bf_%7Bs%2C+t%7D%28a%5Coplus+b%29%7D%7B4%7D+%2B+%5Csup_%7B+%7C%7B%5Cphi%7D%5Crangle+%2C+%5C%7BA_s%5C%7D%2C+%5C%7BB_t%5C%7D%7D+%7B%5Cmathop%7B%5Cmathbb%7BE%7D%7D%7D_%7B%28s%2C+t%29%5Csim%5CPi%7D%5Cfrac%7Bf_%7Bs%2C+t%7D%280%29+-+f_%7Bs%2Ct%7D%281%29%7D%7B2%7D+%5Clangle%7B%5Cphi%7D%7C+A_s%5Cotimes+B_t+%7C%7B%5Cphi%7D%5Crangle++%5C%5C+&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\omega^*(G) = \sup_{ |{\phi}\rangle , \{A_s^a\}, \{B_t^b\}} {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\sum_{a, b}f_{s, t}(a\oplus b) \langle{\phi}| A^a_s\otimes B^b_t |{\phi}\rangle  \\ = \sup_{ |{\phi}\rangle , \{A_s\}, \{B_t\}} {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\sum_{a, b}f_{s, t}(a\oplus b) \langle{\phi}| \frac{{\mathbb{I}} + (-1)^aA_s}{2}\otimes  \frac{{\mathbb{I}} + (-1)^bB_t}{2} |{\phi}\rangle  \\ = {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\sum_{a, b}\frac{f_{s, t}(a\oplus b)}{4} + \sup_{ |{\phi}\rangle , \{A_s\}, \{B_t\}} {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\sum_{a, b}f_{s, t}(a\oplus b) \langle{\phi}| \frac{{\mathbb{I}} + (-1)^aA_s}{2}\otimes  \frac{{\mathbb{I}} + (-1)^bB_t}{2} |{\phi}\rangle  \\ = {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\sum_{a, b}\frac{f_{s, t}(a\oplus b)}{4} + \sup_{ |{\phi}\rangle , \{A_s\}, \{B_t\}} {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\sum_{a, b}\frac{f_{s, t}(a\oplus b)(-1)^{ab}}{4} \langle{\phi}| A_s\otimes B_t |{\phi}\rangle  \\ = {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\sum_{a, b}\frac{f_{s, t}(a\oplus b)}{4} + \sup_{ |{\phi}\rangle , \{A_s\}, \{B_t\}} {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\frac{f_{s, t}(0) - f_{s,t}(1)}{2} \langle{\phi}| A_s\otimes B_t |{\phi}\rangle  \\ " class="latex" title="\omega^*(G) = \sup_{ |{\phi}\rangle , \{A_s^a\}, \{B_t^b\}} {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\sum_{a, b}f_{s, t}(a\oplus b) \langle{\phi}| A^a_s\otimes B^b_t |{\phi}\rangle  \\ = \sup_{ |{\phi}\rangle , \{A_s\}, \{B_t\}} {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\sum_{a, b}f_{s, t}(a\oplus b) \langle{\phi}| \frac{{\mathbb{I}} + (-1)^aA_s}{2}\otimes  \frac{{\mathbb{I}} + (-1)^bB_t}{2} |{\phi}\rangle  \\ = {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\sum_{a, b}\frac{f_{s, t}(a\oplus b)}{4} + \sup_{ |{\phi}\rangle , \{A_s\}, \{B_t\}} {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\sum_{a, b}f_{s, t}(a\oplus b) \langle{\phi}| \frac{{\mathbb{I}} + (-1)^aA_s}{2}\otimes  \frac{{\mathbb{I}} + (-1)^bB_t}{2} |{\phi}\rangle  \\ = {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\sum_{a, b}\frac{f_{s, t}(a\oplus b)}{4} + \sup_{ |{\phi}\rangle , \{A_s\}, \{B_t\}} {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\sum_{a, b}\frac{f_{s, t}(a\oplus b)(-1)^{ab}}{4} \langle{\phi}| A_s\otimes B_t |{\phi}\rangle  \\ = {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\sum_{a, b}\frac{f_{s, t}(a\oplus b)}{4} + \sup_{ |{\phi}\rangle , \{A_s\}, \{B_t\}} {\mathop{\mathbb{E}}}_{(s, t)\sim\Pi}\frac{f_{s, t}(0) - f_{s,t}(1)}{2} \langle{\phi}| A_s\otimes B_t |{\phi}\rangle  \\ " />
+
+where the summation <img src="https://s0.wp.com/latex.php?latex=%7B+%5Csum_%7Ba%2C+b%5Cin%5C%7B0%2C+1%5C%7D%7D%5Cleft%28%5Ccdot%5Cright%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \sum_{a, b\in\{0, 1\}}\left(\cdot\right)}" class="latex" title="{ \sum_{a, b\in\{0, 1\}}\left(\cdot\right)}" /> has been evaluated in the last line.
+
+Now note that the first term is independent of the quantum strategy and as a result equals the value of the uniformly random strategy which is 1/2. So we proceed to focus on the second term. Note that for CHSH <img src="https://s0.wp.com/latex.php?latex=%7B+f_%7Bs%2C+t%7D%280%29+-+f_%7Bs%2Ct%7D%281%29+%3D+%28-1%29%5E%7Bst%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ f_{s, t}(0) - f_{s,t}(1) = (-1)^{st}}" class="latex" title="{ f_{s, t}(0) - f_{s,t}(1) = (-1)^{st}}" /> simplifying the second term to
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+%5Cfrac%7B1%7D%7B8%7D%28+%5Clangle%7B%5Cphi%7D%7C+A_0%5Cotimes+B_0+%7C%7B%5Cphi%7D%5Crangle+%2B+%5Clangle%7B%5Cphi%7D%7C+A_1%5Cotimes+B_0+%7C%7B%5Cphi%7D%5Crangle+%2B+%5Clangle%7B%5Cphi%7D%7C+A_0%5Cotimes+B_1+%7C%7B%5Cphi%7D%5Crangle+-+%5Clangle%7B%5Cphi%7D%7C+A_1%5Cotimes+B_1+%7C%7B%5Cphi%7D%5Crangle+%29.+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \frac{1}{8}( \langle{\phi}| A_0\otimes B_0 |{\phi}\rangle + \langle{\phi}| A_1\otimes B_0 |{\phi}\rangle + \langle{\phi}| A_0\otimes B_1 |{\phi}\rangle - \langle{\phi}| A_1\otimes B_1 |{\phi}\rangle ). }" class="latex" title="{ \frac{1}{8}( \langle{\phi}| A_0\otimes B_0 |{\phi}\rangle + \langle{\phi}| A_1\otimes B_0 |{\phi}\rangle + \langle{\phi}| A_0\otimes B_1 |{\phi}\rangle - \langle{\phi}| A_1\otimes B_1 |{\phi}\rangle ). }" />
+
+Next, we invoke Tsirelson’s Theorem (See Theorem <a href="https://windowsontheory.org/feed/#thmtsirelson">3</a>) to bound this second term as
+
+<img src="https://s0.wp.com/latex.php?latex=%3D+%5Csup_%7B%7B%5Ctextbf%7Bx%7D%7D_s%2C+%7B%5Ctextbf%7By%7D%7D_t%7D%5Cfrac%7B1%7D%7B8%7D%28%7B%5Ctextbf%7Bx%7D%7D_0%5Ccdot+%7B%5Ctextbf%7By%7D%7D_0+%2B+%7B%5Ctextbf%7Bx%7D%7D_0%5Ccdot+%7B%5Ctextbf%7By%7D%7D_1+%2B+%7B%5Ctextbf%7Bx%7D%7D_1%5Ccdot+%7B%5Ctextbf%7By%7D%7D_0+-+%7B%5Ctextbf%7Bx%7D%7D_1%5Ccdot+%7B%5Ctextbf%7By%7D%7D_1%29+%5C%5C+%5Cleq+%5Csup_%7B%7B%5Ctextbf%7Bx%7D%7D_s%2C+%7B%5Ctextbf%7By%7D%7D_t%7D%5Cfrac%7B1%7D%7B8%7D%28%5C%7C%7B%5Ctextbf%7Bx%7D%7D_0%5C%7C%5C%7C%7B%5Ctextbf%7By%7D%7D_0+%2B+%7B%5Ctextbf%7By%7D%7D_1%5C%7C+%2B+%5C%7C%7B%5Ctextbf%7Bx%7D%7D_1%5C%7C%5C%7C%7B%5Ctextbf%7By%7D%7D_0+-+%7B%5Ctextbf%7By%7D%7D_1%5C%7C%29+%5C%5C+%5Cleq+%5Csup_%7B%7B%5Ctextbf%7Bx%7D%7D_s%2C+%7B%5Ctextbf%7By%7D%7D_t%7D%5Cfrac%7B%5Csqrt%7B2%7D%7D%7B8%7D%5Csqrt%7B2%5C%7C%7B%5Ctextbf%7By%7D%7D_0%5C%7C%5E2+%2B+2%5C%7C%7B%5Ctextbf%7By%7D%7D_1%5C%7C%5E2%7D+%5Cleq+%5Cfrac%7B%5Csqrt%7B2%7D%7D%7B4%7D+&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="= \sup_{{\textbf{x}}_s, {\textbf{y}}_t}\frac{1}{8}({\textbf{x}}_0\cdot {\textbf{y}}_0 + {\textbf{x}}_0\cdot {\textbf{y}}_1 + {\textbf{x}}_1\cdot {\textbf{y}}_0 - {\textbf{x}}_1\cdot {\textbf{y}}_1) \\ \leq \sup_{{\textbf{x}}_s, {\textbf{y}}_t}\frac{1}{8}(\|{\textbf{x}}_0\|\|{\textbf{y}}_0 + {\textbf{y}}_1\| + \|{\textbf{x}}_1\|\|{\textbf{y}}_0 - {\textbf{y}}_1\|) \\ \leq \sup_{{\textbf{x}}_s, {\textbf{y}}_t}\frac{\sqrt{2}}{8}\sqrt{2\|{\textbf{y}}_0\|^2 + 2\|{\textbf{y}}_1\|^2} \leq \frac{\sqrt{2}}{4} " class="latex" title="= \sup_{{\textbf{x}}_s, {\textbf{y}}_t}\frac{1}{8}({\textbf{x}}_0\cdot {\textbf{y}}_0 + {\textbf{x}}_0\cdot {\textbf{y}}_1 + {\textbf{x}}_1\cdot {\textbf{y}}_0 - {\textbf{x}}_1\cdot {\textbf{y}}_1) \\ \leq \sup_{{\textbf{x}}_s, {\textbf{y}}_t}\frac{1}{8}(\|{\textbf{x}}_0\|\|{\textbf{y}}_0 + {\textbf{y}}_1\| + \|{\textbf{x}}_1\|\|{\textbf{y}}_0 - {\textbf{y}}_1\|) \\ \leq \sup_{{\textbf{x}}_s, {\textbf{y}}_t}\frac{\sqrt{2}}{8}\sqrt{2\|{\textbf{y}}_0\|^2 + 2\|{\textbf{y}}_1\|^2} \leq \frac{\sqrt{2}}{4} " />
+
+where we have used Cauchy-Schwartz and the concavity of the <img src="https://s0.wp.com/latex.php?latex=%7B+%5Csqrt%7B%5Ccdot%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \sqrt{\cdot}}" class="latex" title="{ \sqrt{\cdot}}" /> function.
+
+This completes our proof showing the exact characterization of the value (<img src="https://s0.wp.com/latex.php?latex=%7B+%3D%5Ccos%5E2%28%5Cfrac%7B%5Cpi%7D%7B8%7D%29%3D%5Cfrac%7B1%7D%7B2%7D%2B%5Cfrac%7B%5Csqrt%7B2%7D%7D%7B4%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ =\cos^2(\frac{\pi}{8})=\frac{1}{2}+\frac{\sqrt{2}}{4}}" class="latex" title="{ =\cos^2(\frac{\pi}{8})=\frac{1}{2}+\frac{\sqrt{2}}{4}}" />) of the CHSH game using a quantum strategy. This proof is an adaptation of the one in [12]. 
+<div align="right">□</div>
+<b>Theorem 3 (Tsirelson’s Theorem [1])</b> <em><a name="thmtsirelson"></a> For any <img src="https://s0.wp.com/latex.php?latex=%7B+n%5Ctimes+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ n\times n}" class="latex" title="{ n\times n}" /> matrix <img src="https://s0.wp.com/latex.php?latex=%7B+C+%3D+%28C_%7Bs%2C+t%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ C = (C_{s, t})}" class="latex" title="{ C = (C_{s, t})}" />, the following are equivalent: </em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em>
+<ol>
+ 	<li> There exist <img src="https://s0.wp.com/latex.php?latex=%7B+d%5Cin%5Cmathbb%7BN%7D%2C+%7C%7B%5Cphi%7D%5Crangle+%5Cin%5Cmathbb%7BC%7D%5E%7Bd%7D%5Cotimes%5Cmathbb%7BC%7D%5E%7Bd%7D%2C+A_s%2C+B_t%5Cin%5Ctext%7BHerm%7D%28%5Cmathbb%7BC%7D%5Ed%29%2C+A_s%5E2+%3D+B_t%5E2+%3D+I%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ d\in\mathbb{N}, |{\phi}\rangle \in\mathbb{C}^{d}\otimes\mathbb{C}^{d}, A_s, B_t\in\text{Herm}(\mathbb{C}^d), A_s^2 = B_t^2 = I}" class="latex" title="{ d\in\mathbb{N}, |{\phi}\rangle \in\mathbb{C}^{d}\otimes\mathbb{C}^{d}, A_s, B_t\in\text{Herm}(\mathbb{C}^d), A_s^2 = B_t^2 = I}" /> such that for any <img src="https://s0.wp.com/latex.php?latex=%7B+s%2C+t%5Cin%5Bn%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s, t\in[n]}" class="latex" title="{ s, t\in[n]}" /> <img src="https://s0.wp.com/latex.php?latex=%7B+C_%7Bs%2C+t%7D+%3D+%5Clangle%7B%5Cphi%7D%7C+A_s%5Cotimes+B_t+%7C%7B%5Cphi%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ C_{s, t} = \langle{\phi}| A_s\otimes B_t |{\phi}\rangle}" class="latex" title="{ C_{s, t} = \langle{\phi}| A_s\otimes B_t |{\phi}\rangle}" /> . Further this would imply that <img src="https://s0.wp.com/latex.php?latex=%7B+d%5Cleq+2%5E%7B%5Clceil%5Cfrac%7Bn%2B2%7D%7B2%7D%5Crceil%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ d\leq 2^{\lceil\frac{n+2}{2}\rceil}}" class="latex" title="{ d\leq 2^{\lceil\frac{n+2}{2}\rceil}}" />;</li>
+ 	<li> There exist real unit vectors <img src="https://s0.wp.com/latex.php?latex=%7B+%7B%09%7B%5Ctextbf%7Bx%7D%7D%7D_s%2C+%7B%09%7B%5Ctextbf%7By%7D%7D%7D_t%5Cin%7B%5Cmathbb%7BR%7D%7D%5E%7Bn%2B2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ { {\textbf{x}}}_s, { {\textbf{y}}}_t\in{\mathbb{R}}^{n+2}}" class="latex" title="{ { {\textbf{x}}}_s, { {\textbf{y}}}_t\in{\mathbb{R}}^{n+2}}" /> for <img src="https://s0.wp.com/latex.php?latex=%7B+s%2C+t%5Cin+%5Bn%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s, t\in [n]}" class="latex" title="{ s, t\in [n]}" /> such that <img src="https://s0.wp.com/latex.php?latex=%7B+C_%7Bs%2C+t%7D+%3D+%7B%09%7B%5Ctextbf%7Bx%7D%7D%7D_s%5Ccdot+%7B%09%7B%5Ctextbf%7By%7D%7D%7D_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ C_{s, t} = { {\textbf{x}}}_s\cdot { {\textbf{y}}}_t}" class="latex" title="{ C_{s, t} = { {\textbf{x}}}_s\cdot { {\textbf{y}}}_t}" />;</li>
+</ol>
+</em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em> </em>
+<h2>Entangled unique games are easy</h2>
+The CHSH game provides the first example that the entangled value <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%5E%2A%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega^*(G)}" class="latex" title="{ \omega^*(G)}" /> of a nonlocal game can exceed the classical value <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega(G)}" class="latex" title="{ \omega(G)}" />. XOR-games like the CHSH game are the special case corresponding to alphabet size <img src="https://s0.wp.com/latex.php?latex=%7B+k%3D2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ k=2}" class="latex" title="{ k=2}" /> of the class of <em>unique games</em> :
+<h4>Definition (Unique Games)</h4>
+<em> A 2-prover 1-round game is called a <em>unique game</em> if its constraints are of the form <img src="https://s0.wp.com/latex.php?latex=%7B+b%3D%5Cpi_%7Bij%7D%28a%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ b=\pi_{ij}(a)}" class="latex" title="{ b=\pi_{ij}(a)}" /> where <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cpi_%7Bij%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \pi_{ij}}" class="latex" title="{ \pi_{ij}}" /> is a permutation of the alphabet <img src="https://s0.wp.com/latex.php?latex=%7B+%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \Sigma}" class="latex" title="{ \Sigma}" /> for each edge <img src="https://s0.wp.com/latex.php?latex=%7B+i%5Csim+j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ i\sim j}" class="latex" title="{ i\sim j}" />. </em>
+
+ The famous <em>unique games conjecture</em> (UGC) by Khot says that <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega(G)}" class="latex" title="{ \omega(G)}" /> is NP-hard to approximate for unique games. Surprisingly, Kempe et al. showed that a natural semidefinite relaxation for unique games yields an approximation to the entangled value <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%5E%2A%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega^*(G)}" class="latex" title="{ \omega^*(G)}" /> which can be computed in polynomial time. In other words the UGC is false for entangled provers, in contrast to the classical case where the conjecture is open.
+<br />Theorem 4 <em><a name="efficientUGC"></a> There is an efficient (classical) algorithm which takes a description of a nonlocal game <img src="https://s0.wp.com/latex.php?latex=%7B+G%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ G}" class="latex" title="{ G}" /> as its input and outputs <img src="https://s0.wp.com/latex.php?latex=%7B+%5Chat%5Comega%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \hat\omega(G)}" class="latex" title="{ \hat\omega(G)}" /> such that </em>
+
+<em>
+<img src="https://s0.wp.com/latex.php?latex=%7B+1-6%281-%5Chat%5Comega%28G%29%29%5Cle%5Comega%5E%2A%28G%29%5Cle%5Chat%5Comega%28G%29+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ 1-6(1-\hat\omega(G))\le\omega^*(G)\le\hat\omega(G) }" class="latex" title="{ 1-6(1-\hat\omega(G))\le\omega^*(G)\le\hat\omega(G) }" /></em>
+
+<em>Put differently, if <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%5E%2A%28G%29%3D1-%5Cvarepsilon%5E%2A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega^*(G)=1-\varepsilon^*}" class="latex" title="{ \omega^*(G)=1-\varepsilon^*}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+%5Chat%5Comega%28G%29%3D1-%5Chat%5Cvarepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \hat\omega(G)=1-\hat\varepsilon}" class="latex" title="{ \hat\omega(G)=1-\hat\varepsilon}" />, then</em>
+
+<em><img src="https://s0.wp.com/latex.php?latex=%7B+%5Cvarepsilon%5E%2A%5Cin%5B%5Chat%5Cvarepsilon%2C6%5Chat%5Cvarepsilon%5D+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \varepsilon^*\in[\hat\varepsilon,6\hat\varepsilon] }" class="latex" title="{ \varepsilon^*\in[\hat\varepsilon,6\hat\varepsilon] }" /></em>
+
+<em>
+</em><em></em><em></em><em></em><em> </em>
+<br />The algorithm of theorem <a href="https://windowsontheory.org/feed/#efficientUGC">4</a> proceeds by relaxing the set of quantum strategies to a larger convex set <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathcal+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathcal S}" class="latex" title="{ \mathcal S}" /> of <em>pseudo-strategies</em> and maximizing over <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathcal+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathcal S}" class="latex" title="{ \mathcal S}" /> instead of actual strategies, a much easier task. In approximation theory one often encounters a collection of hypothetical moments not arising from a distribution, known as a pseudo-distribution. In contrast, our pseudo-strategies are actual conditional probability distributions on answers (conditional on the questions). What makes <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathcal+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathcal S}" class="latex" title="{ \mathcal S}" /> a set of “pseudo”-strategies rather than actual strategies is that they may enjoy correlations which cannot be achieved without communication.
+<h3> Convex relaxation of quantum strategies</h3>
+We will define <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathcal+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathcal S}" class="latex" title="{ \mathcal S}" /> to be a class of conditional probability distributions <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BP%7D%28a%2Cb%7Cs%2Ct%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{P}(a,b|s,t)}" class="latex" title="{ \tilde{P}(a,b|s,t)}" /> on answers given questions. We will require that the pseudo-strategies satisfy a positive semidefinite constraint when arranged in matrix form. In particular this matrix has to be symmetric, so we symmetrize the conditional probability <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BP%7D%28a%2Cb%7Cs%2Ct%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{P}(a,b|s,t)}" class="latex" title="{ \tilde{P}(a,b|s,t)}" /> by allowing each of <img src="https://s0.wp.com/latex.php?latex=%7B+s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s}" class="latex" title="{ s}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t}" class="latex" title="{ t}" /> to be either a question for Alice or for Bob. That is, we extend the domain of definition for <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BP%7D%28a%2Cb%7Cs%2Ct%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{P}(a,b|s,t)}" class="latex" title="{ \tilde{P}(a,b|s,t)}" /> from <img src="https://s0.wp.com/latex.php?latex=%7B+%5CSigma%5E2%5Ctimes+S%5Ctimes+T%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \Sigma^2\times S\times T}" class="latex" title="{ \Sigma^2\times S\times T}" /> to <img src="https://s0.wp.com/latex.php?latex=%7B+%5CSigma%5E2%5Ctimes+%28S%5Ccup+T%29%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \Sigma^2\times (S\cup T)^2}" class="latex" title="{ \Sigma^2\times (S\cup T)^2}" /> where <img src="https://s0.wp.com/latex.php?latex=%7B+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ S}" class="latex" title="{ S}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+T%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ T}" class="latex" title="{ T}" /> are the question sets. So each question <img src="https://s0.wp.com/latex.php?latex=%7B+s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s}" class="latex" title="{ s}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t}" class="latex" title="{ t}" /> and answer <img src="https://s0.wp.com/latex.php?latex=%7B+a%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a}" class="latex" title="{ a}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+b%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ b}" class="latex" title="{ b}" /> can be either for Alice or Bob — we indicate this by changing notation from <img src="https://s0.wp.com/latex.php?latex=%7B+%28s%2Ct%29%5Cin+S%5Ctimes+T%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (s,t)\in S\times T}" class="latex" title="{ (s,t)\in S\times T}" /> to <img src="https://s0.wp.com/latex.php?latex=%7B+q%2Cq%27%5Cin+S%5Ccup+T%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ q,q'\in S\cup T}" class="latex" title="{ q,q'\in S\cup T}" /> and for the answers replacing <img src="https://s0.wp.com/latex.php?latex=%7B+a%2Cb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a,b}" class="latex" title="{ a,b}" /> by <img src="https://s0.wp.com/latex.php?latex=%7B+c%2Cc%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ c,c'}" class="latex" title="{ c,c'}" />.
+
+<br />Definition 5 (Block-matrix form) <em><a name="to_matrix"></a> Given a function <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BP%7D%3D%5Ctilde%7BP%7D%28%5Ccdot%5Ccdot%7C%5Ccdot%5Ccdot%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{P}=\tilde{P}(\cdot\cdot|\cdot\cdot)}" class="latex" title="{ \tilde{P}=\tilde{P}(\cdot\cdot|\cdot\cdot)}" /> defined on <img src="https://s0.wp.com/latex.php?latex=%7B+%28S%5Ccup+T%29%5E2%5Ctimes+%5CSigma%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (S\cup T)^2\times \Sigma^2}" class="latex" title="{ (S\cup T)^2\times \Sigma^2}" /> with <img src="https://s0.wp.com/latex.php?latex=%7B+%7CS%7C%3D%7CT%7C%3Dn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |S|=|T|=n}" class="latex" title="{ |S|=|T|=n}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5CSigma%7C%3Dk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\Sigma|=k}" class="latex" title="{ |\Sigma|=k}" />, define a <img src="https://s0.wp.com/latex.php?latex=%7B+2nk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ 2nk}" class="latex" title="{ 2nk}" />-by-<img src="https://s0.wp.com/latex.php?latex=%7B+2nk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ 2nk}" class="latex" title="{ 2nk}" /> matrix <img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7B%5Ctilde%7BP%7D%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{\tilde{P}}}" class="latex" title="{ M^{\tilde{P}}}" /> whose rows are indexed by pairs <img src="https://s0.wp.com/latex.php?latex=%7B+%28q%2Cc%29%5Cin%28S%5Ccup+T%29%5Ctimes%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (q,c)\in(S\cup T)\times\Sigma}" class="latex" title="{ (q,c)\in(S\cup T)\times\Sigma}" /> and columns by pairs <img src="https://s0.wp.com/latex.php?latex=%7B+%28q%27%2Cc%27%29%5Cin+%28S%5Ccup+T%29%5Ctimes%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (q',c')\in (S\cup T)\times\Sigma}" class="latex" title="{ (q',c')\in (S\cup T)\times\Sigma}" />, and whose entries are </em>
+
+<em>
+<img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7B%5Ctilde%7BP%7D%7D_%7B%28q%2Cc%29%2C%28q%27%2Cc%27%29%7D%3D%5Ctilde%7BP%7D%28c%2Cc%27%7Cq%2Cq%27%29+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{\tilde{P}}_{(q,c),(q',c')}=\tilde{P}(c,c'|q,q') }" class="latex" title="{ M^{\tilde{P}}_{(q,c),(q',c')}=\tilde{P}(c,c'|q,q') }" /></em>
+
+<em>
+</em><em></em><em> In other words <img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7B%5Ctilde%7BP%7D%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{\tilde{P}}}" class="latex" title="{ M^{\tilde{P}}}" /> consists of <img src="https://s0.wp.com/latex.php?latex=%7B+k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ k}" class="latex" title="{ k}" />-by-<img src="https://s0.wp.com/latex.php?latex=%7B+k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ k}" class="latex" title="{ k}" /> blocks where the block <img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7B%5Ctilde%7BP%7D%7D_%7Bq%2Cq%27%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{\tilde{P}}_{q,q'}}" class="latex" title="{ M^{\tilde{P}}_{q,q'}}" /> at position <img src="https://s0.wp.com/latex.php?latex=%7B+q%2Cq%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ q,q'}" class="latex" title="{ q,q'}" /> contains the entries <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BP%7D%28%5Ccdot%5Ccdot%7Cq%2Cq%27%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{P}(\cdot\cdot|q,q')}" class="latex" title="{ \tilde{P}(\cdot\cdot|q,q')}" />. </em><br />
+Definition <a href="https://windowsontheory.org/feed/#to_matrix">5</a> is simply a convenient change of notation and we identify <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BP%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{P}}" class="latex" title="{ \tilde{P}}" /> with <img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7B%5Ctilde%7BP%7D%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{\tilde{P}}}" class="latex" title="{ M^{\tilde{P}}}" />, using either notation depending on the context.
+<br />Definition 6 (Pseudo-strategies) <em><a name="Sdef"></a> Let <img src="https://s0.wp.com/latex.php?latex=%7B+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ S}" class="latex" title="{ S}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+T%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ T}" class="latex" title="{ T}" /> be the question sets for Alice and Bob, respectively. We say that <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BP%7D%3D%5Ctilde%7BP%7D%28%5Ccdot%5Ccdot%7C%5Ccdot%5Ccdot%29%3A%5CSigma%5E2%5Ctimes+%28S%5Ccup+T%29%5E2%5Crightarrow%5B0%2C1%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{P}=\tilde{P}(\cdot\cdot|\cdot\cdot):\Sigma^2\times (S\cup T)^2\rightarrow[0,1]}" class="latex" title="{ \tilde{P}=\tilde{P}(\cdot\cdot|\cdot\cdot):\Sigma^2\times (S\cup T)^2\rightarrow[0,1]}" /> (or its matrix form <img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7B%5Ctilde%7BP%7D%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{\tilde{P}}}" class="latex" title="{ M^{\tilde{P}}}" />) is a pseudo-strategy if: </em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em></em>
+
+<em>
+<ol>
+ 	<li> <img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7B%5Ctilde%7BP%7D%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{\tilde{P}}}" class="latex" title="{ M^{\tilde{P}}}" /> is positive semidefinite.<a name="positive"></a></li>
+ 	<li> For any pair of questions <img src="https://s0.wp.com/latex.php?latex=%7B+q%2Cq%27%5Cin+S%5Ccup+T%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ q,q'\in S\cup T}" class="latex" title="{ q,q'\in S\cup T}" />, <img src="https://s0.wp.com/latex.php?latex=%7B+%5Csum_%7Bc%2Cc%27%3D1%7D%5Ek+%5Ctilde%7BP%7D%28c%2Cc%27%7Cq%2Cq%27%29%3D1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \sum_{c,c'=1}^k \tilde{P}(c,c'|q,q')=1}" class="latex" title="{ \sum_{c,c'=1}^k \tilde{P}(c,c'|q,q')=1}" />.<a name="sum1"></a></li>
+ 	<li> The blocks <img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7B%5Ctilde%7BP%7D%7D_%7Bq%2Cq%27%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{\tilde{P}}_{q,q'}}" class="latex" title="{ M^{\tilde{P}}_{q,q'}}" /> on the diagonal are themselves diagonal <img src="https://s0.wp.com/latex.php?latex=%7B+k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ k}" class="latex" title="{ k}" />-by-<img src="https://s0.wp.com/latex.php?latex=%7B+k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ k}" class="latex" title="{ k}" /> matrices.<a name="diagonal"></a></li>
+</ol>
+</em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em></em><em> </em>
+Define the winning probability or value of a pseudo-strategy as:
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%5E%7B%5Ctilde%7BP%7D%7D%28G%29%3D%5Cmathbb+E_%7B%28s%2Ct%29%5Csim+%5CPi%7D+%5Csum_%7Ba%2Cb%7D+%5Ctilde%7BP%7D%28a%2Cb%7Cs%2Ct%29V%28a%2Cb%7Cs%2Ct%29+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega^{\tilde{P}}(G)=\mathbb E_{(s,t)\sim \Pi} \sum_{a,b} \tilde{P}(a,b|s,t)V(a,b|s,t) }" class="latex" title="{ \omega^{\tilde{P}}(G)=\mathbb E_{(s,t)\sim \Pi} \sum_{a,b} \tilde{P}(a,b|s,t)V(a,b|s,t) }" />
+
+The algorithm outputs the maximum winning probability:
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+%5Chat%5Comega%28G%29%3D%5Cmax_%7B%5Ctilde%7BP%7D%5Cin%5Cmathcal+S%7D%5Comega%5E%7B%5Ctilde%7BP%7D%7D%28G%29+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \hat\omega(G)=\max_{\tilde{P}\in\mathcal S}\omega^{\tilde{P}}(G) }" class="latex" title="{ \hat\omega(G)=\max_{\tilde{P}\in\mathcal S}\omega^{\tilde{P}}(G) }" />
+
+over pseudo-strategies <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BP%7D%5Cin+%5Cmathcal+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{P}\in \mathcal S}" class="latex" title="{ \tilde{P}\in \mathcal S}" />. This maximum is efficiently computable using standard semidefinite programming algorithms. As we will see, actual quantum strategies are in <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathcal+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathcal S}" class="latex" title="{ \mathcal S}" /> which immediately implies <img src="https://s0.wp.com/latex.php?latex=%7B+%5Chat%5Comega%28G%29%5Cge%5Comega%5E%2A%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \hat\omega(G)\ge\omega^*(G)}" class="latex" title="{ \hat\omega(G)\ge\omega^*(G)}" />. It then remains to show that the optimal pseudo-strategy can be approximated by an actual entangled strategy, thus bounding the gap from <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%5E%2A%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega^*(G)}" class="latex" title="{ \omega^*(G)}" /> to <img src="https://s0.wp.com/latex.php?latex=%7B+%5Chat%5Comega%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \hat\omega(G)}" class="latex" title="{ \hat\omega(G)}" />.
+<h3> Quantum strategies are in <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathcal+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathcal S}" class="latex" title="{ \mathcal S}" /></h3>
+Let us establish that <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathcal+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathcal S}" class="latex" title="{ \mathcal S}" /> is indeed a relaxation of the class of quantum strategies, that is, it contains the quantum strategies. So suppose we are given a quantum strategy. By equation <a href="https://windowsontheory.org/feed/#Qstrategy">1</a> the probability of answers <img src="https://s0.wp.com/latex.php?latex=%7B+a%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a}" class="latex" title="{ a}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+b%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ b}" class="latex" title="{ b}" /> given questions <img src="https://s0.wp.com/latex.php?latex=%7B+s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s}" class="latex" title="{ s}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t}" class="latex" title="{ t}" /> is of the form
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+%5Clangle%5Cphi%7CA%5Es_a%5Cotimes+B%5Et_b+%7C%5Cphi%5Crangle%3D%5Clangle%5Cphi%7C%28A%5Es_a%5Cotimes+%7B%5Cmathbb%7BI%7D%7D%29%28%7B%5Cmathbb%7BI%7D%7D%5Cotimes+B%5Et_b+%29%7C%5Cphi%5Crangle+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \langle\phi|A^s_a\otimes B^t_b |\phi\rangle=\langle\phi|(A^s_a\otimes {\mathbb{I}})({\mathbb{I}}\otimes B^t_b )|\phi\rangle }" class="latex" title="{ \langle\phi|A^s_a\otimes B^t_b |\phi\rangle=\langle\phi|(A^s_a\otimes {\mathbb{I}})({\mathbb{I}}\otimes B^t_b )|\phi\rangle }" />
+
+for some PVM’s <img src="https://s0.wp.com/latex.php?latex=%7B+A%5Es%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A^s}" class="latex" title="{ A^s}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+B%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ B^t}" class="latex" title="{ B^t}" /> and some <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5Cphi%5Crangle%5Cin%5Cmathbb+C%5Ed%5Cotimes%5Cmathbb+C%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\phi\rangle\in\mathbb C^d\otimes\mathbb C^d}" class="latex" title="{ |\phi\rangle\in\mathbb C^d\otimes\mathbb C^d}" />. This conditional probability distibution is not immediately in the form of a pseudo-strategy because we cannot evaluate it on pairs of Alice-questions or pairs of Bob-questions. We therefore have to extend it, as follows: Place all the column vectors <img src="https://s0.wp.com/latex.php?latex=%7B+A%5Es_a%5Cotimes+%7B%5Cmathbb%7BI%7D%7D%7C%5Cphi%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A^s_a\otimes {\mathbb{I}}|\phi\rangle}" class="latex" title="{ A^s_a\otimes {\mathbb{I}}|\phi\rangle}" />, <img src="https://s0.wp.com/latex.php?latex=%7B+%28s%2Ca%29%5Cin+S%5Ctimes+%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (s,a)\in S\times \Sigma}" class="latex" title="{ (s,a)\in S\times \Sigma}" /> side by side, and then append the vectors <img src="https://s0.wp.com/latex.php?latex=%7B+I%5Cotimes+B%5Et_b%7C%5Cphi%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ I\otimes B^t_b|\phi\rangle}" class="latex" title="{ I\otimes B^t_b|\phi\rangle}" />, resulting in a <img src="https://s0.wp.com/latex.php?latex=%7B+d%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ d^2}" class="latex" title="{ d^2}" />-by-<img src="https://s0.wp.com/latex.php?latex=%7B+2nk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ 2nk}" class="latex" title="{ 2nk}" /> matrix <img src="https://s0.wp.com/latex.php?latex=%7B+R%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ R}" class="latex" title="{ R}" />. We then define <img src="https://s0.wp.com/latex.php?latex=%7B+%7BP%7D%28%5Ccdot%5Ccdot%7C%5Ccdot%5Ccdot%29%3A%5CSigma%5E2%5Ctimes%28S%5Ccup+T%29%5E2%5Crightarrow%5B0%2C1%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ {P}(\cdot\cdot|\cdot\cdot):\Sigma^2\times(S\cup T)^2\rightarrow[0,1]}" class="latex" title="{ {P}(\cdot\cdot|\cdot\cdot):\Sigma^2\times(S\cup T)^2\rightarrow[0,1]}" /> through its matrix form (see the comment below definition <a href="https://windowsontheory.org/feed/#to_matrix">5</a>): <a name="eqMp"></a>
+<p align="center"><a name="eqMp"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++M%5E%7BP%7D%3A%3DR%5E%5Cdag+R%3D%5Cbegin%7Bpmatrix%7D+%28%5Clangle%5Cphi%7CA%5Es_a+A%5E%7Bs%27%7D_%7Ba%27%7D%5Cotimes+%7B%5Cmathbb%7BI%7D%7D+%7C%5Cphi%5Crangle%29_%7B%28s%2Ca%29%2C%28s%27%2Ca%27%29%7D+%28%5Clangle%5Cphi%7CA%5Es_a%5Cotimes+B%5Et_b+%7C%5Cphi%5Crangle%29_%7B%28s%2Ca%29%2C%28t%2Cb%29%7D+%5C%5C%5C%5C+%28%5Clangle%5Cphi%7CB%5Et_b%5Cotimes+A%5Es_a+%7C%5Cphi%5Crangle%29_%7B%28t%2Cb%29%2C%28s%2Ca%29%7D+%28%5Clangle%5Cphi%7C%7B%5Cmathbb%7BI%7D%7D%5Cotimes+B%5Et_bB%5E%7Bt%27%7D_%7Bb%27%7D+%7C%5Cphi%5Crangle%29_%7B%28t%2Cb%29%2C%28t%27%2Cb%27%29%7D+%5Cend%7Bpmatrix%7D+%5C+%5C+%5C+%5C+%5C+%282%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  M^{P}:=R^\dag R=\begin{pmatrix} (\langle\phi|A^s_a A^{s'}_{a'}\otimes {\mathbb{I}} |\phi\rangle)_{(s,a),(s',a')} (\langle\phi|A^s_a\otimes B^t_b |\phi\rangle)_{(s,a),(t,b)} \\\\ (\langle\phi|B^t_b\otimes A^s_a |\phi\rangle)_{(t,b),(s,a)} (\langle\phi|{\mathbb{I}}\otimes B^t_bB^{t'}_{b'} |\phi\rangle)_{(t,b),(t',b')} \end{pmatrix} \ \ \ \ \ (2)" class="latex" title="\displaystyle  M^{P}:=R^\dag R=\begin{pmatrix} (\langle\phi|A^s_a A^{s'}_{a'}\otimes {\mathbb{I}} |\phi\rangle)_{(s,a),(s',a')} (\langle\phi|A^s_a\otimes B^t_b |\phi\rangle)_{(s,a),(t,b)} \\\\ (\langle\phi|B^t_b\otimes A^s_a |\phi\rangle)_{(t,b),(s,a)} (\langle\phi|{\mathbb{I}}\otimes B^t_bB^{t'}_{b'} |\phi\rangle)_{(t,b),(t',b')} \end{pmatrix} \ \ \ \ \ (2)" /></a></p>
+<a name="eqMp">
+</a><a name="eqMp"></a>
+<b>Lemma 7</b> <em><a name="relaxation"></a> <img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7BP%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{P}}" class="latex" title="{ M^{P}}" /> defined in <a href="https://windowsontheory.org/feed/#eqMp">2</a> is a pseudo-strategy, that is, <img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7BP%7D%5Cin%5Cmathcal+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{P}\in\mathcal S}" class="latex" title="{ M^{P}\in\mathcal S}" />. </em>
+<em><br />Proof.</em> We verify the conditions in definition <a href="https://windowsontheory.org/feed/#Sdef">6</a>. Condition <a href="https://windowsontheory.org/feed/#positive">1</a> (<img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7BP%7D%5Csucceq0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{P}\succeq0}" class="latex" title="{ M^{P}\succeq0}" />) holds because it is of the form <img src="https://s0.wp.com/latex.php?latex=%7B+R%5E%5Cdag+R%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ R^\dag R}" class="latex" title="{ R^\dag R}" />. Condition <a href="https://windowsontheory.org/feed/#sum1">2</a> (Each block <img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7BP%7D_%7Bq%2Cq%27%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{P}_{q,q'}}" class="latex" title="{ M^{P}_{q,q'}}" /> sums to <img src="https://s0.wp.com/latex.php?latex=%7B+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ 1}" class="latex" title="{ 1}" />) holds because PVM’s sum to the identity. Condition <a href="https://windowsontheory.org/feed/#diagonal">3</a> (Diagonal blocks <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde+M%3DM%5E%7BP%7D_%7Bqq%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde M=M^{P}_{qq}}" class="latex" title="{ \tilde M=M^{P}_{qq}}" /> are diagonal) holds because the projections in the PVM <img src="https://s0.wp.com/latex.php?latex=%7B+A%5Eq%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A^q}" class="latex" title="{ A^q}" /> are mutually orthogonal, hence <img src="https://s0.wp.com/latex.php?latex=%7B+%5Clangle%7B%5Cphi%7D%7C+A%5Eq_cA%5Eq_%7Bc%27%7D+%7C%7B%5Cphi%7D%5Crangle+%3D0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \langle{\phi}| A^q_cA^q_{c'} |{\phi}\rangle =0}" class="latex" title="{ \langle{\phi}| A^q_cA^q_{c'} |{\phi}\rangle =0}" /> if <img src="https://s0.wp.com/latex.php?latex=%7B+c%5Cneq+c%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ c\neq c'}" class="latex" title="{ c\neq c'}" />. 
+<div align="right">□</div>
+Lemma <a href="https://windowsontheory.org/feed/#relaxation">7</a> means <img src="https://s0.wp.com/latex.php?latex=%7B+%5Chat%5Comega%28G%29%3D%5Cmax_%7B%7BP%7D%5Cin+%5Cmathcal+S%7D%5Comega%5E%7BP%7D%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \hat\omega(G)=\max_{{P}\in \mathcal S}\omega^{P}(G)}" class="latex" title="{ \hat\omega(G)=\max_{{P}\in \mathcal S}\omega^{P}(G)}" /> is an (efficiently computable) upper bound for <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%5E%2A%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega^*(G)}" class="latex" title="{ \omega^*(G)}" />:
+<h4>Corollary</h4><em> <img src="https://s0.wp.com/latex.php?latex=%7B+%5Chat%5Comega%5Cge+%5Comega%5E%2A%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \hat\omega\ge \omega^*(G)}" class="latex" title="{ \hat\omega\ge \omega^*(G)}" />. </em>
+
+
+
+<br />To finish the proof of theorem <a href="https://windowsontheory.org/feed/#efficientUGC">4</a> we need to show that any pseudo-strategy <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BP%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{P}}" class="latex" title="{ \tilde{P}}" /> can be <em>rounded</em> to an actual quantum strategy with answer probabilities <img src="https://s0.wp.com/latex.php?latex=%7B+%7BP%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ {P}}" class="latex" title="{ {P}}" /> such that <a name="roundingobjective"></a>
+<p align="center"><a name="roundingobjective"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++1-%5Comega%5E%7BP%7D%5Cle+6%281-%5Comega%5E%7B%5Ctilde+P%7D%29+%5C+%5C+%5C+%5C+%5C+%283%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  1-\omega^{P}\le 6(1-\omega^{\tilde P}) \ \ \ \ \ (3)" class="latex" title="\displaystyle  1-\omega^{P}\le 6(1-\omega^{\tilde P}) \ \ \ \ \ (3)" /></a></p>
+<a name="roundingobjective">
+</a><a name="roundingobjective"></a> Applying this rounding to the optimal pseudo-strategy implies that
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+1-%5Comega%5E%2A%5Cle+6%281-%5Chat%5Comega%29+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ 1-\omega^*\le 6(1-\hat\omega) }" class="latex" title="{ 1-\omega^*\le 6(1-\hat\omega) }" />
+
+or <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%5E%2A%5Cge+1-6%281-%5Chat%5Comega%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega^*\ge 1-6(1-\hat\omega)}" class="latex" title="{ \omega^*\ge 1-6(1-\hat\omega)}" />, which will finish the proof of theorem <a href="https://windowsontheory.org/feed/#efficientUGC">4</a>.
+
+<em><br /><b>Proof.</b></em>[Proof of theorem <a href="https://windowsontheory.org/feed/#efficientUGC">4</a>] Let <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BP%7D%5Cin%5Cmathcal+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{P}\in\mathcal S}" class="latex" title="{ \tilde{P}\in\mathcal S}" /> be a pseudo-strategy. We construct a quantum strategy <img src="https://s0.wp.com/latex.php?latex=%7B+%7BP%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ {P}}" class="latex" title="{ {P}}" /> approximating <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BP%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{P}}" class="latex" title="{ \tilde{P}}" />. Since <img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7B%5Ctilde%7BP%7D%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{\tilde{P}}}" class="latex" title="{ M^{\tilde{P}}}" /> is positive semidefinite we can write
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde+M%3DR%5E%5Cdag+R+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde M=R^\dag R }" class="latex" title="{ \tilde M=R^\dag R }" />
+
+for <em>some</em> matrix <img src="https://s0.wp.com/latex.php?latex=%7B+R%5Cin+%5Cmathbb+C%5E%7Br%5Ctimes+2nk%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ R\in \mathbb C^{r\times 2nk}}" class="latex" title="{ R\in \mathbb C^{r\times 2nk}}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+r%5Cleq+2nk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ r\leq 2nk}" class="latex" title="{ r\leq 2nk}" />. Now let us define <img src="https://s0.wp.com/latex.php?latex=%7B+2nk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ 2nk}" class="latex" title="{ 2nk}" /> vectors <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5Ctilde+u%5Es_a%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\tilde u^s_a\rangle}" class="latex" title="{ |\tilde u^s_a\rangle}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5Ctilde+v%5Et_b%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\tilde v^t_b\rangle}" class="latex" title="{ |\tilde v^t_b\rangle}" /> in <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathbb+C%5E%7Br%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathbb C^{r}}" class="latex" title="{ \mathbb C^{r}}" />, and let <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7Bu%5Es_a%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{u^s_a}\rangle}" class="latex" title="{ |{u^s_a}\rangle}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7Bv%5Et_b%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{v^t_b}\rangle}" class="latex" title="{ |{v^t_b}\rangle}" /> be the same vectors normalized. The strategy is constructed as follows. Alice and Bob share the maximally entangled state
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5Cphi%5Crangle%3D%5Cfrac1%7B%5Csqrt+r%7D%5Csum_%7Bi%3D1%7D%5Er%7Ci%5Crangle%7Ci%5Crangle%5Cin%5Cmathbb+C%5Er%5Cotimes%5Cmathbb+C%5Er+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\phi\rangle=\frac1{\sqrt r}\sum_{i=1}^r|i\rangle|i\rangle\in\mathbb C^r\otimes\mathbb C^r }" class="latex" title="{ |\phi\rangle=\frac1{\sqrt r}\sum_{i=1}^r|i\rangle|i\rangle\in\mathbb C^r\otimes\mathbb C^r }" />
+
+Before deciding on Alice and Bob’s PVM’s <img src="https://s0.wp.com/latex.php?latex=%7B+A%5Es%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A^s}" class="latex" title="{ A^s}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+B%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ B^t}" class="latex" title="{ B^t}" /> let us see what this choice of shared state means for the conditional distribution on answers (see equation <a href="https://windowsontheory.org/feed/#Qstrategy">(1)</a>).
+<p align="center"> <img src="https://s0.wp.com/latex.php?latex=%5Clangle%5Cphi%7C+A%5Es_a%5Cotimes+B%5Et_b%7C%5Cphi%5Crangle+%3D%5Cfrac1r%5Csum_%7Bi%2Cj%3D1%7D%5Er%5Clangle+i+%7C+A%5Es_a%7C+j%5Crangle%5Clangle+i+%7C+B%5Et_b%7C+j%5Crangle+%3D%5Cfrac1r+A%5Es_a%5Ccdot+B%5Et_b%3D%5Cfrac1r%5Clangle+A%5Es_a%2C%5Coverline%7BB%5Et_b%7D%5Crangle&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\langle\phi| A^s_a\otimes B^t_b|\phi\rangle =\frac1r\sum_{i,j=1}^r\langle i | A^s_a| j\rangle\langle i | B^t_b| j\rangle =\frac1r A^s_a\cdot B^t_b=\frac1r\langle A^s_a,\overline{B^t_b}\rangle" class="latex" title="\langle\phi| A^s_a\otimes B^t_b|\phi\rangle =\frac1r\sum_{i,j=1}^r\langle i | A^s_a| j\rangle\langle i | B^t_b| j\rangle =\frac1r A^s_a\cdot B^t_b=\frac1r\langle A^s_a,\overline{B^t_b}\rangle" />, (*)</p>
+where the bar represents entrywise complex conjugation, <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ccdot%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \cdot}" class="latex" title="{ \cdot}" /> is the entrywise dot product of matrices, and <img src="https://s0.wp.com/latex.php?latex=%7B+%5Clangle%5C%3A%2C%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \langle\:,\rangle}" class="latex" title="{ \langle\:,\rangle}" /> the entrywise complex inner product (Hilbert-Schmidt inner product).
+
+We now choose the measurements. Given question <img src="https://s0.wp.com/latex.php?latex=%7B+s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s}" class="latex" title="{ s}" />, Alice measures in the PVM <img src="https://s0.wp.com/latex.php?latex=%7B+A%5Es%3D%28A%5Es_a%29_%7Ba%3D0%7D%5Ek%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A^s=(A^s_a)_{a=0}^k}" class="latex" title="{ A^s=(A^s_a)_{a=0}^k}" /> with
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+A%5Es_a%3D+%7C%7Bu%5Es_a%7D%5Crangle+%5Clangle%7Bu%5Es_a%7D%7C+%5Ctext%7B+for+%7Da%3D1%2C%5Cldots%2Ck%5Ctext%7B%2C+and+%7DA%5Es_0%3D%7B%5Cmathbb%7BI%7D%7D-%5Csum_%7Bi%3D1%7D%5Ek+%7C%7Bu%5Es_a%7D%5Crangle+%5Clangle%7Bu%5Es_a%7D%7C+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A^s_a= |{u^s_a}\rangle \langle{u^s_a}| \text{ for }a=1,\ldots,k\text{, and }A^s_0={\mathbb{I}}-\sum_{i=1}^k |{u^s_a}\rangle \langle{u^s_a}| }" class="latex" title="{ A^s_a= |{u^s_a}\rangle \langle{u^s_a}| \text{ for }a=1,\ldots,k\text{, and }A^s_0={\mathbb{I}}-\sum_{i=1}^k |{u^s_a}\rangle \langle{u^s_a}| }" />
+
+Similarly, Bob on question <img src="https://s0.wp.com/latex.php?latex=%7B+t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t}" class="latex" title="{ t}" /> applies the PVM <img src="https://s0.wp.com/latex.php?latex=%7B+B%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ B^t}" class="latex" title="{ B^t}" /> with
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+B%5Et_b%3D+%7C%7Bv%5Et_b%7D%5Crangle+%5Clangle%7Bv%5Et_b%7D%7C+%5Ctext%7B+for+%7Db%3D1%2C%5Cldots%2Ck%5Ctext%7B%2C+and+%7DB%5Et_0%3D%7B%5Cmathbb%7BI%7D%7D-%5Csum_%7Bi%3D1%7D%5Ek+%7C%7Bv%5Et_b%7D%5Crangle+%5Clangle%7Bv%5Et_b%7D%7C+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ B^t_b= |{v^t_b}\rangle \langle{v^t_b}| \text{ for }b=1,\ldots,k\text{, and }B^t_0={\mathbb{I}}-\sum_{i=1}^k |{v^t_b}\rangle \langle{v^t_b}| }" class="latex" title="{ B^t_b= |{v^t_b}\rangle \langle{v^t_b}| \text{ for }b=1,\ldots,k\text{, and }B^t_0={\mathbb{I}}-\sum_{i=1}^k |{v^t_b}\rangle \langle{v^t_b}| }" />
+
+The condition <a href="https://windowsontheory.org/feed/#diagonal">3</a> in definition <a href="https://windowsontheory.org/feed/#Sdef">6</a> ensures that for any question <img src="https://s0.wp.com/latex.php?latex=%7B+s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s}" class="latex" title="{ s}" />, the vectors <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7Bu%5Es_1%7D%5Crangle+%2C%5Cldots%2C+%7C%7Bu%5Es_1%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{u^s_1}\rangle ,\ldots, |{u^s_1}\rangle}" class="latex" title="{ |{u^s_1}\rangle ,\ldots, |{u^s_1}\rangle}" /> are orthogonal so that this is a valid PVM.
+
+The measurement outcome “<img src="https://s0.wp.com/latex.php?latex=0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="0" class="latex" title="0" />” is interpreted as “fail”, and upon getting this outcome the player attempts the measurement again on their share of a fresh copy of <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5Cphi%5Crangle_%7BAB%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\phi\rangle_{AB}}" class="latex" title="{ |\phi\rangle_{AB}}" />. This means that the strategy requires many copies of the entangled state to be shared before the game starts. It also leads to the complication of ensuring that with high probability the players measure the same number of times before outputting their measurement, so that the outputs come from measuring the same entangled state.
+
+By (*), at a given round of measurements the conditional distribution of answers is given by
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+%5Clangle%5Cphi%7CA%5Es_a%5Cotimes+B%5Et_b%7C%5Cphi%5Crangle%3D%5Cfrac1r%5CBig%5Clangle+%7C%7Bu%5Es_a%7D%5Crangle+%5Clangle%7B+u%5Es_a%7D%7C+%5C%3A%2C%5C%3A+%7C%7B%7Bv%5Et_b%7D%5Crangle+%7D+%5Clangle%7B+%7Bv%5Et_b%7D%7C+%7D%5CBig%5Crangle%3D%5Cfrac1r%7C%5Clangle+%7Bu%5Es_a%7D%7Cv%5Et_b%5Crangle%7C%5E2%3D%5Cfrac1%7Br%7C%5Ctilde+u%5Es_a%7C%5E2%7C%5Ctilde+v%5Et_b%7C%5E2%7D%5CBig%28M%5E%7B%5Ctilde%7BP%7D%7D_%7B%28s%2Ca%29%2C%28t%2Cb%29%7D%5CBig%29%5E2%2C+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \langle\phi|A^s_a\otimes B^t_b|\phi\rangle=\frac1r\Big\langle |{u^s_a}\rangle \langle{ u^s_a}| \:,\: |{{v^t_b}\rangle } \langle{ {v^t_b}| }\Big\rangle=\frac1r|\langle {u^s_a}|v^t_b\rangle|^2=\frac1{r|\tilde u^s_a|^2|\tilde v^t_b|^2}\Big(M^{\tilde{P}}_{(s,a),(t,b)}\Big)^2, }" class="latex" title="{ \langle\phi|A^s_a\otimes B^t_b|\phi\rangle=\frac1r\Big\langle |{u^s_a}\rangle \langle{ u^s_a}| \:,\: |{{v^t_b}\rangle } \langle{ {v^t_b}| }\Big\rangle=\frac1r|\langle {u^s_a}|v^t_b\rangle|^2=\frac1{r|\tilde u^s_a|^2|\tilde v^t_b|^2}\Big(M^{\tilde{P}}_{(s,a),(t,b)}\Big)^2, }" />
+
+We wish to relate the LHS to <img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7B%5Ctilde%7BP%7D%7D_%7B%28s%2Ca%29%2C%28t%2Cb%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{\tilde{P}}_{(s,a),(t,b)}}" class="latex" title="{ M^{\tilde{P}}_{(s,a),(t,b)}}" />, so to handle the factor <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cfrac1r%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \frac1r}" class="latex" title="{ \frac1r}" /> each prover performs repeated measurements, each time on a fresh copy of <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%5Cphi%5Crangle_%7BAB%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |\phi\rangle_{AB}}" class="latex" title="{ |\phi\rangle_{AB}}" />, until getting an outcome <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cneq0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \neq0}" class="latex" title="{ \neq0}" />. Moreover, to handle the factor <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cfrac1%7B%7Cu%5Es_a%7C%5E2%7Cv%5Et_b%7C%5E2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \frac1{|u^s_a|^2|v^t_b|^2}}" class="latex" title="{ \frac1{|u^s_a|^2|v^t_b|^2}}" />, each prover consults public randomness and accepts the answer <img src="https://s0.wp.com/latex.php?latex=%7B+a%5Cin%5Bk%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a\in[k]}" class="latex" title="{ a\in[k]}" /> with probability <img src="https://s0.wp.com/latex.php?latex=%7B+%7Cu%5Ea_s%7C%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |u^a_s|^2}" class="latex" title="{ |u^a_s|^2}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+%7Cv%5Eb_t%7C%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |v^b_t|^2}" class="latex" title="{ |v^b_t|^2}" /> respectively, or rejects and start over depending on the public randomness. Under a few simplifying conditions (more precisely, assuming that the game is <em>uniform</em> meaning that an optimal strategy exists where the marginal distribution on each prover’s answers is uniform), we can let <img src="https://s0.wp.com/latex.php?latex=%7B+M%5E%7B%5Ctilde%7BP%7D%7D_%7B%28s%2Ca%29%2C%28t%2Cb%29%7D%5Cle+1%2Fk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ M^{\tilde{P}}_{(s,a),(t,b)}\le 1/k}" class="latex" title="{ M^{\tilde{P}}_{(s,a),(t,b)}\le 1/k}" /> for all <img src="https://s0.wp.com/latex.php?latex=%7B+s%2Ca%2Ct%2Cb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s,a,t,b}" class="latex" title="{ s,a,t,b}" />, and one can ensure that the conditional probabilities <img src="https://s0.wp.com/latex.php?latex=%7B+%7BP%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ {P}}" class="latex" title="{ {P}}" /> of the final answers satisfy
+<p align="center">
+<img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+1%2Fk-P%28a%2Cb%7Cs%2Ct%29%5Cle+3%5Cbig%281%2Fk-k%28M%5E%7B%5Ctilde+P%7D_%7B%28s%2Ca%29%2C%28t%2Cb%29%7D%29%5E2%5Cbig%29%2C%5C+%5C+%5C+%5C+%5C+%284%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle 1/k-P(a,b|s,t)\le 3\big(1/k-k(M^{\tilde P}_{(s,a),(t,b)})^2\big),\ \ \ \ \ (4)" class="latex" title="\displaystyle 1/k-P(a,b|s,t)\le 3\big(1/k-k(M^{\tilde P}_{(s,a),(t,b)})^2\big),\ \ \ \ \ (4)" />
+<a name="PM"></a>
+
+At this stage it is important that we are dealing with a <em>unique game</em> . Indeed, by <a href="https://windowsontheory.org/feed/#PM">(4)</a> we have for every <img src="https://s0.wp.com/latex.php?latex=%7B+s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s}" class="latex" title="{ s}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t}" class="latex" title="{ t}" />,
+
+<img src="https://s0.wp.com/latex.php?latex=1-%5Csum_%7Ba%3D1%7D%5Ek+P%28a%2C%5Cpi_%7Bst%7D%28a%29%7Cs%2Ct%29%3D%5Csum_a+%5CBig%28%5Cfrac%7B1%7D%7Bk%7D-P%28a%2C%5Cpi_%7Bst%7D%28a%29%7Cs%2Ct%29+%5CBig%29+%5C%5C+%5Cleq+3%5Csum_%7Bb%3D%5Cpi_%7Bst%7D%28a%29%7D+%5CBig%28%5Cfrac%7B1%7D%7Bk%7D-k%28M%5E%7B%5Ctilde%7BP%7D%7D_%7B%28s%2Ca%29%2C%28t%2Cb%29%7D%29%5E2+%5CBig%29+%5C%5C+%5Cleq+6%5Csum_%7Bb%3D%5Cpi_%7Bst%7D%28a%29%7D%5Cbig%28%5Cfrac%7B1%7D%7Bk%7D-M%5E%7B%5Ctilde%7BP%7D%7D_%7B%28s%2Ca%29%2C%28t%2Cb%29%7D%5Cbig%29%3D6%5CBig%281-%5Csum_%7Bb%3D%5Cpi_%7Bst%7D%28a%29%7D+M%5E%7B%5Ctilde%7BP%7D%7D_%7B%28s%2Ca%29%2C%28t%2Cb%29%7D%5CBig%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="1-\sum_{a=1}^k P(a,\pi_{st}(a)|s,t)=\sum_a \Big(\frac{1}{k}-P(a,\pi_{st}(a)|s,t) \Big) \\ \leq 3\sum_{b=\pi_{st}(a)} \Big(\frac{1}{k}-k(M^{\tilde{P}}_{(s,a),(t,b)})^2 \Big) \\ \leq 6\sum_{b=\pi_{st}(a)}\big(\frac{1}{k}-M^{\tilde{P}}_{(s,a),(t,b)}\big)=6\Big(1-\sum_{b=\pi_{st}(a)} M^{\tilde{P}}_{(s,a),(t,b)}\Big) " class="latex" title="1-\sum_{a=1}^k P(a,\pi_{st}(a)|s,t)=\sum_a \Big(\frac{1}{k}-P(a,\pi_{st}(a)|s,t) \Big) \\ \leq 3\sum_{b=\pi_{st}(a)} \Big(\frac{1}{k}-k(M^{\tilde{P}}_{(s,a),(t,b)})^2 \Big) \\ \leq 6\sum_{b=\pi_{st}(a)}\big(\frac{1}{k}-M^{\tilde{P}}_{(s,a),(t,b)}\big)=6\Big(1-\sum_{b=\pi_{st}(a)} M^{\tilde{P}}_{(s,a),(t,b)}\Big) " />
+
+where the last inequality follows from concavity. Taking the expectation over <img src="https://s0.wp.com/latex.php?latex=%7B+s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ s}" class="latex" title="{ s}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t}" class="latex" title="{ t}" /> implies the bound <a href="https://windowsontheory.org/feed/#roundingobjective">(3)</a>, thus concluding the proof of theorem <a href="https://windowsontheory.org/feed/#efficientUGC">4</a>.
+</p><div align="right">□</div>
+<h2>General games are hard</h2>
+We just saw that a specific class of games becomes easy in the presence of shared entanglement, in that semidefinite programming allows the entangled value <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%5E%2A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega^*}" class="latex" title="{ \omega^*}" /> to be approximated to within exponential precision in polynomial time. Does this phenomenon hold more generally, so that the value of entangled games can always be efficiently approximated? We answer in the negative, by constructing a game where <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%5E%2A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega^*}" class="latex" title="{ \omega^*}" /> is NP-hard to approximate to within inverse-polynomial factors. The complexity for 2P-1R entangled games can be strengthened to constant-factor NP-hardness, putting it on par with the classical PCP theorem. This result is used to prove (with some conditions) the games formulation of the quantum PCP theorem, which states that the entangled value of general games is QMA-hard to approximate within a constant factor.
+<h3> Formulation of game</h3>
+Given any instance <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cphi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \phi}" class="latex" title="{ \phi}" /> of a <img src="https://s0.wp.com/latex.php?latex=%7B+k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ k}" class="latex" title="{ k}" />-CSP (constraint satisfaction problem, where <img src="https://s0.wp.com/latex.php?latex=%7B+k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ k}" class="latex" title="{ k}" /> is the number of literals), we can define a clause-vs-variable game <img src="https://s0.wp.com/latex.php?latex=%7B+G_%5Cphi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ G_\phi}" class="latex" title="{ G_\phi}" /> (see clause-vs-variable figure):
+<ol>
+ 	<li> The referee (verifier) randomly sends a clause to Alice (first prover) and a variable to Bob (second prover).</li>
+ 	<li> Alice and Bob reply with assignments.</li>
+ 	<li> The referee accepts if Alice’s assignment satisfies the clause and Bob’s answer is consistent with Alice’s.</li>
+</ol>
+To show hardness of approximation, we need to go beyond the usual 2-player construction. In particular, in our game [3] one of the players receives an extra dummy question (see subfigure (a)). Mathematically, the result is very similar to introducing another player and having the referee play the 2-player game with two players chosen randomly [4] (see subfigure (b)). In either variation, the quantum phenomenon of <em>monogamy of entanglement</em> , imposing that only two parties can be maximally entangled to one another, is key to establishing hardness. The players do not know where to use their entanglement, which prevents them from coordinating as well as they could in the standard game.
+<figure style="width: 25em; margin: auto;">  
+<a href="https://windowsontheory.org/?attachment_id=7233"><img src="https://windowsontheory.files.wordpress.com/2019/01/2player.png?w=107&amp;h=150" alt="" height="150" class="attachment-thumbnail size-thumbnail" width="107" /></a>
+<a href="https://windowsontheory.org/?attachment_id=7234"><img src="https://windowsontheory.files.wordpress.com/2019/01/3player.png?w=107&amp;h=150" alt="" height="150" class="attachment-thumbnail size-thumbnail" width="107" /></a>
+
+
+Two variations of a 2-player clause-vs-variable game; new features are in red and shared entanglement is denoted in blue. In the standard game <img src="https://s0.wp.com/latex.php?latex=%7B+G_%5Cphi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ G_\phi}" class="latex" title="{ G_\phi}" />, given <img src="https://s0.wp.com/latex.php?latex=%7B+k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ k}" class="latex" title="{ k}" />-CSP <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cphi%3D%28C_1%2C%5Cldots%2CC_m%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \phi=(C_1,\ldots,C_m)}" class="latex" title="{ \phi=(C_1,\ldots,C_m)}" /> on <img src="https://s0.wp.com/latex.php?latex=%7B+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ n}" class="latex" title="{ n}" /> variables <img src="https://s0.wp.com/latex.php?latex=%7B+x_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ x_i}" class="latex" title="{ x_i}" />, (1) the referee R randomly sends a clause <img src="https://s0.wp.com/latex.php?latex=%7B+C_j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ C_j}" class="latex" title="{ C_j}" /> to Alice A and a literal index <img src="https://s0.wp.com/latex.php?latex=%7B+t%5Cin%5Bk%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t\in[k]}" class="latex" title="{ t\in[k]}" /> to Bob B, (2) A replies with an assignment <img src="https://s0.wp.com/latex.php?latex=%7B+%28a_1%2C%5Cldots%2Ca_k%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (a_1,\ldots,a_k)}" class="latex" title="{ (a_1,\ldots,a_k)}" /> and B replies with assignment <img src="https://s0.wp.com/latex.php?latex=%7B+b%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ b}" class="latex" title="{ b}" />, (3) R accepts iff <img src="https://s0.wp.com/latex.php?latex=%7B+%28a_1%2C%5Cldots%2Ca_k%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (a_1,\ldots,a_k)}" class="latex" title="{ (a_1,\ldots,a_k)}" /> satisfies <img src="https://s0.wp.com/latex.php?latex=%7B+C_j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ C_j}" class="latex" title="{ C_j}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+a_t%3Db%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a_t=b}" class="latex" title="{ a_t=b}" />. In variation (a), R sends an additional dummy index <img src="https://s0.wp.com/latex.php?latex=%7B+l%5Cin%5Bk%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ l\in[k]}" class="latex" title="{ l\in[k]}" />, so that B replies with an additional assignment <img src="https://s0.wp.com/latex.php?latex=%7B+b%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ b'}" class="latex" title="{ b'}" />, but he does not know which is the right variable. Equivalently, in (b) a third player Charlie C is introduced, but <img src="https://s0.wp.com/latex.php?latex=%7B+G_%5Cphi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ G_\phi}" class="latex" title="{ G_\phi}" /> is played with two randomly chosen players. Since only parties can be maximally entangled and the players do not know who is playing the game, they cannot coordinate perfectly. </figure>
+<h3> NP-hardness of approximating the entangled value</h3>
+To prove hardness, we rely on several results from classical complexity theory.
+<br />Theorem 8 ([6]) <em> Given an instance of 1-in-3 3SAT (a CSP), it is NP-hard to distinguish whether it is satisfiable or no assignments satisfy more than a constant fraction of clauses. <a name="thmCSP"></a> </em>
+<br />Theorem 9 ([2]) <em> For a PCP game <img src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{G}" class="latex" title="{G}" /> (emulating the CSP) and its oracularization <img src="https://s0.wp.com/latex.php?latex=%7BG%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{G'}" class="latex" title="{G'}" /> (transformation to a 2P-1R game), </em>
+
+<p align="center"><em><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Comega%28G%29%5Cleq+%5Comega%28G%27%29%5Cleq+1-%5Cfrac%7B1-%5Comega%28G%29%7D%7B3%7D%5C%2C.+%5C+%5C+%5C+%5C+%5C+%285%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \omega(G)\leq \omega(G')\leq 1-\frac{1-\omega(G)}{3}\,. \ \ \ \ \ (5)" class="latex" title="\displaystyle  \omega(G)\leq \omega(G')\leq 1-\frac{1-\omega(G)}{3}\,. \ \ \ \ \ (5)" /></em></p>
+<em>
+</em><em> <a name="thmMIP"></a> </em>
+Theorem <a href="https://windowsontheory.org/feed/#thmCSP">8</a> establishes the CSP variant of the classical PCP theorem: distinguishing between <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%28%5Cphi%29%3D1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega(\phi)=1}" class="latex" title="{ \omega(\phi)=1}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%28%5Cphi%29%5Cleq+1%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega(\phi)\leq 1/2}" class="latex" title="{ \omega(\phi)\leq 1/2}" /> is NP-hard for some <img src="https://s0.wp.com/latex.php?latex=%7B+k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ k}" class="latex" title="{ k}" />-CSP. Here, <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%28%5Cphi%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega(\phi)}" class="latex" title="{ \omega(\phi)}" /> denotes the maximum fraction of clauses that are simultaneously satisfiable. Theorem <a href="https://windowsontheory.org/feed/#thmMIP">9</a> relates the general game <img src="https://s0.wp.com/latex.php?latex=%7B+G%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ G}" class="latex" title="{ G}" /> obtained from the CSP to a two-player one-round game <img src="https://s0.wp.com/latex.php?latex=%7B+G%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ G'}" class="latex" title="{ G'}" />, in terms of the value (probability of winning) the game. The first inequality, equivalently saying <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%28%5Cphi%29%5Cleq+%5Comega%28G_%5Cphi%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega(\phi)\leq \omega(G_\phi)}" class="latex" title="{ \omega(\phi)\leq \omega(G_\phi)}" />, is achieved since the players can answer the questions in the game <img src="https://s0.wp.com/latex.php?latex=%7B+G_%5Cphi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ G_\phi}" class="latex" title="{ G_\phi}" /> to satisfy the clauses in <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cphi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \phi}" class="latex" title="{ \phi}" />. These theorems together imply that <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%28G_%5Cphi%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega(G_\phi)}" class="latex" title="{ \omega(G_\phi)}" /> is NP-hard to approximate to within constant factors.
+
+Allowing the two players to share entanglement can increase the game value to <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%5E%2A%28G_%5Cphi%29%5Cgeq+%5Comega%28G_%5Cphi%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega^*(G_\phi)\geq \omega(G_\phi)}" class="latex" title="{ \omega^*(G_\phi)\geq \omega(G_\phi)}" />. Classical results do not necessarily carry over, but exploiting monogamy of entanglement allows us to limit the power of entangled strategies. One can show the following lemma, which is weaker than what we have classically.
+<br /><b>Lemma 10 ([3])</b> <em> There exists a constant <img src="https://s0.wp.com/latex.php?latex=%7Bc%3E0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{c&gt;0}" class="latex" title="{c&gt;0}" /> such that for a CSP <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi}" class="latex" title="{\phi}" />, </em>
+<p align="center"><em><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Comega%5E%2A%28G_%5Cphi%29%5Cleq+1+-+%5Cfrac%7Bc%281-%5Comega%28%5Cphi%29%29%5E2%7D%7Bn%5E2%7D%5C%2C%2C+%5C+%5C+%5C+%5C+%5C+%286%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \omega^*(G_\phi)\leq 1 - \frac{c(1-\omega(\phi))^2}{n^2}\,, \ \ \ \ \ (6)" class="latex" title="\displaystyle  \omega^*(G_\phi)\leq 1 - \frac{c(1-\omega(\phi))^2}{n^2}\,, \ \ \ \ \ (6)" /></em></p>
+<em>
+</em><em> where <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{n}" class="latex" title="{n}" /> is the number of variables. <a name="lemmaIto"></a> </em>
+Combining Theorem <a href="https://windowsontheory.org/feed/#thmMIP">9</a> and Lemma <a href="https://windowsontheory.org/feed/#lemmaIto">10</a>, we have
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%28%5Cphi%29%5Cleq+%5Comega%5E%2A%28G_%5Cphi%29%5Cleq+1+-+%5Cfrac%7Bc%281-%5Comega%28%5Cphi%29%29%5E2%7D%7Bn%5E2%7D%5C%2C.+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega(\phi)\leq \omega^*(G_\phi)\leq 1 - \frac{c(1-\omega(\phi))^2}{n^2}\,. }" class="latex" title="{ \omega(\phi)\leq \omega^*(G_\phi)\leq 1 - \frac{c(1-\omega(\phi))^2}{n^2}\,. }" />
+
+Using Theorem <a href="https://windowsontheory.org/feed/#thmCSP">8</a>, approximating <img src="https://s0.wp.com/latex.php?latex=%7B+%5Comega%5E%2A%28G_%5Cphi%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \omega^*(G_\phi)}" class="latex" title="{ \omega^*(G_\phi)}" /> is NP-hard to within inverse polynomial factors. Proving Lemma <a href="https://windowsontheory.org/feed/#lemmaIto">10</a> takes some work in keeping track of approximations. For simplicity, we will show a less quantitative statement and indicate where the approximations come in.
+<br />Proposition 11 (adapted from [13]) <em> <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi}" class="latex" title="{\phi}" /> is satisfiable iff <img src="https://s0.wp.com/latex.php?latex=%7B%5Comega%5E%2A%28G_%5Cphi%29%3D1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\omega^*(G_\phi)=1}" class="latex" title="{\omega^*(G_\phi)=1}" />. <a name="proposition"></a> </em>
+<h3> Proof of Proposition <a href="https://windowsontheory.org/feed/#proposition">11</a></h3>
+The forward direction is straightforward: If <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cphi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \phi}" class="latex" title="{ \phi}" /> is satisfiable, then there exists a perfect winning strategy where the questions are answered according to the satisfying assignment.
+
+For the reverse direction, suppose there exists a strategy that succeeds with probability 1, specified by a shared entangled state <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cpsi%7D%5Crangle+%5Cin%5Cmathbb%7BC%7D%5Ed%5Cotimes%5Cmathbb%7BC%7D%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\psi}\rangle \in\mathbb{C}^d\otimes\mathbb{C}^d}" class="latex" title="{ |{\psi}\rangle \in\mathbb{C}^d\otimes\mathbb{C}^d}" /> and measurements <img src="https://s0.wp.com/latex.php?latex=%7B+%28A%5Ej_%7Ba_1%2C%5Cldots%2Ca_k%7D%29_%7Ba_1%2C%5Cldots%2Ca_k%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (A^j_{a_1,\ldots,a_k})_{a_1,\ldots,a_k}}" class="latex" title="{ (A^j_{a_1,\ldots,a_k})_{a_1,\ldots,a_k}}" /> for Alice and <img src="https://s0.wp.com/latex.php?latex=%7B+%28B%5E%7Bt%2Cl%7D_%7Bb%2Cb%27%7D%29_%7Bb%2Cb%27%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (B^{t,l}_{b,b'})_{b,b'}}" class="latex" title="{ (B^{t,l}_{b,b'})_{b,b'}}" /> for Bob, where the questions <img src="https://s0.wp.com/latex.php?latex=%7B+j%5Cin%5Bm%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ j\in[m]}" class="latex" title="{ j\in[m]}" />, <img src="https://s0.wp.com/latex.php?latex=%7B+t%2Cl%5Cin%5Bk%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t,l\in[k]}" class="latex" title="{ t,l\in[k]}" /> and the answers <img src="https://s0.wp.com/latex.php?latex=%7B+a%2Cb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a,b}" class="latex" title="{ a,b}" /> are from the CSP’s alphabet. Since one of the questions/answers for Bob corresponds to a dummy variable that is irrelevant to the game, trace over the dummy variable to define a new measurement operator <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BB%7D%5Et_b%3D%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bl%2Cb%27%7D+B%5E%7Bt%2Cl%7D_%7Bb%2Cb%27%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{B}^t_b=\frac{1}{n}\sum_{l,b'} B^{t,l}_{b,b'}}" class="latex" title="{ \tilde{B}^t_b=\frac{1}{n}\sum_{l,b'} B^{t,l}_{b,b'}}" />. We can introduce a distribution on assignments to the <img src="https://s0.wp.com/latex.php?latex=%7B+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ n}" class="latex" title="{ n}" /> relevant variables,
+
+<a name="eqpB"></a>
+<p align="center"><a name="eqpB"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++p%28a_1%2C%5Cldots%2Ca_n%29%3D%5ClVert+%5Cmathbb%7BI%7D+%5Cotimes+%5Ctilde%7BB%7D%5E1_%7Ba_1%7D%5Ccdots%5Ctilde%7BB%7D%5En_%7Ba_n%7D+%7C%5Cpsi%5Crangle+%5CrVert%5E2%5C%2C.++%5C+%5C+%5C+%5C+%5C+%287%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  p(a_1,\ldots,a_n)=\lVert \mathbb{I} \otimes \tilde{B}^1_{a_1}\cdots\tilde{B}^n_{a_n} |\psi\rangle \rVert^2\,.  \ \ \ \ \ (7)" class="latex" title="\displaystyle  p(a_1,\ldots,a_n)=\lVert \mathbb{I} \otimes \tilde{B}^1_{a_1}\cdots\tilde{B}^n_{a_n} |\psi\rangle \rVert^2\,.  \ \ \ \ \ (7)" /></a></p>
+<a name="eqpB">
+</a><a name="eqpB"></a> If we show that the distribution for assignments <img src="https://s0.wp.com/latex.php?latex=%7Ba_%7Bi_1%7D%2C%5Cldots%2Ca_%7Bi_k%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{a_{i_1},\ldots,a_{i_k}}" class="latex" title="{a_{i_1},\ldots,a_{i_k}}" /> on variables <img src="https://s0.wp.com/latex.php?latex=%7Bx_%7Bi_1%7D%2C%5Cldots%2Cx_%7Bi_k%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{x_{i_1},\ldots,x_{i_k}}" class="latex" title="{x_{i_1},\ldots,x_{i_k}}" /> in any clause <img src="https://s0.wp.com/latex.php?latex=%7BC_j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{C_j}" class="latex" title="{C_j}" /> is <a name="eqpA"></a>
+<p align="center"><a name="eqpA"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++p%28a_%7Bi_1%7D%2C%5Cldots%2Ca_%7Bi_k%7D%29%3D+%5ClVert+A%5Ej_%7Ba_%7Bi_1%7D%2C%5Cldots%2Ca_%7Bi_k%7D%7D+%5Cotimes+%5Cmathbb%7BI%7D+%7C%5Cpsi%5Crangle+%5CrVert%5E2%5C%2C%2C++%5C+%5C+%5C+%5C+%5C+%288%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  p(a_{i_1},\ldots,a_{i_k})= \lVert A^j_{a_{i_1},\ldots,a_{i_k}} \otimes \mathbb{I} |\psi\rangle \rVert^2\,,  \ \ \ \ \ (8)" class="latex" title="\displaystyle  p(a_{i_1},\ldots,a_{i_k})= \lVert A^j_{a_{i_1},\ldots,a_{i_k}} \otimes \mathbb{I} |\psi\rangle \rVert^2\,,  \ \ \ \ \ (8)" /></a></p>
+<a name="eqpA">
+</a><a name="eqpA"></a> then, since the players win with certainty, <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi}" class="latex" title="{\phi}" /> has a satisfying assignment. To transform Eq. <a href="https://windowsontheory.org/feed/#eqpB">7</a> to Eq. <a href="https://windowsontheory.org/feed/#eqpA">8</a>, we need a relation between the <img src="https://s0.wp.com/latex.php?latex=%7BA%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{A}" class="latex" title="{A}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B%5Ctilde%7BB%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\tilde{B}}" class="latex" title="{\tilde{B}}" /> measurement operators and a way to commute the <img src="https://s0.wp.com/latex.php?latex=%7B%5Ctilde%7BB%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\tilde{B}}" class="latex" title="{\tilde{B}}" /> operators.
+
+The success probability of the players’ strategy is expressed as
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+P%3D%5Cfrac%7B1%7D%7Bm%7D%5Csum_%7Bj%5Cin%5Bm%5D%7D%5Cfrac%7B1%7D%7Bk%7D%5Csum_%7Bi%5Cin+C_j%7D+%5Csum_%7B%28a_1%2C%5Cldots%2Ca_k%29%5Cvdash+C_j%7D+%5Clangle%7B%5Cpsi%7D%7C+A%5Ej_%7Ba_1%2C%5Cldots%2Ca_k%7D%5Cotimes+%5Ctilde%7BB%7D%5Ei_%7Ba_i%7D+%7C%7B%5Cpsi%7D%5Crangle+%5C%2C%2C+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ P=\frac{1}{m}\sum_{j\in[m]}\frac{1}{k}\sum_{i\in C_j} \sum_{(a_1,\ldots,a_k)\vdash C_j} \langle{\psi}| A^j_{a_1,\ldots,a_k}\otimes \tilde{B}^i_{a_i} |{\psi}\rangle \,, }" class="latex" title="{ P=\frac{1}{m}\sum_{j\in[m]}\frac{1}{k}\sum_{i\in C_j} \sum_{(a_1,\ldots,a_k)\vdash C_j} \langle{\psi}| A^j_{a_1,\ldots,a_k}\otimes \tilde{B}^i_{a_i} |{\psi}\rangle \,, }" />
+
+where <img src="https://s0.wp.com/latex.php?latex=%7B+i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ i}" class="latex" title="{ i}" /> is the index of one of the <img src="https://s0.wp.com/latex.php?latex=%7B+k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ k}" class="latex" title="{ k}" /> variables on which <img src="https://s0.wp.com/latex.php?latex=%7B+C_j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ C_j}" class="latex" title="{ C_j}" /> acts, and <img src="https://s0.wp.com/latex.php?latex=%7B+%28a_1%2C%5Cldots%2Ca_k%29%5Cvdash+C_j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (a_1,\ldots,a_k)\vdash C_j}" class="latex" title="{ (a_1,\ldots,a_k)\vdash C_j}" /> indicates that the assignment satisfies the clause. By positivity and summation to identity of the measurement operators <img src="https://s0.wp.com/latex.php?latex=%7B+A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A}" class="latex" title="{ A}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BB%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{B}}" class="latex" title="{ \tilde{B}}" />, each term is at most 1; for our hypothesis <img src="https://s0.wp.com/latex.php?latex=%7B+P%3D1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ P=1}" class="latex" title="{ P=1}" />, each has to be 1. Hence, using orthogonality of the vectors <img src="https://s0.wp.com/latex.php?latex=%7B+%7B%5Cmathbb%7BI%7D%7D%5Cotimes%5Ctilde%7BB%7D%5Ei_%7Ba_i%7D+%7C%7B%5Cpsi%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ {\mathbb{I}}\otimes\tilde{B}^i_{a_i} |{\psi}\rangle}" class="latex" title="{ {\mathbb{I}}\otimes\tilde{B}^i_{a_i} |{\psi}\rangle}" /> for different <img src="https://s0.wp.com/latex.php?latex=%7B+a_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a_i}" class="latex" title="{ a_i}" />, we have <a name="eqrelation"></a>
+<p align="center"><a name="eqrelation"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_%7B%5Csubstack%7B%28a_%7Bi_1%7D%2C%5Cldots%2Ca_%7Bi_k%7D%29%5Cvdash+C_j+%5C%5C+a_i%3Db%7D%7D+A%5Ej_%7Ba_%7Bi_1%7D%2C%5Cldots%2Ca_%7Bi_k%7D%7D%5Cotimes+%5Cmathbb%7BI%7D+%7C%5Cpsi%5Crangle+%3D+%5Cmathbb%7BI%7D+%5Cotimes+%5Ctilde%7BB%7D%5Ei_%7Ba_i%7D%7C%5Cpsi%5Crangle%5C%2C%2C++%5C+%5C+%5C+%5C+%5C+%289%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \sum_{\substack{(a_{i_1},\ldots,a_{i_k})\vdash C_j \\ a_i=b}} A^j_{a_{i_1},\ldots,a_{i_k}}\otimes \mathbb{I} |\psi\rangle = \mathbb{I} \otimes \tilde{B}^i_{a_i}|\psi\rangle\,,  \ \ \ \ \ (9)" class="latex" title="\displaystyle  \sum_{\substack{(a_{i_1},\ldots,a_{i_k})\vdash C_j \\ a_i=b}} A^j_{a_{i_1},\ldots,a_{i_k}}\otimes \mathbb{I} |\psi\rangle = \mathbb{I} \otimes \tilde{B}^i_{a_i}|\psi\rangle\,,  \ \ \ \ \ (9)" /></a></p>
+<a name="eqrelation">
+</a><a name="eqrelation"></a> for any <img src="https://s0.wp.com/latex.php?latex=%7B+j%5Cin%5Bm%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ j\in[m]}" class="latex" title="{ j\in[m]}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+i%5Cin+C_j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ i\in C_j}" class="latex" title="{ i\in C_j}" />.
+
+We now demonstrate that two different <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BB%7D%5E%7Bt_1%7D_%7Bb_1%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{B}^{t_1}_{b_1}}" class="latex" title="{ \tilde{B}^{t_1}_{b_1}}" />, <img src="https://s0.wp.com/latex.php?latex=%7B+%5Ctilde%7BB%7D%5E%7Bt_2%7D_%7Bb_2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \tilde{B}^{t_2}_{b_2}}" class="latex" title="{ \tilde{B}^{t_2}_{b_2}}" /> commute, so that Bob can match any satisfied clause/variable.
+
+<img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BI%7D%7D+%5Cotimes+%5Ctilde%7BB%7D%5E%7Bt_1%7D_%7Bb_1%7D+%5Ctilde%7BB%7D%5E%7Bt_2%7D_%7Bb_2%7D+%7C%7B%5Cpsi%7D%5Crangle+%3D++%7B%5Cmathbb%7BI%7D%7D+%5Cotimes+%28%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bl_1%2Cb_1%27%7D+B%5E%7Bt_1%2Cl_1%7D_%7Bb_1%2Cb_1%27%7D%29+%28%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bl_2%2Cb_2%27%7D+B%5E%7Bt_2%2Cl_2%7D_%7Bb_2%2Cb_2%27%7D%29+%7C%7B%5Cpsi%7D%5Crangle+%5C%5C+%3D+%7B%5Cmathbb%7BI%7D%7D+%5Cotimes+%28%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bt_2%2Cb_1%27%7D+B%5E%7Bt_1%2Ct_2%7D_%7Bb_1%2Cb_1%27%7D%29+%28%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bt_1%2Cb_2%27%7D+B%5E%7Bt_2%2Ct_1%7D_%7Bb_2%2Cb_2%27%7D%29+%7C%7B%5Cpsi%7D%5Crangle+%5C%5C+%3D+%7B%5Cmathbb%7BI%7D%7D+%5Cotimes+%5Cfrac%7B1%7D%7Bn%5E2%7D%5Csum_%7Bt_1%2Ct_2%7D+B%5E%7Bt_1%2Ct_2%7D_%7Bb_1%2Cb_2%7D+%7C%7B%5Cpsi%7D%5Crangle+%5C%5C+%3D+%7B%5Cmathbb%7BI%7D%7D+%5Cotimes+%5Cfrac%7B1%7D%7Bn%5E2%7D%5Csum_%7Bt_1%2Ct_2%7D+B%5E%7Bt_2%2Ct_1%7D_%7Bb_2%2Cb_1%7D+%7C%7B%5Cpsi%7D%5Crangle+%5C%5C+%3D+%7B%5Cmathbb%7BI%7D%7D+%5Cotimes+%5Ctilde%7BB%7D%5E%7Bt_2%7D_%7Bb_2%7D+%5Ctilde%7BB%7D%5E%7Bt_1%7D_%7Bb_1%7D+%7C%7B%5Cpsi%7D%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathbb{I}} \otimes \tilde{B}^{t_1}_{b_1} \tilde{B}^{t_2}_{b_2} |{\psi}\rangle =  {\mathbb{I}} \otimes (\frac{1}{n}\sum_{l_1,b_1'} B^{t_1,l_1}_{b_1,b_1'}) (\frac{1}{n}\sum_{l_2,b_2'} B^{t_2,l_2}_{b_2,b_2'}) |{\psi}\rangle \\ = {\mathbb{I}} \otimes (\frac{1}{n}\sum_{t_2,b_1'} B^{t_1,t_2}_{b_1,b_1'}) (\frac{1}{n}\sum_{t_1,b_2'} B^{t_2,t_1}_{b_2,b_2'}) |{\psi}\rangle \\ = {\mathbb{I}} \otimes \frac{1}{n^2}\sum_{t_1,t_2} B^{t_1,t_2}_{b_1,b_2} |{\psi}\rangle \\ = {\mathbb{I}} \otimes \frac{1}{n^2}\sum_{t_1,t_2} B^{t_2,t_1}_{b_2,b_1} |{\psi}\rangle \\ = {\mathbb{I}} \otimes \tilde{B}^{t_2}_{b_2} \tilde{B}^{t_1}_{b_1} |{\psi}\rangle " class="latex" title="{\mathbb{I}} \otimes \tilde{B}^{t_1}_{b_1} \tilde{B}^{t_2}_{b_2} |{\psi}\rangle =  {\mathbb{I}} \otimes (\frac{1}{n}\sum_{l_1,b_1'} B^{t_1,l_1}_{b_1,b_1'}) (\frac{1}{n}\sum_{l_2,b_2'} B^{t_2,l_2}_{b_2,b_2'}) |{\psi}\rangle \\ = {\mathbb{I}} \otimes (\frac{1}{n}\sum_{t_2,b_1'} B^{t_1,t_2}_{b_1,b_1'}) (\frac{1}{n}\sum_{t_1,b_2'} B^{t_2,t_1}_{b_2,b_2'}) |{\psi}\rangle \\ = {\mathbb{I}} \otimes \frac{1}{n^2}\sum_{t_1,t_2} B^{t_1,t_2}_{b_1,b_2} |{\psi}\rangle \\ = {\mathbb{I}} \otimes \frac{1}{n^2}\sum_{t_1,t_2} B^{t_2,t_1}_{b_2,b_1} |{\psi}\rangle \\ = {\mathbb{I}} \otimes \tilde{B}^{t_2}_{b_2} \tilde{B}^{t_1}_{b_1} |{\psi}\rangle " />
+
+In the second line, we used (<a href="https://windowsontheory.org/feed/#eqrelation">9</a>) to relate the measurements. The third line follows by the orthogonality of <img src="https://s0.wp.com/latex.php?latex=%7B+B%5E%7Bt_1%2Ct_2%7D_%7Bb_1%2Cb_2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ B^{t_1,t_2}_{b_1,b_2}}" class="latex" title="{ B^{t_1,t_2}_{b_1,b_2}}" /> for different <img src="https://s0.wp.com/latex.php?latex=%7B+b_1%2Cb_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ b_1,b_2}" class="latex" title="{ b_1,b_2}" />. For the fourth equation, we simply swap <img src="https://s0.wp.com/latex.php?latex=%7B+t_1%2Ct_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ t_1,t_2}" class="latex" title="{ t_1,t_2}" /> since the questions are indistinguishable to Bob. Thus, we can see how the dummy variable comes into play. If we had assumed <img src="https://s0.wp.com/latex.php?latex=%7B+P%3D1-%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ P=1-\epsilon}" class="latex" title="{ P=1-\epsilon}" /> and kept track of approximations, we would find <a name="eqcommutation"></a>
+<p align="center"><a name="eqcommutation"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac%7B1%7D%7Bn%5E2%7D%5Csum_%7Bt_1%2Cb_1%7D%5Csum_%7Bt_2%2Cb_2%7D%5ClVert+%5Cmathbb%7BI%7D+%5Cotimes+%28%5Ctilde%7BB%7D%5E%7Bt_1%7D_%7Bb_1%7D+%5Ctilde%7BB%7D%5E%7Bt_2%7D_%7Bb_2%7D+-+%5Ctilde%7BB%7D%5E%7Bt_2%7D_%7Bb_2%7D+%5Ctilde%7BB%7D%5E%7Bt_1%7D_%7Bb_1%7D%29+%7C%5Cpsi%5Crangle+%5CrVert%5E2+%3D+O%28%5Cepsilon%29%5C%2C.++%5C+%5C+%5C+%5C+%5C+%2810%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \frac{1}{n^2}\sum_{t_1,b_1}\sum_{t_2,b_2}\lVert \mathbb{I} \otimes (\tilde{B}^{t_1}_{b_1} \tilde{B}^{t_2}_{b_2} - \tilde{B}^{t_2}_{b_2} \tilde{B}^{t_1}_{b_1}) |\psi\rangle \rVert^2 = O(\epsilon)\,.  \ \ \ \ \ (10)" class="latex" title="\displaystyle  \frac{1}{n^2}\sum_{t_1,b_1}\sum_{t_2,b_2}\lVert \mathbb{I} \otimes (\tilde{B}^{t_1}_{b_1} \tilde{B}^{t_2}_{b_2} - \tilde{B}^{t_2}_{b_2} \tilde{B}^{t_1}_{b_1}) |\psi\rangle \rVert^2 = O(\epsilon)\,.  \ \ \ \ \ (10)" /></a></p>
+<a name="eqcommutation">
+</a><a name="eqcommutation"></a> This approximate commutativity results in the hardness of approximation holding only to within inverse poly<img src="https://s0.wp.com/latex.php?latex=%7B+%28n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (n)}" class="latex" title="{ (n)}" /> factors.
+
+Now we are ready to transform Eq. <a href="https://windowsontheory.org/feed/#eqpB">7</a> to Eq. <a href="https://windowsontheory.org/feed/#eqpA">8</a> to conclude the proof.
+
+<img src="https://s0.wp.com/latex.php?latex=p%28a_1%2C%5Cldots%2Ca_n%29%3D%5ClVert+%7B%5Cmathbb%7BI%7D%7D+%5Cotimes+%5Ctilde%7BB%7D%5E1_%7Ba_1%7D+%5Cldots+%5Ctilde%7BB%7D%5En_%7Ba_n%7D+%7C%7B%5Cpsi%7D%5Crangle+%5CrVert%5E2+%5C%5C+%3D%5ClVert+%7B%5Cmathbb%7BI%7D%7D+%5Cotimes+%5Ctilde%7BB%7D%5E%7Bi_1%7D_%7Ba_%7Bi_1%7D%7D+%5Cldots+%5Ctilde%7BB%7D%5E%7Bi_k%7D_%7Ba_%7Bi_k%7D%7D+%7C%7B%5Cpsi%7D%5Crangle+%5CrVert%5E2+%5C%5C+%3D+%5ClVert+A%5Ej_%7Ba_%7Bi_1%7D%2C%5Cldots%2Ca_%7Bi_k%7D%7D+%5Cotimes+%7B%5Cmathbb%7BI%7D%7D+%7C%7B%5Cpsi%7D%5Crangle+%5CrVert%5E2+%5C%5C+%3Dp%28a_%7Bi_1%7D%2C%5Cldots%2Ca_%7Bi_k%7D%29%5C%2C.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="p(a_1,\ldots,a_n)=\lVert {\mathbb{I}} \otimes \tilde{B}^1_{a_1} \ldots \tilde{B}^n_{a_n} |{\psi}\rangle \rVert^2 \\ =\lVert {\mathbb{I}} \otimes \tilde{B}^{i_1}_{a_{i_1}} \ldots \tilde{B}^{i_k}_{a_{i_k}} |{\psi}\rangle \rVert^2 \\ = \lVert A^j_{a_{i_1},\ldots,a_{i_k}} \otimes {\mathbb{I}} |{\psi}\rangle \rVert^2 \\ =p(a_{i_1},\ldots,a_{i_k})\,. " class="latex" title="p(a_1,\ldots,a_n)=\lVert {\mathbb{I}} \otimes \tilde{B}^1_{a_1} \ldots \tilde{B}^n_{a_n} |{\psi}\rangle \rVert^2 \\ =\lVert {\mathbb{I}} \otimes \tilde{B}^{i_1}_{a_{i_1}} \ldots \tilde{B}^{i_k}_{a_{i_k}} |{\psi}\rangle \rVert^2 \\ = \lVert A^j_{a_{i_1},\ldots,a_{i_k}} \otimes {\mathbb{I}} |{\psi}\rangle \rVert^2 \\ =p(a_{i_1},\ldots,a_{i_k})\,. " />
+
+In the second line, we used (<a href="https://windowsontheory.org/feed/#eqcommutation">10</a>) to commute the measurement operators, along with their properties of orthogonality and summation to identity. For the third equality, we used (<a href="https://windowsontheory.org/feed/#eqrelation">9</a>) to relate Bob’s measurements to Alice’s, along with orthogonality of <img src="https://s0.wp.com/latex.php?latex=%7B+A%5Ej_%7Ba_%7Bi_1%2C%5Cldots%2Ci_k%7D%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A^j_{a_{i_1,\ldots,i_k}}}" class="latex" title="{ A^j_{a_{i_1,\ldots,i_k}}}" /> for different <img src="https://s0.wp.com/latex.php?latex=%7B+a_%7Bi_1%2C%5Cldots%2Ci_k%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ a_{i_1,\ldots,i_k}}" class="latex" title="{ a_{i_1,\ldots,i_k}}" />. 
+<div align="right">□</div>
+<h3> Constant-factor NP-hardness</h3>
+The weakness in the above two-player game carries over from the original three-player variant. Thus, to achieve constant-factor NP-hardness of approximation, we could start with a different multiplayer game. Vidick [11] establishes the soundness of the “plane-vs-point” low-degree test (checking that the restriction of a low-degree polynomial to a plane matches its value at some point) in the presence of shared entanglement. <em> Soundness </em>, in the eponymous probabilistically checkable proof (PCP) formulation of the PCP theorem, refers to the verifier accepting a wrong proof with some bounded probability; bounding with a constant maps to constant-factor hardness of approximation. Here, soundness comes from a strong bound on error accumulation, similar to our approximate commutativity, but relies on the players’ Hilbert space being decomposable into three parts (i.e., there being three players). The particular game is constructed by combining the low-degree test with the 3-SAT test (encoding satisfying assignments in a low-degree polynomial), which can be reduced to the three-player QUADEQ test (testing satisfiability of a system of quadratic equations in binary variables, which is NP-complete). By the strong soundness result, the entangled value is NP-hard to approximate to within constant factors. Natarajan et al. [7] show that soundness holds even for two players, using a semidefinite program. They then construct a two-player game in a way similar to what we demonstrated.
+<h3> Constant-factor QMA-hardness</h3>
+The above can be thought of as the games formulation of the classical PCP theorem holding under shared entanglement. A true quantum PCP theorem states that the entangled value of general games is QMA-hard to approximate to within constant factors. Natarajan et al. [8] establish such a theorem, but under randomized reductions. This requirement stems from the lack of a sufficiently strong QMA-hardness result for local Hamiltonians (the quantum analog of CSPs). The soundness of the two-player low-degree test above is one instrumental component in the proof.
+<h2>How much entanglement is needed?</h2>
+We now focus on the question of quantifying exactly how much entanglement is needed to play XOR games optimally. As we shall see, the answer depends on the size of the question sets posed to Alice &amp; Bob in the game. The previous bound given by Tsirelson [10] (see table below) is tight for certain families of games, but is not tight for other families of games (such as a generalization of the CHSH game). The reason for this discrepancy is closely tied in with the the properties of the representation of the Observables that form the Optimal Strategy (<img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cpsi%7D%5Crangle+%2C+%5C%7BA_%7Bi%7D%5C%7D_%7Bi+%5Cin+S%7D%2C+%5C%7BB_%7Bj%7D%5C%7D_%7Bj+%5Cin+T%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\psi}\rangle , \{A_{i}\}_{i \in S}, \{B_{j}\}_{j \in T}}" class="latex" title="{ |{\psi}\rangle , \{A_{i}\}_{i \in S}, \{B_{j}\}_{j \in T}}" />). Slofstra [9] shows that if the Observables constitute a Clifford Algebra (that is, the solutions are pair-wise anti-commutative), then the strategy is minimally entangled (uses the least number of entangled bits) iff the strategy is a unique solution to the SDP rounding problem. As a trivial corollary, if the SDP rounding problem does not have a unique solution (and a correspondingly unique strategy), then there exists a Non-Clifford optimal strategy that uses (atleast) <img src="https://s0.wp.com/latex.php?latex=%7B+%7CT%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |T|}" class="latex" title="{ |T|}" /> bits of entanglement less than the Clifford strategy. Slofstra further states that minimally entangled <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \epsilon}" class="latex" title="{ \epsilon}" />-optimal strategies may be constructed for XOR games where the optimal strategies have ‘stable’ representations. For the purposes of this post, we will analyze the exact result and merely state the approximate result.
+<h3> Main Results</h3>
+<h4><u>EXACT</u></h4>
+For the exact realm, the table below summarizes Slofstra and Tsirelson’s main results.
+<table border="1px">
+<tbody>
+<tr>
+<th>Person</th>
+<th> Strategy</th>
+<th> Bound(entangled bits)</th>
+</tr>
+<tr>
+<td> Slofstra</td>
+<td> (Possibly) Non-Clifford</td>
+<td> <img src="https://s0.wp.com/latex.php?latex=%7B+%5Clog_%7B2%7D%28N%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \log_{2}(N)}" class="latex" title="{ \log_{2}(N)}" /></td>
+</tr>
+<tr>
+<td> Tsirelson</td>
+<td>Clifford</td>
+<td><img src="https://s0.wp.com/latex.php?latex=%7B+%5Cleft+%5Clfloor%7B%5Cfrac%7Br%7D%7B2%7D%7D%5Cright+%5Crfloor%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \left \lfloor{\frac{r}{2}}\right \rfloor}" class="latex" title="{ \left \lfloor{\frac{r}{2}}\right \rfloor}" /></td>
+</tr>
+</tbody>
+</table>
+Here, <img src="https://s0.wp.com/latex.php?latex=%7B+r%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ r}" class="latex" title="{ r}" /> is the largest integer such that <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cbinom%7Br+%2B+1%7D%7B2%7D+%3C+%7CS%7C+%2B+%7CT%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \binom{r + 1}{2} &lt; |S| + |T|}" class="latex" title="{ \binom{r + 1}{2} &lt; |S| + |T|}" /> and corresponds to the maximum-rank of an extremal point in the quantum correlation matrix corresponding to an optimal strategy.
+<img src="https://s0.wp.com/latex.php?latex=%7B+N%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ N}" class="latex" title="{ N}" /> is the minimum dimension of the representations of the Operators (<img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7BB_%7Bj%7D%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{B_{j}\}}" class="latex" title="{ \{B_{j}\}}" />).
+<h4><u>APPROXIMATE</u></h4>
+In the approximate realm, the minimum entanglement dimension of the representation of the Operators from an <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \epsilon}" class="latex" title="{ \epsilon}" />-Optimal Strategy is: min(<img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathcal%7BO%7D%28%5Cepsilon%5E%7B%5Cfrac%7B-1%7D%7B12%7D%7D%29%2C+2%5E%7B%5Cleft+%5Clfloor%7B%5Cfrac%7Br%7D%7B2%7D%7D%5Cright+%5Crfloor%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathcal{O}(\epsilon^{\frac{-1}{12}}), 2^{\left \lfloor{\frac{r}{2}}\right \rfloor}}" class="latex" title="{ \mathcal{O}(\epsilon^{\frac{-1}{12}}), 2^{\left \lfloor{\frac{r}{2}}\right \rfloor}}" />).
+
+As we shall see, Slofstra’s theorem allows us to recover Tsirelson’s bound easily by using a fact from Representation Theory about the irreducible representations of Clifford Algebras, but stands as a more general lower bound for solutions that aren’t Clifford.
+<h3> Marginals and Solution Algebras</h3>
+We’ll begin by introducing 3 key ideas:
+i) Degeneracy <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cleftrightarrow%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \leftrightarrow}" class="latex" title="{ \leftrightarrow}" /> Non-Degeneracy
+ii) Existence of Marginals
+iii) Solution Algebra
+
+Once these ideas are defined and their notions made clear, we will be in a position to state the main result and sketch a proof for it.
+<h4>Definition (Marginal Strategy)</h4>
+<em> Given an Optimal Quantum Strategy (<img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cpsi%7D%5Crangle+%2C+%5C%7BA_%7Bi%7D%5C%7D_%7Bi+%5Cin+S%7D%2C+%5C%7BB_%7Bj%7D%5C%7D_%7Bj+%5Cin+T%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\psi}\rangle , \{A_{i}\}_{i \in S}, \{B_{j}\}_{j \in T}}" class="latex" title="{ |{\psi}\rangle , \{A_{i}\}_{i \in S}, \{B_{j}\}_{j \in T}}" />), a marginal constitutes <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7BB_%7Bj%7D%5C%7D_%7Bj+%5Cin+T%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{B_{j}\}_{j \in T}}" class="latex" title="{ \{B_{j}\}_{j \in T}}" />, and the partial trace of <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cpsi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \psi}" class="latex" title="{ \psi}" /> with respect to <img src="https://s0.wp.com/latex.php?latex=%7B+H_%7BA%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ H_{A}}" class="latex" title="{ H_{A}}" /> (<img src="https://s0.wp.com/latex.php?latex=%7B+%5Crho_%7BB%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \rho_{B}}" class="latex" title="{ \rho_{B}}" />). </em>
+
+ It is also possible to dualize the definition for obtaining <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7BA_%7Bi%7D%5C%7D_%7Bi+%5Cin+S%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{A_{i}\}_{i \in S}}" class="latex" title="{ \{A_{i}\}_{i \in S}}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+%5Crho_%7BA%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \rho_{A}}" class="latex" title="{ \rho_{A}}" />.
+We now define the notion of degeneracy, which is critical when proving the main theorem. The main point to drive home is that a degenerate optimal quantum strategy can be reduced to a unique, non-degenerate optimal quantum strategy.
+<h4>Definition (Degenerate Quantum Strategy)</h4>
+<em> A quantum strategy (<img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cpsi%7D%5Crangle+%2C+%5C%7BA_%7Bi%7D%5C%7D_%7Bi+%5Cin+S%7D%2C+%5C%7BB_%7Bj%7D%5C%7D_%7Bj+%5Cin+T%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\psi}\rangle , \{A_{i}\}_{i \in S}, \{B_{j}\}_{j \in T}}" class="latex" title="{ |{\psi}\rangle , \{A_{i}\}_{i \in S}, \{B_{j}\}_{j \in T}}" />) is said to be degenerate if <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cexists+%28P+%5Cin+H_A%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \exists (P \in H_A)}" class="latex" title="{ \exists (P \in H_A)}" />, <img src="https://s0.wp.com/latex.php?latex=%7B+%28Q+%5Cin+H_B%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (Q \in H_B)}" class="latex" title="{ (Q \in H_B)}" /> such that:
+i) <img src="https://s0.wp.com/latex.php?latex=%7B+P%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ P}" class="latex" title="{ P}" /> commutes with all <img src="https://s0.wp.com/latex.php?latex=%7B+A_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A_i}" class="latex" title="{ A_i}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+%28P+%5Cotimes+%7B%5Cmathbb%7BI%7D%7D%29+%7C%7B%5Cpsi%7D%5Crangle+%3D+%7C%7B%5Cpsi%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (P \otimes {\mathbb{I}}) |{\psi}\rangle = |{\psi}\rangle}" class="latex" title="{ (P \otimes {\mathbb{I}}) |{\psi}\rangle = |{\psi}\rangle}" />
+ii) <img src="https://s0.wp.com/latex.php?latex=%7B+Q%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ Q}" class="latex" title="{ Q}" /> commutes with all <img src="https://s0.wp.com/latex.php?latex=%7B+B_j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ B_j}" class="latex" title="{ B_j}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+%28%7B%5Cmathbb%7BI%7D%7D+%5Cotimes+Q%29+%7C%7B%5Cpsi%7D%5Crangle+%3D+%7C%7B%5Cpsi%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ ({\mathbb{I}} \otimes Q) |{\psi}\rangle = |{\psi}\rangle}" class="latex" title="{ ({\mathbb{I}} \otimes Q) |{\psi}\rangle = |{\psi}\rangle}" /> </em>
+
+ Since we can efficiently construct for any degenerate Optimal Quantum Strategy a unique, non-degenerate Optimal Quantum Strategy, we will now assume WLOG that every Optimal Quantum Strategy is non-degenerate (and unique).
+
+We now define the (unique) existence of marginal biases, which correspond to constants for the rows of the quantum correlation matrix (which is a generalization of the classical pay-off). An equivalent statement can be made for columns (<img src="https://s0.wp.com/latex.php?latex=%7B+d_%7Bj%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ d_{j}}" class="latex" title="{ d_{j}}" />) by dualizing the existence of row marginals. These constants can be thought of as representing the (expected) optimum-payoff possible for a set of operator choices by one player, given that the other player’s choice is fixed. Intuitively, this can be seen as “collapsing” the quantum correlation matrix into a column, by summing over the rows (or collapsing into a row, by summing over the columns).
+<br /><b>Lemma 12 (Existence of Marginals)</b> <em> For all <img src="https://s0.wp.com/latex.php?latex=%7Bm+%5Ctimes+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{m \times n}" class="latex" title="{m \times n}" /> XOR games G, <img src="https://s0.wp.com/latex.php?latex=%7B%5Cexists+%5C%7Bc_%7Bi%7D+%5Cgeq+0+%5Chspace%7B1mm%7D+%7C+%5Chspace%7B1mm%7D+i+%5Cin+%7CS%7C%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\exists \{c_{i} \geq 0 \hspace{1mm} | \hspace{1mm} i \in |S|\}}" class="latex" title="{\exists \{c_{i} \geq 0 \hspace{1mm} | \hspace{1mm} i \in |S|\}}" />, such that, if <img src="https://s0.wp.com/latex.php?latex=%7B%5C%7Bu_%7Bi%7D%5C%7D_%7Bi+%5Cin+%7CS%7C%7D%2C+%5C%7Bv_%7Bj%7D%5C%7D_%7Bj+%5Cin+%7CT%7C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\{u_{i}\}_{i \in |S|}, \{v_{j}\}_{j \in |T|}}" class="latex" title="{\{u_{i}\}_{i \in |S|}, \{v_{j}\}_{j \in |T|}}" /> form an <img src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\epsilon}" class="latex" title="{\epsilon}" />-optimal vector strategy where <img src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon+%5Cleq+%5Cfrac%7B1%7D%7B4%28m%2Bn%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\epsilon \leq \frac{1}{4(m+n)}}" class="latex" title="{\epsilon \leq \frac{1}{4(m+n)}}" />,
+<a name="eqmarginale"></a></em>
+<p align="center"><em><a name="eqmarginale"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5C%7C%5Csum_%7Bj%5Cin%7CT%7C%7DG_%7Bij%7Dv_%7Bj%7D+-+c_%7Bi%7Du_%7Bi%7D%5C%7C+%5Cleq+%5Csqrt%7B10%7D%28m+%2B+n%29%5E%7B%5Cfrac%7B1%7D%7B4%7D%7D%5Cepsilon%5E%7B%5Cfrac%7B1%7D%7B4%7D%7D%2C+%5Cforall+i++%5C+%5C+%5C+%5C+%5C+%2811%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \|\sum_{j\in|T|}G_{ij}v_{j} - c_{i}u_{i}\| \leq \sqrt{10}(m + n)^{\frac{1}{4}}\epsilon^{\frac{1}{4}}, \forall i  \ \ \ \ \ (11)" class="latex" title="\displaystyle  \|\sum_{j\in|T|}G_{ij}v_{j} - c_{i}u_{i}\| \leq \sqrt{10}(m + n)^{\frac{1}{4}}\epsilon^{\frac{1}{4}}, \forall i  \ \ \ \ \ (11)" /></a></em></p>
+<em><a name="eqmarginale">
+</a></em><em><a name="eqmarginale"></a> <a name="lemma"></a> </em>
+If <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cepsilon+%3D+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \epsilon = 0}" class="latex" title="{ \epsilon = 0}" /> and our strategy is perfectly optimal, we recover an exact estimation of the marginal biases: <a name="eqmarginal"></a>
+<p align="center"><a name="eqmarginal"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_%7Bj%5Cin%7CT%7C%7DG_%7Bij%7Dv_%7Bj%7D+%3D+c_%7Bi%7Du_%7Bi%7D%2C+%5Cforall+i++%5C+%5C+%5C+%5C+%5C+%2812%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \sum_{j\in|T|}G_{ij}v_{j} = c_{i}u_{i}, \forall i  \ \ \ \ \ (12)" class="latex" title="\displaystyle  \sum_{j\in|T|}G_{ij}v_{j} = c_{i}u_{i}, \forall i  \ \ \ \ \ (12)" /></a></p>
+<a name="eqmarginal">
+</a><a name="eqmarginal"></a> The proof for the above lemma provided by Slofstra relies on using techniques to analyze the structure of the SDP program that pertains to quantum marginals. In particular, conducting trace analysis on SDP matrices that correspond to using the game matrix as off-diagonal elements leads us to the construction of the desired marginal biases.
+It is also critical to note that a dual statement allows us to recover the column biases <img src="https://s0.wp.com/latex.php?latex=%7B+d_%7Bj%7D+%5Cgeq+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ d_{j} \geq 0}" class="latex" title="{ d_{j} \geq 0}" />: <a name="eqmarginalc"></a>
+<p align="center"><a name="eqmarginalc"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_%7Bi%5Cin%5B%7CS%7C%5D%7DG_%7Bij%7Du_%7Bi%7D+%3D+d_%7Bj%7Dv_%7Bj%7D%2C+%5Cforall+j++%5C+%5C+%5C+%5C+%5C+%2813%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \sum_{i\in[|S|]}G_{ij}u_{i} = d_{j}v_{j}, \forall j  \ \ \ \ \ (13)" class="latex" title="\displaystyle  \sum_{i\in[|S|]}G_{ij}u_{i} = d_{j}v_{j}, \forall j  \ \ \ \ \ (13)" /></a></p>
+<a name="eqmarginalc">
+</a><a name="eqmarginalc"></a> We now move on to defining the notion of a solution algebra.
+<br />Definition 13 (Solution Algebra) <em> A solution algebra <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BA%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathcal{A}}" class="latex" title="{\mathcal{A}}" /> consists of self-adjoint (Hermitian) operators <img src="https://s0.wp.com/latex.php?latex=%7BX_%7Bj%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{X_{j}}" class="latex" title="{X_{j}}" /> that satisfy the following predicates:  <a name="eqhermit"></a></em>
+<p align="center"><em><a name="eqhermit"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++X_%7Bj%7D%5E%7B2%7D+%3D+%5Cmathbb%7BI%7D%2C+%5Cforall+1+%5Cleq+j+%5Cleq+n++%5C+%5C+%5C+%5C+%5C+%2814%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  X_{j}^{2} = \mathbb{I}, \forall 1 \leq j \leq n  \ \ \ \ \ (14)" class="latex" title="\displaystyle  X_{j}^{2} = \mathbb{I}, \forall 1 \leq j \leq n  \ \ \ \ \ (14)" /></a></em></p>
+<em><a name="eqhermit">
+</a><a name="eqhermit"></a> <a name="eqbiasespay"></a>
+</em>
+<p align="center"><em><a name="eqbiasespay"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%28%5Csum_%7Bj%5Cin%5B%7CT%7C%5D%7DG_%7Bij%7DX_%7Bj%7D%29%5E%7B2%7D+%3D+%28c_%7Bi%7D%29%5E%7B2%7D%5Ccdot%5Cmathbb%7BI%7D%2C+%5Cforall+i++%5C+%5C+%5C+%5C+%5C+%2815%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  (\sum_{j\in[|T|]}G_{ij}X_{j})^{2} = (c_{i})^{2}\cdot\mathbb{I}, \forall i  \ \ \ \ \ (15)" class="latex" title="\displaystyle  (\sum_{j\in[|T|]}G_{ij}X_{j})^{2} = (c_{i})^{2}\cdot\mathbb{I}, \forall i  \ \ \ \ \ (15)" /></a></em></p>
+<em>
+</em><em><a name="eqbiasespay">
+</a></em><em><a name="eqbiasespay"></a> </em>
+The definition above merely enforces the property that our unknown marginal operators be Hermitian <a href="https://windowsontheory.org/feed/#eqhermit">(14)</a> and that they respect the optimal marginal biases (or payoffs) <a href="https://windowsontheory.org/feed/#eqbiasespay">(15)</a> we saw in <a href="https://windowsontheory.org/feed/#eqmarginale">(11)</a>, so that they correspond to being constructed from an optimal vector strategy. These unknown operators will be mapped to operators that are the marginal strategy corresponding to the optimal quantum strategy. This is at the heart of the main theorem we will now state:
+<b>Theorem 14 (Slofstra, 2010)</b> <em> Given a <img src="https://s0.wp.com/latex.php?latex=%7Bm+%5Ctimes+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{m \times n}" class="latex" title="{m \times n}" /> XOR game G (with no zero rows or columns) and a solution algebra <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BA%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathcal{A}}" class="latex" title="{\mathcal{A}}" />, a collection of Linear Operators <img src="https://s0.wp.com/latex.php?latex=%7B%5C%7BB_%7Bj%7D%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\{B_{j}\}}" class="latex" title="{\{B_{j}\}}" /> and density matrix <img src="https://s0.wp.com/latex.php?latex=%7B%5Crho%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\rho}" class="latex" title="{\rho}" /> are the marginal of an optimal strategy iff the map <img src="https://s0.wp.com/latex.php?latex=%7BX_%7Bj%7D+%5Crightarrow+B_%7Bj%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{X_{j} \rightarrow B_{j}}" class="latex" title="{X_{j} \rightarrow B_{j}}" /> induces a density-matrix representation of <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BA%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathcal{A}}" class="latex" title="{\mathcal{A}}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B%5Crho%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\rho}" class="latex" title="{\rho}" /> commutes with <img src="https://s0.wp.com/latex.php?latex=%7Bim%28%5Cmathcal%7BA%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{im(\mathcal{A})}" class="latex" title="{im(\mathcal{A})}" />. <a name="th20"></a> </em>
+Put simply, the theorem states that our unknown self-adjoint operators map to an optimal marginal strategy iff the density matrix (traced from the joint Hilbert-Space) commutes with all the mapped operators (<img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7BB_%7Bj%7D%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{B_{j}\}}" class="latex" title="{ \{B_{j}\}}" />). The result we desire on the lower bound for the number of entangled bits, given a mapping from these indeterminate operators to the marginal of an optimal strategy, comes from a corollary to <a href="https://windowsontheory.org/feed/#th20">(14)</a>.
+<br />Corollary 15 <em> Given a <img src="https://s0.wp.com/latex.php?latex=%7Bm+%5Ctimes+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{m \times n}" class="latex" title="{m \times n}" /> XOR game G (with no zero rows or columns) and a solution algebra <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BA%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathcal{A}}" class="latex" title="{\mathcal{A}}" /> with minimum dimension <img src="https://s0.wp.com/latex.php?latex=%7BN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{N}" class="latex" title="{N}" /> among non-zero representations, the strategy for minimum entanglement uses <img src="https://s0.wp.com/latex.php?latex=%7B%5Clog_%7B2%7D%28N%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\log_{2}(N)}" class="latex" title="{\log_{2}(N)}" /> entangled bits. <a name="co21"></a> </em>
+The proof for this corollary follows from the eigenspace decomposition of the joint Hilbert Space <img src="https://s0.wp.com/latex.php?latex=%7B+H%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ H}" class="latex" title="{ H}" /> in terms of <img src="https://s0.wp.com/latex.php?latex=%7B+%5Crho%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \rho}" class="latex" title="{ \rho}" />, which is preserved by the action of <img src="https://s0.wp.com/latex.php?latex=%7B+im%28%5Cmathcal%7BA%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ im(\mathcal{A})}" class="latex" title="{ im(\mathcal{A})}" />. As a result, each eigenspace decomposes into a finite sum of irreducible representations of <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathcal%7BA%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathcal{A}}" class="latex" title="{ \mathcal{A}}" />. The minimum entanglement is realized when there is exactly one invariant subspace (with one irreducible representation). The entanglement used by such a representation is <img src="https://s0.wp.com/latex.php?latex=%7B+%5Clog_%7B2%7D%28%5Ctext%7Bdim%7D%5C%2CH%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \log_{2}(\text{dim}\,H)}" class="latex" title="{ \log_{2}(\text{dim}\,H)}" />.
+<h3> Proof of Theorem 20</h3>
+The rest of the section is dedicated to sketching a brief (but formal) proof for Theorem <a href="https://windowsontheory.org/feed/#th20">(14)</a>, and then using a simple fact about the representations of a Clifford Algebra to show how Slofstra’s result subsumes Tsirelson’s bound.
+
+For this section, <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cpsi%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\psi}\rangle}" class="latex" title="{ |{\psi}\rangle}" /> refers to an arbitrary state in <img src="https://s0.wp.com/latex.php?latex=%7B+H+%3D+H_%7BA%7D+%5Cotimes+H_%7BB%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ H = H_{A} \otimes H_{B}}" class="latex" title="{ H = H_{A} \otimes H_{B}}" /> (the joint Hilbert space). We can write <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cpsi%7D%5Crangle+%3D+%5Csum_%7Bi%7D+%7C%7Bi%7D%5Crangle+%5Clambda+%7C%7Bi%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\psi}\rangle = \sum_{i} |{i}\rangle \lambda |{i}\rangle}" class="latex" title="{ |{\psi}\rangle = \sum_{i} |{i}\rangle \lambda |{i}\rangle}" /> over some basis <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7B%7Bi%7D%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{{i}\}}" class="latex" title="{ \{{i}\}}" />, where <img src="https://s0.wp.com/latex.php?latex=%7B+%5Clambda%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \lambda}" class="latex" title="{ \lambda}" /> is a linear map. Then, the partial trace of <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cpsi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \psi}" class="latex" title="{ \psi}" /> over <img src="https://s0.wp.com/latex.php?latex=%7B+H_%7BA%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ H_{A}}" class="latex" title="{ H_{A}}" /> is given by <img src="https://s0.wp.com/latex.php?latex=%7B+%5Crho+%3D+%5Clambda%5Clambda%5E%7B%2A%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \rho = \lambda\lambda^{*}}" class="latex" title="{ \rho = \lambda\lambda^{*}}" />.
+Let <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathcal%7BB%7D_%7BA%7D%2C+%5Cmathcal%7BB%7D_%7BB%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathcal{B}_{A}, \mathcal{B}_{B}}" class="latex" title="{ \mathcal{B}_{A}, \mathcal{B}_{B}}" /> denote the algebra generated by <img src="https://s0.wp.com/latex.php?latex=%7B+A_%7B1%7D%2C..%2CA_%7Bm%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A_{1},..,A_{m}}" class="latex" title="{ A_{1},..,A_{m}}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+B_%7B1%7D%2C..%2CB_%7Bn%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ B_{1},..,B_{n}}" class="latex" title="{ B_{1},..,B_{n}}" />. Here, the generating elements are the observables of an optimal quantum strategy.
+
+To arrive at a proof for the theorem, we will rely on 2 additional lemmas which we will not prove but state.
+<br />Lemma 16 <em> Given Hermitian operators <img src="https://s0.wp.com/latex.php?latex=%7BA%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{A}" class="latex" title="{A}" />, <img src="https://s0.wp.com/latex.php?latex=%7BB+%5Cin+H_%7BA%7D%2C+H_%7BB%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{B \in H_{A}, H_{B}}" class="latex" title="{B \in H_{A}, H_{B}}" />,
+<a name="eqfrob"></a></em>
+<p align="center"><em><a name="eqfrob"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5C%7C%28A+%5Cotimes+%5Cmathbb%7BI%7D+-+%5Cmathbb%7BI%7D+%5Cotimes+B%29%7C%5Cpsi%5Crangle%5C%7C+%5Cleq+%5C%7C%5Clambda%5Coverline%7BA%7D+-+B%5Clambda%5C%7C_%7BF%7D++%5C+%5C+%5C+%5C+%5C+%2816%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \|(A \otimes \mathbb{I} - \mathbb{I} \otimes B)|\psi\rangle\| \leq \|\lambda\overline{A} - B\lambda\|_{F}  \ \ \ \ \ (16)" class="latex" title="\displaystyle  \|(A \otimes \mathbb{I} - \mathbb{I} \otimes B)|\psi\rangle\| \leq \|\lambda\overline{A} - B\lambda\|_{F}  \ \ \ \ \ (16)" /></a></em></p>
+<em><a name="eqfrob">
+</a><a name="eqfrob"></a> This allows us to conclude that,
+<a name="eqcomm"></a>
+</em>
+<p align="center"><em><a name="eqcomm"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5C%7C%28A+%5Cotimes+%5Cmathbb%7BI%7D+-+%5Cmathbb%7BI%7D+%5Cotimes+B%29%7C%5Cpsi%5Crangle%5C%7C+%5Cleq+%5Cepsilon+%5Cimplies+%5C%7C%5Crho%28B%29+-+B%5Crho%5C%7C_%7BF%7D+%5Cleq+2%5Cepsilon++%5C+%5C+%5C+%5C+%5C+%2817%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \|(A \otimes \mathbb{I} - \mathbb{I} \otimes B)|\psi\rangle\| \leq \epsilon \implies \|\rho(B) - B\rho\|_{F} \leq 2\epsilon  \ \ \ \ \ (17)" class="latex" title="\displaystyle  \|(A \otimes \mathbb{I} - \mathbb{I} \otimes B)|\psi\rangle\| \leq \epsilon \implies \|\rho(B) - B\rho\|_{F} \leq 2\epsilon  \ \ \ \ \ (17)" /></a></em></p>
+<em>
+</em><em><a name="eqcomm">
+</a></em><em><a name="eqcomm"></a> <a name="lecomm"></a> </em>
+<b>Lemma 17</b> <em> The optimal strategy in question is non-degenerate iff <a name="eqcl1"></a></em>
+<p align="center"><em><a name="eqcl1"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++closure%28%5Cmathcal%7BB%7D_%7BB%7D%5Clambda+H_%7BA%7D%29+%3D+closure%28%5Cmathcal%7BB%7D_%7BA%7D%5Clambda%5E%7B%2A%7DH_%7BB%7D%29.+%5C%5C++%5C+%5C+%5C+%5C+%5C+%2818%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  closure(\mathcal{B}_{B}\lambda H_{A}) = closure(\mathcal{B}_{A}\lambda^{*}H_{B}). \\  \ \ \ \ \ (18)" class="latex" title="\displaystyle  closure(\mathcal{B}_{B}\lambda H_{A}) = closure(\mathcal{B}_{A}\lambda^{*}H_{B}). \\  \ \ \ \ \ (18)" /></a></em></p>
+<em><a name="eqcl1">
+</a><a name="eqcl1"></a> As a special case:
+<a name="eqcl2"></a>
+</em>
+<p align="center"><em><a name="eqcl2"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++closure%28%5Cmathcal%7BB%7D_%7BB%7D%5Clambda+H_%7BA%7D%29+%3D+H_%7BB%7D+%5Cleftrightarrow+closure%28%5Crho+H_%7BB%7D%29+%3D+H_%7BB%7D++%5C+%5C+%5C+%5C+%5C+%2819%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  closure(\mathcal{B}_{B}\lambda H_{A}) = H_{B} \leftrightarrow closure(\rho H_{B}) = H_{B}  \ \ \ \ \ (19)" class="latex" title="\displaystyle  closure(\mathcal{B}_{B}\lambda H_{A}) = H_{B} \leftrightarrow closure(\rho H_{B}) = H_{B}  \ \ \ \ \ (19)" /></a></em></p>
+<em>
+</em><em><a name="eqcl2">
+</a></em><em><a name="eqcl2"></a> <a name="lecl"></a> </em>
+<b> Forward direction </b>:
+We use the first lemma to prove commutativity of <img src="https://s0.wp.com/latex.php?latex=%5Crho&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\rho" class="latex" title="\rho" /> with all <img src="https://s0.wp.com/latex.php?latex=B_%7Bj%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="B_{j}" class="latex" title="B_{j}" />, and we use the second lemma to show that the closure of <img src="https://s0.wp.com/latex.php?latex=%5Crho&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\rho" class="latex" title="\rho" /> is <img src="https://s0.wp.com/latex.php?latex=%7B+H_%7BB%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ H_{B}}" class="latex" title="{ H_{B}}" />.
+We first show the forward direction:
+Suppose we are given an optimal quantum strategy (<img src="https://s0.wp.com/latex.php?latex=%7C%7B%5Cpsi%7D%5Crangle+%2C+%5C%7BA_%7Bi%7D%5C%7D_%7Bi+%5Cin+S%7D%2C+%5C%7BB_%7Bj%7D%5C%7D_%7Bj+%5Cin+T%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="|{\psi}\rangle , \{A_{i}\}_{i \in S}, \{B_{j}\}_{j \in T}" class="latex" title="|{\psi}\rangle , \{A_{i}\}_{i \in S}, \{B_{j}\}_{j \in T}" />) for a game <img src="https://s0.wp.com/latex.php?latex=%7B+G%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ G}" class="latex" title="{ G}" />. Then, we fix our optimal vector strategy as:
+<a name="eqrs"></a>
+<p align="center"><b><a name="eqrs"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++u_%7Bi%7D+%3D+%28A_%7Bi%7D+%5Cotimes+%5Cmathbb%7BI%7D%29%7C%5Cpsi%5Crangle++%5C+%5C+%5C+%5C+%5C+%2820%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  u_{i} = (A_{i} \otimes \mathbb{I})|\psi\rangle  \ \ \ \ \ (20)" class="latex" title="\displaystyle  u_{i} = (A_{i} \otimes \mathbb{I})|\psi\rangle  \ \ \ \ \ (20)" /></a></b></p>
+<b><a name="eqrs">
+</a><a name="eqrs"></a> <a name="eqcs"></a>
+</b>
+<p align="center"><b><a name="eqcs"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++v_%7Bj%7D+%3D+%28%5Cmathbb%7BI%7D+%5Cotimes+B_%7Bj%7D%29%7C%5Cpsi%5Crangle++%5C+%5C+%5C+%5C+%5C+%2821%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  v_{j} = (\mathbb{I} \otimes B_{j})|\psi\rangle  \ \ \ \ \ (21)" class="latex" title="\displaystyle  v_{j} = (\mathbb{I} \otimes B_{j})|\psi\rangle  \ \ \ \ \ (21)" /></a></b></p>
+<a name="eqcs">
+</a><a name="eqcs"></a>
+
+We can now use Equations <a href="https://windowsontheory.org/feed/#eqmarginale">(11)</a> and <a href="https://windowsontheory.org/feed/#eqmarginalc">(13)</a> to establish our optimal marginal biases to write a relationship between them and <img src="https://s0.wp.com/latex.php?latex=%7B+%7C%7B%5Cpsi%7D%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ |{\psi}\rangle}" class="latex" title="{ |{\psi}\rangle}" /> , and apply Lemma <a href="https://windowsontheory.org/feed/#lecomm">(16)</a> to show commutativity and Lemma <a href="https://windowsontheory.org/feed/#lecl">(17)</a> to show that <img src="https://s0.wp.com/latex.php?latex=%7B+im%28%5Cmathcal%7BA%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ im(\mathcal{A})}" class="latex" title="{ im(\mathcal{A})}" /> = cyclic(<img src="https://s0.wp.com/latex.php?latex=%7B+B_%7Bj%7D%2C+%5Crho%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ B_{j}, \rho}" class="latex" title="{ B_{j}, \rho}" />).
+Using <a href="https://windowsontheory.org/feed/#eqmarginalc">(13)</a> with <a href="https://windowsontheory.org/feed/#eqrs">(20)</a> and <a href="https://windowsontheory.org/feed/#eqcs">(21)</a>, we have:
+<a name="eqqs1"></a>
+<p align="center"><a name="eqqs1"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++d_%7Bj%7D%28%5Cmathbb%7BI%7D%5Cotimes+B_%7Bj%7D%29%7C%5Cpsi%5Crangle+%3D+%5Csum_%7Bi%7DG_%7Bij%7D%28A_%7Bi%7D%5Cotimes%5Cmathbb%7BI%7D%29%7C%5Cpsi%5Crangle++%5C+%5C+%5C+%5C+%5C+%2822%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  d_{j}(\mathbb{I}\otimes B_{j})|\psi\rangle = \sum_{i}G_{ij}(A_{i}\otimes\mathbb{I})|\psi\rangle  \ \ \ \ \ (22)" class="latex" title="\displaystyle  d_{j}(\mathbb{I}\otimes B_{j})|\psi\rangle = \sum_{i}G_{ij}(A_{i}\otimes\mathbb{I})|\psi\rangle  \ \ \ \ \ (22)" /></a></p>
+<a name="eqqs1">
+</a><a name="eqqs1"></a> We can now use <a href="https://windowsontheory.org/feed/#eqcomm">(17)</a> with <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cepsilon+%3D+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \epsilon = 0}" class="latex" title="{ \epsilon = 0}" /> on <a href="https://windowsontheory.org/feed/#eqqs1">(22)</a> to see that <img src="https://s0.wp.com/latex.php?latex=%7B+%5Crho%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \rho}" class="latex" title="{ \rho}" /> commutes with every <img src="https://s0.wp.com/latex.php?latex=%7B+B_%7Bj%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ B_{j}}" class="latex" title="{ B_{j}}" />.
+Additionally, as the terms in <a href="https://windowsontheory.org/feed/#eqqs1">(22)</a> constitute linear combinations of <img src="https://s0.wp.com/latex.php?latex=%7B+A_%7Bi%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ A_{i}}" class="latex" title="{ A_{i}}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+B_%7Bj%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ B_{j}}" class="latex" title="{ B_{j}}" />, we can compute the closure of their actions on <img src="https://s0.wp.com/latex.php?latex=%7B+%5Clambda+H_%7BA%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \lambda H_{A}}" class="latex" title="{ \lambda H_{A}}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B+%5Clambda%5E%7B%2A%7D+H_%7BB%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \lambda^{*} H_{B}}" class="latex" title="{ \lambda^{*} H_{B}}" />, which will be equivalent. Therefore, <img src="https://s0.wp.com/latex.php?latex=%7B+im%28%5Crho%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ im(\rho)}" class="latex" title="{ im(\rho)}" /> = <img src="https://s0.wp.com/latex.php?latex=%7B+H_%7BB%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ H_{B}}" class="latex" title="{ H_{B}}" />, which follows from the special case of <a href="https://windowsontheory.org/feed/#eqcl2">(19)</a>.
+For the dual case, we substitute <a href="https://windowsontheory.org/feed/#eqrs">(20)</a> and <a href="https://windowsontheory.org/feed/#eqcs">(21)</a> into <a href="https://windowsontheory.org/feed/#eqmarginal">(12)</a>:
+<a name="eqdn"></a>
+<p align="center"><a name="eqdn"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++c_%7Bi%7D%28A_%7Bi%7D%5Cotimes%5Cmathbb%7BI%7D%29%7C%5Cpsi%5Crangle+%3D+%5Csum_%7Bj%7DG_%7Bij%7D%28%5Cmathbb%7BI%7D%5Cotimes+B_%7Bj%7D%29%7C%5Cpsi%5Crangle&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\displaystyle  c_{i}(A_{i}\otimes\mathbb{I})|\psi\rangle = \sum_{j}G_{ij}(\mathbb{I}\otimes B_{j})|\psi\rangle" class="latex" title="\displaystyle  c_{i}(A_{i}\otimes\mathbb{I})|\psi\rangle = \sum_{j}G_{ij}(\mathbb{I}\otimes B_{j})|\psi\rangle" /> </a></p>
+<a name="eqdn"></a>
+
+<a name="eqdn">
+</a><a name="eqdn"></a><a name="eqdn"></a> On taking the norm of the above on both sides and using a little algebra, we finally obtain the fact that <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7BB_%7Bj%7D%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{B_{j}\}}" class="latex" title="{ \{B_{j}\}}" /> satisfy predicate <a href="https://windowsontheory.org/feed/#eqbiasespay">(15)</a> making them the representations of <img src="https://s0.wp.com/latex.php?latex=%7B+X_%7Bj%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ X_{j}}" class="latex" title="{ X_{j}}" />:
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+%28%5Csum_%7Bj%7DG_%7Bij%7DB_%7Bj%7D%29%5E%7B2%7D+%3D+c_%7Bi%7D%5E%7B2%7D%7B%5Cmathbb%7BI%7D%7D+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ (\sum_{j}G_{ij}B_{j})^{2} = c_{i}^{2}{\mathbb{I}} }" class="latex" title="{ (\sum_{j}G_{ij}B_{j})^{2} = c_{i}^{2}{\mathbb{I}} }" />
+
+This shows that the map from <img src="https://s0.wp.com/latex.php?latex=%7B+X_%7Bj%7D+%5Crightarrow+B_%7Bj%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ X_{j} \rightarrow B_{j}}" class="latex" title="{ X_{j} \rightarrow B_{j}}" /> computes a density matrix representation of <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathcal%7BA%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathcal{A}}" class="latex" title="{ \mathcal{A}}" />, where <img src="https://s0.wp.com/latex.php?latex=%7B+%5Crho%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \rho}" class="latex" title="{ \rho}" /> commutes with all <img src="https://s0.wp.com/latex.php?latex=%7B+B_%7Bj%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ B_{j}}" class="latex" title="{ B_{j}}" />.
+
+<br /><b> Backward Direction </b>:
+The proof for the backward direction is much less involved:
+If we knew that <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7BB_%7Bj%7D%5C%7D%2C+%5Crho%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{B_{j}\}, \rho}" class="latex" title="{ \{B_{j}\}, \rho}" /> constituted the cyclic representation of <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cmathcal%7BA%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \mathcal{A}}" class="latex" title="{ \mathcal{A}}" /> with commutativity (with <img src="https://s0.wp.com/latex.php?latex=%7B+B_%7Bj%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ B_{j}}" class="latex" title="{ B_{j}}" />), then we can use Lemma <a href="https://windowsontheory.org/feed/#eqcl2">(19)</a> to conclude that the image of <img src="https://s0.wp.com/latex.php?latex=%7B+%5Crho%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \rho}" class="latex" title="{ \rho}" /> on <img src="https://s0.wp.com/latex.php?latex=%7B+H%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ H}" class="latex" title="{ H}" /> would form a subspace of <img src="https://s0.wp.com/latex.php?latex=%7B+%5Clambda+H%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \lambda H}" class="latex" title="{ \lambda H}" />. We define:
+
+<img src="https://s0.wp.com/latex.php?latex=%7B+%5Coverline%7BA%7D_%7Bi%7D+%3D+%5Cfrac%7B%5Csum_%7Bj%7DG_%7Bij%7DB_%7Bj%7D%7D%7Bc_%7Bi%7D%7D+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \overline{A}_{i} = \frac{\sum_{j}G_{ij}B_{j}}{c_{i}} }" class="latex" title="{ \overline{A}_{i} = \frac{\sum_{j}G_{ij}B_{j}}{c_{i}} }" />
+
+allowing us to recover our original marginal biases <img src="https://s0.wp.com/latex.php?latex=%7B+c_%7Bi%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ c_{i}}" class="latex" title="{ c_{i}}" /> that satisfy <a href="https://windowsontheory.org/feed/#eqdn">(23)</a> and therefore correspond to the optimal strategy. This shows us that <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7BA_%7Bi%7D%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{A_{i}\}}" class="latex" title="{ \{A_{i}\}}" />, <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7BB_%7Bj%7D%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{B_{j}\}}" class="latex" title="{ \{B_{j}\}}" /> would constitute an optimal quantum strategy. 
+<div align="right">□</div>
+Having proved this theorem, we now obtain Corollary <a href="https://windowsontheory.org/feed/#co21">15</a>, which is the main desired result. To see how it subsumes Tsirelson’s result as a special case, we use a simple fact from Representation Theory:
+<br /><b>Lemma 18</b> <em> For a Clifford Algebra generated by <img src="https://s0.wp.com/latex.php?latex=%7BX_%7B1%7D%2C..%2CX_%7Br%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{X_{1},..,X_{r}}" class="latex" title="{X_{1},..,X_{r}}" />, there exist one or two irreducible representations of dimension <img src="https://s0.wp.com/latex.php?latex=%7B2%5E%7B%5Cleft+%5Clfloor%7B%5Cfrac%7Br%7D%7B2%7D%7D%5Cright+%5Crfloor%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{2^{\left \lfloor{\frac{r}{2}}\right \rfloor}}" class="latex" title="{2^{\left \lfloor{\frac{r}{2}}\right \rfloor}}" /> <a name="lecr"></a> </em>
+Plugging Lemma <a href="https://windowsontheory.org/feed/#lecr">18</a> into Corollary <a href="https://windowsontheory.org/feed/#co21">15</a>, we simply recover the fact that the number of entangled bits of a solution algebra that is Clifford is <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cleft+%5Clfloor%7B%5Cfrac%7Br%7D%7B2%7D%7D%5Cright+%5Crfloor%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \left \lfloor{\frac{r}{2}}\right \rfloor}" class="latex" title="{ \left \lfloor{\frac{r}{2}}\right \rfloor}" />. However, note that being Clifford means an extra constraint:
+<img src="https://s0.wp.com/latex.php?latex=%7B+X_%7Bi%7DX_%7Bj%7D+%3D+-X_%7Bj%7DX_%7Bi%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ X_{i}X_{j} = -X_{j}X_{i}}" class="latex" title="{ X_{i}X_{j} = -X_{j}X_{i}}" />, <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cforall+i%2C+j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \forall i, j}" class="latex" title="{ \forall i, j}" />
+
+The constraints on the Solution Algebra <a href="https://windowsontheory.org/feed/#eqhermit">(14)</a>, <a href="https://windowsontheory.org/feed/#eqbiasespay">(15)</a> given by Slofstra do \textit{not} necessarily mean that the solution is Clifford. In fact, when an optimal quantum strategy with minimal entanglement is Clifford, <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7BA_%7Bi%7D%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{A_{i}\}}" class="latex" title="{ \{A_{i}\}}" />, <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7BB_%7Bj%7D%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{B_{j}\}}" class="latex" title="{ \{B_{j}\}}" /> are constructed from a unique set of <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7Bu_%7Bi%7D%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{u_{i}\}}" class="latex" title="{ \{u_{i}\}}" />, <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7Bv_%7Bj%7D%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{v_{j}\}}" class="latex" title="{ \{v_{j}\}}" />.
+To end, we write down a lemma that shows there exist XOR games where the optimal strategy is not unique and for minimal entanglement, a solution generated by a Non-Clifford algebra must be used:
+<h4>Lemma (Existence of XOR games with Non-Clifford optimal strategies)</h4>
+<em> There exist a family of <img src="https://s0.wp.com/latex.php?latex=%7B+m+%5Ctimes+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ m \times n}" class="latex" title="{ m \times n}" /> XOR games <img src="https://s0.wp.com/latex.php?latex=%7B+%5C%7BG%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{ \{G\}}" class="latex" title="{ \{G\}}" /> that correspond to generalizations of the CHSH games (<img src="https://s0.wp.com/latex.php?latex=%7BCL_%7Bn%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{CL_{n}}" class="latex" title="{CL_{n}}" />), such that, the optimal strategy of minimal entanglement is Non-Clifford. </em>
+
+
+<h2>References</h2>
+[1] David Avis, Sonoko Moriyama, and Masaki Owari. From bell inequalities to tsirelson’s theorem. IEICE Transactions, 92-A(5):1254–1267, 2009.
+
+[2] Lance Fortnow, John Rompel, and Michael Sipser. On the power of multi-prover interactive protocols. Theoretical Computer Science, 134(2):545 – 557, 1994.
+
+[3] T. Ito, H. Kobayashi, and K. Matsumoto. Oracularization and Two-Prover One-Round Interactive Proofs against Nonlocal Strategies. ArXiv e-prints, October 2008.
+
+[4] J. Kempe, H. Kobayashi, K. Matsumoto, B. Toner, and T. Vidick. Entangled games are hard to approximate. ArXiv e-prints, April 2007.
+
+[5] Julia Kempe, Oded Regev, and Ben Toner. Unique games with entangled provers are easy. SIAM Journal on Computing, 39(7):3207– 3229, 2010.
+
+[6] S. Khanna, M. Sudan, L. Trevisan, and D. Williamson. The approximability of constraint satisfaction problems. SIAM Journal on Computing, 30(6):1863–1920, 2001.
+
+[7] Anand Natarajan and Thomas Vidick. Two-player entangled games are NP-hard. arXiv e-prints, page arXiv:1710.03062, October 2017.
+
+[8] Anand Natarajan and Thomas Vidick. Low-degree testing for quantum states, and a quantum entangled games PCP for QMA. arXiv e-prints, page arXiv:1801.03821, January 2018.
+
+[9] William Slofstra. Lower bounds on the entanglement needed to play xor non-local games. CoRR, abs/1007.2248, 2010.
+
+[10] B.S. Tsirelson. Quantum analogues of the bell inequalities. the case of two spatially separated domains. Journal of Soviet Mathematics, 36(4):557–570, 1987.
+
+[11] Thomas Vidick. Three-player entangled XOR games are NP-hard to approximate. arXiv e-prints, page arXiv:1302.1242, February 2013.
+
+[12] Thomas Vidick. Cs286.2 lecture 15: Tsirelson’s characterization of xor games. Online, December 2014. Lecture Notes.
+
+[13] Thomas Vidick. Cs286.2 lecture 17: Np-hardness of computing <img src="https://s0.wp.com/latex.php?latex=%5Comega%5E%2A%28G%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\omega^*(G)" class="latex" title="\omega^*(G)" />. Online, December 2014. Lecture Notes.</div>
+
+
+
+
+
+
+
+<p class="date">
+by mitalibafna <a href="https://windowsontheory.org/2019/01/03/quantum-games/"><span class="datestr">at January 04, 2019 04:58 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2370,45 +3606,6 @@ earlier proof for simplicial polytopes.</p>
 
 <p class="date">
 by Gil Kalai <a href="https://gilkalai.wordpress.com/2018/12/25/amazing-karim-adiprasito-proved-the-g-conjecture-for-spheres/"><span class="datestr">at December 25, 2018 02:38 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://cstheory.stackexchange.com/q/42094">
-<div class="entryheader">
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="https://cstheory.stackexchange.com/questions/42094/can-a-term-on-normal-form-prove-an-illogical-assertion">Can a term on normal form prove an illogical assertion?</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://cstheory.stackexchange.com/questions" title="Recent Questions - Theoretical Computer Science Stack Exchange">CS Theory StackExchange (Q&A)</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p>Suppose we take a language such as Agda and disable the features that make it consistent; for example, universe polymorphism, structural recursion checks and similar. Suppose then that we take a term in normal form, i.e., with no redex left. Could that term prove an absurd claim such as, for example, <code>1 = 2</code>, despite the fact it is normalised (and, thus, doesn't include infinite loops)?</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by MaiaVictor <a href="https://cstheory.stackexchange.com/questions/42094/can-a-term-on-normal-form-prove-an-illogical-assertion"><span class="datestr">at December 24, 2018 08:50 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
