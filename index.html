@@ -222,7 +222,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at January 09, 2019 06:21 PM UTC</span>.
+Last updated <span class="datestr">at January 09, 2019 07:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -230,6 +230,100 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://blogs.princeton.edu/imabandit/?p=1350">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/bubeck.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-US"><a class="entryheader" href="https://blogs.princeton.edu/imabandit/2019/01/09/nemirovskis-acceleration/">Nemirovski’s acceleration</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://blogs.princeton.edu/imabandit" title="I’m a bandit">S&eacute;bastien Bubeck</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en-US">
+<p>I will describe here the very first (to my knowledge) acceleration algorithm for smooth convex optimization, which is due to <a href="https://en.wikipedia.org/wiki/Arkadi_Nemirovski" class="liinternal" rel="nofollow">Arkadi Nemirovski</a> (dating back to the end of the 70’s). The algorithm relies on a <img src="https://i1.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-bc2da46d9824359f6ac8d33c5fb882dd_l3.png?resize=8%2C12&amp;ssl=1" style="vertical-align: 0px;" title="Rendered by QuickLaTeX.com" height="12" width="8" alt="2" class="ql-img-inline-formula " />-dimensional plane-search subroutine (which, in theory, can be implemented in <img src="https://i1.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-38bfa3c1131fbae41cb358b8b685dc56_l3.png?resize=61%2C19&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="19" width="61" alt="\log(1/\epsilon)" class="ql-img-inline-formula " /> calls to a first-order oracle). He later improved it to only require a <img src="https://i0.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-21b5b4cbe9a10b6d847eeb4265b99898_l3.png?resize=7%2C13&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="13" width="7" alt="1" class="ql-img-inline-formula " />-dimensional line-search in 1981, but of course the breakthrough that everyone knows about came a year after with the famous 1982 paper by <a href="https://en.wikipedia.org/wiki/Yurii_Nesterov" class="liinternal" rel="nofollow">Nesterov</a> that gets rid of this extraneous logarithmic term altogether (and in addition is based on the <a href="https://blogs.princeton.edu/imabandit/2018/11/21/a-short-proof-for-nesterovs-momentum/" class="liinternal">deep insight</a> of modifying Polyak’s momentum).</p>
+<p>Let <img src="https://i1.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-c7d97b919a3b73617cf2fbb375fff3b1_l3.png?resize=10%2C16&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="16" width="10" alt="f" class="ql-img-inline-formula " /> be a <img src="https://i0.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-21b5b4cbe9a10b6d847eeb4265b99898_l3.png?resize=7%2C13&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="13" width="7" alt="1" class="ql-img-inline-formula " />-smooth function. Denote <img src="https://i1.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-d69559ebcb4e4ecdf7454cab91bf526b_l3.png?resize=125%2C19&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="19" width="125" alt="x^{+} = x - \nabla f(x)" class="ql-img-inline-formula " />. Fix a sequence <img src="https://i2.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-ba9ca1ebe088d1befda0acb3c4644727_l3.png?resize=43%2C18&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="18" width="43" alt="(\lambda_t)_{t \in \N}" class="ql-img-inline-formula " />, to be optimized later. We consider the “conjugate” point <img src="https://i1.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-d22daf1993fbb2397de0b21ab0ea87ee_l3.png?resize=119%2C23&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="23" width="119" alt="\sum_{s =1}^t \lambda_s \nabla f(x_s)" class="ql-img-inline-formula " />. The algorithm simply returns the optimal combination of the conjugate point and the gradient descent point, that is:</p>
+<p style="line-height: 54px;" class="ql-center-displayed-equation"><span class="ql-right-eqno">   </span><span class="ql-left-eqno">   </span><img src="https://i1.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-360399a70097a55997eaeacb3ec02615_l3.png?resize=424%2C54&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="54" width="424" alt="\[ x_{t+1} = \argmin_{x \in P_t} f(x) \, \text{where} \, P_t = \mathrm{span}\left(x_t^+, \sum_{s =1}^t \lambda_s \nabla f(x_s)\right) \,. \]" class="ql-img-displayed-equation " /></p>
+<p>Let us denote <img src="https://i1.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-e614d7a76c02a9a308f9898af91df8ff_l3.png?resize=95%2C18&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="18" width="95" alt="g_s = \nabla f(x_s)" class="ql-img-inline-formula " /> and <img src="https://i1.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-629dcf91ea83c14ea854c74de1069acd_l3.png?resize=143%2C18&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="18" width="143" alt="\delta_s = f(x_s) - f(x^*)" class="ql-img-inline-formula " /> for shorthand. The key point is that <img src="https://i2.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-9d21b904e2ccc5df54959aa117a37b98_l3.png?resize=77%2C20&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="20" width="77" alt="g_{t+1} \in P_t^{\perp}" class="ql-img-inline-formula " />, and in particular <img src="https://i2.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-4e57279bc2d0342e42087a51af61fb76_l3.png?resize=231%2C22&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="22" width="231" alt="\|\sum_{s \leq t} \lambda_s g_s\|^2 = \sum_{s \leq t} \lambda_s^2 \|g_s\|^2" class="ql-img-inline-formula " />. Now recognize that <img src="https://i2.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-b728147d95760e42ef7cdbb706a8cfd1_l3.png?resize=38%2C20&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="20" width="38" alt="\|g_s\|^2" class="ql-img-inline-formula " /> is a lower bound on the improvement <img src="https://i1.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-0808cda8024eb11ab7ce37176832a9fe_l3.png?resize=68%2C17&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="17" width="68" alt="\delta_s - \delta_{s+1}" class="ql-img-inline-formula " /> (here we use that <img src="https://i1.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-b0878f455a78407f8618e726e941aea6_l3.png?resize=33%2C13&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="13" width="33" alt="x_{s+1}" class="ql-img-inline-formula " /> is better than <img src="https://i0.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-5acc4c663fcf2f647eb177ebb24bc154_l3.png?resize=20%2C19&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="19" width="20" alt="x_s^+" class="ql-img-inline-formula " />). Thus we get:</p>
+<p style="line-height: 40px;" class="ql-center-displayed-equation"><span class="ql-right-eqno">   </span><span class="ql-left-eqno">   </span><img src="https://i0.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-a12bda17f9c1f0f0e13ef03c9a1c9d2c_l3.png?resize=404%2C40&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="40" width="404" alt="\[ \|\sum_{s \leq t} \lambda_s g_s\|^2 \leq \sum_{s \leq t} \lambda_s^2 (\delta_s - \delta_{s+1}) \leq \sum_{s \leq t} \delta_s (\lambda_s^2 - \lambda_{s-1}^2) \,. \]" class="ql-img-displayed-equation " /></p>
+<p>In other words if the sequence <img src="https://i2.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-ab48baf331239642a00255b86324280a_l3.png?resize=10%2C12&amp;ssl=1" style="vertical-align: 0px;" title="Rendered by QuickLaTeX.com" height="12" width="10" alt="\lambda" class="ql-img-inline-formula " /> is chosen such that <img src="https://i2.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-2f241a8315da6dd3f7735135d1d2b7ae_l3.png?resize=114%2C21&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="21" width="114" alt="\lambda_s = \lambda_s^2 - \lambda_{s-1}^2" class="ql-img-inline-formula " /> then we get</p>
+<p style="line-height: 40px;" class="ql-center-displayed-equation"><span class="ql-right-eqno">   </span><span class="ql-left-eqno">   </span><img src="https://i2.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-8e959561f27eec9096b81bd7148a4a75_l3.png?resize=180%2C40&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="40" width="180" alt="\[ \|\sum_{s \leq t} \lambda_s g_s\|^2 \leq \sum_{s \leq t} \lambda_s \delta_s \,. \]" class="ql-img-displayed-equation " /></p>
+<p>This is good because roughly the reverse inequality also holds true by convexity (and the fact that <img src="https://i1.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-212cae06b1b9b8b6af498b589bb15865_l3.png?resize=56%2C15&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="15" width="56" alt="x_s \in P_s" class="ql-img-inline-formula " /> so <img src="https://i0.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-cf91835fdc91be361d1c7e89f867c5db_l3.png?resize=78%2C16&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="16" width="78" alt="g_s \cdot x_s = 0" class="ql-img-inline-formula " />):</p>
+<p style="line-height: 40px;" class="ql-center-displayed-equation"><span class="ql-right-eqno">   </span><span class="ql-left-eqno">   </span><img src="https://i1.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-9d1ee450c97dfc04bca3a123fb68daa8_l3.png?resize=391%2C40&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="40" width="391" alt="\[ \sum_{s \leq t} \lambda_s \delta_s \leq \sum_{s \leq t} \lambda_s g_s \cdot (x_s - x^*) \leq \|x^*\| \cdot \| \sum_{s \leq t} \lambda_s g_s\| \,. \]" class="ql-img-displayed-equation " /></p>
+<p>So finally we get <img src="https://i1.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-9a824c3ceaa5f687a8751a121d4ef8a4_l3.png?resize=144%2C22&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="22" width="144" alt="\sum_{s \leq t} \lambda_s g_s \leq \|x^*\|^2" class="ql-img-inline-formula " />, and it just remains to realize that <img src="https://i0.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-f100f89f751713a1814b3938a510009b_l3.png?resize=16%2C15&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="15" width="16" alt="\lambda_s" class="ql-img-inline-formula " /> is of order <img src="https://i2.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-3bcfb3f0b6b04be3b598743cd774dd78_l3.png?resize=8%2C8&amp;ssl=1" style="vertical-align: 0px;" title="Rendered by QuickLaTeX.com" height="8" width="8" alt="s" class="ql-img-inline-formula " /> so that <img src="https://i0.wp.com/blogs.princeton.edu/imabandit/wp-content/ql-cache/quicklatex.com-3ff4a3e78d1ced5a05f33eb077194504_l3.png?resize=103%2C20&amp;ssl=1" title="Rendered by QuickLaTeX.com" height="20" width="103" alt="\delta_t \leq \|x^*\|^2 / t^2" class="ql-img-inline-formula " />.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Sebastien Bubeck <a href="https://blogs.princeton.edu/imabandit/2019/01/09/nemirovskis-acceleration/"><span class="datestr">at January 09, 2019 06:51 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://cstheory.stackexchange.com/q/42180">
+<div class="entryheader">
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://cstheory.stackexchange.com/questions/42180/coordinate-descent-in-integer-programing-when-does-it-work">Coordinate descent in integer programing: when does it work?</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://cstheory.stackexchange.com/questions" title="Recent Questions - Theoretical Computer Science Stack Exchange">CS Theory StackExchange (Q&A)</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>Denote <span class="math-container">$N_i=\{0,1,\dots,\bar{n}_i\}$</span> and define <span class="math-container">$N=N_1\times \dots \times N_I$</span>. I want to minimize a function <span class="math-container">$f:N\rightarrow \mathbb{R}$</span>. It is very easy to minimize <span class="math-container">$f$</span> coordinate by coordinate so one natural algorithm is to iterate on a mapping <span class="math-container">$T$</span> for which the <span class="math-container">$i$</span>th element is defined as
+<span class="math-container">$$(Tn)_i=\arg\min_{\tilde{n}_i\in N_i} f\left( \left\{ n_1,\dots,\tilde{n}_i,\dots,n_I\right\}\right)$$</span>
+until we have convergence. This is essentially a <a href="https://en.wikipedia.org/wiki/Coordinate_descent" rel="nofollow noreferrer">coordinate descent</a> algorithm but in a discrete space.</p>
+
+<p>My question is: under what conditions does this approach yield the true global minimum of <span class="math-container">$f$</span>? For instance, is <span class="math-container">$f$</span> strictly convex a sufficient condition for this procedure to work? Also, if anybody has a reference on the topic that would be highly appreciated.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by user_lambda <a href="https://cstheory.stackexchange.com/questions/42180/coordinate-descent-in-integer-programing-when-does-it-work"><span class="datestr">at January 09, 2019 06:38 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2100,7 +2194,7 @@ by GASARCH (noreply@blogger.com) <a href="https://blog.computationalcomplexity.o
 <tbody>
 <tr>
 <td>
-<a href="https://rjlipton.files.wordpress.com/2019/01/asimovtorontostar.jpg"><img width="180" alt="" src="https://rjlipton.files.wordpress.com/2019/01/asimovtorontostar.jpg?w=180&amp;h=167" class="alignright wp-image-15564" height="167" /></a>
+<a href="https://rjlipton.files.wordpress.com/2019/01/asimovtorontostar.jpg"><img src="https://rjlipton.files.wordpress.com/2019/01/asimovtorontostar.jpg?w=180&amp;h=167" alt="" width="180" class="alignright wp-image-15564" height="167" /></a>
 </td>
 </tr>
 <tr>
@@ -2383,112 +2477,6 @@ We give an essentially optimal solution to this problem. For any $\epsilon&gt;0,
 
 <p class="date">
 <a href="https://eccc.weizmann.ac.il/report/2019/003"><span class="datestr">at January 06, 2019 08:28 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://eccc.weizmann.ac.il/report/2019/002">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eccc.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="https://eccc.weizmann.ac.il/report/2019/002">TR19-002 |  Complexity of Linear Operators | 
-
-	Alexander Kulikov, 
-
-	Ivan Mikhailin, 
-
-	Vladimir Podolskii, 
-
-	Andrey Mokhov</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://eccc.weizmann.ac.il/" title="ECCC - Reports">ECCC papers</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-Let $A \in \{0,1\}^{n \times n}$ be a matrix with $z$ zeroes and $u$ ones and $x$ be an $n$-dimensional vector of formal variables over a semigroup $(S, \circ)$. How many semigroup operations are required to compute the linear operator $Ax$?
-
-As we observe in this paper, this problem contains as a special case the well-known range queries problem and has a rich variety of applications in such areas as graph algorithms, functional programming, circuit complexity, and others. It is easy to compute $Ax$ using $O(u)$ semigroup operations. The main question studied in this paper is: can $Ax$ be computed using $O(z)$ semigroup operations? We prove that in general this is not possible: there exists a matrix $A \in \{0,1\}^{n \times n}$ with exactly two zeroes in every row (hence $z=2n$) whose complexity is $\Theta(n\alpha(n))$ where $\alpha(n)$ is the inverse Ackermann function. However, for the case when the semigroup is commutative, we give a constructive proof of an $O(z)$ upper bound. This implies that in commutative settings, complements of sparse matrices can be processed as efficiently as sparse matrices (though the corresponding algorithms are more involved). Note that this covers the cases of Boolean and tropical semirings that have numerous applications, e.g., in graph theory. 
-
-As a simple application of the presented linear-size construction, we show how to multiply two $n\times n$ matrices over an arbitrary semiring in $O(n^2)$ time if one of these matrices is a 0/1-matrix with $O(n)$ zeroes (i.e., a complement of a sparse matrix).</div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="https://eccc.weizmann.ac.il/report/2019/002"><span class="datestr">at January 06, 2019 05:55 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://cstheory.stackexchange.com/q/42159">
-<div class="entryheader">
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="https://cstheory.stackexchange.com/questions/42159/nusmv-how-to-indicate-the-execution-should-visit-some-states-infinitely-often">NuSMV - How to indicate the execution should visit some states infinitely often?</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://cstheory.stackexchange.com/questions" title="Recent Questions - Theoretical Computer Science Stack Exchange">CS Theory StackExchange (Q&A)</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p>I have the following kripke structure:</p>
-
-<p><a href="https://i.stack.imgur.com/3xDPG.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/3xDPG.png" alt="enter image description here" /></a></p>
-
-<p>I need my model to follow the LTL constraint that state d will be visited infinitely often:</p>
-
-<pre><code>LTLSPEC  G F (modelState=d)
-</code></pre>
-
-<p>This constraint fails due to existence of the loop .... b-&gt;c-&gt;b-&gt;c ......  </p>
-
-<p>Question: What would be a solution to this problem? This may be related to fair traces, but I am not very familiar with that, or how to indicate d as a fair state in NuSMV. </p>
-
-<p>I am learning model checking on my own and I appreciate your help very much.</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by Fabiana <a href="https://cstheory.stackexchange.com/questions/42159/nusmv-how-to-indicate-the-execution-should-visit-some-states-infinitely-often"><span class="datestr">at January 06, 2019 05:47 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
