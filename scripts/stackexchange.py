@@ -20,7 +20,7 @@ def main(req, **kwargs):
 	entries=s.findAll('entry')
 
 	for e in entries:
-		if int(e.find('re:rank').string) < 12:
+		if int(e.find('re:rank').string) < 6:
 			e.extract()
 
 	return s.prettify()
