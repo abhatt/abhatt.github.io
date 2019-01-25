@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-01-25T22:22:05Z</updated>
+  <updated>2019-01-25T23:54:53Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,112 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://windowsontheory.org/?p=7413</id>
+    <link href="https://windowsontheory.org/2019/01/25/quantum-circuits-and-their-role-in-demonstrating-quantum-supremacy/" rel="alternate" type="text/html"/>
+    <title>Quantum circuits and their role in demonstrating quantum supremacy</title>
+    <summary>There’s a lot of discussion and (possibly well-deserved) hype nowadays about quantum computation and its potential for computation at speeds we simply can’t reach with the classical computers we’re used to today. The excitement about this has been building for years, even decades, but it’s only very recently that we’ve really been approaching a solid […]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>There’s a lot of discussion and (possibly well-deserved) hype nowadays about quantum computation and its potential for computation at speeds we simply can’t reach with the classical computers we’re used to today. The excitement about this has been building for years, even decades, but it’s only very recently that we’ve really been approaching a solid proof that quantum computers do have an <a href="https://en.wikipedia.org/wiki/Quantum_supremacy">advantage</a> over classical computers. </p>
+
+
+
+<p>What’s rather tricky about showing such a result is that, rather than a direct argument about the capability of quantum computers, what we really need to demonstrate is the incapability of classical computers to achieve tasks that can be done with quantum computers. </p>
+
+
+
+<p>One of the major leaps forward in demonstrating quantum supremacy was taken by Terhal and DiVincenzo in their 2008 paper “<a href="https://arxiv.org/abs/quant-ph/0205133">Adaptive quantum computation, constant depth quantum circuits and arthur-merlin games</a>“. Their approach was to appeal to a complexity-theoretic argument: they gave evidence that there exists a certain class of quantum circuits that cannot be simulated classically by proving that if a classical simulation existed, certain complexity classes strongly believed to be distinct would collapse to the same class. While this doesn’t quite provide a proof of quantum supremacy – since the statement about the distinction between complexity classes upon which it hinges is not a proven fact – because the complexity statement appears overwhelmingly likely to be true, so too does the proposed existence of non-classically-simulatable quantum circuits. The Terhal and DiVincenzo paper is a complex and highly technical one, but in this post I hope to explain a little bit and give some intuition for the major points. </p>
+
+
+
+<p>Now, let’s start at the beginning. What is a <a href="https://en.wikipedia.org/wiki/Quantum_circuit">quantum circuit</a>? I’m going to go ahead and assume you already know what a <a href="https://en.wikipedia.org/wiki/Circuit_(computer_science)">classical circuit</a> is – the extension to a quantum circuit is rather straightforward: it’s a circuit in which all gates are <a href="https://en.wikipedia.org/wiki/Quantum_logic_gate">quantum gates</a>, where a quantum gate can be thought of as a classical gate whose output is, rather than a deterministic function of the inputs, instead a probability distribution over all possible outputs given the size of the inputs. For example, given two single-bit inputs, a classical AND gate outputs 0 or 1 deterministically given the inputs. A quantum AND gate on the analogous single-<a href="https://en.wikipedia.org/wiki/Qubit">qubit</a> inputs would output 0 with some probability <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="p"/> and 1 with some probability <img alt="1-p" class="latex" src="https://s0.wp.com/latex.php?latex=1-p&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="1-p"/>. Similarly, a classical AND gate on two 4-bit inputs outputs the bitwise AND, while the quantum analog has associated with it a 4-qubit output: some probability distribution over all 4-bit binary strings. A priori there is no particular string that is the “output” of the computation by the quantum gate; it’s only after taking a <a href="https://en.wikipedia.org/wiki/Measurement_in_quantum_mechanics">quantum measurement</a> of the output that we get an actual string that we can think of as the outcome of the computation done by the gate. The actual string we “observe” upon taking the measurement follows the probability distribution computed by the gate on its inputs. In this way, a quantum circuit can then be thought of as producing, via a sequence of probabilistic classical gates (i.e., quantum gates) some probability distribution over possible outputs given the input lengths. It’s not hard to see that in this way, we can compose circuits: suppose we have a quantum circuit <img alt="c_1" class="latex" src="https://s0.wp.com/latex.php?latex=c_1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="c_1"/> and another quantum circuit <img alt="c_2" class="latex" src="https://s0.wp.com/latex.php?latex=c_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="c_2"/>. Let <img alt="c_1" class="latex" src="https://s0.wp.com/latex.php?latex=c_1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="c_1"/> have an input of <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/> qubits and an output of <img alt="m" class="latex" src="https://s0.wp.com/latex.php?latex=m&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="m"/> qubits; suppose we measure <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/> of the output qubits of <img alt="c_1" class="latex" src="https://s0.wp.com/latex.php?latex=c_1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="c_1"/> – then we can feed the remaining <img alt="m-k" class="latex" src="https://s0.wp.com/latex.php?latex=m-k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="m-k"/> unmeasured qubits as inputs into <img alt="c_2" class="latex" src="https://s0.wp.com/latex.php?latex=c_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="c_2"/>(assuming that those <img alt="m-k" class="latex" src="https://s0.wp.com/latex.php?latex=m-k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="m-k"/> qubits do indeed constitute a valid input to <img alt="c_2" class="latex" src="https://s0.wp.com/latex.php?latex=c_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="c_2"/>). </p>
+
+
+
+<p>Consider, then, the following sort of quantum circuit: it’s a composition of <img alt="N" class="latex" src="https://s0.wp.com/latex.php?latex=N&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="N"/> quantum circuits, such that after each <img alt="i" class="latex" src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="i"/>-th circuit we take a measurement some of its output qubits (so that the remaining unmeasured qubits become inputs to the <img alt="(i+1)" class="latex" src="https://s0.wp.com/latex.php?latex=%28i%2B1%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(i+1)"/>-th circuit), and then the structure of the <img alt="(i+1)" class="latex" src="https://s0.wp.com/latex.php?latex=%28i%2B1%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(i+1)"/>-th circuit is dependent on this measurement. That is, it’s as though, given a quantum circuit, we’re checking every so often at intermediate layers over the course of the circuit’s computation what the value of some of the variables are (leaving the rest to keep going along through the circuit to undergo more computational processing), and based on what we measure is the current computed value, the remainder of the circuit “adapts” in a way determined by that measurement. Aptly enough, this is called an “adaptive circuit”. But since the “downstream” structure of the circuit depends on the outcomes of all the measurements made “upstream”, each adaptive circuit actually comprises a family of circuits, each of which is specified by the sequence of intermediate measurement outcomes. That is, we can alternatively characterize an adaptive circuit as a set of ordinary quantum circuits that is parameterized by a list of measurement outcomes. Terhal and DiVincenzo call this way of viewing an adaptive circuit, as a family of circuits parametrized by a sequence of measurement values, a “non-adaptive circuit” – since we replace the idea that the circuit “adapts” to intermediate measurements with the idea that there are just many regular circuits, one for each possible sequence of measurements. It’s this non-adaptive circuit concept that’ll be our main object of study going forward.</p>
+
+
+
+<h2>Simulating quantum circuits</h2>
+
+
+
+<p>Now, the result we wanted to demonstrate about quantum circuits had to do with their efficient simulatability by classical circuits – and so we should establish some notion of what we mean when we talk about an “efficient simulation”. </p>
+
+
+
+<p>Terhal and DiVincenzo offer the following notion of a classical simulation – which in their paper they call an “efficient density computation”: consider a quantum circuit with some output of length <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/> qubits. Recall that to actually obtain an output value, we need to take a measurement of the circuit output – imagine doing this in disjoint subsets of cubits at a time. That is, we can break up the <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/> qubits into <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/> disjoint subsets and consider the entire output measurement as a process of taking <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k"/> measurements, subset by subset. An efficient density computation exists if there’s a classical procedure for computing, in time polynomial in the width and depth of the quantum circuit, the conditional probability distribution over the set of possible measurement outcomes of a particular subset of qubits, given any subset of the <img alt="k-1" class="latex" src="https://s0.wp.com/latex.php?latex=k-1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="k-1"/> other measurement outcomes. Intuitively, this is a good notion of what a classical simulation should consist of, or at least what data it should contain, since if you know the conditional probabilities given any (possibly empty) subset of the other measurements, you can just flip coins for the outputs according to the conditional probabilities as a way of actually exhibiting a “working” simulation.</p>
+
+
+
+<p>It’s with this notion of simulation, along with our concept of an adaptive quantum circuit as a family of regular circuits parameterized by a sequence of intermediate measurement outcomes, we may now arrive at the main result of Terhal and DiVincenzo’s paper. Recall that what we wanted to show from the very beginning is that there exists some quantum circuit that can’t be simulated classically. The argument for this proceeds like a proof by contradiction: suppose the contrary, and that all quantum circuits can be simulated classically. We want to show that we can find, then, a quantum circuit which, if it were possible to be simulated classically (as per our assumption), we’d wind up with some strange consequences that we believe are false, leading us to conclude that those circuits probably can’t be simulated classically.</p>
+
+
+
+<p>Thus, we shall now exhibit such a quantum circuit whose classical simulatability leads (as far as we believe) to a contradiction. Consider a special case of adaptive quantum circuits, considered as a parameterized family of regular circuits, in which the circuit’s output distribution is independent of the intermediate measurement outcomes; that is, the case in which the entire family of circuits corresponding to an adaptive circuit is logically the same – that is, is the same logical circuit on input qubits independent of intermediate measurements. I’d like to point out, just for clarification’s sake, the subtlety here, which makes this consideration non-redundant, and not simply a reduction of an adaptive quantum circuit (again, thought of as a family) to a single fixed circuit (i.e., a family of one): the situation in which the family is reduced to a single fixed circuit occurs when the<em> structure of the circuit</em> is independent of the intermediate measurement outcomes. If the structure were independent of the measurements, then no matter what we observed in the measurements, we’d get the same circuit – hence a trivial family of one. What we’re considering instead is the case in which the <em>structure</em> of the circuit is still dependent on the intermediate measurements (and so the circuit is still adaptive), but where the <em>distribution over the possible outputs of the circuit</em> is identical no matter what the intermediate measurements are. In this case, the circuit can still be considered as a parameterized and in general non-trivial family of circuits, but for which each member produces the same distribution over outputs – hence, a family of potentially <em>structurally</em> different circuits, but which are <em>logically</em> identical.</p>
+
+
+
+<p>Suppose there’s some set of such circuits that’s universal – that is, that’s sufficient to implement all polynomial-time quantum computations. (This is a reasonable assumption to make, since there do in fact exist <a href="https://en.wikipedia.org/wiki/Quantum_logic_gate\#Universal_quantum_gates">universal quantum gate sets.</a> But now if a simulation of the kind we defined (an efficient density computation) existed for every circuit in this set, then we could calculate the outcome probability of any polynomial-depth quantum circuit, since any polynomial-depth quantum circuit could be realized as some composition of circuits in this universal set (and in particular as a composition of particular family members of each adaptive circuit in the universal set), and an efficient density computation, as we mentioned above, precisely gives us a way to compute the output distribution. </p>
+
+
+
+<p>But now here is where our believed contradiction lies: </p>
+
+
+
+<p><em>Theorem:</em> Suppose there exists a universal set of adaptive quantum circuits whose output distributions are independent of intermediate measurements. If there is an efficient density computation for each family member of each adaptive circuit in this universal set, then for the polynomial hierarchy PH we have PH = BPP = BQP. </p>
+
+
+
+<p>The proof goes something like this: if we can do our desired efficient density computations (as we assumed, for the sake of contradiction, we could for all quantum circuits), this is equivalent to being able to determine the acceptance probability of a quantum computation, which was shown in the paper “<a href="https://arxiv.org/abs/quant-ph/9812056">Determining Acceptance Possibility for a Quantum Computation is Hard for the Polynomial Hierarchy”</a> by Fenner, Green, Homer and Pruim to be equivalent to the class <img alt="\text{coC=P}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BcoC%3DP%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{coC=P}"/>. Thus, we have that <img alt="\text{coC=P} \subseteq \text{BPP}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BcoC%3DP%7D+%5Csubseteq+%5Ctext%7BBPP%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{coC=P} \subseteq \text{BPP}"/>. But it’s known that <img alt="\text{PH} \subseteq \text{BPP}^{\text{coC=P}}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BPH%7D+%5Csubseteq+%5Ctext%7BBPP%7D%5E%7B%5Ctext%7BcoC%3DP%7D%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{PH} \subseteq \text{BPP}^{\text{coC=P}}"/> and so <img alt="\text{PH} \subseteq \text{BPP}^{\text{BPP}} = \text{BPP}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BPH%7D+%5Csubseteq+%5Ctext%7BBPP%7D%5E%7B%5Ctext%7BBPP%7D%7D+%3D+%5Ctext%7BBPP%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{PH} \subseteq \text{BPP}^{\text{BPP}} = \text{BPP}"/>. That is, we have <img alt="\text{PH} = \text{BPP} = \text{BQP}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BPH%7D+%3D+%5Ctext%7BBPP%7D+%3D+%5Ctext%7BBQP%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{PH} = \text{BPP} = \text{BQP}"/>, and so the polynomial hierarchy would collapse to <img alt="\Sigma^P_2" class="latex" src="https://s0.wp.com/latex.php?latex=%5CSigma%5EP_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\Sigma^P_2"/> since <img alt="\text{BPP} \subseteq \Sigma^P_2" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BBPP%7D+%5Csubseteq+%5CSigma%5EP_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\text{BPP} \subseteq \Sigma^P_2"/> (for more on these more obscure complexity classes, see <a href="https://complexityzoo.uwaterloo.ca/Complexity_Zoo">here</a>). Again, this is our “contradiction”: while it hasn’t been quite proven, it is widely believed, with strong supporting evidence, that the polynomial hierarchy does not collapse as would be the case if all quantum circuits were classically simulatable. Thus this provides a strong argument that not all quantum circuits are classically simulatable, which was precisely what we were looking to demonstrate.</p>
+
+
+
+<h2>Conclusion</h2>
+
+
+
+<p>Terhal and DiVincenzo actually go even further and show that there is a certain class of constant-depth quantum circuits that are unlikely to be simulatable by classical circuits – this, indeed, seems to provide even stronger evidence for quantum supremacy. This argument, which is somewhat more complex, uses the idea of teleportation and focuses on a particular class of circuits implementable by a certain restricted set of quantum gates. If you’re interested, I highly recommend reading their paper, where this is explained. </p>
+
+
+
+<h2>Recommended reading</h2>
+
+
+
+<ul><li>Terhal, Barbara and David DiVincenzo.  “Adptive quantum computation, constant depth quantum circuits and arthur-merlin games.” <em>Quantum Info. Comput.</em> 4, 2 (2004); 134-145.</li><li>Bravyil, Sergey, David Gosset, and Robert König. “Quantum advantage with shallow circuits.” <em>Science</em> 362, 6412 (2018); 308-311.</li><li>Harrow, Aram Wettroth and Ashley Montanaro. “Quantum computational supremacy.” <em>Nature</em> 549 (2017): 203-209.</li><li>Boixo, Sergio et. al. “Characterizing quantum supremacy in near-term devices.” <em>Nature Physics</em> 14 (2018); 595-600.</li></ul>
+
+
+
+<h2>References</h2>
+
+
+
+<p>\begin{enumerate}</p>
+
+
+
+<ul><li>Terhal, Barbara and David DiVincenzo.  “Adptive quantum computation, constant depth quantum circuits and arthur-merlin games.” <em>Quantum Info. Comput.</em> 4, 2 (2004); 134-145.</li><li>Fenner, Stephen et. al. “Determining Acceptance Possibility for a Quantum Computation is Hard for the Polynomial Hierarchy.” <a href="https://arxiv.org/abs/quant-ph/9812056" rel="nofollow">https://arxiv.org/abs/quant-ph/9812056</a>. (1998).</li><li>Bravyil, Sergey, David Gosset, and Robert König. “Quantum advantage with shallow circuits.” <em>Science</em> 362, 6412 (2018); 308-311.</li></ul></div>
+    </content>
+    <updated>2019-01-25T23:42:09Z</updated>
+    <published>2019-01-25T23:42:09Z</published>
+    <category term="Uncategorized"/>
+    <author>
+      <name>hksorens</name>
+    </author>
+    <source>
+      <id>https://windowsontheory.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://windowsontheory.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://windowsontheory.org" rel="alternate" type="text/html"/>
+      <link href="https://windowsontheory.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>A Research Blog</subtitle>
+      <title>Windows On Theory</title>
+      <updated>2019-01-25T23:53:45Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://cstheory-jobs.org/2019/01/25/postdoc-at-uc-san-diego-apply-by-march-1-2019/</id>
@@ -34,7 +140,7 @@ Email: shachar.lovett@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-25T22:20:56Z</updated>
+      <updated>2019-01-25T23:53:11Z</updated>
     </source>
   </entry>
 
@@ -64,7 +170,7 @@ Email: shachar.lovett@gmail.com</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-01-25T22:21:25Z</updated>
+      <updated>2019-01-25T23:53:45Z</updated>
     </source>
   </entry>
 
@@ -191,7 +297,7 @@ Chubanov algorithm, there is a strongly polynomial time algorithm to solve
 linear feasibility problem.
 </p></div>
     </summary>
-    <updated>2019-01-25T02:36:41Z</updated>
+    <updated>2019-01-25T23:36:55Z</updated>
     <author>
       <name/>
     </author>
@@ -222,7 +328,7 @@ theoretically maximal metamer mismatch volume is significantly larger than the
 one approximated using a prior art method.
 </p></div>
     </summary>
-    <updated>2019-01-25T02:38:35Z</updated>
+    <updated>2019-01-25T23:38:47Z</updated>
     <author>
       <name/>
     </author>
@@ -253,7 +359,7 @@ complexity of the algorithm is exponential in time and space, but the average
 performance is very good.
 </p></div>
     </summary>
-    <updated>2019-01-25T02:20:25Z</updated>
+    <updated>2019-01-25T23:20:32Z</updated>
     <author>
       <name/>
     </author>
@@ -273,20 +379,20 @@ performance is very good.
     <link href="http://arxiv.org/abs/1901.08235" rel="alternate" type="text/html"/>
     <title>Multi-Frequency Phase Synchronization</title>
     <feedworld_mtime>1548374400</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Gao:Tingran.html">Tingran Gao</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/z/Zhao:Zhizhen.html">Zhizhen Zhao</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1901.08235">PDF</a><br/><b>Abstract: </b>We propose a novel formulation for phase synchronization---the statistical
-problem of jointly estimating alignment angles from noisy pairwise
-comparisons---as a nonconvex optimization problem that enforces consistency
-among the pairwise comparisons in multiple frequency channels. Inspired by
-harmonic retrieval in signal processing, we develop a simple yet efficient
-two-stage algorithm that leverages the multi-frequency information. We
-demonstrate in theory and practice that the proposed algorithm significantly
-outperforms state-of-the-art phase synchronization algorithms, at a mild
-computational costs incurred by using the extra frequency channels. We also
-extend our algorithmic framework to general synchronization problems over
-compact Lie groups.
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Gao:Tingran.html">Tingran Gao</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/z/Zhao:Zhizhen.html">Zhizhen Zhao</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1901.08235">PDF</a><br/><b>Abstract: </b>We propose a novel formulation for phase synchronization -- the statistical
+problem of jointly estimating alignment angles from noisy pairwise comparisons
+-- as a nonconvex optimization problem that enforces consistency among the
+pairwise comparisons in multiple frequency channels. Inspired by harmonic
+retrieval in signal processing, we develop a simple yet efficient two-stage
+algorithm that leverages the multi-frequency information. We demonstrate in
+theory and practice that the proposed algorithm significantly outperforms
+state-of-the-art phase synchronization algorithms, at a mild computational
+costs incurred by using the extra frequency channels. We also extend our
+algorithmic framework to general synchronization problems over compact Lie
+groups.
 </p></div>
     </summary>
-    <updated>2019-01-25T02:21:42Z</updated>
+    <updated>2019-01-25T23:21:47Z</updated>
     <author>
       <name/>
     </author>
@@ -320,7 +426,7 @@ construction can be applied to speedup the popular density-based clustering
 approach DBSCAN.
 </p></div>
     </summary>
-    <updated>2019-01-25T02:39:31Z</updated>
+    <updated>2019-01-25T23:39:40Z</updated>
     <author>
       <name/>
     </author>
@@ -347,7 +453,7 @@ explicitly give an algorithm for calculating them in polynomial time by
 rearranging Sch\"utzenberger's algorithm.
 </p></div>
     </summary>
-    <updated>2019-01-25T02:21:39Z</updated>
+    <updated>2019-01-25T23:21:45Z</updated>
     <author>
       <name/>
     </author>
@@ -385,7 +491,7 @@ Email: slovett@ucsd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-25T22:20:56Z</updated>
+      <updated>2019-01-25T23:53:11Z</updated>
     </source>
   </entry>
 
@@ -440,7 +546,7 @@ I've obviously over simplified the above but I really like this example. This is
       <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2019-01-25T22:12:02Z</updated>
+      <updated>2019-01-25T22:46:37Z</updated>
     </source>
   </entry>
 
@@ -468,266 +574,7 @@ I've obviously over simplified the above but I really like this example. This is
       <link href="http://corner.mimuw.edu.pl" rel="alternate" type="text/html"/>
       <subtitle>University of Warsaw</subtitle>
       <title>Banach's Algorithmic Corner</title>
-      <updated>2019-01-24T23:27:37Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1901.07928</id>
-    <link href="http://arxiv.org/abs/1901.07928" rel="alternate" type="text/html"/>
-    <title>Approximate k-Cover in Hypergraphs: Efficient Algorithms, and Applications</title>
-    <feedworld_mtime>1548288000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Nguyen:Hung.html">Hung Nguyen</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/t/Thai:Phuc.html">Phuc Thai</a>, My Thai, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/v/Vu:Tam.html">Tam Vu</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Dinh:Thang.html">Thang Dinh</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1901.07928">PDF</a><br/><b>Abstract: </b>Given a weighted hypergraph $\mathcal{H}(V, \mathcal{E} \subseteq 2^V, w)$,
-the approximate $k$-cover problem seeks for a size-$k$ subset of $V$ that has
-the maximum weighted coverage by \emph{sampling only a few hyperedges} in
-$\mathcal{E}$. The problem has emerged from several network analysis
-applications including viral marketing, centrality maximization, and landmark
-selection. Despite many efforts, even the best approaches require $O(k n \log
-n)$ space complexities, thus, cannot scale to, nowadays, humongous networks
-without sacrificing formal guarantees. In this paper, we propose BCA, a family
-of algorithms for approximate $k$-cover that can find $(1-\frac{1}{e}
--\epsilon)$-approximation solutions within an \emph{$O(\epsilon^{-2}n \log n)$
-space}. That is a factor $k$ reduction on space comparing to the
-state-of-the-art approaches with the same guarantee. We further make BCA more
-efficient and robust on real-world instances by introducing a novel adaptive
-sampling scheme, termed DTA.
-</p></div>
-    </summary>
-    <updated>2019-01-24T23:24:20Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2019-01-24T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1901.07906</id>
-    <link href="http://arxiv.org/abs/1901.07906" rel="alternate" type="text/html"/>
-    <title>How Many Passengers Can We Serve with Ride-sharing?</title>
-    <feedworld_mtime>1548288000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/t/Tan:Zeren.html">Zeren Tan</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1901.07906">PDF</a><br/><b>Abstract: </b>Ride-sharing can reduce traffic congestion and thus reduce gas emissions and
-save travel time. However, transportation system with ride-sharing is currently
-inefficient due to low occupancy rate, high travel demand and some other
-factors. Existing literature did not consider ride-sharing with multi-request
-grouped in one trip. In our paper, we firstly proposed a graph-based algorithm
-that can obtain an approximation solution in polynomial time and then proposed
-an exact algorithm to solve this problem with maximizing the number of
-passenegers served in $O(1.2312^{|\mathcal{E}|})$ time.
-</p></div>
-    </summary>
-    <updated>2019-01-24T23:22:25Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2019-01-24T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1901.07904</id>
-    <link href="http://arxiv.org/abs/1901.07904" rel="alternate" type="text/html"/>
-    <title>Solving unconstrained 0-1 polynomial programs through quadratic convex reformulation</title>
-    <feedworld_mtime>1548288000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/e/Elloumi:Sourour.html">Sourour Elloumi</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Lambert:Am=eacute=lie.html">Amélie Lambert</a>, Arnaud Lazare <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1901.07904">PDF</a><br/><b>Abstract: </b>We propose a solution approach for the problem (P) of minimizing an
-unconstrained binary polynomial optimization problem. We call this method PQCR
-(Polynomial Quadratic Convex Reformulation). The resolution is based on a
-3-phase method. The first phase consists in reformulating (P) into a quadratic
-program (QP). For this, we recursively reduce the degree of (P) to two, by use
-of the standard substitution of the product of two variables by a new one. We
-then obtain a linearly constrained binary program. In the second phase, we
-rewrite the quadratic objective function into an equivalent and parametrized
-quadratic function using the equality x 2 i = x i and new valid quadratic
-equalities. Then, we focus on finding the best parameters to get a quadratic
-convex program which continuous relaxation's optimal value is maximized. For
-this, we build a semidefinite relaxation (SDP) of (QP). Then, we prove that the
-standard linearization inequalities, used for the quadratization step, are
-redundant in (SDP) in presence of the new quadratic equalities. Next, we deduce
-our optimal parameters from the dual optimal solution of (SDP). The third phase
-consists in solving (QP *), the optimal reformulated problem, with a standard
-solver. In particular, at each node of the branch-and-bound, the solver
-computes the optimal value of a continuous quadratic convex program. We present
-computational results on instances of the image restoration problem and of the
-low autocorrelation binary sequence problem. We compare PQCR with other
-convexification methods, and with the general solver Baron 17.4.1 [39]. We
-observe that most of the considered instances can be solved with our approach
-combined with the use of Cplex [24].
-</p></div>
-    </summary>
-    <updated>2019-01-24T23:22:12Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2019-01-24T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1901.07825</id>
-    <link href="http://arxiv.org/abs/1901.07825" rel="alternate" type="text/html"/>
-    <title>On the Power of Symmetric Linear Programs</title>
-    <feedworld_mtime>1548288000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Atserias:Albert.html">Albert Atserias</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Dawar:Anuj.html">Anuj Dawar</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/o/Ochremiak:Joanna.html">Joanna Ochremiak</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1901.07825">PDF</a><br/><b>Abstract: </b>We consider families of symmetric linear programs (LPs) that decide a
-property of graphs (or other relational structures) in the sense that, for each
-size of graph, there is an LP defining a polyhedral lift that separates the
-integer points corresponding to graphs with the property from those
-corresponding to graphs without the property. We show that this is equivalent,
-with at most polynomial blow-up in size, to families of symmetric Boolean
-circuits with threshold gates. In particular, when we consider polynomial-size
-LPs, the model is equivalent to definability in a non-uniform version of
-fixed-point logic with counting (FPC). Known upper and lower bounds for FPC
-apply to the non-uniform version. In particular, this implies that the class of
-graphs with perfect matchings has polynomial-size symmetric LPs while we obtain
-an exponential lower bound for symmetric LPs for the class of Hamiltonian
-graphs. We compare and contrast this with previous results (Yannakakis 1991)
-showing that any symmetric LPs for the matching and TSP polytopes have
-exponential size. As an application, we establish that for random, uniformly
-distributed graphs, polynomial-size symmetric LPs are as powerful as general
-Boolean circuits. We illustrate the effect of this on the well-studied
-planted-clique problem.
-</p></div>
-    </summary>
-    <updated>2019-01-24T23:20:48Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Computational Complexity"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.CC" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Computational Complexity (cs.CC) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.CC updates on arXiv.org</title>
-      <updated>2019-01-24T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1901.07809</id>
-    <link href="http://arxiv.org/abs/1901.07809" rel="alternate" type="text/html"/>
-    <title>A randomized strategy in the mirror game</title>
-    <feedworld_mtime>1548288000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/f/Feige:Uriel.html">Uriel Feige</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1901.07809">PDF</a><br/><b>Abstract: </b>Alice and Bob take turns (with Alice playing first) in declaring numbers from
-the set $[1,2N]$. If a player declares a number that was previously declared,
-that player looses and the other player wins. If all numbers are declared
-without repetition, the outcome is a tie. If both players have unbounded memory
-and play optimally, then the game will be tied. Garg and Schneider [ITCS 2019]
-showed that if Alice has unbounded memory, then Bob can secure a tie with $\log
-N$ memory, whereas if Bob has unbounded memory, then Alice needs memory linear
-in $N$ in order to secure a tie.
-</p>
-<p>Garg and Schneider also considered an {\em auxiliary matching} model in which
-Alice gets as an additional input a random matching $M$ over the numbers
-$[1,2N]$, and storing this input does not count towards the memory used by
-Alice. They showed that is this model there is a strategy for Alice that ties
-with probability at least $1 - \frac{1}{N}$, and uses only $O(\sqrt{N} (\log
-N)^2)$ memory. We show how to modify Alice's strategy so that it uses only
-$O((\log N)^3)$ space.
-</p></div>
-    </summary>
-    <updated>2019-01-24T23:24:54Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2019-01-24T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1901.07609</id>
-    <link href="http://arxiv.org/abs/1901.07609" rel="alternate" type="text/html"/>
-    <title>Faster parameterized algorithm for Cluster Vertex Deletion</title>
-    <feedworld_mtime>1548288000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/t/Tsur:Dekel.html">Dekel Tsur</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1901.07609">PDF</a><br/><b>Abstract: </b>In the Cluster Vertex Deletion problem the input is a graph $G$ and an
-integer $k$. The goal is to decide whether there is a set of vertices $S$ of
-size at most $k$ such that the deletion of the vertices of $S$ from $G$ results
-a graph in which every connected component is a clique. We give an algorithm
-for Cluster Vertex Deletion whose running time is $O^*(1.811^k)$.
-</p></div>
-    </summary>
-    <updated>2019-01-24T23:21:57Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2019-01-24T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1901.07530</id>
-    <link href="http://arxiv.org/abs/1901.07530" rel="alternate" type="text/html"/>
-    <title>Minimum--Entropy Couplings and their Applications</title>
-    <feedworld_mtime>1548288000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Cicalese:Ferdinando.html">Ferdinando Cicalese</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Gargano:Luisa.html">Luisa Gargano</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/v/Vaccaro:Ugo.html">Ugo Vaccaro</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1901.07530">PDF</a><br/><b>Abstract: </b>Given two discrete random variables $X$ and $Y,$ with probability
-distributions ${\bf p}=(p_1, \ldots , p_n)$ and ${\bf q}=(q_1, \ldots , q_m)$,
-respectively, denote by ${\cal C}({\bf p}, {\bf q})$ the set of all couplings
-of ${\bf p}$ and ${\bf q}$, that is, the set of all bivariate probability
-distributions that have ${\bf p}$ and ${\bf q}$ as marginals. In this paper, we
-study the problem of finding a joint probability distribution in ${\cal C}({\bf
-p}, {\bf q})$ of \emph{minimum entropy} (equivalently, a coupling that
-\emph{maximizes} the mutual information between $X$ and $Y$), and we discuss
-several situations where the need for this kind of optimization naturally
-arises. Since the optimization problem is known to be NP-hard, we give an
-efficient algorithm to find a joint probability distribution in ${\cal C}({\bf
-p}, {\bf q})$ with entropy exceeding the minimum possible at most by {1 bit},
-thus providing an approximation algorithm with an additive gap of at most 1
-bit. Leveraging on this algorithm, we extend our result to the problem of
-finding a minimum--entropy joint distribution of arbitrary $k\geq 2$ discrete
-random variables $X_1, \ldots , X_k$, consistent with the known $k$ marginal
-distributions of the individual random variables $X_1, \ldots , X_k$. In this
-case, our algorithm has an { additive gap of at most $\log k$ from optimum.}
-</p>
-<p>We also discuss several related applications of our findings and {extensions
-of our results to entropies different from the Shannon entropy.}
-</p></div>
-    </summary>
-    <updated>2019-01-24T23:22:30Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2019-01-24T01:30:00Z</updated>
+      <updated>2019-01-25T23:53:46Z</updated>
     </source>
   </entry>
 
@@ -756,7 +603,7 @@ Email: kothari@cs.princeton.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-25T22:20:56Z</updated>
+      <updated>2019-01-25T23:53:11Z</updated>
     </source>
   </entry>
 
@@ -783,7 +630,7 @@ Email: koucky@iuuk.mff.cuni.cz</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-25T22:20:56Z</updated>
+      <updated>2019-01-25T23:53:11Z</updated>
     </source>
   </entry>
 
@@ -810,7 +657,7 @@ Email: koucky@iuuk.mff.cuni.cz</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-25T22:20:56Z</updated>
+      <updated>2019-01-25T23:53:11Z</updated>
     </source>
   </entry>
 
@@ -837,7 +684,7 @@ Email: koucky@iuuk.mff.cuni.cz</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-25T22:20:56Z</updated>
+      <updated>2019-01-25T23:53:11Z</updated>
     </source>
   </entry>
 
@@ -878,7 +725,7 @@ Email: koucky@iuuk.mff.cuni.cz</p></div>
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-01-25T22:20:52Z</updated>
+      <updated>2019-01-25T23:53:05Z</updated>
     </source>
   </entry>
 
@@ -997,7 +844,7 @@ Is there a simpler proof of this key fact? Is it possible to find an easier refe
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-01-25T22:20:53Z</updated>
+      <updated>2019-01-25T23:53:06Z</updated>
     </source>
   </entry>
 
@@ -1103,7 +950,7 @@ b) Freund and Schapire won the 2003 Godel Prize and the 2004 Kanellakis Award, b
       <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2019-01-25T22:12:02Z</updated>
+      <updated>2019-01-25T22:46:37Z</updated>
     </source>
   </entry>
 
@@ -1131,7 +978,7 @@ Our method reduces the general problem of factoring $f(x) \bmod p^k$ to that of 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-01-25T22:20:47Z</updated>
+      <updated>2019-01-25T23:52:54Z</updated>
     </source>
   </entry>
 
@@ -1246,7 +1093,7 @@ Our method reduces the general problem of factoring $f(x) \bmod p^k$ to that of 
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-01-25T22:21:25Z</updated>
+      <updated>2019-01-25T23:53:45Z</updated>
     </source>
   </entry>
 
@@ -1273,7 +1120,7 @@ Email: diz@utexas.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-25T22:20:56Z</updated>
+      <updated>2019-01-25T23:53:11Z</updated>
     </source>
   </entry>
 
@@ -1306,7 +1153,7 @@ Email: diz@utexas.edu</p></div>
       <link href="https://thmatters.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://thmatters.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theory Matters</title>
-      <updated>2019-01-25T22:21:16Z</updated>
+      <updated>2019-01-25T23:53:36Z</updated>
     </source>
   </entry>
 
@@ -1342,7 +1189,7 @@ Email: diz@utexas.edu</p></div>
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-01-25T22:20:52Z</updated>
+      <updated>2019-01-25T23:53:04Z</updated>
     </source>
   </entry>
 
@@ -1453,7 +1300,7 @@ Doesn't work for everyone and companies should make it easy to keep your info se
       <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2019-01-25T22:12:02Z</updated>
+      <updated>2019-01-25T22:46:37Z</updated>
     </source>
   </entry>
 
@@ -1482,7 +1329,7 @@ We use this technique to prove an explicit lower bound by showing that any linea
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-01-25T22:20:47Z</updated>
+      <updated>2019-01-25T23:52:54Z</updated>
     </source>
   </entry>
 
@@ -1506,7 +1353,7 @@ We use this technique to prove an explicit lower bound by showing that any linea
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-01-25T22:21:47Z</updated>
+      <updated>2019-01-25T23:54:23Z</updated>
     </source>
   </entry>
 
@@ -1531,7 +1378,7 @@ We use this technique to prove an explicit lower bound by showing that any linea
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-01-25T22:21:47Z</updated>
+      <updated>2019-01-25T23:54:23Z</updated>
     </source>
   </entry>
 
@@ -1555,7 +1402,7 @@ We use this technique to prove an explicit lower bound by showing that any linea
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-01-25T22:21:47Z</updated>
+      <updated>2019-01-25T23:54:23Z</updated>
     </source>
   </entry>
 
@@ -1579,7 +1426,216 @@ We use this technique to prove an explicit lower bound by showing that any linea
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-01-25T22:20:47Z</updated>
+      <updated>2019-01-25T23:52:54Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>https://eccc.weizmann.ac.il/report/2019/005</id>
+    <link href="https://eccc.weizmann.ac.il/report/2019/005" rel="alternate" type="text/html"/>
+    <title>TR19-005 |  An Exponential Lower Bound on the Sub-Packetization of MSR Codes | 
+
+	Omar Alrabiah, 
+
+	Venkatesan Guruswami</title>
+    <summary>An $(n,k,\ell)$-vector MDS code is a $\mathbb{F}$-linear subspace of $(\mathbb{F}^\ell)^n$ (for some field $\mathbb{F}$) of dimension $k\ell$, such that any $k$ (vector) symbols of the codeword suffice to determine the remaining $r=n-k$ (vector) symbols. The length $\ell$ of each codeword symbol is called the sub-packetization of the code. Such a code is called minimum storage regenerating (MSR), if any single symbol of a codeword can be recovered by downloading $\ell/r$ field elements (which is known to be the least possible) from each of the other symbols.
+
+MSR codes are attractive for use in distributed storage systems, and by now a variety of ingenious constructions of MSR codes are available. However, they all suffer from exponentially large sub-packetization of at least $r^{k/r}$. Our main result is an almost tight lower bound showing that for an MSR code, one must have $\ell \ge \exp(\Omega(k/r))$. Previously, a lower bound of $\approx \exp(\sqrt{k/r})$, and a tight lower bound for a restricted class of optimal access MSR codes, were known. Our work settles a key question concerning MSR codes that has received much attention, with a short proof hinging on one key definition that is somewhat inspired by Galois theory.</summary>
+    <updated>2019-01-16T18:36:24Z</updated>
+    <published>2019-01-16T18:36:24Z</published>
+    <source>
+      <id>https://eccc.weizmann.ac.il/</id>
+      <author>
+        <name>ECCC papers</name>
+      </author>
+      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
+      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
+      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
+      <title>ECCC - Reports</title>
+      <updated>2019-01-25T23:52:54Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://cstheory-jobs.org/2019/01/16/motwani-postdoctoral-fellowship-at-stanford-computer-science-apply-by-december-21-2019/</id>
+    <link href="https://cstheory-jobs.org/2019/01/16/motwani-postdoctoral-fellowship-at-stanford-computer-science-apply-by-december-21-2019/" rel="alternate" type="text/html"/>
+    <title>Motwani Postdoctoral Fellowship at Stanford Computer Science (apply by December 21, 2019)</title>
+    <summary>The theory group at Stanford invites applications for the Motwani postdoctoral fellowship in theoretical computer science. Information and application instructions below. Applications will be accepted until the positions are filled, but review of applicants will begin after Jan 21. Website: https://academicjobsonline.org/ajo/jobs/13134 Email: theory.stanford@gmail.com</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The theory group at Stanford invites applications for the Motwani postdoctoral fellowship in theoretical computer science. Information and application instructions below.</p>
+<p>Applications will be accepted until the positions are filled, but review of applicants will begin after Jan 21.</p>
+<p>Website: <a href="https://academicjobsonline.org/ajo/jobs/13134">https://academicjobsonline.org/ajo/jobs/13134</a><br/>
+Email: theory.stanford@gmail.com</p></div>
+    </content>
+    <updated>2019-01-16T18:32:56Z</updated>
+    <published>2019-01-16T18:32:56Z</published>
+    <category term="Uncategorized"/>
+    <author>
+      <name>shacharlovett</name>
+    </author>
+    <source>
+      <id>https://cstheory-jobs.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://cstheory-jobs.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://cstheory-jobs.org" rel="alternate" type="text/html"/>
+      <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <title>Theoretical Computer Science Jobs</title>
+      <updated>2019-01-25T23:53:11Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://cstheory-events.org/2019/01/15/9th-phd-summer-school-in-discrete-mathematics/</id>
+    <link href="https://cstheory-events.org/2019/01/15/9th-phd-summer-school-in-discrete-mathematics/" rel="alternate" type="text/html"/>
+    <title>9th PhD Summer School in Discrete Mathematics</title>
+    <summary>June 30 – July 6, 2019 Rogla, Slovenia https://conferences.famnit.upr.si/event/12/ The summer school will offer two mini-courses: “Combinatorial limits and their applications in extremal combinatorics” and “Coxeter groups”, as well as invited talks and student talks</summary>
+    <updated>2019-01-15T23:09:50Z</updated>
+    <published>2019-01-15T23:09:50Z</published>
+    <category term="school"/>
+    <author>
+      <name>shacharlovett</name>
+    </author>
+    <source>
+      <id>https://cstheory-events.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://cstheory-events.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://cstheory-events.org" rel="alternate" type="text/html"/>
+      <link href="https://cstheory-events.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
+      <title>CS Theory Events</title>
+      <updated>2019-01-25T23:54:23Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://cstheory-events.org/2019/01/15/5th-algorithmic-and-enumerative-combinatorics-summer-school-2019/</id>
+    <link href="https://cstheory-events.org/2019/01/15/5th-algorithmic-and-enumerative-combinatorics-summer-school-2019/" rel="alternate" type="text/html"/>
+    <title>5th Algorithmic and Enumerative Combinatorics Summer School 2019</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">July 29 – August 2, 2019 Hagenberg, Austria https://www3.risc.jku.at/conferences/aec2019/index.html n the spirit of the AEC2014, AEC2015, AEC2016 and AEC2018, the goal of this summer school is to put forward the interplay between the fields of Enumerative Combinatorics, Analytic Combinatorics, and Algorithmics. This is a very active research area, which, aside from the three fields fueling … <a class="more-link" href="https://cstheory-events.org/2019/01/15/5th-algorithmic-and-enumerative-combinatorics-summer-school-2019/">Continue reading <span class="screen-reader-text">5th Algorithmic and Enumerative Combinatorics Summer School 2019</span></a></div>
+    </summary>
+    <updated>2019-01-15T23:09:30Z</updated>
+    <published>2019-01-15T23:09:30Z</published>
+    <category term="school"/>
+    <author>
+      <name>shacharlovett</name>
+    </author>
+    <source>
+      <id>https://cstheory-events.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://cstheory-events.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://cstheory-events.org" rel="alternate" type="text/html"/>
+      <link href="https://cstheory-events.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
+      <title>CS Theory Events</title>
+      <updated>2019-01-25T23:54:23Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://cstheory-events.org/2019/01/15/spring-school-and-workshop-on-polytopes/</id>
+    <link href="https://cstheory-events.org/2019/01/15/spring-school-and-workshop-on-polytopes/" rel="alternate" type="text/html"/>
+    <title>Spring School and Workshop on Polytopes</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">March 11-15, 2019 Bochum, Germany https://www.rub.de/polytopes2019/ Registration deadline: February 11, 2019 The Spring School is designed for advanced bachelor, master and PhD students. The aim is to prepare the participants in such a way that they can follow the lectures of the subsequent workshop. It consists of three crash courses: Geometry of Polytopes, Monday (2x2h) … <a class="more-link" href="https://cstheory-events.org/2019/01/15/spring-school-and-workshop-on-polytopes/">Continue reading <span class="screen-reader-text">Spring School and Workshop on Polytopes</span></a></div>
+    </summary>
+    <updated>2019-01-15T23:08:56Z</updated>
+    <published>2019-01-15T23:08:56Z</published>
+    <category term="school"/>
+    <author>
+      <name>shacharlovett</name>
+    </author>
+    <source>
+      <id>https://cstheory-events.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://cstheory-events.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://cstheory-events.org" rel="alternate" type="text/html"/>
+      <link href="https://cstheory-events.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
+      <title>CS Theory Events</title>
+      <updated>2019-01-25T23:54:23Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2019/01/15/linkage</id>
+    <link href="https://11011110.github.io/blog/2019/01/15/linkage.html" rel="alternate" type="text/html"/>
+    <title>Linkage</title>
+    <summary>For the new year, I’ve decided to try to get back into taking photos more frequently, and to make it lower-overhead I’m making individual Mastodon posts for some of them rather than writing a longer blog post for every batch of photos. So that’s why you see a couple of those images inline here.</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>For the new year, I’ve decided to try to get back into taking photos more frequently, and to make it lower-overhead I’m making individual Mastodon posts for some of them rather than writing a longer blog post for every batch of photos. So that’s why you see a couple of those images inline here.</p>
+
+<ul>
+  <li>
+    <p><a href="https://community.wolfram.com/groups/-/m/t/1579272">Fitting in</a> (<a href="https://mathstodon.xyz/@shonk/101320172170027222"/>). Animated GIF of 124 disks packed (supposedly optimally) on a sphere and then steregraphically projected to the plane, by Clayton Shonkwiler.</p>
+  </li>
+  <li>
+    <p><a href="https://twitter.com/BrunoLevy01/status/1080085027210309632">More animated GIFs of fluids with splashy frothy surfaces</a> by Bruno Levy (<a href="https://mathstodon.xyz/@11011110/101349213452607605"/>). The fluids are modeled as power diagrams of systems of discrete points and simulated using methods from <a href="https://arxiv.org/abs/1605.00568">arXiv:1605.00568</a>.
+See follow-up tweets for source code and long explanatory video.</p>
+  </li>
+  <li>
+    <p><a href="https://arxiv.org/help/stats/2018_by_area/index">Lots of charts and plots of the growth of arXiv.org through 2018</a> (<a href="https://mathstodon.xyz/@11011110/101355877277070622"/>). In the area I moderate (cs.DS, algorithms and data structures) the number of preprints grew from 1597 in 2017 to 1767 in 2018, but this was a little below the 14% growth rate for arXiv overall, and was far outpaced by the rapid growth in cs.CV (computer vision), cs.LG (machine learning), and cs.CL (natural language processing).</p>
+  </li>
+  <li>
+    <p><a href="https://www.fortbraggalleywayart.org/the-fish-mural.html">Matsya And The Great Deluge</a> (<a href="https://mathstodon.xyz/@11011110/101361278765845519"/>). Street art from Fort Bragg illustrating an ancient Indian folk tale.</p>
+
+    <p style="text-align: center;"><a href="https://www.ics.uci.edu/~eppstein/pix/mfb/MatsyaAndTheGreatDeluge.html"><img alt="&quot;Matsya And The Great Deluge&quot; street art in Fort Bragg, California" src="https://www.ics.uci.edu/~eppstein/pix/mfb/MatsyaAndTheGreatDeluge-m.jpg" style="border-style: solid; border-color: black;"/></a></p>
+  </li>
+  <li>
+    <p><a href="https://www.metafilter.com/178580/Orange-Peels-and-Fresnel-Integrals-Train-Sets-The-Urinal-Problem">Orange peels and fresnel integrals! Train sets! The urinal problem!</a> (<a href="https://mathstodon.xyz/@11011110/101366435174480182"/>). Metafilter discovers <a href="https://mathstodon.xyz/@esoterica">Interesting Esoterica</a>.</p>
+  </li>
+  <li><a href="https://doi.org/10.1137/1.9781611975482"><em>Proceedings of the Thirtieth Annual ACM-SIAM Symposium on Discrete Algorithms (SODA 2019)</em></a> (<a href="https://mathstodon.xyz/@11011110/101373871420970067"/>). My favorite talk from the first day of SODA was “<a href="https://doi.org/10.1137/1.9781611975482.27">Extremal and probabilistic results for order types</a>” (Jie Han, Yoshiharu Kohayakawa, Marcelo T. Sales, and Henrique Stagni).
+Its main results are
+    <ol>
+      <li>the probability that a random point set has a specific order type is upper and lower bounded by functions of the smallest size of a grid containing the order type, and</li>
+      <li>every nontrivial hereditary property of point sets has probability  of being true of random point sets.</li>
+    </ol>
+  </li>
+  <li>
+    <p><a href="https://www.latimes.com/world/la-fg-iran-demographer-arrests-20190107-story.html">Iran arrests demographers, the latest target amid an escalating crackdown on academics and activists</a> (<a href="https://mathstodon.xyz/@11011110/101379517186873559"/>). One of the two arrestees is an Iranian-Australian dual citizen; the other is director of the Iranian National Institute of Population Research. The apparent reason for the arrest is that their research contradicted a political narrative of Iranian hardliners according to which Iran is suffering a population crash and must increase fertility.</p>
+  </li>
+  <li>
+    <p>The first sighting of one of my Wikipedia illustrations in a SODA talk goes to Michał Włodarczyk’s “<a href="https://doi.org/10.1137/1.9781611975482.104">Losing treewidth by separating subsets</a>” (<a href="https://mathstodon.xyz/@11011110/101389040748549759"/>). It concerns removing few graph vertices to reach a subgraph with some desired property. If the optimal solution removes  vertices and graphs with the property have treewidth , then his solution removes  vertices and takes the same time as exactly solving  subproblems of size .</p>
+  </li>
+  <li>
+    <p><a href="http://mybiasedcoin.blogspot.com/2019/01/analco-sosa-soda-post.html">Michael Mitzenmacher blogs about SODA, SOSA, ALENEX, and ANALCO</a> (<a href="https://mathstodon.xyz/@11011110/101390458273110460"/>).
+Michael was PC co-chair of <a href="https://simplicityinalgorithms.com/">SOSA</a>, which I was skeptical about (shouldn’t all the best algorithms be simple?), but the session I attended favorably impressed me. Here’s an example, a simple algorithm for <a href="https://arxiv.org/abs/1501.07460">2-approximating maximum genus oriented graph embedding</a>: greedily remove 2-edge paths while preserving connectivity. .</p>
+  </li>
+  <li>
+    <p><a href="http://www.ics.uci.edu/~eppstein/pubs/EppRee-SODA-19-slides.pdf">My SODA talk slides on finding laminar 3-vertex separators</a> (<a href="https://mathstodon.xyz/@11011110/101396845733518307"/>). At the talk, someone asked about finding a maximum set of laminar 3-separators. It’s NP-complete: use Uehara’s “<a href="https://www.jaist.ac.jp/~uehara/pdf/triangle.pdf">NP-complete problems on a 3-connected cubic graph and their applications</a>” to find cubic planar graphs whose -separators are vertex neighborhoods (so laminar separators = neighbors of independent vertices) in which maximum independent set is hard.</p>
+  </li>
+  <li>
+    <p>Spotted on the Cambridge University Press display table at SODA (<a href="https://mathstodon.xyz/@11011110/101402305412043483"/>):</p>
+
+    <p style="text-align: center;"><a href="https://www.ics.uci.edu/~eppstein/pix/soda-books/index.html"><img alt="Forbidden Configurations in Discrete Geometry on display alongside other Cambridge University Press books" src="https://www.ics.uci.edu/~eppstein/pix/soda-books/books-m.jpg" style="border-style: solid; border-color: black;"/></a></p>
+  </li>
+  <li>
+    <p><a href="https://codeparade.itch.io/marblemarcher">Marble Marcher</a> (<a href="https://mathstodon.xyz/@11011110/101407478247456589"/>, <a href="https://news.ycombinator.com/item?id=18805717">via</a>). A game of guiding a marble across a dynamically changing fractal surface. The key is to use the recursive structure of the fractal to make a data structure that can handle the interactions between the marble and the fractal surface quickly enough to run in realtime.</p>
+  </li>
+  <li>
+    <p><a href="https://thehighergeometer.wordpress.com/2019/01/13/some-serious-open-access-journals-in-mathematics/">A list of (respectable) open access journals in mathematics</a> (<a href="https://mathstodon.xyz/@11011110/101410796814360458"/>). <a href="http://jgaa.info/">JGAA</a> and <a href="http://jocg.org/">JoCG</a> not yet listed but maybe soon?</p>
+  </li>
+  <li>
+    <p><a href="https://www.metafilter.com/178755/Space-filling-curves-the-hard-way">Wacław Szpakowski’s space-filling curve art</a> (<a href="https://mastodon.social/@joshmillard/101415993062003559"/>).</p>
+  </li>
+  <li><a href="https://en.wikipedia.org/wiki/De_Bruijn%E2%80%93Erd%C5%91s_theorem_(graph_theory)">The De Bruijn–Erdős theorem</a> (<a href="https://mathstodon.xyz/@11011110/101421411362488773"/>): when all finite subgraphs of an infinite graph are -colorable, so is the whole graph. Now a Good Article on Wikipedia.</li>
+</ul></div>
+    </content>
+    <updated>2019-01-15T22:07:00Z</updated>
+    <published>2019-01-15T22:07:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2019-01-18T04:45:13Z</updated>
     </source>
   </entry>
 </feed>
