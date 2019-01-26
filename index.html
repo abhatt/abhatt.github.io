@@ -225,7 +225,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at January 26, 2019 06:21 PM UTC</span>.
+Last updated <span class="datestr">at January 26, 2019 07:21 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -233,6 +233,368 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://windowsontheory.org/?p=7420">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/wot.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://windowsontheory.org/2019/01/26/introduction-to-amp-and-the-replica-trick/">Introduction to AMP and the Replica Trick</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://windowsontheory.org" title="Windows On Theory">Windows on Theory</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p><em>(This post from the lecture by <span class="qu"><span class="gD">Yueqi </span></span><span class="qu"><span class="gD">Sheng)</span></span></em></p>
+<p>In this post, we will talk about detecting phase transitions using<br />
+Approximate-Message-Passing (AMP), which is an extension of<br />
+Belief-Propagation to “dense” models. We will also discuss the Replica<br />
+Symmetric trick, which is a heuristic method of analyzing phase<br />
+transitions. We focus on the Rademacher spiked Wigner model (defined<br />
+below), and show how both these methods yield the same phrase transition<br />
+in this setting.</p>
+<p>The Rademacher spiked Wigner model (RSW) is the following. We are given<br />
+observations <img src="https://s0.wp.com/latex.php?latex=Y+%3D+%5Cfrac%7B%5Clambda%7D%7Bn%7Dxx%5ET+%2B+%5Cfrac%7B1%7D%7B%5Csqrt%7Bn%7D%7DW&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y = \frac{\lambda}{n}xx^T + \frac{1}{\sqrt{n}}W" class="latex" title="Y = \frac{\lambda}{n}xx^T + \frac{1}{\sqrt{n}}W" /> where<br />
+<img src="https://s0.wp.com/latex.php?latex=x+%5Cin+%5C%7B%5Cpm+1%5C%7D%5En&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x \in \{\pm 1\}^n" class="latex" title="x \in \{\pm 1\}^n" /> (sampled uniformly) is the true signal and <img src="https://s0.wp.com/latex.php?latex=W&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="W" class="latex" title="W" /> is a<br />
+Gaussian-Orthogonal-Ensemble (GOE) matrix:<br />
+<img src="https://s0.wp.com/latex.php?latex=W_%7Bi%2C+j%7D+%5Csim+%5Cmathbb%7BN%7D%280%2C+1%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="W_{i, j} \sim \mathbb{N}(0, 1)" class="latex" title="W_{i, j} \sim \mathbb{N}(0, 1)" /> for <img src="https://s0.wp.com/latex.php?latex=i+%5Cneq+j&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i \neq j" class="latex" title="i \neq j" /> and<br />
+<img src="https://s0.wp.com/latex.php?latex=W_%7Bi%2C+i%7D+%5Csim+%5Cmathbb%7BN%7D%280%2C+2%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="W_{i, i} \sim \mathbb{N}(0, 2)" class="latex" title="W_{i, i} \sim \mathbb{N}(0, 2)" />. Here <img src="https://s0.wp.com/latex.php?latex=%5Clambda&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\lambda" class="latex" title="\lambda" /> is the signal to noise<br />
+ratio. The goal is to approximately recover <img src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x" class="latex" title="x" />.</p>
+<p>The question here is: how small can <img src="https://s0.wp.com/latex.php?latex=%5Clambda&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\lambda" class="latex" title="\lambda" /> be such that it is<br />
+impossible to recover anything reasonably correlated with the<br />
+ground-truth <img src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x" class="latex" title="x" />? And what do the approximate-message-passing algorithm<br />
+(or the replica method) have to say about this?</p>
+<p>To answer the first question, one can think of the task here is to<br />
+distinguish <img src="https://s0.wp.com/latex.php?latex=Y+%5Csim+%5Cfrac%7B%5Clambda%7D%7Bn%7Dxx%5ET+%2B+%5Cfrac%7B1%7D%7B%5Csqrt%7Bn%7D%7DW&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y \sim \frac{\lambda}{n}xx^T + \frac{1}{\sqrt{n}}W" class="latex" title="Y \sim \frac{\lambda}{n}xx^T + \frac{1}{\sqrt{n}}W" /> vs<br />
+<img src="https://s0.wp.com/latex.php?latex=Y+%5Csim+W&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y \sim W" class="latex" title="Y \sim W" />. One approach to distinguishing these distributions is to<br />
+look at the spectrum of the observation matrix <img src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y" class="latex" title="Y" />. (In fact, it turns<br />
+out that this is an asymptotically optimal distinguisher [1]). The spectrum of <img src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y" class="latex" title="Y" /> behaves as ([2]):</p>
+<ul>
+<li>When <img src="https://s0.wp.com/latex.php?latex=%5Clambda+%5Cleq+1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\lambda \leq 1" class="latex" title="\lambda \leq 1" />, the empirical distribution of eigenvalues in<br />
+spiked model still follows the semicircle law, with the top<br />
+eigenvalues <img src="https://s0.wp.com/latex.php?latex=%5Capprox+2&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\approx 2" class="latex" title="\approx 2" /><p></p>
+</li>
+<li>
+<p>When <img src="https://s0.wp.com/latex.php?latex=%5Clambda+%3E+1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\lambda &gt; 1" class="latex" title="\lambda &gt; 1" />, we start to see an eigenvalue <img src="https://s0.wp.com/latex.php?latex=%3E+2&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="&gt; 2" class="latex" title="&gt; 2" /> in the<br />
+planted model.</p>
+</li>
+</ul>
+<h1>Approximate message passing</h1>
+<p>This section approximately follows the exposition in [3].</p>
+<p>First, note that in the Rademacher spiked Wigner model, the posterior<br />
+distribution of the signal <img src="https://s0.wp.com/latex.php?latex=%5Csigma&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\sigma" class="latex" title="\sigma" /> conditioned on the observation <img src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y" class="latex" title="Y" /><br />
+is: <img src="https://s0.wp.com/latex.php?latex=%5CPr%5B%5Csigma+%7C+Y%5D+%5Cpropto+%5CPr%5BY+%7C+%5Csigma%5D+%5Cpropto+%5Cprod_%7Bi+%5Cneq+j%7D+%5Cexp%28%5Clambda+Y_%7Bi%2C+j%7D+%5Csigma_i+%5Csigma_j+%2F2+%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\Pr[\sigma | Y] \propto \Pr[Y | \sigma] \propto \prod_{i \neq j} \exp(\lambda Y_{i, j} \sigma_i \sigma_j /2 )" class="latex" title="\Pr[\sigma | Y] \propto \Pr[Y | \sigma] \propto \prod_{i \neq j} \exp(\lambda Y_{i, j} \sigma_i \sigma_j /2 )" /> This<br />
+defines a graphical-model (or “factor-graph”), over which we can perform<br />
+Belief-Propogation to infer the posterior distribution of <img src="https://s0.wp.com/latex.php?latex=%5Csigma&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\sigma" class="latex" title="\sigma" />.<br />
+However, in this case the factor-graph is dense (the distribution is a<br />
+product of potentials <img src="https://s0.wp.com/latex.php?latex=%5Cexp%28%5Clambda+Y_%7Bi%2C+j%7D+%5Csigma_i%5Csigma_j%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\exp(\lambda Y_{i, j} \sigma_i\sigma_j)" class="latex" title="\exp(\lambda Y_{i, j} \sigma_i\sigma_j)" /> for all<br />
+pairs of <img src="https://s0.wp.com/latex.php?latex=i%2C+j&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="i, j" class="latex" title="i, j" />).</p>
+<p>In the previous <a href="https://windowsontheory.org/2018/10/20/belief-propagation-and-the-stochastic-block-model/">blog post</a>, we saw belief propagation works great when the underlying interaction<br />
+graph is sparse. Intuitively, this is because <img src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="G" class="latex" title="G" /> is locally tree like,<br />
+which allows us to assume each messages are independent random<br />
+variables. In dense model, this no longer holds. One can think of dense<br />
+model as each node receive a weak signal from all its neighbors.</p>
+<p>In the dense model setting, a class of algorithms called Approximate<br />
+message passing (AMP) is proposed as an alternative of BP. We will<br />
+define AMP for RWM in terms of its state evolution.</p>
+<h2>State evolution of AMP for Rademacher spiked Wigner model</h2>
+<p>Recall that in BP, we wish to infer the posterior distributon of<br />
+<img src="https://s0.wp.com/latex.php?latex=%5Csigma&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\sigma" class="latex" title="\sigma" />, and the messages we pass between nodes correspond to marginal<br />
+probability distribution over values on nodes. In our setting, since the<br />
+distributions are over <img src="https://s0.wp.com/latex.php?latex=%5C%7B%5Cpm+1%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\{\pm 1\}" class="latex" title="\{\pm 1\}" />, we can represent distributions by<br />
+their expected values. Let <img src="https://s0.wp.com/latex.php?latex=m%5Et_%7Bu+%5Cto+v%7D+%5Cin+%5B-1%2C+1%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m^t_{u \to v} \in [-1, 1]" class="latex" title="m^t_{u \to v} \in [-1, 1]" /> denote the<br />
+message from <img src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="u" class="latex" title="u" /> to <img src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="v" class="latex" title="v" /> at time <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t" class="latex" title="t" />. That is, <img src="https://s0.wp.com/latex.php?latex=m_%7Bu+%5Cto+v%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m_{u \to v}" class="latex" title="m_{u \to v}" /> corresponds<br />
+to the expected value <img src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb%7BE%7D%7D%7D%5B%5Csigma_u%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="{{\mathbb{E}}}[\sigma_u]" class="latex" title="{{\mathbb{E}}}[\sigma_u]" />.</p>
+<p>To derive the BP update rules, we want to compute the expectation<br />
+<img src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb%7BE%7D%7D%7D%5B%5Csigma_v%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="{{\mathbb{E}}}[\sigma_v]" class="latex" title="{{\mathbb{E}}}[\sigma_v]" /> of a node <img src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="v" class="latex" title="v" />, given the<br />
+messages <img src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb%7BE%7D%7D%7D%5B%5Csigma_u%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="{{\mathbb{E}}}[\sigma_u]" class="latex" title="{{\mathbb{E}}}[\sigma_u]" /> for <img src="https://s0.wp.com/latex.php?latex=u+%5Cneq+v&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="u \neq v" class="latex" title="u \neq v" />. We can<br />
+do this using the posterior distribution of the RWM, <img src="https://s0.wp.com/latex.php?latex=%5CPr%5B%5Csigma+%7C+Y%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\Pr[\sigma | Y]" class="latex" title="\Pr[\sigma | Y]" />,<br />
+which we computed above.<br />
+<img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+%5CPr%5B%5Csigma_v+%3D+1+%7C+Y%2C+%5C%7B%5Csigma_u%5C%7D_%7Bu+%5Cneq+v%7D%5D+%3D+%5Cfrac%7B+%5Cprod_u+%5Cexp%28%5Clambda+Y_%7Bu%2C+v%7D+%5Csigma_u%29+-+%5Cprod_u+%5Cexp%28-%5Clambda+Y_%7Bu%2C+v%7D+%5Csigma_u%29+%7D%7B+%5Cprod_u+%5Cexp%28%5Clambda+Y_%7Bu%2C+v%7D+%5Csigma_u%29+%2B+%5Cprod_u+%5Cexp%28-%5Clambda+Y_%7Bu%2C+v%7D+%5Csigma_u%29+%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\displaystyle \Pr[\sigma_v = 1 | Y, \{\sigma_u\}_{u \neq v}] = \frac{ \prod_u \exp(\lambda Y_{u, v} \sigma_u) - \prod_u \exp(-\lambda Y_{u, v} \sigma_u) }{ \prod_u \exp(\lambda Y_{u, v} \sigma_u) + \prod_u \exp(-\lambda Y_{u, v} \sigma_u) }" class="latex" title="\displaystyle \Pr[\sigma_v = 1 | Y, \{\sigma_u\}_{u \neq v}] = \frac{ \prod_u \exp(\lambda Y_{u, v} \sigma_u) - \prod_u \exp(-\lambda Y_{u, v} \sigma_u) }{ \prod_u \exp(\lambda Y_{u, v} \sigma_u) + \prod_u \exp(-\lambda Y_{u, v} \sigma_u) }" /></p>
+<p>And similarly for <img src="https://s0.wp.com/latex.php?latex=%5CPr%5B%5Csigma_v+%3D+-1+%7C+Y%2C+%5C%7B%5Csigma_u%5C%7D_%7Bu+%5Cneq+v%7D%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\Pr[\sigma_v = -1 | Y, \{\sigma_u\}_{u \neq v}]" class="latex" title="\Pr[\sigma_v = -1 | Y, \{\sigma_u\}_{u \neq v}]" />.<br />
+From the above, we can take expectations over <img src="https://s0.wp.com/latex.php?latex=%5Csigma_u&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\sigma_u" class="latex" title="\sigma_u" />, and express<br />
+<img src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb%7BE%7D%7D%7D%5B%5Csigma_v%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="{{\mathbb{E}}}[\sigma_v]" class="latex" title="{{\mathbb{E}}}[\sigma_v]" /> in terms of<br />
+<img src="https://s0.wp.com/latex.php?latex=%5C%7B%7B%7B%5Cmathbb%7BE%7D%7D%7D%5B%5Csigma_u%5D%5C%7D_%7Bu+%5Cneq+v%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\{{{\mathbb{E}}}[\sigma_u]\}_{u \neq v}" class="latex" title="\{{{\mathbb{E}}}[\sigma_u]\}_{u \neq v}" />. Doing this (and<br />
+using the heuristic assumption that the distribution of <img src="https://s0.wp.com/latex.php?latex=%5Csigma&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\sigma" class="latex" title="\sigma" /> is a<br />
+product distribution), we find that the BP state update can be written<br />
+as:<br />
+<img src="https://s0.wp.com/latex.php?latex=m%5E%7Bt%7D_%7Bu+%5Cto+v%7D+%3D+f%28%5Csum_%7Bw+%5Cneq+v%7Df%5E%7B-1%7D%28A_%7Bw%2C+u%7D+m%5E%7Bt+-+1%7D_%7Bw+%5Cto+u%7D%29%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m^{t}_{u \to v} = f(\sum_{w \neq v}f^{-1}(A_{w, u} m^{t - 1}_{w \to u}))" class="latex" title="m^{t}_{u \to v} = f(\sum_{w \neq v}f^{-1}(A_{w, u} m^{t - 1}_{w \to u}))" /><br />
+where the interaction matrix <img src="https://s0.wp.com/latex.php?latex=A_%7Bw%2C+u%7D+%3D+%5Clambda+Y_%7Bw%2C+u%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="A_{w, u} = \lambda Y_{w, u}" class="latex" title="A_{w, u} = \lambda Y_{w, u}" />, and<br />
+<img src="https://s0.wp.com/latex.php?latex=f%28x%29+%3D+tanh%28x%29+%3D+%5Cfrac%7B%5Cexp%28x%29+-+%5Cexp%28-x%29%7D%7B%5Cexp%28x%29+%2B+%5Cexp%28x%29%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(x) = tanh(x) = \frac{\exp(x) - \exp(-x)}{\exp(x) + \exp(x)}" class="latex" title="f(x) = tanh(x) = \frac{\exp(x) - \exp(-x)}{\exp(x) + \exp(x)}" />.</p>
+<p>Now, Taylor expanding <img src="https://s0.wp.com/latex.php?latex=f%5E%7B-1%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f^{-1}" class="latex" title="f^{-1}" /> around <img src="https://s0.wp.com/latex.php?latex=0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="0" class="latex" title="0" />, we find<br />
+<img src="https://s0.wp.com/latex.php?latex=m%5E%7Bt%7D_%7Bu+%5Cto+v%7D+%3D+f%5Cleft%28+%28%5Csum_%7Bw+%5Cneq+v%7D+A_%7Bw%2C+u%7D+m%5E%7Bt+-+1%7D_%7Bw+%5Cto+u%7D%29+%2B+O%281%2F%5Csqrt%7Bn%7D%29+%5Cright%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m^{t}_{u \to v} = f\left( (\sum_{w \neq v} A_{w, u} m^{t - 1}_{w \to u}) + O(1/\sqrt{n}) \right)" class="latex" title="m^{t}_{u \to v} = f\left( (\sum_{w \neq v} A_{w, u} m^{t - 1}_{w \to u}) + O(1/\sqrt{n}) \right)" /><br />
+since the terms <img src="https://s0.wp.com/latex.php?latex=A_%7Bw%2C+u%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="A_{w, u}" class="latex" title="A_{w, u}" /> are of order <img src="https://s0.wp.com/latex.php?latex=O%281%2F%5Csqrt%7Bn%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="O(1/\sqrt{n})" class="latex" title="O(1/\sqrt{n})" />.</p>
+<p>At this point, we could try dropping the “non-backtracking” condition<br />
+<img src="https://s0.wp.com/latex.php?latex=w+%5Cneq+v&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="w \neq v" class="latex" title="w \neq v" /> from the above sum (since the node <img src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="v" class="latex" title="v" /> contributes at most<br />
+<img src="https://s0.wp.com/latex.php?latex=O%281%2F%5Csqrt%7Bn%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="O(1/\sqrt{n})" class="latex" title="O(1/\sqrt{n})" /> to the sum anyway), to get the state update:<br />
+<img src="https://s0.wp.com/latex.php?latex=m%5E%7Bt%7D_%7Bu%7D+%3D+f%5Cleft%28+%5Csum_%7Bw%7D+A_%7Bw%2C+u%7D+m%5E%7Bt+-+1%7D_%7Bw%7D%29+%5Cright%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m^{t}_{u} = f\left( \sum_{w} A_{w, u} m^{t - 1}_{w}) \right)" class="latex" title="m^{t}_{u} = f\left( \sum_{w} A_{w, u} m^{t - 1}_{w}) \right)" /> (note the messages no longer<br />
+depend on receiver – so we write <img src="https://s0.wp.com/latex.php?latex=m_u&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m_u" class="latex" title="m_u" /> in place of <img src="https://s0.wp.com/latex.php?latex=m_%7Bu+%5Cto+v%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m_{u \to v}" class="latex" title="m_{u \to v}" />).<br />
+However, this simplification turns out not to work for estimating the<br />
+signal. The problem is that the “backtracking” terms which we added<br />
+amplify over two iterations.</p>
+<p>In AMP, we simply perform the above procedure, except we add a<br />
+correction term to account for the backtracking issue above. Given <img src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="u" class="latex" title="u" />,<br />
+for all <img src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="v" class="latex" title="v" />, the AMP update is:<br />
+<img src="https://s0.wp.com/latex.php?latex=m%5E%7Bt%7D_%7Bu+%5Cto+v%7D+%3D+m%5E%7Bt%7D_u+%3D+f%28%5Csum_%7Bw%7DA_%7Bw%2C+u%7D+m%5E%7Bt+-+1%7D_%7Bw%7D%29+%2B+%5B%5Ctext%7Bsome+correction+term%7D%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m^{t}_{u \to v} = m^{t}_u = f(\sum_{w}A_{w, u} m^{t - 1}_{w}) + [\text{some correction term}]" class="latex" title="m^{t}_{u \to v} = m^{t}_u = f(\sum_{w}A_{w, u} m^{t - 1}_{w}) + [\text{some correction term}]" /></p>
+<p>The correction term corresponds to error introduced by the backtracking<br />
+terms. Suppose everything is good until step <img src="https://s0.wp.com/latex.php?latex=t+-+2&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t - 2" class="latex" title="t - 2" />. We will examine<br />
+the influence of backtracking term to a node <img src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="v" class="latex" title="v" /> through length 2 loops.<br />
+At time <img src="https://s0.wp.com/latex.php?latex=t+-+1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t - 1" class="latex" title="t - 1" />, <img src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="v" class="latex" title="v" /> exert <img src="https://s0.wp.com/latex.php?latex=Y_%7Bv%2C+u%7Dm%5E%7Bt+-+2%7D_v&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y_{v, u}m^{t - 2}_v" class="latex" title="Y_{v, u}m^{t - 2}_v" /> additional influence to<br />
+each of it’s neighbor <img src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="u" class="latex" title="u" />. At time <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t" class="latex" title="t" />, <img src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="v" class="latex" title="v" /> receive roughly<br />
+<img src="https://s0.wp.com/latex.php?latex=Y_%7Bu%2C+v%7D%5E2m%5E%7Bt+-+2%7D_v&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y_{u, v}^2m^{t - 2}_v" class="latex" title="Y_{u, v}^2m^{t - 2}_v" />. Since <img src="https://s0.wp.com/latex.php?latex=Y_%7Bu%2C+v%7D%5E2&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y_{u, v}^2" class="latex" title="Y_{u, v}^2" /> has magnitude<br />
+<img src="https://s0.wp.com/latex.php?latex=%5Capprox+%5Cfrac%7B1%7D%7Bn%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\approx \frac{1}{n}" class="latex" title="\approx \frac{1}{n}" /> and we need to sum over all of <img src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="v" class="latex" title="v" />’s neighbors,<br />
+this error term is to large to ignore. To characterize the exact form of<br />
+correction, we simply do a taylor expansion</p>
+<p><img src="https://s0.wp.com/latex.php?latex=m%5E%7Bt%7D_v+%3D+%5Csum_%7Bu%7Df%28Y_%7Bu%2C+v%7Dm%5E%7Bt+-+1%7D_u%29+%3D+%5Csum_%7Bu%7Df%28Y_%7Bu%2C+v%7D+%5Cleft%28%5Csum_%7Bw%7Df%28Y_%7Bw%2C+u%7Dm%5E%7Bt+-+2%7D_w%29+-+f%28Y_%7Bu%2C+v%7Dm%5E%7Bt+-+2%7D_w%29%5Cright%29+%29%5C%5C+%5Capprox+%5Csum_u+f%28Y_%7Bu%2C+v%7D+m%5E%7Bt+-+1%7D_u%29+-+Y_%7Bu%2C+v%7Df%27%28m%5E%7Bt+-+1%7D_u%29m%5E%7Bt+-+2%7D_v%5C%5C+%5Capprox+%5Csum_u+f%28Y_%7Bu%2C+v%7D+m%5E%7Bt+-+1%7D_u%29+-+%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bu%7Df%27%28m%5E%7Bt+-+1%7D_u%29m%5E%7Bt+-+2%7D_v&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m^{t}_v = \sum_{u}f(Y_{u, v}m^{t - 1}_u) = \sum_{u}f(Y_{u, v} \left(\sum_{w}f(Y_{w, u}m^{t - 2}_w) - f(Y_{u, v}m^{t - 2}_w)\right) )\\ \approx \sum_u f(Y_{u, v} m^{t - 1}_u) - Y_{u, v}f'(m^{t - 1}_u)m^{t - 2}_v\\ \approx \sum_u f(Y_{u, v} m^{t - 1}_u) - \frac{1}{n}\sum_{u}f'(m^{t - 1}_u)m^{t - 2}_v" class="latex" title="m^{t}_v = \sum_{u}f(Y_{u, v}m^{t - 1}_u) = \sum_{u}f(Y_{u, v} \left(\sum_{w}f(Y_{w, u}m^{t - 2}_w) - f(Y_{u, v}m^{t - 2}_w)\right) )\\ \approx \sum_u f(Y_{u, v} m^{t - 1}_u) - Y_{u, v}f'(m^{t - 1}_u)m^{t - 2}_v\\ \approx \sum_u f(Y_{u, v} m^{t - 1}_u) - \frac{1}{n}\sum_{u}f'(m^{t - 1}_u)m^{t - 2}_v" /></p>
+<h2>State evolution of AMP</h2>
+<p>In this section we attempt to obtain the phase transition of Rademacher<br />
+spiked Wigner model via looking at <img src="https://s0.wp.com/latex.php?latex=m%5E%7B%5Cinfty%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m^{\infty}" class="latex" title="m^{\infty}" />.</p>
+<p>We assume that each message could be written as a sum of signal term and<br />
+noise term. <img src="https://s0.wp.com/latex.php?latex=m%5Et+%3D+%5Cmu_t+x+%2B+%5Csigma_t+g&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m^t = \mu_t x + \sigma_t g" class="latex" title="m^t = \mu_t x + \sigma_t g" /> where<br />
+<img src="https://s0.wp.com/latex.php?latex=g+%5Csim+%5Cmathbb%7BN%7D%280%2C+I%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="g \sim \mathbb{N}(0, I)" class="latex" title="g \sim \mathbb{N}(0, I)" />. To the dynamics of AMP (and find its phase<br />
+transition), we need to look at how the signal <img src="https://s0.wp.com/latex.php?latex=%5Cmu_t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\mu_t" class="latex" title="\mu_t" /> and noise<br />
+<img src="https://s0.wp.com/latex.php?latex=%5Csigma_t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\sigma_t" class="latex" title="\sigma_t" /> evolves with <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t" class="latex" title="t" />.</p>
+<p>We do the following simplification: ignore the correction term and<br />
+assume each time we obtain an independent noise <img src="https://s0.wp.com/latex.php?latex=g&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="g" class="latex" title="g" />.</p>
+<p><img src="https://s0.wp.com/latex.php?latex=m%5E%7Bt%7D+%3D+Yf%28m%5E%7Bt+-+1%7D%29+%3D+%28%5Cfrac%7B%5Clambda%7D%7Bn%7Dx%5ETx+%2B+%5Cfrac%7B1%7D%7B%5Csqrt%7Bn%7D%7DW%29f%28m%5E%7Bt+-+1%7D%29+%3D+%5Cfrac%7B%5Clambda%7D%7Bn%7D+%3C+f%28m%5E%7Bt+-+1%7D%29%2C+x+%3E+x+%2B+%5Cfrac%7B1%7D%7B%5Csqrt%7Bn%7D%7D+Wf%28m%5E%7Bt+-+1%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m^{t} = Yf(m^{t - 1}) = (\frac{\lambda}{n}x^Tx + \frac{1}{\sqrt{n}}W)f(m^{t - 1}) = \frac{\lambda}{n} &lt; f(m^{t - 1}), x &gt; x + \frac{1}{\sqrt{n}} Wf(m^{t - 1})" class="latex" title="m^{t} = Yf(m^{t - 1}) = (\frac{\lambda}{n}x^Tx + \frac{1}{\sqrt{n}}W)f(m^{t - 1}) = \frac{\lambda}{n} &lt; f(m^{t - 1}), x &gt; x + \frac{1}{\sqrt{n}} Wf(m^{t - 1})" /></p>
+<p>Here, we see that <img src="https://s0.wp.com/latex.php?latex=%5Cmu_t+%3D+%5Cfrac%7B%5Clambda%7D%7Bn%7D%3C+f%28m%5E%7Bt+-+1%7D%29%2C+x%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\mu_t = \frac{\lambda}{n}&lt; f(m^{t - 1}), x&gt;" class="latex" title="\mu_t = \frac{\lambda}{n}&lt; f(m^{t - 1}), x&gt;" /><br />
+and <img src="https://s0.wp.com/latex.php?latex=%5Csigma_t+%3D+%5Cfrac%7B1%7D%7B%5Csqrt%7Bn%7D%7DWf%28m%5E%7Bt+-+1%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\sigma_t = \frac{1}{\sqrt{n}}Wf(m^{t - 1})" class="latex" title="\sigma_t = \frac{1}{\sqrt{n}}Wf(m^{t - 1})" />.</p>
+<p><em>Note that <img src="https://s0.wp.com/latex.php?latex=%5Cmu_%7Bt%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\mu_{t}" class="latex" title="\mu_{t}" /> is essentially proportional to overlap between<br />
+ground truth and current belief</em>, since the function <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f" class="latex" title="f" /> keeps the<br />
+magnitude of the current beliefs bounded.</p>
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B%5Clambda%7D%7Bn%7D+%3Cf%28m%5E%7Bt+-+1%7D%29%2C+x%3E%3D+%5Cfrac%7B%5Clambda%7D%7Bn%7D+%3Cf%28%5Cmu_%7Bt+-+1%7Dx+%2B+%5Csigma_%7Bt+-+1%7Dg%29%2C+x%3E+%5Capprox%5Clambda+%7B%7B%5Cmathbb%7BE%7D%7D%7D_%7BX+%5Csim+unif%28%5Cpm+1%29%2C+G%5Csim+%5Cmathbb%7BN%7D%280%2C+1%29%7D%5BX+f%28%5Cmu_%7Bt+-+1%7DX+%2B+%5Csigma_%7Bt+-+1%7DG%29%5D+%3D+%5Clambda+%7B%7B%5Cmathbb%7BE%7D%7D%7D_G%5Bf%28%5Cmu_%7Bt+-+1%7D+%2B+%5Csigma_%7Bt+-+1%7DG%29%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\frac{\lambda}{n} &lt;f(m^{t - 1}), x&gt;= \frac{\lambda}{n} &lt;f(\mu_{t - 1}x + \sigma_{t - 1}g), x&gt; \approx\lambda {{\mathbb{E}}}_{X \sim unif(\pm 1), G\sim \mathbb{N}(0, 1)}[X f(\mu_{t - 1}X + \sigma_{t - 1}G)] = \lambda {{\mathbb{E}}}_G[f(\mu_{t - 1} + \sigma_{t - 1}G)]" class="latex" title="\frac{\lambda}{n} &lt;f(m^{t - 1}), x&gt;= \frac{\lambda}{n} &lt;f(\mu_{t - 1}x + \sigma_{t - 1}g), x&gt; \approx\lambda {{\mathbb{E}}}_{X \sim unif(\pm 1), G\sim \mathbb{N}(0, 1)}[X f(\mu_{t - 1}X + \sigma_{t - 1}G)] = \lambda {{\mathbb{E}}}_G[f(\mu_{t - 1} + \sigma_{t - 1}G)]" /></p>
+<p>For the noise term, each coordinate of <img src="https://s0.wp.com/latex.php?latex=%5Csigma_t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\sigma_t" class="latex" title="\sigma_t" /> is a gaussian random<br />
+variable with <img src="https://s0.wp.com/latex.php?latex=0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="0" class="latex" title="0" /> mean and variance</p>
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7Bn%7D+%5Csum_v+f%28m%5E%7Bt+-+1%7D%29_v%5E2+%5Capprox+%7B%7B%5Cmathbb%7BE%7D%7D%7D_%7BX%2C+G%7D%5Bf%28%5Cmu_%7Bt+-+1%7DX+%2B+%5Csigma_%7Bt+-+1%7DG%29%5E2%5D+%3D+%7B%7B%5Cmathbb%7BE%7D%7D%7D_%7BG%7D%5Bf%28%5Cmu_%7Bt+-+1%7D+%2B+%5Csigma_%7Bt+-+1%7DG%29%5E2%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\frac{1}{n} \sum_v f(m^{t - 1})_v^2 \approx {{\mathbb{E}}}_{X, G}[f(\mu_{t - 1}X + \sigma_{t - 1}G)^2] = {{\mathbb{E}}}_{G}[f(\mu_{t - 1} + \sigma_{t - 1}G)^2]" class="latex" title="\frac{1}{n} \sum_v f(m^{t - 1})_v^2 \approx {{\mathbb{E}}}_{X, G}[f(\mu_{t - 1}X + \sigma_{t - 1}G)^2] = {{\mathbb{E}}}_{G}[f(\mu_{t - 1} + \sigma_{t - 1}G)^2]" /></p>
+<p>It was shown in [4] that we can introduce a new<br />
+parameter <img src="https://s0.wp.com/latex.php?latex=%5Cgamma_t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\gamma_t" class="latex" title="\gamma_t" /> s.t.<br />
+<img src="https://s0.wp.com/latex.php?latex=%5Cgamma_t+%3D+%5Clambda%5E2+%7B%7B%5Cmathbb%7BE%7D%7D%7D%5Bf%28%5Cgamma_%7Bt+-+1%7D+%2B+%5Csqrt%7B%5Cgamma_%7Bt+-+1%7D%7DG%29%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\gamma_t = \lambda^2 {{\mathbb{E}}}[f(\gamma_{t - 1} + \sqrt{\gamma_{t - 1}}G)]" class="latex" title="\gamma_t = \lambda^2 {{\mathbb{E}}}[f(\gamma_{t - 1} + \sqrt{\gamma_{t - 1}}G)]" /><br />
+As <img src="https://s0.wp.com/latex.php?latex=t+%5Cto+%5Cinfty&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t \to \infty" class="latex" title="t \to \infty" />, turns out <img src="https://s0.wp.com/latex.php?latex=%5Cmu_t+%3D+%5Cfrac%7B%5Cgamma_t%7D%7B%5Clambda%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\mu_t = \frac{\gamma_t}{\lambda}" class="latex" title="\mu_t = \frac{\gamma_t}{\lambda}" /> and<br />
+<img src="https://s0.wp.com/latex.php?latex=%5Csigma_t%5E2+%3D+%5Cfrac%7B%5Csigma_t%7D%7B%5Clambda%5E2%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\sigma_t^2 = \frac{\sigma_t}{\lambda^2}" class="latex" title="\sigma_t^2 = \frac{\sigma_t}{\lambda^2}" />. To study the behavior of<br />
+<img src="https://s0.wp.com/latex.php?latex=m%5Et&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="m^t" class="latex" title="m^t" /> as <img src="https://s0.wp.com/latex.php?latex=t+%5Cto+%5Cinfty&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t \to \infty" class="latex" title="t \to \infty" />, it is enough to track the evolution of<br />
+<img src="https://s0.wp.com/latex.php?latex=%5Cgamma_t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\gamma_t" class="latex" title="\gamma_t" />.</p>
+<p>This heuristic analysis of AMP actually gives a phase transition at<br />
+<img src="https://s0.wp.com/latex.php?latex=%5Clambda+%3D+1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\lambda = 1" class="latex" title="\lambda = 1" /> (in fact, the analysis of AMP can be done rigorously as in [5]):</p>
+<ul>
+<li>For <img src="https://s0.wp.com/latex.php?latex=%5Clambda+%3C+1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\lambda &lt; 1" class="latex" title="\lambda &lt; 1" />: If <img src="https://s0.wp.com/latex.php?latex=%5Cgamma_t+%5Capprox+0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\gamma_t \approx 0" class="latex" title="\gamma_t \approx 0" />, <img src="https://s0.wp.com/latex.php?latex=%7C%5Cgamma_t+%2B+%5Csqrt%7B%5Cgamma_t%7DG%7C+%3C+1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="|\gamma_t + \sqrt{\gamma_t}G| &lt; 1" class="latex" title="|\gamma_t + \sqrt{\gamma_t}G| &lt; 1" /> w.h.p., thus we have <img src="https://s0.wp.com/latex.php?latex=%5Cgamma_%7Bt+%2B+1%7D+%5Capprox+%5Clambda%5E2+%28%5Cgamma_t%29+%3C+%5Cgamma_t&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\gamma_{t + 1} \approx \lambda^2 (\gamma_t) &lt; \gamma_t" class="latex" title="\gamma_{t + 1} \approx \lambda^2 (\gamma_t) &lt; \gamma_t" />. Taking <img src="https://s0.wp.com/latex.php?latex=t+%5Cto+%5Cinfty&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="t \to \infty" class="latex" title="t \to \infty" />, we have <img src="https://s0.wp.com/latex.php?latex=%5Cgamma_%7B%5Cinfty%7D+%3D+0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\gamma_{\infty} = 0" class="latex" title="\gamma_{\infty} = 0" />, which means there AMP solution has no overlap with the ground truth.<p></p>
+</li>
+<li>
+<p>For <img src="https://s0.wp.com/latex.php?latex=%5Clambda+%3E+1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\lambda &gt; 1" class="latex" title="\lambda &gt; 1" />: In this case, AMP’s solution has some correlation with the ground truth.</p>
+</li>
+</ul>
+<p><img src="https://windowsontheory.files.wordpress.com/2019/01/screenshot-2019-01-26-13.49.39.png?w=600" alt="screenshot 2019-01-26 13.49.39" class="alignnone size-full wp-image-7422" /></p>
+<p>(Figure from [6])</p>
+<h1>Replica symmetry trick</h1>
+<p>Another way of obtaining the phase transition is via a non-rigorous<br />
+analytic method called the replica method. Although non-rigorous, this<br />
+method from statistical physics has been used to predict the fixed point<br />
+of many message passing algorithms and has the advantage of being easy<br />
+to simulate. In our case, we will see that we obtain the same phase<br />
+transition temperature as AMP above. The method is non-rigorous due to<br />
+several assumptions made during the computation.</p>
+<h2>Outline of replica method</h2>
+<p>Recall that we are interested in minizing the free energy of a given<br />
+system <img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%2C+Y%29+%3D+%5Cfrac%7B1%7D%7B%5Cbeta+n%7D+%5Clog+Z%28%5Cbeta%2C+Y%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta, Y) = \frac{1}{\beta n} \log Z(\beta, Y)" class="latex" title="f(\beta, Y) = \frac{1}{\beta n} \log Z(\beta, Y)" /> where <img src="https://s0.wp.com/latex.php?latex=Z&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Z" class="latex" title="Z" /> is<br />
+the partition function as before:<br />
+<img src="https://s0.wp.com/latex.php?latex=Z%28%5Cbeta%2C+Y%29+%3D+%5Csum_%7Bx+%5Cin+%5C%7B%5Cpm+1%5C%7D%5En%7D+exp%28-%5Cbeta+H%28Y%2C+x%29%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Z(\beta, Y) = \sum_{x \in \{\pm 1\}^n} exp(-\beta H(Y, x))" class="latex" title="Z(\beta, Y) = \sum_{x \in \{\pm 1\}^n} exp(-\beta H(Y, x))" /> and<br />
+<img src="https://s0.wp.com/latex.php?latex=H%28Y%2C+x%29+%3D+-%3CY%2C+x%5ETx%3E+%3D+-xYx%5ET+%3D+-%5Csum_%7Bi%2C+j%7D+Y_%7Bi%2C+j%7Dx_ix_j&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="H(Y, x) = -&lt;Y, x^Tx&gt; = -xYx^T = -\sum_{i, j} Y_{i, j}x_ix_j" class="latex" title="H(Y, x) = -&lt;Y, x^Tx&gt; = -xYx^T = -\sum_{i, j} Y_{i, j}x_ix_j" />.</p>
+<p>In replica method, <img src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y" class="latex" title="Y" /> is not fixed but a random variable. The<br />
+assumption is that as <img src="https://s0.wp.com/latex.php?latex=n+%5Cto+%5Cinfty&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n \to \infty" class="latex" title="n \to \infty" />, free energy doesn’t vary with <img src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y" class="latex" title="Y" /><br />
+too much, so we will look at the mean of <img src="https://s0.wp.com/latex.php?latex=f_Y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f_Y" class="latex" title="f_Y" /> to approximate free<br />
+energy of the system.</p>
+<p><img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%29+%3D+%5Clim_%7Bn+%5Cto+%5Cinfty%7D%5Cfrac%7B1%7D%7B%5Cbeta+n%7D%7B%7B%5Cmathbb%7BE%7D%7D%7D_%7BY%7D%5B%5Clog+Z%28%5Cbeta%2C+Y%29%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta) = \lim_{n \to \infty}\frac{1}{\beta n}{{\mathbb{E}}}_{Y}[\log Z(\beta, Y)]" class="latex" title="f(\beta) = \lim_{n \to \infty}\frac{1}{\beta n}{{\mathbb{E}}}_{Y}[\log Z(\beta, Y)]" /></p>
+<p><img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta)" class="latex" title="f(\beta)" /> is called the free energy density and the goal now is to<br />
+compute the free energy density as a function of only <img src="https://s0.wp.com/latex.php?latex=%5Cbeta&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\beta" class="latex" title="\beta" /> , the<br />
+temperature of the system.</p>
+<p>The <strong>replica method</strong> is first proposed as a simplification of the<br />
+computation of <img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta)" class="latex" title="f(\beta)" /></p>
+<p>It is a generally hard problem to compute <img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta)" class="latex" title="f(\beta)" /> in a clear way. A<br />
+naive attempt of approximate <img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta)" class="latex" title="f(\beta)" /> is to simply pull the log out<br />
+<img src="https://s0.wp.com/latex.php?latex=g%28%5Cbeta%29+%3D+%5Cfrac%7B1%7D%7B%5Cbeta+n%7D%5Clog+%7B%7B%5Cmathbb%7BE%7D%7D%7D_Y%5BZ%28%5Cbeta%2C+Y%29%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="g(\beta) = \frac{1}{\beta n}\log {{\mathbb{E}}}_Y[Z(\beta, Y)]" class="latex" title="g(\beta) = \frac{1}{\beta n}\log {{\mathbb{E}}}_Y[Z(\beta, Y)]" /><br />
+Unfortunately <img src="https://s0.wp.com/latex.php?latex=g%28%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="g(\beta)" class="latex" title="g(\beta)" /> and <img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta)" class="latex" title="f(\beta)" /> are quite different quantities,<br />
+at least when temperature is low. Intuitively, <img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta)" class="latex" title="f(\beta)" /> is looking at<br />
+system with a fixed <img src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y" class="latex" title="Y" /> while in <img src="https://s0.wp.com/latex.php?latex=g%28%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="g(\beta)" class="latex" title="g(\beta)" />, <img src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x" class="latex" title="x" /> and <img src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y" class="latex" title="Y" /> are allowed to<br />
+fluctuate together. When the temperature is high, <img src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y" class="latex" title="Y" /> doesn’t play a big<br />
+roll in system thus they could be close. However, when temperature is<br />
+low, there could be a problems. Let <img src="https://s0.wp.com/latex.php?latex=%5Cbeta+%5Cto+%5Cinfty&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\beta \to \infty" class="latex" title="\beta \to \infty" />,<br />
+<img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%29+%5Capprox+%5Cint_Y+%28%5Cbeta+x_Y+Y+x_Y%29%5Cmu%28Y%29+dY&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta) \approx \int_Y (\beta x_Y Y x_Y)\mu(Y) dY" class="latex" title="f(\beta) \approx \int_Y (\beta x_Y Y x_Y)\mu(Y) dY" />,<br />
+<img src="https://s0.wp.com/latex.php?latex=g%28%5Cbeta%29+%5Capprox+%5Clog+%5Cint_Y+exp%28%5Cbeta+x_J+Y+x_Y%29%5Cmu%28Y%29dY+%5Capprox+%5Cbeta+x%5E%2A+Yx%5E%2A&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="g(\beta) \approx \log \int_Y exp(\beta x_J Y x_Y)\mu(Y)dY \approx \beta x^* Yx^*" class="latex" title="g(\beta) \approx \log \int_Y exp(\beta x_J Y x_Y)\mu(Y)dY \approx \beta x^* Yx^*" />.</p>
+<p>While <img src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb%7BE%7D%7D%7D_X%5B%5Clog%28f%28X%29%29%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="{{\mathbb{E}}}_X[\log(f(X))]" class="latex" title="{{\mathbb{E}}}_X[\log(f(X))]" /> is hard to compute,<br />
+<img src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb%7BE%7D%7D%7D%5Bf%28X%29%5Er%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="{{\mathbb{E}}}[f(X)^r]" class="latex" title="{{\mathbb{E}}}[f(X)^r]" /> is a much easier quantity. The<br />
+replica trick starts from rewriting <img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta)" class="latex" title="f(\beta)" /> with moments of <img src="https://s0.wp.com/latex.php?latex=Z&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Z" class="latex" title="Z" />:<br />
+Recall that <img src="https://s0.wp.com/latex.php?latex=x%5Er+%5Capprox+1+%2B+r+%5Clog+x&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x^r \approx 1 + r \log x" class="latex" title="x^r \approx 1 + r \log x" /> for <img src="https://s0.wp.com/latex.php?latex=r+%5Capprox+0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="r \approx 0" class="latex" title="r \approx 0" /> and<br />
+<img src="https://s0.wp.com/latex.php?latex=%5Cln%281+%2B+x%29%5Capprox+x&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\ln(1 + x)\approx x" class="latex" title="\ln(1 + x)\approx x" />, using this we can rewrite <img src="https://s0.wp.com/latex.php?latex=f%28x%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(x)" class="latex" title="f(x)" /> in the following<br />
+way:</p>
+<p><strong>Claim 1.</strong> <em>Let <img src="https://s0.wp.com/latex.php?latex=f_r%28%5Cbeta%29+%3D+%5Cfrac%7B1%7D%7Br+%5Cbeta+n%7D%5Cln%5B%7B%7B%5Cmathbb%7BE%7D%7D%7D_Y%5BZ%28%5Cbeta%2C+Y%29%5Er%5D%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f_r(\beta) = \frac{1}{r \beta n}\ln[{{\mathbb{E}}}_Y[Z(\beta, Y)^r]]" class="latex" title="f_r(\beta) = \frac{1}{r \beta n}\ln[{{\mathbb{E}}}_Y[Z(\beta, Y)^r]]" /></em><br />
+<em>Then, <img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%29+%3D+%5Clim_%7Br+%5Cto+0%7Df_r%28%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta) = \lim_{r \to 0}f_r(\beta)" class="latex" title="f(\beta) = \lim_{r \to 0}f_r(\beta)" /></em></p>
+<p>The idea of replica method is quite simple</p>
+<ul>
+<li>Define a function <img src="https://s0.wp.com/latex.php?latex=f%28r%2C+%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(r, \beta)" class="latex" title="f(r, \beta)" /> for <img src="https://s0.wp.com/latex.php?latex=r+%5Cin+%5Cmathbb%7BZ%7D_%2B&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="r \in \mathbb{Z}_+" class="latex" title="r \in \mathbb{Z}_+" /> s.t. <img src="https://s0.wp.com/latex.php?latex=f%28r%2C+%5Cbeta%29+%3D+f_r%28%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(r, \beta) = f_r(\beta)" class="latex" title="f(r, \beta) = f_r(\beta)" /> for all such <img src="https://s0.wp.com/latex.php?latex=r&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="r" class="latex" title="r" />.<p></p>
+</li>
+<li>
+<p>Extend <img src="https://s0.wp.com/latex.php?latex=f%28r%2C+%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(r, \beta)" class="latex" title="f(r, \beta)" /> analytically to all <img src="https://s0.wp.com/latex.php?latex=r+%5Cin+%7B%7B%5Cmathbb%7BR%7D%7D%7D_%2B&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="r \in {{\mathbb{R}}}_+" class="latex" title="r \in {{\mathbb{R}}}_+" /> and take the limit of <img src="https://s0.wp.com/latex.php?latex=r+%5Cto+0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="r \to 0" class="latex" title="r \to 0" />.</p>
+</li>
+</ul>
+<p>The second step may sound crazy, but for some unexplained reason, it has<br />
+been surprisingly effective at making correct predictions.</p>
+<p>The term replica comes from the way used to compute<br />
+<img src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb%7BE%7D%7D%7D%5BZ%5Er%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="{{\mathbb{E}}}[Z^r]" class="latex" title="{{\mathbb{E}}}[Z^r]" /> in Claim 1. We expand the <img src="https://s0.wp.com/latex.php?latex=r&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="r" class="latex" title="r" />-th moment<br />
+in terms of <img src="https://s0.wp.com/latex.php?latex=r&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="r" class="latex" title="r" /> replicas of the system</p>
+<p><img src="https://s0.wp.com/latex.php?latex=Z%28%5Cbeta%2C+Y%29%5Er+%3D+%28%5Csum_x+exp%28-%5Cbeta+H%28Y%2C+x%29%29%29%5Er+%3D+%5Csum_%7Bx%5E1%2C+%5Ccdots%2C+x%5Er%7D+%5CPi_%7Bk+%3D+1%7D%5Er+exp%28-%5Cbeta+H%28Y%2C+x%5Ei%29%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Z(\beta, Y)^r = (\sum_x exp(-\beta H(Y, x)))^r = \sum_{x^1, \cdots, x^r} \Pi_{k = 1}^r exp(-\beta H(Y, x^i))" class="latex" title="Z(\beta, Y)^r = (\sum_x exp(-\beta H(Y, x)))^r = \sum_{x^1, \cdots, x^r} \Pi_{k = 1}^r exp(-\beta H(Y, x^i))" /></p>
+<h2>For Rademacher spiked Wigner model</h2>
+<p>In this section, we will see how one can apply the replica trick to<br />
+obtain phase transition in the Rademacher spiked Wigner model. Recall<br />
+that given a hidden <img src="https://s0.wp.com/latex.php?latex=a+%5Cin+%5C%7B%5Cpm+1%5C%7D%5En&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="a \in \{\pm 1\}^n" class="latex" title="a \in \{\pm 1\}^n" />, the observable<br />
+<img src="https://s0.wp.com/latex.php?latex=Y+%3D+%5Cfrac%7B%5Clambda%7D%7Bn%7Da%5ETa+%2B+%5Cfrac%7B1%7D%7B%5Csqrt+n%7D+W&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y = \frac{\lambda}{n}a^Ta + \frac{1}{\sqrt n} W" class="latex" title="Y = \frac{\lambda}{n}a^Ta + \frac{1}{\sqrt n} W" /> where<br />
+<img src="https://s0.wp.com/latex.php?latex=W_%7Bi%2C+j%7D+%5Csim+%5Cmathcal%7BN%7D%280%2C+1%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="W_{i, j} \sim \mathcal{N}(0, 1)" class="latex" title="W_{i, j} \sim \mathcal{N}(0, 1)" /> and <img src="https://s0.wp.com/latex.php?latex=W_%7Bi%2C+i%7D+%5Csim+%5Cmathcal%7BN%7D%280%2C+2%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="W_{i, i} \sim \mathcal{N}(0, 2)" class="latex" title="W_{i, i} \sim \mathcal{N}(0, 2)" />.<br />
+We are interested in finding the smallest <img src="https://s0.wp.com/latex.php?latex=%5Clambda&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\lambda" class="latex" title="\lambda" /> where we can still<br />
+recover a solution with some correlation to the ground truth <img src="https://s0.wp.com/latex.php?latex=a&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="a" class="latex" title="a" />. <em>Note<br />
+that <img src="https://s0.wp.com/latex.php?latex=%5C%7BW_%7Bi%2C+i%7D%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\{W_{i, i}\}" class="latex" title="\{W_{i, i}\}" /> is not so important here as <img src="https://s0.wp.com/latex.php?latex=x_i%5E2&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x_i^2" class="latex" title="x_i^2" /> doesn’t carry<br />
+any information in this case.</em></p>
+<p>Given by the posterior <img src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb%7BP%7D%7D%7D%5Bx%7CY%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="{{\mathbb{P}}}[x|Y]" class="latex" title="{{\mathbb{P}}}[x|Y]" />, the system we<br />
+set up corresponding to Rademacher spiked Wigner model is the following:</p>
+<ul>
+<li>the system consists of <img src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n" class="latex" title="n" /> particles and the interactions between<br />
+each particle are give by <img src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y" class="latex" title="Y" /><p></p>
+</li>
+<li>
+<p>the signal to noise ratio <img src="https://s0.wp.com/latex.php?latex=%5Clambda&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\lambda" class="latex" title="\lambda" /> as the inverse temperature<br />
+<img src="https://s0.wp.com/latex.php?latex=%5Cbeta&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\beta" class="latex" title="\beta" />.</p>
+</li>
+</ul>
+<p>Following the steps above, we begin by computing<br />
+<img src="https://s0.wp.com/latex.php?latex=f%28r%2C+%5Cbeta%29+%3D+%5Cfrac%7B1%7D%7Br%5Cbeta+n%7D%5Cln%7B%7B%5Cmathbb%7BE%7D%7D%7D_Y%5BZ%5Er%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(r, \beta) = \frac{1}{r\beta n}\ln{{\mathbb{E}}}_Y[Z^r]" class="latex" title="f(r, \beta) = \frac{1}{r\beta n}\ln{{\mathbb{E}}}_Y[Z^r]" /><br />
+for <img src="https://s0.wp.com/latex.php?latex=r+%5Cin+%5Cmathbb%7BZ%7D_%2B&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="r \in \mathbb{Z}_+" class="latex" title="r \in \mathbb{Z}_+" />: Denote <img src="https://s0.wp.com/latex.php?latex=X%5Ek+%3D+%28x%5Ek%29%5ETx%5Ek&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="X^k = (x^k)^Tx^k" class="latex" title="X^k = (x^k)^Tx^k" /> where <img src="https://s0.wp.com/latex.php?latex=x%5Ek&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x^k" class="latex" title="x^k" /> is the<br />
+<img src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="k" class="latex" title="k" />th replica of the system.</p>
+<p><img src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb%7BE%7D%7D%7D_Y%5BZ%5Er%5D+%3D+%5Cint_Y+%5Csum_%7Bx%5E1%2C+%5Ccdots%2C+x%5Er%7D+exp%28%5Cbeta+%5Csum_k+%3CY%2C+X%5Ek%3E+%5Cmu%28Y%29+dY%5C%5C+%3D+%5Cint_Y+%5Csum_%7Bx%5E1%2C+%5Ccdots%2C+x%5Er%7D+exp%28%5Cbeta+%3CY%2C+%5Csum_k+X%5Ek%3E%29+%5Cmu%28Y%29+dY&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="{{\mathbb{E}}}_Y[Z^r] = \int_Y \sum_{x^1, \cdots, x^r} exp(\beta \sum_k &lt;Y, X^k&gt; \mu(Y) dY\\ = \int_Y \sum_{x^1, \cdots, x^r} exp(\beta &lt;Y, \sum_k X^k&gt;) \mu(Y) dY" class="latex" title="{{\mathbb{E}}}_Y[Z^r] = \int_Y \sum_{x^1, \cdots, x^r} exp(\beta \sum_k &lt;Y, X^k&gt; \mu(Y) dY\\ = \int_Y \sum_{x^1, \cdots, x^r} exp(\beta &lt;Y, \sum_k X^k&gt;) \mu(Y) dY" /></p>
+<p>We then simplify the above expression with a technical claim.</p>
+<p><strong>Claim 2.</strong><em> Let <img src="https://s0.wp.com/latex.php?latex=Y+%3D+A+%2B+%5Cfrac%7B1%7D%7B%5Csqrt%7Bn%7D%7DW&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y = A + \frac{1}{\sqrt{n}}W" class="latex" title="Y = A + \frac{1}{\sqrt{n}}W" /> where <img src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="A" class="latex" title="A" /> is a fixed matrix and</em><br />
+<em><img src="https://s0.wp.com/latex.php?latex=W&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="W" class="latex" title="W" /> is the GOE matrix defined as above. Then,</em><br />
+<em><img src="https://s0.wp.com/latex.php?latex=%5Cint_Y+exp%28%5Cbeta%3CY%2C+X%3E%29+%5Cmu%28Y%29+dY+%3D+exp%28%5Cfrac%7B%5Cbeta%5E2%7D%7Bn%7D%7B%7B%5C%7C%7BX%7D%5C%7C_%7BF%7D%7D%7D%5E2+%2B+%5Cfrac%7B%5Cbeta%7D%7B2%7D+%3CA%2C+X%3E%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\int_Y exp(\beta&lt;Y, X&gt;) \mu(Y) dY = exp(\frac{\beta^2}{n}{{\|{X}\|_{F}}}^2 + \frac{\beta}{2} &lt;A, X&gt;)" class="latex" title="\int_Y exp(\beta&lt;Y, X&gt;) \mu(Y) dY = exp(\frac{\beta^2}{n}{{\|{X}\|_{F}}}^2 + \frac{\beta}{2} &lt;A, X&gt;)" /></em><br />
+<em>for some constant <img src="https://s0.wp.com/latex.php?latex=C&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="C" class="latex" title="C" /> depending on distribution of <img src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y" class="latex" title="Y" />.</em></p>
+<p>Denote <img src="https://s0.wp.com/latex.php?latex=X+%3D+%5Csum_k+X%5Ek&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="X = \sum_k X^k" class="latex" title="X = \sum_k X^k" />. Apply Claim 2 with<br />
+<img src="https://s0.wp.com/latex.php?latex=A+%3D+%5Cfrac%7B%5Cbeta%7D%7Bn%7Da%5ETa&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="A = \frac{\beta}{n}a^Ta" class="latex" title="A = \frac{\beta}{n}a^Ta" />, we have<br />
+<img src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb%7BE%7D%7D%7D_Y%5BZ%5Er%5D+%3D+%5Csum_%7Bx%5E1%2C+%5Ccdots%2C+x%5Er%7D+exp%28%5Cfrac%7B%5Cbeta%5E2%7D%7Bn%7D%7B%7B%5C%7C%7BX%7D%5C%7C_%7BF%7D%7D%7D%5E2+%2B+%5Cfrac%7B%5Cbeta%5E2%7D%7B2n%7D+%3Ca%5ETa%2C+X%3E%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="{{\mathbb{E}}}_Y[Z^r] = \sum_{x^1, \cdots, x^r} exp(\frac{\beta^2}{n}{{\|{X}\|_{F}}}^2 + \frac{\beta^2}{2n} &lt;a^Ta, X&gt;)" class="latex" title="{{\mathbb{E}}}_Y[Z^r] = \sum_{x^1, \cdots, x^r} exp(\frac{\beta^2}{n}{{\|{X}\|_{F}}}^2 + \frac{\beta^2}{2n} &lt;a^Ta, X&gt;)" /><br />
+To understand the term inside exponent better, we can rewrite the inner<br />
+sum in terms of overlap between replicas:</p>
+<p><img src="https://s0.wp.com/latex.php?latex=%7B%7B%5C%7C%7BX%7D%5C%7C_%7BF%7D%7D%7D%5E2+%3D+%5Csum_%7Bi%2C+j%7DX_%7Bi%2C+j%7D%5E2+%3D+%5Csum_%7Bi%2C+j%7D%28%5Csum_%7Bk+%3D+1%7D%5Er+x%5Ek_ix%5Ek_j%29%5E2+%3D%5Csum_%7Bi%2C+j%7D%28%5Csum_%7Bk+%3D+1%7D%5Er+x%5Ek_ix%5Ek_j%29%28%5Csum_%7Bl+%3D+1%7D%5Er+x%5El_ix%5El_j%29%5C%5C+%3D+%5Csum_%7Bk%2C+l%7D+%28%5Csum_%7Bi+%3D+1%7D%5En+x%5Ek_ix%5E%7Bl%7D_i%29%5E2+%3D+%5Csum_%7Bk%2C+l%7D+%3Cx%5Ek%2C+x%5El%3E%5E2&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="{{\|{X}\|_{F}}}^2 = \sum_{i, j}X_{i, j}^2 = \sum_{i, j}(\sum_{k = 1}^r x^k_ix^k_j)^2 =\sum_{i, j}(\sum_{k = 1}^r x^k_ix^k_j)(\sum_{l = 1}^r x^l_ix^l_j)\\ = \sum_{k, l} (\sum_{i = 1}^n x^k_ix^{l}_i)^2 = \sum_{k, l} &lt;x^k, x^l&gt;^2" class="latex" title="{{\|{X}\|_{F}}}^2 = \sum_{i, j}X_{i, j}^2 = \sum_{i, j}(\sum_{k = 1}^r x^k_ix^k_j)^2 =\sum_{i, j}(\sum_{k = 1}^r x^k_ix^k_j)(\sum_{l = 1}^r x^l_ix^l_j)\\ = \sum_{k, l} (\sum_{i = 1}^n x^k_ix^{l}_i)^2 = \sum_{k, l} &lt;x^k, x^l&gt;^2" /></p>
+<p>where the last equality follows from rearranging and switch the inner<br />
+and outer summations.</p>
+<p>Using a similar trick, we can view the other term as</p>
+<p><img src="https://s0.wp.com/latex.php?latex=%3Ca%5ETa%2C+X%3E+%3D+%5Csum_%7Bi%2C+j%7D%5Csum_%7Bk+%3D+1%7D%5Erx%5Ek_ix%5Ek_ja_ia_j+%3D+%5Csum_%7Bk+%3D+1%7D%5Er+%28%5Csum_%7Bi+%3D+1%7D%5En+a_ix%5Ek_i%29%5E2+%3D+%5Csum_%7Bk%7D%3Ca%2C+x%5Ek%3E%5E2&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="&lt;a^Ta, X&gt; = \sum_{i, j}\sum_{k = 1}^rx^k_ix^k_ja_ia_j = \sum_{k = 1}^r (\sum_{i = 1}^n a_ix^k_i)^2 = \sum_{k}&lt;a, x^k&gt;^2" class="latex" title="&lt;a^Ta, X&gt; = \sum_{i, j}\sum_{k = 1}^rx^k_ix^k_ja_ia_j = \sum_{k = 1}^r (\sum_{i = 1}^n a_ix^k_i)^2 = \sum_{k}&lt;a, x^k&gt;^2" /></p>
+<p>Note that <img src="https://s0.wp.com/latex.php?latex=Q_%7Bk%2C+l%7D+%3D+%3Cx%5Ek%2C+x%5El%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Q_{k, l} = &lt;x^k, x^l&gt;" class="latex" title="Q_{k, l} = &lt;x^k, x^l&gt;" /> represents overlaps between the<br />
+<img src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="k" class="latex" title="k" /> and <img src="https://s0.wp.com/latex.php?latex=l&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="l" class="latex" title="l" />th replicas and <img src="https://s0.wp.com/latex.php?latex=Q_k+%3D+%3Ca%2C+x%5Ek%3E&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Q_k = &lt;a, x^k&gt;" class="latex" title="Q_k = &lt;a, x^k&gt;" /> represents the<br />
+overlaps between the <img src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="k" class="latex" title="k" />th replica and the ground truth vector.</p>
+<p>In the end, we get for any integer <img src="https://s0.wp.com/latex.php?latex=r&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="r" class="latex" title="r" />, (Equation 1):</p>
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+f%28r%2C+%5Cbeta%29+%3D+%5Cfrac%7B1%7D%7Br%5Cbeta+n%7D%5Cln%28%5Csum_%7Bx%5E1%2C+%5Ccdots%2C+x%5Er%7D+exp%28%5Cfrac%7B%5Cbeta%5E2%7D%7Bn%7D%5Csum_%7Bk%2C+l%7DQ_%7Bk%2C+l%7D%5E2+%2B+%5Cfrac%7B%5Cbeta%5E2%7D%7B2n%7D%5Csum_k+Q_k%5E2%29%29+%5Clabel%7Be%3A1%7D%5C%5C+%3D+%5Cfrac%7B1%7D%7Br%5Cbeta+n%7D+%5Cln%28%5Csum_%7BQ%7D%5Cnu_%7Bx%5Ek%7D%28Q%29exp%28%5Cfrac%7B%5Cbeta%5E2%7D%7Bn%7D%5Csum_%7Bk%2C+l%7DQ_%7Bk%2C+l%7D%5E2+%2B+%5Cfrac%7B%5Cbeta%5E2%7D%7B2n%7D%5Csum_k+Q_k%5E2%29%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\displaystyle f(r, \beta) = \frac{1}{r\beta n}\ln(\sum_{x^1, \cdots, x^r} exp(\frac{\beta^2}{n}\sum_{k, l}Q_{k, l}^2 + \frac{\beta^2}{2n}\sum_k Q_k^2)) \label{e:1}\\ = \frac{1}{r\beta n} \ln(\sum_{Q}\nu_{x^k}(Q)exp(\frac{\beta^2}{n}\sum_{k, l}Q_{k, l}^2 + \frac{\beta^2}{2n}\sum_k Q_k^2))" class="latex" title="\displaystyle f(r, \beta) = \frac{1}{r\beta n}\ln(\sum_{x^1, \cdots, x^r} exp(\frac{\beta^2}{n}\sum_{k, l}Q_{k, l}^2 + \frac{\beta^2}{2n}\sum_k Q_k^2)) \label{e:1}\\ = \frac{1}{r\beta n} \ln(\sum_{Q}\nu_{x^k}(Q)exp(\frac{\beta^2}{n}\sum_{k, l}Q_{k, l}^2 + \frac{\beta^2}{2n}\sum_k Q_k^2))" /></p>
+<p>Our goal becomes to approximate this quantity. Intuitively, if we think<br />
+of <img src="https://s0.wp.com/latex.php?latex=Q_%7Bk%2C+l%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Q_{k, l}" class="latex" title="Q_{k, l}" /> as indices on a <img src="https://s0.wp.com/latex.php?latex=%28r+%2B+1%29+%5Ctimes+%28r+%2B+1%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="(r + 1) \times (r + 1)" class="latex" title="(r + 1) \times (r + 1)" /> matrices, <img src="https://s0.wp.com/latex.php?latex=Q&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Q" class="latex" title="Q" />,<br />
+with <img src="https://s0.wp.com/latex.php?latex=Q%28i%2Ci%29+%3D+1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Q(i,i) = 1" class="latex" title="Q(i,i) = 1" />, then <img src="https://s0.wp.com/latex.php?latex=Q&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Q" class="latex" title="Q" /> is the average of <img src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n" class="latex" title="n" /> i.i.d matrices. So we<br />
+expect <img src="https://s0.wp.com/latex.php?latex=Q_%7Bj%2C+k%7D+%5Cin+%5B%5Cpm+%5Cfrac%7B1%7D%7Bn%7D%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Q_{j, k} \in [\pm \frac{1}{n}]" class="latex" title="Q_{j, k} \in [\pm \frac{1}{n}]" /> for <img src="https://s0.wp.com/latex.php?latex=j+%5Cneq+k&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="j \neq k" class="latex" title="j \neq k" /> w.h.p. In the<br />
+remaining part, We find the correct <img src="https://s0.wp.com/latex.php?latex=Q&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Q" class="latex" title="Q" /> via rewriting Equation 1.</p>
+<p>Observe that by introducing a new variable <img src="https://s0.wp.com/latex.php?latex=Z_%7Bk%2C+l%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Z_{k, l}" class="latex" title="Z_{k, l}" /> for <img src="https://s0.wp.com/latex.php?latex=k+%5Cneq+l&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="k \neq l" class="latex" title="k \neq l" /> and<br />
+using the property of gaussian intergal (Equation 4):</p>
+<p><img src="https://s0.wp.com/latex.php?latex=%5Clabel%7Be%3A4%7D+exp%28%5Cfrac%7B%5Cbeta%5E2%7D%7Bn%7DQ_%7Bk%2C+l%7D%5E2%29+%3D+%5Csqrt%7B%5Cfrac%7Bn%7D%7B4%5Cpi%7D%7D%5Cint_%7BZ_%7Bk%2C+l%7D%7D+exp%28-%5Cfrac%7Bn%7D%7B4%7DZ_%7Bk%2C+l%7D%5E2+%2B+%5Cbeta+Q_%7Bk%2C+l%7DZ_%7Bk%2C+l%7D%29dZ_k&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\label{e:4} exp(\frac{\beta^2}{n}Q_{k, l}^2) = \sqrt{\frac{n}{4\pi}}\int_{Z_{k, l}} exp(-\frac{n}{4}Z_{k, l}^2 + \beta Q_{k, l}Z_{k, l})dZ_k" class="latex" title="\label{e:4} exp(\frac{\beta^2}{n}Q_{k, l}^2) = \sqrt{\frac{n}{4\pi}}\int_{Z_{k, l}} exp(-\frac{n}{4}Z_{k, l}^2 + \beta Q_{k, l}Z_{k, l})dZ_k" /></p>
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cexp%28%5Cfrac%7B%5Cbeta%5E2%7D%7B2n%7DQ_k%5E2%29+%3D+%5Csqrt%7B%5Cfrac%7B1%7D%7B8%5Cpi+n%7D%7D%5Cint_%7BZ_k%7Dexp%28-%282n%29Z_k%5E2+%2B+2%5Cbeta+Q_%7Bk%7DZ_k%29dZ_k&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\exp(\frac{\beta^2}{2n}Q_k^2) = \sqrt{\frac{1}{8\pi n}}\int_{Z_k}exp(-(2n)Z_k^2 + 2\beta Q_{k}Z_k)dZ_k" class="latex" title="\exp(\frac{\beta^2}{2n}Q_k^2) = \sqrt{\frac{1}{8\pi n}}\int_{Z_k}exp(-(2n)Z_k^2 + 2\beta Q_{k}Z_k)dZ_k" /><br />
+Replace each <img src="https://s0.wp.com/latex.php?latex=exp%28%5Cfrac%7B%5Cbeta%5E2%7D%7Bn%7DQ_%7Bk%2C+l%7D%5E2%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="exp(\frac{\beta^2}{n}Q_{k, l}^2)" class="latex" title="exp(\frac{\beta^2}{n}Q_{k, l}^2)" /> by a such integral, we<br />
+have (Equation 2):</p>
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Bgathered%7D+%7B%7B%5Cmathbb%7BE%7D%7D%7D%5BZ%5Er%5D+%3D+%5Csum_%7Bx%5E1%2C+%5Ccdots%2C+x%5Er%7D+exp%28%5Cfrac%7B%5Cbeta%5E2%7D%7Bn%7D%5Csum_%7Bk%2C+l%7DQ_%7Bk%2C+l%7D%5E2+%2B+%5Cfrac%7B%5Cbeta%5E2%7D%7B2n%7D%5Csum_k+Q_k%5E2%29+%5Clabel%7Be%3A2%7D%5C%5C+%3D+C%5Csum_%7Bx%5E1%2C+%5Ccdots%2C+x%5Er%7D+%5Cexp%28%5Cbeta%5E2+n%29%5Cint_%7BZ_%7Bk%2C+l%7D%7Dexp%28-%5Cfrac%7Bn%7D%7B4%7D%5Csum_%7Bk+%5Cneq+l%7DZ_%7Bk%2C+l%7D%5E2+-+%5Cfrac%7Bn%7D%7B2%7D%5Csum_k+Z_k%5E2+%2B+%5Cbeta+%5Csum_%7Bk+%5Cneq+l%7DY_%7Bk%2C+l%7DQ_%7Bk%2C+l%7D+%2B+2%5Cbeta%5Csum_kZ_k+Q_k%29+dZ+%5C%5C+%3DC%5Cexp%28%5Cbeta%5En%29+%5Cint_%7BY_%7Bk%2C+l%7D%7Dexp%28-%5Cfrac%7Bn%7D%7B4%7D%5Csum_%7Bk+%5Cneq+l%7DY_%7Bk%2C+l%7D%5E2+-+%5Cfrac%7Bn%7D%7B2%7D%5Csum_k+Z_k%5E2+%2B+%5Cln%28%5Csum_%7Bx_1%2C%5Ccdots%2C+x_r%7Dexp%28%5Cbeta+%5Csum_%7Bk%5Cneq+l%7DY_%7Bk%2C+l%7DQ_%7Bk%2C+l%7D+%2B+2%5Cbeta%5Csum_kY_k+Q_k%29%29+dY+%5Clabel%7Be%3A2%7D%5Cend%7Bgathered%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\begin{gathered} {{\mathbb{E}}}[Z^r] = \sum_{x^1, \cdots, x^r} exp(\frac{\beta^2}{n}\sum_{k, l}Q_{k, l}^2 + \frac{\beta^2}{2n}\sum_k Q_k^2) \label{e:2}\\ = C\sum_{x^1, \cdots, x^r} \exp(\beta^2 n)\int_{Z_{k, l}}exp(-\frac{n}{4}\sum_{k \neq l}Z_{k, l}^2 - \frac{n}{2}\sum_k Z_k^2 + \beta \sum_{k \neq l}Y_{k, l}Q_{k, l} + 2\beta\sum_kZ_k Q_k) dZ \\ =C\exp(\beta^n) \int_{Y_{k, l}}exp(-\frac{n}{4}\sum_{k \neq l}Y_{k, l}^2 - \frac{n}{2}\sum_k Z_k^2 + \ln(\sum_{x_1,\cdots, x_r}exp(\beta \sum_{k\neq l}Y_{k, l}Q_{k, l} + 2\beta\sum_kY_k Q_k)) dY \label{e:2}\end{gathered}" class="latex" title="\begin{gathered} {{\mathbb{E}}}[Z^r] = \sum_{x^1, \cdots, x^r} exp(\frac{\beta^2}{n}\sum_{k, l}Q_{k, l}^2 + \frac{\beta^2}{2n}\sum_k Q_k^2) \label{e:2}\\ = C\sum_{x^1, \cdots, x^r} \exp(\beta^2 n)\int_{Z_{k, l}}exp(-\frac{n}{4}\sum_{k \neq l}Z_{k, l}^2 - \frac{n}{2}\sum_k Z_k^2 + \beta \sum_{k \neq l}Y_{k, l}Q_{k, l} + 2\beta\sum_kZ_k Q_k) dZ \\ =C\exp(\beta^n) \int_{Y_{k, l}}exp(-\frac{n}{4}\sum_{k \neq l}Y_{k, l}^2 - \frac{n}{2}\sum_k Z_k^2 + \ln(\sum_{x_1,\cdots, x_r}exp(\beta \sum_{k\neq l}Y_{k, l}Q_{k, l} + 2\beta\sum_kY_k Q_k)) dY \label{e:2}\end{gathered}" /></p>
+<p>where <img src="https://s0.wp.com/latex.php?latex=C&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="C" class="latex" title="C" /> is the constant given by introducing gaussian intergals.</p>
+<p>To compute the integral in (Equation 2), we need to cheat a little bit and take<br />
+<img src="https://s0.wp.com/latex.php?latex=n+%5Cto+%5Cinfty&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n \to \infty" class="latex" title="n \to \infty" /> before letting <img src="https://s0.wp.com/latex.php?latex=r+%5Cto+0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="r \to 0" class="latex" title="r \to 0" />. Note that free energy density<br />
+is defined as<br />
+<img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%29+%3D+%5Clim_%7Bn+%5Cto+%5Cinfty%7D%5Clim_%7Br+%5Cto+0%7D%5Cfrac%7B1%7D%7Br%5Cbeta+n%7D%5Cln+%7B%7B%5Cmathbb%7BE%7D%7D%7D_Y%5BZ%28%5Cbeta%2C+Y%29%5Er%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta) = \lim_{n \to \infty}\lim_{r \to 0}\frac{1}{r\beta n}\ln {{\mathbb{E}}}_Y[Z(\beta, Y)^r]" class="latex" title="f(\beta) = \lim_{n \to \infty}\lim_{r \to 0}\frac{1}{r\beta n}\ln {{\mathbb{E}}}_Y[Z(\beta, Y)^r]" /><br />
+This is the second assumption made in the replica method and it is<br />
+commonly believed that switching the order is okay here. Physically,<br />
+this is plausible because we believe intrinsic physical quantities<br />
+should not depend on the system size.</p>
+<p>Now the <a href="https://en.wikipedia.org/wiki/Laplace%27s_method">Laplace method</a> tells us when <img src="https://s0.wp.com/latex.php?latex=n+%5Cto+%5Cinfty&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n \to \infty" class="latex" title="n \to \infty" />, the integral in (Equation 2) is dominated by the max of the exponent.</p>
+<p><strong>Theorem 1 (Laplace Method).</strong> <em>Let <img src="https://s0.wp.com/latex.php?latex=h%28x%29%3A+%7B%7B%5Cmathbb%7BR%7D%7D%7D%5En+%5Cto+%7B%7B%5Cmathbb%7BR%7D%7D%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="h(x): {{\mathbb{R}}}^n \to {{\mathbb{R}}}" class="latex" title="h(x): {{\mathbb{R}}}^n \to {{\mathbb{R}}}" />, </em><em>then </em></p>
+<p><em><img src="https://s0.wp.com/latex.php?latex=%5Cint+e%5E%7Bnh%28x%29%7D+%5Capprox+e%5E%7Bnh%28x%5E%2A%29%7D%28%5Cfrac%7B2%5Cpi%7D%7Bn%7D%29%5E%7B%5Cfrac%7Bd%7D%7B2%7D%7D%5Cfrac%7B1%7D%7B%5Csqrt%7Bdet%28H%29%7D%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\int e^{nh(x)} \approx e^{nh(x^*)}(\frac{2\pi}{n})^{\frac{d}{2}}\frac{1}{\sqrt{det(H)}}" class="latex" title="\int e^{nh(x)} \approx e^{nh(x^*)}(\frac{2\pi}{n})^{\frac{d}{2}}\frac{1}{\sqrt{det(H)}}" /></em></p>
+<p><em>where <img src="https://s0.wp.com/latex.php?latex=x%5E%2A+%3D+argmax_x+%5C%7Bh%28x%29%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x^* = argmax_x \{h(x)\}" class="latex" title="x^* = argmax_x \{h(x)\}" /> and <img src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="H" class="latex" title="H" /> is the Hessian of <img src="https://s0.wp.com/latex.php?latex=h&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="h" class="latex" title="h" /> evaluated at the point <img src="https://s0.wp.com/latex.php?latex=x%5E%2A&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="x^*" class="latex" title="x^*" />.</em></p>
+<p>Fix a pair of <img src="https://s0.wp.com/latex.php?latex=k%2C+l&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="k, l" class="latex" title="k, l" /> and apply Laplace method with<br />
+<img src="https://s0.wp.com/latex.php?latex=h%28Z_%7Bk%2C+l%7D%29+%3D+-%5Cfrac%7B1%7D%7B2%7D%5Csum_%7B0+%5Cleq+k+%3C+l+%5Cleq+r%7DZ_%7Bk%2C+l%7D%5E2+%2B+%5Cfrac%7B1%7D%7Bn%7D%5Cln%28%5Csum_%7Bx_1%2C%5Ccdots%2C+x_r%7Dexp%28%5Cbeta+%5Csum_%7Bk+%5Cneq+l%7DZ_%7Bk%2C+l%7DQ_%7Bk%2C+l%7D+%2B+2%5Cbeta%5Csum_kZ_k+Q_k%29%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="h(Z_{k, l}) = -\frac{1}{2}\sum_{0 \leq k &lt; l \leq r}Z_{k, l}^2 + \frac{1}{n}\ln(\sum_{x_1,\cdots, x_r}exp(\beta \sum_{k \neq l}Z_{k, l}Q_{k, l} + 2\beta\sum_kZ_k Q_k))" class="latex" title="h(Z_{k, l}) = -\frac{1}{2}\sum_{0 \leq k &lt; l \leq r}Z_{k, l}^2 + \frac{1}{n}\ln(\sum_{x_1,\cdots, x_r}exp(\beta \sum_{k \neq l}Z_{k, l}Q_{k, l} + 2\beta\sum_kZ_k Q_k))" /><br />
+what’s left to do is to find the critical point of <img src="https://s0.wp.com/latex.php?latex=h&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="h" class="latex" title="h" />. Taking the<br />
+derivatives gives<br />
+<img src="https://s0.wp.com/latex.php?latex=-Y_%7Bk%2C+l%7D+%2B+%5Cfrac%7BA%28Z_%7Bk%2C+l%7D%29%5Cbeta+Q_%7Bk%2C+l%7D%7D%7Bn+A%28Z_%7Bk%2C+l%7D%29%7D+%3D+0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="-Y_{k, l} + \frac{A(Z_{k, l})\beta Q_{k, l}}{n A(Z_{k, l})} = 0" class="latex" title="-Y_{k, l} + \frac{A(Z_{k, l})\beta Q_{k, l}}{n A(Z_{k, l})} = 0" /><br />
+where<br />
+<img src="https://s0.wp.com/latex.php?latex=A%28Z_%7Bk%2C+l%7D%29+%3D+%5Csum_%7Bx_1%2C%5Ccdots%2C+x_r%7Dexp%28%5Cbeta+%5Csum_%7Bk+%5Cneq+l%7DZ_%7Bk%2C+l%7DQ_%7Bk%2C+l%7D+%2B+%5Cbeta%5Csum_kY_k+Q_k%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="A(Z_{k, l}) = \sum_{x_1,\cdots, x_r}exp(\beta \sum_{k \neq l}Z_{k, l}Q_{k, l} + \beta\sum_kY_k Q_k)" class="latex" title="A(Z_{k, l}) = \sum_{x_1,\cdots, x_r}exp(\beta \sum_{k \neq l}Z_{k, l}Q_{k, l} + \beta\sum_kY_k Q_k)" />.</p>
+<p>We now need to find a saddle point of <img src="https://s0.wp.com/latex.php?latex=h&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="h" class="latex" title="h" /> where the hessian is PSD. To<br />
+do that, we choose to assume the order of the replicas does not matter,<br />
+which is refer to as the replica symmetry case. <sup id="fnref-7420-1"><a href="https://windowsontheory.org/feed/#fn-7420-1" class="jetpack-footnote">1</a></sup> One simplest form<br />
+of <img src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Y" class="latex" title="Y" /> is the following: <img src="https://s0.wp.com/latex.php?latex=%5Cforall+k%2C+l+%3E+0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\forall k, l &gt; 0" class="latex" title="\forall k, l &gt; 0" />, <img src="https://s0.wp.com/latex.php?latex=Z_%7Bk%2C+l%7D+%3D+y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Z_{k, l} = y" class="latex" title="Z_{k, l} = y" /> and<br />
+<img src="https://s0.wp.com/latex.php?latex=Z_%7Bk%7D+%3D+y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Z_{k} = y" class="latex" title="Z_{k} = y" /> for some <img src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="y" class="latex" title="y" />. This also implies that <img src="https://s0.wp.com/latex.php?latex=Q_%7Bk%2C+l%7D+%3D+q&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Q_{k, l} = q" class="latex" title="Q_{k, l} = q" /> for some<br />
+<img src="https://s0.wp.com/latex.php?latex=q&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="q" class="latex" title="q" /> and <img src="https://s0.wp.com/latex.php?latex=y+%3D%5Cfrac%7B%5Cbeta%7D%7Bn%7D+q&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="y =\frac{\beta}{n} q" class="latex" title="y =\frac{\beta}{n} q" /></p>
+<p>Plug this back in to Equation 2 gives: (Equation 3)</p>
+<p><img src="https://s0.wp.com/latex.php?latex=%5Clabel%7Be%3A3%7D+%7B%7B%5Cmathbb%7BE%7D%7D%7D%5BZ%5Er%5D+%3D+C%5Cexp%28%5Cbeta+n%29%5Cexp%28-%5Cfrac%7Bn%7D%7B2%7D%28%5Cfrac%7Br%5E2+-+r%7D%7B2%7D%29y%5E2+-+%5Cfrac%7Bn%5E2%7D%7B2%7D+%2B+%5Cln%28%5Csum_%7Bx%5Ei%7D%5Cexp%28y%5Cbeta%5Csum_%7Bk+%5Cneq+l%7DQ_%7Bk%2C+l%7D+%2B+2y%5Cbeta+%5Csum_k+Q_k%29%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\label{e:3} {{\mathbb{E}}}[Z^r] = C\exp(\beta n)\exp(-\frac{n}{2}(\frac{r^2 - r}{2})y^2 - \frac{n^2}{2} + \ln(\sum_{x^i}\exp(y\beta\sum_{k \neq l}Q_{k, l} + 2y\beta \sum_k Q_k))" class="latex" title="\label{e:3} {{\mathbb{E}}}[Z^r] = C\exp(\beta n)\exp(-\frac{n}{2}(\frac{r^2 - r}{2})y^2 - \frac{n^2}{2} + \ln(\sum_{x^i}\exp(y\beta\sum_{k \neq l}Q_{k, l} + 2y\beta \sum_k Q_k))" /></p>
+<p>To obtain <img src="https://s0.wp.com/latex.php?latex=f%28r%2C+%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(r, \beta)" class="latex" title="f(r, \beta)" />, we only need to deal with the last term in<br />
+(Equation 3) as <img src="https://s0.wp.com/latex.php?latex=r+%5Cto+0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="r \to 0" class="latex" title="r \to 0" />. Using the fact that <img src="https://s0.wp.com/latex.php?latex=Q_%7Bk%2C+l%7D+%3D+y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="Q_{k, l} = y" class="latex" title="Q_{k, l} = y" /> for all<br />
+<img src="https://s0.wp.com/latex.php?latex=k%2C+l&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="k, l" class="latex" title="k, l" /> and using the same trick of introducing new gaussain integral as<br />
+in (Equation 4) we have<br />
+<img src="https://s0.wp.com/latex.php?latex=%5Clim_%7Br+%5Cto+0%7D%5Cfrac%7B1%7D%7Br%7D%5Cln%28%5Csum_%7Bx%5Ei%7D%5Cexp%28y%5Cbeta%5Csum_%7Bk+%5Cneq+l%7DQ_%7Bk%2C+l%7D+%2B+n%5Cbeta+%5Csum_k+Q_k%29%29+%3D+-%5Cbeta+%2B+%7B%7B%5Cmathbb%7BE%7D%7D%7D_%7Bz+%5Csim+%5Cmathcal%7BN%7D%280%2C+1%29%7D%5B%5Clog%282cosh%28y%5Cbeta+%2B+%5Csqrt%7By%5Cbeta%7Dz%29%29%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\lim_{r \to 0}\frac{1}{r}\ln(\sum_{x^i}\exp(y\beta\sum_{k \neq l}Q_{k, l} + n\beta \sum_k Q_k)) = -\beta + {{\mathbb{E}}}_{z \sim \mathcal{N}(0, 1)}[\log(2cosh(y\beta + \sqrt{y\beta}z))]" class="latex" title="\lim_{r \to 0}\frac{1}{r}\ln(\sum_{x^i}\exp(y\beta\sum_{k \neq l}Q_{k, l} + n\beta \sum_k Q_k)) = -\beta + {{\mathbb{E}}}_{z \sim \mathcal{N}(0, 1)}[\log(2cosh(y\beta + \sqrt{y\beta}z))]" /></p>
+<p>Using the fact that we want the solution to minimizes free energy,<br />
+taking the derivative of the current <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f" class="latex" title="f" /> w.r.t. <img src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="y" class="latex" title="y" /> gives<br />
+<img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7By%7D%7B%5Cbeta%7D+%3D+n%7B%7B%5Cmathbb%7BE%7D%7D%7D_z%5Btanh%28y%5Cbeta+%2B+%5Csqrt%7By%5Cbeta%7Dz%29%5D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\frac{y}{\beta} = n{{\mathbb{E}}}_z[tanh(y\beta + \sqrt{y\beta}z)]" class="latex" title="\frac{y}{\beta} = n{{\mathbb{E}}}_z[tanh(y\beta + \sqrt{y\beta}z)]" /><br />
+which matches the fixed point of AMP. Plug in <img src="https://s0.wp.com/latex.php?latex=q&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="q" class="latex" title="q" /> and <img src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="y" class="latex" title="y" /> will give us<br />
+<img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta)" class="latex" title="f(\beta)" />. The curve of <img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta)" class="latex" title="f(\beta)" /> looks like the Figure below, where<br />
+the solid line is the curve of <img src="https://s0.wp.com/latex.php?latex=f%28%5Cbeta%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f(\beta)" class="latex" title="f(\beta)" /> with the given <img src="https://s0.wp.com/latex.php?latex=q&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="q" class="latex" title="q" /> and the<br />
+dotted line is the curve given by setting all variables <img src="https://s0.wp.com/latex.php?latex=0&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="0" class="latex" title="0" />.</p>
+<p><img src="https://windowsontheory.files.wordpress.com/2019/01/screenshot-2019-01-26-13.54.49.png?w=600" alt="screenshot 2019-01-26 13.54.49" class="alignnone size-full wp-image-7423" /></p>
+<p> </p>
+<p><strong>References</strong></p>
+<div>[1] Amelia Perry, Alexander S Wein, Afonso S Bandeira, and Ankur Moitra. Optimality and sub-optimality of pca for spiked random matrices and synchronization.</div>
+<div>arXiv preprint arXiv:1609.05573, 2016.</div>
+<div></div>
+<div>[2] D. Feral and S. Pech e. The Largest Eigenvalue of Rank One Deformation of Large Wigner Matrices. Communications in Mathematical Physics, 272:185–228, May 2007.</div>
+<div></div>
+<div>[3] Afonso S Bandeira, Amelia Perry, and Alexander S Wein. Notes on computational-to-statistical gaps: predictions using statistical physics. arXiv preprint arXiv:1803.11132, 2018.</div>
+<div></div>
+<div>[4] Yash Deshpande, Emmanuel Abbe, and Andrea Montanari. Asymptotic mutual information for thebinary stochastic block model. In</div>
+<div>Information Theory (ISIT), 2016 IEEE International Symposium on, pages 185–189. IEEE, 2016.</div>
+<div></div>
+<div>[5] Adel Javanmard and Andrea Montanari. State evolution for general approximate message passing algorithms, with applications to spatial coupling. Information and Inference: A Journal of the IMA, 2(2):115–144, 2013.</div>
+<div></div>
+<div>[6] A. Perry, A. S. Wein, and A. S. Bandeira. Statistical limits of spiked tensor models.</div>
+<div>ArXiv e-prints, December 2016.</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn-7420-1">
+Turns out for this problem, replica symmetry is the only case. We<br />
+will not talk about replica symmetry breaking here, which<br />
+intuitively means we partition replicas into groups and re-curse. <a href="https://windowsontheory.org/feed/#fnref-7420-1">↩</a>
+</li>
+</ol>
+</div></div>
+
+
+
+
+
+
+
+<p class="date">
+by preetum <a href="https://windowsontheory.org/2019/01/26/introduction-to-amp-and-the-replica-trick/"><span class="datestr">at January 26, 2019 07:10 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -1319,7 +1681,7 @@ by robertkleinberg <a href="https://agtb.wordpress.com/2019/01/22/guest-post-lik
 <tbody>
 <tr>
 <td>
-<a href="https://rjlipton.files.wordpress.com/2019/01/wedderburndickson.png"><img width="193" alt="" src="https://rjlipton.files.wordpress.com/2019/01/wedderburndickson.png?w=193&amp;h=142" class="alignright wp-image-15598" height="142" /></a>
+<a href="https://rjlipton.files.wordpress.com/2019/01/wedderburndickson.png"><img src="https://rjlipton.files.wordpress.com/2019/01/wedderburndickson.png?w=193&amp;h=142" alt="" width="193" class="alignright wp-image-15598" height="142" /></a>
 </td>
 </tr>
 <tr>
@@ -2406,104 +2768,6 @@ March 11-15, 2019 Bochum, Germany https://www.rub.de/polytopes2019/ Registration
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-events.org/2019/01/15/spring-school-and-workshop-on-polytopes/"><span class="datestr">at January 15, 2019 11:08 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://11011110.github.io/blog/2019/01/15/linkage">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eppstein.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="https://11011110.github.io/blog/2019/01/15/linkage.html">Linkage</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p>For the new year, I’ve decided to try to get back into taking photos more frequently, and to make it lower-overhead I’m making individual Mastodon posts for some of them rather than writing a longer blog post for every batch of photos. So that’s why you see a couple of those images inline here.</p>
-
-<ul>
-  <li>
-    <p><a href="https://community.wolfram.com/groups/-/m/t/1579272">Fitting in</a> (<a href="https://mathstodon.xyz/@shonk/101320172170027222"></a>). Animated GIF of 124 disks packed (supposedly optimally) on a sphere and then steregraphically projected to the plane, by Clayton Shonkwiler.</p>
-  </li>
-  <li>
-    <p><a href="https://twitter.com/BrunoLevy01/status/1080085027210309632">More animated GIFs of fluids with splashy frothy surfaces</a> by Bruno Levy (<a href="https://mathstodon.xyz/@11011110/101349213452607605"></a>). The fluids are modeled as power diagrams of systems of discrete points and simulated using methods from <a href="https://arxiv.org/abs/1605.00568">arXiv:1605.00568</a>.
-See follow-up tweets for source code and long explanatory video.</p>
-  </li>
-  <li>
-    <p><a href="https://arxiv.org/help/stats/2018_by_area/index">Lots of charts and plots of the growth of arXiv.org through 2018</a> (<a href="https://mathstodon.xyz/@11011110/101355877277070622"></a>). In the area I moderate (cs.DS, algorithms and data structures) the number of preprints grew from 1597 in 2017 to 1767 in 2018, but this was a little below the 14% growth rate for arXiv overall, and was far outpaced by the rapid growth in cs.CV (computer vision), cs.LG (machine learning), and cs.CL (natural language processing).</p>
-  </li>
-  <li>
-    <p><a href="https://www.fortbraggalleywayart.org/the-fish-mural.html">Matsya And The Great Deluge</a> (<a href="https://mathstodon.xyz/@11011110/101361278765845519"></a>). Street art from Fort Bragg illustrating an ancient Indian folk tale.</p>
-
-    <p style="text-align: center;"><a href="https://www.ics.uci.edu/~eppstein/pix/mfb/MatsyaAndTheGreatDeluge.html"><img src="https://www.ics.uci.edu/~eppstein/pix/mfb/MatsyaAndTheGreatDeluge-m.jpg" alt="&quot;Matsya And The Great Deluge&quot; street art in Fort Bragg, California" style="border-style: solid; border-color: black;" /></a></p>
-  </li>
-  <li>
-    <p><a href="https://www.metafilter.com/178580/Orange-Peels-and-Fresnel-Integrals-Train-Sets-The-Urinal-Problem">Orange peels and fresnel integrals! Train sets! The urinal problem!</a> (<a href="https://mathstodon.xyz/@11011110/101366435174480182"></a>). Metafilter discovers <a href="https://mathstodon.xyz/@esoterica">Interesting Esoterica</a>.</p>
-  </li>
-  <li><a href="https://doi.org/10.1137/1.9781611975482"><em>Proceedings of the Thirtieth Annual ACM-SIAM Symposium on Discrete Algorithms (SODA 2019)</em></a> (<a href="https://mathstodon.xyz/@11011110/101373871420970067"></a>). My favorite talk from the first day of SODA was “<a href="https://doi.org/10.1137/1.9781611975482.27">Extremal and probabilistic results for order types</a>” (Jie Han, Yoshiharu Kohayakawa, Marcelo T. Sales, and Henrique Stagni).
-Its main results are
-    <ol>
-      <li>the probability that a random point set has a specific order type is upper and lower bounded by functions of the smallest size of a grid containing the order type, and</li>
-      <li>every nontrivial hereditary property of point sets has probability  of being true of random point sets.</li>
-    </ol>
-  </li>
-  <li>
-    <p><a href="https://www.latimes.com/world/la-fg-iran-demographer-arrests-20190107-story.html">Iran arrests demographers, the latest target amid an escalating crackdown on academics and activists</a> (<a href="https://mathstodon.xyz/@11011110/101379517186873559"></a>). One of the two arrestees is an Iranian-Australian dual citizen; the other is director of the Iranian National Institute of Population Research. The apparent reason for the arrest is that their research contradicted a political narrative of Iranian hardliners according to which Iran is suffering a population crash and must increase fertility.</p>
-  </li>
-  <li>
-    <p>The first sighting of one of my Wikipedia illustrations in a SODA talk goes to Michał Włodarczyk’s “<a href="https://doi.org/10.1137/1.9781611975482.104">Losing treewidth by separating subsets</a>” (<a href="https://mathstodon.xyz/@11011110/101389040748549759"></a>). It concerns removing few graph vertices to reach a subgraph with some desired property. If the optimal solution removes  vertices and graphs with the property have treewidth , then his solution removes  vertices and takes the same time as exactly solving  subproblems of size .</p>
-  </li>
-  <li>
-    <p><a href="http://mybiasedcoin.blogspot.com/2019/01/analco-sosa-soda-post.html">Michael Mitzenmacher blogs about SODA, SOSA, ALENEX, and ANALCO</a> (<a href="https://mathstodon.xyz/@11011110/101390458273110460"></a>).
-Michael was PC co-chair of <a href="https://simplicityinalgorithms.com/">SOSA</a>, which I was skeptical about (shouldn’t all the best algorithms be simple?), but the session I attended favorably impressed me. Here’s an example, a simple algorithm for <a href="https://arxiv.org/abs/1501.07460">2-approximating maximum genus oriented graph embedding</a>: greedily remove 2-edge paths while preserving connectivity. .</p>
-  </li>
-  <li>
-    <p><a href="http://www.ics.uci.edu/~eppstein/pubs/EppRee-SODA-19-slides.pdf">My SODA talk slides on finding laminar 3-vertex separators</a> (<a href="https://mathstodon.xyz/@11011110/101396845733518307"></a>). At the talk, someone asked about finding a maximum set of laminar 3-separators. It’s NP-complete: use Uehara’s “<a href="https://www.jaist.ac.jp/~uehara/pdf/triangle.pdf">NP-complete problems on a 3-connected cubic graph and their applications</a>” to find cubic planar graphs whose -separators are vertex neighborhoods (so laminar separators = neighbors of independent vertices) in which maximum independent set is hard.</p>
-  </li>
-  <li>
-    <p>Spotted on the Cambridge University Press display table at SODA (<a href="https://mathstodon.xyz/@11011110/101402305412043483"></a>):</p>
-
-    <p style="text-align: center;"><a href="https://www.ics.uci.edu/~eppstein/pix/soda-books/index.html"><img src="https://www.ics.uci.edu/~eppstein/pix/soda-books/books-m.jpg" alt="Forbidden Configurations in Discrete Geometry on display alongside other Cambridge University Press books" style="border-style: solid; border-color: black;" /></a></p>
-  </li>
-  <li>
-    <p><a href="https://codeparade.itch.io/marblemarcher">Marble Marcher</a> (<a href="https://mathstodon.xyz/@11011110/101407478247456589"></a>, <a href="https://news.ycombinator.com/item?id=18805717">via</a>). A game of guiding a marble across a dynamically changing fractal surface. The key is to use the recursive structure of the fractal to make a data structure that can handle the interactions between the marble and the fractal surface quickly enough to run in realtime.</p>
-  </li>
-  <li>
-    <p><a href="https://thehighergeometer.wordpress.com/2019/01/13/some-serious-open-access-journals-in-mathematics/">A list of (respectable) open access journals in mathematics</a> (<a href="https://mathstodon.xyz/@11011110/101410796814360458"></a>). <a href="http://jgaa.info/">JGAA</a> and <a href="http://jocg.org/">JoCG</a> not yet listed but maybe soon?</p>
-  </li>
-  <li>
-    <p><a href="https://www.metafilter.com/178755/Space-filling-curves-the-hard-way">Wacław Szpakowski’s space-filling curve art</a> (<a href="https://mastodon.social/@joshmillard/101415993062003559"></a>).</p>
-  </li>
-  <li><a href="https://en.wikipedia.org/wiki/De_Bruijn%E2%80%93Erd%C5%91s_theorem_(graph_theory)">The De Bruijn–Erdős theorem</a> (<a href="https://mathstodon.xyz/@11011110/101421411362488773"></a>): when all finite subgraphs of an infinite graph are -colorable, so is the whole graph. Now a Good Article on Wikipedia.</li>
-</ul></div>
-
-
-
-
-
-
-
-<p class="date">
-by David Eppstein <a href="https://11011110.github.io/blog/2019/01/15/linkage.html"><span class="datestr">at January 15, 2019 10:07 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
