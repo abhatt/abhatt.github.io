@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-01-26T21:22:13Z</updated>
+  <updated>2019-01-26T22:21:38Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,41 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>tag:blogger.com,1999:blog-25562705.post-2559156841800187715</id>
+    <link href="http://aaronsadventures.blogspot.com/feeds/2559156841800187715/comments/default" rel="replies" type="application/atom+xml"/>
+    <link href="http://www.blogger.com/comment.g?blogID=25562705&amp;postID=2559156841800187715" rel="replies" type="text/html"/>
+    <link href="http://www.blogger.com/feeds/25562705/posts/default/2559156841800187715" rel="edit" type="application/atom+xml"/>
+    <link href="http://www.blogger.com/feeds/25562705/posts/default/2559156841800187715" rel="self" type="application/atom+xml"/>
+    <link href="http://aaronsadventures.blogspot.com/2019/01/discussion-of-unfairness-in-machine.html" rel="alternate" type="text/html"/>
+    <title/>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Discussion of (un)fairness in machine learning hit mainstream political discourse this week, when Representative Alexandria Ocasio-Cortez discussed the possibility of algorithmic bias, and was clumsily "called out" by Ryan Saavedra on twitter: <br/><center><blockquote class="twitter-tweet"><div dir="ltr" lang="en">Socialist Rep. Alexandria Ocasio-Cortez (D-NY) claims that algorithms, which are driven by math, are racist <a href="https://t.co/X2veVvAU1H">pic.twitter.com/X2veVvAU1H</a>— Ryan Saavedra (@RealSaavedra) <a href="https://twitter.com/RealSaavedra/status/1087627739861897216?ref_src=twsrc%5Etfw">January 22, 2019</a></div></blockquote></center>It was gratifying to see the number of responses pointing out how wrong he was --- awareness of algorithmic bias has clearly become pervasive! But most of the pushback focused the possibility being "baked in" by the designer of the algorithm, or because of latent bias embedded in the data, or both:  <br/><center><blockquote class="twitter-tweet"><div dir="ltr" lang="en">You know algorithms are written by people right? And that the data they are trained on is made and selected by people? And that the problems algorithms solve are decided...again...by people? And that people can be and many times are racist? Ok now you do the math</div>— kade (@onekade) <a href="https://twitter.com/onekade/status/1087853353000939521?ref_src=twsrc%5Etfw">January 22, 2019</a></blockquote></center>Bias in the data is certainly a problem, especially when labels are gathered by human beings. But its far from being the only problem. In this post, I want to walk through a very simple example in which the algorithm designer is being entirely reasonable, there are no human beings injecting bias into the labels, and yet the resulting outcome is "unfair".   Here is the (toy) scenario -- the specifics aren't important. High school students are applying to college, and each student has some innate "talent" $I$, which we will imagine is normally distributed, with mean 100 and standard deviation 15: $I \sim N(100,15)$. The college would like to admit students who are sufficiently talented --- say one standard deviation above the average (so, it would like to admit students with $I \geq 115$). The problem is that talent isn't directly observable. Instead, the college can observe <i>grades</i> $g$ and <i>SAT scores $s$</i>, which are a noisy estimate of talent. For simplicity, lets imagine that both grades and SAT scores are independently and normally distributed, centered at a student's talent level, and also with standard deviation 15: $g \sim N(I, 15)$, $s \sim N(I, 15)$.<br/><br/>In this scenario, the college has a simple, optimal decision rule: It should run a linear regression to try and predict student talent from grades and SAT scores, and then it should admit the students whose <i>predicted </i>talent is at least 115. This is indeed "driven by math" --- since we assumed everything was Gaussian here, this turns out to correspond to the Bayesian optimal decision rule for the college.<br/><br/>Ok. Now lets suppose there are two populations of students, which we will call Reds and Blues. Reds are the majority population, and Blues are a small minority population --- the Blues's only make up about 1% of the student body. But the Reds and the Blues are no different when it comes to talent: they both have the same talent distribution, as described above. And there is no bias baked into the grading or the exams: both the Reds and the Blues also have exactly the same grade and exam score distributions, as described above.<br/><br/>But there is one difference: the Blues have a bit more money than the Reds, so they each take the SAT twice, and report only the highest of the two scores to the college. This results in a small but noticeable bump in their average SAT scores, compared to the Reds. Here are the grades and exam scores for the two populations, plotted:<br/><div class="separator" style="clear: both; text-align: center;"><a href="https://1.bp.blogspot.com/-B7-EMI0LIZ8/XEzQO2OBAsI/AAAAAAAAQ3o/PFO_wd6igLgwpA5OCQ1Ux0N7B9A5s3mcACLcBGAs/s1600/gradesexams.png" style="margin-left: 1em; margin-right: 1em;"><img border="0" height="261" src="https://1.bp.blogspot.com/-B7-EMI0LIZ8/XEzQO2OBAsI/AAAAAAAAQ3o/PFO_wd6igLgwpA5OCQ1Ux0N7B9A5s3mcACLcBGAs/s400/gradesexams.png" width="400"/></a></div><div class="separator" style="clear: both; text-align: center;"/>So what is the effect of this when we use our reasonable inference procedure? First, lets consider what happens when we learn two different regression models: one for the Blues, and a different one for the Reds. We don't see much difference:<br/><br/>The Red classifier makes errors approximately 11% of the time. The Blue classifier does about the same --- it makes errors about 10.4% of the time. This makes sense: the Blues artificially inflated their SAT score distribution without increasing their talent, and the classifier picked up on this and corrected for it. In fact, it is even a little more accurate!<br/><br/>And since we are interested in fairness, lets think about the <i>false negative rate</i> of our classifiers. "False Negatives" in this setting are the people who are qualified to attend the college ($I &gt; 115$), but whom the college mistakenly rejects. These are really the people who have come to harm as a result of the classifier's mistakes. And the False Negative <i>Rate</i> is the probability that a randomly selected qualified person is mistakenly rejected from college --- i.e. the probability that a randomly selected student is harmed by the classifier. We should want that the false negative rates are approximately equal across the two populations: this would mean that the burden of harm caused by the classifier's mistakes is not disproportionately borne by one population over the other. This is one reason why the difference between false negative rates across different populations has become a standard fairness metric in algorithmic fairness --- <a href="http://papers.nips.cc/paper/6373-equality-of-opportunity-in-supervised-learning">sometimes referred to as "equal opportunity."</a><br/><br/>So how do we fare on this metric? Not so badly! The Blue model has a false negative rate of 50% on the blues, and the Red model has a false negative rate of 47% on the reds --- so the difference between these two is a satisfyingly small 3%.<br/><br/>But you might reasonably object: because we have learned separate models for the Blues and the Reds, we are <i>explicitly </i>making admissions decisions as a function of a student's color! This might sound like a form of discrimination, baked in by the algorithm designer --- and if the two populations represent e.g. racial groups, then its explicitly illegal in a number of settings, including lending.<br/><br/>So what happens if we don't allow our classifier to see group membership, and just train one classifier on the whole student body? The gap in false negative rates between the two populations balloons to 12.5%, and the overall error rate ticks up. This means if you are a qualified member of the Red population, you are substantially more likely to be mistakenly rejected by our classifier than if you are a qualified member of the Blue population.<br/><br/>What happened? There wasn't any malice anywhere in this data pipeline. Its just that the Red population was much larger than the Blue population, so when we trained a classifier to minimize its average error over the entire student body, it naturally fit the Red population --- which contributed much more to the <i>average</i>. But this means that the classifier was no longer compensating for the artificially inflated SAT scores of the Blues, and so was making a disproportionate number of errors on them --- all in their favor.<br/><br/><table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto; text-align: center;"><tbody><tr><td style="text-align: center;"><a href="https://4.bp.blogspot.com/-W3rfiRIJUC0/XEzciybyBfI/AAAAAAAAQ4A/lmABxaYed28K77up20emGgc3TMr8D05QQCLcBGAs/s1600/classifier.png" style="margin-left: auto; margin-right: auto;"><img border="0" height="262" src="https://4.bp.blogspot.com/-W3rfiRIJUC0/XEzciybyBfI/AAAAAAAAQ4A/lmABxaYed28K77up20emGgc3TMr8D05QQCLcBGAs/s400/classifier.png" width="400"/></a></td></tr><tr><td class="tr-caption" style="text-align: center;">The combined admissions rule takes everyone above the black line. Since the Blues are shifted up relative to the Reds, they are admitted at a disproportionately higher rate. </td></tr></tbody></table><div class="separator" style="clear: both; text-align: center;"/><br/><br/>This is the kind of thing that happens <i>all the time</i>: whenever there are two populations that have different feature distributions, learning a single classifier (that is prohibited from discriminating based on population) will fit the bigger of the two populations, simply because they contribute more to average error. Depending on the nature of the distribution difference, this can be either to the benefit or the detriment of the minority population. And not only does this not involve any explicit human bias, either on the part of the algorithm designer or the data gathering process, <i>it is exacerbated if we artificially force the algorithm to be group blind</i>. Well intentioned "fairness" regulations prohibiting decision makers form taking sensitive attributes into account can actually make things less fair and less accurate at the same time.<br/><br/><br/><br/><br/></div>
+    </content>
+    <updated>2019-01-26T22:19:00Z</updated>
+    <published>2019-01-26T22:19:00Z</published>
+    <author>
+      <name>Aaron Roth</name>
+      <email>noreply@blogger.com</email>
+      <uri>https://plus.google.com/111805394598997130229</uri>
+    </author>
+    <source>
+      <id>tag:blogger.com,1999:blog-25562705</id>
+      <category term="game theory"/>
+      <category term="news"/>
+      <author>
+        <name>Aaron Roth</name>
+        <email>noreply@blogger.com</email>
+      </author>
+      <link href="http://aaronsadventures.blogspot.com/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
+      <link href="http://www.blogger.com/feeds/25562705/posts/default" rel="self" type="application/atom+xml"/>
+      <link href="http://aaronsadventures.blogspot.com/" rel="alternate" type="text/html"/>
+      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
+      <link href="http://www.blogger.com/feeds/25562705/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
+      <title>Adventures in Computation</title>
+      <updated>2019-01-26T22:19:27Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://windowsontheory.org/?p=7420</id>
@@ -353,7 +388,7 @@ intuitively means we partition replicas into groups and re-curse. <a href="http
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-01-26T21:21:30Z</updated>
+      <updated>2019-01-26T22:21:08Z</updated>
     </source>
   </entry>
 
@@ -459,7 +494,7 @@ intuitively means we partition replicas into groups and re-curse. <a href="http
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-01-26T21:21:30Z</updated>
+      <updated>2019-01-26T22:21:09Z</updated>
     </source>
   </entry>
 
@@ -486,7 +521,7 @@ Email: shachar.lovett@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-26T21:21:02Z</updated>
+      <updated>2019-01-26T22:20:49Z</updated>
     </source>
   </entry>
 
@@ -516,7 +551,7 @@ Email: shachar.lovett@gmail.com</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-01-26T21:21:30Z</updated>
+      <updated>2019-01-26T22:21:09Z</updated>
     </source>
   </entry>
 
@@ -837,7 +872,7 @@ Email: slovett@ucsd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-26T21:21:02Z</updated>
+      <updated>2019-01-26T22:20:49Z</updated>
     </source>
   </entry>
 
@@ -949,7 +984,7 @@ Email: kothari@cs.princeton.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-26T21:21:02Z</updated>
+      <updated>2019-01-26T22:20:49Z</updated>
     </source>
   </entry>
 
@@ -976,7 +1011,7 @@ Email: koucky@iuuk.mff.cuni.cz</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-26T21:21:02Z</updated>
+      <updated>2019-01-26T22:20:49Z</updated>
     </source>
   </entry>
 
@@ -1003,7 +1038,7 @@ Email: koucky@iuuk.mff.cuni.cz</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-26T21:21:02Z</updated>
+      <updated>2019-01-26T22:20:49Z</updated>
     </source>
   </entry>
 
@@ -1030,7 +1065,7 @@ Email: koucky@iuuk.mff.cuni.cz</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-26T21:21:02Z</updated>
+      <updated>2019-01-26T22:20:49Z</updated>
     </source>
   </entry>
 
@@ -1071,7 +1106,7 @@ Email: koucky@iuuk.mff.cuni.cz</p></div>
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-01-26T21:20:57Z</updated>
+      <updated>2019-01-26T22:20:45Z</updated>
     </source>
   </entry>
 
@@ -1190,7 +1225,7 @@ Is there a simpler proof of this key fact? Is it possible to find an easier refe
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-01-26T21:20:59Z</updated>
+      <updated>2019-01-26T22:20:46Z</updated>
     </source>
   </entry>
 
@@ -1324,7 +1359,7 @@ Our method reduces the general problem of factoring $f(x) \bmod p^k$ to that of 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-01-26T21:20:51Z</updated>
+      <updated>2019-01-26T22:20:39Z</updated>
     </source>
   </entry>
 
@@ -1439,7 +1474,7 @@ Our method reduces the general problem of factoring $f(x) \bmod p^k$ to that of 
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-01-26T21:21:30Z</updated>
+      <updated>2019-01-26T22:21:09Z</updated>
     </source>
   </entry>
 
@@ -1466,7 +1501,7 @@ Email: diz@utexas.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-26T21:21:02Z</updated>
+      <updated>2019-01-26T22:20:49Z</updated>
     </source>
   </entry>
 
@@ -1499,7 +1534,7 @@ Email: diz@utexas.edu</p></div>
       <link href="https://thmatters.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://thmatters.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theory Matters</title>
-      <updated>2019-01-26T21:21:21Z</updated>
+      <updated>2019-01-26T22:20:59Z</updated>
     </source>
   </entry>
 
@@ -1535,7 +1570,7 @@ Email: diz@utexas.edu</p></div>
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-01-26T21:20:57Z</updated>
+      <updated>2019-01-26T22:20:45Z</updated>
     </source>
   </entry>
 
@@ -1675,7 +1710,7 @@ We use this technique to prove an explicit lower bound by showing that any linea
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-01-26T21:20:51Z</updated>
+      <updated>2019-01-26T22:20:39Z</updated>
     </source>
   </entry>
 
@@ -1699,7 +1734,7 @@ We use this technique to prove an explicit lower bound by showing that any linea
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-01-26T21:21:55Z</updated>
+      <updated>2019-01-26T22:21:25Z</updated>
     </source>
   </entry>
 
@@ -1724,7 +1759,7 @@ We use this technique to prove an explicit lower bound by showing that any linea
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-01-26T21:21:55Z</updated>
+      <updated>2019-01-26T22:21:25Z</updated>
     </source>
   </entry>
 
@@ -1748,7 +1783,7 @@ We use this technique to prove an explicit lower bound by showing that any linea
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-01-26T21:21:55Z</updated>
+      <updated>2019-01-26T22:21:25Z</updated>
     </source>
   </entry>
 
@@ -1772,7 +1807,7 @@ We use this technique to prove an explicit lower bound by showing that any linea
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-01-26T21:20:51Z</updated>
+      <updated>2019-01-26T22:20:39Z</updated>
     </source>
   </entry>
 
@@ -1798,7 +1833,7 @@ MSR codes are attractive for use in distributed storage systems, and by now a va
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-01-26T21:20:51Z</updated>
+      <updated>2019-01-26T22:20:39Z</updated>
     </source>
   </entry>
 
@@ -1826,7 +1861,7 @@ Email: theory.stanford@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-26T21:21:02Z</updated>
+      <updated>2019-01-26T22:20:49Z</updated>
     </source>
   </entry>
 
@@ -1850,7 +1885,7 @@ Email: theory.stanford@gmail.com</p></div>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-01-26T21:21:55Z</updated>
+      <updated>2019-01-26T22:21:25Z</updated>
     </source>
   </entry>
 
@@ -1875,32 +1910,7 @@ Email: theory.stanford@gmail.com</p></div>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-01-26T21:21:55Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-events.org/2019/01/15/spring-school-and-workshop-on-polytopes/</id>
-    <link href="https://cstheory-events.org/2019/01/15/spring-school-and-workshop-on-polytopes/" rel="alternate" type="text/html"/>
-    <title>Spring School and Workshop on Polytopes</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">March 11-15, 2019 Bochum, Germany https://www.rub.de/polytopes2019/ Registration deadline: February 11, 2019 The Spring School is designed for advanced bachelor, master and PhD students. The aim is to prepare the participants in such a way that they can follow the lectures of the subsequent workshop. It consists of three crash courses: Geometry of Polytopes, Monday (2x2h) … <a class="more-link" href="https://cstheory-events.org/2019/01/15/spring-school-and-workshop-on-polytopes/">Continue reading <span class="screen-reader-text">Spring School and Workshop on Polytopes</span></a></div>
-    </summary>
-    <updated>2019-01-15T23:08:56Z</updated>
-    <published>2019-01-15T23:08:56Z</published>
-    <category term="school"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-events.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-events.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-events.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-events.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
-      <title>CS Theory Events</title>
-      <updated>2019-01-26T21:21:55Z</updated>
+      <updated>2019-01-26T22:21:25Z</updated>
     </source>
   </entry>
 </feed>
