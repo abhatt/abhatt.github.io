@@ -131,8 +131,8 @@ Stay up to date
 <a class="feedlink" href="http://learningwitherrors.org/atom.xml" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://learningwitherrors.org" title="Learning With Errors">Learning with Errors: Student Theory Blog</a>
 <br>
-<a class="feedlink" href="" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
-<a class="message" title="403: forbidden">Luca Aceto</a>
+<a class="feedlink" href="http://www.blogger.com/feeds/27705661/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
+<a href="http://processalgebra.blogspot.com/" title="Process Algebra Diary">Luca Aceto</a>
 <br>
 <a class="feedlink" href="https://lucatrevisan.wordpress.com/feed/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="https://lucatrevisan.wordpress.com" title="in   theory">Luca Trevisan</a>
@@ -225,7 +225,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at January 30, 2019 12:21 AM UTC</span>.
+Last updated <span class="datestr">at January 30, 2019 01:22 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -308,7 +308,7 @@ by Omer Reingold <a href="https://theorydish.blog/2019/01/29/deadline-approachin
 <tbody>
 <tr>
 <td>
-<a href="https://rjlipton.files.wordpress.com/2019/01/issaischur.jpg"><img width="120" alt="" src="https://rjlipton.files.wordpress.com/2019/01/issaischur.jpg?w=120&amp;h=180" class="alignright wp-image-15604" height="180" /></a>
+<a href="https://rjlipton.files.wordpress.com/2019/01/issaischur.jpg"><img src="https://rjlipton.files.wordpress.com/2019/01/issaischur.jpg?w=120&amp;h=180" alt="" width="120" class="alignright wp-image-15604" height="180" /></a>
 </td>
 </tr>
 <tr>
@@ -392,6 +392,95 @@ by RJLipton+KWRegan <a href="https://rjlipton.wordpress.com/2019/01/29/primes-an
 
 <div class="channelgroup">
 <div class="entrygroup" 
+	id="https://11011110.github.io/blog/2019/01/29/simplifying-task-milestone">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/eppstein.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://11011110.github.io/blog/2019/01/29/simplifying-task-milestone.html">Simplifying task-milestone diagrams</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>In my graph algorithms class last week, I covered critical path scheduling, as motivation for the linear-time algorithms for computing shortest and longest paths in directed acyclic graphs. In this scheduling problem, you are given a system of tasks, each with a predicted time to perform it, and constraints that some tasks should be done before others. Assuming that you have enough people working together to perform tasks in parallel, how quickly can you get everything done?</p>
+
+<p>An optimal solution can be found by scheduling each task to start at a time given by the longest sequence of tasks leading up to it such that each consecutive pair in the sequence must be performed sequentially. The total length of the resulting schedule equals the length of the <a href="https://en.wikipedia.org/wiki/Critical_path_method">critical path</a>, the longest sequence of sequential tasks in the whole system. The example below could represent subtasks of a software project: design, implement, and test the software (A, B, and C), develop test cases (D), and document the results (E). Its critical path could be one of ABC, DE, AE, or DC, depending on the lengths of each task.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/pert1.svg" alt="Five tasks with ordering constraints" /></p>
+
+<p>It’s easy enough to solve this problem directly, but to convert it to a path problem we need to have lengths on edges rather than times on vertices. It’s also convenient to have a single starting vertex for all the paths.
+Therefore, <a href="https://en.wikipedia.org/wiki/Critical_path_method">Wikipedia’s article on the critical path method</a> uses a different kind of graph, which I’ll call a “task-milestone diagram” to distinguish it from the one above.
+In this diagram, the vertices represent milestones, single points in time. The tasks to be performed are represented by edges, and the time to perform a task becomes the length of its edge. The goal of the scheduling problem now becomes one of choosing a time for each milestone, with enough time between pairs of milestones to perform each task.
+The longest-path schedule, in which we place each milestone at a time given by the longest path to it from the start milestone, solves this problem optimally.</p>
+
+<p>To convert a system of tasks and ordering constraints (without milestones) into an equivalent task-milestone diagram, make two new milestones for each task, one for when it starts and one for when it ends. Turn each task into an edge between its two milestones. Transform each ordering constraint (saying that task X should be performed earlier than task Y) into a length-zero edge from the end of task X to the beginning of task Y. Add two more milestones, for the start and end of the whole project. And add more length-zero edges from the project start to the start of each task that has no predecessors, and from the end of each task that has no successors to the project end milestone.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/pert2.svg" alt="Expanding each task vertex into two milestone vertices connected by a task edge" /></p>
+
+<p>In the resulting graph, the paths from the start to the end milestone consist of the same sequences of tasks as we had before: ABC, DE, AE, or DC, separated by length-zero edges.
+And for computational purposes the expansion doesn’t blow up the input size enough to cause any problems. But if we want to use this diagram for visualizing the resulting schedule, it’s a little confusing because of all of those extra length-zero edges. They don’t really represent tasks; they’re just there to make sure that the paths connect the tasks in the correct order. Do we really need so many of them?</p>
+
+<p>There are a couple of simple rules that can be used to reduce the number of length-zero edges:</p>
+
+<ul>
+  <li>If two vertices both have only zero-length edges going out of them, and both have the same set of outgoing neighbors, they can be merged into a single vertex. Symmetrically, if two vertices both have only zero-length edges coming into them, and both have the same set of incoming neighbors, they can be merged.</li>
+  <li>If a vertex has only one edge going out of it, of length zero, it can be merged with its outgoing neighbor. Symmetrically, if a vertex has only one edge coming into it, of length zero, it can be merged with its incoming neighbor.</li>
+</ul>
+
+<p>For instance, the first rule will merge the milestones for the starts of tasks A and D, and the second rule will merge the resulting vertex into the start vertex. Repeatedly applying these rules produces the following simplified graph. Note that its start-to-end paths, ABC, DE, AE, and DC, are exactly the same as the potential critical paths that we started with.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/pert3.svg" alt="Path-preserving simplification of the task-milestone diagram" /></p>
+
+<p>If we assume that the task edges all have non-negative length (as they do in the scheduling application) and that we only care about longest paths, there are even more simplifications that we can perform. These ones might change the set of all paths in the graph (as identified by their sequences of tasks) but they preserve the identities of the longest paths:</p>
+
+<ul>
+  <li>
+    <p>If a zero-length edge goes from task X to task Y, and the graph contains another path between the same two tasks, remove the edge.</p>
+  </li>
+  <li>
+    <p>If a zero-length edge goes from task X to Y, every other edge into Y or out of X has length zero, and every incoming neighbor of task Y has a path to every outgoing neighbor of task X, then merge X and Y into a single vertex.</p>
+  </li>
+</ul>
+
+<p>In our example, the bottom edge meets the conditions of the second rule. Applying that rule produces an even simpler task-milestone diagram:</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/pert4.svg" alt="Additional simplification preserving longest paths" /></p>
+
+<p>Our example has no instances of the first rule, but when it is used it removes paths from the graph. The removed paths can never be longest paths, because any path through the removed edge can be made longer by replacing that edge by a different path from X to Y.
+When we perform the second rule, we may introduce new paths that were not already present, from a predecessor of Y, through the merged vertex, to a successor of X. For instance, the new graph has a path through only the two tasks AC, which was not one of the four paths we started with. But because these new paths replace portions of existing paths by two length-zero edges, they can never be the longest path, and the resulting compacted diagram can safely be used for scheduling.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/101502692118389818">Discuss on Mastodon</a>)</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by David Eppstein <a href="https://11011110.github.io/blog/2019/01/29/simplifying-task-milestone.html"><span class="datestr">at January 29, 2019 04:22 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
 	id="tag:blogger.com,1999:blog-6555947.post-6062056358171439265">
 <div class="entryheader">
 <span class="face">
@@ -410,7 +499,7 @@ by RJLipton+KWRegan <a href="https://rjlipton.wordpress.com/2019/01/29/primes-an
 <div class="content">
 Building systems that have fairness properties and monitoring systems that do A/B testing on us.<br /><br /><a href="https://algorithmicfairness.wordpress.com/2019/01/28/fat-papers-systems-and-measurement/">Session 2 of FAT*</a>: my opinionated summary.<div class="feedflare">
 <a href="http://feeds.feedburner.com/~ff/TheGeomblog?a=G-UqSGr3bSg:UU9jYzynrL0:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/TheGeomblog?d=yIl2AUoC8zA" border="0" /></a> <a href="http://feeds.feedburner.com/~ff/TheGeomblog?a=G-UqSGr3bSg:UU9jYzynrL0:63t7Ie-LG7Y"><img src="http://feeds.feedburner.com/~ff/TheGeomblog?d=63t7Ie-LG7Y" border="0" /></a>
-</div><img width="1" alt="" src="http://feeds.feedburner.com/~r/TheGeomblog/~4/G-UqSGr3bSg" height="1" /></div>
+</div><img src="http://feeds.feedburner.com/~r/TheGeomblog/~4/G-UqSGr3bSg" alt="" width="1" height="1" /></div>
 
 
 
@@ -1409,7 +1498,7 @@ by shacharlovett <a href="https://cstheory-events.org/2019/01/28/first-airoyoung
 <div class="content">
 I'll be blogging about each session of papers from the FAT* Conference. So as not to clutter your feed, the posts will be housed at the fairness blog that I co-write along with Sorelle Friedler and Carlos Scheidegger.<br /><br />The first post is on <a href="https://algorithmicfairness.wordpress.com/2019/01/27/fat-papers-framing-and-abstraction/">Session 1: Framing and Abstraction</a>.<div class="feedflare">
 <a href="http://feeds.feedburner.com/~ff/TheGeomblog?a=TROyy-Os39k:gYq646_XYaU:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/TheGeomblog?d=yIl2AUoC8zA" border="0" /></a> <a href="http://feeds.feedburner.com/~ff/TheGeomblog?a=TROyy-Os39k:gYq646_XYaU:63t7Ie-LG7Y"><img src="http://feeds.feedburner.com/~ff/TheGeomblog?d=63t7Ie-LG7Y" border="0" /></a>
-</div><img width="1" alt="" src="http://feeds.feedburner.com/~r/TheGeomblog/~4/TROyy-Os39k" height="1" /></div>
+</div><img src="http://feeds.feedburner.com/~r/TheGeomblog/~4/TROyy-Os39k" alt="" width="1" height="1" /></div>
 
 
 
@@ -2677,63 +2766,6 @@ Email: koucky@iuuk.mff.cuni.cz</p></div>
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-jobs.org/2019/01/22/postdoc-at-charles-university-in-prague-apply-by-february-28-2019/"><span class="datestr">at January 22, 2019 12:33 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://agtb.wordpress.com/?p=3377">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/agtb.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://agtb.wordpress.com/2019/01/22/guest-post-like-a-swarm-of-locusts-vijay-vazirani/">Guest post: “Like a Swarm of Locusts…” (Vijay Vazirani)</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://agtb.wordpress.com" title="Turing's Invisible Hand">Turing's invisible hand</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p><em><img src="https://www.ics.uci.edu/~vazirani/Vijay2.png" align="RIGHT" height="161" width="135" alt="My Picture" border="1" class=" alignleft" /></em></p>
-<p> </p>
-<p style="text-align: right;"><em>[The following guest post was written by Vijay Vazirani.] </em></p>
-<p> </p>
-<p> </p>
-<p> </p>
-<p><em> </em></p>
-<p> </p>
-<blockquote><p><em>What the cutting locust left, the swarming locust has eaten. What the swarming locust left, the hopping locust has eaten, and what the hopping locust left, the destroying locust has eaten.</em></p>
-<p style="text-align: right;">Joel 1:4</p>
-</blockquote>
-<p>A few years ago, while attending a Dagstuhl program on Equilibrium Computation, I embarked on one of the traditional long hikes through the beautiful woods surrounding Schloss Dagstuhl and happened to be walking next to a senior member of the Operations Research community. In no time we got immersed in a lively discussion on the style of research going on in Algorithmic Game Theory. We both agreed that the progress made in a matter of a few years was nothing short of phenomenal. At this point, my colleague remarked that AGT was no exception and that when TCS researchers enter a new area, they go in with such energies and enthusiasm that in no time not only is all low hanging fruit gone but in fact the entire area is devoid of any reasonable open problems! “They attack the area like swarms of locusts devouring foliage in biblical lands, consuming not only fruit and leaves but even shrubs and twigs,” he added. “Yes, and only sh*t is left behind!” I chimed in.</p>
-<p>As AGT is reaching that stage, with researchers yearning for new issues/problems for their students and their own research and grant proposals, there is a reprieve emerging on the horizon: a program at Simons on “<a href="https://simons.berkeley.edu/programs/market2019">Online and Matching-Based Market Design</a>” in Fall 2019.</p>
-<p>This is by no means a new area. In fact, the first such market, for matching medical residents to hospitals, dates back to 1920s, well before the classic — and by now Nobel Prize winning — work of Gale and Shapley on the stable matching problem, which provided the canonical algorithm for this market. In recent years, the advent of the Internet and the relocation of our most important activities to online platforms have led to an explosion of such marketplaces (for examples, see the Simons web page) and they have been occupying an ever-increasing fraction of our economy.</p>
-<p>AGT, CS and Economics have already had a massive impact via these markets. My own experience comes from Google’s multi-billion dollar Adwords market in which sophisticated algorithmic ideas have also played a central role, e.g., see the Simons talk “<a href="https://simons.berkeley.edu/talks/vijay-vazirani-4-30-18">Google’s AdWords Market: How Theory Influenced Practice</a>“.</p>
-<p>Clearly, the stakes are high. There is a real opportunity of extending the already existing highly inter-disciplinary theory in substantial ways and making an even bigger impact. Considering this and the enthusiasm of the researchers who have agreed to be participants in this program, Federico Echenique, Nicole Immorlica and I have launched the project of publishing a comprehensive volume of contributed chapters on this topic. More information on this will be coming soon.</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by robertkleinberg <a href="https://agtb.wordpress.com/2019/01/22/guest-post-like-a-swarm-of-locusts-vijay-vazirani/"><span class="datestr">at January 21, 2019 10:24 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>

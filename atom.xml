@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-01-30T00:21:41Z</updated>
+  <updated>2019-01-30T01:22:08Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -33,7 +33,7 @@
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2019-01-30T00:21:21Z</updated>
+      <updated>2019-01-30T01:21:47Z</updated>
     </source>
   </entry>
 
@@ -134,7 +134,79 @@ We did mention Schur’s long list of things named after him. Did people name th
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-01-30T00:20:43Z</updated>
+      <updated>2019-01-30T01:20:52Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2019/01/29/simplifying-task-milestone</id>
+    <link href="https://11011110.github.io/blog/2019/01/29/simplifying-task-milestone.html" rel="alternate" type="text/html"/>
+    <title>Simplifying task-milestone diagrams</title>
+    <summary>In my graph algorithms class last week, I covered critical path scheduling, as motivation for the linear-time algorithms for computing shortest and longest paths in directed acyclic graphs. In this scheduling problem, you are given a system of tasks, each with a predicted time to perform it, and constraints that some tasks should be done before others. Assuming that you have enough people working together to perform tasks in parallel, how quickly can you get everything done?</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>In my graph algorithms class last week, I covered critical path scheduling, as motivation for the linear-time algorithms for computing shortest and longest paths in directed acyclic graphs. In this scheduling problem, you are given a system of tasks, each with a predicted time to perform it, and constraints that some tasks should be done before others. Assuming that you have enough people working together to perform tasks in parallel, how quickly can you get everything done?</p>
+
+<p>An optimal solution can be found by scheduling each task to start at a time given by the longest sequence of tasks leading up to it such that each consecutive pair in the sequence must be performed sequentially. The total length of the resulting schedule equals the length of the <a href="https://en.wikipedia.org/wiki/Critical_path_method">critical path</a>, the longest sequence of sequential tasks in the whole system. The example below could represent subtasks of a software project: design, implement, and test the software (A, B, and C), develop test cases (D), and document the results (E). Its critical path could be one of ABC, DE, AE, or DC, depending on the lengths of each task.</p>
+
+<p style="text-align: center;"><img alt="Five tasks with ordering constraints" src="https://11011110.github.io/blog/assets/2019/pert1.svg"/></p>
+
+<p>It’s easy enough to solve this problem directly, but to convert it to a path problem we need to have lengths on edges rather than times on vertices. It’s also convenient to have a single starting vertex for all the paths.
+Therefore, <a href="https://en.wikipedia.org/wiki/Critical_path_method">Wikipedia’s article on the critical path method</a> uses a different kind of graph, which I’ll call a “task-milestone diagram” to distinguish it from the one above.
+In this diagram, the vertices represent milestones, single points in time. The tasks to be performed are represented by edges, and the time to perform a task becomes the length of its edge. The goal of the scheduling problem now becomes one of choosing a time for each milestone, with enough time between pairs of milestones to perform each task.
+The longest-path schedule, in which we place each milestone at a time given by the longest path to it from the start milestone, solves this problem optimally.</p>
+
+<p>To convert a system of tasks and ordering constraints (without milestones) into an equivalent task-milestone diagram, make two new milestones for each task, one for when it starts and one for when it ends. Turn each task into an edge between its two milestones. Transform each ordering constraint (saying that task X should be performed earlier than task Y) into a length-zero edge from the end of task X to the beginning of task Y. Add two more milestones, for the start and end of the whole project. And add more length-zero edges from the project start to the start of each task that has no predecessors, and from the end of each task that has no successors to the project end milestone.</p>
+
+<p style="text-align: center;"><img alt="Expanding each task vertex into two milestone vertices connected by a task edge" src="https://11011110.github.io/blog/assets/2019/pert2.svg"/></p>
+
+<p>In the resulting graph, the paths from the start to the end milestone consist of the same sequences of tasks as we had before: ABC, DE, AE, or DC, separated by length-zero edges.
+And for computational purposes the expansion doesn’t blow up the input size enough to cause any problems. But if we want to use this diagram for visualizing the resulting schedule, it’s a little confusing because of all of those extra length-zero edges. They don’t really represent tasks; they’re just there to make sure that the paths connect the tasks in the correct order. Do we really need so many of them?</p>
+
+<p>There are a couple of simple rules that can be used to reduce the number of length-zero edges:</p>
+
+<ul>
+  <li>If two vertices both have only zero-length edges going out of them, and both have the same set of outgoing neighbors, they can be merged into a single vertex. Symmetrically, if two vertices both have only zero-length edges coming into them, and both have the same set of incoming neighbors, they can be merged.</li>
+  <li>If a vertex has only one edge going out of it, of length zero, it can be merged with its outgoing neighbor. Symmetrically, if a vertex has only one edge coming into it, of length zero, it can be merged with its incoming neighbor.</li>
+</ul>
+
+<p>For instance, the first rule will merge the milestones for the starts of tasks A and D, and the second rule will merge the resulting vertex into the start vertex. Repeatedly applying these rules produces the following simplified graph. Note that its start-to-end paths, ABC, DE, AE, and DC, are exactly the same as the potential critical paths that we started with.</p>
+
+<p style="text-align: center;"><img alt="Path-preserving simplification of the task-milestone diagram" src="https://11011110.github.io/blog/assets/2019/pert3.svg"/></p>
+
+<p>If we assume that the task edges all have non-negative length (as they do in the scheduling application) and that we only care about longest paths, there are even more simplifications that we can perform. These ones might change the set of all paths in the graph (as identified by their sequences of tasks) but they preserve the identities of the longest paths:</p>
+
+<ul>
+  <li>
+    <p>If a zero-length edge goes from task X to task Y, and the graph contains another path between the same two tasks, remove the edge.</p>
+  </li>
+  <li>
+    <p>If a zero-length edge goes from task X to Y, every other edge into Y or out of X has length zero, and every incoming neighbor of task Y has a path to every outgoing neighbor of task X, then merge X and Y into a single vertex.</p>
+  </li>
+</ul>
+
+<p>In our example, the bottom edge meets the conditions of the second rule. Applying that rule produces an even simpler task-milestone diagram:</p>
+
+<p style="text-align: center;"><img alt="Additional simplification preserving longest paths" src="https://11011110.github.io/blog/assets/2019/pert4.svg"/></p>
+
+<p>Our example has no instances of the first rule, but when it is used it removes paths from the graph. The removed paths can never be longest paths, because any path through the removed edge can be made longer by replacing that edge by a different path from X to Y.
+When we perform the second rule, we may introduce new paths that were not already present, from a predecessor of Y, through the merged vertex, to a successor of X. For instance, the new graph has a path through only the two tasks AC, which was not one of the four paths we started with. But because these new paths replace portions of existing paths by two length-zero edges, they can never be the longest path, and the resulting compacted diagram can safely be used for scheduling.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/101502692118389818">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2019-01-29T16:22:00Z</updated>
+    <published>2019-01-29T16:22:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2019-01-30T00:50:41Z</updated>
     </source>
   </entry>
 
@@ -976,7 +1048,7 @@ for any $\varepsilon &gt; 0$, provided that the grid is sufficiently big.
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2019-01-30T00:21:17Z</updated>
+      <updated>2019-01-30T01:21:43Z</updated>
     </source>
   </entry>
 
@@ -1000,7 +1072,7 @@ for any $\varepsilon &gt; 0$, provided that the grid is sufficiently big.
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-01-30T00:21:20Z</updated>
+      <updated>2019-01-30T01:21:46Z</updated>
     </source>
   </entry>
 
@@ -1280,7 +1352,7 @@ for any $\varepsilon &gt; 0$, provided that the grid is sufficiently big.
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>By Emanuele Viola</subtitle>
       <title>Thoughts</title>
-      <updated>2019-01-30T00:21:08Z</updated>
+      <updated>2019-01-30T01:21:29Z</updated>
     </source>
   </entry>
 
@@ -1308,7 +1380,7 @@ and relate them to other known notions.</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-01-30T00:20:36Z</updated>
+      <updated>2019-01-30T01:20:42Z</updated>
     </source>
   </entry>
 
@@ -1336,7 +1408,7 @@ We argue that such an ``almost-explicit'' construction can be employed in many u
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-01-30T00:20:36Z</updated>
+      <updated>2019-01-30T01:20:42Z</updated>
     </source>
   </entry>
 
@@ -1360,7 +1432,7 @@ We argue that such an ``almost-explicit'' construction can be employed in many u
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-01-30T00:20:36Z</updated>
+      <updated>2019-01-30T01:20:42Z</updated>
     </source>
   </entry>
 
@@ -1388,7 +1460,7 @@ of model checking, although it increases the logic's expressive power.</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-01-30T00:20:36Z</updated>
+      <updated>2019-01-30T01:20:42Z</updated>
     </source>
   </entry>
 
@@ -1769,7 +1841,7 @@ intuitively means we partition replicas into groups and re-curse. <a href="http
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-01-30T00:21:03Z</updated>
+      <updated>2019-01-30T01:21:24Z</updated>
     </source>
   </entry>
 
@@ -1875,7 +1947,7 @@ intuitively means we partition replicas into groups and re-curse. <a href="http
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-01-30T00:21:04Z</updated>
+      <updated>2019-01-30T01:21:24Z</updated>
     </source>
   </entry>
 
@@ -1902,7 +1974,7 @@ Email: shachar.lovett@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-30T00:20:44Z</updated>
+      <updated>2019-01-30T01:20:53Z</updated>
     </source>
   </entry>
 
@@ -1932,7 +2004,7 @@ Email: shachar.lovett@gmail.com</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-01-30T00:21:04Z</updated>
+      <updated>2019-01-30T01:21:24Z</updated>
     </source>
   </entry>
 
@@ -2042,7 +2114,7 @@ Email: slovett@ucsd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-30T00:20:44Z</updated>
+      <updated>2019-01-30T01:20:53Z</updated>
     </source>
   </entry>
 
@@ -2154,7 +2226,7 @@ Email: kothari@cs.princeton.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-30T00:20:45Z</updated>
+      <updated>2019-01-30T01:20:53Z</updated>
     </source>
   </entry>
 
@@ -2181,7 +2253,7 @@ Email: koucky@iuuk.mff.cuni.cz</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-30T00:20:44Z</updated>
+      <updated>2019-01-30T01:20:53Z</updated>
     </source>
   </entry>
 
@@ -2208,7 +2280,7 @@ Email: koucky@iuuk.mff.cuni.cz</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-30T00:20:45Z</updated>
+      <updated>2019-01-30T01:20:53Z</updated>
     </source>
   </entry>
 
@@ -2235,48 +2307,7 @@ Email: koucky@iuuk.mff.cuni.cz</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-01-30T00:20:45Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://agtb.wordpress.com/?p=3377</id>
-    <link href="https://agtb.wordpress.com/2019/01/22/guest-post-like-a-swarm-of-locusts-vijay-vazirani/" rel="alternate" type="text/html"/>
-    <title>Guest post: “Like a Swarm of Locusts…” (Vijay Vazirani)</title>
-    <summary>  [The following guest post was written by Vijay Vazirani.]           What the cutting locust left, the swarming locust has eaten. What the swarming locust left, the hopping locust has eaten, and what the hopping locust left, the destroying locust has eaten. Joel 1:4 A few years ago, while attending a […]</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><em><img align="RIGHT" alt="My Picture" border="1" class=" alignleft" height="161" src="https://www.ics.uci.edu/~vazirani/Vijay2.png" width="135"/></em></p>
-<p> </p>
-<p style="text-align: right;"><em>[The following guest post was written by Vijay Vazirani.] </em></p>
-<p> </p>
-<p> </p>
-<p> </p>
-<p><em> </em></p>
-<p> </p>
-<blockquote><p><em>What the cutting locust left, the swarming locust has eaten. What the swarming locust left, the hopping locust has eaten, and what the hopping locust left, the destroying locust has eaten.</em></p>
-<p style="text-align: right;">Joel 1:4</p>
-</blockquote>
-<p>A few years ago, while attending a Dagstuhl program on Equilibrium Computation, I embarked on one of the traditional long hikes through the beautiful woods surrounding Schloss Dagstuhl and happened to be walking next to a senior member of the Operations Research community. In no time we got immersed in a lively discussion on the style of research going on in Algorithmic Game Theory. We both agreed that the progress made in a matter of a few years was nothing short of phenomenal. At this point, my colleague remarked that AGT was no exception and that when TCS researchers enter a new area, they go in with such energies and enthusiasm that in no time not only is all low hanging fruit gone but in fact the entire area is devoid of any reasonable open problems! “They attack the area like swarms of locusts devouring foliage in biblical lands, consuming not only fruit and leaves but even shrubs and twigs,” he added. “Yes, and only sh*t is left behind!” I chimed in.</p>
-<p>As AGT is reaching that stage, with researchers yearning for new issues/problems for their students and their own research and grant proposals, there is a reprieve emerging on the horizon: a program at Simons on “<a href="https://simons.berkeley.edu/programs/market2019">Online and Matching-Based Market Design</a>” in Fall 2019.</p>
-<p>This is by no means a new area. In fact, the first such market, for matching medical residents to hospitals, dates back to 1920s, well before the classic — and by now Nobel Prize winning — work of Gale and Shapley on the stable matching problem, which provided the canonical algorithm for this market. In recent years, the advent of the Internet and the relocation of our most important activities to online platforms have led to an explosion of such marketplaces (for examples, see the Simons web page) and they have been occupying an ever-increasing fraction of our economy.</p>
-<p>AGT, CS and Economics have already had a massive impact via these markets. My own experience comes from Google’s multi-billion dollar Adwords market in which sophisticated algorithmic ideas have also played a central role, e.g., see the Simons talk “<a href="https://simons.berkeley.edu/talks/vijay-vazirani-4-30-18">Google’s AdWords Market: How Theory Influenced Practice</a>“.</p>
-<p>Clearly, the stakes are high. There is a real opportunity of extending the already existing highly inter-disciplinary theory in substantial ways and making an even bigger impact. Considering this and the enthusiasm of the researchers who have agreed to be participants in this program, Federico Echenique, Nicole Immorlica and I have launched the project of publishing a comprehensive volume of contributed chapters on this topic. More information on this will be coming soon.</p></div>
-    </content>
-    <updated>2019-01-21T22:24:51Z</updated>
-    <published>2019-01-21T22:24:51Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>robertkleinberg</name>
-    </author>
-    <source>
-      <id>https://agtb.wordpress.com</id>
-      <logo>https://secure.gravatar.com/blavatar/52ef314e11e379febf97d1a97547f4cd?s=96&amp;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fbuttonw-com.png</logo>
-      <link href="https://agtb.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://agtb.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://agtb.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Computation, Economics, and Game Theory</subtitle>
-      <title>Turing's Invisible Hand</title>
-      <updated>2019-01-30T00:20:40Z</updated>
+      <updated>2019-01-30T01:20:53Z</updated>
     </source>
   </entry>
 </feed>
