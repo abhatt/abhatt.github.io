@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-02-09T23:37:04Z</updated>
+  <updated>2019-02-10T00:21:55Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,73 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra</id>
+    <link href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html" rel="alternate" type="text/html"/>
+    <title>Big convex polyhedra in grids</title>
+    <summary>I recently wrote here about big convex polygons in grids, a problem for which we know very precise answers. This naturally raises the question: what about higher dimensions? How many vertices can be part of a convex polyhedron in an grid, or more generally a convex polytope in a -dimensional grid of side length ? Here we do still know some pretty good answers, at least up to constant factors in spaces of constant dimension.</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>I recently wrote here about <a href="https://11011110.github.io/blog/2018/09/05/big-convex-polygons.html">big convex polygons in grids</a>, a problem for which we know very precise answers. This naturally raises the question: what about higher dimensions? How many vertices can be part of a convex polyhedron in an  grid, or more generally a convex polytope in a -dimensional grid of side length ? Here we do still know some pretty good answers, at least up to constant factors in spaces of constant dimension.</p>
+
+<p>The problem is included in a 2008 survey by Imre Bárány,<sup id="fnref:bar"><a class="footnote" href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html#fn:bar">1</a></sup> according to whom the maximum number of vertices is</p>
+
+
+
+<p>For instance, in three dimensional  grids the maximum number of vertices is .</p>
+
+<p>One way to find polyhedra with this many vertices is to take the convex hull of the points in a ball,<sup id="fnref:bl"><a class="footnote" href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html#fn:bl">2</a></sup> <sup id="fnref:bd"><a class="footnote" href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html#fn:bd">3</a></sup> or in scaled copies of any fixed smooth convex body. Another way, which should generate polyhedra with a somewhat less irregular appearance and (up to constant factors) the same number of vertices, is to take the <a href="https://en.wikipedia.org/wiki/Minkowski_addition">Minkowski sum</a> of all line segments (up to scaling and translation) that will fit into a smaller grid, of side length . For instance, the <a href="https://en.wikipedia.org/wiki/Truncated_rhombicuboctahedron">truncated rhombicuboctahedron</a> below<sup id="fnref:ruen"><a class="footnote" href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html#fn:ruen">4</a></sup> is the Minkowski sum of all the line segments that fit into a unit cube. Its 96 vertices lie in a  grid. In general, this method produces a <a href="https://en.wikipedia.org/wiki/Zonohedron">zonohedron</a> whose complexity can be analyzed in terms of a -dimensional arrangement of  hyperplanes. As long as this arrangement is not too degenerate (which it appears not to be, but I haven’t worked out the details carefully) this should give
+a number of vertices within a constant factor of the number coming from the convex hull construction.</p>
+
+<p style="text-align: center;"><img alt="Truncated rhombicuboctahedron" src="https://11011110.github.io/blog/assets/2019/truncated-rhombicuboctahedron2.png"/></p>
+
+<p>A matching upper bound comes from a 1963 paper by G. K. Andrews,<sup id="fnref:and"><a class="footnote" href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html#fn:and">5</a></sup> and Bárány writes that although several more proofs have been published none of them is easy. I’m not sure whether the difficulty is in getting the exact bound or in the fact that Andrews and the later proofs allow more general shapes with volume  that don’t fit into a grid, but it’s not hard to get close to the right bound simply by counting the number of possible facets of a given volume . By using <a href="https://en.wikipedia.org/wiki/Lenstra%E2%80%93Lenstra%E2%80%93Lov%C3%A1sz_lattice_basis_reduction_algorithm">lattice basis reduction</a> the integer vectors in the hyperplane through any facet have a nearly-orthogonal basis whose product of lengths is proportional to . By considering how this product of lengths can be broken down into factors of different scales, and counting how many integer vectors of those lengths exist, it follows that the number of possible facets of volume  is . Combining this with the  surface area of a grid polytope gives the correct upper bound on the number of vertices up to a polylog factor.</p>
+
+<p>What about when the dimension is not constant? The best general construction I know for high dimensions is to take all points with a fixed distance  from the grid center. There are  possible values for the distance, so this construction produces a convex polytope with  vertices. It comes from a 1946 paper by Behrend, who uses this idea to find <a href="https://en.wikipedia.org/wiki/Salem%E2%80%93Spencer_set">dense sets of integers with no arithmetic progressions</a>.<sup id="fnref:beh"><a class="footnote" href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html#fn:beh">6</a></sup> It is never worse to use the convex hull of the ball than the points on a sphere,
+and it is tempting to guess that (at least when  is singly exponential in  so that  becomes constant) the convex hull technique will produce slightly more vertices, , but I don’t know whether this is true or if so how to prove it. A celebrated paper by Elkin from 2011 produces exactly this factor of  improvement in Behrend’s progression-free sets,<sup id="fnref:elk"><a class="footnote" href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html#fn:elk">7</a></sup> but appears to be doing it some other way than by finding larger convex polytopes.</p>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:bar">
+      <p>Bárány, Imre (2008), “Extremal problems for convex lattice polytopes: a survey”, <em>Surveys on Discrete and Computational Geometry</em>, Contemporary Mathematics 453, Amer. Math. Soc., pp. 87–103, <a href="https://doi.org/10.1090/conm/453/08796">doi:10.1090/conm/453/08796</a>, <a href="https://mathscinet.ams.org/mathscinet-getitem?mr=2405678">MR2405678</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html#fnref:bar">↩</a></p>
+    </li>
+    <li id="fn:bl">
+      <p>Bárány, Imre and Larman, David (1998), “The convex hull of the integer points in a large ball”, <em>Math. Ann.</em> 312 (1), pp. 167–181, <a href="https://doi.org/10.1007/s002080050217">doi:10.1007/s002080050217</a>, <a href="https://mathscinet.ams.org/mathscinet-getitem?mr=1645957">MR1645957</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html#fnref:bl">↩</a></p>
+    </li>
+    <li id="fn:bd">
+      <p>Balog, Antal and Deshouillers, Jean-Marc (1999), “On some convex lattice polytopes”. <em>Number Theory in Progress</em>, Vol. 2 (Zakopane-Kościelisko, 1997), de Gruyter, pp. 591–606, <a href="https://mathscinet.ams.org/mathscinet-getitem?mr=1689533">MR1689533</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html#fnref:bd">↩</a></p>
+    </li>
+    <li id="fn:ruen">
+      <p>Ruen, Tom (2014), “Truncated rhombicuboctahedron”, CC-BY-SA 4.0, <a href="https://commons.wikimedia.org/wiki/File:Truncated_rhombicuboctahedron2.png">File:Truncated rhombicuboctahedron2.png</a> on Wikimedia commons. <a class="reversefootnote" href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html#fnref:ruen">↩</a></p>
+    </li>
+    <li id="fn:and">
+      <p>Andrews, George E. (1963), “A lower bound for the volume of strictly convex bodies with many boundary lattice points”, <em>Trans. Amer. Math. Soc.</em> 106, pp. 270–279, <a href="https://doi.org/10.2307/1993769">doi:10.2307/1993769</a>, <a href="https://mathscinet.ams.org/mathscinet-getitem?mr=0143105">MR0143105</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html#fnref:and">↩</a></p>
+    </li>
+    <li id="fn:beh">
+      <p>Behrend, F. A. (1946), “On sets of integers which contain no three terms in arithmetical progression”, <em>Proc. Nat. Acad. Sci.</em> 32 (12), pp. 331–332, <a href="https://doi.org/10.1073/pnas.32.12.331">doi:10.1073/pnas.32.12.331</a>, <a href="https://mathscinet.ams.org/mathscinet-getitem?mr=0018694">MR0018694</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html#fnref:beh">↩</a></p>
+    </li>
+    <li id="fn:elk">
+      <p>Elkin, Michael (2011), “An improved construction of progression-free sets”, <em>Israel J. Math.</em> 184, pp. 93–128, <a href="https://arxiv.org/abs/0801.4310">arXiv:0801.4310</a>, <a href="https://doi.org/10.1007%2Fs11856-011-0061-1">doi:10.1007/s11856-011-0061-1</a>, <a href="https://www.ams.org/mathscinet-getitem?mr=2823971">MR2823971</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2019/02/09/big-convex-polyhedra.html#fnref:elk">↩</a></p>
+    </li>
+  </ol>
+</div></div>
+    </content>
+    <updated>2019-02-09T15:07:00Z</updated>
+    <published>2019-02-09T15:07:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2019-02-10T00:17:13Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>http://arxiv.org/abs/1902.02755</id>
@@ -381,7 +448,7 @@ To: &lt;<a href="mailto:SIG-ELECTION-ANNOUNCEMENT@listserv.acm.org">SIG-ELECTION
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-02-09T23:35:12Z</updated>
+      <updated>2019-02-10T00:21:03Z</updated>
     </source>
   </entry>
 
@@ -411,7 +478,7 @@ Using Schur-convexity, we also extend our results to functions $f_i$ whose range
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-02-09T23:34:55Z</updated>
+      <updated>2019-02-10T00:20:59Z</updated>
     </source>
   </entry>
 
@@ -435,7 +502,7 @@ As an application, we construct a communication problem with essentially the lar
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-02-09T23:34:55Z</updated>
+      <updated>2019-02-10T00:20:59Z</updated>
     </source>
   </entry>
 
@@ -504,7 +571,7 @@ Even though both papers were <a href="https://doi.org/10.1137/0217058">published
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-02-09T23:34:55Z</updated>
+      <updated>2019-02-10T00:20:59Z</updated>
     </source>
   </entry>
 
@@ -613,7 +680,7 @@ I really like Moser’s clever solution to the diophantine equation 	</p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-02-09T23:35:15Z</updated>
+      <updated>2019-02-10T00:21:06Z</updated>
     </source>
   </entry>
 
@@ -727,7 +794,7 @@ Late submissions will be accepted subject to space constraints.</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-02-09T23:35:11Z</updated>
+      <updated>2019-02-10T00:21:01Z</updated>
     </source>
   </entry>
 
@@ -789,7 +856,7 @@ Late submissions will be accepted subject to space constraints.</p></div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-02-09T23:20:12Z</updated>
+      <updated>2019-02-10T00:20:08Z</updated>
     </source>
   </entry>
 
@@ -996,7 +1063,7 @@ The above was all written the day before Superb Owl. Now its the next day and Gl
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-02-09T23:34:55Z</updated>
+      <updated>2019-02-10T00:20:59Z</updated>
     </source>
   </entry>
 
@@ -1143,7 +1210,7 @@ We’ve connected the horizon of perfect play to whether the fundamental relatio
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-02-09T23:35:16Z</updated>
+      <updated>2019-02-10T00:21:06Z</updated>
     </source>
   </entry>
 
@@ -1171,7 +1238,7 @@ We’ve connected the horizon of perfect play to whether the fundamental relatio
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2019-02-09T23:36:38Z</updated>
+      <updated>2019-02-10T00:21:43Z</updated>
     </source>
   </entry>
 
@@ -1221,7 +1288,7 @@ We’ve connected the horizon of perfect play to whether the fundamental relatio
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-02-09T23:35:11Z</updated>
+      <updated>2019-02-10T00:21:02Z</updated>
     </source>
   </entry>
 
@@ -1647,7 +1714,7 @@ very small but non-zero chance, a black hole is easy to distill? Does that mean 
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-02-09T23:35:54Z</updated>
+      <updated>2019-02-10T00:21:23Z</updated>
     </source>
   </entry>
 
@@ -1723,7 +1790,7 @@ Jacob Siehler. The goal is to swap the positions of two colored blocks. Even the
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2019-02-01T06:51:08Z</updated>
+      <updated>2019-02-10T00:17:13Z</updated>
     </source>
   </entry>
 
@@ -1817,7 +1884,7 @@ The inspiration for our study comes from a recent work by Nägele, Sudakov, and 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-02-09T23:34:55Z</updated>
+      <updated>2019-02-10T00:20:58Z</updated>
     </source>
   </entry>
 
@@ -2213,7 +2280,7 @@ The inspiration for our study comes from a recent work by Nägele, Sudakov, and 
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-02-09T23:35:54Z</updated>
+      <updated>2019-02-10T00:21:24Z</updated>
     </source>
   </entry>
 
@@ -2239,7 +2306,7 @@ The inspiration for our study comes from a recent work by Nägele, Sudakov, and 
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2019-02-09T23:36:38Z</updated>
+      <updated>2019-02-10T00:21:43Z</updated>
     </source>
   </entry>
 
@@ -2344,7 +2411,7 @@ We did mention Schur’s long list of things named after him. Did people name th
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-02-09T23:35:16Z</updated>
+      <updated>2019-02-10T00:21:06Z</updated>
     </source>
   </entry>
 
@@ -2416,7 +2483,7 @@ When we perform the second rule, we may introduce new paths that were not alread
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2019-02-01T06:51:08Z</updated>
+      <updated>2019-02-10T00:17:13Z</updated>
     </source>
   </entry>
 
@@ -2692,7 +2759,7 @@ When we perform the second rule, we may introduce new paths that were not alread
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2019-02-09T23:36:32Z</updated>
+      <updated>2019-02-10T00:21:39Z</updated>
     </source>
   </entry>
 
@@ -2716,7 +2783,7 @@ When we perform the second rule, we may introduce new paths that were not alread
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-02-09T23:36:37Z</updated>
+      <updated>2019-02-10T00:21:42Z</updated>
     </source>
   </entry>
 
@@ -2996,35 +3063,7 @@ When we perform the second rule, we may introduce new paths that were not alread
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>By Emanuele Viola</subtitle>
       <title>Thoughts</title>
-      <updated>2019-02-09T23:36:07Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2019/012</id>
-    <link href="https://eccc.weizmann.ac.il/report/2019/012" rel="alternate" type="text/html"/>
-    <title>TR19-012 |  Multi-pseudodeterministic algorithms | 
-
-	Oded Goldreich</title>
-    <summary>In this work, dedicated to Shafi Goldwasser, we consider a relaxation of the notion of pseudodeterministic algorithms, which was put forward by Gat and Goldwasser ({\em ECCC}, TR11--136, 2011). 
-
-
-Pseudodeterministic algorithms are randomized algorithms that solve search problems by almost always providing the same canonical solution (per each input). 
-Multi-pseudodeterministic algorithms relax the former notion by allowing the algorithms to output one of a bounded number  of canonical solutions (per each input). 
-We show that efficient multi-seudodeterministic algorithms can solve natural problems that are not solveable by efficient pseudodeterministic algorithms, present a composition theorem regarding multi-pseudodeterministic algorithms,
-and relate them to other known notions.</summary>
-    <updated>2019-01-27T17:25:14Z</updated>
-    <published>2019-01-27T17:25:14Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2019-02-09T23:34:55Z</updated>
+      <updated>2019-02-10T00:21:30Z</updated>
     </source>
   </entry>
 </feed>
