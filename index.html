@@ -225,7 +225,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at February 22, 2019 04:21 AM UTC</span>.
+Last updated <span class="datestr">at February 22, 2019 05:21 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -932,6 +932,91 @@ solution whenever it exists.
 
 <p class="date">
 <a href="http://arxiv.org/abs/1902.06749"><span class="datestr">at February 22, 2019 12:00 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/eppstein.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html">Mutual nearest neighbors versus closest pairs</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>In the 1990s I published a series of papers on data structures for closest pairs. As long as you already know how to maintain dynamic sets of objects of some type, and answer nearest-neighbor queries among them, you can also keep track of the closest pair, and this can be used as a subroutine in many other
+computational geometry algorithms. But it turns out that many of those algorithms can now be simplified and sped up by using mutual nearest neighbors (pairs of objects that are each other’s nearest neighbors) instead of closest pairs.</p>
+
+<p>My original motivation for studying these types of problems was to maintain minimum spanning trees of dynamic point sets, using closest red-blue pairs of Euclidean points,<sup id="fnref:aem"><a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fn:aem" class="footnote">1</a></sup> <sup id="fnref:ebf"><a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fn:ebf" class="footnote">2</a></sup> and I later found more applications in hierarchical clustering, greedy matching, traveling salesperson heuristics,<sup id="fnref:fhc"><a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fn:fhc" class="footnote">3</a></sup> <sup id="fnref:lazy"><a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fn:lazy" class="footnote">4</a></sup> and (with Jeff Erickson) motorcycle graphs and <a href="https://en.wikipedia.org/wiki/Straight_skeleton">straight skeletons</a>.<sup id="fnref:ee"><a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fn:ee" class="footnote">5</a></sup> But to use these closest pair data structures, you have to pay two logarithmic factors in time complexity over the time for the underlying nearest-neighbor data structure. So they’re not competitive with (uncolored) Euclidean closest pair data structures, which take only logarithmic time in any fixed dimension. Instead they make more sense to use with other distances than Euclidean, with objects more complicated than single points, or with variations like the red-blue closest pair for which the logarithmic-time solution doesn’t work.</p>
+
+<p>For several variations of hierarchical clustering, an alternative and simpler technique has been known for quite a bit longer, based on finding mutual nearest neighbors (pairs of objects that are nearer to each other than to anything else) rather than closest pairs.<sup id="fnref:ben"><a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fn:ben" class="footnote">6</a></sup> <sup id="fnref:juan"><a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fn:juan" class="footnote">7</a></sup> It’s called the <a href="https://en.wikipedia.org/wiki/Nearest-neighbor_chain_algorithm">nearest neighbor chain algorithm</a>, but really it’s a data structure rather than an algorithm, one that allows you to maintain a dynamic point set and find pairs of mutual nearest neighbors, again based on calls to an underlying nearest neighbor data structure. The idea is to maintain a stack of shorter and shorter pairs of nearest neighbors, until the two objects whose distance is on the top of the stack have nothing nearer – they are mutual nearest neighbors. Whenever you want a pair of neighbors, you look at the top pair, an object  and its nearest neighbor , and ask whether ’s nearest neighbor is . If so, you have found a mutual nearest neighbor pair, and if not you have a new shorter distance to push onto the stack.</p>
+
+<p>One can this in a hierarchical clustering algorithm that repeatedly finds and merges the nearest two clusters, whenever the distance between clusters has a special property: a merged cluster is never closer to other clusters than the closer of the two clusters that was merged. This property implies both that the stack of distances remains valid after the merge, and that mutual nearest neighbors are always safe to merge. If two clusters are mutual nearest neighbors, then the closest-pair clustering algorithm will eventually merge them, because none of its actions can cause them to stop being mutual nearest neighbors. So we might as well merge them immediately once we discover them to be mutual nearest neighbors. (One way to formulate this mathematically is that the set of mutual nearest neighbor pairs merged by the clustering algorithm forms an <a href="https://en.wikipedia.org/wiki/Antimatroid">antimatroid</a>). When this works, you get a clustering algorithm that uses a linear number of nearest neighbor queries, instead of the  queries that you would get using my closest-pair data structures.</p>
+
+<p>In more recent research with UCI student Nil Mamano (finishing his doctorate this year; hire him for a postdoc, he’s good!) we noticed that the nearest neighbor chain algorithm can also be applied to certain <a href="https://11011110.github.io/blog/2017/04/11/stable-grid-matching.html">stable marriage problems with preferences coming from geometric distances</a>.<sup id="fnref:egm"><a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fn:egm" class="footnote">8</a></sup> Our latest preprint, “Euclidean TSP, Motorcycle Graphs, and Other New Applications of Nearest-Neighbor Chains” (with Efrat, Frishberg, Goodrich, Kobourov, Mamano, Matias, and Polishchuk, <a href="https://arxiv.org/abs/1902.06875">arXiv:1902.06875</a>) extends this to a much broader set of applications. As well as simplifying and speeding up my previous work on motorcycle graphs and TSP heuristics, we also use nearest neighbor chains in a bigger class of stable matching problems and in an approximate geometric set cover problem. In each case, we need to show either that the problem has an antimatroid-like property (so using mutual nearest neighbors produces the same solution as closest pairs) or that, even when varying from the same solution, it achieves the same quality. It’s not quite true that anything closest pairs can do, mutual nearest neighbors can do better, but it’s close.</p>
+
+<p>Another idea in the paper is that to find (exact!) mutual nearest neighbor pairs one can sometimes get away with using approximate near neighbor structures. This is important if you’re using Euclidean distance, because the time bounds for exact nearest neighbors have the form  for constants  that get very small as  gets large, while approximate nearest neighbors are logarithmic in all dimensions. The idea is to build the stack of shorter distances by asking for a constant number of approximate near neighbors, the th of which is within a constant factor of the distance to the actual th nearest neighbor. By a packing argument for points in Euclidean space, either some two of these points are closer to each other than the distance on the current stack top (in which case you can build the stack one more level) or these approximate neighbors are guaranteed to contain the actual nearest neighbor (in which case you can either detect a mutual nearest neighbor pair or again build the stack).
+This idea leads, for instance, to an algorithm for the <a href="https://en.wikipedia.org/wiki/Multi-fragment_algorithm">multi-fragment TSP heuristic</a> that takes time  in Euclidean spaces of any bounded dimension; the best previous time appears to be an -time algorithm (valid in any metric space) from one of my previous papers.<sup id="fnref:fhc:1"><a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fn:fhc" class="footnote">3</a></sup></p>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:aem">
+      <p>Agarwal, P. K., Eppstein, D., and Matoušek, J., “<a href="https://www.ics.uci.edu/~eppstein/pubs/AgaEppMat-FOCS-92.pdf">Dynamic algorithms for half-space reporting, proximity problems, and geometric minimum spanning trees</a>”, <em>FOCS</em>, 1992, pp. 80–89. <a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fnref:aem" class="reversefootnote">↩</a></p>
+    </li>
+    <li id="fn:ebf">
+      <p>Eppstein, D., “<a href="https://www.ics.uci.edu/~eppstein/pubs/Epp-DCG-95.pdf">Dynamic Euclidean minimum spanning trees and extrema of binary functions</a>”, <em>Discrete Comput. Geom.</em> 13: 111–122, 1995. <a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fnref:ebf" class="reversefootnote">↩</a></p>
+    </li>
+    <li id="fn:fhc">
+      <p>Eppstein, D., “Fast hierarchical clustering and other applications of dynamic closest pairs”, <em>SODA</em>, 1998, pp. 619–628, <a href="https://arxiv.org/abs/cs.DS/9912014">arXiv:cs.DS/9912014</a>, <em>J. Experimental Algorithmics</em> 5 (1): 1–23, 2000. <a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fnref:fhc" class="reversefootnote">↩</a> <a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fnref:fhc:1" class="reversefootnote">↩<sup>2</sup></a></p>
+    </li>
+    <li id="fn:lazy">
+      <p>Cardinal, J., and Eppstein, D., “<a href="https://www.siam.org/meetings/alenex04/abstacts/JCardinal.pdf">Lazy algorithms for dynamic closest pair with arbitrary distance measures</a>”, <em>ALENEX</em>, 2004, pp. 112–119. <a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fnref:lazy" class="reversefootnote">↩</a></p>
+    </li>
+    <li id="fn:ee">
+      <p>Eppstein, D., and Erickson, J., “<a href="http://jeffe.cs.illinois.edu/pubs/pdf/cycles.pdf">Raising roofs, crashing cycles, and playing pool: applications of a data structure for finding pairwise interactions</a>”, <em>SoCG</em>, 1998, pp. 58–67, <em>Discrete Comput. Geom.</em> 22 (4): 569–592, 1999. <a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fnref:ee" class="reversefootnote">↩</a></p>
+    </li>
+    <li id="fn:ben">
+      <p>Benzécri, J.-P. (1982), “<a href="http://www.numdam.org/item?id=CAD_1982__7_2_209_0">Construction d’une classification ascendante hiérarchique par la recherche en chaîne des voisins réciproques</a>”, Les Cahiers de l’Analyse des Données, 7 (2): 209–218. <a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fnref:ben" class="reversefootnote">↩</a></p>
+    </li>
+    <li id="fn:juan">
+      <p>Juan, J. (1982), “<a href="http://www.numdam.org/item?id=CAD_1982__7_2_219_0">Programme de classification hiérarchique par l’algorithme de la recherche en chaîne des voisins réciproques</a>”, <em>Les Cahiers de l’Analyse des Données</em>, 7 (2): 219–225. <a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fnref:juan" class="reversefootnote">↩</a></p>
+    </li>
+    <li id="fn:egm">
+      <p>Eppstein, D., Goodrich, M. T., and Mamano, N., “Algorithms for stable matching and clustering in a grid”, <a href="https://arxiv.org/abs/1704.02303">arXiv:1704.02303</a>, <em>IWCIA</em> 2017, LNCS 10256 (2017), pp. 117–131. <a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html#fnref:egm" class="reversefootnote">↩</a></p>
+    </li>
+  </ol>
+</div>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/101634032916499158">Discuss on Mastodon</a>)</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by David Eppstein <a href="https://11011110.github.io/blog/2019/02/21/mutual-nearest-neighbors.html"><span class="datestr">at February 21, 2019 09:06 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -2658,54 +2743,6 @@ by Gil Kalai <a href="https://gilkalai.wordpress.com/2019/02/16/attila-pors-univ
 
 <p class="date">
 by David Eppstein <a href="https://11011110.github.io/blog/2019/02/15/linkage.html"><span class="datestr">at February 15, 2019 10:45 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://gilkalai.wordpress.com/?p=16854">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/kalai.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://gilkalai.wordpress.com/2019/02/15/henry-cohn-abhinav-kumar-stephen-d-miller-danylo-radchenko-and-maryna-viazovska-universal-optimality-of-the-e8-and-leech-lattices-and-interpolation-formulas/">Henry Cohn, Abhinav Kumar, Stephen D. Miller, Danylo Radchenko, and Maryna Viazovska: Universal optimality of the E8 and Leech lattices and interpolation formulas</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://gilkalai.wordpress.com" title="Combinatorics and more">Gil Kalai</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p><a href="https://gilkalai.files.wordpress.com/2019/02/hlc.jpg"><img src="https://gilkalai.files.wordpress.com/2019/02/hlc.jpg?w=640&amp;h=641" alt="" width="640" class="alignnone size-full wp-image-16863" height="641" /></a></p>
-<p><span style="color: #ff0000;"><strong>Henry Cohn</strong></span></p>
-<p>A follow up paper on the tight bounds for sphere packings in eight and 24 dimensions. (Thanks, again, Steve, for letting me know.)</p>
-<p>For the 2016 breakthroughs see <a href="https://gilkalai.wordpress.com/2016/03/23/a-breakthrough-by-maryna-viazovska-lead-to-the-long-awaited-solutions-for-the-densest-packing-problem-in-dimensions-8-and-24/">this post</a>,<a href="https://golem.ph.utexas.edu/category/2016/03/e8_is_the_best.html"> this post of John Baez</a>, this <a href="https://www.quantamagazine.org/20160330-sphere-packing-solved-in-higher-dimensions/">article by Erica Klarreich on Quanta Magazine, </a>and a Notices AMS article by  Henry Cohn   <a href="http://www.ams.org/publications/journals/notices/201702/rnoti-p102.pdf" rel="nofollow">A conceptual breakthrough in sphere packing</a>. See also, Henry Cohn’s 2010 paper <a href="https://arxiv.org/abs/1003.3053">Order and disorder in energy minimization</a>, and <a href="https://www.youtube.com/watch?v=8y-uqcyRZ1M">Maryna Viazovska’s ICM 2018 videotaped lecture.</a></p>
-<h3>Henry Cohn, Abhinav Kumar, Stephen D. Miller, Danylo Radchenko, and Maryna Viazovska: <a href="https://arxiv.org/abs/1902.05438">Universal optimality of the E8 and Leech lattices and interpolation formulas</a></h3>
-<p><strong>Abstract: </strong>We prove that the <img src="https://s0.wp.com/latex.php?latex=E_8&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="E_8" class="latex" title="E_8" /> root lattice and the Leech lattice are universally optimal among point configurations in Euclidean spaces of dimensions 8 and 24, respectively. In other words, they minimize energy for every potential function that is a completely monotonic function of squared distance (for example, inverse power laws or Gaussians), which is a strong form of robustness not previously known for any configuration in more than one dimension. This theorem implies their recently shown optimality as sphere packings, and broadly generalizes it to allow for long-range interactions.</p>
-<p>The proof uses sharp linear programming bounds for energy. To construct the optimal auxiliary functions used to attain these bounds, we prove a new interpolation theorem, which is of independent interest. It reconstructs a radial Schwartz function <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f" class="latex" title="f" /> from the values and radial derivatives of <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f" class="latex" title="f" /> and its Fourier transform <img src="https://s0.wp.com/latex.php?latex=%5Chat+f&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\hat f" class="latex" title="\hat f" /> at the radii √2π for integers <em>n ≥ 1</em> in <img src="https://s0.wp.com/latex.php?latex=R%5E8&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="R^8" class="latex" title="R^8" /> and <em>n ≥ 2</em> in <img src="https://s0.wp.com/latex.php?latex=R%5E%7B24%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="R^{24}" class="latex" title="R^{24}" />. To prove this theorem, we construct an interpolation basis using integral transforms of quasimodular forms, generalizing Viazovska’s work on sphere packing and placing it in the context of a more conceptual theory.</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by Gil Kalai <a href="https://gilkalai.wordpress.com/2019/02/15/henry-cohn-abhinav-kumar-stephen-d-miller-danylo-radchenko-and-maryna-viazovska-universal-optimality-of-the-e8-and-leech-lattices-and-interpolation-formulas/"><span class="datestr">at February 15, 2019 07:17 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
