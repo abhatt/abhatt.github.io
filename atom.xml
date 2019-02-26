@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-02-26T20:22:18Z</updated>
+  <updated>2019-02-26T21:21:49Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,41 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>tag:blogger.com,1999:blog-25562705.post-2251645165874378750</id>
+    <link href="http://aaronsadventures.blogspot.com/feeds/2251645165874378750/comments/default" rel="replies" type="application/atom+xml"/>
+    <link href="http://www.blogger.com/comment.g?blogID=25562705&amp;postID=2251645165874378750" rel="replies" type="text/html"/>
+    <link href="http://www.blogger.com/feeds/25562705/posts/default/2251645165874378750" rel="edit" type="application/atom+xml"/>
+    <link href="http://www.blogger.com/feeds/25562705/posts/default/2251645165874378750" rel="self" type="application/atom+xml"/>
+    <link href="http://aaronsadventures.blogspot.com/2019/02/impossibility-results-in-fairness-as.html" rel="alternate" type="text/html"/>
+    <title>Impossibility Results in Fairness as Bayesian Inference</title>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">One of the most striking results about fairness in machine learning is the impossibility result that <a href="https://www.liebertpub.com/doi/full/10.1089/big.2016.0047">Alexandra Chouldechova</a>, and separately<a href="https://arxiv.org/abs/1609.05807"> Jon Kleinberg, Sendhil Mullainathan, and Manish Raghavan</a> discovered a few years ago. These papers say something very crisp. I'll focus here on the binary classification setting that Alex studies because it is much simpler. There are (at least) three reasonable properties you would want your "fair" classifiers to have. They are:<br/><div><ol><li><b>False Positive Rate Balance</b>: The rate at which your classifier makes errors in the positive direction (i.e. labels negative examples positive) should be the same across groups.</li><li><b>False Negative Rate Balance</b>:  The rate at which your classifier makes errors in the negative direction (i.e. labels positive examples negative) should be the same across groups.</li><li><b>Predictive Parity</b>: The statistical "meaning" of a positive classification should be the same across groups (we'll be more specific about what this means in a moment)</li></ol><div>What Chouldechova and KMR show is that if you want all three, you are out of luck --- unless you are in one of two very unlikely situations: Either you have a <i>perfect</i> classifier that never errs, or the <i>base rate</i> is exactly the same for both populations --- i.e. both populations have exactly the same frequency of positive examples. If you don't find yourself in one of these two unusual situations, then you have to give up on properties 1, 2, or 3. </div></div><div><br/></div><div>This is discouraging, because there are good reasons to want each of properties 1, 2, and 3. And these aren't measures made up in order to formulate an impossibility result --- they have their root in the <a href="https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing">Propublica/COMPASS controversy</a>. Roughly speaking, Propublica discovered that the COMPASS recidivism prediction algorithm violated false positive and negative rate balance, and they took the position that this made the classifier <i>unfair</i>. Northpointe (the creators of the COMPASS algorithm) responded by saying that their algorithm satisfied predictive parity, and took the position that this made the classifier fair. They were seemingly talking past each other by using two different definitions of what "fair" should mean. What the impossibility result says is that there is no way to satisfy both sides of this debate. </div><div><br/></div><div>So why is this result true? The proof in Alex's paper can't be made simpler --- its already a one liner, following from an algebraic identity. But the first time I read it I didn't have a great intuition for <i>why</i> it held. Viewing the statement through the lens of Bayesian inference made the result very intuitive (at least for me). With this viewpoint, all the impossibility result is saying is: "If you have different <i>priors</i> about some event (say that a released inmate will go on to commit a crime) for two different populations, and you receive evidence of the same strength for both populations, then you will have different posteriors as well". This is now bordering on obvious --- because your posterior belief about an event is a combination of your prior belief and the new evidence you have received, weighted by the strength of that evidence.  </div><div><br/></div><div>Lets walk through this. Suppose we have two populations, call them $A$s and $B$s. Individuals $x$ from these populations have some true binary label $\ell(x) \in \{0,1\}$ which we are trying to predict. Individuals from the two populations are drawn from different distributions, which we'll call $D_A$ and $D_B$. We have some classifier that predicts labels $\hat\ell(x)$, and we would like it to satisfy the three fairness criteria defined above. First, lets define some terms:<br/><br/>The <i>base rate</i> for a population $i$ is just the frequency of positive labels:<br/>$$p_i = \Pr_{x \sim D_i}[\ell(x) = 1].$$<br/>The <i>false positive </i>and <i>false negative </i>rates of the classifier are:<br/>$$FPR_i = \Pr_{x \sim D_i}[\hat\ell(x) = 1 | \ell(x) = 0] \ \ \ \ FNR_i = \Pr_{x \sim D_i}[\hat\ell(x) = 0 | \ell(x) = 1].$$<br/>And the <i>positive predictive value</i> of the classifier is:<br/>$$PPV_i = \Pr_{x \sim D_i}[\ell(x) = 1 | \hat\ell(x)=1].$$</div><div>Satisfying all three fairness constraints just means finding a classifier such that $FPR_A = FPR_B$, $FNR_A = FNR_B$, and $PPV_A = PPV_B$.<br/><br/>How should we prove that this is impossible? All three of these quantities are conditional probabilities, so we are essentially obligated to apply Bayes Rule:<br/>$$PPV_i =  \Pr_{x \sim D_i}[\ell(x) = 1 | \hat\ell(x)=1] = \frac{ \Pr_{x \sim D_i}[\hat\ell(x)=1 | \ell(x) = 1]\cdot \Pr_{x \sim D_i} [\ell(x) = 1]}{ \Pr_{x \sim D_i}[\hat \ell(x) = 1]}$$<br/>But now these quantities on the right hand side are things we have names for. Substituting in, we get:<br/>$$PPV_i  = \frac{p_i(1-FNR_i)}{p_i(1-FNR_i) + (1-p_i)FPR_i}$$<br/><br/>And so now we see the problem. Suppose we have $FNR_A = FNR_B$ and $FPR_A = FPR_B$. Can we have $PPV_A = PPV_B$? There are only two ways. If $p_A = p_B$, then we are done, because the right hand side is the same for either $i \in \{A,B\}$. But if the base rates are different, then the only way to make these two quantities equal is if $FNR_i = FPR_i = 0$ --- i.e. if our classifier is perfect.<br/><br/>The piece of intuition here is that the base rate is our prior belief that $\ell(x) = 1$, before we see the output of the classifier. The positive predictive value is our <i>posterior</i> belief that $\ell(x) = 1$, after we see the output of the classifier. And all we need to know about the classifier in order to apply Bayes rule to derive our posterior from our prior is its false positive rate and its false negative rate --- these fully characterize the "strength of the evidence." Hence: "If our prior probabilities differ, and we see evidence of a positive label of the same strength, then our posterior probabilities will differ as well."<br/><br/>Once you realize this, then you can generalize the fairness impossibility result to other settings by making equally obvious statements about probability elsewhere. :-)<br/><br/>For example, suppose we generalize the labels to be real valued instead of binary --- so when making decisions, we can model individuals using shades of gray. (e.g. in college admissions, we don't have to model individuals as "qualified" or not, but rather can model talent as a real value.) Lets fix a model for concreteness, but the particulars are not important. (The model here is related to my paper with <a href="https://www.cis.upenn.edu/~kannan/">Sampath Kannan</a> and<a href="http://www.its.caltech.edu/~jziani/"> Juba Ziani </a>on <a href="https://arxiv.org/abs/1808.09004">the downstream effects of affirmative action</a>)<br/><br/>Suppose that in population $i$, labels are distributed according to a Gaussian distribution with mean $\mu_i$: $\ell(x) \sim N(\mu_i, 1)$. For an individual from group $i$, we have a test that gives an unbiased estimator of their label, with some standard deviation $\sigma_i$: $\hat \ell(x) \sim N(\ell(x), \sigma_i)$.<br/><br/>In a model like this, we have analogues of our fairness desiderata in the binary case:<br/><br/><ul><li><b>Analogue of Error Rate Balance</b><i style="font-weight: bold;">: </i>We would like our test to be equally informative about both populations: $\sigma_A = \sigma_B$. </li><li><b>Analogue of Predictive Parity</b>: Any test score $t$ should induce the same posterior expectation on true labels across populations: $$E_{D_A}[\ell(x) | \hat \ell(x) = t] = E_{D_B}[\ell(x) | \hat \ell(x) = t]$$ </li></ul><div>Can we satisfy both of these conditions at the same time? Because the normal distribution is <i>self conjugate</i> (that's why we chose it!) Bayes Rule simplifies to have a nice closed form, and we can compute our posteriors as follows:</div><div>$$E_{D_i}[\ell(x) | \hat \ell(x) = t] = \frac{\sigma_i^2}{\sigma_i^2 + 1}\cdot \mu_i + \frac{1}{\sigma_i^2 + 1}\cdot t$$</div><div>So there are only two ways we can achieve both properties:</div><div><ol><li>We can of course satisfy both conditions if the prior distributions are the same for both groups: $\mu_A = \mu_B$. Then we can set $\sigma_A = \sigma_B$ and observe that the right hand side of the above expression is identical for $i \in \{A, B\}$.</li><li>We can also satisfy both conditions if the prior means are different, but the signal is perfect: i.e. $\sigma_A = \sigma_B = 0$. (Then both posterior means are just $t$, independent of the prior means). </li></ol></div>But we can see from inspection these are the only two cases. If $\sigma_A = \sigma_B$, but the prior means are different, then the posterior means will be different for every $t$. This is really the same impossibility result as in the binary case: all it is saying is that if I have different priors about different groups, but the evidence I receive has the same strength, then my posteriors will also be different.<br/><br/>So the mathematical fact is simple --- but its implications remain deep. It means we have to choose between equalizing a decision maker's posterior about the label of an individual, or providing an equally accurate signal about each individual, and that we cannot have both. Unfortunately, living without either one of these conditions can lead to real harm.<br/><br/></div><div><br/></div></div>
+    </content>
+    <updated>2019-02-26T20:41:00Z</updated>
+    <published>2019-02-26T20:41:00Z</published>
+    <author>
+      <name>Aaron Roth</name>
+      <email>noreply@blogger.com</email>
+      <uri>https://plus.google.com/111805394598997130229</uri>
+    </author>
+    <source>
+      <id>tag:blogger.com,1999:blog-25562705</id>
+      <category term="game theory"/>
+      <category term="news"/>
+      <author>
+        <name>Aaron Roth</name>
+        <email>noreply@blogger.com</email>
+      </author>
+      <link href="http://aaronsadventures.blogspot.com/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
+      <link href="http://www.blogger.com/feeds/25562705/posts/default" rel="self" type="application/atom+xml"/>
+      <link href="http://aaronsadventures.blogspot.com/" rel="alternate" type="text/html"/>
+      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
+      <link href="http://www.blogger.com/feeds/25562705/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
+      <title>Adventures in Computation</title>
+      <updated>2019-02-26T21:01:16Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>tag:blogger.com,1999:blog-3722233.post-4283341625722054774</id>
@@ -91,7 +126,7 @@ This improves on the recent result of Dinur, Gur and Goldreich (ITCS, 2019) that
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-02-26T20:20:54Z</updated>
+      <updated>2019-02-26T21:20:50Z</updated>
     </source>
   </entry>
 
@@ -638,7 +673,7 @@ Recently (depending on when Gil puts this post on the blog), I met Leonid Gurvit
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-02-26T20:21:00Z</updated>
+      <updated>2019-02-26T21:20:56Z</updated>
     </source>
   </entry>
 
@@ -744,7 +779,7 @@ Do you see how to prove Theorem <a href="https://rjlipton.wordpress.com/feed/#in
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-02-26T20:21:03Z</updated>
+      <updated>2019-02-26T21:20:59Z</updated>
     </source>
   </entry>
 
@@ -781,7 +816,7 @@ Specifically, we show that computing MCSP, on functions with a truth table of le
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-02-26T20:20:54Z</updated>
+      <updated>2019-02-26T21:20:50Z</updated>
     </source>
   </entry>
 
@@ -916,7 +951,7 @@ We also define MOCSP, an oracle version of MCSP that takes as input a Boolean fu
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-02-26T20:20:54Z</updated>
+      <updated>2019-02-26T21:20:50Z</updated>
     </source>
   </entry>
 
@@ -942,7 +977,7 @@ We apply the mentioned results in the analysis of the complexity of derivation i
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-02-26T20:20:54Z</updated>
+      <updated>2019-02-26T21:20:50Z</updated>
     </source>
   </entry>
 
@@ -1217,7 +1252,7 @@ More generally, we show that an $n$-variate polynomial computable by a syntactic
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-02-26T20:20:54Z</updated>
+      <updated>2019-02-26T21:20:50Z</updated>
     </source>
   </entry>
 
@@ -1345,7 +1380,7 @@ I am NOT a pundit- so what I predict is not what I hope happens.  What do I hop
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-02-26T20:20:54Z</updated>
+      <updated>2019-02-26T21:20:50Z</updated>
     </source>
   </entry>
 
@@ -1467,7 +1502,7 @@ We at GLL thank you all for your help and support these ten years. Ken and I pla
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-02-26T20:21:03Z</updated>
+      <updated>2019-02-26T21:20:59Z</updated>
     </source>
   </entry>
 
@@ -1611,7 +1646,7 @@ We at GLL thank you all for your help and support these ten years. Ken and I pla
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-02-26T20:20:59Z</updated>
+      <updated>2019-02-26T21:20:55Z</updated>
     </source>
   </entry>
 
@@ -1728,7 +1763,7 @@ We at GLL thank you all for your help and support these ten years. Ken and I pla
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-02-26T20:21:00Z</updated>
+      <updated>2019-02-26T21:20:56Z</updated>
     </source>
   </entry>
 
@@ -1760,7 +1795,7 @@ Time, 18:00 UTC). <strong>Sepehr Assadi</strong> from Princeton University will 
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2019-02-26T20:21:53Z</updated>
+      <updated>2019-02-26T21:21:35Z</updated>
     </source>
   </entry>
 
@@ -1953,7 +1988,7 @@ I have used the term ze several times since then- often when I get email from a 
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-02-26T20:21:56Z</updated>
+      <updated>2019-02-26T21:21:37Z</updated>
     </source>
   </entry>
 
@@ -2335,7 +2370,7 @@ To: &lt;<a href="mailto:SIG-ELECTION-ANNOUNCEMENT@listserv.acm.org">SIG-ELECTION
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-02-26T20:21:01Z</updated>
+      <updated>2019-02-26T21:20:57Z</updated>
     </source>
   </entry>
 
@@ -2365,31 +2400,7 @@ Using Schur-convexity, we also extend our results to functions $f_i$ whose range
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-02-26T20:20:54Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2019/016</id>
-    <link href="https://eccc.weizmann.ac.il/report/2019/016" rel="alternate" type="text/html"/>
-    <title>TR19-016 |  The hardest halfspace | 
-
-	Alexander A. Sherstov</title>
-    <summary>We study the approximation of halfspaces $h:\{0,1\}^n\to\{0,1\}$ in the infinity norm by polynomials and rational functions of any given degree.  Our main result is an explicit construction of the "hardest" halfspace, for which we prove polynomial and rational approximation lower bounds that match the trivial upper bounds achievable for all halfspaces.  This completes a lengthy line of work started by Myhill and Kautz (1961).
-
-As an application, we construct a communication problem with essentially the largest possible gap, of $n$ versus $2^{-\Omega(n)},$ between the sign-rank and discrepancy. Equivalently, our problem exhibits a gap of $\log n$ versus $\Omega(n)$ between the communication complexity with unbounded versus weakly unbounded error, improving quadratically on previous constructions and completing a line of work started by Babai, Frankl, and Simon (FOCS 1986). Our results further generalize to the $k$-party number-on-the-forehead model, where we obtain an explicit separation of $\log n$ versus $\Omega(n/4^{n})$ for communication with unbounded versus weakly unbounded error. This gap is a quadratic improvement on previous work and matches the state of the art for number-on-the-forehead lower bounds.</summary>
-    <updated>2019-02-07T14:57:13Z</updated>
-    <published>2019-02-07T14:57:13Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2019-02-26T20:20:54Z</updated>
+      <updated>2019-02-26T21:20:50Z</updated>
     </source>
   </entry>
 </feed>
