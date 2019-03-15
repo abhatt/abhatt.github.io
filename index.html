@@ -225,7 +225,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at March 15, 2019 08:21 AM UTC</span>.
+Last updated <span class="datestr">at March 15, 2019 09:21 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -233,6 +233,94 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://corner.mimuw.edu.pl/?p=1071">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/banach.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-US"><a class="entryheader" href="http://corner.mimuw.edu.pl/?p=1071">How to identify m numbers using m/log m checks</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://corner.mimuw.edu.pl" title="Banach's Algorithmic Corner">Banach's Algorithmic Corner</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en-US">
+<p></p>
+<p>Here's an old trick that we found useful for proving some tight complexity lower bounds. You are given <em>m</em> coins, each of weight either <em>a</em> or <em>b</em>, and a modern scale that can tell you the total weight of any chosen subset of coins. How many weighings do you need to identify which coin is which? Checking each coin individually uses <em>m</em> weighings, but can you do less?</p>
+<p></p>
+<p></p>
+<p>In any weighing, we try some unknown number of weight-<em>a</em> coins between 0 and <em>m</em>, so this results in one of <em>m</em> + 1 possible values, giving us at most log(<em>m</em> + 1) bits of information. In total we need m bits of information to identify each coin, so clearly we will need at least Ω(<em>m</em> / log <em>m</em>) weighings.</p>
+<p></p>
+<p></p>
+<p>It turns out that this many is in fact enough, and this generalizes to various other settings with less restricted weights. This is the basis for two of our recent results: a tight complexity lower bound for Integer Linear Programming with few constraints and for multicoloring (a.k.a. <a href="https://en.wikipedia.org/wiki/Fractional_coloring#Definitions">b-fold coloring</a>), assuming the Exponential Time Hypothesis. The trick allows us to use constraints that check the value of some number between 0 and <em>m</em> to indeed extract about log(<em>m</em>) bits of new information from each, in a way that is general enough to check <em>m</em> clauses of a 3-CNF-SAT instance using only <em>O</em>(<em>m</em> / log <em>m</em>) constraints.</p>
+<p><span id="more-1071"></span></p>
+<p></p>
+<p></p>
+<h2>Detecting matrices</h2>
+<p></p>
+<p></p>
+<p>One way to rephrase this coin-weighing problem is as follows: the unknown coin weights are described by a (column) vector <em>x</em> in {<em>a</em>,<em>b</em>}<sup><em>m</em></sup>. A subset of coins is described by a characteristic (row) vector <em>v</em> in {0,1}<sup><em>m</em></sup> and the resulting value of the weighing is the dot product <em>v</em> <strong>·</strong> <em>x</em>.</p>
+<p></p>
+<p></p>
+<p>For a number of weighings <em>k</em>, the row vectors form a 0-1 matrix <em>M</em> with <em>k</em> rows and <em>m</em> columns, while the obtained values are simply the <em>k</em>-element vector <em>M x</em>. The condition that these values are enough to identify each entry of <em>x</em> is formalized as follows:</p>
+<p></p>
+<p></p>
+<p style="text-align: center;">For all <em>m</em>, there is a 0-1 matrix <em>M</em> with k=<em>O</em>(<em>m</em> / log <em>m</em>) rows and <em>m</em> columns<br />
+such that for any <em>x</em>, <em>y</em> in {<em>a</em>,<em>b</em>}<sup><em>m</em></sup>, x ≠ y implies <em>M x</em> ≠ <em>M y</em>.</p>
+<p></p>
+<p></p>
+<p>This is called a <em>detecting matrix</em>. In other words, instead of checking x = y entry by entry, it suffices to compare the k entries of M x and M y. (An equivalent definition is to require that the kernel of <em>M</em> is trivial on {-1,0,1}<sup><em>m</em></sup>, since we could instead compare (<em>x</em> - <em>y</em>)/(<em>a</em> - <em>b</em>) with zero). A generalization for <em>x</em>, <em>y</em> in {0, 1, …, <em>d</em> - 1}<sup><em>m</em></sup> was first proved by <a href="https://doi.org/10.4153/CMB-1965-034-2">(Lindström 1965)</a> (in fact he proves the constant hidden behind <em>O</em> is 2 log<sub>2</sub>(<em>d</em>) and cannot be improved, for any <em>d</em>), giving a deterministic, poly-time construction. <a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.162.2327">(Bshouty 2009)</a> gives a more direct and general construction using Fourier analysis. However, a random matrix can be shown to be detecting with fairly elementary methods.</p>
+<p></p>
+<p></p>
+<h2>Integer Linear Programming</h2>
+<p></p>
+<p></p>
+<p>In ILP we are given a matrix <em>A</em> with <em>n</em> columns and <em>m</em> rows, a vector <em>b</em> with <em>m</em> entries, and we ask for a vector <em>x</em> with <em>n</em> non-negative integer entries such that <em>A x</em> = <em>b</em>. So each of the <em>m</em> rows is a linear equality to be satisfied. What is the complexity for small <em>m</em>?</p>
+<p></p>
+<p></p>
+<p>We start with an instance <em>A x</em> = <em>b</em> encoding a suitable 3-CNF-SAT instance of size <em>O</em>(<em>m</em>) in a straightforward way, using only {0,1,2,3} entries in <em>A</em> and <em>b</em>. Instead of checking each row individually, we use detecting matrices to check them in bunches, reducing our problem to an equivalent instance <em>M A x</em> = <em>M b</em>. The matrix <em>M A </em>of the new instance has only O(<em>m</em> / log <em>m</em>) rows (at the cost of having larger entries in <em>M b</em>). With some tinkering, this simple reduction shows that, assuming ETH, ILP with <em>m</em> constraints cannot be solved in time 2<sup><em>o</em>(<em>m</em> log <em>m</em>)</sup>, even when the matrix has only 0-1 entries and <em>b</em> has poly(<em>m</em>) entries. This matches a recent (surprisingly simple and clever!) 2<sup><em>O</em>(<em>m</em> log <em>m</em>)</sup> algorithm by <a href="https://dl.acm.org/citation.cfm?id=3175322">Eisenbrand and Weismantel (SODA 2018)</a>.</p>
+<p></p>
+<p></p>
+<p>One caveat when applying detecting matrices is that we do not know any bound on one side, <em>A x</em>, except that it is a non-negative integer vector. Fortunately, <a href="https://doi.org/10.1007/s004530010033">(Grebinsky &amp; Kucherov 2000)</a> showed that a random 0-1 matrix satisfies the following:</p>
+<p></p>
+<p></p>
+<p style="text-align: center;">For all <em>d</em>,<em>m</em>, there is a 0-1 matrix <em>M</em> with k=<em>O</em>(<em>m</em> <em>log</em> <em>d</em> / log <em>m</em>) rows and <em>m</em> columns<br />
+such that for any <em>x</em>, <em>y</em> in ℕ<sup><em>m</em></sup> with ‖<em>y</em>‖<sub>1</sub> ≤ <em>d</em> <em>m</em>, x ≠ y implies <em>M x</em> ≠ <em>M y</em>.</p>
+<p></p>
+<p></p>
+<p>Here no upper bound on <em>x</em> is needed, because a single row in <em>M</em> full of ones is enough to guarantee that the sum of entries is the same: ‖<em>x</em>‖<sub>1</sub> = ‖<em>y</em>‖<sub>1</sub>. However, it remains an open problem to find a deterministic construction (we work around this by giving a somewhat weaker construction). See <a href="https://arxiv.org/pdf/1811.01296.pdf">the full paper (STACS 2019)</a> for details (with Dušan Knop and Michał Pilipczuk). The reduction for <em>multicoloring</em> is quite different and more problem-specific, see <a href="https://arxiv.org/abs/1607.03432">the full paper (ESA 2017)</a> for definitions (with Marthe Bonamy, Łukasz Kowalik, Michał Pilipczuk and Arkadiusz Socała).</p>
+<p> </p>
+<p><em>Marcin Wrochna</em></p>
+<p></p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Renata Czarniecka <a href="http://corner.mimuw.edu.pl/?p=1071"><span class="datestr">at March 15, 2019 08:59 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2437,48 +2525,6 @@ Email: divesh.aggarwal@gmail.com</p></div>
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-jobs.org/2019/03/06/postdoc-at-center-for-quantum-technologies-nus-singapore-apply-by-april-30-2019/"><span class="datestr">at March 06, 2019 12:50 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://cstheory-events.org/2019/03/04/symposium-on-50-years-of-complexity-theory-a-celebration-of-the-work-of-stephen-cook/">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/events.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://cstheory-events.org/2019/03/05/symposium-on-50-years-of-complexity-theory-a-celebration-of-the-work-of-stephen-cook/">Symposium on 50 Years of Complexity Theory: A Celebration of the Work of Stephen Cook</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://cstheory-events.org" title="CS Theory Events">CS Theory Events</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-May 6-9, 2019 The Fields Institute, Toronto, Ontario, Canada http://www.fields.utoronto.ca/activities/18-19/NP50 This symposium celebrates 50 years of NP-Completeness and the outstanding achievements of Stephen Cook and his remarkable influence on the field of computing. The symposium begins Monday evening May 6, with a reception and a public lecture by Christos Papadimitriou. The scientific program continues Tuesday … <a href="https://cstheory-events.org/2019/03/05/symposium-on-50-years-of-complexity-theory-a-celebration-of-the-work-of-stephen-cook/" class="more-link">Continue reading <span class="screen-reader-text">Symposium on 50 Years of Complexity Theory: A Celebration of the Work of Stephen Cook</span></a></div>
-
-
-
-
-
-
-
-<p class="date">
-by shacharlovett <a href="https://cstheory-events.org/2019/03/05/symposium-on-50-years-of-complexity-theory-a-celebration-of-the-work-of-stephen-cook/"><span class="datestr">at March 05, 2019 07:05 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>

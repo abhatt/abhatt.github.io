@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-03-15T08:21:57Z</updated>
+  <updated>2019-03-15T09:21:46Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,76 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>http://corner.mimuw.edu.pl/?p=1071</id>
+    <link href="http://corner.mimuw.edu.pl/?p=1071" rel="alternate" type="text/html"/>
+    <title>How to identify m numbers using m/log m checks</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Here's an old trick that we found useful for proving some tight complexity lower bounds. You are given m coins, each of weight either a or b, and a modern scale that can tell you the total weight of any chosen … <a href="http://corner.mimuw.edu.pl/?p=1071">Continue reading <span class="meta-nav">→</span></a></div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><!-- wp:paragraph --></p>
+<p>Here's an old trick that we found useful for proving some tight complexity lower bounds. You are given <em>m</em> coins, each of weight either <em>a</em> or <em>b</em>, and a modern scale that can tell you the total weight of any chosen subset of coins. How many weighings do you need to identify which coin is which? Checking each coin individually uses <em>m</em> weighings, but can you do less?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In any weighing, we try some unknown number of weight-<em>a</em> coins between 0 and <em>m</em>, so this results in one of <em>m</em> + 1 possible values, giving us at most log(<em>m</em> + 1) bits of information. In total we need m bits of information to identify each coin, so clearly we will need at least Ω(<em>m</em> / log <em>m</em>) weighings.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It turns out that this many is in fact enough, and this generalizes to various other settings with less restricted weights. This is the basis for two of our recent results: a tight complexity lower bound for Integer Linear Programming with few constraints and for multicoloring (a.k.a. <a href="https://en.wikipedia.org/wiki/Fractional_coloring#Definitions">b-fold coloring</a>), assuming the Exponential Time Hypothesis. The trick allows us to use constraints that check the value of some number between 0 and <em>m</em> to indeed extract about log(<em>m</em>) bits of new information from each, in a way that is general enough to check <em>m</em> clauses of a 3-CNF-SAT instance using only <em>O</em>(<em>m</em> / log <em>m</em>) constraints.</p>
+<p><span id="more-1071"/></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2>Detecting matrices</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>One way to rephrase this coin-weighing problem is as follows: the unknown coin weights are described by a (column) vector <em>x</em> in {<em>a</em>,<em>b</em>}<sup><em>m</em></sup>. A subset of coins is described by a characteristic (row) vector <em>v</em> in {0,1}<sup><em>m</em></sup> and the resulting value of the weighing is the dot product <em>v</em> <strong>·</strong> <em>x</em>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For a number of weighings <em>k</em>, the row vectors form a 0-1 matrix <em>M</em> with <em>k</em> rows and <em>m</em> columns, while the obtained values are simply the <em>k</em>-element vector <em>M x</em>. The condition that these values are enough to identify each entry of <em>x</em> is formalized as follows:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p style="text-align: center;">For all <em>m</em>, there is a 0-1 matrix <em>M</em> with k=<em>O</em>(<em>m</em> / log <em>m</em>) rows and <em>m</em> columns<br/>
+such that for any <em>x</em>, <em>y</em> in {<em>a</em>,<em>b</em>}<sup><em>m</em></sup>, x ≠ y implies <em>M x</em> ≠ <em>M y</em>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This is called a <em>detecting matrix</em>. In other words, instead of checking x = y entry by entry, it suffices to compare the k entries of M x and M y. (An equivalent definition is to require that the kernel of <em>M</em> is trivial on {-1,0,1}<sup><em>m</em></sup>, since we could instead compare (<em>x</em> - <em>y</em>)/(<em>a</em> - <em>b</em>) with zero). A generalization for <em>x</em>, <em>y</em> in {0, 1, …, <em>d</em> - 1}<sup><em>m</em></sup> was first proved by <a href="https://doi.org/10.4153/CMB-1965-034-2">(Lindström 1965)</a> (in fact he proves the constant hidden behind <em>O</em> is 2 log<sub>2</sub>(<em>d</em>) and cannot be improved, for any <em>d</em>), giving a deterministic, poly-time construction. <a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.162.2327">(Bshouty 2009)</a> gives a more direct and general construction using Fourier analysis. However, a random matrix can be shown to be detecting with fairly elementary methods.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2>Integer Linear Programming</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>In ILP we are given a matrix <em>A</em> with <em>n</em> columns and <em>m</em> rows, a vector <em>b</em> with <em>m</em> entries, and we ask for a vector <em>x</em> with <em>n</em> non-negative integer entries such that <em>A x</em> = <em>b</em>. So each of the <em>m</em> rows is a linear equality to be satisfied. What is the complexity for small <em>m</em>?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We start with an instance <em>A x</em> = <em>b</em> encoding a suitable 3-CNF-SAT instance of size <em>O</em>(<em>m</em>) in a straightforward way, using only {0,1,2,3} entries in <em>A</em> and <em>b</em>. Instead of checking each row individually, we use detecting matrices to check them in bunches, reducing our problem to an equivalent instance <em>M A x</em> = <em>M b</em>. The matrix <em>M A </em>of the new instance has only O(<em>m</em> / log <em>m</em>) rows (at the cost of having larger entries in <em>M b</em>). With some tinkering, this simple reduction shows that, assuming ETH, ILP with <em>m</em> constraints cannot be solved in time 2<sup><em>o</em>(<em>m</em> log <em>m</em>)</sup>, even when the matrix has only 0-1 entries and <em>b</em> has poly(<em>m</em>) entries. This matches a recent (surprisingly simple and clever!) 2<sup><em>O</em>(<em>m</em> log <em>m</em>)</sup> algorithm by <a href="https://dl.acm.org/citation.cfm?id=3175322">Eisenbrand and Weismantel (SODA 2018)</a>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>One caveat when applying detecting matrices is that we do not know any bound on one side, <em>A x</em>, except that it is a non-negative integer vector. Fortunately, <a href="https://doi.org/10.1007/s004530010033">(Grebinsky &amp; Kucherov 2000)</a> showed that a random 0-1 matrix satisfies the following:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p style="text-align: center;">For all <em>d</em>,<em>m</em>, there is a 0-1 matrix <em>M</em> with k=<em>O</em>(<em>m</em> <em>log</em> <em>d</em> / log <em>m</em>) rows and <em>m</em> columns<br/>
+such that for any <em>x</em>, <em>y</em> in ℕ<sup><em>m</em></sup> with ‖<em>y</em>‖<sub>1</sub> ≤ <em>d</em> <em>m</em>, x ≠ y implies <em>M x</em> ≠ <em>M y</em>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here no upper bound on <em>x</em> is needed, because a single row in <em>M</em> full of ones is enough to guarantee that the sum of entries is the same: ‖<em>x</em>‖<sub>1</sub> = ‖<em>y</em>‖<sub>1</sub>. However, it remains an open problem to find a deterministic construction (we work around this by giving a somewhat weaker construction). See <a href="https://arxiv.org/pdf/1811.01296.pdf">the full paper (STACS 2019)</a> for details (with Dušan Knop and Michał Pilipczuk). The reduction for <em>multicoloring</em> is quite different and more problem-specific, see <a href="https://arxiv.org/abs/1607.03432">the full paper (ESA 2017)</a> for definitions (with Marthe Bonamy, Łukasz Kowalik, Michał Pilipczuk and Arkadiusz Socała).</p>
+<p> </p>
+<p><em>Marcin Wrochna</em></p>
+<p><!-- /wp:paragraph --></p></div>
+    </content>
+    <updated>2019-03-15T08:59:51Z</updated>
+    <published>2019-03-15T08:59:51Z</published>
+    <category term="post"/>
+    <author>
+      <name>Renata Czarniecka</name>
+    </author>
+    <source>
+      <id>http://corner.mimuw.edu.pl</id>
+      <link href="http://corner.mimuw.edu.pl/?feed=rss2" rel="self" type="application/atom+xml"/>
+      <link href="http://corner.mimuw.edu.pl" rel="alternate" type="text/html"/>
+      <subtitle>University of Warsaw</subtitle>
+      <title>Banach's Algorithmic Corner</title>
+      <updated>2019-03-15T09:21:06Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>http://arxiv.org/abs/1903.06081</id>
@@ -241,7 +311,7 @@ systems, further defining the boundary of what is possible using this tool.
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-03-15T08:21:45Z</updated>
+      <updated>2019-03-15T09:21:29Z</updated>
     </source>
   </entry>
 
@@ -272,7 +342,7 @@ systems, further defining the boundary of what is possible using this tool.
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2019-03-15T08:21:41Z</updated>
+      <updated>2019-03-15T09:21:26Z</updated>
     </source>
   </entry>
 
@@ -427,7 +497,7 @@ Email: ran.gelles@biu.ac.il</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-03-15T08:21:02Z</updated>
+      <updated>2019-03-15T09:20:39Z</updated>
     </source>
   </entry>
 
@@ -465,7 +535,7 @@ Email: ran.gelles@biu.ac.il</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-03-15T08:21:16Z</updated>
+      <updated>2019-03-15T09:21:01Z</updated>
     </source>
   </entry>
 
@@ -963,7 +1033,7 @@ Our techniques combine some classical as well as recent tools from graph theory.
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-03-15T08:20:52Z</updated>
+      <updated>2019-03-15T09:20:27Z</updated>
     </source>
   </entry>
 
@@ -991,7 +1061,7 @@ Our techniques combine some classical as well as recent tools from graph theory.
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-03-15T08:20:52Z</updated>
+      <updated>2019-03-15T09:20:27Z</updated>
     </source>
   </entry>
 
@@ -1014,7 +1084,7 @@ Our techniques combine some classical as well as recent tools from graph theory.
       <link href="http://corner.mimuw.edu.pl" rel="alternate" type="text/html"/>
       <subtitle>University of Warsaw</subtitle>
       <title>Banach's Algorithmic Corner</title>
-      <updated>2019-03-14T23:39:45Z</updated>
+      <updated>2019-03-15T09:21:06Z</updated>
     </source>
   </entry>
 
@@ -1041,7 +1111,7 @@ Email: nailon@cs.technion.ac.il</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-03-15T08:21:02Z</updated>
+      <updated>2019-03-15T09:20:39Z</updated>
     </source>
   </entry>
 
@@ -1065,7 +1135,7 @@ Email: nailon@cs.technion.ac.il</p></div>
       <link href="https://adamsheffer.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Discrete geometry and other typos</subtitle>
       <title>Some Plane Truths</title>
-      <updated>2019-03-15T08:21:38Z</updated>
+      <updated>2019-03-15T09:21:24Z</updated>
     </source>
   </entry>
 
@@ -1158,7 +1228,7 @@ Email: d.alistarh@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-03-15T08:21:02Z</updated>
+      <updated>2019-03-15T09:20:39Z</updated>
     </source>
   </entry>
 
@@ -1265,7 +1335,7 @@ The big open problem with the book is how it might help gear us up to tackle the
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-03-15T08:21:00Z</updated>
+      <updated>2019-03-15T09:20:36Z</updated>
     </source>
   </entry>
 
@@ -1299,7 +1369,7 @@ The big open problem with the book is how it might help gear us up to tackle the
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-03-15T08:20:52Z</updated>
+      <updated>2019-03-15T09:20:27Z</updated>
     </source>
   </entry>
 
@@ -1374,7 +1444,7 @@ The big open problem with the book is how it might help gear us up to tackle the
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2019-03-15T08:21:46Z</updated>
+      <updated>2019-03-15T09:21:30Z</updated>
     </source>
   </entry>
 
@@ -1453,7 +1523,7 @@ Here here on the beauty of complexity. So what about truth? I cover much of this
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>By Emanuele Viola</subtitle>
       <title>Thoughts</title>
-      <updated>2019-03-15T08:21:25Z</updated>
+      <updated>2019-03-15T09:21:11Z</updated>
     </source>
   </entry>
 
@@ -1555,7 +1625,7 @@ However, unlike Kaltofen's argument, our proof  does not  directly give an effic
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-03-15T08:20:52Z</updated>
+      <updated>2019-03-15T09:20:27Z</updated>
     </source>
   </entry>
 
@@ -1583,32 +1653,7 @@ Email: divesh.aggarwal@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-03-15T08:21:02Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-events.org/2019/03/04/symposium-on-50-years-of-complexity-theory-a-celebration-of-the-work-of-stephen-cook/</id>
-    <link href="https://cstheory-events.org/2019/03/05/symposium-on-50-years-of-complexity-theory-a-celebration-of-the-work-of-stephen-cook/" rel="alternate" type="text/html"/>
-    <title>Symposium on 50 Years of Complexity Theory: A Celebration of the Work of Stephen Cook</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">May 6-9, 2019 The Fields Institute, Toronto, Ontario, Canada http://www.fields.utoronto.ca/activities/18-19/NP50 This symposium celebrates 50 years of NP-Completeness and the outstanding achievements of Stephen Cook and his remarkable influence on the field of computing. The symposium begins Monday evening May 6, with a reception and a public lecture by Christos Papadimitriou. The scientific program continues Tuesday … <a class="more-link" href="https://cstheory-events.org/2019/03/05/symposium-on-50-years-of-complexity-theory-a-celebration-of-the-work-of-stephen-cook/">Continue reading <span class="screen-reader-text">Symposium on 50 Years of Complexity Theory: A Celebration of the Work of Stephen Cook</span></a></div>
-    </summary>
-    <updated>2019-03-05T19:05:21Z</updated>
-    <published>2019-03-05T19:05:21Z</published>
-    <category term="other"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-events.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-events.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-events.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-events.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
-      <title>CS Theory Events</title>
-      <updated>2019-03-15T08:21:45Z</updated>
+      <updated>2019-03-15T09:20:39Z</updated>
     </source>
   </entry>
 </feed>
