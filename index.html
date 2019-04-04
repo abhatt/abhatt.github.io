@@ -131,7 +131,7 @@ Stay up to date
 <a class="feedlink" href="http://learningwitherrors.org/atom.xml" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://learningwitherrors.org" title="Learning With Errors">Learning with Errors: Student Theory Blog</a>
 <br>
-<a class="feedlink" href="http://processalgebra.blogspot.com/feeds/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
+<a class="feedlink" href="http://www.blogger.com/feeds/27705661/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://processalgebra.blogspot.com/" title="Process Algebra Diary">Luca Aceto</a>
 <br>
 <a class="feedlink" href="https://lucatrevisan.wordpress.com/feed/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
@@ -225,7 +225,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at April 04, 2019 11:21 AM UTC</span>.
+Last updated <span class="datestr">at April 04, 2019 12:21 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -233,6 +233,123 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="tag:blogger.com,1999:blog-3722233.post-6372871065307387905">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/gasarch.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://blog.computationalcomplexity.org/2019/04/cuckoo-cycles.html">Cuckoo Cycles</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://blog.computationalcomplexity.org/" title="Computational Complexity">Computational Complexity</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<span style="font-weight: normal;"><i>Guest Blog by John Tromp (Thanks for the opportunity, Lance)</i></span><br />
+<br />
+In the past few months, cycle finding has become one of the most widely run
+graph theory problems. An estimated quarter-to-half million GPUs are constantly
+looking for 42-cycles in random bipartite graphs on a billion or more nodes.
+Customized chips have been designed to perform this specific application an
+order of magnitude more efficiently, thanks to integrating as much as 1GB of
+SRAM on a single chip, where Intel/AMD CPUs top out at 64 MB.
+
+<br />
+<br />
+The purpose of all this? To compete for block rewards in various
+cryptocurrencies using the <a href="https://github.com/tromp/cuckoo">Cuckoo Cycle Proof of Work</a>.
+
+
+<br />
+<br />
+It is named after the Cuckoo Hashtable, in which each data item can be stored
+at two possible locations, one in each of two arrays.  A hash function maps the
+pair of item and choice of array to its location in that array. When a newly
+stored item finds both its locations already occupied, one is kicked out and
+replaced by the new item. This forces the kicked-out item to move to its
+alternate location, possibly kicking out yet another item. Problems arise
+if the corresponding Cuckoo graph, a bipartite graph with array locations as
+nodes and item location pairs as edges, has cycles.
+While n items, whose edges form a cycle, could barely be stored in the table,
+any n+1st item mapping within the same set of locations (a chord in the cycle)
+would not fit, as the pigeonhole principle tells us.
+
+<br />
+In the Proof-of-Work problem, we typically set n ≥ 29, and use edge indices
+(items) 0 .. N-1, where N = 2<sup>n</sup>.  The endpoints of edge i are (siphash(i|0) % N, siphash(i|1) % N), with
+<a href="https://en.wikipedia.org/wiki/SipHash">siphash</a> being a popular keyed hash function.
+A solution is a cycle of length L in this Cuckoo graph, where typically L = 42.<br />
+<br />
+While looking for cycles takes a lot of time and memory, solutions can be instantly verified.
+This sets Cuckoo Cycle apart from many other memory hard proofs of work that require computing a memory hard hash function, such as scrypt,
+both for proving and verifying.
+
+Some luck is also required to find a 42-cycle;
+Slides 18 and 19 of this <a href="https://github.com/mimblewimble/grin-pm/blob/master/presentations/grinconUS0/12-Tromp-Proof_of_Work.pdf">Grincon.US presentation</a> sketch a proof of the
+<br />
+<br />
+<b>Cuckoo Cycle Theorem</b>:
+The expected number of L-cycles tends to 1/L
+
+<br />
+<br />
+While there is a known linear time-memory trade-off, it suffers from a large constant factor penalty.
+A large bounty is offered on the project webpage for better trade-offs.
+
+<br />
+<br />
+Cuckoo Cycle solvers spend nearly all cycles on edge trimming; identifying and
+removing edges that end in a leaf node (of degree 1), as such edges cannot be
+part of a cycle. Trimming rounds alternate between the two node
+partitions. This can be done using N bits for the edge bitmap, and N log<sub>2</sub>(3) bits
+for the (truncated) node degrees. The random accesses to the latter,
+while not a problem for custom chips using enough SRAM, cause large memory latencies
+on commodity hardware. These can be mostly avoided by storing remaining edges explicitly
+and (bucket) sorting them to determine node degrees.
+Despite using an order of magnitude more memory than the edge bitmap, this is still over 4x faster.<br />
+<br />
+The fraction f<sub>i</sub> of remaining edges after i trimming rounds (in the limit as N
+goes to infinity) appears to obey the
+<br />
+<div style="text-align: center;">
+<b>Cuckoo Cycle Conjecture:</b>
+f<sub>i</sub> = a<sub>i-1</sub> * a<sub>i</sub>, where a<sub>-1</sub> = a<sub>0</sub> = 1, and a<sub>i+1</sub> = 1 - e<sup>-a<sub>i</sub></sup></div>
+f<sub>i</sub> could equivalently be defined as the fraction of edges whose first endpoint is the middle of a (not necessarily simple) path of length 2i.<br />
+<br />
+So far I have only been able to prove the conjecture for i ≤ 3.
+For instance, for i = 1, the probability that an edge endpoint is not the endpoint
+of any other edge is (1-1/N)<sup>N-1</sup> ~ 1/e.
+
+Here's hoping someone finds an elegant proof...</div>
+
+
+
+
+
+
+
+<p class="date">
+by Lance Fortnow (noreply@blogger.com) <a href="https://blog.computationalcomplexity.org/2019/04/cuckoo-cycles.html"><span class="datestr">at April 04, 2019 11:50 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2591,86 +2708,6 @@ Moreover, this paper shows that on these graphs, property testing of form $\exis
 
 <p class="date">
 by plustcs <a href="https://tcsplus.wordpress.com/2019/03/28/tcs-talk-wednesday-april-3rd-richard-peng-georgia-tech/"><span class="datestr">at March 28, 2019 05:26 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://windowsontheory.org/?p=7487">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/wot.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://windowsontheory.org/2019/03/28/nominate-tcs-papers-for-research-highlights/">Nominate TCS papers for research highlights</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://windowsontheory.org" title="Windows On Theory">Windows on Theory</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p><em>[Guest post by Aleksander Mądry]</em></p>
-
-
-
-<p>To me, one of the best things about working in theoretical computer <br />science has always the exciting rate of progress we make as a community. <br />On (what appears to be) a regular basis, we produce breakthroughs on <br />problems that are absolutely fundamental to our field. Problems that <br />often look impossible to tackle, right up until someone actually tackles <br />them.</p>
-
-
-
-<p>However, as inspiring as all these developments were to me, I also <br />always felt that we, as a community, could do more to properly recognize <br />and highlight them, both internally and to the outside world. This kind <br />of outreach would make it easier for us to capitalize on the <br />breakthroughs as well as to accelerate the impact of the underlying <br />ideas on the other areas of computer science, and beyond.</p>
-
-
-
-<p>Fortunately, this is about to change!</p>
-
-
-
-<p>One of the first decisions of our newly (re-)elected <a href="https://www.sigact.org/">SIGACT committee</a> was to create a committee (as committees are wont to do <img src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/1f642.png" alt="🙂" style="height: 1em;" class="wp-smiley" /> whose mission will be to help  promote top computer science theory research. This <strong>SIGACT Research Highlights Committee</strong> – consisting of <a href="https://www.boazbarak.org/">Boaz Barak</a>, <a href="https://omereingold.wordpress.com/">Omer Reingold</a>,  <a href="https://sites.google.com/site/marywootters/">Mary Wootters</a> and <a href="https://people.csail.mit.edu/madry/">myself</a> – will, in particular, work to identify results to be recommended for consideration for the <a href="http://cacm.acm.org/">CACM </a>Research Highlights section as well  as other general-audience research outlets in computer science and other  fields.</p>
-
-
-
-<p>Of course, to do a proper job here we require your help! To this end, <br />the committee solicits two types of nominations:</p>
-
-
-
-<p>1) Conference nominations. Each year, the committee will ask the PC <br />chairs of a broad set of theoretical computer science conferences to <br />send a selection of up to three top papers from these conferences <br />(selected based on both their technical merit and the potential <br />significant interest to non-theory audiences) and forwarding them to the <br />committee for consideration.</p>
-
-
-
-<p>2) Community nominations. The committee will accept nominations from the  members of the community. Each such nomination should summarize the  contribution of the nominated (and recently published) paper and also <br />argue why this paper particularly merits a broader outreach. The <br />nomination should be no more than a page in length and can be submitted <br />at any time by emailing it to <a href="mailto:sigact.cacm.nominations@gmail.com" target="_blank" rel="noreferrer noopener">sigact.cacm.nominations@gmail.com</a>. <br />Self-nominations are discouraged.</p>
-
-
-
-<p>To be considered in the upcoming round of our deliberations, we need to <br />receive your nomination by <strong>April 30</strong>.</p>
-
-
-
-<p>Looking forward to learning about all the new exciting research that you <br />all are doing!
-
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by windowsontheory <a href="https://windowsontheory.org/2019/03/28/nominate-tcs-papers-for-research-highlights/"><span class="datestr">at March 28, 2019 03:37 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
