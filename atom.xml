@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-04-08T22:22:00Z</updated>
+  <updated>2019-04-08T23:46:30Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -11,220 +11,28 @@
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
 
-  <entry xml:lang="en-US">
-    <id>http://bit-player.org/?p=2150</id>
-    <link href="http://bit-player.org/2019/737-the-max-mess" rel="alternate" type="text/html"/>
-    <link href="http://bit-player.org/2019/737-the-max-mess#comments" rel="replies" type="text/html"/>
-    <link href="http://bit-player.org/2019/737-the-max-mess/feed/atom" rel="replies" type="application/atom+xml"/>
-    <title xml:lang="en-US">737: The MAX Mess</title>
-    <summary type="xhtml" xml:lang="en-US"><div xmlns="http://www.w3.org/1999/xhtml">Controlled Flight into Terrain is the aviation industry’s term for what happens when a properly functioning airplane plows into the ground because the pilots are distracted or disoriented. What a nightmare. Even worse, in my estimation, is Automated Flight into … <a href="http://bit-player.org/2019/737-the-max-mess">Continue reading <span class="meta-nav">→</span></a></div>
+  <entry xml:lang="en">
+    <id>http://cstheory-events.org/2019/04/08/computer-science-summer-in-russia/</id>
+    <link href="https://cstheory-events.org/2019/04/08/computer-science-summer-in-russia/" rel="alternate" type="text/html"/>
+    <title>Computer Science Summer in Russia</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">June 24 – July 5, 2019 Akademgorodok, Novosibirsk, Russia http://cssr.nsu.ru/school/ Registration deadline: May 12, 2019 The school will take place from 24 -29 June, 2019 at Novosibirsk State University and targets student audience from Russia and neighbor countries. The school consists of two parallel tracks: The Theory of Programming + Methods of Software Verification &amp; … <a class="more-link" href="https://cstheory-events.org/2019/04/08/computer-science-summer-in-russia/">Continue reading <span class="screen-reader-text">Computer Science Summer in Russia</span></a></div>
     </summary>
-    <content type="xhtml" xml:lang="en-US"><div xmlns="http://www.w3.org/1999/xhtml"><p><em>Controlled Flight into Terrain</em> is the aviation industry’s term for what happens when a properly functioning airplane plows into the ground because the pilots are distracted or disoriented. What a nightmare. Even worse, in my estimation, is <em>Automated Flight into Terrain</em>, when an aircraft’s control system forces it into a fatal nose dive despite the frantic efforts of the crew to save it. That is the conjectured cause of two recent crashes of new Boeing 737 MAX 8 airplanes. I’ve been trying to reason my way through to an understanding of how those accidents could have happened.</p>
-<p>Disclaimer: The investigations of the MAX 8 disasters are in an early stage, so much of what follows is based on secondary sources—in other words, on leaks and rumors and the speculations of people who may or may not know what they’re talking about. As for my own speculations: I’m not an aeronautical engineer, or an airframe mechanic, or a control theorist. I’m not even a pilot. Please keep that in mind if you choose to read on.</p>
-<h3>The accidents</h3>
-<p>Early on the morning of October 29, 2018, Lion Air Flight 610 departed Jakarta, Indonesia, with 189 people on board. The airplane was a four-month-old 737 MAX 8—the latest model in a line of Boeing aircraft that goes back to the 1960s. Takeoff and climb were normal to about 1,600 feet, where the pilots retracted the flaps (wing extensions that increase lift at low speed). At that point the aircraft unexpectedly descended to 900 feet. In radio conversations with air traffic controllers, the pilots reported a “flight control problem” and asked about their altitude and speed as displayed on the controllers’ radar screens. Cockpit instruments were giving inconsistent readings. The pilots then redeployed the flaps and climbed to 5,000 feet, but when the flaps were stowed again, the nose dipped and the plane began to lose altitude. Over the next six or seven minutes the pilots engaged in a tug of war with their own aircraft, as they struggled to keep the nose level but the flight control system repeatedly pushed it down. In the end the machine won. The airplane plunged into the sea at high speed, killing everyone aboard.</p>
-<p>The second crash happened March 8, when Ethiopian Airlines Flight 302 went down six minutes after taking off from Addis Ababa, killing 157. The aircraft was another MAX 8, just two months old. The pilots reported control problems, and data from a satellite tracking service showed sharp fluctuations in altitude. The similarities to the Lion Air crash set off alarm bells: If the same malfunction or design flaw caused both accidents, it might also cause more. Within days, the worldwide fleet of 737 MAX aircraft was grounded. Data recovered since then from the Flight 302 wreckage has reinforced the suspicion that the two accidents are closely related.</p>
-<p>The grim fate of Lion Air 610 can be traced in brightly colored squiggles extracted from the flight data recorder. (The chart was published in November in a <a href="http://jacdec.de/database/2018-10-29_PK-LQP-NTSC_Preliminary%20Report.pdf">preliminary report</a> from the Indonesian National Committee on Transportation Safety.)</p>
-<p><img alt="Lion Air 610 flight data chart 1280" border="0" class="centered withLoupe" height="834" src="http://bit-player.org/wp-content/uploads/2019/03/Lion-Air-610-flight-data-chart-1280.jpg" width="900"/></p>
-<p>The outline of the story is given in the altitude traces at the bottom of the chart. The initial climb is interrupted by a sharp dip; then a further climb is followed by a long, erratic roller coaster ride. At the end comes the dive, as the aircraft plunges 5,000 feet in a little more than 10 seconds. (Why are there two altitude curves, separated by a few hundred feet? I’ll come back to that question at the end of this long screed.)</p>
-<p>All those ups and downs were caused by movements of the horizontal stabilizer, the small winglike control surface at the rear of the fuselage. <img alt="Stabilizer elevator diagram" border="0" class="alignright" height="" src="http://bit-player.org/wp-content/uploads/2019/04/stabilizer_elevator_diagram.svg" style="margin-bottom: 12px;" width="250"/>The stabilizer controls the airplane’s pitch attitude—nose-up vs. nose-down. On the 737 it does so in two ways. A mechanism for pitch <em>trim</em> tilts the entire stabilizer, whereas push­ing or pulling on the pilot’s control yoke moves the elevator, a hinged tab at the rear of the stabilizer. In either case, moving the trailing edge of the surface upward tends to force the nose of the airplane up, and vice versa. Here we’re mainly concerned with trim changes rather than elevator movements.</p>
-<p>Commands to the pitch-trim system and their effect on the airplane are shown in three traces from the flight data, which I reproduce here for convenience:</p>
-<p><img alt="Lion Air 610 flight data chart trim commands" border="0" class="aligncenter" height="117" src="http://bit-player.org/wp-content/uploads/2019/04/Lion-Air-610-flight-data-chart-trim-commands.jpg" width="640"/></p>
-<p>The line labeled “trim manual” <em>(light blue)</em> reflects the pilots’ inputs, “trim automatic” <em>(orange)</em> shows commands from the airplane’s electronic systems, and “pitch trim position” <em>(dark blue)</em> represents the tilt of the stabilizer, with higher position on the scale denoting a nose-up command. This is where the tug of war between man and machine is clearly evident. In the latter half of the flight, the automatic trim system repeatedly commands nose down, at intervals of roughly 10 seconds. In the breaks between those automated commands, the pilots dial in nose-up trim, using buttons on the control yoke. In response to these conflicting commands, the position of the horizontal stabilizer oscillates with a period of 15 or 20 seconds. The see-sawing motion continues for at least 20 cycles, but toward the end the unrelenting automatic nose-down adjustments prevail over the briefer nose-up commands from the pilots. The stabilizer finally reaches its limiting nose-down deflection and stays there as the airplane plummets into the sea.</p>
-<h3>Angle of attack</h3>
-<p>What’s to blame for the perverse behavior of the automatic pitch trim system? The accusatory finger is pointing at something called MCAS, a new feature of the 737 MAX series. MCAS stands for Maneuvering Characteristics Augmentation System—an im­pressively polysyllabic name that tells you nothing about what the thing is or what it does. As I understand it, MCAS is not a piece of hardware; there’s no box labeled MCAS in the airplane’s electronic equipment bays. MCAS consists entirely of software. It’s a program running on a computer.</p>
-<p>MCAS has just one function. It is designed to help prevent an aerodynamic stall, a situation in which an airplane has its nose pointed up so high with respect to the surrounding airflow that the wings can’t keep it aloft. A stall is a little like what happens to a bicyclist climbing a hill that keeps getting steeper and steeper: Eventually the rider runs out of oomph, wobbles a bit, and then rolls back to the bottom. Pilots are taught to recover from stalls, but it’s not a skill they routinely practice with a planeful of passengers. In commercial aviation the emphasis is on <em>avoiding</em> stalls—forestalling them, so to speak. Airliners have mechanisms to detect an imminent stall and warn the pilot with lights and horns and a “stick shaker” that vibrates the control yoke. On Flight 610, the captain’s stick was shaking almost from start to finish.</p>
-<p>Some aircraft go beyond mere warnings when a stall threatens. If the aircraft’s nose continues to pitch upward, an automated system intervenes to push it back down—if necessary overriding the manual control inputs of the pilot. MCAS is designed to do exactly this. It is armed and ready whenever two criteria are met: The flaps are up (generally true except during takeoff and landing) and the airplane is under manual control (not autopilot). Under these conditions the system is triggered whenever an aerodynamic quantity called angle of attack, or AoA, rises into a dangerous range.</p>
-<p>Angle of attack is a concept subtle enough to merit a diagram:Adapted from Lisa R. Le Vie, <a href="https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/20140011419.pdf">Review of Research on Angle-of-Attack Indi­cator Effectiveness</a>.</p>
-<p><img alt="Le Vie angle of attack diagram detail" border="0" class="centered" height="229" src="http://bit-player.org/wp-content/uploads/2019/03/Le-Vie-angle-of-attack-diagram-detail.png" width="607"/></p>
-<p class="undent">The various angles at issue are rotations of the aircraft body around the pitch axis, a line parallel to the wings, perpendicular to the fuselage, and passing through the airplane’s center of gravity. If you’re sitting in an exit row, the pitch axis might run right under your seat. Rotation about the pitch axis tilts the nose up or down. <em>Pitch attitude</em> is defined as the angle of the fuselage with respect to a horizontal plane. The <em>flight-path angle</em> is measured between the horizontal plane and the aircraft’s velocity vector, thus showing how steeply it is climbing or descending. <em>Angle of attack</em> is the difference between pitch attitude and flight-path angle. It is the angle at which the aircraft is moving through the surrounding air (assuming the air itself is motionless, <em>i.e.</em>, no wind).</p>
-<p>AoA affects both lift (the upward force opposing the downward tug of gravity) and drag (the dissipative force opposing forward motion and the thrust of the engines). As AoA increases from zero, lift is enhanced because of air impinging on the underside of the wings and fuselage. For the same reason, however, drag also increases. As the angle of attack grows even steeper, the flow of air over the wings becomes turbulent; beyond that point lift diminishes but drag continues increasing. That’s where the stall sets in. The critical angle for a stall depends on speed, weight, and other factors, but usually it’s no more than 15 degrees.</p>
-<p>Neither the Lion Air nor the Ethiopian flight was ever in danger of stalling, so if MCAS was activated, it must have been by mistake. The working hypothesis mentioned in many press accounts is that the system received and acted upon erroneous input from a failed AoA sensor. </p>
-<p>A sensor to measure angle of attack is conceptually simple. It’s essentially a weather­vane poking out into the airstream. In the photo below, the angle-of-attack sensor is the small black vane just forward of the “737 MAX” legend. Hinged at the front, the vane rotates to align itself with the local airflow and generates an electrical signal that rep­resents the vane’s angle with respect to the axis of the fuselage. The 737 MAX has two angle-of-attack vanes, one on each side of the nose. (The protruding devices above the AoA vane are pitot tubes, used to measure air speed. Another device below the word MAX is probably a temperature sensor.)</p>
-<p><img alt="SpiritofRenton nose1280" border="0" class="centered" height="452" src="http://bit-player.org/wp-content/uploads/2019/03/SpiritofRenton-nose1280.jpg" width="640"/></p>
-<p class="indent">Angle of attack was not among the variables displayed to the pilots of the Lion Air 737, but the flight data recorder did capture signals derived from the two AoA sensors:</p>
-<p><img alt="Lion Air 610 flight data chart AoA details" border="0" class="centered" height="60" src="http://bit-player.org/wp-content/uploads/2019/04/Lion-Air-610-flight-data-chart-AoA-details.jpg" width="640"/></p>
-<p class="undent">There’s something dreadfully wrong here. The left sensor is indicating an angle of attack about 20 degrees steeper than the right sensor. That’s a huge discrepancy. There’s no plausible way those disparate readings could reflect the true state of the airplane’s motion through the air, with the left side of the nose pointing sky-high and the right side near level. One of the measurements must be wrong, and the higher reading is the suspect one. If the true angle of attack ever reached 20 degrees, the airplane would already be in a deep stall. Unfortunately, on Flight 610 MCAS was taking data only from the left-side AoA sensor. It interpreted the nonsensical measurement as a valid indicator of aircraft attitude, and worked relentlessly to correct it, up to the very moment the airplane hit the sea.</p>
-<h3>Cockpit automation</h3>
-<p>The tragedies in Jakarta and Addis Ababa are being framed as a cautionary tale of automation run amok, with computers usurping the authority of pilots. The <em>Washington Post</em> <a href="https://www.washingtonpost.com/opinions/the-boeing-crashes-are-a-cautionary-tale-about-automation/2019/03/27/62c09154-4fd0-11e9-8d28-f5149e5a2fda_story.html?utm_term=.514085b92e47">editorialized</a>: </p>
-<blockquote><p>A second fatal airplane accident involving a Boeing 737 MAX 8 may have been a case of man vs. machine…. The debacle shows that regulators should apply extra review to systems that take control away from humans when safety is at stake.</p></blockquote>
-<p class="undent">Tom Dieusaert, a Belgian journalist who writes often on aviation and computation, offered this <a href="https://medium.com/crash-investigators/computer-crash-on-a-boeing-what-we-do-know-about-lion-air-jt610-9b5dbd654c75">opinion</a>:</p>
-<blockquote><p>What can’t be denied is that the Boeing of Flight JT610 had serious computer problems. And in the hi-tech, fly-by-wire world of aircraft manufacturers, where pilots are reduced to button pushers and passive observers, these accidents are prone to happen more in the future.</p></blockquote>
-<p>The button-pushing pilots are particularly irate. <a href="https://drive.google.com/file/d/1249KS8xtIDKb5SxgpeFI6AD-PSC6nFA5/view">Gregory Travis</a>, who is both a pilot and software developer, summed up his feelings in this acerbic comment:</p>
-<blockquote><p>“Raise the nose, HAL.” </p>
-<p class="undent">“I’m sorry, Dave, I can’t do that.”</p>
-</blockquote>
-<p>Even Donald Trump <a href="https://twitter.com/realDonaldTrump/status/1105468569800839169">tweeted</a> on the issue:</p>
-<blockquote><p>Airplanes are becoming far too complex to fly. Pilots are no longer needed, but rather computer scientists from MIT. I see it all the time in many products. Always seeking to go one unnecessary step further, when often old and simpler is far better. Split second decisions are…. </p>
-<p>….needed, and the complexity creates danger. All of this for great cost yet very little gain. I don’t know about you, but I don’t want Albert Einstein to be my pilot. I want great flying professionals that are allowed to easily and quickly take control of a plane!</p></blockquote>
-<p>There’s considerable irony in the complaint that the 737 is too automated; in many respects the aircraft is in fact quaintly old-fashioned. The basic design goes back more than 50 years, and even in the latest MAX models quite a lot of 1960s technology survives. The primary flight controls are hydraulic, with a spider web of high-pressure tubing running directly from the control yokes in the cockpit to the ailerons, elevator, and rudder. If the hydraulic systems should fail, there’s a purely mechanical backup, with cables and pulleys to operate the various control surfaces. For stabilizer trim the primary actuator is an electric motor, but again there’s a mechanical fallback, with crank wheels near the pilots’ knees pulling on cables that run all the way back to the tail.</p>
-<p>Other aircraft are much more dependent on computers and electronics. The 737′s principal competitor, the Airbus A320, is a thoroughgoing fly-by-wire vehicle. The pilot flies the computer, and the computer flies the airplane. Specifically, the pilot decides where to go—up, down, left, right—but the computer decides how to get there, choosing which control surfaces to deflect and by how much. Boeing’s own more recent designs, the 777 and 787, also rely on digital controls. Indeed, the latest models from both companies go a step beyond fly-by-wire to fly-by-network. Most of the communication from sensors to computers and onward to control surfaces consists of digital packets flowing through a <a href="https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/20150011061.pdf">variant of Ethernet</a>. The airplane is a computer peripheral.</p>
-<p>Thus if you want to gripe about the dangers and indignities of automation on the flight deck, the 737 is not the most obvious place to start. And a luddite campaign to smash all the avionics and put pilots back in the seat of their pants would be a dangerously off-target response to the current predicament. There’s no question the 737 MAX has a critical problem. It’s a matter of life and death for those who would fly in it and possibly also for the Boeing Company. But the problem didn’t start with MCAS. It started with earlier decisions that made MCAS necessary. Furthermore, the problem may not end with the remedy that Boeing has proposed—a software update that will hobble MCAS and leave more to the discretion of pilots.</p>
-<h3>Maxing out the 737</h3>
-<p>The 737 flew its first passengers in 1968. It was (and still is) the smallest member of the Boeing family of jet airliners, and it is also the most popular by far. More than 10,000 have been sold, and Boeing has orders for another 4,600. Of course there have been changes over the years, especially to engines and instruments. A 1980s update came to be known as 737 Classic, and a 1997 model was called 737 NG, for “next generation.” (Now, with the MAX, the NG has become the <em>previous</em> generation.) Through all these revisions, however, the basic structure of the airframe has hardly changed.</p>
-<p>Ten years ago, it looked like the 737 had finally come to the end of its life. Boeing announced it would develop an all-new design as a replacement, with a hull built of lightweight composite materials rather than aluminum. Competitive pressures forced a change of course. Airbus had a head start on the A320neo, an update that would bring more efficient engines to their entry in the same market segment. The revised Airbus would be ready around 2015, whereas Boeing’s clean-slate project would take a decade. Customers were threatening to defect. In particular, American Airlines—long a Boeing loyalist—was negotiating a large order of A320neos. </p>
-<p>In 2011 Boeing scrapped the plan for an all-new design and elected to do the same thing Airbus was doing: bolt new engines onto an old airframe. This would eliminate most of the up-front design work, as well as the need to build tooling and manufacturing facilities. Testing and certification by the FAA would also go quicker, so that the first deliveries might be made in five or six years, not too far behind Airbus.</p>
-<p>A 737-800 (a pre-MAX model) burns about 800 gallons of jet fuel per hour aloft. That comes to $2,000 at $2.50 per gallon. If the airplane flies 10 hours a day, the annual fuel bill is $7.3 million. Fourteen percent of that is just over $1 million.The new engines mated to the 737 promised a 14 percent gain in fuel efficiency, which might save an airline a million dollars a year in operating costs. The better fuel economy would also increase the airplane’s range. And to sweeten the deal Boeing proposed to keep enough of the airframe unchanged that the new model would operate under the same “type certificate” as the old one. A pilot qualified to fly the 737 NG could step into the MAX without extensive retraining.</p>
-<p><img alt="737 200 and 737 MAX compared" border="0" class="centered" height="272" src="http://bit-player.org/wp-content/uploads/2019/04/737-200-and-737-MAX-compared.jpg" width="640"/>Sources: <em>(left)</em> <a href="https://www.flickr.com/people/12094576@N08">Bryan</a> via Wikimedia, <a href="https://creativecommons.org/licenses/by/2.0/deed.en">CC BY 2.0</a>; <em>(right)</em> <a href="https://www.flickr.com/people/71965027@N02">Steve Lynes</a> via Wikimedia, <a href="https://creativecommons.org/licenses/by/2.0/deed.en">CC BY 2.0</a>.</p>
-<p class="indent">The original 1960s 737 had two cigar-shaped engines, long and skinny, tucked up under the wings <em>(left photo above)</em>. Since then, jet engines have grown fat and stubby. They derive much of their thrust not from the jet exhaust coming out of the tailpipe but from “bypass” air moved by a large-diameter fan. Such engines would scrape on the ground if they were mounted under the wings of the 737; instead they are perched on pylons that extend forward from the leading edge of the wing. The engines on the MAX models <em>(right photo)</em> are the fattest yet, with a fan 69 inches in diameter. Compared with the NG series, the MAX engines are pushed a few inches farther forward and hang a few inches lower.</p>
-<p>A <a href="https://www.nytimes.com/2019/03/23/business/boeing-737-max-crash.html?action=click&amp;module=RelatedCoverage&amp;pgtype=Article&amp;region=Footer">New York Times article</a> by David Gelles, Natalie Kitroeff, Jack Nicas, and Rebecca R. Ruiz describes the plane’s development as hurried and hectic.</p>
-<blockquote><p>Months behind Airbus, Boeing had to play catch-up. The pace of the work on the 737 Max was frenetic, according to current and former employees who spoke with <em>The New York Times</em>…. Engineers were pushed to submit technical drawings and designs at roughly double the normal pace, former employees said.</p></blockquote>
-<p>The <em>Times</em> article also notes:  “Although the project had been hectic, current and former employees said they had finished it feeling confident in the safety of the plane.” </p>
-<h3>Pitch instability</h3>
-<p>Sometime during the development of the MAX series, Boeing got an unpleasant surprise. The new engines were causing unwanted pitch-up movements under certain flight con­ditions. When I first read about this problem, soon after the Lion Air crash, I found the following explanation is an article by Sean Broderick and Guy Norris in <em>Aviation Week and Space Technology</em> (Nov. 26–Dec. 9, 2018, pp. 56–57):</p>
-<blockquote><p>Like all turbofan-powered airliners in which the thrust lines of the engines pass below the center of gravity (CG), any change in thrust on the 737 will result in a change of flight path angle caused by the vertical component of thrust.</p></blockquote>
-<p>In other words, the low-slung engines not only push the airplane forward but also tend to twirl it around the pitch axis. It’s like a motorcycle doing wheelies. Because the MAX engines are mounted farther below and in front of the center of gravity, they act through a longer lever arm and cause more severe pitch-up motions. </p>
-<p>I found more detail on this effect in an <a href="https://aviationweek.com/commercial-aviation/pilot-report-flying-737-8-boeing-s-new-narrowbody-breadwinner">earlier <em>Aviation Week</em> article</a>, a 2017 pilot report by Fred George, describing his first flight at the controls of the new MAX 8. </p>
-<blockquote><p>The aircraft has sufficient natural speed stability through much of its flight envelope. But with as much as 58,000 lb. of thrust available from engines mounted well below the center of gravity, there is pronounced thrust-versus-pitch coupling at low speeds, especially with aft center of gravity (CG) and at light gross weights. Boeing equips the aircraft with a speed-stability augmen­tation function that helps to compensate for the coupling by automatically trimming the horizontal stabilizer according to indicated speed, thrust lever position and CG. Pilots still must be aware of the effect of thrust changes on pitching moment and make purposeful control-wheel and pitch-trim inputs to counter it.</p></blockquote>
-<p>The reference to an “augmentation function” that works by “automatically trimming the horizontal stabilizer” sounded awfully familiar, but it turns out this is <em>not</em> MCAS. The system that compensates for thrust-pitch coupling is known as <em>speed-trim</em>. Like MCAS, it works “behind the pilot’s back,” making adjustments to control surfaces that were not directly commanded. There’s yet another system of this kind called <em>mach-trim</em> that silently corrects a different pitch anomally when the aircraft reaches transonic speeds, at about mach 0.6. Neither of these systems is new to the MAX series of aircraft; they have been part of the control algorithm at least since the NG came out in 1997. MCAS runs on the same computer as speed-trim and mach-trim and is part of the same software system, but it is a distinct function. And according to what I’ve been reading in the past few weeks, it addresses a different problem—one that seems more sinister.</p>
-<p>Most aircraft have the pleasant property of static stability. When an airplane is properly trimmed for level flight, you can let go of the controls—at least briefly—and it will continue on a stable path. Moreover, if you pull back on the control yoke to point the nose up, then let go again, the pitch angle should return to neutral. The layout of the airplane’s various airfoil surfaces accounts for this behavior. When the nose goes up, the tail goes down, pushing the underside of the horizontal stabilizer into the airstream. The pressure of the air against this tail surface provides a restoring force that brings the tail back up and the nose back down. (That’s why it’s called a <em>stabilizer</em>!) This negative feedback loop is built in to the structure of the airplane, so that any departure from equilibrium creates a force that opposes the disturbance.</p>
-<p><img alt="Pitch stability" border="0" class="centered" height="" src="http://bit-player.org/wp-content/uploads/2019/04/pitch-stability.svg" width="600"/></p>
-<p class="indent">However, the tail surface, with its helpful stablizing influence, is not the only structure that affects the balance of aerodynamic forces. Jet engines are not designed to contribute lift to the airplane, but at high angles of attack they can do so, as the airstream impinges on the lower surface of each engine’s outer covering, or nacelle. When the engines are well forward of the center of gravity, the lift creates a pitch-up turning moment. If this moment exceeds the counterbalancing force from the tail, the aircraft is unstable. A nose-up attitude generates forces that raise the nose still higher, and positive feedback takes over.</p>
-<p>Is the 737 MAX vulnerable to such runaway pitch excursions? The possibility had not occurred to me until I read a <a href="http://www.b737.org.uk/mcas.htm">commentary on MCAS</a> on the <a href="http://www.b737.org.uk/index.htm">Boeing 737 Technical Site</a>, a web publication produced by Chris Brady, a former 737 pilot and flight instructor. He writes:</p>
-<blockquote><p>MCAS is a longitudinal stability enhancement. It is not for stall prevention or to make the MAX handle like the NG; it was introduced to counteract the non-linear lift of the LEAP-1B engine nacelles and give a steady increase in stick force as AoA increases. The LEAP engines are both larger and relocated slightly up and forward from the previous NG CFM56-7 engines to accommodate their larger fan diameter. This new location and size of the nacelle cause the vortex flow off the nacelle body to produce lift at high AoA; as the nacelle is ahead of the CofG this lift causes a slight pitch-up effect (ie a reducing stick force) which could lead the pilot to further increase the back pressure on the yoke and send the aircraft closer towards the stall. This non-linear/reducing stick force is not allowable underFAR = Federal Air Regulations. <a href="https://www.ecfr.gov/cgi-bin/text-idx?SID=1a3ab2a8cbd0ea0ab242c75558315fc2&amp;mc=true&amp;node=pt14.1.25&amp;rgn=div5">Part 25</a> deals with airworthiness standards for transport category airplanes. FAR §25.173 “Static longitudinal stability”. MCAS was therefore introduced to give an automatic nose down stabilizer input during steep turns with elevated load factors (high AoA) and during flaps up flight at airspeeds approaching stall.</p></blockquote>
-<p class="indent">Brady cites no sources for this statement, and as far as I know Boeing has neither confirmed nor denied. But <em>Aviation Week</em>, which earlier mentioned the thrust-pitch linkage, has more recently (<a href="https://aviationweek.com/commercial-aviation/boeing-737-max-mcas-explained">issue of March 20</a>) gotten behind the nacelle-lift instability hypothesis:</p>
-<blockquote><p>The MAX’s larger CFM Leap 1 engines create more lift at high AOA and give the aircraft a greater pitch-up moment than the CFM56-7-equipped NG. The MCAS was added as a certification requirement to minimize the handling difference between the MAX and NG.</p></blockquote>
-<p class="indent">Assuming the Brady account is correct, an interesting question is when Boeing noticed the instability. Were the designers aware of this hazard from the outset? Did it emerge during early computer simulations, or in wind tunnel testing of scale models? A story by Dominic Gates in the <em>Seattle Times</em> hints that Boeing may not have recognized the severity of the problem until flight tests of the first completed aircraft began in 2015.</p>
-<p>According to Gates, the safety analysis that Boeing submitted to the FAA specified that MCAS would be allowed to move the horizontal stabilizer by no more than 0.6 degree. In the airplane ultimately released to the market, MCAS can go as far as 2.5 degrees, and it can act repeatedly until reaching the mechanical limit of motion at about 5 degrees. <a href="https://www.seattletimes.com/business/boeing-aerospace/failed-certification-faa-missed-safety-issues-in-the-737-max-system-implicated-in-the-lion-air-crash/">Gates writes</a>:</p>
-<blockquote><p>That limit was later increased after flight tests showed that a more powerful movement of the tail was required to avert a high-speed stall, when the plane is in danger of losing lift and spiraling down.</p>
-<p>The behavior of a plane in a high angle-of-attack stall is difficult to model in advance purely by analysis and so, as test pilots work through stall-recovery routines during flight tests on a new airplane, it’s not uncommon to tweak the control software to refine the jet’s performance.</p></blockquote>
-<p>The high-AoA instability of the MAX appears to be a property of the aerodynamic form of the entire aircraft, and so a direct way to suppress it would be to alter that form. For example, enlarging the tail surface might restore static stability. But such airframe modifications would have delayed the delivery of the airplane, especially if the need for them was discovered only after the first prototypes were already flying. Structural changes might also jeopardize inclusion of the new model under the old type certificate. Modifying software instead of aluminum must have looked like an attractive alternative. Someday, perhaps, we’ll learn how the decision was made.</p>
-<p>By the way, according to Gates, the safety document filed with the FAA specifying a 0.6 degree limit has yet to be amended to reflect the true range of MCAS commands.</p>
-<h3>Flying while unstable</h3>
-<p>Instability is not necessarily the kiss of death in an airplane. There have been at least a few successful unstable designs, starting with the 1903 Wright Flyer. The Wright brothers deliberately put the horizontal stabilizer in front of the wing rather than behind it because their earlier experiments with kites and gliders had shown that what we call stability can also be described as sluggishness. The Flyer’s forward control surfaces (known as canards) tended to amplify any slight nose-up or nose-down motions. Maintaining a steady pitch attitude demanded high alertness from the pilot, but it also allowed the airplane to respond more quickly when the pilot <em>wanted</em> to pitch up or down. (The pros and cons of the design are reviewed in a 1984 <a href="https://authors.library.caltech.edu/21217/">paper</a> by Fred E. C. Culick and Henry R. Jex.)</p>
-<p><img alt="Wright First Flight 1903Dec17" border="0" class="centered" height="213" src="http://bit-player.org/wp-content/uploads/2019/04/Wright_First_Flight_1903Dec17.jpg" width="640"/>Orville at the controls, Wilbur running alongside, at Kitty Hawk on December 17, 1903. In this view we are seeing the airplane from the stern. The canards—dual adjustable horizontal surfaces at the front—seem to be calling for nose-up pitch. (Photo from <a href="https://commons.wikimedia.org/wiki/File:Wright_First_Flight_1903Dec17_(full_restore_115).jpg">WikiMedia</a>.</p>
-<p class="indent">Another dramatically unstable aircraft was the Gruman X-29, a research platform designed in the 1980s. The X-29 had its wings on backwards; to make matters worse,<img alt="X 29 at High Angle of Attack with Smoke Generators" border="0" class="alignleft" height="234" src="http://bit-player.org/wp-content/uploads/2019/04/X-29_at_High_Angle_of_Attack_with_Smoke_Generators.jpg" style="margin-bottom: 12px;" width="300"/> the primary surfaces for pitch control were canards mounted in front of the wings, as in the Wright Flyer. The aim of this quirky project was to explore designs with exceptional agility, sacrificing static stability for tighter maneuvering. No unaided human pilot could have mastered such a twitchy vehicle. It required a digital fly-by-wire system that sampled the state of the airplane and adjusted the control surfaces up to 80 times per second. The controller was successful—perhaps too much so. It allowed the airplane to be flown safely, but in taming the instability it also left the plane with rather tame handling characteristics.</p>
-<p>I have a glancing personal connection with the X-29 project. In the 1980s I briefly worked as an editor with members of the group at Honeywell who designed and built the X-29 control system. I helped prepare publications on the control laws and on their implementation in hardware and software. That experience taught me just enough to recognize something odd about MCAS: It is way too slow to be suppressing aerodynamic instability in a jet aircraft. Whereas the X-29 controller had a response time of 25 milliseconds, MCAS takes 10 seconds to move the 737 stabilizer through a 2.5-degree adjustment. At that pace, it cannot possibly keep up with forces that tend to flip the nose upward in a positive feedback loop.</p>
-<p>There’s a simple explanation. MCAS is not meant to control an unstable aircraft. It is meant to restrain the aircraft from entering the regime where it becomes unstable. This is the same strategy used by other mechanisms of stall prevention—intervening before the angle of attack reaches the critical point. However, if Brady is correct about the instability of the 737 MAX, the task is more urgent for MCAS. Instability implies a steep and slippery slope. MCAS is a guard rail that bounces you back onto the road when you’re about to drive over the cliff. </p>
-<p>Which brings up the question of Boeing’s announced plan to fix the MCAS problem. <a href="https://aviationweek.com/commercial-aviation/boeing-max-changes-add-redundancy-pilot-control">Reportedly</a>, the revised system will not keep reactivating itself so persistently, and it will automatically disengage if it detects a large difference between the two AoA sensors. These changes should prevent a recurrence of the recent crashes. But do they provide adequate protection against the kind of mishap that MCAS was designed to prevent in the first place? With MCAS shut down, either manually or automatically, there’s nothing to stop an unwary or misguided pilot from wandering into the corner of the flight envelope where the MAX becomes unstable.</p>
-<p>Without further information from Boeing, there’s no telling how severe the instability might be—if indeed it exists at all. The Brady article at the Boeing 737 Technical Site implies the problem is partly pilot-induced. Normally, to make the nose go higher and higher you have to pull harder and harder on the control yoke. In the unstable region, however, the resistance to pulling suddenly fades, and so the pilot may unwittingly pull the yoke to a more extreme position.</p>
-<p>Is this human interaction a <em>necessary</em> part of the instability, or is it just an exacer­bating factor? In other words, without the pilot in the loop, would there still be positive feedback causing runaway nose-up pitch? I have yet to find answers.</p>
-<p>Another question: If the root of the problem is a deceptive change in the force resisting a nose-up movements of the control yoke, why not address that issue directly? The elevator feel computer and the elevator feel and centering unit pro­vide “fake” forces to the pilot’s control yoke. Figure borrowed from <a href="https://www.slideshare.net/theoryce/b737-ng-flight-controls">B737 NG Flight controls</a>, a presentation by <a href="https://www.slideshare.net/theoryce">theoryce</a>. The presentation is for the 737 NG, not the MAX series; it’s possible the architecture has changed.<img alt="Pitch controls diagram" border="0" class="alignright" height="407" src="http://bit-player.org/wp-content/uploads/2019/04/pitch-controls-diagram.png" width="300"/>In the 737 (and most other large aircraft) the forces that the pilot “feels” through the control yoke are not simple reflections of the aerodynamic forces acting on the elevator and other control surfaces. The feedback forces are largely synthetic, generated by an “elevator feel computer” and an “elevator feel and centering unit,” devices that monitor the state of the airplane and gen­erate appro­priate hydraulic pressures push­ing the yoke one way or another. Those systems could have been given the addi­tional task of maintaining or increasing back force on the yoke when the angle of attack approaches the instability. Artificially en­hanced resis­tance is already part of the stall warning system. Why not extend it to MCAS? (There may be a good answer; I just don’t know it.)</p>
-<h3>Where’s the off switch?</h3>
-<p>Even after the spurious activation of MCAS on Lion Air 610, the crash and the casualties would have been avoided if the pilots had simply turned the damn thing off. Why didn’t they? Apparently because they had never heard of MCAS, and didn’t know it was installed on the airplane they were flying, and had not received any instruction on how to disable it. There’s no switch or knob in the cockpit labeled “MCAS ON/OFF.” The Flight Crew Operation Manual does not mention it (<a href="https://www.cbc.ca/news/business/boeing-737-manual-mcas-system-plane-crash-1.5065842">except in a list of abbreviations</a>), and neither did the transitional training program the pilots had completed before switching from the 737 NG to the MAX. The training consisted of either one or two hours (reports differ) with an iPad app.</p>
-<p>Boeing’s explanation of these omissions was captured in a <a href="https://www.wsj.com/articles/boeing-withheld-information-on-737-model-according-to-safety-experts-and-others-1542082575"><em>Wall Street Journal</em> story</a>:</p>
-<blockquote><p>One high-ranking Boeing official said the company had decided against disclos­ing more details to cockpit crews due to concerns about inundating average pilots with too much information—and significantly more technical data—than they needed or could digest.</p></blockquote>
-<p>To call this statement disingenuous would be disingenuous. What it is is preposterous. In the first place, Boeing did not withhold “more details”; they failed to mention the very existence of MCAS. And the too-much-information argument is silly. I don’t have access to the Flight Crew Operation Manual for the MAX, but <a href="http://www.737ng.co.uk/737NG%20POH.pdf">the NG edition</a> runs to more than 1,300 pages, plus another 800 for the Quick Reference Handbook. A few paragraphs on MCAS would not have sunk any pilot who wasn’t already drowning in TMI. Moreover, the manual carefully documents the speed-trim and mach-trim features, which seem to fall in the same category as MCAS: They act autonomously, and offer the pilot no direct interface for monitoring or adjusting them.</p>
-<p>In the aftermath of the Lion Air accident, Boeing stated that the procedure for disabling MCAS was spelled out in the manual, even though MCAS itself wasn’t mentioned. That procedure is given in a checklist for “runaway stabilizer trim.” It is not complicated: Hang onto the control yoke, switch off the autopilot and autothrottles if they’re on; then, if the problem persists, flip two switches labeled “STAB TRIM” to the “CUTOUT” position. Only the last step will actually matter in the case of an MCAS malfunction.</p>
-<p>This checklist is considered a “memory item”; pilots must be able to execute the steps without looking it up in the handbook. The Lion Air crew should certainly have been familiar with it. But could they recognize that it was the right checklist to apply in an airplane whose behavior was unlike anything they had seen in their training or previous 737 flying experience? According to the handbook, the condition that triggers use of the runaway checklist is “Uncommanded stabilizer trim movement occurs continuously.” The MCAS commands were not continuous but repetitive, so some leap of inference would have been needed to make this diagnosis.</p>
-<p><img alt="Center console trim wheels" border="0" class="aligncenter" height="576" src="http://bit-player.org/wp-content/uploads/2019/04/center-console-trim-wheels.png" width="500"/></p>
-<p class="indent">By the time of the Ethiopian crash, 737 pilots everywhere knew all about MCAS and the procedure for disabling it. A <a href="http://www.ecaa.gov.et/documents/20435/0/Preliminary+Report+B737-800MAX+,(ET-AVJ).pdf">preliminary report</a> issued last week by Ethiopian Airlines indicates that after a few minutes of wrestling with the control yoke, the pilots on Flight 302 did invoke the checklist procedure, and moved the STAB TRIM switches to CUTOUT. The stabilizer then stopped responding to MCAS nose-down commands, but the pilots were unable to regain control of the airplane. </p>
-<p>It’s not entirely clear why they failed or what was going on in the cockpit in those last minutes. One factor may be that the cutout switch disables not only automatic pitch trim movements but also manual ones requested through the buttons on the control yoke. The switch cuts all power to the electric motor that moves the stabilizer. In this situation the only way to adjust the trim is to turn the hand crank wheels near the pilots’ knees. During the crisis on Flight 302 that mechanism may have been too slow to correct the trim in time, or the pilots may have been so fixated on pulling the control yoke back with maximum force that they did not try the manual wheels. It’s also possible that they flipped the switches back to the NORMAL setting, restoring power to the stabilizer motor. The report’s narrative doesn’t mention this possibility, but the graph from the flight data recorder suggests it <em>(see below)</em>.</p>
-<h3>The single point of failure</h3>
-<p>There’s room for debate on whether the MCAS system is a good idea when it is operating correctly, but when it activates <em>mistakenly</em> and sends an airplane diving into the sea, no one would defend it. By all appearances, the rogue behavior in both the Lion Air and the Ethiopian accidents was triggered by a malfunction in a single sensor. That’s not supposed to happen in aviation. It’s unfathomable that any aircraft manufacturer would knowingly build a vehicle in which the failure of a single part would lead to a fatal accident.</p>
-<p>Protection against single failures comes from redundancy, and the 737 is so committed to this principle that it almost amounts to two airplanes wrapped up in a single skin. Aircraft that rely more heavily on automation generally have <em>three</em> of everything—sensors, computers, and actuators.The cockpit has stations for two pilots, who look at separate sets of instruments and operate separate sets of controls. The left and right instrument panels receive signals from separate sets of sensors, and those signals are processed by separate computers. Each side of the cockpit has its own inertial guidance system, its own navigation computer, its own autopilot. There are two electric power supplies and two hydraulic systems—plus mechanical backups in case of a dual hydraulic failure. The two control yokes normally move in unison—they are linked under the floor—but if one yoke should get stuck, the connection can be broken, allowing the other pilot to continue flying the airplane.</p>
-<p>There’s one asterisk in this roster of redundancy: A device called the flight control computer, or FCC, apparently gets special treatment. There are two FCCs, but <a href="http://www.b737.org.uk/mcas.htm">according to the Boeing 737 Technical Site</a> only one of them operates during any given flight. All the other duplicated components run in parallel, receiving independent inputs, doing independent computations, emitting independent control actions. But for each flight just one FCC does all the work, and the other is put on standby. The scheme for choosing the active computer seems strangely arbitrary. Each day when the airplane is powered up, the left side FCC gets control for the first flight, then the right side unit takes over for the second flight of the day, and the two sides alternate until the power is shut off. After a restart, the alternation begins again with the left FCC.</p>
-<p>Aspects of this scheme puzzle me. I don’t understand why redundant FCC units are treated differently from other components. If one FCC dies, does the other automatically take over? Can the pilots switch between them in flight? If so, would that be an effective way to combat MCAS misbehavior? I’ve tried to find answers in the manuals, but I don’t trust my interpretation of what I read.</p>
-<p>I’ve also had a hard time learning anything about the FCC itself. I don’t know who makes it, or what it looks like, or how it is programmed. <img alt="Honeywell 737 Flight Control Computer" border="0" class="alignleft" height="253" src="http://bit-player.org/wp-content/uploads/2019/04/Honeywell-737-Flight-Control-Computer.jpg" style="margin-bottom: 12px;" width="300"/> On a website called <a href="https://www.closetwonderfuls.top/737-boeing-honeywell-flight-controller-computer-asremoved-pn4051600914-p-18738.html">Closet Wonderfuls</a> an item identified as a 737 flight control computer is on offer for $43.82, with free shipping.A website called <a href="http://www.airframer.com/aircraft_detail.html?model=B737">Airframer</a> lists many suppliers of parts and materials for the 737, but there’s no entry for a flight control computer. It has a Honeywell label. I’m tempted, but I’m pretty sure this is not the unit installed in the latest MAX models. I’ve learned that the FCC was once the FCE, for flight control elec­tronics, suggesting it was an analog device, doing its integrations and differ­entiations with capacitors and resis­tors. By now I’m sure the FCC has caught up with the digital age, but it might still be special-purpose, custom-built hardware. Or it might be an off-the-shelf Intel CPU in a fancy box, maybe even running Linux or Windows. I just don’t know.</p>
-<p>In the context of the MAX crashes, the flight control computer is important for two reasons. First, it’s where MCAS lives; this is the computer on which the MCAS software runs. Second, the curious procedure for choosing a different FCC on alternating flights also winds up choosing which AoA sensor is providing input to MCAS. The left and right sensors are connected to the corresponding FCCs.</p>
-<p>If the two FCCs are used in alternation, that raises an interesting question about the history of the aircraft that crashed in Indonesia. The preliminary crash report describes trouble with various instruments and controls on five flights over four days (including the fatal flight). All of the problems were on the left side of the aircraft or involved a dis­agreement between the left and right sides.<br/>
-The flight in the gray row is not mentioned in the preliminary report, but the airplane had to get from Manado to Denpasar for the following day’s flight.</p>
-
-<table class="tg" style="margin-top: 16px;">
-<tbody><tr>
-<th class="tg-7btt">date</th>
-<th class="tg-amwm">route</th>
-<th class="tg-amwm">trouble reports</th>
-<th class="tg-amwm">maintenance</th>
-</tr>
-<tr>
-<td class="tg-c3ow">Oct 26</td>
-<td class="tg-baqh">Tianjin → Manado</td>
-<td class="tg-baqh">left side: no airspeed<br/>or altitude indications</td>
-<td class="tg-baqh">test left Stall Management and<br/>Yaw Damper computer; passed<br/></td>
-</tr>
-<tr>
-<td class="tg-yj5y">?</td>
-<td class="tg-uqo3">Manado → Denpasar</td>
-<td class="tg-uqo3">?</td>
-<td class="tg-uqo3">?</td>
-</tr>
-<tr>
-<td class="tg-c3ow">Oct 27</td>
-<td class="tg-baqh">Denpasar → Manado</td>
-<td class="tg-baqh">left side: no airspeed<br/>or altitude indications<br/><br/>speed trim and mach trim<br/>warning lights</td>
-<td class="tg-baqh">test left Stall Management and<br/>Yaw Damper computer; failed<br/><br/>reset left Air Data and Inertial<br/>Reference Unit<br/><br/>retest left Stall Management and<br/>Yaw Damper computer; passed<br/><br/>clean electrical connections</td>
-</tr>
-<tr>
-<td class="tg-c3ow">Oct 27</td>
-<td class="tg-baqh">Manado → Denpasar</td>
-<td class="tg-baqh">left side: no airspeed<br/>or altitude indications<br/><br/>speed trim and mach trim<br/>warning lights<br/><br/>autothrottle disconnect</td>
-<td class="tg-baqh">test left Stall Management and<br/>Yaw Damper computer; failed<br/><br/>reset left Air Data and Inertial<br/>Reference Unit<br/><br/>replace left AoA sensor</td>
-</tr>
-<tr>
-<td class="tg-bolj">Oct 28</td>
-<td class="tg-cmwg">Denpasar → Jakarta</td>
-<td class="tg-cmwg">left/right disagree warning<br/>on airspeed and altitude<br/><br/>stick shaker<br/><br/>[MCAS activation]</td>
-<td class="tg-cmwg">flush left pitot tube<br/>and static port<br/><br/>clean electrical connectors<br/>on elevator “feel” computer</td>
-</tr>
-<tr>
-<td class="tg-bolj">Oct 29</td>
-<td class="tg-cmwg">Jakarta → Pangkal Pinang</td>
-<td class="tg-cmwg">stick shaker<br/><br/>[MCAS activation]</td>
-<td class="tg-cmwg"/>
-</tr>
-</tbody></table>
-<p class="indent">Which of the five flights had the left-side FCC as active computer? The final two flights <em>(red)</em>, where MCAS activated, were both first-of-the-day flights and so presumably under control of the left FCC. For the rest it’s hard to tell, especially since maintenance operations may have entailed full shutdowns of the aircraft, which would have reset the alternation sequence.</p>
-<p>The revised MCAS software will reportedly consult signals from both AoA sensors. What will it do with the additional information? Only one clue has been published so far: If the readings differ by more than 5.5 degrees, MCAS will shut down. What if the readings differ by 4 or 5 degrees? A <a href="https://www.researchgate.net/publication/306356837_Enhanced_detection_and_isolation_of_angle_of_attack_sensor_faults">recent paper</a> by Daniel Ossmann of the German Aerospace Center dis­cusses algorithmic detection of fail­ures in AoA sensors.Which sensor will MCAS choose to believe? Conservative (or pessimistic) engineering practice would seem to favor the higher reading, in order to provide better protection against instability and a stall. But that choice also raises the risk of dangerous “corrections” mandated by a faulty sensor.</p>
-<p>The present MCAS system, with its alternating choice of left and right, has a 50 percent chance of disaster when a single random failure causes an AoA sensor to spew out falsely high data. With the same one-sided random failure, the updated MCAS will have a 100 percent chance of ignoring a pilot’s excursion into stall territory. Is that an improvement?</p>
-<h3>The broken sensor</h3>
-<p>Although a faulty sensor should not bring down an airplane, I would still like to know what went wrong with the AoA vane.</p>
-<p>It’s no surprise that AoA sensors can fail. They are mechanical devices operating in a harsh environment: winds exceeding 500 miles per hour and temperatures below –40. <img alt="Lion Air 610 flight data chart AoA detail" border="0" class="alignright" height="110" src="http://bit-player.org/wp-content/uploads/2019/04/Lion-Air-610-flight-data-chart-AoA-detail.jpg" style="margin-bottom: 10px;" width="300"/>A common failure mode is a stuck vane, often caused by ice (despite a built-in de-icing heater). But a seized vane would produce a constant output, regardless of the real angle of attack, which is not the symptom seen in Flight 610. The flight data recorder shows small fluctuations in the signals from both the left and the right instruments. Furthermore, the jiggles in the two curves are closely aligned, suggesting they are both tracking the same movements of the aircraft. In other words, the left-hand sensor appears to be functioning; it’s just giving measurements offset by a constant deviation of roughly 20 degrees.</p>
-<p>Is there some other failure mode that might produce the observed offset? Sure: Just bend the vane by 20 degrees. Maybe a catering truck or an airport jetway blundered into it. Another creative thought is that the sensor might have been installed wrong, with the entire unit rotated by 20 degrees. Several writers on a website called the <a href="https://www.pprune.org/tech-log/616624-maintenance-lapse-identified-initial-problem-leading-lion-air-crash.html">Professional Pilots Rumour Network</a> explored this possibility, but they ultimately concluded it was impossible. The manufacturer, doubtless aware of the risk, placed the mounting screws and locator pins asymmetrically, so the unit will only go into the hull opening one way.</p>
-<p>You might get the same effect through an assembly error during the manufacture of the sensor. The vane could be incorrectly attached to the shaft, or else the internal transducer that converts angular position into an electrical signal might be mounted wrong. Did the designers also ensure that such mistakes are impossible? I don’t know; I haven’t been able to find any drawings or photographs of the sensor’s innards.</p>
-<p>Looking for other ideas about what might have gone wrong, I made a quick, scattershot survey of <a href="https://www.faa.gov/regulations_policies/airworthiness_directives/">FAA airworthiness directives</a> that call for servicing or replacing AoA sensors. I found dozens of them, including several that discuss the same sensor installed on the 737 MAX (the <a href="https://utcaerospacesystems.com/wp-content/uploads/2018/04/Angle-of-Attack-AOA-Systems.pdf">Rosemount 0861</a>). But none of the reports I read describes a malfunction that could cause a consistent 20-degree error.</p>
-<p>For a while I thought that the fault might lie not in the sensor itself but farther along the data path. It could be something as simple as a bad cable or connector. Signals from the AoA sensor go to the Air Data and Inertial Reference Unit (ADIRU), where the sine and cosine components are combined and digitized to yield a number representing the measured angle of attack. The ADIRU also receives inputs from other sensors, including the pitot tubes for measuring airspeed and the static ports for air pressure. And it houses the gyroscopes and accelerometers of an inertial guidance system, which can keep track of aircraft motion without reference to external cues. (There’s a separate ADIRU for each side of the airplane.) Maybe there was a problem with the digitizer—a stuck bit rather than a stuck vane.</p>
-<p>Further information has undermined this idea. For one thing, the AoA sensor removed by the Lion Air maintenance crew on October 27 is now in the hands of investigators. According to <a href="https://www.nytimes.com/2019/04/04/world/asia/ethiopia-crash-boeing.html">news reports</a>, it was “deemed to be defective,” though I’ve heard no hint of what the defect might be. Also, it turns out that one element of the control system, the Stall Management and Yaw Damper (SMYD) computer, receives the raw sine and cosine voltages directly from the sensor, not a digitized angle calculated by the ADIRU. It is the SMYD that controls the stick-shaker function. On both the Lion Air and the Ethiopian flights the stick shaker was active almost continuously, so those undigitized sine and cosine voltages must have been indicating a high angle of attack. In other words the error already existed before the signals reached the ADIRU.</p>
-<p>I’m still stumped by the fixed angular offset in the Lion Air data, but the question now seems a little less important. The release of the preliminary report on Ethiopian Flight 302 shows that the left-side AoA sensor on that aircraft also failed badly, but in a way that looks totally different. Here are the relevant traces from the flight data recorder:</p>
-<p><img alt="Ethiopian 302 FDR AoA" border="0" class="centered withLoupe" height="175" src="http://bit-player.org/wp-content/uploads/2019/04/Ethiopian-302-FDR-AoA.png" width="900"/></p>
-<p>The readings from the AoA sensors are the uppermost lines, red for the left sensor and blue for the right. At the left edge of the graph they differ somewhat when the airplane has just begun to move, but they fall into close coincidence once the roll down the runway has built up some speed. At takeoff, however, they suddenly diverge dramtically, as the left vane begins reading an utterly implausible 75 degrees nose up. Later it comes down a few degrees but otherwise shows no sign of the ripples that would suggest a response to airflow. At the very end of the flight there are some more unexplained excursions.</p>
-<p>By the way, in this graph the light blue trace of automatic trim commands offers another clue to what might have happened in the last moments of Flight 302. Around the middle of the graph, the STAB TRIM switches were pulled, with the result that an automatic nose-down command had no effect on the stabilizer position. But at the far right, another automatic nose-down command does register in the trim-position trace, suggesting that the cutout switches may have been turned on again.</p>
-<h3>Still more stumpers</h3>
-<p>There’s so much I still don’t understand.</p>
-<p>Puzzle 1. If the Lion Air and Ethiopian accidents were both caused by faulty AoA sensors, then there were three parts with similar defects in brand new aircraft (including the replacement sensor installed by Lion Air on October 27). A recent news item says the replacement was not a new part but one that had been refurbished by a Florida shop called <a href="http://www.xtaero.com/">XTRA Aerospace</a>. This fact offers us somewhere else to point the accusatory finger, but presumably the two sensors installed by Boeing were not retreads, so XTRA can’t be blamed for all of them.</p>
-<p>There are roughly 400 MAX aircraft in service, with 800 AoA sensors. Is a failure rate of 3 out of 800 unusual or unacceptable? Does that judgment depend on whether or not it’s the same defect in all three cases?</p>
-<p>Puzzle 2. Let’s look again at the traces for pitch trim and angle of attack in the Lion Air 610 data. The conflicting manual and automatic commands in the second half of the flight have gotten lots of attention, but I’m also baffled by what was going on in the first few minutes.</p>
-<p><img alt="Lion Air 610 flight data chart  trim and AoA detail" border="0" class="centered" height="185" src="http://bit-player.org/wp-content/uploads/2019/04/Lion-Air-610-flight-data-chart-trim-and-AoA-detail.jpg" width="640"/></p>
-<p>During the roll down the runway, the pitch trim system was set near its maximum pitch-up position <em>(dark blue line)</em>. Immediately after takeoff, the automatic trim system began calling for further pitch-up movement, and the stabilizer probably reached its mechanical limit. At that point the pilots manually trimmed it in the pitch-down direction, and the automatic system replied with a rapid sequence of up adjustments. In other words, there was already a tug-of-war underway, but the pilots and the automated controls were pulling in directions opposite to those they would choose later on. All this happened while the flaps were still deployed, which means that MCAS could not have been active. Some other element of the control system must have been issuing those automatic pitch-up orders. Deepening the mystery, the left side AoA sensor was already feeding its spurious high readings to the left-side flight control computer. If the FCC was acting on that data, it should not have been commanding nose-up trim.</p>
-<p>Puzzle 3. The AoA readings are not the only peculiar data in the chart from the Lion Air preliminary report. Here are the altitude and speed traces:</p>
-<p><img alt="Lion Air 610 flight data chart alt and ias details" border="0" class="centered" height="198" src="http://bit-player.org/wp-content/uploads/2019/04/Lion-Air-610-flight-data-chart-alt-and-ias-details.jpg" width="640"/></p>
-<p>The left-side altitude readings <em>(red)</em> are low by at least a few hundred feet. The error looks like it might be multiplicative rather than additive, perhaps 10 percent. The left and right computed airspeeds also disagree, although the chart is too squished to allow a quantitative comparison. It was these discrepancies that initially upset the pilots of Flight 610; they could see them on their instruments. (They had no angle of attack indicators in the cockpit, so that conflict was invisible to them.)</p>
-<p>Altitude, airspeed, and angle of attack are all measured by different sensors. Could they all have gone haywire at the same time? Or is there some common point of failure that might explain all the weird behavior? In particular, is it possible a single wonky AoA sensor caused all of this havoc? My guess is yes. The sensors for altitude and airspeed and even temperature are influenced by angle of attack. The measured speed and pressure are therefore adjusted to compensate for this confounding variable, using the output of the AoA sensor. That output was wrong, and so the adjustments allowed one bad data stream to infect all of the air data measurements.</p>
-<h3>Man or machine</h3>
-<p>Six months ago, I was <a href="http://bit-player.org/2018/another-technological-tragedy">writing</a> about another disaster caused by an out-of-control control system. In that case the trouble spot was a natural gas distribution network in Massa­chusetts, where a misconfigured pressure-regulating station caused fires and explosions in more than 100 buildings, with one fatality and 20 serious injuries. I lamented: “The special pathos of technological tragedies is that the engines of our destruction are machines that we ourselves design and build.”</p>
-<p>In a world where defective automatic controls are blowing up houses and dropping aircraft out of the sky, it’s hard to argue for <em>more</em> automation, for adding further layers of complexity to control systems, for endowing machines with greater autonomy. Public sentiment leans the other way. Like President Trump, most of us trust pilots more than we trust computer scientists. We don’t want MCAS on the flight deck. We want Chesley Sullenberger III, the hero of USAir Flight 1549, who guided his crippled A320 to a dead-stick landing in the Hudson River and saved all 155 souls on board. No amount of cockpit automation could have pulled off that feat.</p>
-<p>Nevertheless, a cold, analytical view of the statistics suggests a different reaction. The human touch doesn’t always save the day. On the contrary, pilot error is responsible for more fatal crashes than any other cause. One <a href="https://ageconsearch.umn.edu/record/207282/files/2010_164_Why_Airplanes_Crash.pdf">survey</a> lists pilot error as the initiating event in 40 percent of fatal accidents, with equipment failure accounting for 23 percent. No one is (yet) advocating a <a href="https://www.theatlantic.com/technology/archive/2016/03/has-the-self-flying-plane-arrived/472005/">pilotless cockpit</a>, but at this point in the history of aviation technology that’s a nearer prospect than a computer-free cockpit.</p>
-<p>The MCAS system of the 737 MAX represents a particularly awkward compromise between fully manual and fully automatic control. The software is given a large measure of responsibility for flight safety and is even allowed the override the decisions of the pilot. And yet when the system malfunctions, it’s entirely up to the pilot to figure out what went wrong and how to fix it—and the fix had better be quick, before MCAS can drive the plane into the ground.</p>
-<p>Two lost aircraft and 346 deaths are strong evidence that this design was not a good idea. But what to do about it? <a href="https://www.boeing.com/commercial/737max/737-max-software-updates.page">Boeing’s plan</a> is a retreat from automatic control, returning more responsibility and authority to the pilots: </p>
-<blockquote><ul>
-<li>Flight control system will now compare inputs from both AOA sensors. If the sensors disagree by 5.5 degrees or more with the flaps retracted, MCAS will not activate. An indicator on the flight deck display will alert the pilots.</li>
-<li>If MCAS is activated in non-normal conditions, it will only provide one input for each elevated AOA event. There are no known or envisioned failure conditions where MCAS will provide multiple inputs.</li>
-<li>MCAS can never command more stabilizer input than can be counter­acted by the flight crew pulling back on the column. The pilots will continue to always have the ability to override MCAS and manually control the airplane.</li>
-</ul>
-</blockquote>
-<p>A <a href="https://www.boeing.com/commercial/737max/737-max-update.page">statement</a> from Dennis Muilenburg, Boeing’s CEO, says the software update “will ensure accidents like that of Lion Air Flight 610 and Ethiopian Airlines Flight 302 never happen again.” I hope that’s true, but what about the accidents that MCAS was designed to prevent? I also hope we will not be reading about a 737 MAX that stalled and crashed because the pilots, believing MCAS was misbehaving, kept hauling back on the control yokes.</p>
-<p>If Boeing were to take the opposite approach—not curtailing MCAS but enhancing it with still more algorithms that fiddle with the flight controls—the plan would be greeted with hoots of outrage and derision. Indeed, it seems like a terrible idea. MCAS was installed to prevent pilots from wandering into hazardous territory. A new supervisory system would keep an eye on MCAS, stepping in if it began acting suspiciously. Wouldn’t we then need another custodian to guard the custodians, ad infinitum? Moreoever, with each extra layer of complexity we get new side effects and unintended consequences and opportunities for something to break. The system becomes harder to test, and impossible to prove correct.</p>
-<p>Those are serious objections, but the problem being addressed is also serious.</p>
-<p>Suppose the 737 MAX didn’t have MCAS but did have a cockpit indicator of angle of attack. On the Lion Air flight, the captain would have felt the stick-shaker warning him of an incipient stall and would have seen an alarmingly high angle of attack on his instrument panel. His training would have impelled him to do the same thing MCAS did: Push the nose down to get the wings working again. Would he have continued pushing it down until the plane crashed? Surely not. He would have looked out the window, he would have cross-checked the instruments on the other side of the cockpit, and after some scary moments he would have realized it was a false alarm. (In darkness or low visibility, where the pilot can lose track of the horizon, the outcome might be worse.)</p>
-<p>I see two lessons in this hypothetical exercise. First, erroneous sensor data is dangerous, whether the airplane is being flown by a computer or by Chesley Sullenberger. A prudently designed instrument and control system would take steps to detect (and ideally correct) such errors. At the moment, redundancy is the only defense against these failures—and in the unpatched version of MCAS even that protection is compromised. It’s not enough. One key to the superiority of human pilots is that they exercise judgment and sometimes skepticism about what the instruments tell them. That kind of reasoning is not beyond the reach of automated systems. There’s plenty of information to be exploited. For example, inconsistencies between AoA sensors, pitot tubes, static pressure ports, and air temperature probes not only signal that something’s wrong but can offer clues about <em>which</em> sensor has failed. The inertial reference unit provides an independent check on aircraft attitude; even GPS signals might be brought to bear. Admittedly, making sense of all this data and drawing a valid conclusion from it—a problem known as sensor fusion—is a major challenge.</p>
-<p>Second, a closed-loop controller has yet another source of information: an implicit model of the system being controlled. If you change the angle of the horizontal stabilizer, the state of the airplane is expected to change in known ways—in angle of attack, pitch angle, airspeed, altitude, and in the rate of change in all these parameters. If the result of the control action is not consistent with the model, something’s not right. To persist in issuing the same commands when they don’t produce the expected results is not reasonable behavior. Autopilots include rules to deal with such situations; the lower-level control laws that run in manual-mode flight could incorporate such sanity checks as well.</p>
-<p>I don’t claim the answer to the MCAS problem. And I don’t want to fly in an airplane I designed. (Neither do you.) But there’s a general principle here that I believe should be taken to heart: If an autonomous system makes life-or-death decisions based on sensor data, it ought to verify the validity of the data.</p></div>
-    </content>
-    <updated>2019-04-08T21:34:51Z</updated>
-    <published>2019-04-08T21:34:51Z</published>
-    <category scheme="http://bit-player.org" term="computing"/>
-    <category scheme="http://bit-player.org" term="technology"/>
+    <updated>2019-04-08T23:07:16Z</updated>
+    <published>2019-04-08T23:07:16Z</published>
+    <category term="school"/>
     <author>
-      <name>Brian Hayes</name>
-      <uri>http://bit-player.org</uri>
+      <name>shacharlovett</name>
     </author>
     <source>
-      <id>http://bit-player.org/feed/atom</id>
-      <link href="http://bit-player.org" rel="alternate" type="text/html"/>
-      <link href="http://bit-player.org/feed/atom" rel="self" type="application/atom+xml"/>
-      <subtitle xml:lang="en-US">An amateur's outlook on computation and mathematics</subtitle>
-      <title xml:lang="en-US">bit-player</title>
-      <updated>2019-04-08T21:57:56Z</updated>
+      <id>https://cstheory-events.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://cstheory-events.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://cstheory-events.org" rel="alternate" type="text/html"/>
+      <link href="https://cstheory-events.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
+      <title>CS Theory Events</title>
+      <updated>2019-04-08T23:45:59Z</updated>
     </source>
   </entry>
 
@@ -341,7 +149,7 @@ n,n^2\}}{\varepsilon^2})$ for applications in which the coefficients are known
 to be log-concave (e.g.\ for connected subgraphs of a given graph).
 </p></div>
     </summary>
-    <updated>2019-04-08T01:21:26Z</updated>
+    <updated>2019-04-08T23:21:33Z</updated>
     <author>
       <name/>
     </author>
@@ -370,7 +178,7 @@ unknot of treewidth 2 can always be reduced to the trivial diagram with at most
 $n$ (un)twist and (un)poke Reidemeister moves.
 </p></div>
     </summary>
-    <updated>2019-04-08T01:22:40Z</updated>
+    <updated>2019-04-08T23:22:46Z</updated>
     <author>
       <name/>
     </author>
@@ -407,7 +215,7 @@ theoretical guarantees. However, the constant factors in the running times turn
 out to be rather large for the algorithms to be fully useful in practice.
 </p></div>
     </summary>
-    <updated>2019-04-08T01:42:41Z</updated>
+    <updated>2019-04-08T23:43:13Z</updated>
     <author>
       <name/>
     </author>
@@ -437,7 +245,7 @@ mixed-integer linear programming approach of N\"ollenburg and Wolff (2011) that
 can draw k-linear metro maps.
 </p></div>
     </summary>
-    <updated>2019-04-08T01:41:38Z</updated>
+    <updated>2019-04-08T23:42:09Z</updated>
     <author>
       <name/>
     </author>
@@ -462,7 +270,7 @@ for the limited capacity many-to-many matching between S and T which improves
 the previous quadratic algorithm.
 </p></div>
     </summary>
-    <updated>2019-04-08T01:42:25Z</updated>
+    <updated>2019-04-08T23:42:56Z</updated>
     <author>
       <name/>
     </author>
@@ -491,7 +299,7 @@ This also implies that Resolution is not automatizable in subexponential time
 or quasi-polynomial time unless NP is included in SUBEXP or QP, respectively.
 </p></div>
     </summary>
-    <updated>2019-04-08T01:20:45Z</updated>
+    <updated>2019-04-08T23:20:49Z</updated>
     <author>
       <name/>
     </author>
@@ -536,7 +344,7 @@ a faster algorithm for TMC. That is, one does not need to design a similar
 theorem specifically for TMC.
 </p></div>
     </summary>
-    <updated>2019-04-08T01:30:53Z</updated>
+    <updated>2019-04-08T23:31:03Z</updated>
     <author>
       <name/>
     </author>
@@ -583,7 +391,7 @@ least $1 - O(\exp(-\Omega(\epsilon^2 p))$. We further extend the guarantees of
 our randomized algorithm to consider larger backlogs.
 </p></div>
     </summary>
-    <updated>2019-04-08T01:39:10Z</updated>
+    <updated>2019-04-08T23:39:44Z</updated>
     <author>
       <name/>
     </author>
@@ -615,7 +423,7 @@ show that these extensions also admit a constant approximation ratio on the
 minimum number of turns, and on the number of crossings in most cases.
 </p></div>
     </summary>
-    <updated>2019-04-08T01:22:05Z</updated>
+    <updated>2019-04-08T23:22:12Z</updated>
     <author>
       <name/>
     </author>
@@ -651,7 +459,7 @@ well-known, we believe this to be their first formalization and a needed step
 towards provably-safe implementations of big data.
 </p></div>
     </summary>
-    <updated>2019-04-08T01:22:21Z</updated>
+    <updated>2019-04-08T23:22:28Z</updated>
     <author>
       <name/>
     </author>
@@ -694,7 +502,7 @@ Sahu and Reif. Surprisingly, our error-resilient systems use the same number of
 tile types as the error-prone system from which they are constructed.
 </p></div>
     </summary>
-    <updated>2019-04-08T01:41:27Z</updated>
+    <updated>2019-04-08T23:41:58Z</updated>
     <author>
       <name/>
     </author>
@@ -775,296 +583,7 @@ tile types as the error-prone system from which they are constructed.
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-04-08T22:21:19Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1904.02502</id>
-    <link href="http://arxiv.org/abs/1904.02502" rel="alternate" type="text/html"/>
-    <title>Sharing a pizza: bisecting masses with two cuts</title>
-    <feedworld_mtime>1554595200</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Barba:Luis.html">Luis Barba</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Pilz:Alexander.html">Alexander Pilz</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Schnider:Patrick.html">Patrick Schnider</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.02502">PDF</a><br/><b>Abstract: </b>Assume you have a pizza consisting of four ingredients (e.g., bread,
-tomatoes, cheese and olives) that you want to share with your friend. You want
-to do this fairly, meaning that you and your friend should get the same amount
-of each ingredient. How many times do you need to cut the pizza so that this is
-possible? We will show that two straight cuts always suffice. More formally, we
-will show the following extension of the well-known Ham-sandwich theorem: Given
-four mass distributions in the plane, they can be simultaneously bisected with
-two lines. That is, there exist two oriented lines with the following property:
-let $R^+_1$ be the region of the plane that lies to the positive side of both
-lines and let $R^+_2$ be the region of the plane that lies to the negative side
-of both lines. Then $R^+=R^+_1\cup R^+_2$ contains exactly half of each mass
-distribution.
-</p></div>
-    </summary>
-    <updated>2019-04-07T23:24:59Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Computational Geometry"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.CG" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Computational Geometry (cs.CG) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.CG updates on arXiv.org</title>
-      <updated>2019-04-05T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1904.02425</id>
-    <link href="http://arxiv.org/abs/1904.02425" rel="alternate" type="text/html"/>
-    <title>Quasi-polynomial Algorithms for List-coloring of Nearly Intersecting Hypergraphs</title>
-    <feedworld_mtime>1554595200</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Khaled Elbassioni <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.02425">PDF</a><br/><b>Abstract: </b>A hypergraph $\mathcal{H}$ on $n$ vertices and $m$ edges is said to be {\it
-nearly-intersecting} if every edge of $\mathcal{H}$ intersects all but at most
-polylogarthmically many (in $m$ and $n$) other edges. Given lists of colors
-$\mathcal{L}(v)$, for each vertex $v\in V$, $\mathcal{H}$ is said to be
-$\mathcal{L}$-(list) colorable, if each vertex can be assigned a color from its
-list such that no edge in $\mathcal{H}$ is monochromatic. We show that
-list-colorability for any nearly intersecting hypergraph, and lists drawn from
-a set of constant size, can be checked in quasi-polynomial time in $m$ and $n$.
-</p></div>
-    </summary>
-    <updated>2019-04-07T00:00:00Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2019-04-05T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1904.02404</id>
-    <link href="http://arxiv.org/abs/1904.02404" rel="alternate" type="text/html"/>
-    <title>Embeddings of $k$-complexes into $2k$-manifolds</title>
-    <feedworld_mtime>1554595200</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Pat=aacute=k:Pavel.html">Pavel Paták</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/t/Tancer:Martin.html">Martin Tancer</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.02404">PDF</a><br/><b>Abstract: </b>If $K$ is a simplicial $k$-complex, the standard van Kampen obstructions
-tells you whether $K$ can be embedded into $\mathbb R^{2k}$ or not (provided
-$k\neq 2$). We describe how the obstruction changes if we replace $\mathbb
-R^{2k}$ by a closed PL $2k$-manifold satisfying a certain technical condition:
-</p>
-<p>We require that every map $f\colon |K| \to M$ is homotopic to a map $f'\colon
-|K| \to M$ such that $f'(|K^{(k-1)}|)$ fits into some $2k$-ball in $M$, where
-$K^{(k-1)}$ stands for the $(k-1)$-skeleton of $K$. The technical condition is
-satisfied, in particular, either if $M$ is $(k-1)$-connected or if $K$ is the
-$k$-skeleton of $n$-simplex, $\Delta_n^{(k)}$, for some $n$. Under the
-technical condition, if $K$ embeds in $M$, then our obstruction vanishes. In
-addition, if $M$ is $(k-1)$-connected and $k \geq 3$, then the obstruction is
-complete, that is, we get the reverse implication.
-</p>
-<p>If $M = S^{2k}$ (or $\mathbb R^{2k}$) then the intersection form on $M$
-vanishes and our obstruction coincides with the standard van Kampen
-obstruction. However, if the intersection form is nontrivial, then our
-obstruction is not linear (a cohomology class) but rather `quadratic' in a
-sense that it vanishes if and only if a certain system of quadratic equations
-over integers is solvable. It remains to be determined whether these systems
-can be solved algorithmically.
-</p>
-<p>Finally, the $\mathbb Z_2$-reduction of the obstruction shows how to obtain a
-non-trivial upper bound for the K\"{u}hnel problem: determine the smallest $n$
-so that $\Delta_n^{(k)}$ does not embed into $M$. Also, the $\mathbb
-Z_2$-reduction is computable and, if $M$ is $(k-1)$-connected, it determines
-whether there is a map $f\colon |K| \to M$ which has an even number of
-crossings of $f(\sigma)$ and $f(\tau)$ for each pair $(\sigma, \tau)$ of
-disjoint $k$-simplices of $K$.
-</p></div>
-    </summary>
-    <updated>2019-04-07T23:24:46Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Computational Geometry"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.CG" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Computational Geometry (cs.CG) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.CG updates on arXiv.org</title>
-      <updated>2019-04-05T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1904.02362</id>
-    <link href="http://arxiv.org/abs/1904.02362" rel="alternate" type="text/html"/>
-    <title>Complexity of Counting Weighted Eulerian Orientations with ARS</title>
-    <feedworld_mtime>1554595200</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Cai:Jin=Yi.html">Jin-Yi Cai</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/f/Fu:Zhiguo.html">Zhiguo Fu</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Shao:Shuai.html">Shuai Shao</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.02362">PDF</a><br/><b>Abstract: </b>Unique prime factorization of integers is taught in every high school. We
-define and explore a notion of unique prime factorization for constraint
-functions, and use this as a new tool to prove a complexity classification for
-counting weighted Eulerian orientation problems with arrow reversal symmetry
-(ARS). We establish a novel connection between counting constraint satisfaction
-problems and counting weighted Eulerian orientation problems that is global in
-nature, and is based on the determination of half-weighted affine linear
-subspaces.
-</p></div>
-    </summary>
-    <updated>2019-04-07T23:20:46Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Computational Complexity"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.CC" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Computational Complexity (cs.CC) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.CC updates on arXiv.org</title>
-      <updated>2019-04-05T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1904.02348</id>
-    <link href="http://arxiv.org/abs/1904.02348" rel="alternate" type="text/html"/>
-    <title>Orthogonal Voronoi Diagram and Treemap</title>
-    <feedworld_mtime>1554595200</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/w/Wang:Yan=Chao.html">Yan-Chao Wang</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Lin:Feng.html">Feng Lin</a>, Hock-Soon Seah <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.02348">PDF</a><br/><b>Abstract: </b>In this paper, we propose a novel space partitioning strategy for implicit
-hierarchy visualization such that the new plot not only has a tidy layout
-similar to the treemap, but also is flexible to data changes similar to the
-Voronoi treemap. To achieve this, we define a new distance function and
-neighborhood relationship between sites so that space will be divided by
-axis-aligned segments. Then a sweepline+skyline based heuristic algorithm is
-proposed to allocate the partitioned spaces to form an orthogonal Voronoi
-diagram with orthogonal rectangles. To the best of our knowledge, it is the
-first time to use a sweepline-based strategy for the Voronoi treemap. Moreover,
-we design a novel strategy to initialize the diagram status and modify the
-status update procedure so that the generation of our plot is more effective
-and efficient. We show that the proposed algorithm has an O(nlog(n)) complexity
-which is the same as the state-of-the-art Voronoi treemap. To this end, we show
-via experiments on the artificial dataset and real-world dataset the
-performance of our algorithm in terms of computation time, converge rate, and
-aspect ratio. Finally, we discuss the pros and cons of our method and make a
-conclusion.
-</p></div>
-    </summary>
-    <updated>2019-04-07T23:23:42Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2019-04-05T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1904.02276</id>
-    <link href="http://arxiv.org/abs/1904.02276" rel="alternate" type="text/html"/>
-    <title>Sublinear quantum algorithms for training linear and kernel-based classifiers</title>
-    <feedworld_mtime>1554595200</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Li:Tongyang.html">Tongyang Li</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Chakrabarti:Shouvanik.html">Shouvanik Chakrabarti</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/w/Wu:Xiaodi.html">Xiaodi Wu</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.02276">PDF</a><br/><b>Abstract: </b>We investigate quantum algorithms for classification, a fundamental problem
-in machine learning, with provable guarantees. Given $n$ $d$-dimensional data
-points, the state-of-the-art (and optimal) classical algorithm for training
-classifiers with constant margin runs in $\tilde{O}(n+d)$ time. We design
-sublinear quantum algorithms for the same task running in $\tilde{O}(\sqrt{n}
-+\sqrt{d})$ time, a quadratic improvement in both $n$ and $d$. Moreover, our
-algorithms use the standard quantization of the classical input and generate
-the same classical output, suggesting minimal overheads when used as
-subroutines for end-to-end applications. We also demonstrate a tight lower
-bound (up to poly-log factors) and discuss the possibility of implementation on
-near-term quantum machines. As a side result, we also give sublinear quantum
-algorithms for approximating the equilibria of $n$-dimensional matrix zero-sum
-games with optimal complexity $\tilde{\Theta}(\sqrt{n})$.
-</p></div>
-    </summary>
-    <updated>2019-04-07T23:23:15Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2019-04-05T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1904.02231</id>
-    <link href="http://arxiv.org/abs/1904.02231" rel="alternate" type="text/html"/>
-    <title>Monte Carlo algorithms are very effective in finding the largest independent set in sparse random graphs</title>
-    <feedworld_mtime>1554595200</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Angelini:Maria_Chiara.html">Maria Chiara Angelini</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/r/Ricci=Tersenghi:Federico.html">Federico Ricci-Tersenghi</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.02231">PDF</a><br/><b>Abstract: </b>The effectiveness of stochastic algorithms based on Monte Carlo dynamics in
-solving hard optimization problems is mostly unknown. Beyond the basic
-statement that at a dynamical phase transition the ergodicity breaks and a
-Monte Carlo dynamics cannot sample correctly the probability distribution in
-times linear in the system size, there are almost no predictions nor intuitions
-on the behavior of this class of stochastic dynamics. The situation is
-particularly intricate because, when using a Monte Carlo based algorithm as an
-optimization algorithm, one is usually interested in the out of equilibrium
-behavior which is very hard to analyse. Here we focus on the use of Parallel
-Tempering in the search for the largest independent set in a sparse random
-graph, showing that it can find solutions well beyond the dynamical threshold.
-Comparison with state-of-the-art message passing algorithms reveals that
-parallel tempering is definitely the algorithm performing best, although a
-theory explaining its behavior is still lacking.
-</p></div>
-    </summary>
-    <updated>2019-04-07T00:00:00Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2019-04-05T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1904.02204</id>
-    <link href="http://arxiv.org/abs/1904.02204" rel="alternate" type="text/html"/>
-    <title>Linearly Converging Quasi Branch and Bound Algorithms for Global Rigid Registration</title>
-    <feedworld_mtime>1554595200</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Dym:Nadav.html">Nadav Dym</a>, Shahar Ziv Kovalsky <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.02204">PDF</a><br/><b>Abstract: </b>In recent years, several branch-and-bound (BnB) algorithms have been proposed
-to globally optimize rigid registration problems. In this paper, we suggest a
-general framework to improve upon the BnB approach, which we name Quasi BnB.
-Quasi BnB replaces the linear lower bounds used in BnB algorithms with
-quadratic quasi-lower bounds which are based on the quadratic behavior of the
-energy in the vicinity of the global minimum. While quasi-lower bounds are not
-truly lower bounds, the Quasi-BnB algorithm is globally optimal. In fact we
-prove that it exhibits linear convergence -- it achieves $\epsilon$-accuracy in
-$~O(\log(1/\epsilon)) $ time while the time complexity of other rigid
-registration BnB algorithms is polynomial in $1/\epsilon $. Our experiments
-verify that Quasi-BnB is significantly more efficient than state-of-the-art BnB
-algorithms, especially for problems where high accuracy is desired.
-</p></div>
-    </summary>
-    <updated>2019-04-07T23:25:31Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Computational Geometry"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.CG" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Computational Geometry (cs.CG) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.CG updates on arXiv.org</title>
-      <updated>2019-04-05T01:30:00Z</updated>
+      <updated>2019-04-08T23:45:19Z</updated>
     </source>
   </entry>
 
@@ -1122,7 +641,7 @@ algorithms, especially for problems where high accuracy is desired.
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-04-08T22:20:53Z</updated>
+      <updated>2019-04-08T23:44:40Z</updated>
     </source>
   </entry>
 
@@ -1153,7 +672,7 @@ algorithms, especially for problems where high accuracy is desired.
       <link href="https://ptreview.sublinear.info" rel="alternate" type="text/html"/>
       <subtitle>The latest in property testing and sublinear time algorithms</subtitle>
       <title>Property Testing Review</title>
-      <updated>2019-04-07T23:27:29Z</updated>
+      <updated>2019-04-08T23:46:17Z</updated>
     </source>
   </entry>
 
@@ -1187,7 +706,7 @@ algorithms, especially for problems where high accuracy is desired.
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-04-08T22:21:19Z</updated>
+      <updated>2019-04-08T23:45:18Z</updated>
     </source>
   </entry>
 
@@ -1355,7 +874,7 @@ Submissions will be evaluated based on the following criteria:
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-04-08T22:20:53Z</updated>
+      <updated>2019-04-08T23:44:40Z</updated>
     </source>
   </entry>
 
@@ -1522,42 +1041,7 @@ We congratulate Avi once more. The same Polish interview notes at the end that t
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-04-08T22:20:56Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-27705661.post-1237807013127291431</id>
-    <link href="http://processalgebra.blogspot.com/feeds/1237807013127291431/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="http://www.blogger.com/comment.g?blogID=27705661&amp;postID=1237807013127291431" rel="replies" type="text/html"/>
-    <link href="http://www.blogger.com/feeds/27705661/posts/default/1237807013127291431" rel="edit" type="application/atom+xml"/>
-    <link href="http://www.blogger.com/feeds/27705661/posts/default/1237807013127291431" rel="self" type="application/atom+xml"/>
-    <link href="http://processalgebra.blogspot.com/2019/04/guarded-recursion-and-unique-fixed.html" rel="alternate" type="text/html"/>
-    <title>Guarded recursion and unique fixed points: A pill of wisdom from a recent ICE-TCS seminar</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Last Tuesday, <a href="https://www8.cs.fau.de/sergey">Sergey Goncharov</a> (FAU Erlangen-Nürnberg, Germany) delivered an <a href="http://www.icetcs.ru.is/" target="_blank">ICE-TCS</a> seminar entitled <i>Guarded traced categories for recursion and iteration</i>. In his talk, Sergey presented recent results, based on  joint work (in progress) with <a href="http://www8.informatik.uni-erlangen.de/schroeder/" target="_blank">Lutz Schröder </a>and <a href="https://www.cs.bham.ac.uk/~pbl/" target="_blank">Paul Blain Levy</a>, on axiomatizing the theory of guarded  fixed points with applications to process algebra in monad-based form, where  the notion of guardedness originated.  <br/><br/>In the classic theory of process calculi without internal actions, an equation<br/><br/><div style="text-align: center;"><i>X = P(X) </i></div><br/>is <i>guarded</i> if each occurrence of the variable <i>X </i>in the expression <i>P(X) </i>occurs within the scope of some prefixing operator. A classic result in the theory of, for instance, Milner's <a href="https://en.wikipedia.org/wiki/Calculus_of_communicating_systems" target="_blank">Calculus of Communicating Systems</a> is that guarded equations have unique solutions modulo <a href="https://en.wikipedia.org/wiki/Bisimilarity">bisimilarity.</a> For instance, the equation<br/><br/><div style="text-align: center;"><i>X = a.X </i></div><br/>denotes the process <i>rec X. a.X</i> that executes action <i>a</i> indefinitely. If one interprets the above equation over the complete lattice of all languages of finite words over some alphabet, then its only solution is the empty language.<br/><br/>I freely admit that I was under the impression that guarded equations always had unique solutions, but I was wrong. There was a point in the talk at which Sergey showed that the above equation has more than one solution over other domains. Consider, for instance, the set of languages of infinite words over the singleton alphabet <i>{a}</i>. There are only two such languages, namely the empty language and <i>{a<sup>ω</sup>}</i>, and both are solutions to the above equation. (This is not surprising, since a-prefixing is just the identity function over this family of languages.) The same holds true when we interpret that equation over the set of all languages of finite and infinite words over some alphabet.<br/><br/>This is probably not news to many, but I have learnt a lesson from attending the talk myself: Guardedness does <i>not </i>imply uniqueness of solutions. <br/><br/>To the young researchers of all ages out there: Go to talks and keep an open mind. You will learn a few bits of information that you might need in your future research projects or you might clarify some misconceptions you might have had, like I did last Tuesday.</div>
-    </content>
-    <updated>2019-04-04T12:40:00Z</updated>
-    <published>2019-04-04T12:40:00Z</published>
-    <author>
-      <name>Luca Aceto</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/01092671728833265127</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-27705661</id>
-      <author>
-        <name>Luca Aceto</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/01092671728833265127</uri>
-      </author>
-      <link href="http://processalgebra.blogspot.com/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="http://www.blogger.com/feeds/27705661/posts/default" rel="self" type="application/atom+xml"/>
-      <link href="http://processalgebra.blogspot.com/" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="http://www.blogger.com/feeds/27705661/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>Papers I find interesting---mostly, but not solely, in Process Algebra---, and some fun stuff in Mathematics and Computer Science at large and on general issues related to research, teaching and academic life.</subtitle>
-      <title>Process Algebra Diary</title>
-      <updated>2019-04-05T08:30:57Z</updated>
+      <updated>2019-04-08T23:44:42Z</updated>
     </source>
   </entry>
 
@@ -1734,7 +1218,7 @@ Here's hoping someone finds an elegant proof...</div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-04-08T22:21:19Z</updated>
+      <updated>2019-04-08T23:45:18Z</updated>
     </source>
   </entry>
 
@@ -1767,7 +1251,7 @@ d) New characterizations of Hunion and two variants in terms of coNP-completenes
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-08T22:20:44Z</updated>
+      <updated>2019-04-08T23:43:54Z</updated>
     </source>
   </entry>
 
@@ -1802,7 +1286,7 @@ d) New characterizations of Hunion and two variants in terms of coNP-completenes
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-04-08T22:20:09Z</updated>
+      <updated>2019-04-08T23:20:11Z</updated>
     </source>
   </entry>
 
@@ -1834,7 +1318,7 @@ In this work we introduce a different analysis for Haitner's method, proving tha
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-08T22:20:44Z</updated>
+      <updated>2019-04-08T23:43:54Z</updated>
     </source>
   </entry>
 
@@ -1867,7 +1351,7 @@ where $n$ is the number of vertices of the hypergraph and $\delta&gt;0$ is a uni
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-08T22:20:44Z</updated>
+      <updated>2019-04-08T23:43:54Z</updated>
     </source>
   </entry>
 
@@ -1895,7 +1379,7 @@ We then outline an approach for proving improved lower bounds through a certain 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-08T22:20:44Z</updated>
+      <updated>2019-04-08T23:43:54Z</updated>
     </source>
   </entry>
 
@@ -1922,7 +1406,7 @@ Email: or@tum.de</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-04-08T22:20:58Z</updated>
+      <updated>2019-04-08T23:44:51Z</updated>
     </source>
   </entry>
 
@@ -1989,6 +1473,584 @@ After we get the technology working on Theorists and P vs NP we will try to expa
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
       <updated>2019-04-08T17:26:43Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>https://eccc.weizmann.ac.il/report/2019/046</id>
+    <link href="https://eccc.weizmann.ac.il/report/2019/046" rel="alternate" type="text/html"/>
+    <title>TR19-046 |  andom walks and forbidden minors II: A $\poly(d\eps^{-1})$-query tester for minor-closed properties of bounded degree graphs | 
+
+	Akash Kumar, 
+
+	C. Seshadhri, 
+
+	Andrew Stolman</title>
+    <summary>Let $G$ be a graph with $n$ vertices and maximum degree $d$. Fix some minor-closed property $\mathcal{P}$ (such as planarity).
+We say that $G$ is $\varepsilon$-far from $\mathcal{P}$ if one has to remove $\varepsilon dn$ edges to make it have $\mathcal{P}$.
+The problem of property testing $\mathcal{P}$ was introduced in the seminal work of Benjamini-Schramm-Shapira (STOC 2008)
+that gave a tester with query complexity triply exponential in $\varepsilon^{-1}$.
+Levi-Ron (TALG 2015) have given the best tester to date, with a quasipolynomial (in $\varepsilon^{-1}$) query complexity.
+It is an open problem to get property testers whose query complexity is $\poly(d\varepsilon^{-1})$,
+even for planarity.
+
+In this paper, we resolve this open question. For any minor-closed property,
+we give a tester with query complexity $d\cdot \poly(\varepsilon^{-1})$.
+The previous line of work on (independent of $n$, two-sided) testers is primarily combinatorial.
+Our work, on the other hand, employs techniques from spectral graph theory. This paper
+is a continuation of recent work of the authors (FOCS 2018) analyzing random walk algorithms
+that find forbidden minors.</summary>
+    <updated>2019-04-01T08:45:13Z</updated>
+    <published>2019-04-01T08:45:13Z</published>
+    <source>
+      <id>https://eccc.weizmann.ac.il/</id>
+      <author>
+        <name>ECCC papers</name>
+      </author>
+      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
+      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
+      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
+      <title>ECCC - Reports</title>
+      <updated>2019-04-08T23:43:54Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://cstheory-events.org/2019/04/01/the-sat-smt-ar-summer-school/</id>
+    <link href="https://cstheory-events.org/2019/04/01/the-sat-smt-ar-summer-school/" rel="alternate" type="text/html"/>
+    <title>The SAT/SMT/AR Summer School</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">July 3-6, 2019 Lisbon, Portugal https://reason.di.fc.ul.pt/ssa-school-2019/ Registration deadline: May 31, 2019 Satisfiability (SAT), Satisfiability Modulo Theories (SMT), and Automated Reasoning (AR) continue to make rapid advances and find novel uses in a wide variety of applications, both in computer science and beyond. The SAT/SMT/AR Summer School aims to bring a select group of students up … <a class="more-link" href="https://cstheory-events.org/2019/04/01/the-sat-smt-ar-summer-school/">Continue reading <span class="screen-reader-text">The SAT/SMT/AR Summer School</span></a></div>
+    </summary>
+    <updated>2019-04-01T08:39:38Z</updated>
+    <published>2019-04-01T08:39:38Z</published>
+    <category term="school"/>
+    <author>
+      <name>shacharlovett</name>
+    </author>
+    <source>
+      <id>https://cstheory-events.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://cstheory-events.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://cstheory-events.org" rel="alternate" type="text/html"/>
+      <link href="https://cstheory-events.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
+      <title>CS Theory Events</title>
+      <updated>2019-04-08T23:45:59Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://rjlipton.wordpress.com/?p=15715</id>
+    <link href="https://rjlipton.wordpress.com/2019/04/01/the-breakthrough-result-of-2019/" rel="alternate" type="text/html"/>
+    <title>The Breakthrough Result Of 2019</title>
+    <summary>Our nomination for best result of the year Cropped from source Faadosly Polir has had an incredible year of research success. A year ago we covered his research on universal information entropy in baseball. This led to uncredited co-authorship on a paper, which Quanta covered last week, about reversal of entropy in a previously-built 51-qubit […]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><font color="#0044cc"><br/>
+<em>Our nomination for best result of the year</em><br/>
+<font color="#000000"/></font></p><font color="#0044cc"><font color="#000000">
+<table class="image alignright">
+<tbody>
+<tr>
+<td>
+<a href="https://rjlipton.files.wordpress.com/2019/04/carnivalfool.png"><img alt="" class="alignright wp-image-15716" height="135" src="https://rjlipton.files.wordpress.com/2019/04/carnivalfool.png?w=123&amp;h=135" width="123"/></a>
+</td>
+</tr>
+<tr>
+<td class="caption alignright"><font size="-2">Cropped from <a href="https://pxhere.com/en/photo/1036632">source</a></font></td>
+</tr>
+</tbody>
+</table>
+<p>
+Faadosly Polir has had an incredible year of research success. A year ago we <a href="https://rjlipton.wordpress.com/2018/04/01/the-entropy-of-baseball/">covered</a> his research on universal information entropy in baseball. This led to uncredited co-authorship on a <a href="https://arxiv.org/abs/1812.05561">paper</a>, which <em>Quanta</em> <a href="https://www.quantamagazine.org/quantum-scarring-appears-to-defy-universes-push-for-disorder-20190320/">covered</a> last week, about reversal of entropy in a previously-built 51-qubit quantum <a href="https://www.nature.com/articles/nature24622">computer</a>. The paper focuses on quantum many-body scarring in a Bunimovich <a href="https://blogs.ams.org/visualinsight/2016/11/15/bunimovich-stadium/">stadium</a>, but Polir’s work on athletic body scarring in baseball stadiums was integral. </p>
+<p>
+Today we report on his exciting and topical new findings.<br/>
+<span id="more-15715"/></p>
+<p>
+Polir’s next project implemented a <a href="https://www.quora.com/How-do-random-events-of-quantum-physics-influence-the-information-content-of-the-universe">suggestion</a> by the complexity theorist Vaughan Pratt on how to research the influence of random events on the information content of the universe:</p>
+<blockquote><p><b> </b> <em> Picture inserting a giant eggbeater into the deep state cloud servers and relocating all its bits at random. How would you recover important information like the net worth of Meghan Markle or President Trump’s tax returns? </em>
+</p></blockquote>
+<p/><p>
+Polir began the Cloud Beater Project using spare Amazon Web Services credits from Ken. The results so far are classified, but in addition to the above objectives there is a current push to infer from web traffic the full text of the impending <a href="https://en.wikipedia.org/wiki/Special_Counsel_investigation_(2017-2019)">report</a> by Robert Mueller. The string length has been <a href="https://www.nytimes.com/2019/03/28/us/politics/mueller-report-length.html">inferred</a>. Polir’s model algebraically represents the entire cloud as a finite automaton analogous to Alan Turing’s model of the Enigma machine during World War II. The inferencing process is similar and <a href="https://www.nhregister.com/technology/businessinsider/article/With-just-60-and-internet-access-researchers-13628061.php">cheap</a>. </p>
+<p>
+The newest work, however, will have the greatest social impact for the research community.</p>
+<p>
+</p><p/><h2> The Problem </h2><p/>
+<p/><p>
+The problem is one we all are familiar with: the impact of the Internet and computing technology resources on critical thinking and academic research <a href="https://www.weforum.org/agenda/2018/03/is-technology-hurting-productivity">productivity</a>. After extensive analysis-of-variance runs on Google Scholar data, Polir’s team isolated one key adverse factor:</p>
+<blockquote><p><b> </b> <em> <i>LaTeX forces one to compile and recompile multiple times</i>. </em>
+</p></blockquote>
+<p/><p>
+In retrospect the effect of this should have been suspected—after all, LaTeX is the one factor common to a major part of research across all scientific disciplines. Here are examples of relevant user <a href="https://tex.stackexchange.com/questions/107967/need-to-typeset-twice-for-correct-compile">comments</a>, some paraphrased:</p>
+<p>
+<img alt="{\bullet}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet}"/> You cannot avoid it. LaTeX has to build the .aux file to store the table of contents (ToC) and such, because when typesetting the ToC it cannot know beforehand what sections will occur. </p>
+<p>
+<img alt="{\bullet}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet}"/> Often not only two but three or more runs are necessary. Imagine a document with lots of figures and a list of figures somewhere at the first pages of the document. All pages are numbered using ascending Arabic numbers. First compilation run will typeset the document without any entry at the list of figures but collects the information at the .lof file (via .aux file). Second compilation run will typeset the list of figures with several pages and as a consequence of this the page numbers of all figures will change. So you need a third run to get the correct numbers at the list of figures.</p>
+<p>
+<img alt="{\bullet}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet}"/> To correctly line up the various parts of a longtable, “In the typical case the algorithm will converge after three or four passes” (manual, section 4).</p>
+<p>
+</p><p/><h2> The Magnitude </h2><p/>
+<p/><p>
+The result is the observation that there now are so many uses of LaTeX that any inefficiency in using it has great consequences. The bottom line of the first findings chapter in the report led by Polir is:</p>
+<blockquote><p><b> </b> <em> We found that over 100 million hours of productive time per year are lost to the multiple-pass issue in LaTeX. </em>
+</p></blockquote>
+<p/><p>
+There are now billions of LaTeX pages being worked on each year. See <a href="https://www.overleaf.com/blog/219-youve-created-three-million-projects-and-counting-dot-dot-dot">this</a> for some data. Thus at a conservative estimate of $100 dollars per hour this means that we are losing <i>over ten billion dollars per year</i>. </p>
+<p>
+</p><p/><h2> Ken’s Solution </h2><p/>
+<p/><p>
+Ken has a way of coping. He spends the time waiting for LaTeX documents to open and compile on his office PC in a productive way. He used to check fantasy baseball or football player news during these waits. But last year he acquired a Facebook friend (FBF) from the chess world who became the first—out of his several hundred FBFs—to post cat videos. Several times daily cat videos, all new. </p>
+<p>
+Ken had never seen a Facebook cat video before. So now he goes to the FBF’s page and clicks the next one while waiting for LaTeX to finish. This does, however, have less relevance to his statistical chess research than <a href="https://rjlipton.wordpress.com/2012/07/29/benfords-law-and-baseball/">fantasy</a> <a href="https://rjlipton.wordpress.com/2015/10/12/is-the-hot-hand-fallacy-a-fallacy/">sports</a> <a href="https://rjlipton.wordpress.com/2018/03/28/is-there-momentum-in-chess/">had</a>.</p>
+<p/><p/>
+<table style="margin: auto;">
+<tbody><tr>
+<td>
+<a href="https://rjlipton.files.wordpress.com/2019/04/videocat.png"><img alt="" class="aligncenter size-full wp-image-15717" src="https://rjlipton.files.wordpress.com/2019/04/videocat.png?w=600"/></a>
+</td>
+</tr>
+<tr>
+<td class="caption alignright"><font size="-2">The mother <a href="https://en.wikipedia.org/wiki/Recurring_Saturday_Night_Live_characters_and_sketches_introduced_1988%E2%80%931989#Toonces_The_Driving_Cat">lode</a>?</font>
+</td>
+</tr>
+</tbody></table>
+<p/><h2> Polir’s Solution </h2><p/>
+<p>
+Polir found a different solution that does not use cat videos—too bad for the cats. Polir first approached the most recently responsible party, who won the 2013 ACM Turing Award for solving the <em>broken deli number dispenser</em> problem. The prize-winning solution, as described in the <a href="https://amturing.acm.org/award_winners/lamport_1205376.cfm">citation</a>, is to have each customer choose a number higher than all the other customers’ numbers. But how to leverage this brilliant solution to solve the multi-pass problem?</p>
+<p>
+Polir’s insight came while consulting the original responsible party and author of the following computer <a href="https://www-cs-faculty.stanford.edu/~knuth/programs/sat13.w">code</a> for a SAT solver. While hearing the author explain how this code emerged from his Pascal-based <a href="https://en.wikipedia.org/wiki/WEB">WEB</a> and C-based <a href="https://en.wikipedia.org/wiki/CWEB">CWEB</a> programming environments, Polir realized this in a flash:</p>
+<blockquote><p><b> </b> <em> A LaTeX document is a <b>network</b>. </em>
+</p></blockquote>
+<p/><p>
+This led to the realization that the quick-compilation problems could be formulated as instances of <a href="https://en.wikipedia.org/wiki/Linear_network_coding">network coding</a> problems upon dividing the document into <img alt="{O(\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(\log n)}"/>-sized chunks. A helpful reader of this blog supplied the final needed piece last week in a <a href="https://rjlipton.wordpress.com/2019/03/29/integer-multiplication-in-nlogn-time/#comment-100107">comment</a>: via this new <a href="https://arxiv.org/abs/1902.10935">paper</a>, there is an efficient reduction from network coding to integer multiplication. The reduction is not a string mapping but rather “corporate” via direct analysis of solving circuits.</p>
+<p>
+Thus the solution came down to ideas in the brilliant new <a href="https://web.maths.unsw.edu.au/~davidharvey/papers/nlogn/">paper</a> on integer multiplication which we just <a href="https://rjlipton.wordpress.com/2019/03/29/integer-multiplication-in-nlogn-time/">posted</a> about. It means that we can solve the multi-pass problem essentially by multiplying pieces of the document together—or more exactly, <a href="https://en.wikipedia.org/wiki/Convolution#Discrete_convolution">convolving</a> them. We needn’t be concerned about our remarks on the algorithm in that paper being galactic—there is a clear proof of concept in that the paper’s second author is also the chief developer of the <a href="http://texmacs.org/tmweb/home/welcome.en.html">TeXmacs</a> composition environment. We thus nominate the paper plus Polir’s breakthrough consequence for result of the year.</p>
+<p>
+</p><p/><h2> Open Problems </h2><p/>
+<p/><p>
+Incidentally, that comment has tag number 100,107—which means we just passed the 100,000 milepost in whatever those tags signify. We actually have 18,694 comments over the history of the blog and have been intending to mark its passing 20K. This again gives us a “no-fooling” opportunity to thank our readers.</p>
+<p/></font></font></div>
+    </content>
+    <updated>2019-04-01T06:01:57Z</updated>
+    <published>2019-04-01T06:01:57Z</published>
+    <category term="All Posts"/>
+    <category term="Ideas"/>
+    <category term="Results"/>
+    <category term="April Fool"/>
+    <category term="breakthrough"/>
+    <category term="cat videos"/>
+    <category term="entropy"/>
+    <category term="Faadosly Polir"/>
+    <category term="information theory"/>
+    <category term="integer multiplication"/>
+    <category term="internet"/>
+    <category term="LaTeX"/>
+    <category term="multi-pass compiling"/>
+    <category term="network coding"/>
+    <category term="Robert Mueller"/>
+    <category term="TeX"/>
+    <category term="TeXmacs"/>
+    <category term="Vaughan Pratt"/>
+    <author>
+      <name>RJLipton+KWRegan</name>
+    </author>
+    <source>
+      <id>https://rjlipton.wordpress.com</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://rjlipton.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://rjlipton.wordpress.com" rel="alternate" type="text/html"/>
+      <link href="https://rjlipton.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>a personal view of the theory of computation</subtitle>
+      <title>Gödel’s Lost Letter and P=NP</title>
+      <updated>2019-04-08T23:44:42Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://cstheory-events.org/2019/03/31/summer-school-on-randomness-and-learning-in-non-linear-algebra/</id>
+    <link href="https://cstheory-events.org/2019/03/31/summer-school-on-randomness-and-learning-in-non-linear-algebra/" rel="alternate" type="text/html"/>
+    <title>Summer School on Randomness and Learning in Non-Linear Algebra</title>
+    <summary>July 1-4, 2019 Leipzig, Germany https://www.mis.mpg.de/calendar/conferences/2019/ranlearn2019.html This summer school aims at bringing together researchers working on probabilistic and statistical methods and questions in nonlinear algebra. Keynote speakers will be: Peter Bürgisser (Technische Universität Berlin) Daniel Erman (University of Wisconsin-Madison) Antonio Lerario (Scuola Internazionale Superiore di Studi Avanzati)</summary>
+    <updated>2019-03-31T20:03:04Z</updated>
+    <published>2019-03-31T20:03:04Z</published>
+    <category term="school"/>
+    <author>
+      <name>shacharlovett</name>
+    </author>
+    <source>
+      <id>https://cstheory-events.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://cstheory-events.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://cstheory-events.org" rel="alternate" type="text/html"/>
+      <link href="https://cstheory-events.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
+      <title>CS Theory Events</title>
+      <updated>2019-04-08T23:45:59Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://gilkalai.wordpress.com/?p=17274</id>
+    <link href="https://gilkalai.wordpress.com/2019/03/31/is-it-legitimate-ethical-for-google-to-close-google/" rel="alternate" type="text/html"/>
+    <title>Is it Legitimate/Ethical for Google to close Google+?</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Update April 2, 2019: the links below are not working anymore.  Google Plus is a nice social platform with tens of millions participants. I found it especially nice for scientific posts, e.g. by John Baez, Moshe Vardi, or about symplectic … <a href="https://gilkalai.wordpress.com/2019/03/31/is-it-legitimate-ethical-for-google-to-close-google/">Continue reading <span class="meta-nav">→</span></a></div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><a href="https://gilkalai.files.wordpress.com/2019/03/google.png"><img alt="" class="alignnone size-full wp-image-17276" src="https://gilkalai.files.wordpress.com/2019/03/google.png?w=640"/></a></p>
+<h3><span style="color: #ff6600;"><strong>Update April 2, 2019: the links below are not working anymore. </strong></span></h3>
+<p>Google Plus is a nice social platform with tens of millions participants. I found it especially nice for scientific posts, e.g. by <a href="https://plus.google.com/u/0/117663015413546257905">John Baez</a>, <a href="https://plus.google.com/u/0/104488217075635760621">Moshe Vardi</a>, or about <a href="https://plus.google.com/u/0/s/symplectic%20geometry/top">symplectic geometry, </a> about <a href="https://plus.google.com/u/0/s/majorana%20fermions/top">Majorana Fermions</a>, and with a discussion about <a href="https://plus.google.com/u/0/106808239073321070854/posts/cwzYpKXSACM">What is combinatorics</a>. A few months ago Google announced  that Google+ will be closed. This is going to happen today (March 31, 2019) in a few hours. For example, I am not even sure if the above valuable links will continue to operate. (Every individual user can get his own stuff.)</p>
+<p>For possible answers on why Google shut down Google Plus see this <a href="https://www.quora.com/Why-is-Google+-closed">Quora question</a>.</p>
+<p>My question is different. <span style="color: #0000ff;"><strong>Is it legitimate for Google to close Google+? Is it legitimate and is it ethical for Google to eliminate existing content from the public domain?</strong> </span></p>
+<h3>Let me state clearly my opinion:</h3>
+<h3 style="text-align: center;"><span style="color: #000080;"><strong>Google has strong ethical/moral obligation to maintain at least for several years public access to all Google+ existing material. </strong></span></h3>
+<p>The fact that huge content that millions of people spent time and effort creating and that people spent time and effort to search and find, is deleted — by a huge and successful company — is very problematic</p>
+<p> </p>
+<p>(Related post: <a href="https://gilkalai.wordpress.com/2008/06/06/what-do-firms-want/">What do firms want</a> .)</p></div>
+    </content>
+    <updated>2019-03-31T17:51:53Z</updated>
+    <published>2019-03-31T17:51:53Z</published>
+    <category term="Combinatorics"/>
+    <category term="Economics"/>
+    <category term="Open discussion"/>
+    <category term="Rationality"/>
+    <category term="Google plus"/>
+    <author>
+      <name>Gil Kalai</name>
+    </author>
+    <source>
+      <id>https://gilkalai.wordpress.com</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://gilkalai.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://gilkalai.wordpress.com" rel="alternate" type="text/html"/>
+      <link href="https://gilkalai.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>Gil Kalai's blog</subtitle>
+      <title>Combinatorics and more</title>
+      <updated>2019-04-08T23:44:38Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2019/03/31/linkage</id>
+    <link href="https://11011110.github.io/blog/2019/03/31/linkage.html" rel="alternate" type="text/html"/>
+    <title>Linkage</title>
+    <summary>A 3-regular matchstick graph of girth 5 consisting of 54 vertices, Mike Winkler, Peter Dinkelacker, and Stefan Vogel (). The previous smallest-known graph with these properties had 180 vertices, but this one might still not be optimal, as the known lower bound is only 30. I found it difficult to understand the connectivity of the graph from its matchstick representation so I made another drawing of the same graph in a different style:</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><ul>
+  <li>
+    <p><a href="https://arxiv.org/abs/1903.04304">A 3-regular matchstick graph of girth 5 consisting of 54 vertices</a>, Mike Winkler, Peter Dinkelacker, and Stefan Vogel (<a href="https://mathstodon.xyz/@11011110/101761530841835018"/>). The previous smallest-known graph with these properties had 180 vertices, but this one might still not be optimal, as the known lower bound is only 30. I found it difficult to understand the connectivity of the graph from <a href="https://commons.wikimedia.org/wiki/File:Winkler_3-reg_girth5_54.svg">its matchstick representation</a> so I made another drawing of the same graph in a different style:</p>
+
+    <p style="text-align: center;"><img alt="The 54-vertex 3-regular girth-5 matchstick graph of Winkler, Dinkelacker, and Vogel in Lombardi drawing style" src="https://11011110.github.io/blog/assets/2019/girth-5-matchstick.svg"/></p>
+  </li>
+  <li>
+    <p><a href="https://www.reddit.com/r/plexodus/comments/az285j/saving_of_public_google_content_at_the_internet/">Saving public Google+ content at the Internet Archive</a> (<a href="https://mathstodon.xyz/@11011110/101767934776473984"/>, <a href="https://news.ycombinator.com/item?id=19407865">via</a>). Archive.org and the <a href="https://www.archiveteam.org/">Archive Team</a> (a separate “loose collective of rogue archivists, programmers, writers and loudmouths dedicated to saving our digital heritage”) are undertaking an organized effort to capture it all before Google takes it down at the end of the month.</p>
+  </li>
+  <li>
+    <p><a href="https://mathstodon.xyz/@shonk/101807604452877379">Symmetric minimality</a>, Clayton Shonkwiler. An animation of a symmetric minimal-length grid realization of a trefoil knot, posted after I complained that <a href="https://mathstodon.xyz/@shonk/101768569662399661">his earlier animation</a> was too asymmetric, and suggested using the realization below (drawn using  <a href="http://vzome.com/home/">vZome</a>). Clayton also posted a <a href="https://mathstodon.xyz/@shonk/101819922406308000">bcc figure-8</a> and <a href="https://mathstodon.xyz/@shonk/101825678378019686">bcc </a>. Not every symmetric knot has a symmetric lattice realization (e.g. the  lattice knot doesn’t) but it may be an interesting question whether every lattice-realizable symmetry of a knot can be realized by a minimal lattice knot.</p>
+
+    <p style="text-align: center;"><img alt="Symmetric lattice trefoil knot drawn using vZome" src="https://11011110.github.io/blog/assets/2019/zomeknot.png"/></p>
+  </li>
+  <li>
+    <p><a href="https://en.wikipedia.org/wiki/Karen_Uhlenbeck">Karen Uhlenbeck</a> becomes <a href="http://www.abelprize.no/c73996/seksjon/vis.html?tid=74011&amp;strukt_tid=73996">the first woman to win the Abel Prize</a> (<a href="https://mathstodon.xyz/@JordiGH/101778053801507834"/>).</p>
+  </li>
+  <li>
+    <p><a href="http://corner.mimuw.edu.pl/?p=1073">The curse of the Euclidean metric</a> (<a href="https://mathstodon.xyz/@11011110/101785024820380513"/>). Krzysztof Fleszar posts about a big difficulty with algorithms for problems like Euclidean shortest paths where the answer is a sum of distances: we don’t know how to compare two solutions efficiently. Fortunately in the case of <a href="https://epubs.siam.org/doi/10.1137/1.9781611975482.67">Krzysztof’s SODA 2019 paper on approximate TSP of hyperplanes</a> (find a short tour that touches each given hyperplane) it’s possible to use approximate numerical comparisons.</p>
+  </li>
+  <li>
+    <p><a href="https://hal.archives-ouvertes.fr/hal-02070778/document">Integer multiplication in time </a> (<a href="https://mathstodon.xyz/@erou/101787744661719386"/>, <a href="https://rjlipton.wordpress.com/2019/03/29/integer-multiplication-in-nlogn-time/">see also</a>).</p>
+  </li>
+  <li>
+    <p><a href="https://www.latimes.com/entertainment/arts/la-ca-cm-inksap-linda-lack-20190314-story.html">An odd couple of Los Angeles street art</a> (<a href="https://mathstodon.xyz/@11011110/101794533654899105"/>): 20-something Inksap, a son of Vietnamese refugees, and 70-something dance teacher Linda Lack.</p>
+  </li>
+  <li>
+    <p><a href="https://archive.org/stream/BrainfillingCurves-AFractalBestiary/BrainFilling">Brain-filling curves: A fractal bestiary</a> (<a href="https://mathstodon.xyz/@11011110/101801960587162487"/>). A 200-page compendium by Jeffrey Ventrella of space-filling curves, generated by subdivision rules that expand line segments to lattice paths whose sum of squared edge lengths equals the square of the segment.</p>
+  </li>
+  <li>
+    <p><a href="http://www.graphics.rwth-aachen.de/software/zometool">Automatically translate any 3d model into a zometool approximation of it</a> (<a href="https://mathstodon.xyz/@11011110/101807397098535057"/>, <a href="http://www.zometool.com/news/amazing-app-zometool-shape-approximation/">via</a>). With obligatory Stanford bunny. See also their <a href="https://www.youtube.com/watch?v=piDPsHTLV1A">1-minute video introduction</a>.</p>
+  </li>
+  <li>
+    <p><a href="https://arstechnica.com/science/2019/03/physicists-are-decoding-math-y-secrets-of-knitting-to-make-bespoke-materials/">Physicists are decoding math-y secrets of knitting to make bespoke materials</a> (<a href="https://mathstodon.xyz/@11011110/101813393444829450"/>). Jennifer Ouelette writes on <em>Ars Technica</em> that by varying the stitching one can control both the stretchiness and shape of the resulting knit.</p>
+  </li>
+  <li>
+    <p><a href="https://mathml.igalia.com/news/2019/02/12/launch-of-the-project/">The MathML people are trying again</a> (<a href="https://mathstodon.xyz/@11011110/101820557668090856"/>, <a href="https://news.ycombinator.com/item?id=19344843">via</a>). Much as I think MathML has failed and that promotion by its proponents after its failure was already obvious directly caused the continued bad mathematics rendering on Wikipedia, I wish them well. A working web mathematics markup language (if it can be achieved) would be a step up from Javascripted LaTeX. Of course I’m not about to give up LaTeX in my source but that’s what markup processors are for.</p>
+  </li>
+  <li>
+    <p><a href="https://mathstodon.xyz/@ccppurcell/101822142519831628">Chris Purcell asks “who is the mathematician/scientist who has the most Wikipedia citations without having a Wikipedia page?”</a>. <a href="https://mathstodon.xyz/@11011110/101822690106826262">My guess</a> is Heidi Burgiel, co-author of frequently-cited book <em>The Symmetries of Things</em>.</p>
+  </li>
+  <li>
+    <p><a href="https://jmfork.github.io/2048/">Deterministic 2048</a> (<a href="https://mathstodon.xyz/@11011110/101830138376282978"/>). The next tile is always a 2 at the first available square. It should be possible to describe a strategy that applies to any  board and that provably achieves a score of  but apparently this is not known.</p>
+  </li>
+  <li>
+    <p><a href="https://adamsheffer.wordpress.com/2019/03/11/incidences-open-problem-part-1/">Adam Sheffer points out that, despite recent advances in incidence geometry, many problems remain open, and sets out on a project to catalog them</a> (<a href="https://mathstodon.xyz/@11011110/101837928344081808"/>). His starting points are the unit distances problem and incidences with nonlinear algebraic plane curves.</p>
+  </li>
+  <li>
+    <p><a href="https://gizmodo.com/rss-is-better-than-twitter-1833624929">Why you should be keeping up with news and long-form websites using RSS rather than twitter</a> (<a href="https://mathstodon.xyz/@11011110/101840580734668234"/>, <a href="https://news.ycombinator.com/item?id=19529442">via</a>). If you want to incorporate RSS feeds into your Mastodon stream, <a href="https://friend.camp/@darius/100897757870017125">Darius Kazemi’s RSS-to-Mastodon tool</a> looks useful, but I haven’t tried it, because so far I’m happy reading those feeds through NetNewsWire.</p>
+  </li>
+  <li>
+    <p><a href="https://www.insidehighered.com/news/2019/03/28/scholars-complain-visa-problems-ahead-international-conference-canada">International Studies Association participants unable to get visas to go to their conference in Toronto</a> (<a href="https://mathstodon.xyz/@11011110/101847752696450725"/>), a repeat of an issue I posted about for <a href="https://11011110.github.io/blog/2019/01/31/linkage.html">NeurIPS in January</a>. According to the story, the proportion of participants with visa issues is similar to recent years when the conference has been in the US. Which is not a great target for Canada to aspire to…</p>
+  </li>
+</ul></div>
+    </content>
+    <updated>2019-03-31T16:48:00Z</updated>
+    <published>2019-03-31T16:48:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2019-04-08T04:33:38Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://windowsontheory.org/?p=7489</id>
+    <link href="https://windowsontheory.org/2019/03/30/physics-computation-blog-post-round-up/" rel="alternate" type="text/html"/>
+    <title>Physics &amp; Computation Blog Post Round-up</title>
+    <summary>In the Fall, Boaz and I co-taught a grad seminar on physics and computation (see here for some of the original press coverage). We were lucky to attract an intrepid group of students from multiple fields, with representatives from computer science, physics, math and biology. As part of the course, we asked our students to […]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>In the Fall, Boaz and I co-taught a <a href="https://www.boazbarak.org/fall18seminar/">grad seminar</a> on physics and computation (see <a href="https://windowsontheory.org/2018/08/06/physics-envy/">here</a> for some of the original press coverage). We were lucky to attract an intrepid group of students from multiple fields, with representatives from computer science, physics, math and biology. As part of the course, we asked our students to give presentations and write expository blog posts on a number of topics at the intersection of computation and physics, including algorithms from statistical physics, quantum area laws, and the firewall paradox. The students worked hard to produce posts that make the physics concepts accessible to a computer science audience, and the result is a nice collection of posts that create a “bridge” from CS to physics.</p>
+<p>Here, the aim is to give a (long overdue) table of contents for their posts. Followers of the blog may have noticed a landslide of physics &amp; computation posts around December and January; if you weren’t able to keep up with them all at the time, then here they are, rounded up and organized by topic.</p>
+<h2>Statistical Physics</h2>
+<h4>Background and intro to phase transitions:</h4>
+<ul>
+<li><a href="https://windowsontheory.org/2018/09/15/statistical-physics-an-introduction-in-two-parts/">Statistical Physics: an introduction in two parts</a> (by Tselil Schramm)</li>
+</ul>
+<h4>Algorithms from statistical physics: belief propagation and approximate message passing:</h4>
+<ul>
+<li><a href="https://windowsontheory.org/2018/10/20/belief-propagation-and-the-stochastic-block-model/">Belief Propagation and the Stochastic Block Model</a> (by Thomas Orton)</li>
+<li><a href="https://windowsontheory.org/2019/01/26/introduction-to-amp-and-the-replica-trick/">Introduction to AMP and the Replica Trick</a> (by Preetum Nakkiran and <span class="qu"><span class="gD">Yueqi </span></span><span class="qu"><span class="gD">Sheng)</span></span></li>
+</ul>
+<h4>Informational and computational phase transitions:</h4>
+<ul>
+<li><a href="https://windowsontheory.org/2018/12/16/algorithmic-and-information-theoretic-decoding-thresholds-for-low-density-parity-check-code/">Algorithmic and Information Theoretic Decoding Thresholds for Low density Parity-Check Code</a> (by Jeremy Dohmann, Vanessa Wong, and Venkat Arun)</li>
+</ul>
+<h4>Proving the existence of phase transitions:</h4>
+<ul>
+<li><a href="https://windowsontheory.org/2018/12/13/ising-perceptron-under-gaussian-disorder-and-k-nae-sat/">Ising Perceptron under Gaussian Disorder, and k-NAE-SAT</a> (based on a guest lecture by <a href="https://www.stat.berkeley.edu/~nikesun/">Nike Sun</a>, as scribed by Patrick Guo, Vinh-Kha Le, Shyam Narayanan, and David Stoner)</li>
+</ul>
+<h4> Using convex relaxations to approximate partition functions:</h4>
+<ul>
+<li><a href="https://windowsontheory.org/2018/11/11/approximating-partition-functions/">Approximating Partition Functions</a> (based on a guest lecture by <a href="https://math.mit.edu/~risteski/">Andrej Risteski</a> as scribed by Alex Kelser, Alex Lin, Amil Merchant, and Suproteem Sarkar)</li>
+</ul>
+<h2>Quantum Computation</h2>
+<h4>Background on Quantum Hamiltonians and tensor network representations:</h4>
+<ul>
+<li><a href="https://windowsontheory.org/2018/12/20/quantum-hamiltonian-complexity/">What is Quantum Hamiltonian Complexity?</a> (by Ben Edelman)</li>
+<li><a href="https://windowsontheory.org/2018/12/20/tensor-networks-matrix-product-states-dmrg/">Tensor Networks, Matrix Product States and Density Matrix Renormalization Group</a> (by Fred Zhang)</li>
+</ul>
+<h4>Area laws:</h4>
+<ul>
+<li><a href="https://windowsontheory.org/2018/12/18/a-1d-area-law-for-gapped-local-hamiltonians/">A 1D Area Law for Gapped Local Hamiltonians</a> (by Boriana Gjura and Prayaag Venkat)</li>
+</ul>
+<h4>Quantum algorithms:</h4>
+<ul>
+<li><a href="https://windowsontheory.org/2018/12/23/introduction-to-quantum-walks/">Introduction to Quantum Walks</a> (by Beatrice Nash)</li>
+<li><a href="https://windowsontheory.org/2018/12/20/efficient-preparation-of-thermal-states-of-quantum-systems-natural-or-artificial/">Efficient preparation of thermal states of quantum systems: natural or artificial</a> (based on a guest lecture by <a href="http://web.mit.edu/aram/www/">Aram Harrow</a> as scribed by Sinho Chewi, William S. Moses, Tasha Schoenstein, Ary Swaminathan)</li>
+<li><a href="https://windowsontheory.org/2018/12/22/quantum-approximate-optimization-algorithm-and-applications/">Quantum Approximate Optimization Algorithm and Applications</a> (by
+<div class="b4">
+<div class="dl">
+<div class="aIj">
+<div class="c5 J-J5-Ji">Amir Karamlou)</div>
+</div>
+</div>
+</div>
+<div class="dp"/>
+</li>
+</ul>
+<h4>Quantum games and quantum PCPs:</h4>
+<ul>
+<li><a href="https://windowsontheory.org/2018/12/22/towards-quantum-pcp-a-proof-of-the-nlets-theorem/">Towards Quantum PCP: A Proof of the NLETS Theorem</a> (by Abhijit Mudigonda, Richard Wang, and Lisa Yang)</li>
+<li><a href="https://windowsontheory.org/2019/01/03/quantum-games/">Quantum Games</a> (by Nilin Abrahamsen, Daniel Alabi, Mitali Bafna, Emil Khabiboulline, and Juspreet Sandhu)</li>
+</ul>
+<h4>Quantum supremacy:</h4>
+<ul>
+<li><a href="https://windowsontheory.org/2019/01/25/quantum-circuits-and-their-role-in-demonstrating-quantum-supremacy/">Quantum circuits and their role in demonstrating quantum supremacy</a> (by Hikari Sorensen)</li>
+</ul>
+<h4>Quantum error correction:</h4>
+<ul>
+<li><a href="https://windowsontheory.org/2018/12/07/quantum-error-correction/">Peter Shor on Quantum Error Correction</a> (based on a guest lecture by Peter Shor as scribed by Annie Wei)</li>
+</ul>
+<h2>Black Holes and the Firewall Paradox</h2>
+<p>(See also Boaz’s <a href="https://windowsontheory.org/2018/08/22/black-holes-paradoxes-and-computational-complexity/">introductory post</a>)</p>
+<h4>Background on black holes and the Firewall Paradox:</h4>
+<ul>
+<li><a href="https://windowsontheory.org/2019/01/20/the-firewall-paradox-in-context/">Why physicists care about the Firewall Paradox</a> (by Noah Miller)</li>
+<li><a href="https://windowsontheory.org/2019/01/30/black-hole-paradoxes-a-conservative-yet-radical-journey/">Black hole paradoxes: A conservative yet radical journey</a> (by Abhishek Anand and Noah Miller)</li>
+</ul>
+<h4>Firewall Paradox meets Computational Complexity:</h4>
+<ul>
+<li><a href="https://windowsontheory.org/2019/02/01/black-holes-a-complexity-theory-perspective/">Black Holes, a complexity theory perspective</a> (by Chi-Ning Chou and Parth Mehta)</li>
+</ul></div>
+    </content>
+    <updated>2019-03-30T20:20:58Z</updated>
+    <published>2019-03-30T20:20:58Z</published>
+    <category term="Uncategorized"/>
+    <author>
+      <name>tselilschramm</name>
+    </author>
+    <source>
+      <id>https://windowsontheory.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://windowsontheory.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://windowsontheory.org" rel="alternate" type="text/html"/>
+      <link href="https://windowsontheory.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>A Research Blog</subtitle>
+      <title>Windows On Theory</title>
+      <updated>2019-04-08T23:45:18Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://rjlipton.wordpress.com/?p=15708</id>
+    <link href="https://rjlipton.wordpress.com/2019/03/29/integer-multiplication-in-nlogn-time/" rel="alternate" type="text/html"/>
+    <title>Integer Multiplication in NlogN Time</title>
+    <summary>A win for multi-variable polynomials Composite crop from src1, src2 David Harvey and Joris van der Hoeven are computational mathematicians. They have just released a paper showing how to multiply two -bit integers in time. A companion paper gives details of a simpler second algorithm that is time pending a widely-believed conjecture about primes. Today […]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><font color="#0044cc"><br/>
+<em>A win for multi-variable polynomials</em><br/>
+<font color="#000000"/></font></p><font color="#0044cc"><font color="#000000">
+<table class="image alignright">
+<tbody>
+<tr>
+<td>
+<a href="https://rjlipton.wordpress.com/2019/03/29/integer-multiplication-in-nlogn-time/harveyvanderhoeven2/" rel="attachment wp-att-15709"><img alt="" class="alignright wp-image-15709" height="150" src="https://rjlipton.files.wordpress.com/2019/03/harveyvanderhoeven2.png?w=201&amp;h=150" width="201"/></a>
+</td>
+</tr>
+<tr>
+<td class="caption alignright"><font size="-2">Composite crop from <a href="https://web.maths.unsw.edu.au/~davidharvey/">src1</a>, <a href="https://www.polytechnique.edu/en/content/researchers-lx-international-congress-mathematicians-brazil">src2</a></font></td>
+</tr>
+</tbody>
+</table>
+<p>
+David Harvey and Joris van der Hoeven are computational mathematicians. They have just released a <a href="https://web.maths.unsw.edu.au/~davidharvey/papers/nlogn/">paper</a> showing how to multiply two <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n}"/>-bit integers in <img alt="{O(n\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28n%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(n\log n)}"/> time. A companion <a href="http://www.texmacs.org/joris/ffnlogn/ffnlogn-abs.html">paper</a> gives details of a simpler second algorithm that is <img alt="{O(n\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28n%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(n\log n)}"/> time pending a widely-believed conjecture about primes.</p>
+<p>
+Today we discuss what makes these new results possible.<br/>
+<span id="more-15708"/></p>
+<p>
+The first paper leads off with a nice history of algorithms that beat the <img alt="{O(n^2)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28n%5E2%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(n^2)}"/>-time method all of us learned in school. Far from being <a href="https://rjlipton.wordpress.com/2010/10/23/galactic-algorithms/">galactic</a>, the longtime-champion <img alt="{O(n\log n \log\!\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28n%5Clog+n+%5Clog%5C%21%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(n\log n \log\!\log n)}"/> algorithm of Arnold Schönhage and Volker Strassen is a workhorse of the GNU Multiple Precision Library (<a href="https://en.wikipedia.org/wiki/GNU_Multiple_Precision_Arithmetic_Library">GMP</a>). The <img alt="{\log\!\log n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clog%5C%21%5Clog+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\log\!\log n}"/> factor was <a href="http://en.wikipedia.org/wiki/Furer's_algorithm">improved</a> by Martin Fürer in 2007 and <a href="https://arxiv.org/abs/1407.3360?context=cs">further</a> in 2014 by Harvey and van der Hoeven with Grégoire Lecerf. Now it is gone altogether.</p>
+<p>
+Their algorithm is currently not practical, but it is also not yet tuned. At the start of section 5, they note that their estimates take effect for <img alt="{n \geq 2^{d^{12}}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn+%5Cgeq+2%5E%7Bd%5E%7B12%7D%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n \geq 2^{d^{12}}}"/> where they use <img alt="{d = 1,\!729}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bd+%3D+1%2C%5C%21729%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{d = 1,\!729}"/>. When they note that <img alt="{2^{d^{12}} &gt; 2^{4,\!096}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%5E%7Bd%5E%7B12%7D%7D+%3E+2%5E%7B4%2C%5C%21096%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{2^{d^{12}} &gt; 2^{4,\!096}}"/> they don’t mean the numbers need at least <img alt="{4,\!096}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B4%2C%5C%21096%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{4,\!096}"/> bits, rather <img alt="{2^{4,\!096}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%5E%7B4%2C%5C%21096%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{2^{4,\!096}}"/> is the number of bits. Since there are only <a href="https://www.popularmechanics.com/space/a27259/how-many-particles-are-in-the-entire-universe/">about</a> <img alt="{2^{270}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%5E%7B270%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{2^{270}}"/> particles in the observable universe, this puts the term <a href="https://rjlipton.wordpress.com/2010/10/23/galactic-algorithms/">galactic</a> to shame. </p>
+<p>
+The number <img alt="{1,\!729}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2C%5C%21729%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1,\!729}"/> recalls a famous <a href="http://mathworld.wolfram.com/Hardy-RamanujanNumber.html">story</a> about Godfrey Hardy and Srinivasa Ramanujan. This is not wholly a coincidence. They get a bounding multiplier of <img alt="{36}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B36%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{36}"/> from one place, another factor of <img alt="{6}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B6%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{6}"/> from another, and finally a factor of <img alt="{8}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B8%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{8}"/> giving <img alt="{1,\!728}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2C%5C%21728%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1,\!728}"/> which equals <img alt="{12^3}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B12%5E3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{12^3}"/>. Then they just make <img alt="{d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{d}"/> be higher by <img alt="{1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1}"/>, setting up <img alt="{1,\!729 = 12^3 + 1^3}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2C%5C%21729+%3D+12%5E3+%2B+1%5E3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1,\!729 = 12^3 + 1^3}"/> which happens to equal <img alt="{9^3 + 10^3}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B9%5E3+%2B+10%5E3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{9^3 + 10^3}"/>. But there is much flex in the choices and they sketch how to improve the needed bound from <img alt="{1,\!728}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2C%5C%21728%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1,\!728}"/> to just <img alt="{8}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B8%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{8}"/>. They also uncover some new tricks for calculating in certain large finite rings defined via multi-variable polynomials.</p>
+<p>
+</p><p/><h2> Polynomials and Tricks </h2><p/>
+<p/><p>
+When we heard the news on Tuesday, both of us thought of the famous primality <a href="https://en.wikipedia.org/wiki/AKS_primality_test">test</a> of Manindra Agrawal, Neeraj Kayal, and Nitin Saxena (AKS), which placed deciding primality into deterministic polynomial time. We stated the message as the title of an old <a href="https://rjlipton.wordpress.com/2011/02/26/polynomials-are-easier-than-integers/">post</a> on other joint work by Kayal: “Polynomials Are Easier Than Integers.” </p>
+<p>
+The crux of the AKS test is to employ the theorem that for any co-prime <img alt="{(a,N)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28a%2CN%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{(a,N)}"/>, the polynomial congruence relation </p>
+<p align="center"><img alt="\displaystyle  (x + a)^N \equiv x^N + a \pmod{N} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%28x+%2B+a%29%5EN+%5Cequiv+x%5EN+%2B+a+%5Cpmod%7BN%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  (x + a)^N \equiv x^N + a \pmod{N} "/></p>
+<p>holds in <img alt="{\mathbb{Z}[x]}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BZ%7D%5Bx%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\mathbb{Z}[x]}"/> if and only if <img alt="{N}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{N}"/> is prime. This is tested in the quotient ring <img alt="{\mathbb{Z}[x]/(x^r - 1)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BZ%7D%5Bx%5D%2F%28x%5Er+-+1%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\mathbb{Z}[x]/(x^r - 1)}"/>. The game becomes finding <img alt="{r}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r}"/> small enough and minimizing the number of <img alt="{a}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Ba%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{a}"/> that need to be checked in order for the body of tests in the quotient ring to be conclusive. </p>
+<p>
+We take time to note that the case <img alt="{a = N-1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Ba+%3D+N-1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{a = N-1}"/> is possibly sufficient while testing a small set of <img alt="{r}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r}"/>. Agrawal has <a href="https://en.wikipedia.org/wiki/Agrawal's_conjecture">conjectured</a> that if <img alt="{(x - 1)^N \equiv x^N - 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28x+-+1%29%5EN+%5Cequiv+x%5EN+-+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{(x - 1)^N \equiv x^N - 1}"/> modulo both <img alt="{N}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{N}"/> and <img alt="{x^r - 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%5Er+-+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x^r - 1}"/> then either <img alt="{N}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{N}"/> is prime or <img alt="{r}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r}"/> divides <img alt="{N^2 - 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BN%5E2+-+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{N^2 - 1}"/>. This conjecture is <a href="https://aimath.org/WWN/primesinp/primesinp.pdf">doubted</a> on heuristic counting grounds but it has been verified for <img alt="{N &lt; 10^{12}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BN+%3C+10%5E%7B12%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{N &lt; 10^{12}}"/> and can be <a href="https://eprint.iacr.org/2009/008.pdf">modified</a> by including the case <img alt="{a = 2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Ba+%3D+2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{a = 2}"/>. It would improve the polynomial time in the number <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n}"/> of bits in <img alt="{N}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{N}"/> from <img alt="{\tilde{O}(n^6)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctilde%7BO%7D%28n%5E6%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\tilde{O}(n^6)}"/> to <img alt="{\tilde{O}(n^3)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctilde%7BO%7D%28n%5E3%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\tilde{O}(n^3)}"/> and also improve the constants. We mention this because Harvey and van der Hoeven have a number-theoretic conjecture that (as shown in their companion paper) improves both their constant on <img alt="{n\log n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%5Clog+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n\log n}"/> and the simplicity of the proof.</p>
+<p>
+The further message of the new papers is added power from giving the polynomials more variables. They use <img alt="{d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{d}"/> variables: <img alt="{x_1,\dots,x_{d-1}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_1%2C%5Cdots%2Cx_%7Bd-1%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_1,\dots,x_{d-1}}"/> plus a nominal <img alt="{x_d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_d%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_d}"/> that is later substituted by <img alt="{e^{\pi i/r} y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Be%5E%7B%5Cpi+i%2Fr%7D+y%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{e^{\pi i/r} y}"/>. Here <img alt="{r}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r}"/> is a certain power of <img alt="{2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{2}"/> and combined with the <img alt="{d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{d}"/>-th variable <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> to build the base ring <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> of complex polynomials in <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> modulo <img alt="{y^r + 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%5Er+%2B+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y^r + 1}"/>. The other variables are used to mod out by <img alt="{(x_1^{t_1} - 1,\dots,x_{d-1}^{t_{d-1}} - 1)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28x_1%5E%7Bt_1%7D+-+1%2C%5Cdots%2Cx_%7Bd-1%7D%5E%7Bt_%7Bd-1%7D%7D+-+1%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{(x_1^{t_1} - 1,\dots,x_{d-1}^{t_{d-1}} - 1)}"/> where the <img alt="{t_i}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t_i}"/> are powers of <img alt="{2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{2}"/> no higher than <img alt="{2r}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2r%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{2r}"/>. Operations in quotient rings of this type are especially efficient. They are used to emulate operations in <img alt="{\mathbb{Z}[x]/(x^s - 1)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BZ%7D%5Bx%5D%2F%28x%5Es+-+1%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\mathbb{Z}[x]/(x^s - 1)}"/> where <img alt="{s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s}"/> is a product of primes <img alt="{s_1\cdots s_d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_1%5Ccdots+s_d%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s_1\cdots s_d}"/> that are near powers of <img alt="{2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{2}"/>. The emulation is done via the isomorphism</p>
+<p>
+<a name="CRT"/></p><a name="CRT">
+<p align="center"><img alt="\displaystyle  \mathbb{Z}[x]/(x^{s_1\cdots s_d} - 1) \cong \mathbb{Z}[x_1,\dots,x_d]/(x_1^{s_1} - 1,\dots,x_d^{s_d} - 1), \ \ \ \ \ (1)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cmathbb%7BZ%7D%5Bx%5D%2F%28x%5E%7Bs_1%5Ccdots+s_d%7D+-+1%29+%5Ccong+%5Cmathbb%7BZ%7D%5Bx_1%2C%5Cdots%2Cx_d%5D%2F%28x_1%5E%7Bs_1%7D+-+1%2C%5Cdots%2Cx_d%5E%7Bs_d%7D+-+1%29%2C+%5C+%5C+%5C+%5C+%5C+%281%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \mathbb{Z}[x]/(x^{s_1\cdots s_d} - 1) \cong \mathbb{Z}[x_1,\dots,x_d]/(x_1^{s_1} - 1,\dots,x_d^{s_d} - 1), \ \ \ \ \ (1)"/></p>
+</a><p><a name="CRT"/> which follows from the Chinese remainder theorem. </p>
+<p>
+They start with Schönhage and Strassen’s original trick of splitting the two <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n}"/>-bit integers into <img alt="{\Theta(\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5CTheta%28%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\Theta(\log n)}"/>-sized pieces so that the problem reduces to multiplying polynomials of degree <img alt="{\Theta(n/\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5CTheta%28n%2F%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\Theta(n/\log n)}"/> in <img alt="{\mathbb{Z}[x]}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BZ%7D%5Bx%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\mathbb{Z}[x]}"/> with coefficients of <img alt="{O(\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(\log n)}"/> size. They use the <img alt="{d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{d}"/>-dimensional Discrete Fourier Transform over <img alt="{\mathbb{C}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BC%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\mathbb{C}}"/> with complex operations that need only <img alt="{O(\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(\log n)}"/> bits of precision individually. This setting also gives leeway for approximative methods in their final algorithm. But first we describe what was evidently their original strategy.</p>
+<p>
+</p><p/><h2> The Recursive Strategy </h2><p/>
+<p/><p>
+Their first task in either case is to find <img alt="{d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{d}"/>-many distinct primes <img alt="{s_1,\dots,s_d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_1%2C%5Cdots%2Cs_d%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s_1,\dots,s_d}"/> of order <img alt="{(n/\log n)^{1/d}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28n%2F%5Clog+n%29%5E%7B1%2Fd%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{(n/\log n)^{1/d}}"/> in magnitude. Now when <img alt="{d = 1,\!729}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bd+%3D+1%2C%5C%21729%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{d = 1,\!729}"/> the exponent <img alt="{1/d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2Fd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1/d}"/> makes the primes quite small indeed, and the need to find distinct ones already drives <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n}"/> up quite high before their algorithm can even go into effect. Moreover, for the approximation to work, the primes need to be congruent to <img alt="{1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1}"/> modulo <img alt="{r}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r}"/>. </p>
+<p>
+Their original strategy—detailed in the companion paper—builds on a <a href="https://ieeexplore.ieee.org/document/1448407">result</a> of Charles Rader to reduce the DFT computation to multiplications in </p>
+<p align="center"><img alt="\displaystyle  \mathbb{C}[x_1,\dots,x_d]/(x_1^{s_1 - 1} - 1,\dots,x_d^{s_d - 1} - 1), " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cmathbb%7BC%7D%5Bx_1%2C%5Cdots%2Cx_d%5D%2F%28x_1%5E%7Bs_1+-+1%7D+-+1%2C%5Cdots%2Cx_d%5E%7Bs_d+-+1%7D+-+1%29%2C+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \mathbb{C}[x_1,\dots,x_d]/(x_1^{s_1 - 1} - 1,\dots,x_d^{s_d - 1} - 1), "/></p>
+<p>where compared to (<a href="https://rjlipton.wordpress.com/feed/#CRT">1</a>) they have reduced the exponents by one. Using <img alt="{s_i \equiv 1 \pmod{r}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_i+%5Cequiv+1+%5Cpmod%7Br%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s_i \equiv 1 \pmod{r}}"/>, they next reduce this to multiplications in </p>
+<p align="center"><img alt="\displaystyle  \mathbb{C}[x_1,\dots,x_d]/(x_1^{r} - 1,\dots,x_d^{r} - 1). " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cmathbb%7BC%7D%5Bx_1%2C%5Cdots%2Cx_d%5D%2F%28x_1%5E%7Br%7D+-+1%2C%5Cdots%2Cx_d%5E%7Br%7D+-+1%29.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \mathbb{C}[x_1,\dots,x_d]/(x_1^{r} - 1,\dots,x_d^{r} - 1). "/></p>
+<p>Then the above-mentioned substitution of <img alt="{x_d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_d%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_d}"/> by <img alt="{e^{\pi i/r} y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Be%5E%7B%5Cpi+i%2Fr%7D+y%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{e^{\pi i/r} y}"/> makes them into products over </p>
+<p align="center"><img alt="\displaystyle  R[x_1,\dots,x_{d-1}]/(x_1^{t_1} - 1,\dots,x_{d-1}^{t_{d-1}} - 1) \qquad\text{with}\qquad R = \mathbb{C}[y]/(y^r + 1). " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++R%5Bx_1%2C%5Cdots%2Cx_%7Bd-1%7D%5D%2F%28x_1%5E%7Bt_1%7D+-+1%2C%5Cdots%2Cx_%7Bd-1%7D%5E%7Bt_%7Bd-1%7D%7D+-+1%29+%5Cqquad%5Ctext%7Bwith%7D%5Cqquad+R+%3D+%5Cmathbb%7BC%7D%5By%5D%2F%28y%5Er+%2B+1%29.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  R[x_1,\dots,x_{d-1}]/(x_1^{t_1} - 1,\dots,x_{d-1}^{t_{d-1}} - 1) \qquad\text{with}\qquad R = \mathbb{C}[y]/(y^r + 1). "/></p>
+<p>These last products are at last amenable to the usual Fast Fourier Transform trick of applying FFT for each <img alt="{t_i}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t_i}"/> by pretending that <img alt="{y^{2r/t_i}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%5E%7B2r%2Ft_i%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y^{2r/t_i}}"/> is a primitive <img alt="{t_i}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t_i}"/>-th root of unity, multiplying pointwise in <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/>, and doing the inverse FFT. Finally the products in <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> can be converted into <img alt="{O(\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(\log n)}"/>-bit integer products, and this sets up the vast recursion from multiplying the original <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n}"/>-bit integers to a batch of <img alt="{O(\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(\log n)}"/>-bit ones. </p>
+<p>
+</p><p/><h2> Finding Good Primes </h2><p/>
+<p/><p>
+In order for the recursion to solve to <img alt="{O(n\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28n%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(n\log n)}"/>, they need the values <img alt="{q_i = (s_i - 1)/r}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bq_i+%3D+%28s_i+-+1%29%2Fr%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{q_i = (s_i - 1)/r}"/> to be not too large. Viewing this task from the bottom up, they want to choose a single value <img alt="{r}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r}"/> and choose small <img alt="{q_i}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bq_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{q_i}"/> such that <img alt="{s_i = rq_i + 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_i+%3D+rq_i+%2B+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s_i = rq_i + 1}"/> is prime. Since <img alt="{r}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r}"/> is a power of <img alt="{2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{2}"/>, there is some resemblance to the harder task of finding Sophie Germain primes, which are also relevant to the AKS algorithm. In this case, however, all they need is a sufficiently small <img alt="{\epsilon &gt; 0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon+%3E+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon &gt; 0}"/> such that:</p>
+<blockquote><p><b> </b> <em> For all coprime <img alt="{a,k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Ba%2Ck%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{a,k}"/> with <img alt="{k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{k}"/> sufficiently large, there is a prime <img alt="{q &lt; k^{1+\epsilon}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bq+%3C+k%5E%7B1%2B%5Cepsilon%7D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{q &lt; k^{1+\epsilon}}"/> such that <img alt="{q \equiv a \pmod{k}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bq+%5Cequiv+a+%5Cpmod%7Bk%7D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{q \equiv a \pmod{k}}"/>. </em>
+</p></blockquote>
+<p/><p>
+This is, however, only known for “<img alt="{\epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon}"/>” <img alt="{= 4.18}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%3D+4.18%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{= 4.18}"/> and the Generalized Riemann Hypothesis is only known to improve the bound to <img alt="{k^{2+\delta}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk%5E%7B2%2B%5Cdelta%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{k^{2+\delta}}"/> for any <img alt="{\delta &gt; 0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cdelta+%3E+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\delta &gt; 0}"/>. The above is conjectured to hold for any <img alt="{\epsilon &gt; 0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon+%3E+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon &gt; 0}"/> but it hasn’t been proved. They currently need it for <img alt="{\epsilon = 1/303}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon+%3D+1%2F303%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon = 1/303}"/>.</p>
+<p>
+The companion paper uses the conjecture to improve multiplication in the field <img alt="{\mathbb{F}_{p^\ell}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BF%7D_%7Bp%5E%5Cell%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\mathbb{F}_{p^\ell}}"/> to time <img alt="{O(n\ell \log(p)(\log(n) + \log(\ell) + \log\!\log(p))}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28n%5Cell+%5Clog%28p%29%28%5Clog%28n%29+%2B+%5Clog%28%5Cell%29+%2B+%5Clog%5C%21%5Clog%28p%29%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(n\ell \log(p)(\log(n) + \log(\ell) + \log\!\log(p))}"/>. This uses a single algorithm over any prime <img alt="{p}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bp%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{p}"/> and power <img alt="{\ell}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cell%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\ell}"/>; of course if they are fixed, then this time likewise becomes <img alt="{O(n\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28n%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(n\log n)}"/>. This currently needs <img alt="{\epsilon = 1/2^{1,\!162}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon+%3D+1%2F2%5E%7B1%2C%5C%21162%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon = 1/2^{1,\!162}}"/>. </p>
+<p>
+The companion <a href="http://www.texmacs.org/joris/ffnlogn/ffnlogn-abs.html">paper</a> has full details of how all this works and many more numerical tricks than we’ve mentioned—a <em>tour de force</em>. Getting the result for integer multiplication unconditionally, however, requires one more major tool in their arsenal. To use it they set up the primes <img alt="{s_i}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s_i}"/> to be slightly below respective powers of 2 <img alt="{t_i}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t_i}"/> (rather than be above a single power of <img alt="{2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{2}"/> <img alt="{r}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r}"/> by the aforementioned factors <img alt="{q_i}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bq_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{q_i}"/>) while retaining <img alt="{t_1\cdots t_d = O(s_1 \cdots s_d)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt_1%5Ccdots+t_d+%3D+O%28s_1+%5Ccdots+s_d%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t_1\cdots t_d = O(s_1 \cdots s_d)}"/>. </p>
+<p>
+Their innovation compared to the translations in the first strategy is that one can still reduce the DFT computation in dimensions <img alt="{s_1,\dots,s_d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_1%2C%5Cdots%2Cs_d%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s_1,\dots,s_d}"/> needing <img alt="{O(\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(\log n)}"/> precision to a complex DFT in dimensions <img alt="{t_1,\dots,t_d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt_1%2C%5Cdots%2Ct_d%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t_1,\dots,t_d}"/> by employing approximation. Their algorithm is completely deterministic but it employs weights that conform to Gaussian distributions to effect the approximation. The preservation of Gaussians under Fourier transforms enables close enough approximations to be obtained by solving relatively small and easily-specified systems of linear equations. The resulting complex DFT is then massaged in a manner similar to the first strategy. The resulting recursion is not quite as steep—it goes from <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n}"/> to <img alt="{n' = n^{1/d + o(1)}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%27+%3D+n%5E%7B1%2Fd+%2B+o%281%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n' = n^{1/d + o(1)}}"/>—but it gives </p>
+<p align="center"><img alt="\displaystyle  M(n) = \frac{Kn}{n'} M(n') + O(n\log n) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++M%28n%29+%3D+%5Cfrac%7BKn%7D%7Bn%27%7D+M%28n%27%29+%2B+O%28n%5Clog+n%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  M(n) = \frac{Kn}{n'} M(n') + O(n\log n) "/></p>
+<p>with <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/> and the <img alt="{O(n\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28n%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(n\log n)}"/> term independent of <img alt="{d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{d}"/> (indeed, <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/> becomes the aforementioned <img alt="{1,\!729}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2C%5C%21729%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1,\!729}"/>). This gives <img alt="{M(n) = O(n\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BM%28n%29+%3D+O%28n%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{M(n) = O(n\log n)}"/>. The approximation technique does not work for multiplication in <img alt="{\mathbb{F}_{p^\ell}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BF%7D_%7Bp%5E%5Cell%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\mathbb{F}_{p^\ell}}"/>, however. As usual, here is where we say to consult the papers for further details—there is a wealth of them.</p>
+<p>
+</p><p/><h2> Open Problems </h2><p/>
+<p/><p>
+Will the <img alt="{O(n\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28n%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(n\log n)}"/> time be concretely improvable? Will it tell us anything about the <a href="https://rjlipton.wordpress.com/2009/02/24/a-conjecture-of-hartmanis/">problem</a> of <a href="https://rjlipton.wordpress.com/2012/06/15/why-the-hartmanis-stearns-conjecture-is-still-open/">proving</a> a super-linear lower bound? And short of those two goals, what new results will become possible through the multi-variable polynomial techniques they employ?</p>
+<p/></font></font></div>
+    </content>
+    <updated>2019-03-29T13:23:44Z</updated>
+    <published>2019-03-29T13:23:44Z</published>
+    <category term="All Posts"/>
+    <category term="News"/>
+    <category term="Open Problems"/>
+    <category term="primes"/>
+    <category term="Proofs"/>
+    <category term="Results"/>
+    <category term="trick"/>
+    <category term="algebra"/>
+    <category term="Arnold Schonhage"/>
+    <category term="asymptotics"/>
+    <category term="congruence"/>
+    <category term="David Harvey"/>
+    <category term="finite fields"/>
+    <category term="integer multiplication"/>
+    <category term="Joris van der Hoeven"/>
+    <category term="Manindra Agrawal"/>
+    <category term="Martin Furer"/>
+    <category term="Neeraj Kayal"/>
+    <category term="Nitin Saxena"/>
+    <category term="NlogN time"/>
+    <category term="polynomials"/>
+    <category term="rings"/>
+    <category term="Volker Strassen"/>
+    <author>
+      <name>KWRegan</name>
+    </author>
+    <source>
+      <id>https://rjlipton.wordpress.com</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://rjlipton.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://rjlipton.wordpress.com" rel="alternate" type="text/html"/>
+      <link href="https://rjlipton.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>a personal view of the theory of computation</subtitle>
+      <title>Gödel’s Lost Letter and P=NP</title>
+      <updated>2019-04-08T23:44:43Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>https://eccc.weizmann.ac.il/report/2019/045</id>
+    <link href="https://eccc.weizmann.ac.il/report/2019/045" rel="alternate" type="text/html"/>
+    <title>TR19-045 |  On the Fine-grained Complexity of Least Weight Subsequence in Graphs | 
+
+	Jiawei Gao</title>
+    <summary>Least Weight Subsequence (LWS) is a type of highly sequential optimization problems with form $F(j) = \min_{i &lt; j} [F(i) + c_{i,j}]$. They can be solved in quadratic time using dynamic programming, but it is not known whether these problems can be solved faster than $n^{2-o(1)}$ time. Surprisingly, each such problem is subquadratic time reducible to a highly parallel, non-dynamic programming problem [KPS17]. In other words, if a "static"  problem is faster than quadratic time, so is an LWS problem. For many instances of LWS, the sequential versions are equivalent to their static versions by subquadratic time reductions. The previous result applies to LWS on linear structures, and this paper extends this result to LWS on paths in sparse graphs. When the graph is a multitree (i.e. a DAG where any pair vertices can have at most one path) or when the graph is a DAG whose underlying undirected graph has constant treewidth, we show that LWS on this graph is still subquadratically reducible to their corresponding static problems. For many instances, the graph versions are still equivalent to their static versions.
+
+Moreover, this paper shows that on these graphs, property testing of form $\exists x \exists y (\text{TC}_E(x,y) \wedge P(x,y))$ is subquadratically reducible to property testing of form $\exists x \exists y P(x,y)$, where $P$ is a property checkable in time linear to the sizes of $x$ and $y$, and $\text{TC}_E$ is the transitive closure of relation $E$. Furthermore, when $P$ is definable by a first-order logic formula with at most one quantified variable, then the above two problems are equivalent to each other by subquadratic reductions.</summary>
+    <updated>2019-03-28T20:21:13Z</updated>
+    <published>2019-03-28T20:21:13Z</published>
+    <source>
+      <id>https://eccc.weizmann.ac.il/</id>
+      <author>
+        <name>ECCC papers</name>
+      </author>
+      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
+      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
+      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
+      <title>ECCC - Reports</title>
+      <updated>2019-04-08T23:43:54Z</updated>
     </source>
   </entry>
 </feed>
