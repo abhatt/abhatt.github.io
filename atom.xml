@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-04-12T04:21:32Z</updated>
+  <updated>2019-04-12T05:21:59Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -653,6 +653,60 @@ In 1989, Berlekamp purchased the largest interest in a trading company named Axc
   </entry>
 
   <entry>
+    <id>https://11011110.github.io/blog/2019/04/11/coloring-kinggraphs</id>
+    <link href="https://11011110.github.io/blog/2019/04/11/coloring-kinggraphs.html" rel="alternate" type="text/html"/>
+    <title>Coloring kinggraphs</title>
+    <summary>Draw a collection of quadrilaterals in the plane, meeting edge to edge, so that they don’t surround any open space (the region they cover is a topological disk) and every vertex interior to the disk touches at least four quadrilaterals. Is it always possible to color the corners of the quadrilaterals with four colors so that all four colors appear in each quadrilateral?</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Draw a collection of quadrilaterals in the plane, meeting edge to edge, so that they don’t surround any open space (the region they cover is a topological disk) and every vertex interior to the disk touches at least four quadrilaterals. Is it always possible to color the corners of the quadrilaterals with four colors so that all four colors appear in each quadrilateral?</p>
+
+<p style="text-align: center;"><img alt="4-colored kinggraph" src="https://11011110.github.io/blog/assets/2019/colored-kinggraph.svg"/></p>
+
+<p>The graph of corners and quadrilateral edges is a <a href="https://en.wikipedia.org/wiki/Squaregraph">squaregraph</a> but this question is really about coloring a different and related graph, called a kinggraph, that also includes as edges the diagonals of each quad. It’s called that because one example of this kind of graph is the <a href="https://en.wikipedia.org/wiki/King's_graph">king’s graph</a> describing the possible moves of a chess king on a chessboard.</p>
+
+<p style="text-align: center;"><img alt="The king's graph" src="https://11011110.github.io/blog/assets/2019/kings-graph.svg"/></p>
+
+<p>The king’s graph, and kinggraphs more generally, are examples of 1-planar graphs, graphs drawn in the plane in such a way that each edge is crossed at most once. The edges of the underlying squaregraph are not crossed at all, and the diagonals of each quad only cross each other. Squaregraphs are bipartite (like every planar graph in which all faces have an even number of edges), so they can be colored with only two colors. 1-planar graphs, in general, can require six colors (for instance you can draw the complete graph  as a 1-planar graph by adding diagonals to the squares of a triangular prism) and this is tight.
+And you can easily 4-color the king’s graph by using two colors in alternation across the even rows of the chessboard, and a different two colors across the odd rows. So the number of colors for kinggraphs should be somewhere between these two extremes, but where?</p>
+
+<p>One useful and general graph coloring method is based on the <a href="https://en.wikipedia.org/wiki/Degeneracy_(graph_theory)">degeneracy</a> of graphs. This is the largest number  such that every subgraph has a vertex with at most  neighbors; one can use a <a href="https://en.wikipedia.org/wiki/Greedy_coloring">greedy coloring algorithm</a> to color any graph with  colors. Kinggraphs themselves always have a vertex with at most  neighbors, but unfortunately they do not have degeneracy . If you form a king’s graph on a  chessboard, and then remove its four corners, you get a subgraph in which all vertices have at least four neighbors.
+This turns out to be as large as possible: every kinggraph has degeneracy at most four. This is because, if you consider the zones of the system of quads (strips of quads connected on opposite pairs of edges), there always exists an “outer zone”, a zone with nothing on one side of it (see the illustration, below). You can remove the vertices of the outer zone one at a time, in order from one end to the other, always removing a vertex of degree at most four, and then repeat on another outer zone until the whole graph is gone. So the degeneracy and greedy coloring method shows that you can 5-color every kinggraph, better than the 6-coloring that we get for arbitrary 1-planar graphs.</p>
+
+<p style="text-align: center;"><img alt="An outer zone" src="https://11011110.github.io/blog/assets/2019/outer-zone.svg"/></p>
+
+<p>This turns out to be optimal! For a while I thought that every kinggraph must be 4-colorable, because it was true of all the small examples that I tried. But it’s not true in general, and here’s why. If you look at the zones of the 4-colored kinggraph above, you might notice a pattern. The edges that connect pairs of quads from the same zone have colorings that alternate between two different pairs of colors. For instance, we might have a zone that has red–yellow edges alternating with blue–green edges, or another zone that has red–blue edges alternating with green–yellow edges. This is true whenever a kinggraph can be 4-colored. But there are only three ways of coloring a zone (that is, of partitioning the four colors into two disjoint pairs, which alternate along the zone). And when two zones cross each other, they must be colored differently. So every 4-coloring of a kinggraph turns into a 3-coloring of its zones. But the graph that describes the zones and its crossings is a triangle-free <a href="https://en.wikipedia.org/wiki/Circle_graph">circle graph</a>, and vice versa: every triangle-free circle graph describes a kinggraph. And triangle-free circle graphs may sometimes need as many as five colors, in which case so does the corresponding kinggraph.</p>
+
+<p>I posted <a href="https://11011110.github.io/blog/2008/03/23/ageevs-squaregraph.html">an example of a squaregraph whose circle graph needs five colors</a> on this blog in 2008. Here’s a slightly different drawing of the same graph from <a href="https://11011110.github.io/blog/2009/05/29/congratulations-dr-wortman.html">a later post</a>.
+Because its circle graph is not 3-colorable, the corresponding kinggraph is not 4-colorable.</p>
+
+<p style="text-align: center;"><img alt="A squaregraph whose kinggraph is not 4-colorable" src="https://11011110.github.io/blog/assets/2009/cd220c.svg"/></p>
+
+<p>There are simpler examples of squaregraphs whose circle graph needs four colors. As long as the number of colors of the circle graph is more than three, the number of colors of the kinggraph will be more than four.</p>
+
+<p>On the other hand, if you can color the circle graph with three colors, then it’s also possible to translate this 3-coloring of zones back into a 4-coloring of the kinggraph. Just remove an outer zone, color the remaining graph recursively, add the removed zone back, and use the color of the zone you removed to decide which colors to assign to its vertices. Unfortunately, I don’t know the computational complexity of testing whether a circle graph is 3-colorable. There was a conference paper by Walter Unger in 1992 that claimed to have a polynomial time algorithm, but without enough details and it was never published in a journal. I think we have to consider the problem of finding a coloring as still being open.</p>
+
+<p>The same method also leads to an easy calculation of the number of 4-colorings (in the same sense) of the usual kind of chessboard with  squares, or of a king’s graph with  vertices. In this case, the zones are just the rows and columns of the chessboard. We can use one color for the rows and two for the columns, or vice versa, so the number of 3-colorings of the zones (accounting for the fact that the 2-colorings get counted twice) is . And once the coloring of the zones is chosen, the coloring of the chessboard itself is uniquely determined by the color of any of its squares, so the total number of chessboard colorings is .</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/101911453128265954">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2019-04-11T21:28:00Z</updated>
+    <published>2019-04-11T21:28:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2019-04-12T05:04:06Z</updated>
+    </source>
+  </entry>
+
+  <entry>
     <id>tag:blogger.com,1999:blog-6555947.post-9122950491534339538</id>
     <link href="http://blog.geomblog.org/feeds/9122950491534339538/comments/default" rel="replies" type="application/atom+xml"/>
     <link href="http://blog.geomblog.org/2019/04/new-conference-announcement.html#comment-form" rel="replies" type="text/html"/>
@@ -955,7 +1009,7 @@ In 1989, Berlekamp purchased the largest interest in a trading company named Axc
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-04-12T04:21:11Z</updated>
+      <updated>2019-04-12T05:21:43Z</updated>
     </source>
   </entry>
 
@@ -980,7 +1034,7 @@ In 1989, Berlekamp purchased the largest interest in a trading company named Axc
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-04-12T04:21:11Z</updated>
+      <updated>2019-04-12T05:21:43Z</updated>
     </source>
   </entry>
 
@@ -1455,7 +1509,7 @@ result of Bentley and Saxe (Algorithmica, 1980).
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-04-12T04:21:11Z</updated>
+      <updated>2019-04-12T05:21:43Z</updated>
     </source>
   </entry>
 
@@ -1486,7 +1540,7 @@ result of Bentley and Saxe (Algorithmica, 1980).
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2019-04-12T04:21:09Z</updated>
+      <updated>2019-04-12T05:21:40Z</updated>
     </source>
   </entry>
 
@@ -1532,7 +1586,7 @@ result of Bentley and Saxe (Algorithmica, 1980).
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-04-12T04:20:55Z</updated>
+      <updated>2019-04-12T05:21:17Z</updated>
     </source>
   </entry>
 
@@ -1560,7 +1614,7 @@ result of Bentley and Saxe (Algorithmica, 1980).
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-12T04:20:33Z</updated>
+      <updated>2019-04-12T05:20:47Z</updated>
     </source>
   </entry>
 
@@ -1622,7 +1676,7 @@ Taking $E = [0,1/k) \cup (1-1/k,1]$ in our result yields as a corollary a random
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-12T04:20:33Z</updated>
+      <updated>2019-04-12T05:20:47Z</updated>
     </source>
   </entry>
 
@@ -1646,7 +1700,7 @@ Taking $E = [0,1/k) \cup (1-1/k,1]$ in our result yields as a corollary a random
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-12T04:20:33Z</updated>
+      <updated>2019-04-12T05:20:47Z</updated>
     </source>
   </entry>
 
@@ -1674,7 +1728,7 @@ As a by-product of our new approach to space lower bounds  we give a simple proo
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-12T04:20:33Z</updated>
+      <updated>2019-04-12T05:20:47Z</updated>
     </source>
   </entry>
 
@@ -1798,32 +1852,7 @@ Is this notion of any use? Also how hard will it be to formally define this noti
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-04-12T04:20:40Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-events.org/2019/04/09/preferences-decisions-and-games/</id>
-    <link href="https://cstheory-events.org/2019/04/09/preferences-decisions-and-games/" rel="alternate" type="text/html"/>
-    <title>Preferences, decisions and games</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">June 25-28, 2019 Paris, France https://decisionschool.lip6.fr/ Registration deadline: April 30, 2019 The purpose of the Summer School is to bring together PhD students, postdoctoral researchers, and researchers interested in mathematical and computational aspects of preference modelling, decision making and game theory. We expect participants with different backgrounds (Operations Research, Artificial Intelligence, Economics). During 4 days, … <a class="more-link" href="https://cstheory-events.org/2019/04/09/preferences-decisions-and-games/">Continue reading <span class="screen-reader-text">Preferences, decisions and games</span></a></div>
-    </summary>
-    <updated>2019-04-09T15:04:09Z</updated>
-    <published>2019-04-09T15:04:09Z</published>
-    <category term="school"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-events.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-events.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-events.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-events.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
-      <title>CS Theory Events</title>
-      <updated>2019-04-12T04:21:11Z</updated>
+      <updated>2019-04-12T05:20:54Z</updated>
     </source>
   </entry>
 </feed>

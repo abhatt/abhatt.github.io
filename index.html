@@ -225,7 +225,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at April 12, 2019 04:21 AM UTC</span>.
+Last updated <span class="datestr">at April 12, 2019 05:22 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -1144,6 +1144,77 @@ by GASARCH (noreply@blogger.com) <a href="https://blog.computationalcomplexity.o
 
 <div class="channelgroup">
 <div class="entrygroup" 
+	id="https://11011110.github.io/blog/2019/04/11/coloring-kinggraphs">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/eppstein.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://11011110.github.io/blog/2019/04/11/coloring-kinggraphs.html">Coloring kinggraphs</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>Draw a collection of quadrilaterals in the plane, meeting edge to edge, so that they don’t surround any open space (the region they cover is a topological disk) and every vertex interior to the disk touches at least four quadrilaterals. Is it always possible to color the corners of the quadrilaterals with four colors so that all four colors appear in each quadrilateral?</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/colored-kinggraph.svg" alt="4-colored kinggraph" /></p>
+
+<p>The graph of corners and quadrilateral edges is a <a href="https://en.wikipedia.org/wiki/Squaregraph">squaregraph</a> but this question is really about coloring a different and related graph, called a kinggraph, that also includes as edges the diagonals of each quad. It’s called that because one example of this kind of graph is the <a href="https://en.wikipedia.org/wiki/King's_graph">king’s graph</a> describing the possible moves of a chess king on a chessboard.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/kings-graph.svg" alt="The king's graph" /></p>
+
+<p>The king’s graph, and kinggraphs more generally, are examples of 1-planar graphs, graphs drawn in the plane in such a way that each edge is crossed at most once. The edges of the underlying squaregraph are not crossed at all, and the diagonals of each quad only cross each other. Squaregraphs are bipartite (like every planar graph in which all faces have an even number of edges), so they can be colored with only two colors. 1-planar graphs, in general, can require six colors (for instance you can draw the complete graph  as a 1-planar graph by adding diagonals to the squares of a triangular prism) and this is tight.
+And you can easily 4-color the king’s graph by using two colors in alternation across the even rows of the chessboard, and a different two colors across the odd rows. So the number of colors for kinggraphs should be somewhere between these two extremes, but where?</p>
+
+<p>One useful and general graph coloring method is based on the <a href="https://en.wikipedia.org/wiki/Degeneracy_(graph_theory)">degeneracy</a> of graphs. This is the largest number  such that every subgraph has a vertex with at most  neighbors; one can use a <a href="https://en.wikipedia.org/wiki/Greedy_coloring">greedy coloring algorithm</a> to color any graph with  colors. Kinggraphs themselves always have a vertex with at most  neighbors, but unfortunately they do not have degeneracy . If you form a king’s graph on a  chessboard, and then remove its four corners, you get a subgraph in which all vertices have at least four neighbors.
+This turns out to be as large as possible: every kinggraph has degeneracy at most four. This is because, if you consider the zones of the system of quads (strips of quads connected on opposite pairs of edges), there always exists an “outer zone”, a zone with nothing on one side of it (see the illustration, below). You can remove the vertices of the outer zone one at a time, in order from one end to the other, always removing a vertex of degree at most four, and then repeat on another outer zone until the whole graph is gone. So the degeneracy and greedy coloring method shows that you can 5-color every kinggraph, better than the 6-coloring that we get for arbitrary 1-planar graphs.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/outer-zone.svg" alt="An outer zone" /></p>
+
+<p>This turns out to be optimal! For a while I thought that every kinggraph must be 4-colorable, because it was true of all the small examples that I tried. But it’s not true in general, and here’s why. If you look at the zones of the 4-colored kinggraph above, you might notice a pattern. The edges that connect pairs of quads from the same zone have colorings that alternate between two different pairs of colors. For instance, we might have a zone that has red–yellow edges alternating with blue–green edges, or another zone that has red–blue edges alternating with green–yellow edges. This is true whenever a kinggraph can be 4-colored. But there are only three ways of coloring a zone (that is, of partitioning the four colors into two disjoint pairs, which alternate along the zone). And when two zones cross each other, they must be colored differently. So every 4-coloring of a kinggraph turns into a 3-coloring of its zones. But the graph that describes the zones and its crossings is a triangle-free <a href="https://en.wikipedia.org/wiki/Circle_graph">circle graph</a>, and vice versa: every triangle-free circle graph describes a kinggraph. And triangle-free circle graphs may sometimes need as many as five colors, in which case so does the corresponding kinggraph.</p>
+
+<p>I posted <a href="https://11011110.github.io/blog/2008/03/23/ageevs-squaregraph.html">an example of a squaregraph whose circle graph needs five colors</a> on this blog in 2008. Here’s a slightly different drawing of the same graph from <a href="https://11011110.github.io/blog/2009/05/29/congratulations-dr-wortman.html">a later post</a>.
+Because its circle graph is not 3-colorable, the corresponding kinggraph is not 4-colorable.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2009/cd220c.svg" alt="A squaregraph whose kinggraph is not 4-colorable" /></p>
+
+<p>There are simpler examples of squaregraphs whose circle graph needs four colors. As long as the number of colors of the circle graph is more than three, the number of colors of the kinggraph will be more than four.</p>
+
+<p>On the other hand, if you can color the circle graph with three colors, then it’s also possible to translate this 3-coloring of zones back into a 4-coloring of the kinggraph. Just remove an outer zone, color the remaining graph recursively, add the removed zone back, and use the color of the zone you removed to decide which colors to assign to its vertices. Unfortunately, I don’t know the computational complexity of testing whether a circle graph is 3-colorable. There was a conference paper by Walter Unger in 1992 that claimed to have a polynomial time algorithm, but without enough details and it was never published in a journal. I think we have to consider the problem of finding a coloring as still being open.</p>
+
+<p>The same method also leads to an easy calculation of the number of 4-colorings (in the same sense) of the usual kind of chessboard with  squares, or of a king’s graph with  vertices. In this case, the zones are just the rows and columns of the chessboard. We can use one color for the rows and two for the columns, or vice versa, so the number of 3-colorings of the zones (accounting for the fact that the 2-colorings get counted twice) is . And once the coloring of the zones is chosen, the coloring of the chessboard itself is uniquely determined by the color of any of its squares, so the total number of chessboard colorings is .</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/101911453128265954">Discuss on Mastodon</a>)</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by David Eppstein <a href="https://11011110.github.io/blog/2019/04/11/coloring-kinggraphs.html"><span class="datestr">at April 11, 2019 09:28 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
 	id="tag:blogger.com,1999:blog-6555947.post-9122950491534339538">
 <div class="entryheader">
 <span class="face">
@@ -1162,7 +1233,7 @@ by GASARCH (noreply@blogger.com) <a href="https://blog.computationalcomplexity.o
 <div class="content">
 <div class="tr_bq">Martin Farach-Colton asked me to mention this, which is definitely NOT a pox on computer systems. </div><blockquote>ACM-SIAM Algorithmic Principles of Computer Systems (APoCS20) </blockquote><blockquote> <a href="https://www.siam.org/Conferences/CM/Main/apocs20" class=""><span style="color: black;">https://www.siam.org/Conferences/CM/Main/apocs20</span></a>January 8, 2020<br />Hilton Salt Lake City Center, Salt Lake City, Utah, USA<br />Colocated with SODA, SOSA, and Alenex </blockquote><blockquote>The First ACM-SIAM APoCS is sponsored by SIAM SIAG/ACDA and ACM SIGACT. </blockquote><blockquote><b class="">Important Dates:</b><span style="white-space: pre;" class="Apple-tab-span"> </span> </blockquote><blockquote>        August 9: Abstract Submission and Paper Registration Deadline<br /><span style="white-space: pre;" class="Apple-tab-span"> </span>August 16: Full Paper Deadline<br /><span style="white-space: pre;" class="Apple-tab-span"> </span>October 4: Decision Announcement </blockquote><blockquote><b class="">Program Chair: </b>Bruce Maggs, Duke University and Akamai Technologies </blockquote><blockquote><b class="">Submissions: </b>Contributed papers are sought in all areas of algorithms and architectures that offer insight into the performance and design of computer systems.  Topics of interest include, but are not limited to algorithms and data structures for: </blockquote><blockquote><br /><ul><li>Databases</li><li>Compilers</li><li>Emerging Architectures</li><li>Energy Efficient Computing</li><li>High-performance Computing</li><li>Management of Massive Data</li><li>Networks, including Mobile, Ad-Hoc and Sensor Networks</li><li>Operating Systems</li><li>Parallel and Distributed Systems</li><li>Storage Systems</li></ul><br />A submission must report original research that has not previously or is not concurrently being published. Manuscripts must not exceed twelve (12) single-spaced double-column pages, in addition the bibliography and any pages containing only figures.  Submission must be self-contained, and any extra details may be submitted in a clearly marked appendix. </blockquote><blockquote><b class="">Steering Committee:</b> </blockquote><blockquote><br /><ul><li>Michael Bender</li><li>Guy Blelloch</li><li>Jennifer Chayes</li><li>Martin Farach-Colton (Chair)</li><li>Charles Leiserson</li><li>Don Porter</li><li>Jennifer Rexford</li><li>Margo Seltzer  </li></ul></blockquote><div class="feedflare">
 <a href="http://feeds.feedburner.com/~ff/TheGeomblog?a=f-Go67FP6JE:5t9IOqQalN0:yIl2AUoC8zA"><img src="http://feeds.feedburner.com/~ff/TheGeomblog?d=yIl2AUoC8zA" border="0" /></a> <a href="http://feeds.feedburner.com/~ff/TheGeomblog?a=f-Go67FP6JE:5t9IOqQalN0:63t7Ie-LG7Y"><img src="http://feeds.feedburner.com/~ff/TheGeomblog?d=63t7Ie-LG7Y" border="0" /></a>
-</div><img src="http://feeds.feedburner.com/~r/TheGeomblog/~4/f-Go67FP6JE" alt="" width="1" height="1" /></div>
+</div><img width="1" alt="" src="http://feeds.feedburner.com/~r/TheGeomblog/~4/f-Go67FP6JE" height="1" /></div>
 
 
 
@@ -2509,48 +2580,6 @@ Is this notion of any use? Also how hard will it be to formally define this noti
 
 <p class="date">
 by rjlipton <a href="https://rjlipton.wordpress.com/2019/04/09/seeing-is-believing/"><span class="datestr">at April 09, 2019 03:38 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://cstheory-events.org/2019/04/09/preferences-decisions-and-games/">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/events.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://cstheory-events.org/2019/04/09/preferences-decisions-and-games/">Preferences, decisions and games</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://cstheory-events.org" title="CS Theory Events">CS Theory Events</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-June 25-28, 2019 Paris, France https://decisionschool.lip6.fr/ Registration deadline: April 30, 2019 The purpose of the Summer School is to bring together PhD students, postdoctoral researchers, and researchers interested in mathematical and computational aspects of preference modelling, decision making and game theory. We expect participants with different backgrounds (Operations Research, Artificial Intelligence, Economics). During 4 days, … <a href="https://cstheory-events.org/2019/04/09/preferences-decisions-and-games/" class="more-link">Continue reading <span class="screen-reader-text">Preferences, decisions and games</span></a></div>
-
-
-
-
-
-
-
-<p class="date">
-by shacharlovett <a href="https://cstheory-events.org/2019/04/09/preferences-decisions-and-games/"><span class="datestr">at April 09, 2019 03:04 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
