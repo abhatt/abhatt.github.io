@@ -98,8 +98,8 @@ Stay up to date
 <a class="feedlink" href="https://eccc.weizmann.ac.il//feeds/reports/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="https://eccc.weizmann.ac.il/" title="ECCC - Reports">ECCC papers</a>
 <br>
-<a class="feedlink" href="" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
-<a class="message" title="404: not found">Elad Hazan</a>
+<a class="feedlink" href="https://minimizingregret.wordpress.com/feed/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
+<a href="https://minimizingregret.wordpress.com" title="Minimizing Regret">Elad Hazan</a>
 <br>
 <a class="feedlink" href="https://emanueleviola.wordpress.com/feed/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="https://emanueleviola.wordpress.com" title="Thoughts">Emanuele Viola</a>
@@ -225,7 +225,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at April 16, 2019 10:21 AM UTC</span>.
+Last updated <span class="datestr">at April 16, 2019 11:22 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -1176,6 +1176,95 @@ To explain this to someone IN CS and even in CS Theory, but not complexity (e.g.
 
 <p class="date">
 by GASARCH (noreply@blogger.com) <a href="https://blog.computationalcomplexity.org/2019/04/good-article-terrible-headline.html"><span class="datestr">at April 15, 2019 04:08 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://minimizingregret.wordpress.com/?p=116">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/hazan.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://minimizingregret.wordpress.com/2019/04/15/reinforcement-learning-without-rewards/">Reinforcement learning without rewards</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://minimizingregret.wordpress.com" title="Minimizing Regret">Elad Hazan</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p><em>by <a href="http://www.abbyvansoest.com/">Abby van Soest</a> and Elad Hazan, based on <a href="https://arxiv.org/abs/1812.02690">this paper</a> </em></p>
+<p>When humans interact with the environment, we receive a series of signals that indicate the value of our actions. We know that chocolate tastes good, sunburns feel bad, and certain actions generate praise or disapproval from others. Generally speaking, we learn from these signals and adapt our behavior in order to get more positive “rewards” and fewer negative ones.</p>
+<p><i>Reinforcement learning</i> (RL) is a sub-field of machine learning that formally models this setting of learning through interaction in a reactive environment. In RL, we have an <b>agent</b> and an <b>environment</b>. The agent observes its position (or “state”) in the environment and takes actions that transition it to a new state. The environment looks at an agent’s state and hands out rewards based on a hidden set of criteria.</p>
+<p style="text-align: center;"><img width="360" alt="" src="https://minimizingregret.files.wordpress.com/2019/04/null.png?w=360&amp;h=145" title="" height="145" /></p>
+<p><i>Source: <a href="http://incompleteideas.net/book/bookdraft2017nov5.pdf">Reinforcement Learning: An Introduction</a>. Sutton &amp; Barto, 2017.</i></p>
+<p>Typically, the goal of RL is for the agent to learn behavior that maximizes<i> </i>the total reward it receives from the environment. This methodology has led to some notable successes: machines have learned how to<a href="https://deepmind.com/research/publications/playing-atari-deep-reinforcement-learning/"> play Atari games</a>, how to <a href="https://sigmoidal.io/alphago-how-it-uses-reinforcement-learning-to-beat-go-masters/">beat human masters</a> of Go, and how to write <a href="https://www.theverge.com/2019/2/14/18224704/ai-machine-learning-language-models-read-write-openai-gpt2">long-form responses</a> to an essay prompt.</p>
+<h2>But what can we learn without an external reward signal?</h2>
+<p>It seems like a paradoxical question to ask, given that RL is all about rewards. But even though the reward paradigm is fundamentally flexible in many ways, it is also brittle and limits the agent’s ability to learn about its environment. This is due to several reasons. First, a reward signal directs the agents towards a single specific goal that may not generalize. Second, the reward signal may be sparse and uninformative, as we illustrate below.</p>
+<p>Imagine that you want a robot to learn to navigate through the following maze.</p>
+<p><b>Case 1: Sparse Rewards.</b> The agent gets a reward of +1 when it exits the maze, and a reward of 0 everywhere else. The agent doesn’t learn anything until it stumbles upon the exit.</p>
+<p style="text-align: center;">⇒ Clear reward signals are not always available.</p>
+<p><b>Case 2: Misleading Rewards.</b> The agent gets a reward of +1 at the entrance and a reward of +10 at the exit. The agent incorrectly learns to sit at the entrance because it hasn’t explored its environment sufficiently.</p>
+<p style="text-align: center;">⇒ Rewards can <i>prevent</i> discovery of the full environment.</p>
+<p>These issues are easy to overcome in the small maze on the left. But what about the maze on the right? As the size of the environment grows, it’ll get harder and harder to find the correct solution — the intractability of the problem scales exponentially.</p>
+<p style="text-align: center;"><img width="244" alt="" src="https://minimizingregret.files.wordpress.com/2019/04/image.png?w=244&amp;h=238" title="" height="238" /><img src="https://minimizingregret.files.wordpress.com/2019/04/pasted-image-0.png?w=1100" alt="pasted image 0.png" class="alignnone size-full wp-image-130" /></p>
+<p>So what we find is that there is power<i> </i>in being able to learn effectively in the <b>absence</b> of rewards. This intuition is supported by a body of research that shows learning fails when rewards aren’t dense or are <a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">poorly shaped</a>; and fixing these problems can require substantial engineering effort.</p>
+<p>By enabling agents to discover the environment without the requirement of a reward signal, we create a more<b> flexible and generalizable</b> form of reinforcement learning. This framework can be considered a form of “unsupervised” RL. Rather than relying on explicit and inherently limited signals (or “labels”), we can deal with a broad, unlabelled pool of data. Learning from this pool facilitates a more general extraction of knowledge from the environment.</p>
+<h2>Our new approach: Maximum Entropy</h2>
+<p>In <a href="https://arxiv.org/abs/1812.02690">recent work</a>, we propose finding a policy that maximizes entropy (which we refer to as a MaxEnt policy), or another related and concave function of the distribution. This objective is reward-independent and favors exploration.</p>
+<p>In the video below, a two-dimensional cheetah robot learns to run backwards and forwards, move its legs fast and in all different directions, and even do flips. The cheetah doesn’t have access to any external rewards; it only uses signals from the MaxEnt policy.</p>
+<p> </p>
+<div style="width: 1100px; height: 620px;" class="video-player" id="v-ro0BDWO4-1">
+</div>
+<p>Entropy is a function of the distribution over states. A high entropy distribution visits all states with near-equal frequency — it’s a <i>uniform</i> distribution. On the other hand, a low entropy distribution is biased toward visiting some states more frequently than others. (In the maze example, a low entropy distribution would result from the agent sitting at the entrance of the maze forever.)</p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/04/sladx3i4fcsebwejbiohb_g.png?w=1100" alt="slAdX3I4FcseBWeJbioHb_g.png" class=" size-full wp-image-129 aligncenter" /></p>
+<p>So given that policy <img src="https://s0.wp.com/latex.php?latex=%5Cpi&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\pi" class="latex" title="\pi" /> creates a distribution <img src="https://s0.wp.com/latex.php?latex=d_%5Cpi&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="d_\pi" class="latex" title="d_\pi" /> over states, the problem we are hoping to solve is:</p>
+<p style="text-align: center;"><img src="https://s0.wp.com/latex.php?latex=%5Cpi%5E%2A+%3D+%5Carg+%5Cmax_%7B%5Cpi%7D+%5Ctext%7Bentropy%7D%28d_%5Cpi%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\pi^* = \arg \max_{\pi} \text{entropy}(d_\pi) " class="latex" title="\pi^* = \arg \max_{\pi} \text{entropy}(d_\pi) " /></p>
+<p>When we know all the states, actions, and dynamics of a given environment, finding the policy with maximum entropy is a concave optimization problem. This type of problem can be easily and exactly solved by convex programming.</p>
+<p>But we very rarely have all that knowledge available to use. In practice, one of several complications usually arise:</p>
+<ol>
+<li>The states are <b>non-linearly approximated </b>by a neural network or some other function approximator.</li>
+<li>The transition dynamics are unknown.</li>
+<li>The state space is intractably large. (As an interesting example, the game of Go has more than<b> one googol or <img src="https://s0.wp.com/latex.php?latex=10%5E%7B100%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="10^{100}" class="latex" title="10^{100}" /></b> possible states. That’s more than the number of atoms in the universe, according to <a href="https://ai.googleblog.com/2016/01/alphago-mastering-ancient-game-of-go.html">this blog</a> from 2016, and definitely more than can fit on a computer.)</li>
+</ol>
+<p>In such cases, the problem of finding a max-entropy policy becomes non-convex and computationally hard.</p>
+<p>So what to do? If we look at many practical RL problems (Atari, OpenAI Gym), we see that there are many known, efficient solvers that can construct an optimal (or nearly-optimal) policy when they are <i>given a reward signal</i>.</p>
+<p>We thus consider an <i>oracle model</i>: let’s assume that we have access to one of these solvers, so that we can pass it an explicit reward vector and receive an optimal policy in return. Can we now maximize entropy in a provably efficient way? In other words, is it possible to reduce this high complexity optimization problem to that of “standard” RL?</p>
+<p>Our approach does exactly that! It is based on the Frank-Wolfe method. This is a gradient-based optimization algorithm that is particularly suited for oracle-based optimization. Instead of moving in the direction of the steepest decline of the objective function, the Frank-Wolfe method iteratively moves in the direction of the optimal point in the direction of the gradient. This is depicted below (and deserves a separate post…). The Frank-Wolfe method is a projection-free algorithm, see <a href="https://drive.google.com/file/d/1GIDnw7T-NT4Do3eC0B5kYJlzwOs6nzIO/view">this exposition</a> about its theoretical properties.</p>
+<p><img width="616" alt="" src="https://minimizingregret.files.wordpress.com/2019/04/unnamed-file.png?w=616&amp;h=345" title="" height="345" /></p>
+<p>For the exact specification of the algorithm and its performance guarantee, see<a href="https://arxiv.org/abs/1812.02690"> our paper</a>.</p>
+<h2>Experiments</h2>
+<p>To complement the theory, we also created some experiments to test the MaxEnt algorithm on simulated robotic locomotion tasks (<a href="https://github.com/abbyvansoest/maxent/tree/refactor">open source code available here</a>). We used test environments from <a href="https://gym.openai.com/">OpenAI Gym</a> and <a href="https://github.com/openai/mujoco-py">Mujoco</a> and trained MaxEnt experts for various environments.</p>
+<p>These are some results from the Humanoid experiment, where the agent is a human-like bipedal robot. The behavior of the MaxEnt agent (blue) is baselined against a random agent (orange), who explores by sampling randomly from the environment. This random approach is often used in practice for epsilon-greedy RL exploration.</p>
+<p style="text-align: center;"><img width="442" alt="" src="https://minimizingregret.files.wordpress.com/2019/04/null-1.png?w=442&amp;h=332" title="" height="332" /></p>
+<p>In this figure, we see that over the course of 25 epochs, the MaxEnt agent progressively increases the total entropy over the state space.</p>
+<p style="text-align: center;"><img width="460" alt="" src="https://minimizingregret.files.wordpress.com/2019/04/null-2.png?w=460&amp;h=345" title="" height="345" /></p>
+<p>Here, we see a visualization of the Humanoid’s coverage of the $xy$-plane, where the shown plane is of size 40-by-40. After one epoch, there is <b>minimal</b> coverage of the area. But by the 5th, 10th, and 15th epoch, we see that the agent has learned to visit all the different states in the plane, obtaining full and nearly uniform coverage of the grid!</p>
+<div><a href="https://minimizingregret.wordpress.com/2019/04/15/reinforcement-learning-without-rewards/"><img width="160" alt="cheetah-pretty" src="https://videos.files.wordpress.com/ro0BDWO4/cheetah-pretty_std.original.jpg" height="120" /></a></div></div>
+
+
+
+
+
+
+
+<p class="date">
+by Elad Hazan <a href="https://minimizingregret.wordpress.com/2019/04/15/reinforcement-learning-without-rewards/"><span class="datestr">at April 15, 2019 01:03 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -2521,77 +2610,6 @@ In 1989, Berlekamp purchased the largest interest in a trading company named Axc
 
 <p class="date">
 by GASARCH (noreply@blogger.com) <a href="https://blog.computationalcomplexity.org/2019/04/elwyn-berlekamp-died-april-9-2019.html"><span class="datestr">at April 11, 2019 10:13 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://11011110.github.io/blog/2019/04/11/coloring-kinggraphs">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eppstein.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="https://11011110.github.io/blog/2019/04/11/coloring-kinggraphs.html">Coloring kinggraphs</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p>Draw a collection of quadrilaterals in the plane, meeting edge to edge, so that they don’t surround any open space (the region they cover is a topological disk) and every vertex interior to the disk touches at least four quadrilaterals. Is it always possible to color the corners of the quadrilaterals with four colors so that all four colors appear in each quadrilateral?</p>
-
-<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/colored-kinggraph.svg" alt="4-colored kinggraph" /></p>
-
-<p>The graph of corners and quadrilateral edges is a <a href="https://en.wikipedia.org/wiki/Squaregraph">squaregraph</a> but this question is really about coloring a different and related graph, called a kinggraph, that also includes as edges the diagonals of each quad. It’s called that because one example of this kind of graph is the <a href="https://en.wikipedia.org/wiki/King's_graph">king’s graph</a> describing the possible moves of a chess king on a chessboard.</p>
-
-<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/kings-graph.svg" alt="The king's graph" /></p>
-
-<p>The king’s graph, and kinggraphs more generally, are examples of 1-planar graphs, graphs drawn in the plane in such a way that each edge is crossed at most once. The edges of the underlying squaregraph are not crossed at all, and the diagonals of each quad only cross each other. Squaregraphs are bipartite (like every planar graph in which all faces have an even number of edges), so they can be colored with only two colors. 1-planar graphs, in general, can require six colors (for instance you can draw the complete graph  as a 1-planar graph by adding diagonals to the squares of a triangular prism) and this is tight.
-And you can easily 4-color the king’s graph by using two colors in alternation across the even rows of the chessboard, and a different two colors across the odd rows. So the number of colors for kinggraphs should be somewhere between these two extremes, but where?</p>
-
-<p>One useful and general graph coloring method is based on the <a href="https://en.wikipedia.org/wiki/Degeneracy_(graph_theory)">degeneracy</a> of graphs. This is the largest number  such that every subgraph has a vertex with at most  neighbors; one can use a <a href="https://en.wikipedia.org/wiki/Greedy_coloring">greedy coloring algorithm</a> to color any graph with  colors. Kinggraphs themselves always have a vertex with at most  neighbors, but unfortunately they do not have degeneracy . If you form a king’s graph on a  chessboard, and then remove its four corners, you get a subgraph in which all vertices have at least four neighbors.
-This turns out to be as large as possible: every kinggraph has degeneracy at most four. This is because, if you consider the zones of the system of quads (strips of quads connected on opposite pairs of edges), there always exists an “outer zone”, a zone with nothing on one side of it (see the illustration, below). You can remove the vertices of the outer zone one at a time, in order from one end to the other, always removing a vertex of degree at most four, and then repeat on another outer zone until the whole graph is gone. So the degeneracy and greedy coloring method shows that you can 5-color every kinggraph, better than the 6-coloring that we get for arbitrary 1-planar graphs.</p>
-
-<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/outer-zone.svg" alt="An outer zone" /></p>
-
-<p>This turns out to be optimal! For a while I thought that every kinggraph must be 4-colorable, because it was true of all the small examples that I tried. But it’s not true in general, and here’s why. If you look at the zones of the 4-colored kinggraph above, you might notice a pattern. The edges that connect pairs of quads from the same zone have colorings that alternate between two different pairs of colors. For instance, we might have a zone that has red–yellow edges alternating with blue–green edges, or another zone that has red–blue edges alternating with green–yellow edges. This is true whenever a kinggraph can be 4-colored. But there are only three ways of coloring a zone (that is, of partitioning the four colors into two disjoint pairs, which alternate along the zone). And when two zones cross each other, they must be colored differently. So every 4-coloring of a kinggraph turns into a 3-coloring of its zones. But the graph that describes the zones and its crossings is a triangle-free <a href="https://en.wikipedia.org/wiki/Circle_graph">circle graph</a>, and vice versa: every triangle-free circle graph describes a kinggraph. And triangle-free circle graphs may sometimes need as many as five colors, in which case so does the corresponding kinggraph.</p>
-
-<p>I posted <a href="https://11011110.github.io/blog/2008/03/23/ageevs-squaregraph.html">an example of a squaregraph whose circle graph needs five colors</a> on this blog in 2008. Here’s a slightly different drawing of the same graph from <a href="https://11011110.github.io/blog/2009/05/29/congratulations-dr-wortman.html">a later post</a>.
-Because its circle graph is not 3-colorable, the corresponding kinggraph is not 4-colorable.</p>
-
-<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2009/cd220c.svg" alt="A squaregraph whose kinggraph is not 4-colorable" /></p>
-
-<p>There are simpler examples of squaregraphs whose circle graph needs four colors. As long as the number of colors of the circle graph is more than three, the number of colors of the kinggraph will be more than four.</p>
-
-<p>On the other hand, if you can color the circle graph with three colors, then it’s also possible to translate this 3-coloring of zones back into a 4-coloring of the kinggraph. Just remove an outer zone, color the remaining graph recursively, add the removed zone back, and use the color of the zone you removed to decide which colors to assign to its vertices. Unfortunately, I don’t know the computational complexity of testing whether a circle graph is 3-colorable. There was a conference paper by Walter Unger in 1992 that claimed to have a polynomial time algorithm, but without enough details and it was never published in a journal. I think we have to consider the problem of finding a coloring as still being open.</p>
-
-<p>The same method also leads to an easy calculation of the number of 4-colorings (in the same sense) of the usual kind of chessboard with  squares, or of a king’s graph with  vertices. In this case, the zones are just the rows and columns of the chessboard. We can use one color for the rows and two for the columns, or vice versa, so the number of 3-colorings of the zones (accounting for the fact that the 2-colorings get counted twice) is . And once the coloring of the zones is chosen, the coloring of the chessboard itself is uniquely determined by the color of any of its squares, so the total number of chessboard colorings is .</p>
-
-<p>(<a href="https://mathstodon.xyz/@11011110/101911453128265954">Discuss on Mastodon</a>)</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by David Eppstein <a href="https://11011110.github.io/blog/2019/04/11/coloring-kinggraphs.html"><span class="datestr">at April 11, 2019 09:28 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
