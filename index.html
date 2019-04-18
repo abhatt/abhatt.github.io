@@ -225,7 +225,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at April 18, 2019 01:21 PM UTC</span>.
+Last updated <span class="datestr">at April 18, 2019 02:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -2570,7 +2570,7 @@ by GASARCH (noreply@blogger.com) <a href="https://blog.computationalcomplexity.o
 <p><em>by <a href="http://www.abbyvansoest.com/">Abby van Soest</a> and Elad Hazan, based on <a href="https://arxiv.org/abs/1812.02690">this paper</a> </em></p>
 <p>When humans interact with the environment, we receive a series of signals that indicate the value of our actions. We know that chocolate tastes good, sunburns feel bad, and certain actions generate praise or disapproval from others. Generally speaking, we learn from these signals and adapt our behavior in order to get more positive “rewards” and fewer negative ones.</p>
 <p><i>Reinforcement learning</i> (RL) is a sub-field of machine learning that formally models this setting of learning through interaction in a reactive environment. In RL, we have an <b>agent</b> and an <b>environment</b>. The agent observes its position (or “state”) in the environment and takes actions that transition it to a new state. The environment looks at an agent’s state and hands out rewards based on a hidden set of criteria.</p>
-<p style="text-align: center;"><img width="360" alt="" src="https://minimizingregret.files.wordpress.com/2019/04/null.png?w=360&amp;h=145" title="" height="145" /></p>
+<p style="text-align: center;"><img src="https://minimizingregret.files.wordpress.com/2019/04/null.png?w=360&amp;h=145" alt="" title="" width="360" height="145" /></p>
 <p><i>Source: <a href="http://incompleteideas.net/book/bookdraft2017nov5.pdf">Reinforcement Learning: An Introduction</a>. Sutton &amp; Barto, 2017.</i></p>
 <p>Typically, the goal of RL is for the agent to learn behavior that maximizes<i> </i>the total reward it receives from the environment. This methodology has led to some notable successes: machines have learned how to<a href="https://deepmind.com/research/publications/playing-atari-deep-reinforcement-learning/"> play Atari games</a>, how to <a href="https://sigmoidal.io/alphago-how-it-uses-reinforcement-learning-to-beat-go-masters/">beat human masters</a> of Go, and how to write <a href="https://www.theverge.com/2019/2/14/18224704/ai-machine-learning-language-models-read-write-openai-gpt2">long-form responses</a> to an essay prompt.</p>
 <h2>But what can we learn without an external reward signal?</h2>
@@ -2581,7 +2581,7 @@ by GASARCH (noreply@blogger.com) <a href="https://blog.computationalcomplexity.o
 <p><b>Case 2: Misleading Rewards.</b> The agent gets a reward of +1 at the entrance and a reward of +10 at the exit. The agent incorrectly learns to sit at the entrance because it hasn’t explored its environment sufficiently.</p>
 <p style="text-align: center;">⇒ Rewards can <i>prevent</i> discovery of the full environment.</p>
 <p>These issues are easy to overcome in the small maze on the left. But what about the maze on the right? As the size of the environment grows, it’ll get harder and harder to find the correct solution — the intractability of the problem scales exponentially.</p>
-<p style="text-align: center;"><img width="244" alt="" src="https://minimizingregret.files.wordpress.com/2019/04/image.png?w=244&amp;h=238" title="" height="238" /><img src="https://minimizingregret.files.wordpress.com/2019/04/pasted-image-0.png?w=1100" alt="pasted image 0.png" class="alignnone size-full wp-image-130" /></p>
+<p style="text-align: center;"><img src="https://minimizingregret.files.wordpress.com/2019/04/image.png?w=244&amp;h=238" alt="" title="" width="244" height="238" /><img src="https://minimizingregret.files.wordpress.com/2019/04/pasted-image-0.png?w=1100" alt="pasted image 0.png" class="alignnone size-full wp-image-130" /></p>
 <p>So what we find is that there is power<i> </i>in being able to learn effectively in the <b>absence</b> of rewards. This intuition is supported by a body of research that shows learning fails when rewards aren’t dense or are <a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">poorly shaped</a>; and fixing these problems can require substantial engineering effort.</p>
 <p>By enabling agents to discover the environment without the requirement of a reward signal, we create a more<b> flexible and generalizable</b> form of reinforcement learning. This framework can be considered a form of “unsupervised” RL. Rather than relying on explicit and inherently limited signals (or “labels”), we can deal with a broad, unlabelled pool of data. Learning from this pool facilitates a more general extraction of knowledge from the environment.</p>
 <h2>Our new approach: Maximum Entropy</h2>
@@ -2605,16 +2605,16 @@ by GASARCH (noreply@blogger.com) <a href="https://blog.computationalcomplexity.o
 <p>So what to do? If we look at many practical RL problems (Atari, OpenAI Gym), we see that there are many known, efficient solvers that can construct an optimal (or nearly-optimal) policy when they are <i>given a reward signal</i>.</p>
 <p>We thus consider an <i>oracle model</i>: let’s assume that we have access to one of these solvers, so that we can pass it an explicit reward vector and receive an optimal policy in return. Can we now maximize entropy in a provably efficient way? In other words, is it possible to reduce this high complexity optimization problem to that of “standard” RL?</p>
 <p>Our approach does exactly that! It is based on the Frank-Wolfe method. This is a gradient-based optimization algorithm that is particularly suited for oracle-based optimization. Instead of moving in the direction of the steepest decline of the objective function, the Frank-Wolfe method iteratively moves in the direction of the optimal point in the direction of the gradient. This is depicted below (and deserves a separate post…). The Frank-Wolfe method is a projection-free algorithm, see <a href="https://drive.google.com/file/d/1GIDnw7T-NT4Do3eC0B5kYJlzwOs6nzIO/view">this exposition</a> about its theoretical properties.</p>
-<p><img width="616" alt="" src="https://minimizingregret.files.wordpress.com/2019/04/unnamed-file.png?w=616&amp;h=345" title="" height="345" /></p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/04/unnamed-file.png?w=616&amp;h=345" alt="" title="" width="616" height="345" /></p>
 <p>For the exact specification of the algorithm and its performance guarantee, see<a href="https://arxiv.org/abs/1812.02690"> our paper</a>.</p>
 <h2>Experiments</h2>
 <p>To complement the theory, we also created some experiments to test the MaxEnt algorithm on simulated robotic locomotion tasks (<a href="https://github.com/abbyvansoest/maxent/tree/refactor">open source code available here</a>). We used test environments from <a href="https://gym.openai.com/">OpenAI Gym</a> and <a href="https://github.com/openai/mujoco-py">Mujoco</a> and trained MaxEnt experts for various environments.</p>
 <p>These are some results from the Humanoid experiment, where the agent is a human-like bipedal robot. The behavior of the MaxEnt agent (blue) is baselined against a random agent (orange), who explores by sampling randomly from the environment. This random approach is often used in practice for epsilon-greedy RL exploration.</p>
-<p style="text-align: center;"><img width="442" alt="" src="https://minimizingregret.files.wordpress.com/2019/04/null-1.png?w=442&amp;h=332" title="" height="332" /></p>
+<p style="text-align: center;"><img src="https://minimizingregret.files.wordpress.com/2019/04/null-1.png?w=442&amp;h=332" alt="" title="" width="442" height="332" /></p>
 <p>In this figure, we see that over the course of 25 epochs, the MaxEnt agent progressively increases the total entropy over the state space.</p>
-<p style="text-align: center;"><img width="460" alt="" src="https://minimizingregret.files.wordpress.com/2019/04/null-2.png?w=460&amp;h=345" title="" height="345" /></p>
+<p style="text-align: center;"><img src="https://minimizingregret.files.wordpress.com/2019/04/null-2.png?w=460&amp;h=345" alt="" title="" width="460" height="345" /></p>
 <p>Here, we see a visualization of the Humanoid’s coverage of the $xy$-plane, where the shown plane is of size 40-by-40. After one epoch, there is <b>minimal</b> coverage of the area. But by the 5th, 10th, and 15th epoch, we see that the agent has learned to visit all the different states in the plane, obtaining full and nearly uniform coverage of the grid!</p>
-<div><a href="https://minimizingregret.wordpress.com/2019/04/15/reinforcement-learning-without-rewards/"><img width="160" alt="cheetah-pretty" src="https://videos.files.wordpress.com/ro0BDWO4/cheetah-pretty_std.original.jpg" height="120" /></a></div></div>
+<div><a href="https://minimizingregret.wordpress.com/2019/04/15/reinforcement-learning-without-rewards/"><img src="https://videos.files.wordpress.com/ro0BDWO4/cheetah-pretty_std.original.jpg" alt="cheetah-pretty" width="160" height="120" /></a></div></div>
 
 
 
