@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-04-23T23:35:42Z</updated>
+  <updated>2019-04-24T00:21:24Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,51 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2019/04/23/euler-characteristics-nonmanifold</id>
+    <link href="https://11011110.github.io/blog/2019/04/23/euler-characteristics-nonmanifold.html" rel="alternate" type="text/html"/>
+    <title>Euler characteristics of non-manifold polycubes</title>
+    <summary>From a block of cubes, remove two non-adjacent and non-opposite cubes. The resulting polycube has a boundary that is not a manifold: between the two removed cubes, there is an edge shared by four squares, but a two-dimensional manifold can only have two faces per edge. Nevertheless, we can compute its Euler characteristic as the number of vertices () minus the number of edges () plus the number of square faces (). , the same number we would expect for the Euler characteristic of a topological sphere! What does it mean?</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>From a  block of cubes, remove two non-adjacent and non-opposite cubes. The resulting polycube has a boundary that is not a <a href="https://en.wikipedia.org/wiki/Manifold">manifold</a>: between the two removed cubes, there is an edge shared by four squares, but a two-dimensional manifold can only have two faces per edge. Nevertheless, we can compute its Euler characteristic as the number of vertices () minus the number of edges () plus the number of square faces (). , the same number we would expect for the Euler characteristic of a topological sphere! What does it mean?</p>
+
+<p style="text-align: center;"><img alt="Removing two non-adjacent and non-opposite cubes from a 2x2 block of cubes" src="https://11011110.github.io/blog/assets/2019/nonmanifold-polycube.svg"/></p>
+
+<p>Any finite union of cubes of the integer lattice (not even necessarily connected) has as its boundary a set of vertices, edges, and squares, with each edge incident to an even number of squares. We can define the Euler characteristic to be the number of vertices minus edges plus squares, in the usual way. But we can also compute it in a different, more intrinsic and topological, way. For any  in the range , define the “shrunken interior” of the polycube to be the set of points of the interior farther than  from the boundary, and define the “shrunken exterior” in the same way. Then the shrunken interior and shrunken exterior both have (possibly disconnected) 2-manifolds as boundaries. We can define their Euler characteristics in the standard way from any cell decomposition of these boundaries (it doesn’t matter which cell decomposition we choose). Then the Euler characteristic of the polycube is the average of the Euler characteristics of the shrunken interior and shrunken exterior!</p>
+
+<p>In the case of the mutilated  block, the shrunken interior and shrunken exterior are both topological balls (ignoring the puncture at infinity as it doesn’t have a boundary), so the average of their Euler characteristics is the Euler characteristic of a sphere, as we calculated.</p>
+
+<p>There’s probably a simpler and more conceptual way of doing it, but here’s an explanation for why the Euler characteristic of the polycube boundary is the average of the Euler characteristics of the interior and exterior. Form a cell complex on the boundary of the interior and exterior, together, in the following way: expand each square of the polycube boundary to a cuboid with thickness 0.1, expand each edge into a cylinder with diameter 0.2 (big enough to enclose all the intersections of two expanded squares), and expand each vertex into a sphere with diameter 0.3 (big enough to enclose all the intersections of two cylinders but small enough that no two of these spheres touch). Remove the union of these expanded shapes from the space, and consider what’s left. It has the same topology as the union of the shrunken interior and exterior, and its boundary is now naturally divided up into cells: offset squares patches on the sides of each expanded square face, cylindrical patches on each expanded edge, and spherical patches on each expanded vertex, with curves where two patches meet.</p>
+
+<p>Let’s calculate the Euler characteristic of this cell complex. Each square of the polycube leads to two offset square patches, so the  squares contribute   to the Euler characteristic. Each edge  of the polycube might be adjacent to two or four squares; call this number . Then the cylinder around  includes  surface patches between pairs of squares and  curves connecting them to the square patches. The patches count  and the curves count  for a total contribution to the Euler characteristic of .</p>
+
+<p>Finally, each vertex of the polycube becomes a sphere, subdivided by the patches and curves of the complex. These spheres also contain all the vertices of the complex. The Euler characteristic of a subdivided sphere would be , but the vertex spheres have some parts of their subdivision removed. Where each edge cylinder or expanded square comes into the sphere, a patch of surfaces is removed, and the curves between these removed patches are also removed. An edge  with degree  contributes to the removal of  curves and  patches (one for itself and  for each adjacent square). So if there are  vertices in the polycube, the  contribution from the Euler characteristics of the subdivided spheres is modified by subtracting  for each incident edge. The total modification at both endpoints of each edge is . The  that we calculated here is cancelled by the  on the cylinder for , and we are left with a total modification of  where  is the number of polycube edges.</p>
+
+<p>Putting all the pieces of this calculation together, the complex we have constructed on the union of the shrunken interior and exterior has Euler characteristic . Therefore, the Euler characteristic of the polycube boundary itself, , equals the average of the characteristics of the interior and exterior. The same reasoning shows more generally that whenever you have a finite cell complex embedded into , dividing space up into chambers, the Euler characteristic of the complex equals half the sum of Euler characteristics of the manifolds bounding shrunken chambers.</p>
+
+<p>Although Euler characteristics of 2-manifolds embedded without boundary in  are always even, this averaging method can produce non-manifold surfaces with odd Euler characteristic. For instance, consider mutilating the  block in a different way, by removing two opposite cubes. The interior and exterior of the resulting polycube are both connected, but the interior is a solid torus and the exterior is a ball. So the Euler characteristic of the polycube should be the average of the torus and sphere, . And if we actually calculate it we get .</p>
+
+<p>As this example shows, it’s possible for a polycube to have different topologies of surface on the interior and exterior, and it’s also possible to have different numbers of surfaces: for instance, two cubes attached vertex-to-vertex produce two interior surfaces but only one exterior. For cell complexes in , there appears to be no restriction on which combinations of surfaces are possible. But for cell complexes in other spaces (other 3-manifolds than Euclidean space) it may be possible to embed 2-manifolds with odd Euler characteristic. When this happens, the number of odd chambers of a cell complex must always be even. For, the parity of the sum of the Euler characteristics of the chambers must be even, in order to be able to divide by two and get an integer as the Euler characteristic of the cell complex.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/101978143052398446">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2019-04-23T16:37:00Z</updated>
+    <published>2019-04-23T16:37:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2019-04-23T23:43:50Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://gilkalai.wordpress.com/?p=17325</id>
@@ -51,7 +96,7 @@
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-04-23T23:34:02Z</updated>
+      <updated>2019-04-24T00:20:38Z</updated>
     </source>
   </entry>
 
@@ -159,7 +204,7 @@ A major reason for the exodus of the middle class from San Francisco, demographe
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-04-23T23:20:10Z</updated>
+      <updated>2019-04-24T00:20:15Z</updated>
     </source>
   </entry>
 
@@ -844,7 +889,7 @@ The remarkable results that we will review give algorithms that achieve regret</
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-04-23T23:20:10Z</updated>
+      <updated>2019-04-24T00:20:15Z</updated>
     </source>
   </entry>
 
@@ -957,7 +1002,7 @@ An observation related to the last point is: </p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-04-23T23:34:07Z</updated>
+      <updated>2019-04-24T00:20:42Z</updated>
     </source>
   </entry>
 
@@ -993,7 +1038,7 @@ Note that QMA is "stronger" than the queries+QSamples model in that Merlin's wit
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-23T23:33:50Z</updated>
+      <updated>2019-04-24T00:20:36Z</updated>
     </source>
   </entry>
 
@@ -1023,7 +1068,7 @@ Thus, we view the algorithm for star-free languages as a nontrivial generalizati
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-23T23:33:50Z</updated>
+      <updated>2019-04-24T00:20:36Z</updated>
     </source>
   </entry>
 
@@ -1073,7 +1118,7 @@ Thus, we view the algorithm for star-free languages as a nontrivial generalizati
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-04-23T23:34:02Z</updated>
+      <updated>2019-04-24T00:20:38Z</updated>
     </source>
   </entry>
 
@@ -1284,7 +1329,7 @@ Is the <img alt="{\bf m}" class="latex" src="https://s0.wp.com/latex.php?latex=%
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-04-23T23:34:06Z</updated>
+      <updated>2019-04-24T00:20:41Z</updated>
     </source>
   </entry>
 
@@ -1347,7 +1392,7 @@ Other applications of our connection include new lower bounds for shadow tomogra
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-23T23:33:50Z</updated>
+      <updated>2019-04-24T00:20:36Z</updated>
     </source>
   </entry>
 
@@ -1417,7 +1462,7 @@ Everday life is relative.</div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-23T23:33:50Z</updated>
+      <updated>2019-04-24T00:20:36Z</updated>
     </source>
   </entry>
 
@@ -1498,7 +1543,7 @@ Everday life is relative.</div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-04-23T23:34:02Z</updated>
+      <updated>2019-04-24T00:20:38Z</updated>
     </source>
   </entry>
 
@@ -1537,7 +1582,7 @@ I am happy to say that, except for the “furthermore” part of (2), I achieved
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-04-23T23:20:10Z</updated>
+      <updated>2019-04-24T00:20:15Z</updated>
     </source>
   </entry>
 
@@ -1594,7 +1639,7 @@ Available from <a href="https://www.springer.com/us/book/9783319626796">Springer
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-04-23T23:20:10Z</updated>
+      <updated>2019-04-24T00:20:15Z</updated>
     </source>
   </entry>
 
@@ -1620,7 +1665,7 @@ In this paper we present two different constructions of extractors for zero-fixi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-23T23:33:50Z</updated>
+      <updated>2019-04-24T00:20:36Z</updated>
     </source>
   </entry>
 
@@ -1645,7 +1690,7 @@ In this paper we present two different constructions of extractors for zero-fixi
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-04-23T23:35:15Z</updated>
+      <updated>2019-04-24T00:21:10Z</updated>
     </source>
   </entry>
 
@@ -1708,7 +1753,7 @@ And then Matthew Scroggs and Adam Townsend went ahead and <a href="https://ctan.
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2019-04-16T01:45:00Z</updated>
+      <updated>2019-04-23T23:43:50Z</updated>
     </source>
   </entry>
 
@@ -1756,7 +1801,7 @@ And then Matthew Scroggs and Adam Townsend went ahead and <a href="https://ctan.
       <link href="https://kintali.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computational Complexity, Polyhedral Combinatorics, Algorithms and Graph Theory</subtitle>
       <title>My Brain is Open</title>
-      <updated>2019-04-23T23:34:11Z</updated>
+      <updated>2019-04-24T00:20:45Z</updated>
     </source>
   </entry>
 
@@ -1843,83 +1888,6 @@ To explain this to someone IN CS and even in CS Theory, but not complexity (e.g.
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
       <updated>2019-04-23T22:51:55Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://minimizingregret.wordpress.com/?p=116</id>
-    <link href="https://minimizingregret.wordpress.com/2019/04/15/reinforcement-learning-without-rewards/" rel="alternate" type="text/html"/>
-    <link href="https://videos.files.wordpress.com/ro0BDWO4/cheetah-pretty_hd.mp4" length="19415040" rel="enclosure" type="video/mp4"/>
-    <title>Reinforcement learning without rewards</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">by Abby van Soest and Elad Hazan, based on this paper  When humans interact with the environment, we receive a series of signals that indicate the value of our actions. We know that chocolate tastes good, sunburns feel bad, and certain actions generate praise or disapproval from others. Generally speaking, we learn from these signals … <a class="more-link" href="https://minimizingregret.wordpress.com/2019/04/15/reinforcement-learning-without-rewards/">Continue reading <span class="screen-reader-text">Reinforcement learning without rewards</span> <span class="meta-nav">→</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><em>by <a href="http://www.abbyvansoest.com/">Abby van Soest</a> and Elad Hazan, based on <a href="https://arxiv.org/abs/1812.02690">this paper</a> </em></p>
-<p>When humans interact with the environment, we receive a series of signals that indicate the value of our actions. We know that chocolate tastes good, sunburns feel bad, and certain actions generate praise or disapproval from others. Generally speaking, we learn from these signals and adapt our behavior in order to get more positive “rewards” and fewer negative ones.</p>
-<p><i>Reinforcement learning</i> (RL) is a sub-field of machine learning that formally models this setting of learning through interaction in a reactive environment. In RL, we have an <b>agent</b> and an <b>environment</b>. The agent observes its position (or “state”) in the environment and takes actions that transition it to a new state. The environment looks at an agent’s state and hands out rewards based on a hidden set of criteria.</p>
-<p style="text-align: center;"><img alt="" height="145" src="https://minimizingregret.files.wordpress.com/2019/04/null.png?w=360&amp;h=145" title="" width="360"/></p>
-<p><i>Source: <a href="http://incompleteideas.net/book/bookdraft2017nov5.pdf">Reinforcement Learning: An Introduction</a>. Sutton &amp; Barto, 2017.</i></p>
-<p>Typically, the goal of RL is for the agent to learn behavior that maximizes<i> </i>the total reward it receives from the environment. This methodology has led to some notable successes: machines have learned how to<a href="https://deepmind.com/research/publications/playing-atari-deep-reinforcement-learning/"> play Atari games</a>, how to <a href="https://sigmoidal.io/alphago-how-it-uses-reinforcement-learning-to-beat-go-masters/">beat human masters</a> of Go, and how to write <a href="https://www.theverge.com/2019/2/14/18224704/ai-machine-learning-language-models-read-write-openai-gpt2">long-form responses</a> to an essay prompt.</p>
-<h2>But what can we learn without an external reward signal?</h2>
-<p>It seems like a paradoxical question to ask, given that RL is all about rewards. But even though the reward paradigm is fundamentally flexible in many ways, it is also brittle and limits the agent’s ability to learn about its environment. This is due to several reasons. First, a reward signal directs the agents towards a single specific goal that may not generalize. Second, the reward signal may be sparse and uninformative, as we illustrate below.</p>
-<p>Imagine that you want a robot to learn to navigate through the following maze.</p>
-<p><b>Case 1: Sparse Rewards.</b> The agent gets a reward of +1 when it exits the maze, and a reward of 0 everywhere else. The agent doesn’t learn anything until it stumbles upon the exit.</p>
-<p style="text-align: center;">⇒ Clear reward signals are not always available.</p>
-<p><b>Case 2: Misleading Rewards.</b> The agent gets a reward of +1 at the entrance and a reward of +10 at the exit. The agent incorrectly learns to sit at the entrance because it hasn’t explored its environment sufficiently.</p>
-<p style="text-align: center;">⇒ Rewards can <i>prevent</i> discovery of the full environment.</p>
-<p>These issues are easy to overcome in the small maze on the left. But what about the maze on the right? As the size of the environment grows, it’ll get harder and harder to find the correct solution — the intractability of the problem scales exponentially.</p>
-<p style="text-align: center;"><img alt="" height="238" src="https://minimizingregret.files.wordpress.com/2019/04/image.png?w=244&amp;h=238" title="" width="244"/><img alt="pasted image 0.png" class="alignnone size-full wp-image-130" src="https://minimizingregret.files.wordpress.com/2019/04/pasted-image-0.png?w=1100"/></p>
-<p>So what we find is that there is power<i> </i>in being able to learn effectively in the <b>absence</b> of rewards. This intuition is supported by a body of research that shows learning fails when rewards aren’t dense or are <a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">poorly shaped</a>; and fixing these problems can require substantial engineering effort.</p>
-<p>By enabling agents to discover the environment without the requirement of a reward signal, we create a more<b> flexible and generalizable</b> form of reinforcement learning. This framework can be considered a form of “unsupervised” RL. Rather than relying on explicit and inherently limited signals (or “labels”), we can deal with a broad, unlabelled pool of data. Learning from this pool facilitates a more general extraction of knowledge from the environment.</p>
-<h2>Our new approach: Maximum Entropy</h2>
-<p>In <a href="https://arxiv.org/abs/1812.02690">recent work</a>, we propose finding a policy that maximizes entropy (which we refer to as a MaxEnt policy), or another related and concave function of the distribution. This objective is reward-independent and favors exploration.</p>
-<p>In the video below, a two-dimensional cheetah robot learns to run backwards and forwards, move its legs fast and in all different directions, and even do flips. The cheetah doesn’t have access to any external rewards; it only uses signals from the MaxEnt policy.</p>
-<p> </p>
-<div class="video-player" id="v-ro0BDWO4-1" style="width: 1100px; height: 620px;">
-</div>
-<p>Entropy is a function of the distribution over states. A high entropy distribution visits all states with near-equal frequency — it’s a <i>uniform</i> distribution. On the other hand, a low entropy distribution is biased toward visiting some states more frequently than others. (In the maze example, a low entropy distribution would result from the agent sitting at the entrance of the maze forever.)</p>
-<p><img alt="slAdX3I4FcseBWeJbioHb_g.png" class=" size-full wp-image-129 aligncenter" src="https://minimizingregret.files.wordpress.com/2019/04/sladx3i4fcsebwejbiohb_g.png?w=1100"/></p>
-<p>So given that policy <img alt="\pi" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cpi&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\pi"/> creates a distribution <img alt="d_\pi" class="latex" src="https://s0.wp.com/latex.php?latex=d_%5Cpi&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="d_\pi"/> over states, the problem we are hoping to solve is:</p>
-<p style="text-align: center;"><img alt="\pi^* = \arg \max_{\pi} \text{entropy}(d_\pi) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cpi%5E%2A+%3D+%5Carg+%5Cmax_%7B%5Cpi%7D+%5Ctext%7Bentropy%7D%28d_%5Cpi%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\pi^* = \arg \max_{\pi} \text{entropy}(d_\pi) "/></p>
-<p>When we know all the states, actions, and dynamics of a given environment, finding the policy with maximum entropy is a concave optimization problem. This type of problem can be easily and exactly solved by convex programming.</p>
-<p>But we very rarely have all that knowledge available to use. In practice, one of several complications usually arise:</p>
-<ol>
-<li>The states are <b>non-linearly approximated </b>by a neural network or some other function approximator.</li>
-<li>The transition dynamics are unknown.</li>
-<li>The state space is intractably large. (As an interesting example, the game of Go has more than<b> one googol or <img alt="10^{100}" class="latex" src="https://s0.wp.com/latex.php?latex=10%5E%7B100%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="10^{100}"/></b> possible states. That’s more than the number of atoms in the universe, according to <a href="https://ai.googleblog.com/2016/01/alphago-mastering-ancient-game-of-go.html">this blog</a> from 2016, and definitely more than can fit on a computer.)</li>
-</ol>
-<p>In such cases, the problem of finding a max-entropy policy becomes non-convex and computationally hard.</p>
-<p>So what to do? If we look at many practical RL problems (Atari, OpenAI Gym), we see that there are many known, efficient solvers that can construct an optimal (or nearly-optimal) policy when they are <i>given a reward signal</i>.</p>
-<p>We thus consider an <i>oracle model</i>: let’s assume that we have access to one of these solvers, so that we can pass it an explicit reward vector and receive an optimal policy in return. Can we now maximize entropy in a provably efficient way? In other words, is it possible to reduce this high complexity optimization problem to that of “standard” RL?</p>
-<p>Our approach does exactly that! It is based on the Frank-Wolfe method. This is a gradient-based optimization algorithm that is particularly suited for oracle-based optimization. Instead of moving in the direction of the steepest decline of the objective function, the Frank-Wolfe method iteratively moves in the direction of the optimal point in the direction of the gradient. This is depicted below (and deserves a separate post…). The Frank-Wolfe method is a projection-free algorithm, see <a href="https://drive.google.com/file/d/1GIDnw7T-NT4Do3eC0B5kYJlzwOs6nzIO/view">this exposition</a> about its theoretical properties.</p>
-<p><img alt="" height="345" src="https://minimizingregret.files.wordpress.com/2019/04/unnamed-file.png?w=616&amp;h=345" title="" width="616"/></p>
-<p>For the exact specification of the algorithm and its performance guarantee, see<a href="https://arxiv.org/abs/1812.02690"> our paper</a>.</p>
-<h2>Experiments</h2>
-<p>To complement the theory, we also created some experiments to test the MaxEnt algorithm on simulated robotic locomotion tasks (<a href="https://github.com/abbyvansoest/maxent/tree/refactor">open source code available here</a>). We used test environments from <a href="https://gym.openai.com/">OpenAI Gym</a> and <a href="https://github.com/openai/mujoco-py">Mujoco</a> and trained MaxEnt experts for various environments.</p>
-<p>These are some results from the Humanoid experiment, where the agent is a human-like bipedal robot. The behavior of the MaxEnt agent (blue) is baselined against a random agent (orange), who explores by sampling randomly from the environment. This random approach is often used in practice for epsilon-greedy RL exploration.</p>
-<p style="text-align: center;"><img alt="" height="332" src="https://minimizingregret.files.wordpress.com/2019/04/null-1.png?w=442&amp;h=332" title="" width="442"/></p>
-<p>In this figure, we see that over the course of 25 epochs, the MaxEnt agent progressively increases the total entropy over the state space.</p>
-<p style="text-align: center;"><img alt="" height="345" src="https://minimizingregret.files.wordpress.com/2019/04/null-2.png?w=460&amp;h=345" title="" width="460"/></p>
-<p>Here, we see a visualization of the Humanoid’s coverage of the $xy$-plane, where the shown plane is of size 40-by-40. After one epoch, there is <b>minimal</b> coverage of the area. But by the 5th, 10th, and 15th epoch, we see that the agent has learned to visit all the different states in the plane, obtaining full and nearly uniform coverage of the grid!</p>
-<div><a href="https://minimizingregret.wordpress.com/2019/04/15/reinforcement-learning-without-rewards/"><img alt="cheetah-pretty" height="120" src="https://videos.files.wordpress.com/ro0BDWO4/cheetah-pretty_std.original.jpg" width="160"/></a></div></div>
-    </content>
-    <updated>2019-04-15T01:03:27Z</updated>
-    <published>2019-04-15T01:03:27Z</published>
-    <category term="Uncategorized"/>
-    <category term="machine learning"/>
-    <category term="reinforcement learning"/>
-    <author>
-      <name>Elad Hazan</name>
-    </author>
-    <source>
-      <id>https://minimizingregret.wordpress.com</id>
-      <logo>https://minimizingregret.files.wordpress.com/2017/08/cropped-pu1.png?w=32</logo>
-      <link href="https://minimizingregret.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://minimizingregret.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://minimizingregret.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://minimizingregret.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Google Princeton AI and Hazan Lab @ Princeton University</subtitle>
-      <title>Minimizing Regret</title>
-      <updated>2019-04-23T23:35:23Z</updated>
     </source>
   </entry>
 </feed>
