@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-04-26T00:21:49Z</updated>
+  <updated>2019-04-26T01:30:26Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,585 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://lucatrevisan.wordpress.com/?p=4238</id>
+    <link href="https://lucatrevisan.wordpress.com/2019/04/25/online-optimization-post-2-constructing-pseudorandom-sets/" rel="alternate" type="text/html"/>
+    <title>Online Optimization Post 2: Constructing Pseudorandom Sets</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Today we will see how to use the analysis of the multiplicative weights algorithm in order to construct pseudorandom sets. The method will yield constructions that are optimal in terms of the size of the pseudorandom set, but not very … <a href="https://lucatrevisan.wordpress.com/2019/04/25/online-optimization-post-2-constructing-pseudorandom-sets/">Continue reading <span class="meta-nav">→</span></a></div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>
+ Today we will see how to use the analysis of the multiplicative weights algorithm in order to construct pseudorandom sets. </p>
+<p>
+The method will yield constructions that are optimal in terms of the size of the pseudorandom set, but not very efficient, although there is at least one case (getting an “almost pairwise independent” pseudorandom generator) in which the method does something that I am not sure how to replicate with other techniques. </p>
+<p>
+Mostly, the point of this post is to illustrate a concept that will reoccur in more interesting contexts: that we can use an online optimization algorithm in order to construct a combinatorial object satisfying certain desired properties. The idea is to run a game between a “builder” against an “inspector,” in which the inspector runs the online optimization algorithm with the goal of finding a violated property in what the builder is building, and the builder plays the role of the adversary selecting the cost functions, with the advantage that it gets to build a piece of the construction after seeing what property the “inspector” is looking for. By the regret analysis of the online optimization problem, if the builder did well at each round against the inspector, then it will do well also against the “offline optimum” that looks for a violated property after seeing the whole construction. For example, the construction of graph sparsifiers by Allen-Zhu, Liao and Orecchia can be cast in this framework.</p>
+<p>
+(In some other applications, it will be the “builder” that runs the algorithm and the “inspector” who plays the role of the adversary. This will be the case of the Frieze-Kannan weak regularity lemma and of the Impagliazzo hard-core lemma. In those cases we capitalize on the fact that we know that there is a very good offline optimum, and we keep going for as long as the adversary is able to find violated properties in what the builder is constructing. After a sufficiently large number of rounds, the regret experienced by the algorithm would exceed the general regret bound, so the process must terminate in a small number of rounds. I have been told that this is just the “dual view” of what I described in the previous paragraph.)</p>
+<p>
+But, back the pseudorandom sets: if <img alt="{{\cal C} = \{ C_1,\ldots,C_N \}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7B%5Ccal+C%7D+%3D+%5C%7B+C_1%2C%5Cldots%2CC_N+%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{{\cal C} = \{ C_1,\ldots,C_N \}}"/> is a collection of boolean functions <img alt="{C_i : \{ 0,1 \}^n \rightarrow \{ 0,1 \}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BC_i+%3A+%5C%7B+0%2C1+%5C%7D%5En+%5Crightarrow+%5C%7B+0%2C1+%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{C_i : \{ 0,1 \}^n \rightarrow \{ 0,1 \}}"/>, for example the functions computed by circuits of a certain type and a certain size, then a multiset <img alt="{S\subseteq \{ 0,1 \}^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%5Csubseteq+%5C%7B+0%2C1+%5C%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{S\subseteq \{ 0,1 \}^n}"/> is <img alt="{\epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon}"/>-pseudorandom for <img alt="{\cal C}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ccal+C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\cal C}"/> if, for every <img alt="{C_i \in \cal C}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BC_i+%5Cin+%5Ccal+C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{C_i \in \cal C}"/>, we have </p>
+<p align="center"><img alt="\displaystyle  | \mathop{\mathbb P}_{u \sim \{ 0,1 \}^n} [ C_i (u) =1] - \mathop{\mathbb P}_{s \sim S} [C_i(s) = 1 ] | \leq \epsilon " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7C+%5Cmathop%7B%5Cmathbb+P%7D_%7Bu+%5Csim+%5C%7B+0%2C1+%5C%7D%5En%7D+%5B+C_i+%28u%29+%3D1%5D+-+%5Cmathop%7B%5Cmathbb+P%7D_%7Bs+%5Csim+S%7D+%5BC_i%28s%29+%3D+1+%5D+%7C+%5Cleq+%5Cepsilon+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  | \mathop{\mathbb P}_{u \sim \{ 0,1 \}^n} [ C_i (u) =1] - \mathop{\mathbb P}_{s \sim S} [C_i(s) = 1 ] | \leq \epsilon "/></p>
+<p> That is, sampling uniformly from <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{S}"/>, which we can do with <img alt="{\log_2 |S|}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clog_2+%7CS%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\log_2 |S|}"/> random bits, is as good as sampling uniformly from <img alt="{\{ 0,1 \}^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5C%7B+0%2C1+%5C%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\{ 0,1 \}^n}"/>, which requires <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n}"/> bits, as far as the functions in <img alt="{\cal C}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ccal+C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\cal C}"/> are concerned.</p>
+<p>
+It is easy to use Chernoff bounds and union bounds to argue that there is such a set of size <img alt="{O(N/\epsilon^2)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28N%2F%5Cepsilon%5E2%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(N/\epsilon^2)}"/>, so that we can sample from it using only <img alt="{\log N + 2\log \frac 1 \epsilon + O(1)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clog+N+%2B+2%5Clog+%5Cfrac+1+%5Cepsilon+%2B+O%281%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\log N + 2\log \frac 1 \epsilon + O(1)}"/> random bits.</p>
+<p>
+We will prove this result (while also providing an “algorithm” for the construction) using multiplicative weights.</p>
+<p>
+<span id="more-4238"/></p>
+<p>
+First of all, possibly by changing <img alt="{N}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{N}"/> to <img alt="{2N}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2N%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{2N}"/>, we may assume that for every function <img alt="{C \in {\cal C}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BC+%5Cin+%7B%5Ccal+C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{C \in {\cal C}}"/> the function <img alt="{1-C}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1-C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1-C}"/> is also in <img alt="{\cal C}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ccal+C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\cal C}"/>. This simplifies things a bit because then the pseudorandom condition is equivalent to just</p>
+<p/><p align="center"><img alt="\displaystyle  \forall C\in {\cal C} \ \ \ \mathop{\mathbb P}_{u \sim \{ 0,1 \}^n} [ C (u) =1] - \mathop{\mathbb P}_{s \sim S} [C(s) = 1 ] \geq - \epsilon " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cforall+C%5Cin+%7B%5Ccal+C%7D+%5C+%5C+%5C+%5Cmathop%7B%5Cmathbb+P%7D_%7Bu+%5Csim+%5C%7B+0%2C1+%5C%7D%5En%7D+%5B+C+%28u%29+%3D1%5D+-+%5Cmathop%7B%5Cmathbb+P%7D_%7Bs+%5Csim+S%7D+%5BC%28s%29+%3D+1+%5D+%5Cgeq+-+%5Cepsilon+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \forall C\in {\cal C} \ \ \ \mathop{\mathbb P}_{u \sim \{ 0,1 \}^n} [ C (u) =1] - \mathop{\mathbb P}_{s \sim S} [C(s) = 1 ] \geq - \epsilon "/></p>
+<p>
+We will make up an “experts” setup in which there is an expert <img alt="{i}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{i}"/> for each function <img alt="{C_i}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BC_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{C_i}"/>. Thus, the algorithm, at each step, comes up with a probability distribution <img alt="{x_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_t}"/> over the functions, which we can think of as a “probabilistic function.” At time <img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t}"/>, the adversary chooses a string <img alt="{s_t \in \{ 0,1 \}^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_t+%5Cin+%5C%7B+0%2C1+%5C%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s_t \in \{ 0,1 \}^n}"/> and defines the cost function </p>
+<p align="center"><img alt="\displaystyle  f_t (x) := \sum_{i=1}^N x(i) \cdot \left( \mathop{\mathbb P}_{u \sim \{ 0,1 \}^n} [ C_i (u) = 1 ] - C_i (s_t) \right) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++f_t+%28x%29+%3A%3D+%5Csum_%7Bi%3D1%7D%5EN+x%28i%29+%5Ccdot+%5Cleft%28+%5Cmathop%7B%5Cmathbb+P%7D_%7Bu+%5Csim+%5C%7B+0%2C1+%5C%7D%5En%7D+%5B+C_i+%28u%29+%3D+1+%5D+-+C_i+%28s_t%29+%5Cright%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  f_t (x) := \sum_{i=1}^N x(i) \cdot \left( \mathop{\mathbb P}_{u \sim \{ 0,1 \}^n} [ C_i (u) = 1 ] - C_i (s_t) \right) "/></p>
+<p> where the adversary chooses an <img alt="{s_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s_t}"/> such that <img alt="{f_t(x_t) \geq 0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bf_t%28x_t%29+%5Cgeq+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{f_t(x_t) \geq 0}"/>. At this point, the reader should try, without reading ahead, to establish: </p>
+<ol>
+<li> That such a choice of <img alt="{s_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s_t}"/> is always possible;
+</li><li> That the cost function is of the form <img alt="{f_t(x) = \langle \ell_t , x\rangle}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bf_t%28x%29+%3D+%5Clangle+%5Cell_t+%2C+x%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{f_t(x) = \langle \ell_t , x\rangle}"/>, where the loss vector <img alt="{\ell_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cell_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\ell_t}"/> satisfies <img alt="{|\ell_t (i) | \leq 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7C%5Cell_t+%28i%29+%7C+%5Cleq+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{|\ell_t (i) | \leq 1}"/>, so that the regret after <img alt="{T}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BT%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{T}"/> steps is <img alt="{\leq 2 \sqrt{T \ln N}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cleq+2+%5Csqrt%7BT+%5Cln+N%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\leq 2 \sqrt{T \ln N}}"/>;
+</li><li> That the sequence <img alt="{s_1,\ldots,s_T}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_1%2C%5Cldots%2Cs_T%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s_1,\ldots,s_T}"/> of choices by the adversary determines a <img alt="{2\sqrt {\frac {\ln N}{T}}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%5Csqrt+%7B%5Cfrac+%7B%5Cln+N%7D%7BT%7D%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{2\sqrt {\frac {\ln N}{T}}}"/>-pseudorandom multiset for <img alt="{\cal C}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ccal+C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\cal C}"/>, and, in particular, we get an <img alt="{\epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon}"/>-pseudorandom multiset of cardinality <img alt="{4 \frac {\ln N}{\epsilon^2}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B4+%5Cfrac+%7B%5Cln+N%7D%7B%5Cepsilon%5E2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{4 \frac {\ln N}{\epsilon^2}}"/>
+</li></ol>
+<p> For the first point, note that for a random <img alt="{s \sim \{ 0,1 \}^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs+%5Csim+%5C%7B+0%2C1+%5C%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s \sim \{ 0,1 \}^n}"/> we have </p>
+<p align="center"><img alt="\displaystyle  \mathop{\mathbb E}_{s\sim \{ 0,1 \}^n} \sum_{i=1}^N x_t(i) \cdot \left( \mathop{\mathbb P}_{u \sim \{ 0,1 \}^n} [ C_i (u) = 1 ] - C_i (s) \right) = 0 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cmathop%7B%5Cmathbb+E%7D_%7Bs%5Csim+%5C%7B+0%2C1+%5C%7D%5En%7D+%5Csum_%7Bi%3D1%7D%5EN+x_t%28i%29+%5Ccdot+%5Cleft%28+%5Cmathop%7B%5Cmathbb+P%7D_%7Bu+%5Csim+%5C%7B+0%2C1+%5C%7D%5En%7D+%5B+C_i+%28u%29+%3D+1+%5D+-+C_i+%28s%29+%5Cright%29+%3D+0+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \mathop{\mathbb E}_{s\sim \{ 0,1 \}^n} \sum_{i=1}^N x_t(i) \cdot \left( \mathop{\mathbb P}_{u \sim \{ 0,1 \}^n} [ C_i (u) = 1 ] - C_i (s) \right) = 0 "/></p>
+<p> so there is an <img alt="{s_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s_t}"/> such that </p>
+<p align="center"><img alt="\displaystyle  \sum_{i=1}^N x_t(i) \cdot \left( \mathop{\mathbb P}_{u \sim \{ 0,1 \}^n} [ C_i (u) = 1 ] - C_i (s_t) \right) \geq 0 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_%7Bi%3D1%7D%5EN+x_t%28i%29+%5Ccdot+%5Cleft%28+%5Cmathop%7B%5Cmathbb+P%7D_%7Bu+%5Csim+%5C%7B+0%2C1+%5C%7D%5En%7D+%5B+C_i+%28u%29+%3D+1+%5D+-+C_i+%28s_t%29+%5Cright%29+%5Cgeq+0+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \sum_{i=1}^N x_t(i) \cdot \left( \mathop{\mathbb P}_{u \sim \{ 0,1 \}^n} [ C_i (u) = 1 ] - C_i (s_t) \right) \geq 0 "/></p>
+<p> For the second point we just have to inspect the definition, and for the last point we have, by construction </p>
+<p align="center"><img alt="\displaystyle  \sum_{t=1}^T f_t(x_t) \geq 0 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_%7Bt%3D1%7D%5ET+f_t%28x_t%29+%5Cgeq+0+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \sum_{t=1}^T f_t(x_t) \geq 0 "/></p>
+<p> so the regret bound is </p>
+<p align="center"><img alt="\displaystyle  \min_{x} \sum_{t=1}^T f_t(x) \geq - {\rm Regret}_T \geq - 2 \sqrt{T\ln n} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cmin_%7Bx%7D+%5Csum_%7Bt%3D1%7D%5ET+f_t%28x%29+%5Cgeq+-+%7B%5Crm+Regret%7D_T+%5Cgeq+-+2+%5Csqrt%7BT%5Cln+n%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \min_{x} \sum_{t=1}^T f_t(x) \geq - {\rm Regret}_T \geq - 2 \sqrt{T\ln n} "/></p>
+<p> which, after dividing by <img alt="{T}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BT%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{T}"/>, is </p>
+<p align="center"><img alt="\displaystyle  \forall i : \ \ \ \frac 1T \sum_{t=1}^T \left( \mathop{\mathbb P}_{u \sim \{ 0,1 \}^n} [ C_i (u) = 1 ] - C_i (s_t) \right) \geq - 2 \sqrt{\frac {\ln n}{T}} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cforall+i+%3A+%5C+%5C+%5C+%5Cfrac+1T+%5Csum_%7Bt%3D1%7D%5ET+%5Cleft%28+%5Cmathop%7B%5Cmathbb+P%7D_%7Bu+%5Csim+%5C%7B+0%2C1+%5C%7D%5En%7D+%5B+C_i+%28u%29+%3D+1+%5D+-+C_i+%28s_t%29+%5Cright%29+%5Cgeq+-+2+%5Csqrt%7B%5Cfrac+%7B%5Cln+n%7D%7BT%7D%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \forall i : \ \ \ \frac 1T \sum_{t=1}^T \left( \mathop{\mathbb P}_{u \sim \{ 0,1 \}^n} [ C_i (u) = 1 ] - C_i (s_t) \right) \geq - 2 \sqrt{\frac {\ln n}{T}} "/></p>
+<p align="center"><img alt="\displaystyle  \forall i: \ \ \ \ \mathop{\mathbb P}_{u \sim \{ 0,1 \}^n} [ C_i (u) = 1 ] - \Pr_{s\in \{ s_1,\ldots,s_T \} } [C_i (s) = 1 ] \geq - 2 \sqrt{\frac {\ln n}{T}} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cforall+i%3A+%5C+%5C+%5C+%5C+%5Cmathop%7B%5Cmathbb+P%7D_%7Bu+%5Csim+%5C%7B+0%2C1+%5C%7D%5En%7D+%5B+C_i+%28u%29+%3D+1+%5D+-+%5CPr_%7Bs%5Cin+%5C%7B+s_1%2C%5Cldots%2Cs_T+%5C%7D+%7D+%5BC_i+%28s%29+%3D+1+%5D+%5Cgeq+-+2+%5Csqrt%7B%5Cfrac+%7B%5Cln+n%7D%7BT%7D%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \forall i: \ \ \ \ \mathop{\mathbb P}_{u \sim \{ 0,1 \}^n} [ C_i (u) = 1 ] - \Pr_{s\in \{ s_1,\ldots,s_T \} } [C_i (s) = 1 ] \geq - 2 \sqrt{\frac {\ln n}{T}} "/></p>
+<p> Consider now the application of constructing a small-support distribution over <img alt="{\{ 0,1 \}^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5C%7B+0%2C1+%5C%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\{ 0,1 \}^n}"/> that is <img alt="{\epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon}"/>-almost-pairwise-independent, meaning that if <img alt="{s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s}"/> is a random string sampled according to this distribution, then, for every <img alt="{i,j}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bi%2Cj%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{i,j}"/>, the marginal <img alt="{(s_i,s_j)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28s_i%2Cs_j%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{(s_i,s_j)}"/> is <img alt="{\epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon}"/>-close to the uniform distribution over <img alt="{\{ 0,1 \}^2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5C%7B+0%2C1+%5C%7D%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\{ 0,1 \}^2}"/> in total variation distance. This is the same thing as asking for a small-support distribution that is <img alt="{\epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon}"/>-pseudorandom for all functions <img alt="{\{ 0,1 \}^n \rightarrow \{ 0,1 \}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5C%7B+0%2C1+%5C%7D%5En+%5Crightarrow+%5C%7B+0%2C1+%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\{ 0,1 \}^n \rightarrow \{ 0,1 \}}"/> that depend on only two input variables. There are only <img alt="{O(n^2)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28n%5E2%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(n^2)}"/> such functions, so the above construction gives us a pseudorandom distribution that is uniform over a set of size <img alt="{O(\epsilon^{-2} \ln n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Cepsilon%5E%7B-2%7D+%5Cln+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(\epsilon^{-2} \ln n)}"/>, meaning that the distribution can be sampled using <img alt="{\log\log n + 2 \log \frac 1 \epsilon + O(1)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clog%5Clog+n+%2B+2+%5Clog+%5Cfrac+1+%5Cepsilon+%2B+O%281%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\log\log n + 2 \log \frac 1 \epsilon + O(1)}"/> random bits. Furthermore the algorithm can be implemented to run in time <img alt="{n^{O(1)} / \epsilon^2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%5E%7BO%281%29%7D+%2F+%5Cepsilon%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n^{O(1)} / \epsilon^2}"/>. The only tricky step is how to find the string <img alt="{s_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s_t}"/> at each step. For a string <img alt="{s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s}"/>, the loss <img alt="{f (x_t)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bf+%28x_t%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{f (x_t)}"/> obtained by choosing <img alt="{s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s}"/> as the “reference string” is a polynomial of degree 2 in the bits of <img alt="{s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s}"/>, so we can find a no-worse-than-average <img alt="{s_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s_t}"/> using the method of conditional expectations. I am not sure if there is a more standard way of doing this construction, perhaps one in which the bit <img alt="{j}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bj%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{j}"/> of the <img alt="{k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{k}"/>-th string in the sample space can be generated in time <img alt="{(\log n)^{O(1)}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28%5Clog+n%29%5E%7BO%281%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{(\log n)^{O(1)}}"/>. The standard approach is to combine a small-bias generator with a linear family of pairwise independent hash functions, but even using Ta-Shma’s construction of small-bias generators we would not get the correct dependency on <img alt="{\epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon}"/>. This framework can “derandomize Chernoff bounds” in other settings as well, such as randomized rounding of packing and covering integer linear programs, and it is basically the same thing as the method of “pessimistic estimators” described in the Motwani-Raghavan book on randomized algorithms. </p>
+<p/></div>
+    </content>
+    <updated>2019-04-26T01:00:06Z</updated>
+    <published>2019-04-26T01:00:06Z</published>
+    <category term="theory"/>
+    <category term="multiplicative weights"/>
+    <category term="online optimization"/>
+    <category term="Pseudorandomness"/>
+    <author>
+      <name>luca</name>
+    </author>
+    <source>
+      <id>https://lucatrevisan.wordpress.com</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://lucatrevisan.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://lucatrevisan.wordpress.com" rel="alternate" type="text/html"/>
+      <link href="https://lucatrevisan.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
+      <title>in   theory</title>
+      <updated>2019-04-26T01:20:13Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/1904.11446</id>
+    <link href="http://arxiv.org/abs/1904.11446" rel="alternate" type="text/html"/>
+    <title>Quantum Walk Sampling by Growing Seed Sets</title>
+    <feedworld_mtime>1556236800</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Apers:Simon.html">Simon Apers</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.11446">PDF</a><br/><b>Abstract: </b>This work describes a new algorithm for creating a superposition over the
+edge set of a graph, encoding a quantum sample of the random walk stationary
+distribution. The algorithm requires a number of quantum walk steps scaling as
+$\widetilde{O}(m^{1/3} \delta^{-1/3})$, with $m$ the number of edges and
+$\delta$ the random walk spectral gap. This improves on existing strategies by
+initially growing a classical seed set in the graph, from which a quantum walk
+is then run. The algorithm leads to a number of improvements: (i) it provides a
+new bound on the setup cost of quantum walk search algorithms, (ii) it yields a
+new algorithm for $st$-connectivity, and (iii) it allows to create a
+superposition over the isomorphisms of an $n$-node graph in time
+$\widetilde{O}(2^{n/3})$, surpassing the $\Omega(2^{n/2})$ barrier set by index
+erasure.
+</p></div>
+    </summary>
+    <updated>2019-04-26T01:25:02Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2019-04-26T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/1904.11440</id>
+    <link href="http://arxiv.org/abs/1904.11440" rel="alternate" type="text/html"/>
+    <title>Distributed Detection of Cliques in Dynamic Networks</title>
+    <feedworld_mtime>1556236800</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Matthias Bonne, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Censor=Hillel:Keren.html">Keren Censor-Hillel</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.11440">PDF</a><br/><b>Abstract: </b>This paper provides an in-depth study of the fundamental problems of finding
+small subgraphs in distributed dynamic networks. While some problems are
+trivially easy to handle, such as detecting a triangle that emerges after an
+edge insertion, we show that, perhaps somewhat surprisingly, other problems
+exhibit a wide range of complexities in terms of the trade-offs between their
+round and bandwidth complexities. In the case of triangles, which are only
+affected by the topology of the immediate neighborhood, some end results are:
+</p>
+<p>\begin{itemize}
+</p>
+<p>\item The bandwidth complexity of $1$-round dynamic triangle detection or
+listing is $\Theta(1)$.
+</p>
+<p>\item The bandwidth complexity of $1$-round dynamic triangle membership
+listing is $\Theta(1)$ for node/edge deletions, $\Theta(n^{1/2})$ for edge
+insertions, and $\Theta(n)$ for node insertions.
+</p>
+<p>\item The bandwidth complexity of $1$-round dynamic triangle membership
+detection is $\Theta(1)$ for node/edge deletions, $O(\log n)$ for edge
+insertions, and $\Theta(n)$ for node insertions.
+</p>
+<p>\end{itemize}
+</p>
+<p>Most of our upper and lower bounds are \emph{tight}. Additionally, we provide
+almost always tight upper and lower bounds for larger cliques.
+</p></div>
+    </summary>
+    <updated>2019-04-26T01:25:06Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2019-04-26T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/1904.11395</id>
+    <link href="http://arxiv.org/abs/1904.11395" rel="alternate" type="text/html"/>
+    <title>On the Complexity of Local Graph Transformations</title>
+    <feedworld_mtime>1556236800</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Scheideler:Christian.html">Christian Scheideler</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Setzer:Alexander.html">Alexander Setzer</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.11395">PDF</a><br/><b>Abstract: </b>We consider the problem of transforming a given graph $G_s$ into a desired
+graph $G_t$ by applying a minimum number primitives from a particular set of
+local graph transformation primitives. These primitives are local in the sense
+that each node can apply them based on local knowledge and by affecting only
+its $1$-neighborhood. Although the specific set of primitives we consider makes
+it possible to transform any (weakly) connected graph into any other (weakly)
+connected graph consisting of the same nodes, they cannot disconnect the graph
+or introduce new nodes into the graph, making them ideal in the context of
+supervised overlay network transformations. We prove that computing a minimum
+sequence of primitive applications (even centralized) for arbitrary $G_s$ and
+$G_t$ is NP-hard, which we conjecture to hold for any set of local graph
+transformation primitives satisfying the aforementioned properties. On the
+other hand, we show that this problem admits a polynomial time algorithm with a
+constant approximation ratio.
+</p></div>
+    </summary>
+    <updated>2019-04-26T01:20:46Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Computational Complexity"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.CC" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Computational Complexity (cs.CC) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.CC updates on arXiv.org</title>
+      <updated>2019-04-26T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/1904.11337</id>
+    <link href="http://arxiv.org/abs/1904.11337" rel="alternate" type="text/html"/>
+    <title>A multi-start local search algorithm for the Hamiltonian completion problem on undirected graphs</title>
+    <feedworld_mtime>1556236800</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Jorik Jooken, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Leyman:Pieter.html">Pieter Leyman</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Causmaecker:Patrick_De.html">Patrick De Causmaecker</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.11337">PDF</a><br/><b>Abstract: </b>This paper proposes a local search algorithm for a specific combinatorial
+optimisation problem in graph theory: the Hamiltonian Completion Problem (HCP)
+on undirected graphs. In this problem, the objective is to add as few edges as
+possible to a given undirected graph in order to obtain a Hamiltonian graph.
+This problem has mainly been studied in the context of various specific kinds
+of undirected graphs (e.g. trees, unicyclic graphs and series-parallel graphs).
+The proposed algorithm, however, concentrates on solving HCP for general
+undirected graphs. It can be considered to belong to the category of
+matheuristics, because it integrates an exact linear time solution for trees
+into a local search algorithm for general graphs. This integration makes use of
+the close relation between HCP and the minimum path partition problem, which
+makes the algorithm equally useful for solving the latter problem. Furthermore,
+a benchmark set of problem instances is constructed for demonstrating the
+quality of the proposed algorithm. A comparison with state-of-the-art solvers
+indicates that the proposed algorithm is able to achieve high-quality results.
+</p></div>
+    </summary>
+    <updated>2019-04-26T01:25:32Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2019-04-26T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/1904.11323</id>
+    <link href="http://arxiv.org/abs/1904.11323" rel="alternate" type="text/html"/>
+    <title>Performance Prediction for Coarse-Grained Locking</title>
+    <feedworld_mtime>1556236800</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Vitaly Aksenov Dan Alistarh Petr Kuznetsov <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.11323">PDF</a><br/><b>Abstract: </b>A standard design pattern found in many concurrent data structures, such as
+hash tables or ordered containers, is an alternation of parallelizable sections
+that incur no data conflicts and critical sections that must run sequentially
+and are protected with locks. A lock can be viewed as a queue that arbitrates
+the order in which the critical sections are executed, and a natural question
+is whether we can use stochastic analysis to predict the resulting throughput.
+As a preliminary evidence to the affirmative, we describe a simple model that
+can be used to predict the throughput of coarse-grained lock-based algorithms.
+We show that our model works well for CLH lock, and we expect it to work for
+other popular lock designs such as TTAS, MCS, etc.
+</p></div>
+    </summary>
+    <updated>2019-04-26T01:25:55Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2019-04-26T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/1904.11285</id>
+    <link href="http://arxiv.org/abs/1904.11285" rel="alternate" type="text/html"/>
+    <title>Detecting and Counting Small Patterns in Planar Graphs in Subexponential Parameterized Time</title>
+    <feedworld_mtime>1556236800</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Nederlof:Jesper.html">Jesper Nederlof</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.11285">PDF</a><br/><b>Abstract: </b>We present an algorithm that takes as input an $n$-vertex planar graph $G$
+and a $k$-vertex pattern graph $P$, and computes the number of (induced) copies
+of $P$ in $G$ in $2^{O(k/\log k)}n^{O(1)}$ time. If $P$ is a matching,
+independent set, or connected bounded maximum degree graph, the runtime reduces
+to $2^{\tilde{O}(\sqrt{k})}n^{O(1)}$.
+</p>
+<p>While our algorithm counts all copies of $P$, it also improves the fastest
+algorithms that only detect copies of $P$. Before our work, no $2^{O(k/\log
+k)}n^{O(1)}$ time algorithms for detecting unrestricted patterns $P$ were
+known, and by a result of Bodlaender et al. [ICALP 2016] a $2^{o(k/\log
+k)}n^{O(1)}$ time algorithm would violate the Exponential Time Hypothesis
+(ETH). Furthermore, it was only known how to detect copies of a fixed connected
+bounded maximum degree pattern $P$ in $2^{\tilde{O}(\sqrt{k})}n^{O(1)}$ time
+probabilistically. For counting problems, it was a repeatedly asked open
+question whether $2^{o(k)}n^{O(1)}$ time algorithms exist that count even
+special patterns such as independent sets, matchings and paths in planar
+graphs. The above results resolve this question in a strong sense by giving
+algorithms for counting versions of problems with running times equal to the
+ETH lower bounds for their decision versions.
+</p>
+<p>Generally speaking, our algorithm counts copies of $P$ in time proportional
+to its number of non-isomorphic separations of order $\tilde{O}(\sqrt{k})$. The
+algorithm introduces a new recursive approach to construct families of balanced
+cycle separators in planar graphs that have limited overlap inspired by methods
+from Fomin et al. [FOCS 2016], a new `efficient' inclusion-exclusion based
+argument and uses methods from Bodlaender et al. [ICALP 2016].
+</p></div>
+    </summary>
+    <updated>2019-04-26T00:00:00Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2019-04-26T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/1904.11263</id>
+    <link href="http://arxiv.org/abs/1904.11263" rel="alternate" type="text/html"/>
+    <title>Stochastic rounding and reduced-precision fixed-point arithmetic for solving neural ODEs</title>
+    <feedworld_mtime>1556236800</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Hopkins:Michael.html">Michael Hopkins</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Mikaitis:Mantas.html">Mantas Mikaitis</a>, Dave R. Lester, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/f/Furber:Steve.html">Steve Furber</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.11263">PDF</a><br/><b>Abstract: </b>Although double-precision floating-point arithmetic currently dominates
+high-performance computing, there is increasing interest in smaller and simpler
+arithmetic types. The main reasons are potential improvements in energy
+efficiency and memory footprint and bandwidth. However, simply switching to
+lower-precision types typically results in increased numerical errors. We
+investigate approaches to improving the accuracy of lower-precision arithmetic
+types, using examples in an important domain for numerical computation in
+neuroscience: the solution of Ordinary Differential Equations (ODEs). The
+Izhikevich neuron model is used to demonstrate that rounding has an important
+role in producing accurate spike timings from explicit ODE solution algorithms.
+In particular, stochastic rounding consistently results in smaller errors
+compared to single-precision floatingpoint and fixed-point arithmetic with
+round-tonearest across a range of neuron behaviours and ODE solvers. A
+computationally much cheaper alternative is also investigated, inspired by the
+concept of dither that is a widely understood mechanism for providing
+resolution below the LSB in digital signal processing. These results will have
+implications for the solution of ODEs in other subject areas, and should also
+be directly relevant to the huge range of practical problems that are
+represented by Partial Differential Equations (PDEs).
+</p></div>
+    </summary>
+    <updated>2019-04-26T01:23:50Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2019-04-26T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/1904.11244</id>
+    <link href="http://arxiv.org/abs/1904.11244" rel="alternate" type="text/html"/>
+    <title>On adaptive algorithms for maximum matching</title>
+    <feedworld_mtime>1556236800</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Falko Hegerfeld, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Kratsch:Stefan.html">Stefan Kratsch</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.11244">PDF</a><br/><b>Abstract: </b>In the fundamental Maximum Matching problem the task is to find a maximum
+cardinality set of pairwise disjoint edges in a given undirected graph. The
+fastest algorithm for this problem, due to Micali and Vazirani, runs in time
+$\mathcal{O}(\sqrt{n}m)$ and stands unbeaten since 1980. It is complemented by
+faster, often linear-time, algorithms for various special graph classes.
+Moreover, there are fast parameterized algorithms, e.g., time
+$\mathcal{O}(km\log n)$ relative to tree-width $k$, which outperform
+$\mathcal{O}(\sqrt{n}m)$ when the parameter is sufficiently small.
+</p>
+<p>We show that the Micali-Vazirani algorithm, and in fact any algorithm
+following the phase framework of Hopcroft and Karp, is adaptive to beneficial
+input structure. We exhibit several graph classes for which such algorithms run
+in linear time $\mathcal{O}(n+m)$. More strongly, we show that they run in time
+$\mathcal{O}(\sqrt{k}m)$ for graphs that are $k$ vertex deletions away from any
+of several such classes, without explicitly computing an optimal or approximate
+deletion set; before, most such bounds were at least $\Omega(km)$. Thus, any
+phase-based matching algorithm with linear-time phases obliviously interpolates
+between linear time for $k=\mathcal{O}(1)$ and the worst case of
+$\mathcal{O}(\sqrt{n}m)$ when $k=\Theta(n)$. We complement our findings by
+proving that the phase framework by itself still allows $\Omega(\sqrt{n})$
+phases, and hence time $\Omega(\sqrt{n}m)$, even on paths, cographs, and
+bipartite chain graphs.
+</p></div>
+    </summary>
+    <updated>2019-04-26T01:24:05Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2019-04-26T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/1904.11229</id>
+    <link href="http://arxiv.org/abs/1904.11229" rel="alternate" type="text/html"/>
+    <title>Finding Hexahedrizations for Small Quadrangulations of the Sphere</title>
+    <feedworld_mtime>1556236800</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/v/Verhetsel:Kilian.html">Kilian Verhetsel</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Pellerin:Jeanne.html">Jeanne Pellerin</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/r/Remacle:Jean=Fran=ccedil=ois.html">Jean-François Remacle</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.11229">PDF</a><br/><b>Abstract: </b>This paper tackles the challenging problem of constrained hexahedral meshing.
+An algorithm is introduced to build combinatorial hexahedral meshes whose
+boundary facets exactly match a given quadrangulation of the topological
+sphere. This algorithm is the first practical solution to the problem. It is
+able to compute small hexahedral meshes of quadrangulations for which the
+previously known best solutions could only be built by hand or contained
+thousands of hexahedra. These challenging quadrangulations include the
+boundaries of transition templates that are critical for the success of general
+hexahedral meshing algorithms.
+</p>
+<p>The algorithm proposed in this paper is dedicated to building combinatorial
+hexahedral meshes of small quadrangulations and ignores the geometrical
+problem. The key idea of the method is to exploit the equivalence between quad
+flips in the boundary and the insertion of hexahedra glued to this boundary.
+The tree of all sequences of flipping operations is explored, searching for a
+path that transforms the input quadrangulation Q into a new quadrangulation for
+which a hexahedral mesh is known. When a small hexahedral mesh exists, a
+sequence transforming Q into the boundary of a cube is found; otherwise, a set
+of pre-computed hexahedral meshes is used.
+</p>
+<p>A novel approach to deal with the large number of problem symmetries is
+proposed. Combined with an efficient backtracking search, it allows small
+shellable hexahedral meshes to be found for all even quadrangulations with up
+to 20 quadrangles. All 54,943 such quadrangulations were meshed using no more
+than 72 hexahedra. This algorithm is also used to find a construction to fill
+arbitrary domains, thereby proving that any ball-shaped domain bounded by n
+quadrangles can be meshed with no more than 78 n hexahedra. This very
+significantly lowers the previous upper bound of 5396 n.
+</p></div>
+    </summary>
+    <updated>2019-04-26T01:25:59Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Computational Geometry"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.CG" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Computational Geometry (cs.CG) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.CG updates on arXiv.org</title>
+      <updated>2019-04-26T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/1904.11134</id>
+    <link href="http://arxiv.org/abs/1904.11134" rel="alternate" type="text/html"/>
+    <title>Tell Me What I Need to Know: Succinctly Summarizing Data with Itemsets</title>
+    <feedworld_mtime>1556236800</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Mampaey:Michael.html">Michael Mampaey</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/t/Tatti:Nikolaj.html">Nikolaj Tatti</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/v/Vreeken:Jilles.html">Jilles Vreeken</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.11134">PDF</a><br/><b>Abstract: </b>Data analysis is an inherently iterative process. That is, what we know about
+the data greatly determines our expectations, and hence, what result we would
+find the most interesting. With this in mind, we introduce a well-founded
+approach for succinctly summarizing data with a collection of itemsets; using a
+probabilistic maximum entropy model, we iteratively find the most interesting
+itemset, and in turn update our model of the data accordingly. As we only
+include itemsets that are surprising with regard to the current model, the
+summary is guaranteed to be both descriptive and non-redundant. The algorithm
+that we present can either mine the top-$k$ most interesting itemsets, or use
+the Bayesian Information Criterion to automatically identify the model
+containing only the itemsets most important for describing the data. Or, in
+other words, it will `tell you what you need to know'. Experiments on synthetic
+and benchmark data show that the discovered summaries are succinct, and
+correctly identify the key patterns in the data. The models they form attain
+high likelihoods, and inspection shows that they summarize the data well with
+increasingly specific, yet non-redundant itemsets.
+</p></div>
+    </summary>
+    <updated>2019-04-26T01:22:54Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2019-04-26T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/1904.11037</id>
+    <link href="http://arxiv.org/abs/1904.11037" rel="alternate" type="text/html"/>
+    <title>Counting the Number of Crossings in Geometric Graphs</title>
+    <feedworld_mtime>1556236800</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Duque:Frank.html">Frank Duque</a>, Ruy Fabila-Monroy, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Hern=aacute=ndez=V=eacute=lez:C=eacute=sar.html">César Hernández-Vélez</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Hidalgo=Toscano:Carlos.html">Carlos Hidalgo-Toscano</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.11037">PDF</a><br/><b>Abstract: </b>A geometric graph is a graph whose vertices are points in general position in
+the plane and its edges are straight line segments joining these points. In
+this paper we give an $O(n^2 \log n)$ algorithm to compute the number of pairs
+of edges that cross in a geometric graph on $n$ points. For layered, and convex
+geometric graphs the algorithm takes $O(n^2)$ time.
+</p></div>
+    </summary>
+    <updated>2019-04-26T01:26:18Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Computational Geometry"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.CG" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Computational Geometry (cs.CG) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.CG updates on arXiv.org</title>
+      <updated>2019-04-26T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/1904.11026</id>
+    <link href="http://arxiv.org/abs/1904.11026" rel="alternate" type="text/html"/>
+    <title>Efficient Nearest-Neighbor Query and Clustering of Planar Curves</title>
+    <feedworld_mtime>1556236800</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Aronov:Boris.html">Boris Aronov</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/f/Filtser:Omrit.html">Omrit Filtser</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Horton:Michael.html">Michael Horton</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Katz:Matthew_J=.html">Matthew J. Katz</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Sheikhan:Khadijeh.html">Khadijeh Sheikhan</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.11026">PDF</a><br/><b>Abstract: </b>We study two fundamental problems dealing with curves in the plane, namely,
+the nearest-neighbor problem and the center problem. Let $\mathcal{C}$ be a set
+of $n$ polygonal curves, each of size $m$. In the nearest-neighbor problem, the
+goal is to construct a compact data structure over $\mathcal{C}$, such that,
+given a query curve $Q$, one can efficiently find the curve in $\mathcal{C}$
+closest to $Q$. In the center problem, the goal is to find a curve $Q$, such
+that the maximum distance between $Q$ and the curves in $\mathcal{C}$ is
+minimized. We use the well-known discrete Frechet distance function, both
+under~$L_\infty$ and under $L_2$, to measure the distance between two curves.
+</p>
+<p>For the nearest-neighbor problem, despite discouraging previous results, we
+identify two important cases for which it is possible to obtain practical
+bounds, even when $m$ and $n$ are large. In these cases, either $Q$ is a line
+segment or $\mathcal{C}$ consists of line segments, and the bounds on the size
+of the data structure and query time are nearly linear in the size of the input
+and query curve, respectively. The returned answer is either exact under
+$L_\infty$, or approximated to within a factor of $1+\varepsilon$ under~$L_2$.
+We also consider the variants in which the location of the input curves is only
+fixed up to translation, and obtain similar bounds, under $L_\infty$.
+</p>
+<p>As for the center problem, we study the case where the center is a line
+segment, i.e., we seek the line segment that represents the given set as well
+as possible. We present near-linear time exact algorithms under $L_\infty$,
+even when the location of the input curves is only fixed up to translation.
+Under $L_2$, we present a roughly $O(n^2m^3)$-time exact algorithm.
+</p></div>
+    </summary>
+    <updated>2019-04-26T01:26:34Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Computational Geometry"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.CG" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Computational Geometry (cs.CG) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.CG updates on arXiv.org</title>
+      <updated>2019-04-26T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/1904.10454</id>
+    <link href="http://arxiv.org/abs/1904.10454" rel="alternate" type="text/html"/>
+    <title>Normalizers and permutational isomorphisms in simply-exponential time</title>
+    <feedworld_mtime>1556236800</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/w/Wiebking:Daniel.html">Daniel Wiebking</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.10454">PDF</a><br/><b>Abstract: </b>We show that normalizers and permutational isomorphisms of permutation groups
+given by generating sets can be computed in time simply exponential in the
+degree of the groups. The result is obtained by exploiting canonical forms for
+permutation groups (up to permutational isomorphism).
+</p></div>
+    </summary>
+    <updated>2019-04-26T00:00:00Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2019-04-26T01:30:00Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://tcsplus.wordpress.com/?p=351</id>
@@ -37,7 +616,7 @@
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2019-04-26T00:21:26Z</updated>
+      <updated>2019-04-26T01:29:58Z</updated>
     </source>
   </entry>
 
@@ -208,7 +787,7 @@ I have two minds here. We shouldn't alienate or confuse those who didn't grow up
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-04-26T00:20:49Z</updated>
+      <updated>2019-04-26T01:29:03Z</updated>
     </source>
   </entry>
 
@@ -326,7 +905,7 @@ Here is, however, a story of how a statistical physicist might have invented the
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-04-26T00:20:10Z</updated>
+      <updated>2019-04-26T01:20:13Z</updated>
     </source>
   </entry>
 
@@ -600,32 +1179,6 @@ for properties that are closed under the removal of edges only.
     </source>
   </entry>
 
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1904.10454</id>
-    <link href="http://arxiv.org/abs/1904.10454" rel="alternate" type="text/html"/>
-    <title>Normalizers and permutational isomorphisms in simply-exponential time</title>
-    <feedworld_mtime>1556150400</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/w/Wiebking:Daniel.html">Daniel Wiebking</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.10454">PDF</a><br/><b>Abstract: </b>We show that normalizers and permutational isomorphisms of permutation groups
-given by generating sets can be computed in time simply exponential in the
-degree of the groups. The result is obtained by exploiting canonical forms for
-permutation groups (up to permutational isomorphism).
-</p></div>
-    </summary>
-    <updated>2019-04-25T00:00:00Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2019-04-25T01:30:00Z</updated>
-    </source>
-  </entry>
-
   <entry xml:lang="en">
     <id>http://rjlipton.wordpress.com/?p=15798</id>
     <link href="https://rjlipton.wordpress.com/2019/04/24/why-check-a-proof/" rel="alternate" type="text/html"/>
@@ -742,7 +1295,7 @@ We appreciate the comments on the previous post and hope this adds some addition
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-04-26T00:20:52Z</updated>
+      <updated>2019-04-26T01:29:07Z</updated>
     </source>
   </entry>
 
@@ -833,7 +1386,7 @@ We appreciate the comments on the previous post and hope this adds some addition
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-04-26T00:20:48Z</updated>
+      <updated>2019-04-26T01:29:03Z</updated>
     </source>
   </entry>
 
@@ -941,7 +1494,7 @@ A major reason for the exodus of the middle class from San Francisco, demographe
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-04-26T00:20:09Z</updated>
+      <updated>2019-04-26T01:20:13Z</updated>
     </source>
   </entry>
 
@@ -983,7 +1536,7 @@ The remarkable results that we will review give algorithms that achieve regret</
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-04-26T00:20:09Z</updated>
+      <updated>2019-04-26T01:20:13Z</updated>
     </source>
   </entry>
 
@@ -1096,7 +1649,7 @@ An observation related to the last point is: </p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-04-26T00:20:53Z</updated>
+      <updated>2019-04-26T01:29:07Z</updated>
     </source>
   </entry>
 
@@ -1132,7 +1685,7 @@ Note that QMA is "stronger" than the queries+QSamples model in that Merlin's wit
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-26T00:20:46Z</updated>
+      <updated>2019-04-26T01:28:59Z</updated>
     </source>
   </entry>
 
@@ -1162,7 +1715,7 @@ Thus, we view the algorithm for star-free languages as a nontrivial generalizati
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-26T00:20:46Z</updated>
+      <updated>2019-04-26T01:28:59Z</updated>
     </source>
   </entry>
 
@@ -1212,7 +1765,7 @@ Thus, we view the algorithm for star-free languages as a nontrivial generalizati
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-04-26T00:20:48Z</updated>
+      <updated>2019-04-26T01:29:03Z</updated>
     </source>
   </entry>
 
@@ -1423,7 +1976,42 @@ Is the <img alt="{\bf m}" class="latex" src="https://s0.wp.com/latex.php?latex=%
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-04-26T00:20:52Z</updated>
+      <updated>2019-04-26T01:29:06Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>tag:blogger.com,1999:blog-27705661.post-4286404438772500234</id>
+    <link href="http://processalgebra.blogspot.com/feeds/4286404438772500234/comments/default" rel="replies" type="application/atom+xml"/>
+    <link href="http://www.blogger.com/comment.g?blogID=27705661&amp;postID=4286404438772500234" rel="replies" type="text/html"/>
+    <link href="http://www.blogger.com/feeds/27705661/posts/default/4286404438772500234" rel="edit" type="application/atom+xml"/>
+    <link href="http://www.blogger.com/feeds/27705661/posts/default/4286404438772500234" rel="self" type="application/atom+xml"/>
+    <link href="http://processalgebra.blogspot.com/2019/04/the-complexity-of-identifying.html" rel="alternate" type="text/html"/>
+    <title>The Complexity of Identifying Characteristic Formulae</title>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">One of the classic results in concurrency theory is the Hennessy-Milner Theorem. This result states that<br/><ol><li>two bisimilar states in a labelled transition system satisfy exactly the same formulae in a multi-modal logic now called Hennessy-Milner logic, and </li><li>two states in a labelled transition system that satisfy a mild finiteness constraint (called image finiteness)  and enjoy the same properties expressible in Hennessy-Milner logic are bisimilar.</li></ol>See, for instance, Section 1.2 in <a href="http://homepages.inf.ed.ac.uk/cps/chapbisim.pdf">these notes by Colin Stirling</a> for an exposition of that result. A consequence of the Hennessy-Milner Theorem is that whenever two states <i>p </i>and <i>q </i>in a labelled transition system are <i>not</i> bisimilar, one can come up with a formula in Hennessy-Milner logic that <i>p </i>satisfies, but<i> q </i>does not<i>. </i>Moreover, for each state <i>p </i>in a finite, loop-free labelled transition systems, it is possible to construct a formula <i>F(p) </i>in Hennessy-Milner logic that completely characterizes <i>p</i> up to bisimilarity. This means that, for each state <i>q</i>, <i>p</i> is bisimilar to <i>q</i> if, and only if, <i>q</i> satisfies <i>F(p)</i>. The formula<i> F(p) </i>is called a characteristic formula for<i> p </i>up to bisimilarity.<i> </i>One can obtain a similar result for states in finite labelled transition systems by extending Hennessy-Milner logic with greatest fixed points. <i><br/></i><br/><br/>Characteristic formulae have a long history in concurrency theory. However, to be best of my knowledge, the complexity of determining whether a formula is characteristic had not been studied before <a href="https://sites.google.com/view/antonisachilleos">Antonis Achilleos</a> first addressed the problem in <a href="https://arxiv.org/abs/1605.01004">this conference paper</a>. In that paper, Antonis focused on the complexity of the problem of determining whether a formula <i>F</i> is complete, in the sense that, for each formula <i>G</i>, it can derive either <i>G</i> or its negation.<br/><br/>Our recent preprint    <a href="http://icetcs.ru.is/theofomon/CharFormComplexity.pdf"><i>The   Complexity of Identifying Characteristic Formulae</i></a> extends the results originally obtained by Antonis to a variety of modal logics, possibly including least and greatest fixed-point operators. In the paper, we show that completeness, characterization, and validity have the same complexity — with some exceptions for which there are, in general, no complete formulae. So, for most modal logics of interest, the problem is coNP-complete or PSPACE-complete, and becomes EXPTIME-complete for modal logics with fixed points. To prove our upper bounds, we present a nondeterministic procedure with an oracle for validity that combines tableaux and a test for bisimilarity, and determines whether a formula is complete.<br/><br/>I think that there is still a lot of work that can be done in studying this problem, with respect to a variety of other notions of equivalence considered in concurrency theory, so stay tuned for further updates. </div>
+    </content>
+    <updated>2019-04-18T17:19:00Z</updated>
+    <published>2019-04-18T17:19:00Z</published>
+    <author>
+      <name>Luca Aceto</name>
+      <email>noreply@blogger.com</email>
+      <uri>http://www.blogger.com/profile/01092671728833265127</uri>
+    </author>
+    <source>
+      <id>tag:blogger.com,1999:blog-27705661</id>
+      <author>
+        <name>Luca Aceto</name>
+        <email>noreply@blogger.com</email>
+        <uri>http://www.blogger.com/profile/01092671728833265127</uri>
+      </author>
+      <link href="http://processalgebra.blogspot.com/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
+      <link href="http://www.blogger.com/feeds/27705661/posts/default" rel="self" type="application/atom+xml"/>
+      <link href="http://processalgebra.blogspot.com/" rel="alternate" type="text/html"/>
+      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
+      <link href="http://www.blogger.com/feeds/27705661/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
+      <subtitle>Papers I find interesting---mostly, but not solely, in Process Algebra---, and some fun stuff in Mathematics and Computer Science at large and on general issues related to research, teaching and academic life.</subtitle>
+      <title>Process Algebra Diary</title>
+      <updated>2019-04-22T08:46:05Z</updated>
     </source>
   </entry>
 
@@ -1451,655 +2039,7 @@ Other applications of our connection include new lower bounds for shadow tomogra
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-04-26T00:20:46Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-3722233.post-2053726780224405945</id>
-    <link href="https://blog.computationalcomplexity.org/feeds/2053726780224405945/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2019/04/physics-of-everday-life.html#comment-form" rel="replies" type="text/html"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/2053726780224405945" rel="edit" type="application/atom+xml"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/2053726780224405945" rel="self" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2019/04/physics-of-everday-life.html" rel="alternate" type="text/html"/>
-    <title>Physics of Everday Life</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Based on <a href="https://www.scottaaronson.com/blog/?p=3654">Scott's review</a>, I read through Stephen Pinker's <a href="https://www.amazon.com/Enlightenment-Now-Science-Humanism-Progress-ebook/dp/B073TJBYTB/ref=as_li_ss_tl?crid=2O1U6VZR84R2Q&amp;keywords=enlightenment+now&amp;qid=1554897483&amp;s=gateway&amp;sprefix=engligh,aps,597&amp;sr=8-1&amp;linkCode=ll1&amp;tag=computation09-20&amp;linkId=8f668f77297b7cd8b57a85dca27802b0&amp;language=en_US">Enlightenment Now</a>. I can't top Scott's exposition of the book, but it is pretty incredible how far humanity has gone when you step back to look at the big picture.<br/>
-<br/>
-One line intrigued me, one that Pinker credits to a book called <a href="https://www.amazon.com/Big-Picture-Origins-Meaning-Universe/dp/1101984252/ref=as_li_ss_tl?ie=UTF8&amp;linkCode=ll1&amp;tag=computation09-20&amp;linkId=6c644c72e1d0c1f818a5907f9b221ce1&amp;language=en_US">The Big Picture</a> by Sean Carroll<br/>
-<blockquote class="tr_bq">
-The laws of physics underlying everyday life (that is excluding extreme values of energy and gravitation like black holes, dark matter and the Big Bang) are <i>completely known.</i></blockquote>
-Hasn't this statement almost always been true, in the sense that the leading minds would make this claim at many times in history. The ancient Greeks probably believed they understood physics that underlies everyday life. So did physicists after Newton. Life back then not today. My everyday life involves using a GPS device that requires understanding relativistic effects and computer chips that needed other scientific advances.<br/>
-<br/>
-Is it possible we could do more in everyday life if we knew more physics? I'd certainly use a teleporter in everyday life.<br/>
-<br/>
-And is the statement even true today? We all use public key cryptography, even to read this blog. It's not completely clear if we understand the physics enough to know how or if large-scale quantum computers capable of breaking those systems can be built.<br/>
-<br/>
-Everday life is relative.</div>
-    </content>
-    <updated>2019-04-18T11:40:00Z</updated>
-    <published>2019-04-18T11:40:00Z</published>
-    <author>
-      <name>Lance Fortnow</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-3722233</id>
-      <category term="typecast"/>
-      <category term="focs metacomments"/>
-      <author>
-        <name>Lance Fortnow</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-      </author>
-      <link href="https://blog.computationalcomplexity.org/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default" rel="self" type="application/atom+xml"/>
-      <link href="https://blog.computationalcomplexity.org/" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
-      <title>Computational Complexity</title>
-      <updated>2019-04-25T19:33:54Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2019/059</id>
-    <link href="https://eccc.weizmann.ac.il/report/2019/059" rel="alternate" type="text/html"/>
-    <title>TR19-059 |  Samplers and extractors for unbounded functions | 
-
-	Rohit Agrawal</title>
-    <summary>Blasiok (SODA'18) recently introduced the notion of a subgaussian sampler, defined as an averaging sampler for approximating the mean of functions $f:\{0,1\}^m \to \mathbb{R}$ such that $f(U_m)$ has subgaussian tails, and asked for explicit constructions. In this work, we give the first explicit constructions of subgaussian samplers (and in fact averaging samplers for the broader class of subexponential functions) that match the best-known constructions of averaging samplers for $[0,1]$-bounded functions in the regime of parameters where the approximation error $\varepsilon$ and failure probability $\delta$ are subconstant. Our constructions are established via an extension of the standard notion of randomness extractor (Nisan and Zuckerman, JCSS'96) where the error is measured by an arbitrary divergence rather than total variation distance, and a generalization of Zuckerman's equivalence (Random Struct. Alg.'97) between extractors and samplers. We believe that the framework we develop, and specifically the notion of an extractor for the Kullback-Leibler (KL) divergence, are of independent interest. In particular, KL-extractors are stronger than both standard extractors and subgaussian samplers, but we show that they exist with essentially the same parameters (constructively and non-constructively) as standard extractors.</summary>
-    <updated>2019-04-18T00:27:56Z</updated>
-    <published>2019-04-18T00:27:56Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2019-04-26T00:20:46Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-US">
-    <id>https://www.scottaaronson.com/blog/?p=4166</id>
-    <link href="https://www.scottaaronson.com/blog/?p=4166" rel="alternate" type="text/html"/>
-    <link href="https://www.scottaaronson.com/blog/?p=4166#comments" rel="replies" type="text/html"/>
-    <link href="https://www.scottaaronson.com/blog/?feed=atom&amp;p=4166" rel="replies" type="application/atom+xml"/>
-    <title xml:lang="en-US">Just says in P</title>
-    <summary xml:lang="en-US">Recently a Twitter account started called justsaysinmice. The only thing this account does, is to repost breathless news articles about medical research breakthroughs that fail to mention that the effect in question was only observed in mice, and then add the words “IN MICE” to them. Simple concept, but it already seems to be changing […]</summary>
-    <content type="xhtml" xml:lang="en-US"><div xmlns="http://www.w3.org/1999/xhtml"><p>Recently a Twitter account started called <a href="https://twitter.com/justsaysinmice">justsaysinmice</a>.  The only thing this account does, is to repost breathless news articles about medical research breakthroughs that fail to mention that the effect in question was only observed in mice, and then add the words “IN MICE” to them.  Simple concept, but it already seems to be changing the conversation about science reporting.</p>
-
-
-
-<p>It occurred to me that we could do something analogous for quantum computing.  While my own deep-seated aversion to Twitter prevents me from doing it myself, which of my readers is up for starting an account that just reposts one overhyped QC article after another, while appending the words “A CLASSICAL COMPUTER COULD ALSO DO THIS” to each one?</p></div>
-    </content>
-    <updated>2019-04-17T19:14:17Z</updated>
-    <published>2019-04-17T19:14:17Z</published>
-    <category scheme="https://www.scottaaronson.com/blog" term="Procrastination"/>
-    <category scheme="https://www.scottaaronson.com/blog" term="Quantum"/>
-    <category scheme="https://www.scottaaronson.com/blog" term="Rage Against Doofosity"/>
-    <category scheme="https://www.scottaaronson.com/blog" term="Speaking Truth to Parallelism"/>
-    <author>
-      <name>Scott</name>
-      <uri>http://www.scottaaronson.com</uri>
-    </author>
-    <source>
-      <id>https://www.scottaaronson.com/blog/?feed=atom</id>
-      <link href="https://www.scottaaronson.com/blog" rel="alternate" type="text/html"/>
-      <link href="https://www.scottaaronson.com/blog/?feed=atom" rel="self" type="application/atom+xml"/>
-      <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
-      <title xml:lang="en-US">Shtetl-Optimized</title>
-      <updated>2019-04-19T21:17:59Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://gilkalai.wordpress.com/?p=17286</id>
-    <link href="https://gilkalai.wordpress.com/2019/04/17/gothenburg-stockholm-lancaster-mitzpe-ramon-and-israeli-election-day-2019/" rel="alternate" type="text/html"/>
-    <title>Gothenburg, Stockholm, Lancaster, Mitzpe Ramon, and Israeli Election Day 2019</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Lancaster – Watching the outcomes of the Israeli elections (photo: Andrey Kupavskii) Sweden I just came back from a trip to Sweden and the U.K. I was invited to Gothenburg to be the opponent for a Ph. D. Candidate  Malin … <a href="https://gilkalai.wordpress.com/2019/04/17/gothenburg-stockholm-lancaster-mitzpe-ramon-and-israeli-election-day-2019/">Continue reading <span class="meta-nav">→</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><a href="https://gilkalai.files.wordpress.com/2019/04/dsc5390.jpg"><img alt="" class="alignnone size-medium wp-image-17287" height="200" src="https://gilkalai.files.wordpress.com/2019/04/dsc5390.jpg?w=300&amp;h=200" width="300"/></a> <a href="https://gilkalai.files.wordpress.com/2019/04/hand.png"><img alt="" class="alignnone size-medium wp-image-17288" height="251" src="https://gilkalai.files.wordpress.com/2019/04/hand.png?w=300&amp;h=251" width="300"/></a></p>
-<p><span style="color: #ff0000;">Lancaster – Watching the outcomes of the Israeli elections (photo: Andrey Kupavskii)</span></p>
-<h3>Sweden</h3>
-<p>I just came back from a trip to Sweden and the U.K. I was invited to Gothenburg to be the opponent for a Ph. D. Candidate  Malin Palö Forsström (by now Dr. Malin Palö Forsström),  who wrote her excellent Ph. D. thesis under the supervision of Jeff Steif in Chalmers University. We also used the opportunity for a lovely mini-mini-workshop</p>
-<p>From Gothenburg I took the train to Stockholm to spend the weekend with Anders Björner and we talked about some old projects regarding algebraic shifting.  We had dinner with several colleagues including Svante Linusson who is a candidate for the European parliament!</p>
-<p><a href="https://gilkalai.files.wordpress.com/2019/04/acg80s.jpeg"><img alt="" class="alignnone size-full wp-image-17296" src="https://gilkalai.files.wordpress.com/2019/04/acg80s.jpeg?w=640"/></a> <a href="https://gilkalai.files.wordpress.com/2019/04/20190407_194045.jpg"><img alt="" class="alignnone size-medium wp-image-17297" height="168" src="https://gilkalai.files.wordpress.com/2019/04/20190407_194045.jpg?w=300&amp;h=168" width="300"/></a></p>
-<p><span style="color: #ff0000;">Stockholm: With Anders and Cristins in the late 80s (left, I think this was also when I was an opponent), Svante Linusson ten days ago (right)</span></p>
-<h3>The United Kingdom</h3>
-<p>The <a href="https://www.lancaster.ac.uk/maths/bmc2019/">British Mathematical Colloquium at Lancaster</a> was a lovely 4-day general meeting, an opportunity to meet some old and new friends (and Internet MO friend <a href="https://mathoverflow.net/users/763/yemon-choi">Yemon Choi</a> in real life), and to learn about various new developments. I am aware of the fact that my list of unfulfilled promises is longer than those of most politicians, but I do hope to come back to some mathematics from this trip to Sweden and to Lancaster.</p>
-<h3>Election Day</h3>
-<p>Last week’s Tuesday was election day in Israel,  and as much as I like to participate (and to devote a post to election day here on the blog – in <a href="https://gilkalai.wordpress.com/2009/02/10/majority-rules-the-story-of-achnais-oven/">2009</a>, <a href="https://gilkalai.wordpress.com/2013/01/22/election-day/">2012</a>, and <a href="https://gilkalai.wordpress.com/2015/03/17/election-day-2/">2015</a>) I had to miss the election, for the first time since 1985. (I still tried to follow the outcomes in real time.)</p>
-<h3>The Negev, Israel</h3>
-<p>And we are now spending a three-day vacation and doing some mild hiking in Mitzpe Ramon, in the Negev, the Israeli desert.  The view around here is spectacular. I first fell in love with the sights of the Negev when I spent six months here when I was 19 (in the army). Since then we have been caming here many times over the years, and in 2002 the annual meeting of the Israeli Mathematical Union took place here, in the same hotel.</p>
-<p><a href="https://gilkalai.files.wordpress.com/2019/04/img-20190416-wa0036.jpg"><img alt="" class="alignnone size-medium wp-image-17298" height="300" src="https://gilkalai.files.wordpress.com/2019/04/img-20190416-wa0036.jpg?w=169&amp;h=300" width="169"/></a> <a href="https://gilkalai.files.wordpress.com/2019/04/fb_img_1555444073776-e1555444196265.jpg"> <img alt="" class="alignnone size-medium wp-image-17299" height="165" src="https://gilkalai.files.wordpress.com/2019/04/fb_img_1555444073776-e1555444196265.jpg?w=300&amp;h=165" width="300"/></a></p>
-<p><span style="color: #ff0000;">Ein Ovdat (left). The 2002 Annual meeting of the IMU (right). A large number of Israeli mathematicians come to a substantial fraction of these annual events.</span></p>
-<h3>The stance of the main Israeli parties on quantum computing</h3>
-<p>One anecdote about the Israeli election is that both major political parties of Israel, the Likud, led by Benjamin (Bibi) Netanyahu that won 35 seats in the parliament and will probably lead the coalition, and the newly formed “Blue-and-White” party, led by Benny (Benjamin) Gantz that also won 35 seats and will probably lead the opposition, stand behind quantum computing! <img alt="&#x1F642;" class="wp-smiley" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/1f642.png" style="height: 1em;"/></p>
-<p><a href="https://gilkalai.files.wordpress.com/2019/03/bw-quantum.png"><img alt="" class="alignnone size-medium wp-image-17121" height="233" src="https://gilkalai.files.wordpress.com/2019/03/bw-quantum.png?w=300&amp;h=233" width="300"/></a><a href="https://gilkalai.files.wordpress.com/2019/04/qcbibi.png"> <img alt="" class="alignnone size-medium wp-image-17302" height="258" src="https://gilkalai.files.wordpress.com/2019/04/qcbibi.png?w=300&amp;h=258" width="300"/></a></p>
-<p><span style="color: #ff0000;">Left – A paragraph from “Blue and White’s” charter with a pledge to quantum computing (I thank Noam Lifshitz for telling me about it). Right –  a news item (<a href="https://en.globes.co.il/en/article-government-allocates-nis-300m-for-quantum-computing-1001244244">click for the article</a>) about the quantum computing vision of Netanyahu and the Likud party.</span></p>
-<p> </p></div>
-    </content>
-    <updated>2019-04-17T19:10:12Z</updated>
-    <published>2019-04-17T19:10:12Z</published>
-    <category term="Combinatorics"/>
-    <category term="Probability"/>
-    <category term="Updates"/>
-    <author>
-      <name>Gil Kalai</name>
-    </author>
-    <source>
-      <id>https://gilkalai.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://gilkalai.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://gilkalai.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://gilkalai.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Gil Kalai's blog</subtitle>
-      <title>Combinatorics and more</title>
-      <updated>2019-04-26T00:20:48Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://lucatrevisan.wordpress.com/?p=4227</id>
-    <link href="https://lucatrevisan.wordpress.com/2019/04/17/online-optimization-for-complexity-theorists/" rel="alternate" type="text/html"/>
-    <title>Online Optimization for Complexity Theorists</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Last year I took some time off to study online convex optimization in some detail. The reason for doing that was similar to the reason why at some point I took time off to study spectral graph theory: it was … <a href="https://lucatrevisan.wordpress.com/2019/04/17/online-optimization-for-complexity-theorists/">Continue reading <span class="meta-nav">→</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>
- Last year I took some time off to study online convex optimization in some detail. The reason for doing that was similar to the reason why at some point I took time off to study spectral graph theory: it was coming up in several papers that I wanted to understand, and I felt that I was missing out by not mastering an important tool. In particular, I wanted to understand: </p>
-<ol>
-<li> The <a href="https://dl.acm.org/citation.cfm?id=1496770.1496899">Barak-Hardt-Kale</a> proof of the <a href="https://ieeexplore.ieee.org/document/492584">Impagliazzo hard-core lemma</a>.
-</li><li> The online convex optimization viewpoint on the <a href="https://ieeexplore.ieee.org/document/548459">Frieze-Kannan weak regularity lemma</a>, on the dense model theorem of <a href="https://ieeexplore.ieee.org/document/4690942">(RTTV)</a>, and on the abstract weak regularity lemma of <a href="https://ieeexplore.ieee.org/document/5231258">(TTV)</a> that were described to me by Madhur Tulsiani a few years ago. Furthermore, I wanted to see if Russel Impagliazzo’s subsequent improvements to the dense model theorem and to the abstract weak regularity lemma could be recovered from this point of view.
-</li><li> The <a href="https://dl.acm.org/citation.cfm?doid=2906142.2837020">Arora-Kale</a> algorithms for semidefinite programming, including their nearly linear-time algorithm for approximating the Goemans-Williamson relaxation of Max Cut.
-</li><li> The meaning of the sentence “multiplicative weights and gradient descent are both special cases of follow-the-regularized-leader, using negative entropy and <img alt="{\ell_2^2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cell_2%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\ell_2^2}"/> as regularizer, respectively.”
-</li><li> The <a href="https://arxiv.org/abs/1506.04838">AllenZhu-Liao-Orecchia</a> online optimization proof of the Batson-Spielman-Srivastava sparsification result.
-</li></ol>
-<p>
-I am happy to say that, except for the “furthermore” part of (2), I achieved my goals. To digest this material a bit better, I came up with the rather ambitious plan of writing a series of posts, in which I would alternate between (i) explaining a notion or theorem from online convex optimization (at a level that someone learning about optimization or machine learning might find useful) and (ii) explaining a complexity-theoretic application. Now that a very intense Spring semester is almost over, I plan to get started on this plan, although it is not clear that I will see it through the end. So stay tuned for the forthcoming first episode, which will be about the good old multiplicative weights algorithm.</p>
-<p/></div>
-    </content>
-    <updated>2019-04-17T15:27:23Z</updated>
-    <published>2019-04-17T15:27:23Z</published>
-    <category term="theory"/>
-    <category term="online optimization"/>
-    <author>
-      <name>luca</name>
-    </author>
-    <source>
-      <id>https://lucatrevisan.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://lucatrevisan.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://lucatrevisan.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://lucatrevisan.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
-      <title>in   theory</title>
-      <updated>2019-04-26T00:20:09Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://lucatrevisan.wordpress.com/?p=4224</id>
-    <link href="https://lucatrevisan.wordpress.com/2019/04/16/the-early-years-of-computing-in-italy/" rel="alternate" type="text/html"/>
-    <title>The Early Years of Computing in Italy</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Here are in theory‘s first ever book reviews! The books are Giorgio Garuzzo Quando in Italia si facevano i computer Available for free at Amazon.com and Amazon.it. Giorgio Ausiello The Making of a New Science Available from Springer, as a … <a href="https://lucatrevisan.wordpress.com/2019/04/16/the-early-years-of-computing-in-italy/">Continue reading <span class="meta-nav">→</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Here are <i>in theory</i>‘s first ever book reviews! The books are</p>
-<p>Giorgio Garuzzo<br/>
-<i>Quando in Italia si facevano i computer</i><br/>
-Available for free at <a href="https://www.amazon.com/gp/product/B017PTTUKY">Amazon.com</a> and <a href="https://www.amazon.it/Quando-facevano-computer-Giorgio-Garuzzo-ebook/dp/B017PTTUKY">Amazon.it</a>.</p>
-<p>Giorgio Ausiello<br/>
-<i>The Making of a New Science</i><br/>
-Available from <a href="https://www.springer.com/us/book/9783319626796">Springer</a>, as a DRM-free PDF through your academic library.</p>
-<p>Both books talk about the early years of computing in Italy, on the industrial and academic side, respectively. They briefly intersect with the story of Olivetti’s Elea computer.</p>
-<p><span id="more-4224"/></p>
-<p>Olivetti was a company that was founded in 1908 to make typewriters, and then branched out to other office/business machines and avionics. In the 1930s, Adriano Olivetti, a son of the founder Camillo Olivetti, took over the company. Adriano Olivetti was an unusual figure of entrepreneur deeply interested in arts, humanities and social sciences, with a utopian vision of a company reinvesting its profits in its community. In the 1950s, he led the company to develop the Elea, the first Italian computer. The Elea was made with transistors, and it came out before IBM had built its own first transistor-based computer.</p>
-<p>The development of Elea was led by Mario Tchou. Mario Tchou was a Chinese-Italian born and raised in Rome, who studied electrical engineering at the Sapienza University of Rome and then at Brooklyn Polytechnic, eventually becoming an assistant professor at Columbia University. Olivetti persuaded Tchou to move back to Italy and lead the development of Elea, whose first prototype came out in 1957. </p>
-<p>As production was ramping up, tragedy struck: Adriano Olivetti died in 1960, and Mario Tchou died in 1961. To shore up the finances of the company, the new CEO Roberto Olivetti brought in a series of new investors, who pushed to spin off the computer business.</p>
-<p>At that point, Olivetti was working on another revolutionary machine, the P101, a programmable desktop calculator billed as the “first desktop computer,” which came out in 1964, attracting huge interest. Nonetheless the company spun off its “computer” division into a joint venture with GE, eventually divesting of it completely. Fortunately, they kept control of the P101 project, because those working on it were careful in branding it internally as a “calculator” (not part of the of deal with GE) rather than a “computer.”</p>
-<p>These events are narrated, with a fascinating insider view, in Garuzzo’s book.</p>
-<p>Giorgio Ausiello is one of the founding fathers of academic computer science in Italy. His book is a professional memoir that starts in the 1960s, at the time in which he started working on his undergraduate thesis at the Istituto Nazionale per le Applicazioni del Calcolo (INAC, later renamed IAC) at the National Research Council in Rome. At that point INAC had one of Italy’s few computers, a machine bought in 1954 from the Ferranti company in Manchester (when it was installed, it was Italy’s <i>second</i> computer).</p>
-<p>As narrated in a <a href="https://lucatrevisan.wordpress.com/2017/10/23/corrado-bohm/">previous post</a>, Mauro Picone, the mathematician who was leading INAC, brought Corrado Bohm to Rome to work on this computer, and Ausiello started to work with Bohm at the time in which he was just starting to think about models of computation and lambda-calculus.</p>
-<p>Later, Ausiello visited Berkeley in the 1968-69 academic year, when Manuel Blum and Dick Karp had just joined the faculty. Ausiello took part in the first STOC, which was held in Marina del Rey in May 1969, and, later that month, he witnessed the occupation of <a href="https://en.wikipedia.org/wiki/People%27s_Park_(Berkeley)">People’s Park</a> in Berkeley.</p>
-<p>The Fall of 1969 marks the start of the first Italian undergraduate programs in Computer Science, in just <del>four</del> three universities:  Bari, <del datetime="2019-04-17T11:04:18-07:00">Milan,</del> Pisa and Torino. Back in Italy from Berkeley, Ausiello continued to work at the National Research Council in Rome.</p>
-<p>The book continues with a behind-the-scene narration of the events that led to the founding of the EATCS professional society, the ICALP conference and the TCS journal. There is also another trip to Berkeley in the 1980s, featuring Silvio Micali and Vijay Vazirani working on their matching algorithm, and Shafi Goldwasser just arriving in Berkeley.</p>
-<p>Methodically documented and very detail-oriented, the book is a fascinating read, although it leaves you sometimes wanting to hear more about the personalities and the stories of the people involved and less about the attendance lists of certain meetings.</p>
-<p>Even when it comes to the dryer details, however, I am happy that the books documents them and makes them available to future generations that will not have any living memory of the 1960s and 1970s.</p>
-<p>I should also mention that Alon Rosen has recently interviewed <a href="https://www.youtube.com/watch?v=vKCE7QnsFcw&amp;t=67s">Christos Papadimitriou</a> and <a href="https://www.youtube.com/watch?v=-GQnK6ys6C0&amp;t=20s">Avi Wigderson</a> and those (<i>long</i>) interviews are full of good stories. Finally, the Simons Foundation site has an <a href="https://www.simonsfoundation.org/2013/02/14/laszlo-lovasz/">interview of Laszlo Lovasz</a> in conversation with Avi Wigderson which I very highly recommend everybody to watch.</p></div>
-    </content>
-    <updated>2019-04-17T00:52:21Z</updated>
-    <published>2019-04-17T00:52:21Z</published>
-    <category term="Berkeley"/>
-    <category term="history"/>
-    <category term="Italy"/>
-    <category term="theory"/>
-    <category term="Elea"/>
-    <category term="Giorgio Ausiello"/>
-    <category term="Giorgio Garuzzo"/>
-    <category term="Mario Tchou"/>
-    <category term="Olivetti"/>
-    <category term="P101"/>
-    <author>
-      <name>luca</name>
-    </author>
-    <source>
-      <id>https://lucatrevisan.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://lucatrevisan.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://lucatrevisan.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://lucatrevisan.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
-      <title>in   theory</title>
-      <updated>2019-04-26T00:20:09Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2019/058</id>
-    <link href="https://eccc.weizmann.ac.il/report/2019/058" rel="alternate" type="text/html"/>
-    <title>TR19-058 |  Extractors for small zero-fixing sources | 
-
-	Pavel Pudlak, 
-
-	Vojtech Rodl</title>
-    <summary>A random variable $X$ is an $(n,k)$-zero-fixing source if for some subset $V\subseteq[n]$, $X$ is the uniform distribution on the strings $\{0,1\}^n$ that are zero on every coordinate outside of $V$. An $\epsilon$-extractor for $(n,k)$-zero-fixing sources is a mapping $F:\{0,1\}^n\to\{0,1\}^m$, for some $m$, such that $F(X)$ is $\epsilon$-close in statistical distance to the uniform distribution on $\{0,1\}^m$ for every $(n,k)$-zero-fixing source $X$. Zero-fixing sources were introduced by Cohen and Shinkar in~2015 in connection with the previously studied extractors for bit-fixing sources. They constructed, for every $\mu&gt;0$, an efficiently computable extractor that extracts a positive fraction of entropy, i.e., $\Omega(k)$ bits, from $(n,k)$-zero-fixing sources where $k\geq(\log\log n)^{2+\mu}$. 
-
-In this paper we present two different constructions of extractors for zero-fixing sources that are able to extract a positive fraction of entropy for $k$ essentially smaller than $\log\log n$. The first extractor works for $k\geq C\log\log\log n$, for some constant $C$. The second extractor extracts a positive fraction of entropy for $k\geq \log^{(i)}n$ for any fixed $i\in \N$, where $\log^{(i)}$ denotes $i$-times iterated logarithm. The fraction of extracted entropy decreases with $i$. The first extractor is a function computable in polynomial time in~$n$ (for $\epsilon=o(1)$, but not too small); the second one is computable in polynomial time when $k\leq\alpha\log\log n/\log\log\log n$, where $\alpha$ is a positive constant.</summary>
-    <updated>2019-04-16T15:10:03Z</updated>
-    <published>2019-04-16T15:10:03Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2019-04-26T00:20:46Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-events.org/2019/04/16/tensors-algebra-computation-applications/</id>
-    <link href="https://cstheory-events.org/2019/04/16/tensors-algebra-computation-applications/" rel="alternate" type="text/html"/>
-    <title>Tensors: Algebra-Computation-Applications</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">June 3-14, 2019 U. Colorado Boulder and Colorado State U https://thetensor.space/workshops/2019/02/13/TACA-2019.html The Department of Mathematics at Colorado State University and the Department of Computer Science at the University of Colorado, Boulder invite interested participants to attend a workshop and conference on Tensors: Algebra, Computation, and Applications (TACA). The central theme of tensors is meant to … <a class="more-link" href="https://cstheory-events.org/2019/04/16/tensors-algebra-computation-applications/">Continue reading <span class="screen-reader-text">Tensors: Algebra-Computation-Applications</span></a></div>
-    </summary>
-    <updated>2019-04-16T15:01:44Z</updated>
-    <published>2019-04-16T15:01:44Z</published>
-    <category term="workshop"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-events.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-events.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-events.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-events.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
-      <title>CS Theory Events</title>
-      <updated>2019-04-26T00:21:28Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>https://11011110.github.io/blog/2019/04/15/linkage</id>
-    <link href="https://11011110.github.io/blog/2019/04/15/linkage.html" rel="alternate" type="text/html"/>
-    <title>Linkage</title>
-    <summary>“You know how the \hat command in LaTeΧ puts a caret above a letter? … Well I was thinking it would be funny if someone made a package that made the \hat command put a picture of an actual hat on the symbol instead?” And then Matthew Scroggs and Adam Townsend went ahead and did it ().</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><ul>
-  <li>
-    <p><a href="https://aperiodical.com/2019/03/realhats-writing-a-latex-package/">“You know how the \hat command in LaTeΧ puts a caret above a letter? … Well I was thinking it would be funny if someone made a package that made the \hat command put a picture of an actual hat on the symbol instead?”</a>
-And then Matthew Scroggs and Adam Townsend went ahead and <a href="https://ctan.org/pkg/realhats">did it</a> (<a href="https://mathstodon.xyz/@11011110/101849504150959463"/>).</p>
-  </li>
-  <li>
-    <p><a href="https://syntopia.github.io/Polytopia/polytopes.html">Generating 4d polyhedra from their symmetries</a> (<a href="https://mathstodon.xyz/@11011110/101860652773207990"/>, <a href="https://web.archive.org/web/20190306075446/https://plus.google.com/+RoiceNelson/posts/13EEovjAjh3">via</a>), by Mikael Hvidtfeldt Christensen.</p>
-  </li>
-  <li>
-    <p><a href="https://windowsontheory.org/2019/04/03/focs-2019-real-website-and-submission-server/">Windows on Theory</a> and <a href="https://www.scottaaronson.com/blog/?p=4154">Scott Aaronson</a> both warn about a fake web site for <a href="http://focs2019.cs.jhu.edu/">FOCS 2019</a>, whose submission deadline just passed (<a href="https://mathstodon.xyz/@11011110/101864693573223236"/>).</p>
-  </li>
-  <li>
-    <p><a href="http://service.ifam.uni-hannover.de/~geometriewerkstatt/gallery/index.html">GeometrieWerkstatt Gallery</a> (<a href="https://mathstodon.xyz/@11011110/101872198999374479"/>). A collection of weirdly-shaped mathematical surfaces, mostly of constant mean curvature.</p>
-  </li>
-  <li>
-    <p><a href="http://focs2019.cs.jhu.edu/awards/">Sandi Irani wins IEEE TCMF Distinguished Service Award</a> (<a href="https://mathstodon.xyz/@11011110/101877216457233962"/>). The award recognizes her work chairing the <a href="https://www.ics.uci.edu/~irani/safetoc.html">ad hoc committee to combat harassment and discrimination in the theory of computing community</a>, and then getting many theory conferences to follow its recommendations.</p>
-  </li>
-  <li>
-    <p><a href="http://web.colby.edu/thegeometricviewpoint/2014/04/25/periodic-billiard-paths/">Periodic billiard paths</a> (<a href="https://mathstodon.xyz/@11011110/101883476235740072"/>). If the boundary of a given polygon is made of mirrors, these are paths that a laser beam could take that would eventually reflect back to the starting point and angle and then repeat infinitely. It remains a heavily-studied open question whether such paths exist in every triangle. This blog post from 2014 provides a proof that they do exist in polygons whose vertex angles are all rational multiples of .</p>
-  </li>
-  <li>
-    <p><a href="https://retractionwatch.com/2019/04/08/with-a-badly-handled-tweet-plos-angers-scientists-after-a-blog-disappears/">PLOS disappears one (or maybe more) of its hosted blogs</a> (<a href="https://mathstodon.xyz/@11011110/101894568161561631"/>) without any warning to the blog author, without any attempt at keeping old blog links still working, and with only a belated apology.</p>
-  </li>
-  <li>
-    <p><a href="https://slate.com/news-and-politics/2019/03/scotus-gerrymandering-case-mathematicians-brief-elena-kagan.html">The Supreme Court’s math problem</a> (<a href="https://mathstodon.xyz/@11011110/101900050555580515"/>, <a href="https://www.metafilter.com/180163/The-Supreme-Courts-Math-Problem">via</a>). Jordan Ellenberg explains why, in testing for gerrymandering, asking about deviation from proportional representation is the wrong question. Democratic systems naturally concentrate power to the majority rather than being proportional. The right question is whether that concentration is at the natural level, or is artificially accelerated in one direction or another.</p>
-  </li>
-  <li>
-    <p><a href="https://blog.archive.org/2019/04/10/official-eu-agencies-falsely-report-more-than-550-archive-org-urls-as-terrorist-content/">EU falsely calls Internet Archive’s major collection pages, scholarly articles, and copies of US government publications “terrorism” and demands they be taken down from the internet</a> (<a href="https://mathstodon.xyz/@11011110/101908397856087187"/>, <a href="https://boingboing.net/2019/04/11/one-hour-service.html">see also</a>). The EU is about to vote to require terrorism takedowns to happen within an hour, and these requests are coming on European times when all Internet Archive employees (in California) are asleep, making manual review of these bad takedowns difficult.</p>
-  </li>
-  <li>
-    <p><a href="https://www.siam.org/Conferences/CM/Main/apocs20">SIAM-ACM Conference on Algorithmic Principles of Computer Systems, APOCS</a> (<a href="https://mathstodon.xyz/@11011110/101909431804808574"/>). This is a new conference to be held with SODA, next January in Salt Lake City, covering “all areas of algorithms and architectures that offer insight into the performance and design of computer systems”. Submission titles and abstracts are due August 9 (with full papers due a week later) so if this is an area you’re interested in there’s still plenty of time to come up with something to submit.</p>
-  </li>
-  <li>
-    <p><a href="https://blog.computationalcomplexity.org/2019/04/elwyn-berlekamp-died-april-9-2019.html">Sad news from Berkeley</a>: <a href="https://en.wikipedia.org/wiki/Elwyn_Berlekamp">Elwyn Berlekamp</a> has died (<a href="https://mathstodon.xyz/@11011110/101921251002340100"/>, <a href="https://aperiodical.com/2019/04/elwyn-berlekamp-has-left-us/">see also</a>). Berlekamp made significant contributions to combinatorial game theory (motivated, as I understand it, by the mathematical study of Go endgames), coding theory, and algorithms for polynomials.</p>
-  </li>
-  <li>
-    <p><a href="https://www.berlintransitmap.de/">An unofficially-proposed new Berlin transit map replaces stylized axis-parallel and diagonal line segments with smooth curves</a> (<a href="https://mathstodon.xyz/@11011110"/>, <a href="https://www.metafilter.com/180431/Berlin-Transit-Map-now-with-pleasing-Curves">via</a>). The old design was seen as “out of style”, “too robotized”, and too difficult to follow routes. There’s still a strong preference for axis-parallel and diagonal lines in the new map, but the connections between them have been smoothed out.</p>
-  </li>
-</ul></div>
-    </content>
-    <updated>2019-04-15T17:43:00Z</updated>
-    <published>2019-04-15T17:43:00Z</published>
-    <author>
-      <name>David Eppstein</name>
-    </author>
-    <source>
-      <id>https://11011110.github.io/blog/feed.xml</id>
-      <author>
-        <name>David Eppstein</name>
-      </author>
-      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
-      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
-      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
-      <title>11011110</title>
-      <updated>2019-04-23T23:43:50Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://kintali.wordpress.com/?p=1225</id>
-    <link href="https://kintali.wordpress.com/2019/04/15/a-personal-story-of-a-founder/" rel="alternate" type="text/html"/>
-    <title>A Personal Story of a Founder</title>
-    <summary>Disclaimer: This blog post is not intended to offend University of Pennsylvania or IIT Kharagpur or Yahoo or any individuals or parties involved. The goal of this blog post is to point out some of the inefficiencies and acknowledge them as one of the motivations behind developing TrueCerts platform. The year was 2005. I was applying for a PhD program in Computer Science in […]</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p class="graf graf--p graf-after--p" id="7e4b"><strong class="markup--strong markup--p-strong"><em class="markup--em markup--p-em">Disclaimer:</em></strong><em class="markup--em markup--p-em"> This blog post is not intended to offend </em><a class="markup--anchor markup--p-anchor" href="https://en.wikipedia.org/wiki/University_of_Pennsylvania" rel="nofollow noopener" target="_blank"><em class="markup--em markup--p-em">University of Pennsylvania</em></a><em class="markup--em markup--p-em"> or </em><a class="markup--anchor markup--p-anchor" href="https://en.wikipedia.org/wiki/Indian_Institute_of_Technology_Kharagpur" rel="nofollow noopener" target="_blank"><em class="markup--em markup--p-em">IIT Kharagpur</em></a><em class="markup--em markup--p-em"> or </em><a class="markup--anchor markup--p-anchor" href="https://en.wikipedia.org/wiki/Yahoo!" rel="nofollow noopener" target="_blank"><em class="markup--em markup--p-em">Yahoo</em></a><em class="markup--em markup--p-em"> or any individuals or parties involved. The goal of this blog post is to point out some of the inefficiencies and acknowledge them as one of the motivations behind developing </em><a class="markup--anchor markup--p-anchor" href="https://truecerts.co/" rel="nofollow noopener" target="_blank"><em class="markup--em markup--p-em">TrueCerts</em></a><em class="markup--em markup--p-em"> platform.</em></p>
-<p class="graf graf--p graf-after--p" id="822b">The year was 2005. I was applying for a PhD program in Computer Science in the top US universities. I have applied to 14 US universities. On Dec 2nd 2015, I received the following email (see the screenshot below) from the University of Pennsylvania (UPenn), Penn Engineering, Office of Academic Programs, Graduate Admissions. I have redacted the name, email address and the phone numbers in the emails, to preserve their privacy.</p>
-<p><img alt="upenn1" class="alignnone size-full wp-image-1226" src="https://kintali.files.wordpress.com/2019/04/upenn1.png?w=660"/></p>
-<p>Here are the photos of the original transcript (I received from IIT Kharagpur when I graduated) and the additional transcripts (I received from IIT Kharagpur when I requested them for my PhD application). They are all <strong class="markup--strong markup--p-strong">laminated by IIT Kharagpur</strong> and sent to me. Feel free to laugh at my appearance on the transcript. I do too <img alt="&#x1F609;" class="wp-smiley" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/1f609.png" style="height: 1em;"/></p>
-<p><img alt="kgp" class="alignnone size-full wp-image-1227" src="https://kintali.files.wordpress.com/2019/04/kgp.jpeg?w=660"/></p>
-<p class="graf graf--p graf-after--figure" id="e20e">IIT Kharagpur stated the following in their transcripts policy.</p>
-<p class="graf graf--p graf--startsWithDoubleQuote graf-after--p" id="60be"><em class="markup--em markup--p-em">“Institute does not take responsibility of sending the duplicate copy of grade cards (transcripts) directly to other institutions/organizations, in connection with the applicants’ admission/employment etc.”</em></p>
-<p class="graf graf--p graf-after--p" id="a381">My reply to the above email and the response from UPenn are shown in the following screenshot.</p>
-<p><img alt="upenn2" class="alignnone size-full wp-image-1228" src="https://kintali.files.wordpress.com/2019/04/upenn2.png?w=660"/></p>
-<p class="graf graf--p graf-after--figure" id="1fc0">In Summary, UPenn was concerned that my transcript was laminated and opened. Surprised by their response (“Your application will not go any further with the opened transcript”), I have spent couple of hours searching online and discovered that there is a lot of scam involving fake degrees and fake transcripts. There are “professionals” in India and China creating the “highest quality fakes”. These fake transcripts are often laminated. So, UPenn decided not to process any applications with opened and laminated credentials. All my credentials are valid and correct, but my application was not processed because IIT Kharagpur has no way to <strong>securely send valid transcripts</strong> and UPenn has no way to <strong>efficiently validate applicants’ transcripts</strong>.</p>
-<p class="graf graf--p graf-after--p" id="0588">I have applied to 14 universities and some of them rejected me because ‘they found a better candidate’ or ‘the research group was not looking for new PhD students’ etc etc. But my UPenn application not going further because of an <strong>inefficient and broken system</strong> is frustrating, to say the least.</p>
-<p class="graf graf--p graf-after--p">After a week, I have recovered from this frustration and went back to my daily routine of reading research papers on Theoretical Computer Science. I said to myself “I will get into one of the remaining 13 universities and I have to focus on my research and resolve the <a class="markup--anchor markup--p-anchor" href="https://en.wikipedia.org/wiki/P_versus_NP_problem" rel="nofollow noopener" target="_blank">P vs NP problem</a>” <img alt="&#x1F609;" class="wp-smiley" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/1f609.png" style="height: 1em;"/> I eventually got admission into GeogiaTech and a handful of other universities. I joined GeorgiaTech and did my research at the intersection of complexity theory, game theory, combinatorics, and structural graph theory.</p>
-<p class="graf graf--p graf-after--p"><strong class="markup--strong markup--p-strong">On a lighter note: </strong>There is a simple way to verify that my transcript is valid — ‘Simply open it and look at my grades’. There are some really bad grades. My CGPA was just average. I have received a C grade in complexity theory (which later became my primary <a class="markup--anchor markup--p-anchor" href="https://smartech.gatech.edu/handle/1853/42770" rel="noopener" target="_blank">PhD thesis</a> topic at GeorgiaTech). Nobody in their right senses would create a fake transcript with those grades <img alt="&#x1F642;" class="wp-smiley" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/1f642.png" style="height: 1em;"/> During the last decade, whenever I met any IITian I first set them up by telling <a class="markup--anchor markup--p-anchor" href="http://shivakintali.org/" rel="noopener" target="_blank">my credentials</a> (B-Tech from IIT Kharagpur, Masters from USC, PhD from GeorgiaTech, Taught at Princeton) and then I bet with them that their CGPA at IIT is greater than mine. I never lost till date. I take pride in this fact <img alt="&#x1F609;" class="wp-smiley" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/1f609.png" style="height: 1em;"/> In my defense, I was an all-rounder at IIT Kharagpur, balancing studies, serving as a ‘secretary of fine arts, modeling and dramatics’ of my hostel, painting, learning guitar and many more things.</p>
-<p class="graf graf--p graf-after--p"><strong class="markup--strong markup--p-strong">A second incident: </strong>During summer 2010 (at the end of my fourth year as a PhD student at GeorgiaTech), I was offered an internship at Yahoo labs and the Yahoo HR team wanted to verify all my credentials (my IIT B-Tech degree, USC Master’s degree, work experience). Yahoo uses a third-party service to rigorously verify all credentials of potential employees / interns. <a class="markup--anchor markup--p-anchor" href="https://www.thedailybeast.com/farewell-yahoo-ceo-scott-thompson-ousted-for-a-resume-lie" rel="noopener" target="_blank">Yahoo fired their own CEO</a>when they found out that he lied on his resume. This process is very rigorous, but very time-consuming. The <strong class="markup--strong markup--p-strong">verification of all my credentials took more than couple of months</strong>. Meanwhile, I was waiting with my fingers-crossed (figuratively speaking) and hoping these verifications happen soon, so that I can start my internship and earn some serious summer money for two months and see a bank balance of more than $1,000 dollars for the first time during my grad school <img alt="&#x1F609;" class="wp-smiley" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/1f609.png" style="height: 1em;"/></p>
-<p class="graf graf--p">Later that year, when I discovered <a class="markup--anchor markup--p-anchor" href="https://bitcoin.org/bitcoin.pdf" rel="noopener" target="_blank">Bitcoin white paper</a>and the underlying Blockchain, my first thought was to use the technology to build a ‘<em class="markup--em markup--p-em">document integrity platform</em>’ to issue <strong class="markup--strong markup--p-strong">tamper-proof credentials</strong>(degrees, transcripts, employment certificates, Visas, Identity documents, driver’s license etc), <strong class="markup--strong markup--p-strong">which can be verified instantaneously and securely on the blockchain without compromising the privacy</strong>.</p>
-<p class="graf graf--p">Early 2011, I got busy writing my PhD thesis and joined the CS department Princeton University in September 2011. I have spent the first couple of years teaching at Princeton, mining Bitcoin, keeping track of Blockchain news and hoping that somebody will develop a ‘document integrity platform’. To my relief, some entrepreneurs tried to develop a ‘credential verification solutions’. To my frustration, none of those solutions are perfect. So I started preparing myself to become a full-time entrepreneur (with several exciting startup ideas) and left Princeton in summer 2015. I hired a truck driver (driving towards west coast) and told him that I will meet him around Sunnyvale/Santa Clara/ San Jose area in couple of weeks. I drove my car for a week to reach the Silicon Valley.</p>
-<p class="graf graf--p graf-after--p" id="5810">Today, I am very glad that we have a complete data integrity solution (for universities, employers and enterprises) and I am very excited that we are preventing fraud and corruption in several areas using our <a class="markup--anchor markup--p-anchor" href="https://truecerts.co/" rel="nofollow noopener" target="_blank">TrueCerts</a> platform.</p>
-<p class="graf graf--p graf-after--p" id="e378">Every week I read several stories about fraud and corruption online (Eg: the recent <a class="markup--anchor markup--p-anchor" href="https://en.wikipedia.org/wiki/2019_college_admissions_bribery_scandal" rel="nofollow noopener" target="_blank">college admissions scandal</a>). I approach the involved parties and explain how such instances can be rigorously prevented using technology.</p>
-<p class="graf graf--p">I feel very fortunate to have discovered an exciting vision towards a fraud-free and efficient future. This discovery happened through the above mentioned unfortunate events and many more real-life experiences. Sometimes the most frustrating problems in your life are the biggest opportunities to develop a rigorous solution.</p></div>
-    </content>
-    <updated>2019-04-15T04:35:57Z</updated>
-    <published>2019-04-15T04:35:57Z</published>
-    <category term="blockchain"/>
-    <category term="Education"/>
-    <category term="IIT Kharagpur"/>
-    <category term="upenn"/>
-    <category term="Yahoo"/>
-    <author>
-      <name>kintali</name>
-    </author>
-    <source>
-      <id>https://kintali.wordpress.com</id>
-      <logo>https://secure.gravatar.com/blavatar/e1376dd220aa259d0efd0638d7619231?s=96&amp;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fbuttonw-com.png</logo>
-      <link href="https://kintali.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://kintali.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://kintali.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://kintali.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Computational Complexity, Polyhedral Combinatorics, Algorithms and Graph Theory</subtitle>
-      <title>My Brain is Open</title>
-      <updated>2019-04-26T00:20:56Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-3722233.post-3262168094346690140</id>
-    <link href="https://blog.computationalcomplexity.org/feeds/3262168094346690140/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2019/04/good-article-terrible-headline.html#comment-form" rel="replies" type="text/html"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/3262168094346690140" rel="edit" type="application/atom+xml"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/3262168094346690140" rel="self" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2019/04/good-article-terrible-headline.html" rel="alternate" type="text/html"/>
-    <title>Good article, terrible headline</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">About a month ago (after my P NP poll appeared) I got email from Jacob Aron asking me some questions about it. One thing he was excited about was that the number of people who thought P vs NP would be solved in the next decade had increased from 11% to 22%. I told him that this also surprised me and <i>there had been no major advances to warrant that increase.</i><br/>
-<i><br/></i>
-Then the article came out. Here is the pointer to the headline and the first few lines, the rest is behind a paywall<br/>
-<br/>
-<a href="https://www.newscientist.com/article/2198151-we-could-solve-the-biggest-problem-in-maths-in-the-next-decade/">here</a><br/>
-<br/>
-You may notice that the headline is<br/>
-<br/>
-<i>We could solve the biggest problem in math in the next decade</i><br/>
-<i><br/></i>
-I emailed Jacob to send me the article, which he did. The article was fine, even quoting me as saying that the increase of people who thought it would be solved soon was unwarranted.<br/>
-<br/>
-1) So, article fine, headline terrible.<br/>
-<br/>
-2)  A more honest headline would be<br/>
-<br/>
-<i>The Complexity Theory Community slightly more optimistic about when P vs NP will be resolved for no apparent reason.</i><br/>
-<i><br/></i>
-3) More bad science:<a href="https://www.newscientist.com/article/mg22329780-400-turings-oracle-the-computer-that-goes-beyond-logic/">here</a><br/>
-<br/>
-Headline is<br/>
-<br/>
-<i>Turing's Oracle: The computer that goes beyond logic</i><br/>
-<br/>
-I think the article was about how a Turing Machine with an oracle for HALT can solve HALT. (If I am wrong about this let me know in the comments and I'll correct it.)<br/>
-<br/>
-4) More bad science:<a href="https://www.quantamagazine.org/finally-a-problem-that-only-quantum-computers-will-ever-be-able-to-solve-20180621/">here</a><br/>
-<br/>
-Headline<br/>
-<br/>
-<i>Finally, a problem that only Quantum Computers will ever be able to solve.</i><br/>
-<i><br/></i>
-This was about the oracle such that BQP is not in PH. Really!<br/>
-<br/>
-5) I invite you to add your own.<br/>
-<br/>
-6) OKAY, so why is the press SO BAD at reporting on our field? And is it just our field? I have one explanation, though I am sure there are many.<br/>
-<br/>
-Our field is about showing the LIMITS of computation. Its hard to make that sexy so they ... lie? exaggerate. They themselves don't really understand our field? Note:<br/>
-<br/>
-To explain to someone who does not really know CS why its important to have an oracle where BQP is not in PH is hard<br/>
-<br/>
-To explain this to someone IN CS but not in Theory is still hard!<br/>
-<br/>
-To explain this to someone IN CS and even in CS Theory, but not complexity (e.g., algorithms) might be hard, though it may depend on the person.<br/>
-<br/>
-7) The old saying is `I don't care if you get the story wrong so long as you spell my name right' And indeed, they did spell my name right. So there is that! But more seriously and less about me or even the article that refers to my poll--- is it bad that science reporting is often wrong?<br/>
-<br/>
-<br/>
-<br/></div>
-    </content>
-    <updated>2019-04-15T04:08:00Z</updated>
-    <published>2019-04-15T04:08:00Z</published>
-    <author>
-      <name>GASARCH</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/03615736448441925334</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-3722233</id>
-      <category term="typecast"/>
-      <category term="focs metacomments"/>
-      <author>
-        <name>Lance Fortnow</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-      </author>
-      <link href="https://blog.computationalcomplexity.org/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default" rel="self" type="application/atom+xml"/>
-      <link href="https://blog.computationalcomplexity.org/" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
-      <title>Computational Complexity</title>
-      <updated>2019-04-25T19:33:54Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://minimizingregret.wordpress.com/?p=116</id>
-    <link href="https://minimizingregret.wordpress.com/2019/04/15/reinforcement-learning-without-rewards/" rel="alternate" type="text/html"/>
-    <link href="https://videos.files.wordpress.com/ro0BDWO4/cheetah-pretty_hd.mp4" length="19415040" rel="enclosure" type="video/mp4"/>
-    <title>Reinforcement learning without rewards</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">by Abby van Soest and Elad Hazan, based on this paper  When humans interact with the environment, we receive a series of signals that indicate the value of our actions. We know that chocolate tastes good, sunburns feel bad, and certain actions generate praise or disapproval from others. Generally speaking, we learn from these signals … <a class="more-link" href="https://minimizingregret.wordpress.com/2019/04/15/reinforcement-learning-without-rewards/">Continue reading <span class="screen-reader-text">Reinforcement learning without rewards</span> <span class="meta-nav">→</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><em>by <a href="http://www.abbyvansoest.com/">Abby van Soest</a> and Elad Hazan, based on <a href="https://arxiv.org/abs/1812.02690">this paper</a> </em></p>
-<p>When humans interact with the environment, we receive a series of signals that indicate the value of our actions. We know that chocolate tastes good, sunburns feel bad, and certain actions generate praise or disapproval from others. Generally speaking, we learn from these signals and adapt our behavior in order to get more positive “rewards” and fewer negative ones.</p>
-<p><i>Reinforcement learning</i> (RL) is a sub-field of machine learning that formally models this setting of learning through interaction in a reactive environment. In RL, we have an <b>agent</b> and an <b>environment</b>. The agent observes its position (or “state”) in the environment and takes actions that transition it to a new state. The environment looks at an agent’s state and hands out rewards based on a hidden set of criteria.</p>
-<p style="text-align: center;"><img alt="" height="145" src="https://minimizingregret.files.wordpress.com/2019/04/null.png?w=360&amp;h=145" title="" width="360"/></p>
-<p><i>Source: <a href="http://incompleteideas.net/book/bookdraft2017nov5.pdf">Reinforcement Learning: An Introduction</a>. Sutton &amp; Barto, 2017.</i></p>
-<p>Typically, the goal of RL is for the agent to learn behavior that maximizes<i> </i>the total reward it receives from the environment. This methodology has led to some notable successes: machines have learned how to<a href="https://deepmind.com/research/publications/playing-atari-deep-reinforcement-learning/"> play Atari games</a>, how to <a href="https://sigmoidal.io/alphago-how-it-uses-reinforcement-learning-to-beat-go-masters/">beat human masters</a> of Go, and how to write <a href="https://www.theverge.com/2019/2/14/18224704/ai-machine-learning-language-models-read-write-openai-gpt2">long-form responses</a> to an essay prompt.</p>
-<h2>But what can we learn without an external reward signal?</h2>
-<p>It seems like a paradoxical question to ask, given that RL is all about rewards. But even though the reward paradigm is fundamentally flexible in many ways, it is also brittle and limits the agent’s ability to learn about its environment. This is due to several reasons. First, a reward signal directs the agents towards a single specific goal that may not generalize. Second, the reward signal may be sparse and uninformative, as we illustrate below.</p>
-<p>Imagine that you want a robot to learn to navigate through the following maze.</p>
-<p><b>Case 1: Sparse Rewards.</b> The agent gets a reward of +1 when it exits the maze, and a reward of 0 everywhere else. The agent doesn’t learn anything until it stumbles upon the exit.</p>
-<p style="text-align: center;">⇒ Clear reward signals are not always available.</p>
-<p><b>Case 2: Misleading Rewards.</b> The agent gets a reward of +1 at the entrance and a reward of +10 at the exit. The agent incorrectly learns to sit at the entrance because it hasn’t explored its environment sufficiently.</p>
-<p style="text-align: center;">⇒ Rewards can <i>prevent</i> discovery of the full environment.</p>
-<p>These issues are easy to overcome in the small maze on the left. But what about the maze on the right? As the size of the environment grows, it’ll get harder and harder to find the correct solution — the intractability of the problem scales exponentially.</p>
-<p style="text-align: center;"><img alt="" height="238" src="https://minimizingregret.files.wordpress.com/2019/04/image.png?w=244&amp;h=238" title="" width="244"/><img alt="pasted image 0.png" class="alignnone size-full wp-image-130" src="https://minimizingregret.files.wordpress.com/2019/04/pasted-image-0.png?w=1100"/></p>
-<p>So what we find is that there is power<i> </i>in being able to learn effectively in the <b>absence</b> of rewards. This intuition is supported by a body of research that shows learning fails when rewards aren’t dense or are <a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf">poorly shaped</a>; and fixing these problems can require substantial engineering effort.</p>
-<p>By enabling agents to discover the environment without the requirement of a reward signal, we create a more<b> flexible and generalizable</b> form of reinforcement learning. This framework can be considered a form of “unsupervised” RL. Rather than relying on explicit and inherently limited signals (or “labels”), we can deal with a broad, unlabelled pool of data. Learning from this pool facilitates a more general extraction of knowledge from the environment.</p>
-<h2>Our new approach: Maximum Entropy</h2>
-<p>In <a href="https://arxiv.org/abs/1812.02690">recent work</a>, we propose finding a policy that maximizes entropy (which we refer to as a MaxEnt policy), or another related and concave function of the distribution. This objective is reward-independent and favors exploration.</p>
-<p>In the video below, a two-dimensional cheetah robot learns to run backwards and forwards, move its legs fast and in all different directions, and even do flips. The cheetah doesn’t have access to any external rewards; it only uses signals from the MaxEnt policy.</p>
-<p> </p>
-<div class="video-player" id="v-ro0BDWO4-1" style="width: 1100px; height: 620px;">
-</div>
-<p>Entropy is a function of the distribution over states. A high entropy distribution visits all states with near-equal frequency — it’s a <i>uniform</i> distribution. On the other hand, a low entropy distribution is biased toward visiting some states more frequently than others. (In the maze example, a low entropy distribution would result from the agent sitting at the entrance of the maze forever.)</p>
-<p><img alt="slAdX3I4FcseBWeJbioHb_g.png" class=" size-full wp-image-129 aligncenter" src="https://minimizingregret.files.wordpress.com/2019/04/sladx3i4fcsebwejbiohb_g.png?w=1100"/></p>
-<p>So given that policy <img alt="\pi" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cpi&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\pi"/> creates a distribution <img alt="d_\pi" class="latex" src="https://s0.wp.com/latex.php?latex=d_%5Cpi&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="d_\pi"/> over states, the problem we are hoping to solve is:</p>
-<p style="text-align: center;"><img alt="\pi^* = \arg \max_{\pi} \text{entropy}(d_\pi) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cpi%5E%2A+%3D+%5Carg+%5Cmax_%7B%5Cpi%7D+%5Ctext%7Bentropy%7D%28d_%5Cpi%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\pi^* = \arg \max_{\pi} \text{entropy}(d_\pi) "/></p>
-<p>When we know all the states, actions, and dynamics of a given environment, finding the policy with maximum entropy is a concave optimization problem. This type of problem can be easily and exactly solved by convex programming.</p>
-<p>But we very rarely have all that knowledge available to use. In practice, one of several complications usually arise:</p>
-<ol>
-<li>The states are <b>non-linearly approximated </b>by a neural network or some other function approximator.</li>
-<li>The transition dynamics are unknown.</li>
-<li>The state space is intractably large. (As an interesting example, the game of Go has more than<b> one googol or <img alt="10^{100}" class="latex" src="https://s0.wp.com/latex.php?latex=10%5E%7B100%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="10^{100}"/></b> possible states. That’s more than the number of atoms in the universe, according to <a href="https://ai.googleblog.com/2016/01/alphago-mastering-ancient-game-of-go.html">this blog</a> from 2016, and definitely more than can fit on a computer.)</li>
-</ol>
-<p>In such cases, the problem of finding a max-entropy policy becomes non-convex and computationally hard.</p>
-<p>So what to do? If we look at many practical RL problems (Atari, OpenAI Gym), we see that there are many known, efficient solvers that can construct an optimal (or nearly-optimal) policy when they are <i>given a reward signal</i>.</p>
-<p>We thus consider an <i>oracle model</i>: let’s assume that we have access to one of these solvers, so that we can pass it an explicit reward vector and receive an optimal policy in return. Can we now maximize entropy in a provably efficient way? In other words, is it possible to reduce this high complexity optimization problem to that of “standard” RL?</p>
-<p>Our approach does exactly that! It is based on the Frank-Wolfe method. This is a gradient-based optimization algorithm that is particularly suited for oracle-based optimization. Instead of moving in the direction of the steepest decline of the objective function, the Frank-Wolfe method iteratively moves in the direction of the optimal point in the direction of the gradient. This is depicted below (and deserves a separate post…). The Frank-Wolfe method is a projection-free algorithm, see <a href="https://drive.google.com/file/d/1GIDnw7T-NT4Do3eC0B5kYJlzwOs6nzIO/view">this exposition</a> about its theoretical properties.</p>
-<p><img alt="" height="345" src="https://minimizingregret.files.wordpress.com/2019/04/unnamed-file.png?w=616&amp;h=345" title="" width="616"/></p>
-<p>For the exact specification of the algorithm and its performance guarantee, see<a href="https://arxiv.org/abs/1812.02690"> our paper</a>.</p>
-<h2>Experiments</h2>
-<p>To complement the theory, we also created some experiments to test the MaxEnt algorithm on simulated robotic locomotion tasks (<a href="https://github.com/abbyvansoest/maxent/tree/refactor">open source code available here</a>). We used test environments from <a href="https://gym.openai.com/">OpenAI Gym</a> and <a href="https://github.com/openai/mujoco-py">Mujoco</a> and trained MaxEnt experts for various environments.</p>
-<p>These are some results from the Humanoid experiment, where the agent is a human-like bipedal robot. The behavior of the MaxEnt agent (blue) is baselined against a random agent (orange), who explores by sampling randomly from the environment. This random approach is often used in practice for epsilon-greedy RL exploration.</p>
-<p style="text-align: center;"><img alt="" height="332" src="https://minimizingregret.files.wordpress.com/2019/04/null-1.png?w=442&amp;h=332" title="" width="442"/></p>
-<p>In this figure, we see that over the course of 25 epochs, the MaxEnt agent progressively increases the total entropy over the state space.</p>
-<p style="text-align: center;"><img alt="" height="345" src="https://minimizingregret.files.wordpress.com/2019/04/null-2.png?w=460&amp;h=345" title="" width="460"/></p>
-<p>Here, we see a visualization of the Humanoid’s coverage of the $xy$-plane, where the shown plane is of size 40-by-40. After one epoch, there is <b>minimal</b> coverage of the area. But by the 5th, 10th, and 15th epoch, we see that the agent has learned to visit all the different states in the plane, obtaining full and nearly uniform coverage of the grid!</p>
-<div><a href="https://minimizingregret.wordpress.com/2019/04/15/reinforcement-learning-without-rewards/"><img alt="cheetah-pretty" height="120" src="https://videos.files.wordpress.com/ro0BDWO4/cheetah-pretty_std.original.jpg" width="160"/></a></div></div>
-    </content>
-    <updated>2019-04-15T01:03:27Z</updated>
-    <published>2019-04-15T01:03:27Z</published>
-    <category term="Uncategorized"/>
-    <category term="machine learning"/>
-    <category term="reinforcement learning"/>
-    <author>
-      <name>Elad Hazan</name>
-    </author>
-    <source>
-      <id>https://minimizingregret.wordpress.com</id>
-      <logo>https://minimizingregret.files.wordpress.com/2017/08/cropped-pu1.png?w=32</logo>
-      <link href="https://minimizingregret.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://minimizingregret.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://minimizingregret.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://minimizingregret.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Google Princeton AI and Hazan Lab @ Princeton University</subtitle>
-      <title>Minimizing Regret</title>
-      <updated>2019-04-26T00:21:33Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>https://11011110.github.io/blog/2019/04/14/monochromatic-grids-colored</id>
-    <link href="https://11011110.github.io/blog/2019/04/14/monochromatic-grids-colored.html" rel="alternate" type="text/html"/>
-    <title>Monochromatic grids in colored grids</title>
-    <summary>Color the points of an grid with two colors. How big a monochromatic grid-like subset can you find? By “grid-like” I mean that it should be possible to place equally many horizontal and vertical lines, partitioning the plane into cells each of which contains a single point.</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Color the points of an  grid with two colors. How big a monochromatic grid-like subset can you find? By “grid-like” I mean that it should be possible to place equally many horizontal and vertical lines, partitioning the plane into  cells each of which contains a single point.</p>
-
-<p>So for the coloring of the  grid below, there are several  monochromatic grid-like subsets. The image below shows one, and the completely red and blue southwest and northeast quadrants provide two others.
-The blue quadrant prevents any red grid-like subset from being larger than , and vice versa, so these are the largest grid-like subsets in this grid.</p>
-
-<p style="text-align: center;"><img alt="Monochromatic grid-like subset in a colored grid" src="https://11011110.github.io/blog/assets/2019/subgrid.svg"/></p>
-
-<p>It’s not hard to prove that there always exists a monochromatic grid-like subset of size at least .
-Just use vertical and horizontal lines to partition the big grid into blocks of that size. If one of those blocks is monochromatic, then it’s the grid-like subset you’re looking for. And if not, you can choose a red point from each block to get a grid-like subset of the same size.</p>
-
-<p>In the other direction, there exist colorings of an  grid for which the largest monochromatic grid-like subset has size only a little bigger, . To find such a coloring, partition the big grid into square blocks of size , and make each block monochromatic with a randomly chosen color.</p>
-
-<p style="text-align: center;"><img alt="Coloring a grid by dividing into square blocks and coloring each block randomly" src="https://11011110.github.io/blog/assets/2019/blocked-coloring.svg"/></p>
-
-<p>Now, consider any partition by axis-parallel lines into (irregular) rectangles, each containing one of the points of a grid-like subset.  Only one row or column of the rectangles can cross each line of the partition into square blocks, so the number of rectangles that include parts of two or more square blocks is . Any remaining rectangles of the partition must come from a grid-like subset of square blocks that are all colored the same as each other. But with a random coloring, the expected size of this largest monochromatic subset of square blocks is . Therefore, the number of rectangles that stay within a single square block is limited to the total number of points in this grid-like subset of square blocks, which is again .</p>
-
-<p>I’m not sure how to eliminate the remaining  gap between these two bounds, or which way it should go.</p>
-
-<p>One application of these ideas involves the theory of <a href="https://en.wikipedia.org/wiki/Superpattern">superpatterns</a>, permutations that contain as a <a href="https://en.wikipedia.org/wiki/Permutation_pattern">pattern</a> every smaller permutation up to some size .
-If  is a superpattern for the permutations of size , then we can obtain a point set by interpreting the position and value of each element of  as Cartesian coordinates. This point set includes a grid-like subset of size , coming from a permutation of size  that translates to a grid-like set of points.
-If the elements of the superpattern are colored with two colors, there still exists a monochromatic grid-like subset of size .
-And this monochromatic grid-like subset corresponds to a superpattern, for permutations of size . So, whenever the elements of a superpattern are colored with two (or finitely many) colors, there remains a monochromatic subset of elements that is still a superpattern for permutations of some smaller but non-constant size.</p>
-
-<p>(<a href="https://mathstodon.xyz/@11011110/101927319466372642">Discuss on Mastodon</a>)</p></div>
-    </content>
-    <updated>2019-04-14T17:02:00Z</updated>
-    <published>2019-04-14T17:02:00Z</published>
-    <author>
-      <name>David Eppstein</name>
-    </author>
-    <source>
-      <id>https://11011110.github.io/blog/feed.xml</id>
-      <author>
-        <name>David Eppstein</name>
-      </author>
-      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
-      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
-      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
-      <title>11011110</title>
-      <updated>2019-04-23T23:43:50Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2019/057</id>
-    <link href="https://eccc.weizmann.ac.il/report/2019/057" rel="alternate" type="text/html"/>
-    <title>TR19-057 |  Proof Complexity of Symmetry Learning in QBF | 
-
-	Joshua Blinkhorn, 
-
-	Olaf Beyersdorff</title>
-    <summary>For quantified Boolean formulas (QBF), a resolution system with a symmetry rule was recently introduced by Kauers and Seidl (Inf. Process. Lett. 2018). In this system, many formulas hard for QBF resolution admit short proofs.
-
-Kauers and Seidl apply the symmetry rule on symmetries of the original formula. Here we propose a new formalism where symmetries are dynamically recomputed during the proof on restrictions of the original QBF. This presents a theoretical model for the potential use of symmetry learning as an inprocessing rule in QCDCL solving.
-
-We demonstrate the power of symmetry learning by proving an exponential separation between Q-resolution with the symmetry rule and Q-resolution with our new symmetry learning rule. In fact, we show that bounding the number of symmetry recomputations gives rise to a hierarchy of QBF resolution systems of strictly increasing strength.</summary>
-    <updated>2019-04-14T10:26:19Z</updated>
-    <published>2019-04-14T10:26:19Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2019-04-26T00:20:46Z</updated>
+      <updated>2019-04-26T01:28:59Z</updated>
     </source>
   </entry>
 </feed>
