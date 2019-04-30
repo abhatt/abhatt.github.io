@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-04-30T16:22:19Z</updated>
+  <updated>2019-04-30T17:21:32Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -139,7 +139,325 @@ Is the NCC true? Can it be proved for some interesting classes of graphs? I beli
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-04-30T16:20:53Z</updated>
+      <updated>2019-04-30T17:20:41Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>http://gradientscience.org/policy_gradients_pt3</id>
+    <link href="http://gradientscience.org/policy_gradients_pt3" rel="alternate" type="text/html"/>
+    <title>A Closer Look at Deep Policy Gradients (Part 3&amp;#58; Landscapes and Trust Regions)</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>This post is the last of a three part series about our recent paper: “<a href="https://arxiv.org/abs/1811.02553">Are Deep
+Policy Gradient Algorithms Truly Policy Gradient
+Algorithms?</a>” Today, we will analyze agents’
+reward landscapes as well as try to understand to what extent, and by what mechanisms,
+our agents enforce so-called <i>trust regions</i>.</p>
+
+<p>First, a quick recap (it’s been a while!):</p>
+<ul>
+  <li>
+    <p>In our <a href="https://gradientscience.org/policy_gradients_pt1">first post</a>, we outlined the
+RL framework and introduced policy gradient algorithms. We saw that
+auxiliary optimizations hidden in the implementation details of RL algorithms
+drastically impact performance. These findings highlighted the need for a more
+fine-grained analysis of how algorithms really operate.</p>
+  </li>
+  <li>
+    <p>In our <a href="https://gradientscience.org/policy_gradients_pt2">second post</a>, we zoomed in on
+three algorithms: trust region policy optimization (TRPO), proximal policy
+optimization (PPO), and an algorithm we called “PPO-M.” PPO-M is the core PPO
+algorithm exactly as described in the <a href="https://arxiv.org/abs/1707.06347">original
+paper</a>, without any of the auxiliary
+optimizations. Using these methods as a test-bed, we studied two core
+primitives of the policy gradient framework: gradient estimation and value
+prediction.</p>
+  </li>
+</ul>
+
+<p>Our discussion today begins where we left off in our second post. Recall that
+last time we studied the variance of the gradient estimates our algorithms use
+to maximize rewards. We found (among other things) that, despite high variance, algorithm steps were
+still (very slightly) correlated with the actual, “true” gradient of the reward.
+However, how good was this true gradient to begin with? After all, a fundamental
+assumption of the whole policy gradient framework is that our gradient steps actually point in a direction (in policy
+parameter space) that increases the reward. Is this indeed so in practice?</p>
+
+<h2 id="optimization-landscapes">Optimization Landscapes</h2>
+<p>Recall from our <a href="https://gradientscience.org/policy_gradients_pt1">first post</a> that
+policy gradient methods treat reward maximization as a zeroth-order optimization
+problem. That is, they maximize the objective by applying first order methods
+with finite sample gradient estimates of the form:</p>
+
+
+
+<p>Here,  represents the cumulative reward of a trajectory , where
+ is sampled from the distribution of trajectories induced by the current
+policy . We let  represent an easily computable
+function of  that is an unbiased estimator of the gradient of the reward
+(seen on the left hand side)—for more details see <a href="https://gradientscience.org/policy_gradients_pt1/#rl-with-policy-gradients">our previous post</a>.
+Finally, we denote by  the number of trajectories used to estimate the
+gradient.</p>
+
+<p>An important point is, however, that instead of following the gradients of the cumulative reward (as
+suggested by the above equation), the algorithms we analyze actually use a
+<i>surrogate reward</i> at each step. The surrogate reward is a function of the
+collected trajectories that is meant to locally approximate the true reward,
+while providing other benefits such as easier computation and a smoother
+optimization landscape. Consequently, at each step these algorithms maximize the
+surrogate rewards  instead of following the gradient of the
+true reward .</p>
+
+<p>A natural question to ask is: <i>do steps maximizing the surrogate reward
+consistently increase policy returns?</i> To answer this, we will use
+<i>landscape plots</i> as a tool for visualizing the landscape of returns
+around a given policy :</p>
+
+<p><img alt="Labeled diagram of optimization landscape plot" src="https://gradientscience.org/images/rl/labeled_landscape.jpg"/></p>
+
+<p>Here, for each point  in the plot,  and  specify a policy
+ parameterized by</p>
+
+
+
+<p>where  is the step computed by the studied algorithm. (Note that
+we include the random Gaussian  direction to visualize how
+“important” the step direction is compared to a random baseline). The  axis
+corresponds to the return attained by the policy , which we
+denote by .</p>
+
+<p>Now, when we make this plot for a random  (corresponding to a randomly
+initialized policy network), everything looks as expected:</p>
+
+<p><img alt="Landscape for randomly initialized network" src="https://gradientscience.org/images/rl/step_0_landscape.jpg"/></p>
+
+<p>That is, the return increases significantly more quickly along the step direction than in
+the random direction. However, repeating these landscape experiments at later
+iterations, we find a more surprising picture: going in the step direction
+actually <i>decreases</i> the average cumulative reward obtained by the resulting
+agent!</p>
+
+<p><img alt="Landscape for trained networks" src="https://gradientscience.org/images/rl/landscape_step_150_300_450.jpg"/></p>
+
+<p>So what exactly is going on here? The steps computed by these algorithms are
+estimates of the gradient of the reward, so it is unexpected that the reward
+plateaus (or in some cases decreases!) along this direction.</p>
+
+<p>We find that the
+answer lies in a <i>misalignment</i> of the true reward and the surrogate. Specifically, while
+the steps taken do correspond to an improvement in the surrogate problem, they
+do <i>not</i> always correspond to a similar improvement in the true return.
+Here are the same graphs as above shown again, this time with the corresponding
+optimization landscapes of the <i>surrogate loss</i>
+<sup><a href="https://gradientscience.org/feed.xml#footnote1">1</a></sup>:</p>
+<div class="footnote">
+<sup><a id="footnote1">1</a></sup>All of the landscapes we plot in this post are for PPO; we have (similar)
+results for TRPO in <a href="https://arxiv.org/abs/1811.02553">our paper</a>.
+</div>
+
+<p><img alt="Surrogate vs real landscape" src="https://gradientscience.org/images/rl/surrogate_vs_real_landscape.jpg"/></p>
+
+<!-- The surrogate reward landscape misalignment is further complicated by the fact -->
+<!-- that all of the rewards plotted in the landscapes we’ve seen so far are computed with -->
+<!-- many, many more samples than an algorithm would ever collect at a single step in -->
+<!-- practice.  -->
+
+<p>To make matters worse, we find that in the low sample regime that policy
+gradient methods actually operate in, it is hard to even <i>discern</i> directions of
+improvement in the true reward landscape. (In all the plots above,
+we use orders of magnitude more samples than an agent would ever see in practice
+at a single step.) In the plot below, we visualize reward landscapes while
+varying the number of samples used to estimate the expected return of a policy
+:</p>
+
+<p><img alt="Surrogate vs real landscape" src="https://gradientscience.org/images/rl/landscape_conc.jpg"/></p>
+
+<p>In contrast to the smooth landscape we see on the right and in the plots above,
+the reward landscape actually accessible to the model is jagged and poorly behaved.
+This landscape makes it thus near-impossible for an agent to distinguish between good
+and bad points in its relevant sample regime, even when the true underlying
+landscape is fairly well-behaved!</p>
+
+<p>Overall, our investigation into the optimization landscape of policy gradient algorithms
+reveals that (a) the surrogate reward function is often misaligned with the
+underlying true return of the policy, and (b) in the relevant sample regime, it
+is hard to distinguish between “good” steps and “bad” steps, even when looking at the true reward
+landscape. As always, however, <i>none of this stops the agents from training
+and continually improving reward in the average sense</i>. This raises some
+key questions about the landscape of policy optimization:</p>
+
+<ul>
+  <li>Given that the function we actually optimize is so often misaligned with the
+underlying rewards, how is it that agents continually improve?</li>
+  <li>Can we explain or link the local behaviour we observe in the landscape with a
+more global view of policy optimization?</li>
+  <li>How do we ensure that the reward landscape is navigable? And, more generally,
+what is the best way to navigate it?</li>
+</ul>
+
+<h2 id="trust-regions">Trust Regions</h2>
+<p>Let us now turn our attention to another important notion in the popular policy gradient algorithms: that of the <i>trust region</i>. 
+Recall that a convenient way to think about our training process is to view it as a series of policy parameter iterates:</p>
+
+
+
+<p>An important aspect of this process is ensuring that the steps we take don’t
+lead us outside of the region (of parameter space) where the samples we
+collected are informative. Intuitively, if we collect samples at a given set of
+policy parameters , there is no reason to expect that these samples
+should tell us about the performance of a new set of parameters that is far away
+from .</p>
+
+<p>Thus, in order to ensure that gradient steps are predictive, classical
+algorithms like the 
+<a href="http://www.cs.cmu.edu/~./jcl/papers/aoarl/Final.pdf">conservative policy update</a> 
+employ update schemes that constrain the probability distributions induced by 
+successive policy parameters.  The <a href="https://arxiv.org/abs/1502.05477">TRPO paper</a> 
+in particular showed 
+that one can 
+guarantee monotonic policy improvement with each step by solving a surrogate problem of the following form:</p>
+
+
+
+<p>The second, “penalty” term in the above objective, referred to as the <i>trust region</i> penalty, is a
+critical component of modern policy gradient algorithms. TRPO, one of the
+algorithms we study, proposes a relaxation of \eqref{eq:klpen} that
+instead imposes a hard constraint on the
+<i>mean</i> KL divergence<sup><a href="https://gradientscience.org/feed.xml#footnote2">2</a></sup>
+ (estimated using the empirical samples we obtain):</p>
+
+
+
+<div class="footnote">
+<sup><a id="footnote2">2</a></sup>It's worth noting that 
+<a href="https://arxiv.org/abs/1705.10528">a
+recent paper</a> showed that under some conditions, mean KL is actually
+sufficient.
+</div>
+
+<p>In other words, we try to ensure that the <i>average</i> distance between 
+conditional probability distributions is small. 
+Finally, PPO approximates the mean KL bound of TRPO by attempting to
+constrain a <i>ratio</i> between successive conditional probability
+distributions, instead of the KL divergence. The exact mechanism for
+enforcing this is shown in the 
+box below. Intuitively, however, what PPO does is just throw away
+(i.e. get no gradient signal from) the
+rewards incurred from any state-action pair such that:</p>
+
+
+
+<p>where  is a user-chosen hyperparameter.</p>
+
+<section class="container">
+<div>
+<div class="checkboxdiv">
+<input id="ac-1" name="accordion-1" type="checkbox"/>
+<label for="ac-1"><span class="fas fa-chevron-right" id="titlespan"/> <strong>The PPO update step</strong> (Click to expand)</label>
+<article class="small">
+<i>Note that the following is only for interested readers and is unessential 
+for reading the rest of the blog post.</i> <br/> <br/>
+
+The exact update used by PPO is as follows, where $\widehat{A}_\pi$ is
+the <a href="https://arxiv.org/abs/1506.02438">generalized advantage 
+estimate</a>:
+$$
+\begin{array}{c}{\max _{\theta} \mathbb{E}_{\left(s_{t}, a_{t}\right) \sim \pi}\left[\min \left(\operatorname{clip}\left(\rho_{t}, 1-\varepsilon, 1+\varepsilon\right) \widehat{A}_{\pi}\left(s_{t}, a_{t}\right), \rho_{t} \widehat{A}_{\pi}\left(s_{t}, a_{t}\right)\right)\right]} \\ {\text{where }\ \ \rho_{t}=\frac{\pi_{\theta}\left(a_{t} | s_{t}\right)}{\pi\left(a_{t} | s_{t}\right)}}\end{array}
+$$
+As described in the main text, this intuitively corresponds to throwing
+away (i.e. getting no gradient signal) from state-action pairs where the
+ratio of conditional probabilities between successive policies is too high.
+</article>
+</div>
+</div>
+</section>
+<p><br/></p>
+
+<p>To recap, there is a theoretically motivated algorithm \eqref{eq:klpen} which
+constrains maximum KL. This motivates TRPO’s bound on
+mean KL in \eqref{eq:trpotrust}, which in turn motivates the 
+ratio-based bound of PPO (shown in the box). This chain of approximations might 
+lead us to ask: <i>how well do these algorithms actually maintain trust regions</i>?</p>
+
+<p>We first plot the mean KL divergence between successive policies for each
+algorithm:
+<img src="https://gradientscience.org/images/rl/meankl_trust.jpg" style="width: 50%;"/>
+<br/></p>
+
+<p>TRPO seems to constrain this very well
+<a href="https://gradientscience.org/feed.xml#footnote3"><sup>3</sup></a>
+! On the other hand, our two
+varieties of the PPO algorithm paint a drastically different picture. Recall that we decided to
+separately study two versions of PPO: PPO (based on a state-of-the-art implementation), 
+and PPO-M, which we defined to be the core PPO algorithm without auxiliary optimizations. 
+PPO <i>with</i> optimizations does quite well at maintaining a KL trust region, 
+but PPO-M does not. This is unexpected: PPO’s main mechanism for maintaining the
+trust region (the ratio clipping) is present in both methods—the
+differences are only in auxiliary optimizations such as Adam learning rate annealing or
+orthogonal initialization. As such, it is unclear exactly which mechanisms 
+in PPO are responsible for maintaining the mean KL constraint.</p>
+
+<div class="footnote">
+<a id="footnote3"><sup>3</sup></a>
+Note that this is somewhat unsurprising, since TRPO constrains this
+directly in its optimization.
+</div>
+
+<p>In fact, we find that PPO’s inability to maintain a KL-based trust region 
+is not entirely due to the looseness of its relaxation; it turns out that 
+PPO does not even successfully enforce its <i>own</i> ratio-based trust region.
+Below, we plot the maximum ratio \eqref{eq:ratio} between successive
+policies for the three algorithms in question:</p>
+
+<p><img src="https://gradientscience.org/images/rl/maxratio_trust.jpg" style="width: 50%;"/>
+<br/></p>
+
+<p>In the above, the dotted line represents , corresponding to the 
+bound in \eqref{eq:ratio}—it looks like the max ratio is not kept at all! And once again, 
+simply adding the auxiliary, code-level optimizations to PPO-M
+yields <i>better</i> trust region
+enforcement, despite the main clipping mechanism staying the same.
+Indeed, it turns out that the
+way that PPO enforces the ratio trust region does not actually keep the ratios
+from becoming too large or too small. In fact, in our paper we show that there
+are <i>infinite</i> optima of the optimization problem PPO solves to find each
+step and only <i>one</i> of them enforces the intended trust region bound.</p>
+
+<h2 id="wrapping-up">Wrapping Up</h2>
+
+<p>Deep reinforcement learning algorithms are rooted in a well-grounded framework
+of classical RL, and have shown great promise in practice. However, as we’ve
+found in our three-part investigation, this framework often falls a little short
+of explaining the behavior of these algorithms in practice.</p>
+
+<p>Beyond just being disconcerting, this disconnect impedes our understanding of
+why these algorithms succeed (or fail). It also poses a major barrier to
+addressing key challenges facing deep RL, such as widespread brittleness and
+poor reproducibility (as has been observed by our 
+<a href="https://gradientscience.org/policy_gradients_pt1">study in part one</a> and
+many others [<a href="https://arxiv.org/abs/1709.06560">1</a>,
+<a href="https://www.alexirpan.com/2018/02/14/rl-hard.html">2</a>,
+<a href="http://amid.fish/reproducing-deep-rl">3</a>, etc.]).</p>
+
+<p>To close this gap, we need to either develop methods that adhere more closely to
+theory, or build theory that can capture what makes existing policy gradient
+methods successful. In both cases, the first step is to precisely pinpoint where
+theory and practice diverge. Even more broadly, our findings suggest that
+developing a deep RL toolkit that is truly robust and reliable will require
+moving beyond the current benchmark-driven evaluation model, to a more
+fine-grained understanding of deep RL algorithms.</p></div>
+    </summary>
+    <updated>2019-04-30T00:00:00Z</updated>
+    <published>2019-04-30T00:00:00Z</published>
+    <source>
+      <id>http://gradientscience.org/</id>
+      <author>
+        <name>Gradient Science</name>
+      </author>
+      <link href="http://gradientscience.org/" rel="alternate" type="text/html"/>
+      <link href="http://gradientscience.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Research highlights and perspectives on machine learning and optimization from MadryLab.</subtitle>
+      <title>gradient science</title>
+      <updated>2019-04-30T17:20:53Z</updated>
     </source>
   </entry>
 
@@ -1420,7 +1738,7 @@ Rather than say what I think is true (I have no idea) here is what I HOPE is tru
       <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2019-04-30T16:20:39Z</updated>
+      <updated>2019-04-30T16:27:03Z</updated>
     </source>
   </entry>
 
@@ -1687,44 +2005,6 @@ advantageous on hard problems.
 </p></div>
     </summary>
     <updated>2019-04-29T23:21:35Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2019-04-29T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1904.11668</id>
-    <link href="http://arxiv.org/abs/1904.11668" rel="alternate" type="text/html"/>
-    <title>The minimum cost query problem on matroids with uncertainty areas</title>
-    <feedworld_mtime>1556496000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Arturo I. Merino, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Soto:Jos=eacute=_A=.html">José A. Soto</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1904.11668">PDF</a><br/><b>Abstract: </b>We study the minimum weight basis problem on matroid when elements' weights
-are uncertain. For each element we only know a set of possible values (an
-uncertainty area) that contains its real weight. In some cases there exist
-bases that are uniformly optimal, that is, they are minimum weight bases for
-every possible weight function obeying the uncertainty areas. In other cases,
-computing such a basis is not possible unless we perform some queries for the
-exact value of some elements.
-</p>
-<p>Our main result is a polynomial time algorithm for the following problem.
-Given a matroid with uncertainty areas and a query cost function on its
-elements, find the set of elements of minimum total cost that we need to
-simultaneously query such that, no matter their revelation, the resulting
-instance admits a uniformly optimal base. We also provide combinatorial
-characterizations of all uniformly optimal bases, when one exists; and of all
-sets of queries that can be performed so that after revealing the corresponding
-weights the resulting instance admits a uniformly optimal base.
-</p></div>
-    </summary>
-    <updated>2019-04-29T23:26:57Z</updated>
     <author>
       <name/>
     </author>
