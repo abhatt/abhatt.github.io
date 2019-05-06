@@ -116,7 +116,7 @@ Stay up to date
 <a class="feedlink" href="https://research.googleblog.com/feeds/posts/default/-/Algorithms" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="https://research.googleblog.com/search/label/Algorithms" title="Research Blog">Google Research Blog: Algorithms</a>
 <br>
-<a class="feedlink" href="https://gradientscience.org/feed.xml" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
+<a class="feedlink" href="http://gradientscience.org/feed.xml" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://gradientscience.org/" title="gradient science">Gradient Science</a>
 <br>
 <a class="feedlink" href="http://grigory.us/blog/feed.xml" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
@@ -225,7 +225,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at May 06, 2019 02:21 PM UTC</span>.
+Last updated <span class="datestr">at May 06, 2019 03:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -532,6 +532,183 @@ by luca <a href="https://lucatrevisan.wordpress.com/2019/05/06/online-optimizati
 
 <p class="date">
 by Emanuele <a href="https://emanueleviola.wordpress.com/2019/05/05/e-ink-on-the-move/"><span class="datestr">at May 06, 2019 12:40 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://gradientscience.org/adv/">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/madry.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="http://gradientscience.org/adv/">Adversarial Examples Are Not Bugs, They Are Features</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://gradientscience.org/" title="gradient science">Gradient Science</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><a style="float: left;" href="https://gradientscience.org/adv.pdf" class="bbutton">
+<i class="fas fa-file-pdf"></i>
+    Read the paper
+</a>
+<a style="float: right;" class="bbutton">
+<i class="fab fa-github"></i>
+   Download the datasets
+</a></p>
+
+<p>Over the past few years, adversarial examples – or inputs that have been slightly perturbed by an adversary to cause unintended behavior in machine learning systems – have received significant attention in the machine learning community (for more background, read our introduction to adversarial examples <a href="https://gradientscience.org/intro_adversarial">here</a>). There has been much work on training models that are not vulnerable to adversarial examples (in previous posts, we discussed methods for training robust models: <a href="https://gradientscience.org/robust_opt_pt1/">part 1</a>, <a href="https://gradientscience.org/robust_opt_pt2/">part 2</a>, but all this research does not really confront the fundamental question: <i>why</i> do these adversarial examples arise in the first place?</p>
+
+<p>So far, the prevailing view has been that adversarial examples stem from “quirks” of the models that will eventually disappear once we make enough progress towards better training algorithms and larger scale data collection. Common views include adversarial examples being either a consequence of the input space being high-dimensional (e.g. <a href="https://arxiv.org/abs/1801.02774">here</a>) or attributed to finite-sample phenomena (e.g. <a href="https://arxiv.org/abs/1608.07690">here</a> or <a href="https://arxiv.org/abs/1804.11285">here</a>).</p>
+
+<p>Today we will discuss our <a href="https://gradientscience.org/adv.pdf">recent work</a> that provides a new perspective on the reasons for adversarial examples arise. However, before we dive into the details, let us first tell you a short story:</p>
+
+<h2 id="a-planet-called-erm">A Planet called <i>Erm</i></h2>
+
+<p>Our tale begins on <i><span class="sc">Erm</span></i>, a distant planet inhabited by members of an ancient alien race known as <i>Nets</i>. The Nets are a strange species; each individual’s place in the social hierarchy is determined by their ability to classify bizarre 32-by-32 pixel images (which are meaningless to the Nets) into ten completely arbitrary categories. These images are drawn from a top-secret dataset, <span class="sc">See-Far</span>—outside of looking at those curious pixelated images, the Nets live their lives totally blind.</p>
+
+<p>As Nets grow older and wiser they begin to discover more and more tell-tale <i>patterns</i> in <span class="sc">See-Far</span>. Each new pattern that an alien discovers helps them classify the dataset even more accurately. Due to the immense societal value of increased classification accuracy, the aliens have names for the most predictive image patterns:</p>
+
+<p><img src="https://gradientscience.org/images/featsnotbugs/toogit.png" alt="A Toogit, highly indicative of a '1' image." style="width: 30%;" /></p>
+<div class="footnote">
+        A TOOGIT, highly indicative of a "1" image.
+        Nets are extremely sensitive to TOOGITs.
+</div>
+
+<p>The most powerful aliens were remarkably adept at spotting patterns, and thus were extremely sensitive to their presence in <span class="sc">See-Far</span> images.</p>
+
+<p>Somehow (perhaps looking for <span class="sc">See-Far</span> classification tips), some of the aliens obtain access to a <i>human-written</i> machine learning paper. One figure in
+particular caught the aliens’ eye:</p>
+
+<p>
+<img src="https://gradientscience.org/images/featsnotbugs/bagaboop.png" alt="An quote-unquote adversarial example?" />
+</p><div class="footnote">
+An "adversarial example"?
+</div>
+<p></p>
+
+<p>The figure was relatively simple, they thought: on the left was a “2”, in the middle there was a GAB pattern, which was known to indicate “4”—unsurprisingly, adding a GAB to the image on the left resulted in a new image, <i>which looked (to the Nets) exactly like an image corresponding to the “4” category</i>.</p>
+
+<p>The Nets could not understand why, according to the paper, these two different images should be identically classified. Confused, the Nets flipped on through the manuscript, wondering what other useful patterns humans were oblivious to$\ldots$</p>
+
+<h2 id="what-we-can-learn-from-erm">What we can learn from <i>Erm</i></h2>
+
+<p>As the names may suggest, this story is not merely one of aliens and their curious social constructs: the way Nets develop is reminiscent of how we train machine learning models. In particular, we maximize accuracy without incorporating much prior context about classified classes, the physical world, or other human-related concepts. The result in the story is that the aliens are able to realize that what humans think of as meaningless adversarial perturbation are actually patterns crucial to <span class="sc">See-Far</span> classification. The tale of the Nets should thus make us wonder:</p>
+
+<p><i>Are adversarial perturbations really unnatural and meaningless?</i></p>
+
+<h3 id="a-simple-experiment">A simple experiment</h3>
+<p>To investigate this issue, let us first perform a simple experiment:</p>
+
+<ul>
+  <li>We start with an image from the training set of a standard dataset (e.g. CIFAR10):</li>
+</ul>
+
+<p><img src="https://gradientscience.org/images/featsnotbugs/train.png" alt="An image from the training set" style="width: 50%;" /></p>
+
+<ul>
+  <li>We synthesize a targeted adversarial example (on a standard pre-trained model) from each (x, y) towards the “next” class y+1 (or 0, if y is the last class):</li>
+</ul>
+
+<p><img src="https://gradientscience.org/images/featsnotbugs/adv.png" alt="An adversarial perturabtion to the next class" /></p>
+
+<ul>
+  <li>We then construct a new training set, by labeling these adversarial examples with their corresponding target class:</li>
+</ul>
+
+<p><img src="https://gradientscience.org/images/featsnotbugs/newtrain.png" alt="A new training set based on the perturbation" style="width: 35%;" /></p>
+
+<p>Now, the resulting training set is imperceptibly perturbed from the original, but the labels have been changed—as such, it looks <i>completely</i> mislabeled to a human. In fact, the mislabelings are even consistent with a “permuted” hypothesis (i.e. every dog is labeled as a cat, every cat as a bird, etc.).</p>
+
+<p>We train a new classifier (not necessarily with the same architecture as the first) on the “mislabeled dataset.” How will this classifier perform on the  <em>original (unaltered) test set</em> (i.e. the standard CIFAR-10 test set)?</p>
+
+<p>Remarkably, we find that the resulting classifier actually has moderate accuracy (e.g. 44% for CIFAR)! This is despite the fact that training inputs are associated with their labels <em>solely through imperceptible perturbations</em>, and are associated with a different (incorrect) label matching through <i>all</i> visible features.</p>
+
+<p>What’s going on here?</p>
+
+<h2 id="our-conceptual-model-for-adversarial-examples">Our Conceptual Model for Adversarial Examples</h2>
+
+<p>The experiment we just described establishes adversarial perturbations of standard models as patterns predictive of the target class in a <i>well-generalizing</i> sense. That is, adversarial perturbations in the training set alone allowed moderately accurate predictions on the test set. In this light, one might wonder: perhaps these patterns are <i>not</i> fundamentally different from what humans use to classify images (e.g. ears, whiskers, snouts)! This is precisely our hypothesis—there exist a variety of features of the input that are predictive of the label, and only some of these are perceptible to humans.</p>
+
+<p>More precisely, we posit that predictive features of the data can be split into “robust” and “non-robust” features. Robust features correspond to patterns that are predictive of the true label <em>even when adversarially perturbed</em> (e.g. the presence of “fur” in an image) under some pre-defined (and crucially human-defined) perturbation set, e.g. the $\ell_2$ ball. Conversely, non-robust features correspond to patterns that while predictive, can be “flipped” by an adversary within a pre-defined perturbation set to be indicate a wrong class (see <a href="https://gradientscience.org/adv.pdf">our paper</a> for a formal definition).</p>
+
+<p>Since we always only consider perturbation sets that do not affect human classification performance,  we expect humans to rely solely on robust features. However, when the goal is maximizing (standard) test-set accuracy, non-robust features can be just as useful as robust ones–in fact, the two types of features are completely indistinguishable. This is illustrated in the following figure:</p>
+
+<p><img src="https://gradientscience.org/images/featsnotbugs/model.png" alt="" /></p>
+
+<p>From this perspective, our experiment describes something quite simple. In the original training set, both the robust and non-robust features of the input are predictive of the label. When we make a small adversarial perturbation, we cannot significantly affect the robust features (essentially by definition), but  we can still flip <i>non-robust features</i>. For instance, every dog image now retains the robust features of a dog (and thus appears to us to be a dog), but has non-robust features of a cat. After the training set is relabelled, we make it so that the robust features actually point in the <i>wrong direction</i> (i.e. the pictures with robust “dog” features are labeled as cats) and hence only the non-robust features actually provide correct guidance for generalization.</p>
+
+<p>In summary, both robust and non-robust features are predictive on the training set, but <i>only non-robust features will yield generalization to the original test set</i>:</p>
+
+<p><img src="https://gradientscience.org/images/featsnotbugs/diagram.png" alt="" /></p>
+
+<p>Thus, the fact that models trained on this dataset actually generalize to the standard test set indicates that (a) non-robust features exist and are sufficient for good generalization, and (b) deep neural networks rely on these non-robust features, even in the presence of predictive robust features.</p>
+
+<h2 id="do-robust-models-learn-robust-features">Do Robust Models Learn Robust Features?</h2>
+
+<p>Our experiments establish that adversarial perturbations are not meaningless artifacts but actually correspond directly to perturbing features that are crucial to generalization. At the same time, our blog posts about adversarial examples (<a href="https://gradientscience.org/robust1">here</a> and <a href="https://gradientscience.org/robust2">here</a>) showed that by using robust optimization, we can get models that are more robust to adversarial examples.</p>
+
+<p>So a natural question to ask is: can we verify that robust models actually rely on <i>robust</i> features? To test this, we establish a methodology for restricting (in a best-effort sense) inputs to only the features a model is sensitive to (for deep neural networks, features correspond to the penultimate layer activations). Using this method, we create a new training set that is restricted to only contain the features that an already-trained robust model utilizes:</p>
+
+<p><img src="https://gradientscience.org/images/featsnotbugs/frog.png" alt="" /></p>
+
+<p>We then train a model on the resulting dataset  <em>without</em> adversarial training and find that the resulting model has non-trivial accuracy <em>and</em> robustness! This is in stark contrast to training on the standard training set which leads to models that are accurate yet completely brittle.</p>
+
+<p><img src="https://gradientscience.org/images/featsnotbugs/CIFAR_res.png" alt="" /></p>
+<div class="footnote">
+Standard and robust accuracy, tested on CIFAR-10 test set ($\mathcal{D}$). Training: <br />
+<strong>Left</strong>: training normally on CIFAR-10 ($\mathcal{D}$) <br />
+<strong>Middle</strong>: training adversarially on CIFAR-10 ($\mathcal{D}$) <br />
+<strong>Right</strong>: training normally on constructed dataset ($\widehat{\mathcal{D}}_R$)
+</div>
+
+<p>Our results thus indicate that robustness (and in turn non-robustness) can in fact arise as a property of the dataset itself. In particular, when we remove non-robust features from the original training set, we can get robust models just via standard (non-adversarial) training. This is further evidence that adversarial examples arise as a result of non-robust features and are not necessarily tied to the standard training framework.</p>
+
+<h2 id="transferability">Transferability</h2>
+
+<p>An immediate consequence of this change in perspective is that the <i>transferability</i> of adversarial examples (the thus-far mysterious phenomenon that perturbations for one model are often adversarial for others) no longer requires a separate explanation. Specifically, now that we view adversarial vulnerability as a direct product of the <i>features derived from the dataset</i> (as opposed to quirks in the training of individual models), we would expect similarly expressive models to be able to find and use these features to improve their classification accuracy too.</p>
+
+<p>To further explore this idea, we study how the tendency of different architectures to learning similar non-robust features relates to the transferability of adversarial examples between them:</p>
+
+<p><img src="https://gradientscience.org/images/featsnotbugs/transfer.png" alt="" />
+In the above, we generate the dataset that we described in our very first experiment (a training set of adversarial examples labeled with the target class), using a ResNet-50 to construct the adversarial examples. We can think of the resulting dataset as having all of the ResNet-50’s non-robust features “flipped” to the target class. We then train the five architectures shown above on this dataset, and record their generalization performance on the true test set: this corresponds to how well the architecture is able to generalize using only the non-robust features from a ResNet-50.</p>
+
+<p>When we analyze the results we see that, as our new view of adversarial examples suggests, models’ ability to pick up the non-robust features introduced by the ResNet-50 correlates extremely well with the adversarial transferability from ResNet-50 to standard models of each architecture.</p>
+
+<h2 id="implications">Implications</h2>
+
+<p>Our discussion and experiments establish adversarial examples as a purely human-centric phenomenon. From the perspective of classification performance there is no reason for a model to prefer robust over non-robust features. After all, the notion of robustness is human-specified. Hence, if we want our models to rely mostly on robust features we need to explicitly account for that by incorporating priors into architecture or training process. From that perspective, adversarial training (and more broadly robust optimization) can be thought of as a tool to incorporate desired invariances into the learned model. For example, robust training can be viewed as attempting to undermine the predictiveness of non-robust features by constantly “flipping” them, and thus steering the trained model away from relying on them.</p>
+
+<p>At the same time, the reliance of standard models on non-robust (and hence incomprehensible to humans) features needs to be accounted for when designing interpretability methods. In particular, any “explanation” of a standardly trained model’s prediction should either highlight such non-robust features (and hence not be fully human-meaningful) or hide them (and hence not be fully faithful to the model’s decision process). Therefore, if we want interpretability methods that are both human-meaningful and faithful, resorting only to post-training processing is fundamentally insufficient: one needs to intervene <i>at</i> training time.</p>
+
+<h2 id="more-in-the-paper">More in the Paper</h2>
+
+<p>In <a href="https://gradientscience.org/adv.pdf">our paper</a>, we describe a precise framework for discussing robust and non-robust features, further experiments corroborating our hypothesis, and a theoretical model under which we can study the dynamics of robust training in the presence of non-robust features.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://gradientscience.org/adv/"><span class="datestr">at May 06, 2019 12:00 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -2424,28 +2601,28 @@ by Lance Fortnow (noreply@blogger.com) <a href="https://blog.computationalcomple
 <p>If we count <strong>rooted</strong> <em>k</em>-trees where the root is a <em>k</em>-clique the formula becomes somewhat simpler.</p>
 <p style="text-align: center;"><img src="https://s0.wp.com/latex.php?latex=%28k%28n-k%29%2B1%29%5E%7Bn-k-1%7D.&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="(k(n-k)+1)^{n-k-1}." class="latex" title="(k(n-k)+1)^{n-k-1}." /></p>
 <p>In 1972, when I was a teenage undergraduate student I was very interested in various extensions of Cayley’s formula for counting labeled trees. I thought about the question of finding a <a href="https://en.wikipedia.org/wiki/Pr%C3%BCfer_sequence">Prüfer code</a> for<em> k</em>-trees and  how to extend the results by Beineke and  Pippert when  for every clique of size <img src="https://s0.wp.com/latex.php?latex=k-1&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="k-1" class="latex" title="k-1" /> in the <em>k</em>-tree we specify its “degree”, namely, the number of <em>k</em>-cliques containing it. (I will come back to the mathematics at the end of the post.) I thank Miki Simonovits for the photos and description and very helpful comments.</p>
-<p><a href="https://gilkalai.files.wordpress.com/2019/03/lakeloui.jpg"><img src="https://gilkalai.files.wordpress.com/2019/03/lakeloui.jpg?w=640&amp;h=434" alt="" width="640" class="alignnone size-full wp-image-17134" height="434" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2019/03/lakeloui.jpg"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2019/03/lakeloui.jpg?w=640&amp;h=434" class="alignnone size-full wp-image-17134" height="434" /></a></p>
 <p><strong><span style="color: #ff0000;">Above, Kató Renyi, Paul Turan, Vera Sós, and Paul Erdős ; below Kató, Vera, and Lea Schönheim. Pictures: Jochanan (Janos) Schönheim.</span></strong></p>
-<p><a href="https://gilkalai.files.wordpress.com/2019/03/lakelouise69.jpg"><img src="https://gilkalai.files.wordpress.com/2019/03/lakelouise69.jpg?w=640&amp;h=447" alt="" width="640" class="alignnone size-full wp-image-17137" height="447" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2019/03/lakelouise69.jpg"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2019/03/lakelouise69.jpg?w=640&amp;h=447" class="alignnone size-full wp-image-17137" height="447" /></a></p>
 <p> </p>
 <p> </p>
 <p><a href="https://gilkalai.files.wordpress.com/2015/04/renyi-turan-erdos.jpg"><img src="https://gilkalai.files.wordpress.com/2015/04/renyi-turan-erdos.jpg?w=640" alt="renyi-turan-erdos" class="alignnone size-full wp-image-12883" /></a></p>
 <p><strong><span style="color: #ff0000;">From right, Rényi, Tur<b>á</b>n and Erdős and Grätzer. </span></strong></p>
 <p> </p>
 <p>While I was working on enumeration of <img src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="k" class="latex" title="k" />-trees I came across  a paper by Catherine Rényi and Alfréd Rényi that did everything I intended to do and quite a bit more.</p>
-<p><a href="https://gilkalai.files.wordpress.com/2019/04/rr5.png"><img src="https://gilkalai.files.wordpress.com/2019/04/rr5.png?w=640&amp;h=260" alt="" width="640" class="alignnone size-large wp-image-17340" height="260" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2019/04/rr5.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2019/04/rr5.png?w=640&amp;h=260" class="alignnone size-large wp-image-17340" height="260" /></a></p>
 <p>What caught my eye was a heartbreaking footnote: when the paper was completed Catherine Rényi was no longer alive.</p>
-<p><a href="https://gilkalai.files.wordpress.com/2019/04/rr2r.png"><img src="https://gilkalai.files.wordpress.com/2019/04/rr2r.png?w=640&amp;h=172" alt="" width="640" class="alignnone size-large wp-image-17341" height="172" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2019/04/rr2r.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2019/04/rr2r.png?w=640&amp;h=172" class="alignnone size-large wp-image-17341" height="172" /></a></p>
 <p>The proceedings where the paper appeared were of a conference in combinatorics in Hungary in 1969. This was the first international conference in combinatorics that took place in Hungary.  The list of speakers consists of the best combinatorialists in the world and many young people including Laci Lovasz, Laci Babai, Endre Szemeredi, and many more who since then have become world-class  scientists.</p>
 <p>Years later Vera Sós told me the story of Alfréd Rényi’s lecture at this conference, the first international conference in combinatorics that took place in Hungary:  “Kató died on August 23, on the day of arrival of the conference on “Combinatorial Theory and its Applications” (Balatonfured, August 24-29). Alfréd Renyi gave his talk (with the same title as the paper) on August 27 and his talk was longer than initially scheduled.  They proved the results in the paper just the week before the conference. The paper appeared in the proceedings  of the conference.”</p>
 <p>Alfréd Renyi was one of the organizers of the conference and also served as one of the editors of the proceedings of the conference, which appeared in 1970. A few months after the conference, on February 1, 1970 Alfréd Rényi  died of a violent illness. The proceedings are dedicated to the memory of Catherine Rényi and Alfréd Rényi.</p>
 <p> </p>
-<p><a href="https://gilkalai.files.wordpress.com/2019/03/scan-19.jpg"><img src="https://gilkalai.files.wordpress.com/2019/03/scan-19.jpg?w=640&amp;h=444" alt="" width="640" class="alignnone size-full wp-image-17135" height="444" /></a></p>
-<p><a href="https://gilkalai.files.wordpress.com/2019/03/scan-4.jpg"><img src="https://gilkalai.files.wordpress.com/2019/03/scan-4.jpg?w=640&amp;h=445" alt="" width="640" class="alignnone size-full wp-image-17136" height="445" /></a></p>
-<p><a href="https://gilkalai.files.wordpress.com/2019/03/erdos-renyi.png"><img src="https://gilkalai.files.wordpress.com/2019/03/erdos-renyi.png?w=640&amp;h=426" alt="" width="640" class="alignnone size-full wp-image-17138" height="426" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2019/03/scan-19.jpg"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2019/03/scan-19.jpg?w=640&amp;h=444" class="alignnone size-full wp-image-17135" height="444" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2019/03/scan-4.jpg"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2019/03/scan-4.jpg?w=640&amp;h=445" class="alignnone size-full wp-image-17136" height="445" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2019/03/erdos-renyi.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2019/03/erdos-renyi.png?w=640&amp;h=426" class="alignnone size-full wp-image-17138" height="426" /></a></p>
 <p>Two pictures showing Alfréd and Catherine Rényi and a picture of Alfred Rényi and Paul Erdős.</p>
 <p> </p>
-<p><a href="https://gilkalai.files.wordpress.com/2019/04/srrhe.png"><img src="https://gilkalai.files.wordpress.com/2019/04/srrhe.png?w=640&amp;h=498" alt="" width="640" class="alignnone size-full wp-image-17315" height="498" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2019/04/srrhe.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2019/04/srrhe.png?w=640&amp;h=498" class="alignnone size-full wp-image-17315" height="498" /></a></p>
 <p>Repeating a picture from last-week <a href="https://gilkalai.wordpress.com/2019/04/21/the-random-matrix-and-more/">post</a>. From left: Sándor Szalai,  Catherine Rényi, Alfréd Rényi, András Hajnal and Paul Erdős (Matrahaza)</p>
 <p>Going back to my story. I was 17 at the time and naturally I wondered if counting trees and similar things is what I want to do in my life. Shortly afterwards I went to the army. Without belittling the excitement of the army I quickly reached the conclusion that I prefer to count trees and to do similar things. My first result as a PhD student was another high dimensional extension of Cayley’s formula (mentioned in <a href="https://gilkalai.wordpress.com/2008/06/10/hellys-theorem-hypertrees-and-strange-enumeration-i/">this post</a> and a few subsequent posts).  The question of how to generalize both formulas for <img src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="k" class="latex" title="k" />-trees and for my hypertrees is still an open problem. We know the objects we want to count,  we know what the outcome should be, and we know that we can cheat and use weighted counting, but still I don’t know how to make it work.</p>
 <p>Some more comments on k-trees:</p>
@@ -2693,7 +2870,7 @@ Complementing this lower bound, we observe connections between rKt, the power of
 <font color="#0044cc"><br />
 <em>Practice leads theory</em><br />
 <font color="#000000"></font></font></p><font color="#0044cc"><font color="#000000">
-<a href="https://rjlipton.files.wordpress.com/2019/04/akkl.jpg"><img src="https://rjlipton.files.wordpress.com/2019/04/akkl.jpg?w=123&amp;h=162" alt="" width="123" class="alignright wp-image-15816" height="162" /></a><p></p><p>
+<a href="https://rjlipton.files.wordpress.com/2019/04/akkl.jpg"><img width="123" alt="" src="https://rjlipton.files.wordpress.com/2019/04/akkl.jpg?w=123&amp;h=162" class="alignright wp-image-15816" height="162" /></a><p></p><p>
 Peyman Afshani, Casper Freksen, Lior Kamma, and Kasper Larsen have a beautiful new <a href="https://arxiv.org/abs/1902.10935">paper</a> titled “Lower Bounds for Multiplication via Network Coding”. </p><p>
 Today we will talk about how practical computing played a role in this theory research.</p><p>
 The authors (AFKL) state this:</p><blockquote><p><b> </b> <em> In this work, we prove that if a central conjecture in the area of network coding is true, then any constant degree boolean circuit for multiplication must have size <img src="https://s0.wp.com/latex.php?latex=%7B%5COmega%28n+%5Clog+n%29%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{\Omega(n \log n)}" class="latex" title="{\Omega(n \log n)}" />, thus <s>almost</s> completely settling the complexity of multiplication circuits. </em>
@@ -2712,7 +2889,7 @@ We will next explain what the Network Coding Conjecture (NCC) is. </p><p>
 One of the basic papers was authored by Rudolf Ahlswede, Ning Cai, Shuo-Yen Li, and Raymond Yeung <a href="http://www.inf.fu-berlin.de/lehre/WS11/Wireless/papers/CodAhlswede00.pdf">here</a>. The paper has close to ten thousand citations, which would be amazing for a theory paper.</p><p>
 In basic networks each node can receive and send messages to and from other nodes. They can only move messages around—they are not allowed to peer into a message. The concept of <i>network coding</i> is to allow nodes also to decode and encode messages. Nodes can peer into messages and create new ones. The goal, of course, is to decrease the time required to transmit information through the network.</p><p>
 The following example combines figures from a 2004 <a href="http://www.eecg.utoronto.ca/~bli/papers/allerton04.pdf">paper</a> by Zongpeng Li and Baochun Li which formulated the NCC. At left is a situation where two senders, <img src="https://s0.wp.com/latex.php?latex=%7BS_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{S_1}" class="latex" title="{S_1}" /> with an <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{n}" class="latex" title="{n}" />-bit message <img src="https://s0.wp.com/latex.php?latex=%7Ba%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{a}" class="latex" title="{a}" /> and <img src="https://s0.wp.com/latex.php?latex=%7BS_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{S_2}" class="latex" title="{S_2}" /> with an <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{n}" class="latex" title="{n}" />-bit message <img src="https://s0.wp.com/latex.php?latex=%7Bb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{b}" class="latex" title="{b}" />, wish to transmit to respective receivers <img src="https://s0.wp.com/latex.php?latex=%7BT_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{T_1}" class="latex" title="{T_1}" /> and <img src="https://s0.wp.com/latex.php?latex=%7BT_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{T_2}" class="latex" title="{T_2}" />. The network’s links are one-way as shown, with two intermediate nodes <img src="https://s0.wp.com/latex.php?latex=%7BA%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{A}" class="latex" title="{A}" /> and <img src="https://s0.wp.com/latex.php?latex=%7BB%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{B}" class="latex" title="{B}" />, and each link can carry <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{n}" class="latex" title="{n}" /> bits at any one time.</p><p></p><p><br />
-<a href="https://rjlipton.files.wordpress.com/2019/04/flowfigures.png"><img src="https://rjlipton.files.wordpress.com/2019/04/flowfigures.png?w=500&amp;h=115" alt="" width="500" class="aligncenter wp-image-15815" height="115" /></a></p><p></p><p><br />
+<a href="https://rjlipton.files.wordpress.com/2019/04/flowfigures.png"><img width="500" alt="" src="https://rjlipton.files.wordpress.com/2019/04/flowfigures.png?w=500&amp;h=115" class="aligncenter wp-image-15815" height="115" /></a></p><p></p><p><br />
 If <img src="https://s0.wp.com/latex.php?latex=%7Ba%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{a}" class="latex" title="{a}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{b}" class="latex" title="{b}" /> are black-boxes that must be kept entire, there is no way to solve this in three time steps. But if the nodes can read messages and do lightweight computations, then the middle diagram gives a viable solution. Node <img src="https://s0.wp.com/latex.php?latex=%7BA%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{A}" class="latex" title="{A}" /> reads <img src="https://s0.wp.com/latex.php?latex=%7Ba%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{a}" class="latex" title="{a}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{b}" class="latex" title="{b}" /> and on-the-fly transmits their bitwise exclusive-or to node <img src="https://s0.wp.com/latex.php?latex=%7BB%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{B}" class="latex" title="{B}" />. Node <img src="https://s0.wp.com/latex.php?latex=%7BB%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{B}" class="latex" title="{B}" /> relays this to each receiver, who has also received the other party’s message directly. The receivers can each do a final exclusive-or to recover the messages intended for them. </p><p>
 The ability to look inside messages seems powerful, and there are networks where it helps even more dramatically. Incidentally, as <a href="https://en.wikipedia.org/wiki/Linear_network_coding">noted</a> by Wikipedia, the exclusive-or trick was anticipated in a 1978 <a href="https://ieeexplore.ieee.org/document/1455117">paper</a> showing how the two senders can exchange their messages <img src="https://s0.wp.com/latex.php?latex=%7Ba%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{a}" class="latex" title="{a}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{b}" class="latex" title="{b}" /> by relaying them to a satellite which transmits <img src="https://s0.wp.com/latex.php?latex=%7Ba+%5Coplus+b%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{a \oplus b}" class="latex" title="{a \oplus b}" /> back to each.</p><p>
 </p><p></p><h2> The Conjecture </h2><p></p><p></p><p>
@@ -3128,85 +3305,6 @@ fine-grained understanding of deep RL algorithms.</p></div>
 
 <p class="date">
 <a href="http://gradientscience.org/policy_gradients_pt3"><span class="datestr">at April 30, 2019 12:00 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="tag:blogger.com,1999:blog-3722233.post-6025884855508893027">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/gasarch.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="https://blog.computationalcomplexity.org/2019/04/x-3-y-3-z-3-33-has-solution-in-z-and.html">x3   + y3 + z3 = 33  has a solution in Z. And its big!</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://blog.computationalcomplexity.org/" title="Computational Complexity">Computational Complexity</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-Consider the following problem:<br />
-<br />
-Given k, a natural number, determine if there exists x,y,z INTEGERS such that x<sup>3</sup>+y<sup>3</sup>+z<sup>3</sup>=k.<br />
-<br />
-It is not obvious that this problem is decidable (I think it is but have not been able to find an exact statement to that affect; however, if it was not solvable, I would know that, hence it is solvable. If you know a ref give it in the comments.)<br />
-<br />
-<br />
-If k≡ 4,5 mod 9  then mod arguments easily show there is no solution. <a href="https://arxiv.org/pdf/1604.07746.pdf">Huisman</a> showed that if k≤ 1000, k≡1,2,3,6,7,8 mod 9 and max(|x|,|y|,|z|) ≤ 10<sup>15</sup> and k is NOT one of<br />
-<br />
-33, 42, 114, 165, 390, 579, 627, 633, 732, 795, 906, 921, 975<br />
-<br />
-then there was a solution. For those on the list it was unknown.<br />
-<br />
-Recently <a href="https://people.maths.bris.ac.uk/~maarb/papers/cubesv1.pdf">Booker</a> (not Cory Booker, the candidate for prez, but Andrew Booker who I assume is a math-computer science person and is not running for prez) showed that<br />
-<br />
-x<sup>3</sup> + y<sup>3</sup> + z<sup>3</sup> =33<br />
-<br />
-DOES have a solution in INTEGERS. It is<br />
-<br />
-x= 8,866,128,975,287,528<br />
-<br />
-y=-8,778,405,442,862,239<br />
-<br />
-z=-2,736,111,468,807,040<br />
-<br />
-<br />
-does that make us more likely or less likely to think that<br />
-<br />
-x<sup>3</sup> + y<sup>3</sup> + z<sup>3</sup> =42<br />
-<br />
-has a solution? How about =114, etc, the others on the list?<br />
-<br />
-Rather than say what I think is true (I have no idea) here is what I HOPE is true: that the resolution of these problems leads to some mathematics of interest.<br />
-<br />
-<br />
-<br />
-<br />
-<br /></div>
-
-
-
-
-
-
-
-<p class="date">
-by GASARCH (noreply@blogger.com) <a href="https://blog.computationalcomplexity.org/2019/04/x-3-y-3-z-3-33-has-solution-in-z-and.html"><span class="datestr">at April 29, 2019 02:26 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>

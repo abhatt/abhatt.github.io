@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-05-06T14:21:57Z</updated>
+  <updated>2019-05-06T15:22:11Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -255,7 +255,7 @@ If we have known upper bounds </p>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-05-06T14:20:09Z</updated>
+      <updated>2019-05-06T15:20:09Z</updated>
     </source>
   </entry>
 
@@ -287,7 +287,163 @@ If we have known upper bounds </p>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>By Emanuele Viola</subtitle>
       <title>Thoughts</title>
-      <updated>2019-05-06T14:21:26Z</updated>
+      <updated>2019-05-06T15:21:25Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>http://gradientscience.org/adv/</id>
+    <link href="http://gradientscience.org/adv/" rel="alternate" type="text/html"/>
+    <title>Adversarial Examples Are Not Bugs, They Are Features</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><a class="bbutton" href="https://gradientscience.org/adv.pdf" style="float: left;">
+<i class="fas fa-file-pdf"/>
+    Read the paper
+</a>
+<a class="bbutton" style="float: right;">
+<i class="fab fa-github"/>
+   Download the datasets
+</a></p>
+
+<p>Over the past few years, adversarial examples – or inputs that have been slightly perturbed by an adversary to cause unintended behavior in machine learning systems – have received significant attention in the machine learning community (for more background, read our introduction to adversarial examples <a href="https://gradientscience.org/intro_adversarial">here</a>). There has been much work on training models that are not vulnerable to adversarial examples (in previous posts, we discussed methods for training robust models: <a href="https://gradientscience.org/robust_opt_pt1/">part 1</a>, <a href="https://gradientscience.org/robust_opt_pt2/">part 2</a>, but all this research does not really confront the fundamental question: <i>why</i> do these adversarial examples arise in the first place?</p>
+
+<p>So far, the prevailing view has been that adversarial examples stem from “quirks” of the models that will eventually disappear once we make enough progress towards better training algorithms and larger scale data collection. Common views include adversarial examples being either a consequence of the input space being high-dimensional (e.g. <a href="https://arxiv.org/abs/1801.02774">here</a>) or attributed to finite-sample phenomena (e.g. <a href="https://arxiv.org/abs/1608.07690">here</a> or <a href="https://arxiv.org/abs/1804.11285">here</a>).</p>
+
+<p>Today we will discuss our <a href="https://gradientscience.org/adv.pdf">recent work</a> that provides a new perspective on the reasons for adversarial examples arise. However, before we dive into the details, let us first tell you a short story:</p>
+
+<h2 id="a-planet-called-erm">A Planet called <i>Erm</i></h2>
+
+<p>Our tale begins on <i><span class="sc">Erm</span></i>, a distant planet inhabited by members of an ancient alien race known as <i>Nets</i>. The Nets are a strange species; each individual’s place in the social hierarchy is determined by their ability to classify bizarre 32-by-32 pixel images (which are meaningless to the Nets) into ten completely arbitrary categories. These images are drawn from a top-secret dataset, <span class="sc">See-Far</span>—outside of looking at those curious pixelated images, the Nets live their lives totally blind.</p>
+
+<p>As Nets grow older and wiser they begin to discover more and more tell-tale <i>patterns</i> in <span class="sc">See-Far</span>. Each new pattern that an alien discovers helps them classify the dataset even more accurately. Due to the immense societal value of increased classification accuracy, the aliens have names for the most predictive image patterns:</p>
+
+<p><img alt="A Toogit, highly indicative of a '1' image." src="https://gradientscience.org/images/featsnotbugs/toogit.png" style="width: 30%;"/></p>
+<div class="footnote">
+        A TOOGIT, highly indicative of a "1" image.
+        Nets are extremely sensitive to TOOGITs.
+</div>
+
+<p>The most powerful aliens were remarkably adept at spotting patterns, and thus were extremely sensitive to their presence in <span class="sc">See-Far</span> images.</p>
+
+<p>Somehow (perhaps looking for <span class="sc">See-Far</span> classification tips), some of the aliens obtain access to a <i>human-written</i> machine learning paper. One figure in
+particular caught the aliens’ eye:</p>
+
+<p>
+<img alt="An quote-unquote adversarial example?" src="https://gradientscience.org/images/featsnotbugs/bagaboop.png"/>
+</p><div class="footnote">
+An "adversarial example"?
+</div>
+<p/>
+
+<p>The figure was relatively simple, they thought: on the left was a “2”, in the middle there was a GAB pattern, which was known to indicate “4”—unsurprisingly, adding a GAB to the image on the left resulted in a new image, <i>which looked (to the Nets) exactly like an image corresponding to the “4” category</i>.</p>
+
+<p>The Nets could not understand why, according to the paper, these two different images should be identically classified. Confused, the Nets flipped on through the manuscript, wondering what other useful patterns humans were oblivious to$\ldots$</p>
+
+<h2 id="what-we-can-learn-from-erm">What we can learn from <i>Erm</i></h2>
+
+<p>As the names may suggest, this story is not merely one of aliens and their curious social constructs: the way Nets develop is reminiscent of how we train machine learning models. In particular, we maximize accuracy without incorporating much prior context about classified classes, the physical world, or other human-related concepts. The result in the story is that the aliens are able to realize that what humans think of as meaningless adversarial perturbation are actually patterns crucial to <span class="sc">See-Far</span> classification. The tale of the Nets should thus make us wonder:</p>
+
+<p><i>Are adversarial perturbations really unnatural and meaningless?</i></p>
+
+<h3 id="a-simple-experiment">A simple experiment</h3>
+<p>To investigate this issue, let us first perform a simple experiment:</p>
+
+<ul>
+  <li>We start with an image from the training set of a standard dataset (e.g. CIFAR10):</li>
+</ul>
+
+<p><img alt="An image from the training set" src="https://gradientscience.org/images/featsnotbugs/train.png" style="width: 50%;"/></p>
+
+<ul>
+  <li>We synthesize a targeted adversarial example (on a standard pre-trained model) from each (x, y) towards the “next” class y+1 (or 0, if y is the last class):</li>
+</ul>
+
+<p><img alt="An adversarial perturabtion to the next class" src="https://gradientscience.org/images/featsnotbugs/adv.png"/></p>
+
+<ul>
+  <li>We then construct a new training set, by labeling these adversarial examples with their corresponding target class:</li>
+</ul>
+
+<p><img alt="A new training set based on the perturbation" src="https://gradientscience.org/images/featsnotbugs/newtrain.png" style="width: 35%;"/></p>
+
+<p>Now, the resulting training set is imperceptibly perturbed from the original, but the labels have been changed—as such, it looks <i>completely</i> mislabeled to a human. In fact, the mislabelings are even consistent with a “permuted” hypothesis (i.e. every dog is labeled as a cat, every cat as a bird, etc.).</p>
+
+<p>We train a new classifier (not necessarily with the same architecture as the first) on the “mislabeled dataset.” How will this classifier perform on the  <em>original (unaltered) test set</em> (i.e. the standard CIFAR-10 test set)?</p>
+
+<p>Remarkably, we find that the resulting classifier actually has moderate accuracy (e.g. 44% for CIFAR)! This is despite the fact that training inputs are associated with their labels <em>solely through imperceptible perturbations</em>, and are associated with a different (incorrect) label matching through <i>all</i> visible features.</p>
+
+<p>What’s going on here?</p>
+
+<h2 id="our-conceptual-model-for-adversarial-examples">Our Conceptual Model for Adversarial Examples</h2>
+
+<p>The experiment we just described establishes adversarial perturbations of standard models as patterns predictive of the target class in a <i>well-generalizing</i> sense. That is, adversarial perturbations in the training set alone allowed moderately accurate predictions on the test set. In this light, one might wonder: perhaps these patterns are <i>not</i> fundamentally different from what humans use to classify images (e.g. ears, whiskers, snouts)! This is precisely our hypothesis—there exist a variety of features of the input that are predictive of the label, and only some of these are perceptible to humans.</p>
+
+<p>More precisely, we posit that predictive features of the data can be split into “robust” and “non-robust” features. Robust features correspond to patterns that are predictive of the true label <em>even when adversarially perturbed</em> (e.g. the presence of “fur” in an image) under some pre-defined (and crucially human-defined) perturbation set, e.g. the $\ell_2$ ball. Conversely, non-robust features correspond to patterns that while predictive, can be “flipped” by an adversary within a pre-defined perturbation set to be indicate a wrong class (see <a href="https://gradientscience.org/adv.pdf">our paper</a> for a formal definition).</p>
+
+<p>Since we always only consider perturbation sets that do not affect human classification performance,  we expect humans to rely solely on robust features. However, when the goal is maximizing (standard) test-set accuracy, non-robust features can be just as useful as robust ones–in fact, the two types of features are completely indistinguishable. This is illustrated in the following figure:</p>
+
+<p><img alt="" src="https://gradientscience.org/images/featsnotbugs/model.png"/></p>
+
+<p>From this perspective, our experiment describes something quite simple. In the original training set, both the robust and non-robust features of the input are predictive of the label. When we make a small adversarial perturbation, we cannot significantly affect the robust features (essentially by definition), but  we can still flip <i>non-robust features</i>. For instance, every dog image now retains the robust features of a dog (and thus appears to us to be a dog), but has non-robust features of a cat. After the training set is relabelled, we make it so that the robust features actually point in the <i>wrong direction</i> (i.e. the pictures with robust “dog” features are labeled as cats) and hence only the non-robust features actually provide correct guidance for generalization.</p>
+
+<p>In summary, both robust and non-robust features are predictive on the training set, but <i>only non-robust features will yield generalization to the original test set</i>:</p>
+
+<p><img alt="" src="https://gradientscience.org/images/featsnotbugs/diagram.png"/></p>
+
+<p>Thus, the fact that models trained on this dataset actually generalize to the standard test set indicates that (a) non-robust features exist and are sufficient for good generalization, and (b) deep neural networks rely on these non-robust features, even in the presence of predictive robust features.</p>
+
+<h2 id="do-robust-models-learn-robust-features">Do Robust Models Learn Robust Features?</h2>
+
+<p>Our experiments establish that adversarial perturbations are not meaningless artifacts but actually correspond directly to perturbing features that are crucial to generalization. At the same time, our blog posts about adversarial examples (<a href="https://gradientscience.org/robust1">here</a> and <a href="https://gradientscience.org/robust2">here</a>) showed that by using robust optimization, we can get models that are more robust to adversarial examples.</p>
+
+<p>So a natural question to ask is: can we verify that robust models actually rely on <i>robust</i> features? To test this, we establish a methodology for restricting (in a best-effort sense) inputs to only the features a model is sensitive to (for deep neural networks, features correspond to the penultimate layer activations). Using this method, we create a new training set that is restricted to only contain the features that an already-trained robust model utilizes:</p>
+
+<p><img alt="" src="https://gradientscience.org/images/featsnotbugs/frog.png"/></p>
+
+<p>We then train a model on the resulting dataset  <em>without</em> adversarial training and find that the resulting model has non-trivial accuracy <em>and</em> robustness! This is in stark contrast to training on the standard training set which leads to models that are accurate yet completely brittle.</p>
+
+<p><img alt="" src="https://gradientscience.org/images/featsnotbugs/CIFAR_res.png"/></p>
+<div class="footnote">
+Standard and robust accuracy, tested on CIFAR-10 test set ($\mathcal{D}$). Training: <br/>
+<strong>Left</strong>: training normally on CIFAR-10 ($\mathcal{D}$) <br/>
+<strong>Middle</strong>: training adversarially on CIFAR-10 ($\mathcal{D}$) <br/>
+<strong>Right</strong>: training normally on constructed dataset ($\widehat{\mathcal{D}}_R$)
+</div>
+
+<p>Our results thus indicate that robustness (and in turn non-robustness) can in fact arise as a property of the dataset itself. In particular, when we remove non-robust features from the original training set, we can get robust models just via standard (non-adversarial) training. This is further evidence that adversarial examples arise as a result of non-robust features and are not necessarily tied to the standard training framework.</p>
+
+<h2 id="transferability">Transferability</h2>
+
+<p>An immediate consequence of this change in perspective is that the <i>transferability</i> of adversarial examples (the thus-far mysterious phenomenon that perturbations for one model are often adversarial for others) no longer requires a separate explanation. Specifically, now that we view adversarial vulnerability as a direct product of the <i>features derived from the dataset</i> (as opposed to quirks in the training of individual models), we would expect similarly expressive models to be able to find and use these features to improve their classification accuracy too.</p>
+
+<p>To further explore this idea, we study how the tendency of different architectures to learning similar non-robust features relates to the transferability of adversarial examples between them:</p>
+
+<p><img alt="" src="https://gradientscience.org/images/featsnotbugs/transfer.png"/>
+In the above, we generate the dataset that we described in our very first experiment (a training set of adversarial examples labeled with the target class), using a ResNet-50 to construct the adversarial examples. We can think of the resulting dataset as having all of the ResNet-50’s non-robust features “flipped” to the target class. We then train the five architectures shown above on this dataset, and record their generalization performance on the true test set: this corresponds to how well the architecture is able to generalize using only the non-robust features from a ResNet-50.</p>
+
+<p>When we analyze the results we see that, as our new view of adversarial examples suggests, models’ ability to pick up the non-robust features introduced by the ResNet-50 correlates extremely well with the adversarial transferability from ResNet-50 to standard models of each architecture.</p>
+
+<h2 id="implications">Implications</h2>
+
+<p>Our discussion and experiments establish adversarial examples as a purely human-centric phenomenon. From the perspective of classification performance there is no reason for a model to prefer robust over non-robust features. After all, the notion of robustness is human-specified. Hence, if we want our models to rely mostly on robust features we need to explicitly account for that by incorporating priors into architecture or training process. From that perspective, adversarial training (and more broadly robust optimization) can be thought of as a tool to incorporate desired invariances into the learned model. For example, robust training can be viewed as attempting to undermine the predictiveness of non-robust features by constantly “flipping” them, and thus steering the trained model away from relying on them.</p>
+
+<p>At the same time, the reliance of standard models on non-robust (and hence incomprehensible to humans) features needs to be accounted for when designing interpretability methods. In particular, any “explanation” of a standardly trained model’s prediction should either highlight such non-robust features (and hence not be fully human-meaningful) or hide them (and hence not be fully faithful to the model’s decision process). Therefore, if we want interpretability methods that are both human-meaningful and faithful, resorting only to post-training processing is fundamentally insufficient: one needs to intervene <i>at</i> training time.</p>
+
+<h2 id="more-in-the-paper">More in the Paper</h2>
+
+<p>In <a href="https://gradientscience.org/adv.pdf">our paper</a>, we describe a precise framework for discussing robust and non-robust features, further experiments corroborating our hypothesis, and a theoretical model under which we can study the dynamics of robust training in the presence of non-robust features.</p></div>
+    </summary>
+    <updated>2019-05-06T00:00:00Z</updated>
+    <published>2019-05-06T00:00:00Z</published>
+    <source>
+      <id>http://gradientscience.org/</id>
+      <author>
+        <name>Gradient Science</name>
+      </author>
+      <link href="http://gradientscience.org/" rel="alternate" type="text/html"/>
+      <link href="http://gradientscience.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Research highlights and perspectives on machine learning and optimization from MadryLab.</subtitle>
+      <title>gradient science</title>
+      <updated>2019-05-06T15:21:00Z</updated>
     </source>
   </entry>
 
@@ -1439,7 +1595,7 @@ We wish Bob the best. May he be awarded many other prizes.</p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-05-06T14:20:56Z</updated>
+      <updated>2019-05-06T15:20:42Z</updated>
     </source>
   </entry>
 
@@ -1461,7 +1617,7 @@ We wish Bob the best. May he be awarded many other prizes.</p>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-06T14:20:48Z</updated>
+      <updated>2019-05-06T15:20:29Z</updated>
     </source>
   </entry>
 
@@ -1632,7 +1788,7 @@ I wouldn't bet on my settling the complexity of traveling salesman even if I did
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-05-06T14:20:51Z</updated>
+      <updated>2019-05-06T15:20:38Z</updated>
     </source>
   </entry>
 
@@ -1668,7 +1824,7 @@ Unlike the prior constructions of such maps [NW94, KI04, AGS18, KST19], our cons
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-06T14:20:48Z</updated>
+      <updated>2019-05-06T15:20:29Z</updated>
     </source>
   </entry>
 
@@ -1763,7 +1919,7 @@ Complementing this lower bound, we observe connections between rKt, the power of
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-06T14:20:48Z</updated>
+      <updated>2019-05-06T15:20:29Z</updated>
     </source>
   </entry>
 
@@ -1898,7 +2054,7 @@ Is the NCC true? Can it be proved for some interesting classes of graphs? I beli
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-05-06T14:20:55Z</updated>
+      <updated>2019-05-06T15:20:42Z</updated>
     </source>
   </entry>
 
@@ -2216,81 +2372,7 @@ fine-grained understanding of deep RL algorithms.</p></div>
       <link href="http://gradientscience.org/feed.xml" rel="self" type="application/atom+xml"/>
       <subtitle>Research highlights and perspectives on machine learning and optimization from MadryLab.</subtitle>
       <title>gradient science</title>
-      <updated>2019-05-06T00:04:58Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-3722233.post-6025884855508893027</id>
-    <link href="https://blog.computationalcomplexity.org/feeds/6025884855508893027/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2019/04/x-3-y-3-z-3-33-has-solution-in-z-and.html#comment-form" rel="replies" type="text/html"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/6025884855508893027" rel="edit" type="application/atom+xml"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/6025884855508893027" rel="self" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2019/04/x-3-y-3-z-3-33-has-solution-in-z-and.html" rel="alternate" type="text/html"/>
-    <title>x3   + y3 + z3 = 33  has a solution in Z. And its big!</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Consider the following problem:<br/>
-<br/>
-Given k, a natural number, determine if there exists x,y,z INTEGERS such that x<sup>3</sup>+y<sup>3</sup>+z<sup>3</sup>=k.<br/>
-<br/>
-It is not obvious that this problem is decidable (I think it is but have not been able to find an exact statement to that affect; however, if it was not solvable, I would know that, hence it is solvable. If you know a ref give it in the comments.)<br/>
-<br/>
-<br/>
-If k≡ 4,5 mod 9  then mod arguments easily show there is no solution. <a href="https://arxiv.org/pdf/1604.07746.pdf">Huisman</a> showed that if k≤ 1000, k≡1,2,3,6,7,8 mod 9 and max(|x|,|y|,|z|) ≤ 10<sup>15</sup> and k is NOT one of<br/>
-<br/>
-33, 42, 114, 165, 390, 579, 627, 633, 732, 795, 906, 921, 975<br/>
-<br/>
-then there was a solution. For those on the list it was unknown.<br/>
-<br/>
-Recently <a href="https://people.maths.bris.ac.uk/~maarb/papers/cubesv1.pdf">Booker</a> (not Cory Booker, the candidate for prez, but Andrew Booker who I assume is a math-computer science person and is not running for prez) showed that<br/>
-<br/>
-x<sup>3</sup> + y<sup>3</sup> + z<sup>3</sup> =33<br/>
-<br/>
-DOES have a solution in INTEGERS. It is<br/>
-<br/>
-x= 8,866,128,975,287,528<br/>
-<br/>
-y=-8,778,405,442,862,239<br/>
-<br/>
-z=-2,736,111,468,807,040<br/>
-<br/>
-<br/>
-does that make us more likely or less likely to think that<br/>
-<br/>
-x<sup>3</sup> + y<sup>3</sup> + z<sup>3</sup> =42<br/>
-<br/>
-has a solution? How about =114, etc, the others on the list?<br/>
-<br/>
-Rather than say what I think is true (I have no idea) here is what I HOPE is true: that the resolution of these problems leads to some mathematics of interest.<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/></div>
-    </content>
-    <updated>2019-04-29T02:26:00Z</updated>
-    <published>2019-04-29T02:26:00Z</published>
-    <author>
-      <name>GASARCH</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/03615736448441925334</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-3722233</id>
-      <category term="typecast"/>
-      <category term="focs metacomments"/>
-      <author>
-        <name>Lance Fortnow</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-      </author>
-      <link href="https://blog.computationalcomplexity.org/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default" rel="self" type="application/atom+xml"/>
-      <link href="https://blog.computationalcomplexity.org/" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
-      <title>Computational Complexity</title>
-      <updated>2019-05-06T08:39:00Z</updated>
+      <updated>2019-05-06T15:21:00Z</updated>
     </source>
   </entry>
 </feed>
