@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-05-10T12:21:27Z</updated>
+  <updated>2019-05-10T13:22:08Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,181 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://rjlipton.wordpress.com/?p=15846</id>
+    <link href="https://rjlipton.wordpress.com/2019/05/10/making-elections-safe/" rel="alternate" type="text/html"/>
+    <title>Making Elections Safe</title>
+    <summary>A new proof that MAJORITY is not in . [ Rich DeMillo ] Rich DeMillo is a strong leader, a famous researcher, and a long-time best friend. Proof: He was the first CTO at HP and was the Dean of Computing at Georgia Tech; He helped created mutation a powerful software testing method and did […]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>
+<font color="#0044cc"><br/>
+<em>A new proof that MAJORITY is not in <img alt="{\mathsf{AC}^{0}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BAC%7D%5E%7B0%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\mathsf{AC}^{0}}"/>.</em><br/>
+<font color="#000000"/></font></p><font color="#0044cc"><font color="#000000">
+<table class="image alignright">
+<tbody>
+<tr>
+<td>
+<a href="https://rjlipton.wordpress.com/2019/05/10/making-elections-safe/unknown-121/" rel="attachment wp-att-15848"><img alt="" class="alignright size-full wp-image-15848" src="https://rjlipton.files.wordpress.com/2019/05/unknown.jpeg?w=600"/></a>
+</td>
+</tr>
+<tr>
+<td class="caption alignright"><font size="-2">[ Rich DeMillo ]</font></td>
+</tr>
+</tbody>
+</table>
+<p>
+Rich DeMillo is a strong leader, a famous researcher, and a long-time best friend. <i>Proof</i>: He was the first CTO at HP and was the Dean of Computing at Georgia Tech; He helped created <a href="https://en.wikipedia.org/wiki/Mutation_testing">mutation</a> a powerful software testing method and did seminal work in complexity theory. The last is clear.</p>
+<p>
+Today I want to talk about his recent work on voting systems. </p>
+<p>
+The 2020 election is over a year away, yet it is on our collective minds. People voice concerns everyday on social media, on TV, on cable, in print, everywhere. Their concerns are that our next national election will be compromised. Rich has turned his concern into activism: he is working hard to make elections trusted in general and the 2020 election in particular. </p>
+<p>
+Rich is scheduled to give a talk this coming Monday, May 13, at Georgia Tech. I wish I could be there, but cannot. I do plan to watch the video of his presentation—see <a href="https://www.cc.gatech.edu/calendar/day/2019/05/13/15151">here</a>. The talk is based on his recent <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3375755">paper</a> joint with Andrew Appel and Philip Stark titled, “Ballot-Marking devices (BMDs) cannot assure the will of the voters.” As an aside, their paper (ADS) has already generated measurable interest—it’s been downloaded over <img alt="{300}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B300%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{300}"/> times and viewed over <img alt="{5,000}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B5%2C000%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{5,000}"/> times.</p>
+<p>
+</p><p/><h2> What Makes A Good Election? </h2><p/>
+<p/><p>
+There are several criterion that a “good” election should have. </p>
+<ul>
+<li>
+<i>During the voting</i>: Only eligible voters can vote. <p/>
+</li><li>
+<i>During the tabulation</i>: Each voter gets exactly one vote. <p/>
+</li><li>
+<i>After the election</i>: Each vote remains secret.
+</li></ul>
+<p>
+Rich says in his talk abstract: </p>
+<blockquote><p><b> </b> <em> Many people believe that, in an Internet-enabled world, secure, safe voting should be easy to achieve. For example, using known cryptographically secure protocols (maybe even blockchains), a secure website might be developed to relieve voters of the burden of driving to a polling place on election day. </em>
+</p></blockquote>
+<p/><p>
+This belief is wrong. Elections are hard—impossible?—to safeguard. A U.S. national election is the union of about ten thousand local elections. Each has different rules and protocols, which makes safeguarding the national election difficult. </p>
+<ul>
+<li>
+<i>During the voting</i>: Who votes is subject to human decisions? People must prove they are eligible voters. Even computer identification is subject to bias. <p/>
+</li><li>
+<i>During the tabulation</i>: Counting is usually a combination of human and computer systems. The former make errors and as do the latter. Computers can have bugs or can be hacked by adversaries. <p/>
+</li><li>
+<i>After the election</i>: Since records are usually kept of the voting, they must be safeguarded to avoid disclosing how someone voted.
+</li></ul>
+<p>
+The last point is central. There must be a record of the votes to allow audits after the election is over. We must be able to audit and check that the tabulation was correct. This is the central question that Rich and his co-authors discuss. We will turn to this issue in a moment. </p>
+<p>
+Before that I note that keeping a vote secret is impossible in an absolute sense. Suppose that you vote “yes” in some district. After the election suppose that the count in that district is made public, as it usually is. Say <img alt="{61\%}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B61%5C%25%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{61\%}"/> of the votes were yes. Then clearly information is leaked about how you voted.</p>
+<p>
+</p><p/><h2> How Are Votes Recorded? </h2><p/>
+<p/><p>
+There are two main ways to record votes. One method is to have voters hand-mark their ballots, in the old-fashioned way. It is simple, cheap, and not 21st century. Hand-marked ballots can be read by automatic scanners, at least in principle. A difficulty is voters are human and may mark their ballots incorrectly. They may miss a box, or mark two boxes, or make some other mistake. What if the voter is instructed to:</p>
+<blockquote><p><b> </b> <em> Select two of the following six choices. </em>
+</p></blockquote>
+<p/><p>
+There can be other difficulties: Some voters may have special needs and may require instructions to be in a large type font, for example.</p>
+<p>
+Another recoding method is to have voters use a device to print their paper ballots. These are cleverly called <a href="https://en.wikipedia.org/wiki/Ballot_marking_device">Ballot Marking Devices</a> (BMDs). The name sounds slightly strange to me; there is an alternative name, electronic ballot markers (EBMs).</p>
+<p>
+The authors, ADS, argue that BMDs are dangerous. Such devices can fail, they argue, and not protect the election. The BMDs rely on software, complex special purpose software, and thus are subject to bugs, errors, mistakes, and to active attacks by adversaries. </p>
+<p>
+A BMD device takes input from a voter and then prints out a paper ballot. Often the ballot will contain a machine-readable bar code. This is so scanners can more easily read the paper ballots, later. The problem, the danger, is that most voters cannot tell if a bar code is correct or not. An attacker need only have the BMD confirm that you voted say “yes” and print a ballot that says “yes”. Then the attacker has the BMD cheat you by printing a bar code that says “no”. This is a nasty attack, which is hard to stop. The ADS team discusses this and related problems with BDMs. </p>
+<p>
+<a href="https://rjlipton.wordpress.com/2019/05/10/making-elections-safe/bar/" rel="attachment wp-att-15852"><img alt="" class="aligncenter size-medium wp-image-15852" height="147" src="https://rjlipton.files.wordpress.com/2019/05/bar.png?w=300&amp;h=147" width="300"/></a></p>
+<p>
+</p><p/><h2> Mathematics and Voting </h2><p/>
+<p/><p>
+Can complexity theory help us design better elections? Unclear. Can election theory help us understand complexity theory? Perhaps.</p>
+<p>
+</p><p/><h3> Elections Inform Complexity Theory </h3><p/>
+<p>
+</p><blockquote><p><b>Theorem 1</b> <em> The <i>Election Hardness Axiom</i> implies that the MAJORITY function cannot be computed by a polynomial size constant depth Boolean circuit of NOT, AND, and OR gates. </em>
+</p></blockquote>
+<p/><p>
+That is, the MAJORITY function is not in <img alt="{\mathsf{AC}^{0}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BAC%7D%5E%7B0%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\mathsf{AC}^{0}}"/>. What is the Election Hardness Axiom? It is the empirical fact that there is no practical way to compute who won an election. The MAJORITY function is the tabulation of votes: The outcome of an election is the same as computing the MAJORITY function of the votes—“yes” is a <img alt="{1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1}"/> and “no” is a <img alt="{0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{0}"/>.</p>
+<p>
+Okay we are kidding. But not completely. Suppose that MAJORITY function were in <img alt="{\mathsf{AC}^{0}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BAC%7D%5E%7B0%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\mathsf{AC}^{0}}"/>. Then a series of decisions of the form:</p>
+<blockquote><p><b> </b> <em> The tabulators have looked at the following ballots <img alt="{B_{1},\dots,B_{m}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BB_%7B1%7D%2C%5Cdots%2CB_%7Bm%7D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{B_{1},\dots,B_{m}}"/> and we agree that there is a “yes” vote in ballot <img alt="{B_{i}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BB_%7Bi%7D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{B_{i}}"/>. </em>
+</p></blockquote>
+<p>
+</p><p/><h3> Complexity Informs Elections </h3><p/>
+<p/><p>
+Rich, in his talk abstract, states that it is unlikely that crypto theory could be used to create trusted elections. His reason is voters will not trust elections that rely on crypto results. I agree. But I wonder if ideas from theory could be useful. Here are two high-level thoughts.</p>
+<p>
+<img alt="{\bullet }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet }"/> There is a vast literature on computing in the presence of faults. Usually “faults” are thought to occur at the nano level: the faults are due to hiccups in electronics. What if the faults came from errors in the counting of votes? What if the faults were at the macro level? That is at the level of human decisions? Perhaps we will revisit this in the future.</p>
+<p>
+<img alt="{\bullet }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet }"/> There is a vast literature on computing as a “game”. An election is usually viewed as being run by some trusted party. This could be replaced by assuming that the election is a game. Imagine two parties D and R. As the tabulation is performed D and R can challenge each other. They interact as in game. Could this help make the election trusted? Perhaps we will revisit this too in the future.</p>
+<p>
+</p><p/><h2> Open Problems </h2><p/>
+<p/><p>
+Can we elections be trusted? Can we formalize the connection between election and <img alt="{\mathsf{AC}^{0}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BAC%7D%5E%7B0%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\mathsf{AC}^{0}}"/>? Could this connect be useful? Can theory help with future elections?</p>
+<p/></font></font></div>
+    </content>
+    <updated>2019-05-10T12:35:36Z</updated>
+    <published>2019-05-10T12:35:36Z</published>
+    <category term="Ideas"/>
+    <category term="News"/>
+    <category term="Proofs"/>
+    <category term="AC0"/>
+    <category term="ballots"/>
+    <category term="election"/>
+    <category term="MAJORITY"/>
+    <category term="trust"/>
+    <category term="voters"/>
+    <author>
+      <name>rjlipton</name>
+    </author>
+    <source>
+      <id>https://rjlipton.wordpress.com</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://rjlipton.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://rjlipton.wordpress.com" rel="alternate" type="text/html"/>
+      <link href="https://rjlipton.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>a personal view of the theory of computation</subtitle>
+      <title>Gödel’s Lost Letter and P=NP</title>
+      <updated>2019-05-10T13:20:46Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://gilkalai.wordpress.com/?p=17447</id>
+    <link href="https://gilkalai.wordpress.com/2019/05/10/sansation-in-the-morning-news-yaroslav-shitov-counterexamples-to-hedetniemis-conjecture/" rel="alternate" type="text/html"/>
+    <title>Sansation in the morning news –  Yaroslav Shitov: Counterexamples to Hedetniemi’s conjecture.</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Two days ago Nati Linial sent me an email entitled “Sansation in the morning news”. The link was to a new arXived paper by Yaroslav Shitov: Counterexamples to Hedetniemi’s conjecture. Hedetniemi’s 1966 conjecture asserts that if and are two graphs, … <a href="https://gilkalai.wordpress.com/2019/05/10/sansation-in-the-morning-news-yaroslav-shitov-counterexamples-to-hedetniemis-conjecture/">Continue reading <span class="meta-nav">→</span></a></div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Two days ago Nati Linial sent me an email entitled “Sansation in the morning news”. The link was to a new arXived paper by Yaroslav Shitov:<a href="https://arxiv.org/abs/1905.02167"> Counterexamples to Hedetniemi’s conjecture</a>.</p>
+<p><a href="https://en.wikipedia.org/wiki/Hedetniemi%27s_conjecture">Hedetniemi’s 1966 conjecture</a> asserts that if <img alt="G" class="latex" src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="G"/> and <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> are two graphs, then the chromatic number of their tensor product <img alt="G \times H" class="latex" src="https://s0.wp.com/latex.php?latex=G+%5Ctimes+H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="G \times H"/> equals the minimum of their individual chromatic numbers.  Here, the vertex set of <img alt="G \times H" class="latex" src="https://s0.wp.com/latex.php?latex=G+%5Ctimes+H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="G \times H"/> is the Cartesian product of <img alt="V(G)" class="latex" src="https://s0.wp.com/latex.php?latex=V%28G%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="V(G)"/> and <img alt="V(H)" class="latex" src="https://s0.wp.com/latex.php?latex=V%28H%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="V(H)"/> and two vertices <img alt="(g_1,h_1)" class="latex" src="https://s0.wp.com/latex.php?latex=%28g_1%2Ch_1%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(g_1,h_1)"/> and <img alt="(g_2,h_2)" class="latex" src="https://s0.wp.com/latex.php?latex=%28g_2%2Ch_2%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(g_2,h_2)"/> are adjacent if <img alt="g_1" class="latex" src="https://s0.wp.com/latex.php?latex=g_1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="g_1"/> is adjacent to <img alt="h_1" class="latex" src="https://s0.wp.com/latex.php?latex=h_1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="h_1"/> and  <img alt="g_2" class="latex" src="https://s0.wp.com/latex.php?latex=g_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="g_2"/> is adjacent to <img alt="h_2" class="latex" src="https://s0.wp.com/latex.php?latex=h_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="h_2"/>. Every coloring of <img alt="G" class="latex" src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="G"/> induces a coloring  of <img alt="G \times H" class="latex" src="https://s0.wp.com/latex.php?latex=G+%5Ctimes+H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="G \times H"/>, and so is every coloring of <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/>.  Therefore, <img alt="\chi (G \times H) \le \min (\chi (G), \chi (H))" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cchi+%28G+%5Ctimes+H%29+%5Cle+%5Cmin+%28%5Cchi+%28G%29%2C+%5Cchi+%28H%29%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\chi (G \times H) \le \min (\chi (G), \chi (H))"/>. Hedetniemi conjectured that equality always hold and this is now refuted by  by Yaroslav Shitov.</p>
+<p>The example and the entire proof are quite short (the entire paper is less than 3 pages; It is a bit densely-written).</p>
+<p><a href="https://gilkalai.files.wordpress.com/2019/05/js.png"><img alt="" class="alignnone size-full wp-image-17450" src="https://gilkalai.files.wordpress.com/2019/05/js.png?w=640"/></a></p>
+<p><span style="color: #ff0000;"><strong> Yaroslav Shitov </strong></span></p>
+<p>To tell you what the construction is, I need two important definitions.  The first  is the notion of the exponential graph <img alt="{\cal E}_c(H)" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ccal+E%7D_c%28H%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="{\cal E}_c(H)"/>.</p>
+<p>The exponential graph  <img alt="{\cal E}_c(H)" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ccal+E%7D_c%28H%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="{\cal E}_c(H)"/> arose in the study of Hedetniemi’s conjecture in a 1985 paper by El-Zahar and Sauer. The vertices of <img alt="{\cal E}_c(H)" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ccal+E%7D_c%28H%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="{\cal E}_c(H)"/> are all maps from <img alt="V(H)" class="latex" src="https://s0.wp.com/latex.php?latex=V%28H%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="V(H)"/> to <img alt="\{1,2,\dots,c\}" class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7B1%2C2%2C%5Cdots%2Cc%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\{1,2,\dots,c\}"/>. Two maps <img alt="\phi, \psi" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cphi%2C+%5Cpsi&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\phi, \psi"/> are adjacent if whenever <img alt="v,u" class="latex" src="https://s0.wp.com/latex.php?latex=v%2Cu&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="v,u"/> are adjacent vertices of <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> then <img alt="\phi(u) \ne \psi (v)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cphi%28u%29+%5Cne+%5Cpsi+%28v%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\phi(u) \ne \psi (v)"/>.  <a href="https://link.springer.com/article/10.1007/BF02579374">El-Zahar and Sauer showed</a> that importance of the case  that <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> is a graph and <img alt="G" class="latex" src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="G"/> is an exponential graph of <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> for Hedetniemi’s conjecture. (The entire conjecture reduces to this case.) It is thus crucial to study  coloring of exponential graphs which is the subject of the three claims of Section 1 of Shitov’s paper.</p>
+<p>The second definition is another important notion of product of graphs: <a href="https://en.wikipedia.org/wiki/Strong_product_of_graphs">The strong product <i>G</i> ⊠ <i>H </i>of two graphs <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> and <img alt="G" class="latex" src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="G"/>.</a> The set of vertices is again the Cartesian product of the two sets of vertices. This time,  <img alt="(g_1,h_1)" class="latex" src="https://s0.wp.com/latex.php?latex=%28g_1%2Ch_1%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(g_1,h_1)"/> and <img alt="(g_2,h_2)" class="latex" src="https://s0.wp.com/latex.php?latex=%28g_2%2Ch_2%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(g_2,h_2)"/> are adjacent in <i>G</i> ⊠ <i>H</i> if either</p>
+<p>(a) <img alt="g_1" class="latex" src="https://s0.wp.com/latex.php?latex=g_1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="g_1"/> is adjacent to <img alt="h_1" class="latex" src="https://s0.wp.com/latex.php?latex=h_1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="h_1"/> and  <img alt="g_2" class="latex" src="https://s0.wp.com/latex.php?latex=g_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="g_2"/> is adjacent to <img alt="h_2" class="latex" src="https://s0.wp.com/latex.php?latex=h_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="h_2"/></p>
+<p>OR</p>
+<p>(b) <img alt="g_1" class="latex" src="https://s0.wp.com/latex.php?latex=g_1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="g_1"/> is adjacent to <img alt="h_1" class="latex" src="https://s0.wp.com/latex.php?latex=h_1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="h_1"/> and  <img alt="g_2 = h_2" class="latex" src="https://s0.wp.com/latex.php?latex=g_2+%3D+h_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="g_2 = h_2"/> or <img alt="g_1 =h_1" class="latex" src="https://s0.wp.com/latex.php?latex=g_1+%3Dh_1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="g_1 =h_1"/> and  <img alt="g_2" class="latex" src="https://s0.wp.com/latex.php?latex=g_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="g_2"/> is adjacent to <img alt="h_2" class="latex" src="https://s0.wp.com/latex.php?latex=h_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="h_2"/></p>
+<p>(The edges of condition (a) are the edges of the <em>tensor product</em> of the two graphs and the edges of condition (b) are the edges of the <em>Cartesian product</em> of the two graphs.)</p>
+<p>For Shitov’s counterexample given in Section 2 of his paper, <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H"/> is the strong product of a graph <img alt="L" class="latex" src="https://s0.wp.com/latex.php?latex=L&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="L"/> with girth at least 10 and fractional chromatic number at least 4.1 with a large clique of size <img alt="q" class="latex" src="https://s0.wp.com/latex.php?latex=q&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="q"/>. The second graph <img alt="G" class="latex" src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="G"/> is the exponential graph <img alt="{\cal E}_c(H)" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ccal+E%7D_c%28H%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="{\cal E}_c(H)"/>. Put <img alt="c =\lceil 4.1q \rceil" class="latex" src="https://s0.wp.com/latex.php?latex=c+%3D%5Clceil+4.1q+%5Crceil&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="c =\lceil 4.1q \rceil"/>.  Shitov shows that when <img alt="c" class="latex" src="https://s0.wp.com/latex.php?latex=c&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="c"/> is sufficiently large then  the chromatic number of both <img alt="H,G" class="latex" src="https://s0.wp.com/latex.php?latex=H%2CG&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="H,G"/> is <img alt="c" class="latex" src="https://s0.wp.com/latex.php?latex=c&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="c"/>,  but the chromatic number of their tensor product is smaller than <img alt="c" class="latex" src="https://s0.wp.com/latex.php?latex=c&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="c"/>.</p>
+<p><span style="color: #ff0000;"> (Have a look also at Yaroslav’s other <a href="https://arxiv.org/search/advanced?advanced=&amp;terms-0-operator=AND&amp;terms-0-term=Shitov&amp;terms-0-field=author&amp;classification-physics_archives=all&amp;classification-include_cross_list=include&amp;date-filter_by=all_dates&amp;date-year=&amp;date-from_date=&amp;date-to_date=&amp;date-date_type=submitted_date&amp;abstracts=show&amp;size=50&amp;order=-announced_date_first">arXived papers</a>! )</span></p></div>
+    </content>
+    <updated>2019-05-10T12:32:56Z</updated>
+    <published>2019-05-10T12:32:56Z</published>
+    <category term="Combinatorics"/>
+    <category term="Open problems"/>
+    <category term="Updates"/>
+    <category term="Hedetniemi's conjecture"/>
+    <category term="Yaroslav Shitov"/>
+    <author>
+      <name>Gil Kalai</name>
+    </author>
+    <source>
+      <id>https://gilkalai.wordpress.com</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://gilkalai.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://gilkalai.wordpress.com" rel="alternate" type="text/html"/>
+      <link href="https://gilkalai.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>Gil Kalai's blog</subtitle>
+      <title>Combinatorics and more</title>
+      <updated>2019-05-10T13:20:42Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://cstheory-jobs.org/2019/05/10/postdoc-in-drone-safety-at-department-of-electronic-systems-aalborg-university-apply-by-june-6-2019/</id>
@@ -34,7 +209,7 @@ Email: alc@es.aau.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-05-10T12:20:43Z</updated>
+      <updated>2019-05-10T13:20:48Z</updated>
     </source>
   </entry>
 
@@ -59,7 +234,7 @@ Email: alc@es.aau.dk</p></div>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-05-10T12:21:11Z</updated>
+      <updated>2019-05-10T13:21:36Z</updated>
     </source>
   </entry>
 
@@ -457,7 +632,7 @@ We then propose the model of $a$-irregular resolution. Extended from regular res
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-10T12:20:34Z</updated>
+      <updated>2019-05-10T13:20:39Z</updated>
     </source>
   </entry>
 
@@ -942,7 +1117,7 @@ open source Java library.
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2019-05-10T12:21:09Z</updated>
+      <updated>2019-05-10T13:21:33Z</updated>
     </source>
   </entry>
 
@@ -970,7 +1145,7 @@ Our result in particular implies that there are Boolean functions with $O(1)$ un
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-10T12:20:34Z</updated>
+      <updated>2019-05-10T13:20:39Z</updated>
     </source>
   </entry>
 
@@ -997,7 +1172,7 @@ The <img alt="{\mathsf{shift}}" class="latex" src="https://s0.wp.com/latex.php?l
 <p align="center"><img alt="\displaystyle  x \times 2^{k}. " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++x+%5Ctimes+2%5E%7Bk%7D.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  x \times 2^{k}. "/></p>
 <p>This is a special case of the integer multiplication problem. In symbols it maps <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> and <img alt="{k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{k}"/> to <img alt="{0^k x 0^{n-k}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B0%5Ek+x+0%5E%7Bn-k%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{0^k x 0^{n-k}}"/>, as in our photo above. </p>
 <p>
-Our point, however, is not about integer multiplication. Nor even about NCC—no knowledge of it will be needed today, so read on even if you are not aware of NCC. No. Our point is that a whole lot of other Boolean functions would inherit the same <img alt="{\Omega(n \log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5COmega%28n+%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\Omega(n \log n)}"/> circuit lower bound as <img alt="{\mathsf{shift}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7Bshift%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\mathsf{shift}}"/>. And several aspects of that seem troubling.</p>
+Our point, however, is not about integer multiplication. Nor even about NCC—no knowledge of it will be needed today, so read on even if you are not aware of NCC. No. Our point is that a whole lot of other Boolean functions would inherit the same <img alt="{\Omega(n \log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5COmega%28n+%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\Omega(n \log n)}"/> circuit lower bound as <img alt="{\mathsf{shift}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7Bshift%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\mathsf{shift}}"/>. And several aspects of that seem troubling.<span id="more-15840"/></p>
 <p>
 </p><p/><h2> Some Worry </h2><p/>
 <p/><p>
@@ -1118,7 +1293,7 @@ Is <img alt="{\mathsf{FLIP}}" class="latex" src="https://s0.wp.com/latex.php?lat
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-05-10T12:20:41Z</updated>
+      <updated>2019-05-10T13:20:46Z</updated>
     </source>
   </entry>
 
@@ -1172,7 +1347,7 @@ Is <img alt="{\mathsf{FLIP}}" class="latex" src="https://s0.wp.com/latex.php?lat
       <link href="https://kintali.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computational Complexity, Polyhedral Combinatorics, Algorithms and Graph Theory</subtitle>
       <title>My Brain is Open</title>
-      <updated>2019-05-10T12:20:44Z</updated>
+      <updated>2019-05-10T13:20:49Z</updated>
     </source>
   </entry>
 
@@ -1290,7 +1465,7 @@ For more on his strategy see this article by Oliver Roeder in Nate Silvers Blog:
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-05-10T12:20:37Z</updated>
+      <updated>2019-05-10T13:20:42Z</updated>
     </source>
   </entry>
 
@@ -1538,7 +1713,7 @@ If we have known upper bounds </p>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-05-10T12:20:09Z</updated>
+      <updated>2019-05-10T13:20:09Z</updated>
     </source>
   </entry>
 
@@ -1570,7 +1745,7 @@ If we have known upper bounds </p>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>By Emanuele Viola</subtitle>
       <title>Thoughts</title>
-      <updated>2019-05-10T12:21:00Z</updated>
+      <updated>2019-05-10T13:21:15Z</updated>
     </source>
   </entry>
 
@@ -1962,83 +2137,7 @@ We wish Bob the best. May he be awarded many other prizes.</p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-05-10T12:20:41Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2019/066</id>
-    <link href="https://eccc.weizmann.ac.il/report/2019/066" rel="alternate" type="text/html"/>
-    <title>TR19-066 |  A Lower Bound for Sampling Disjoint Sets | 
-
-	Thomas Watson</title>
-    <summary>Suppose Alice and Bob each start with private randomness and no other input, and they wish to engage in a protocol in which Alice ends up with a set $x\subseteq[n]$ and Bob ends up with a set $y\subseteq[n]$, such that $(x,y)$ is uniformly distributed over all pairs of disjoint sets. We prove that for some constant $\varepsilon&gt;0$, this requires $\Omega(n)$ communication even to get within statistical distance $\varepsilon$ of the target distribution. Previously, Ambainis, Schulman, Ta-Shma, Vazirani, and Wigderson (FOCS 1998) proved that $\Omega(\sqrt{n})$ communication is required to get within $\varepsilon$ of the uniform distribution over all pairs of disjoint sets of size $\sqrt{n}$.</summary>
-    <updated>2019-05-03T00:14:32Z</updated>
-    <published>2019-05-03T00:14:32Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2019-05-10T12:20:34Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>https://11011110.github.io/blog/2019/05/02/playing-model-trains</id>
-    <link href="https://11011110.github.io/blog/2019/05/02/playing-model-trains.html" rel="alternate" type="text/html"/>
-    <title>Playing with model trains and calling it graph theory</title>
-    <summary>You’ve probably played with model trains, for instance with something like the Brio set shown below.1 And if you’ve built a layout with a model train set, you may well have wondered: is it possible for my train to use all the parts of my track? Searching on tineye finds that this image was on Amazon in 2008. Presumably it was supplied to them by Brio? ↩</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>You’ve probably played with model trains, for instance with something like the <a href="https://en.wikipedia.org/wiki/Brio_(company)">Brio</a> set shown below.<sup id="fnref:fn"><a class="footnote" href="https://11011110.github.io/blog/2019/05/02/playing-model-trains.html#fn:fn">1</a></sup> And if you’ve built a layout with a model train set, you may well have wondered: is it possible for my train to use all the parts of my track?</p>
-
-<p style="text-align: center;"><img alt="Brio train set" src="https://11011110.github.io/blog/assets/2019/brio-33133.jpg"/></p>
-
-<p>For instance, in the layout shown in this image, if your train starts on the far right, moving downward, it will be stuck in a loop that it can never escape. There are no choice points where the train can switch to another track until it returns to the Y at the right, moving in the same direction. On the other hand, if you allow yourself to reverse the train, it can reverse back through the other entrance to the Y and reach the rest of the track. It’s also possible for a long-enough train to block itself, preventing it from escaping certain parts of the track that a short train could negotiate more easily.</p>
-
-<p>My newest preprint, “Reconfiguring Undirected Paths” (with Demaine, Hesterberg, Jain, Lubiw, Uehara, and Uno, <a href="https://arxiv.org/abs/1905.00518">arXiv:1905.00518</a>), considers an abstract model for such problems, in which the train track is modeled as an undirected graph and the train is a simple path in the graph. You can slide the train by adding an edge to one end of the path and removing an edge from the other end; we don’t distinguish which end of the train is which, so it can slide in both directions. The vertices of the graph model points where you can choose which of several directions to slide the train. Because it’s an undirected graph, these are like the three-way and four-way junctions in the middle of the image (allowing the train to enter and exit along any pair of track segments) rather than the Y junctions at the far right (where a train that enters at one of the two top edges of the Y has to exit the bottom).</p>
-
-<p>For instance, in a  grid graph, the different positions of a length- path and the ways that one position can shift into another can be visualized as the state space shown below.</p>
-
-<p style="text-align: center;"><img alt="PSPACE-hardness reduction for path reconfiguration" src="https://11011110.github.io/blog/assets/2019/path-reconfig-states.svg"/></p>
-
-<p>Testing whether a long train can slide from one position to another turns out to be PSPACE-complete, even on graphs of bounded bandwidth, by a reduction from <a href="https://en.wikipedia.org/wiki/Nondeterministic_constraint_logic">nondeterministic constraint logic</a>. Here’s an example of an NCL problem transformed by our reduction into a path-sliding problem:</p>
-
-<p style="text-align: center;"><img alt="PSPACE-hardness reduction for path reconfiguration" src="https://11011110.github.io/blog/assets/2019/path-reconfig-redux.svg" width="80%"/></p>
-
-<p>Our main results are a <a href="https://11011110.github.io/blog/2019/05/02/Parameterized complexity">fixed-parameter tractable algorithm</a> parameterized by train length (so it’s fast for short trains) and a linear time algorithm when the graph is a tree. Both cases are based on the same intuition, that the problem becomes easier if we can maneuver the train onto a long enough path. For the parameterized version, if the graph has a path twice as long as the train that can be reached from the starting position of the train, and another long path that can reach the ending position, then we can maneuver the train onto the first long path, send it on an express route directly from the first long path to the second one, and then maneuver it from there into its final position. On the other hand, until we find these long paths, we can restrict our attention to a subgraph with no long paths; this implies that it has bounded <a href="https://11011110.github.io/blog/2019/05/02/Tree-depth">tree-depth</a> and makes searching within the subgraph easy. The linear time tree algorithm similarly involves a lot of back-and-forth maneuvering of the train to free up longer and longer segments of it until the whole train is freed to move from the start to the goal.</p>
-
-<p>A shorter version of our paper will appear at <a href="http://wads.org/">WADS</a> this summer.
-While it was in submission to WADS, a related preprint appeared on arXiv: “The Parameterized Complexity of Motion Planning for Snake-Like Robots”, by Gupta, Sa’ar, and Zehavi (<a href="https://arxiv.org/abs/1903.02445">arXiv:1903.02445</a>). They show that for a graph-theoretic model of the <a href="https://en.wikipedia.org/wiki/Snake_(video_game_genre)">Snake video game</a>, getting the snake from one position to another is fixed-parameter tractable in the length of the snake. For this problem, snakes are again paths in graphs, but they can move only in one direction, and the techniques they use to prove fixed-parameter tractability involve sparsifying the state space instead of maneuvering into long paths. <a href="https://11011110.github.io/blog/2018/08/06/congratulations-dr-gupta.html">Sid Gupta was my student</a> at UCI before taking his current postdoc in Israel, but I haven’t talked to him about this, so I think their work must be independent and its appearance at about the same time a coincidence.</p>
-
-<div class="footnotes">
-  <ol>
-    <li id="fn:fn">
-      <p>Searching on tineye finds that this image was on Amazon in 2008. Presumably it was supplied to them by Brio? <a class="reversefootnote" href="https://11011110.github.io/blog/2019/05/02/playing-model-trains.html#fnref:fn">↩</a></p>
-    </li>
-  </ol>
-</div>
-
-<p>(<a href="https://mathstodon.xyz/@11011110/102029697142872437">Discuss on Mastodon</a>)</p></div>
-    </content>
-    <updated>2019-05-02T19:03:00Z</updated>
-    <published>2019-05-02T19:03:00Z</published>
-    <author>
-      <name>David Eppstein</name>
-    </author>
-    <source>
-      <id>https://11011110.github.io/blog/feed.xml</id>
-      <author>
-        <name>David Eppstein</name>
-      </author>
-      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
-      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
-      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
-      <title>11011110</title>
-      <updated>2019-05-04T16:39:59Z</updated>
+      <updated>2019-05-10T13:20:46Z</updated>
     </source>
   </entry>
 </feed>
