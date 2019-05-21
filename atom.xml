@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-05-21T01:41:11Z</updated>
+  <updated>2019-05-21T02:22:36Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,206 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://lucatrevisan.wordpress.com/?p=4249</id>
+    <link href="https://lucatrevisan.wordpress.com/2019/05/20/online-optimization-post-5-bregman-projections-and-mirror-descent/" rel="alternate" type="text/html"/>
+    <title>Online Optimization Post 5: Bregman Projections and Mirror Descent</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">In this post we return to the generic form of the FTRL online optimization algorithm. If the cost functions are linear, as they will be in all the applications that I plan to talk about, the algorithm is: where is … <a href="https://lucatrevisan.wordpress.com/2019/05/20/online-optimization-post-5-bregman-projections-and-mirror-descent/">Continue reading <span class="meta-nav">→</span></a></div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>
+ In this post we return to the generic form of the FTRL online optimization algorithm. If the cost functions are linear, as they will be in all the applications that I plan to talk about, the algorithm is:</p>
+<p>
+<a name="eq.ftrl.def"/></p><a name="eq.ftrl.def">
+<p align="center"><img alt="\displaystyle   x_t := \arg\min_{x\in K} \ R(x) + \sum_{k=1}^{t-1} \langle \ell_k, x \rangle \ \ \ \ \ (1)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+++x_t+%3A%3D+%5Carg%5Cmin_%7Bx%5Cin+K%7D+%5C+R%28x%29+%2B+%5Csum_%7Bk%3D1%7D%5E%7Bt-1%7D+%5Clangle+%5Cell_k%2C+x+%5Crangle+%5C+%5C+%5C+%5C+%5C+%281%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle   x_t := \arg\min_{x\in K} \ R(x) + \sum_{k=1}^{t-1} \langle \ell_k, x \rangle \ \ \ \ \ (1)"/></p>
+</a><p><a name="eq.ftrl.def"/> where <img alt="{K\subseteq {\mathbb R}^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%5Csubseteq+%7B%5Cmathbb+R%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K\subseteq {\mathbb R}^n}"/> is the convex set of feasible solutions that the algorithm is allowed to produce, <img alt="{x \rightarrow \langle \ell_k , x \rangle}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx+%5Crightarrow+%5Clangle+%5Cell_k+%2C+x+%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x \rightarrow \langle \ell_k , x \rangle}"/> is the linear loss function at time <img alt="{k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{k}"/>, and <img alt="{R: K \rightarrow {\mathbb R}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%3A+K+%5Crightarrow+%7B%5Cmathbb+R%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R: K \rightarrow {\mathbb R}}"/> is the strictly convex regularizer.</p>
+<p>
+If we have an unconstrained problem, that is, if <img alt="{K= {\mathbb R}^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%3D+%7B%5Cmathbb+R%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K= {\mathbb R}^n}"/>, then the optimization problem <a href="https://lucatrevisan.wordpress.com/feed/#eq.ftrl.def">(1)</a> has a unique solution: the <img alt="{x_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_t}"/> such that </p>
+<p align="center"><img alt="\displaystyle  \nabla R(x_t) = - \sum_{k=1}^{t-1} \ell_k " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cnabla+R%28x_t%29+%3D+-+%5Csum_%7Bk%3D1%7D%5E%7Bt-1%7D+%5Cell_k+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \nabla R(x_t) = - \sum_{k=1}^{t-1} \ell_k "/></p>
+<p> and we can usually both compute <img alt="{x_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_t}"/> efficiently in an algorithm and reason about <img alt="{x_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_t}"/> effectively in an analysis.</p>
+<p>
+Unfortunately, we are almost always interested in constrained settings, and then it becomes difficult both to compute <img alt="{x_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_t}"/> and to reason about it.</p>
+<p>
+A very nice special case happens when the regularizer <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> acts as a <em>barrier function</em> for <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/>, that is, the (norm of the) gradient of <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> goes to infinity when one approaches the boundary of <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/>. In such a case, it is impossible for the minimum of <a href="https://lucatrevisan.wordpress.com/feed/#eq.ftrl.def">(1)</a> to occur at the boundary and the solution will be again the unique <img alt="{x_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_t}"/> in <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/> such that </p>
+<p align="center"><img alt="\displaystyle  \nabla R(x_t) = - \sum_{k=1}^{t-1} \ell_k " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cnabla+R%28x_t%29+%3D+-+%5Csum_%7Bk%3D1%7D%5E%7Bt-1%7D+%5Cell_k+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \nabla R(x_t) = - \sum_{k=1}^{t-1} \ell_k "/></p>
+<p>
+We swept this point under the rug when we studied FTRL with negative-entropy regularizer in the settings of experts, in which <img alt="{K = \Delta}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK+%3D+%5CDelta%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K = \Delta}"/> is the set of probability distributions. When we proceeded to solve <a href="https://lucatrevisan.wordpress.com/feed/#eq.ftrl.def">(1)</a> using Lagrange multipliers, we ignored the non-negativity constraints. The reason why it was ok to do so was that the negative-entropy is a barrier function for the non-negative orthant <img alt="{({\mathbb R}_{\geq 0})^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28%7B%5Cmathbb+R%7D_%7B%5Cgeq+0%7D%29%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{({\mathbb R}_{\geq 0})^n}"/>.</p>
+<p>
+Another important special case occurs when the regularizer <img alt="{R(x) = c || x||^2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%28x%29+%3D+c+%7C%7C+x%7C%7C%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R(x) = c || x||^2}"/> is a multiple of length-squared. In this case, we saw that we could “decouple” the optimization problem by first solving the unconstrained optimization problem, and then projecting the solution of the unconstrained problem to <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/>:</p>
+<p/><p align="center"><img alt="\displaystyle y_{t} = \arg\min_{y\in {\mathbb R}^n} \ c || y||^2 + \sum_{k=1}^{t-1} \langle \ell_k, y \rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+y_%7Bt%7D+%3D+%5Carg%5Cmin_%7By%5Cin+%7B%5Cmathbb+R%7D%5En%7D+%5C+c+%7C%7C+y%7C%7C%5E2+%2B+%5Csum_%7Bk%3D1%7D%5E%7Bt-1%7D+%5Clangle+%5Cell_k%2C+y+%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle y_{t} = \arg\min_{y\in {\mathbb R}^n} \ c || y||^2 + \sum_{k=1}^{t-1} \langle \ell_k, y \rangle "/></p>
+<p align="center"><img alt="\displaystyle  x_t = \Pi_K (y_t) = \arg\min _{x\in K} || x - y_t || " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++x_t+%3D+%5CPi_K+%28y_t%29+%3D+%5Carg%5Cmin+_%7Bx%5Cin+K%7D+%7C%7C+x+-+y_t+%7C%7C+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  x_t = \Pi_K (y_t) = \arg\min _{x\in K} || x - y_t || "/></p>
+<p> Then we have the closed-form solution <img alt="{y_t = - \frac 1{2c} \sum_{k=1}^{t-1} \ell _k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By_t+%3D+-+%5Cfrac+1%7B2c%7D+%5Csum_%7Bk%3D1%7D%5E%7Bt-1%7D+%5Cell+_k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y_t = - \frac 1{2c} \sum_{k=1}^{t-1} \ell _k}"/> and, depending on the set <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/>, the projection might also have a nice closed-form, as in the case <img alt="{K= [0,1]^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%3D+%5B0%2C1%5D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K= [0,1]^n}"/> that comes up in results related to regularity lemmas.</p>
+<p>
+As we will see today, this approach of solving the unconstrained problem and then projecting on <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/> works for every regularizer, for an appropriate notion of projection called the <em>Bregman projection</em> (the projection will depend on the regularizer). </p>
+<p>
+To define the Bregman projection, we will first define the <em>Bregman divergence</em> with respect to the regularizer <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/>, which is a non-negative “distance” <img alt="{D(x,y)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD%28x%2Cy%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D(x,y)}"/> defined on <img alt="{{\mathbb R}^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb+R%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{{\mathbb R}^n}"/> (or possibly a subset of <img alt="{{\mathbb R}^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb+R%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{{\mathbb R}^n}"/> for which the regularizer <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> is a barrier function). Then, the Bregman projection of <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> on <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/> is defined as <img alt="{\arg\min_{x\in K} \ D(x,y)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Carg%5Cmin_%7Bx%5Cin+K%7D+%5C+D%28x%2Cy%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\arg\min_{x\in K} \ D(x,y)}"/>.</p>
+<p>
+Unfortunately, it is not so easy to reason about Bregman projections either, but the notion of Bregman divergence offers a way to reinterpret the FTRL algorithm from another point of view, called <em>mirror descent</em>. Via this reinterpretation, we will prove the regret bound </p>
+<p align="center"><img alt="\displaystyle  {\rm Regret}_T(x) \leq D(x,x_1) + \sum_{t=1}^T D(x_t,y_{t+1}) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7B%5Crm+Regret%7D_T%28x%29+%5Cleq+D%28x%2Cx_1%29+%2B+%5Csum_%7Bt%3D1%7D%5ET+D%28x_t%2Cy_%7Bt%2B1%7D%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  {\rm Regret}_T(x) \leq D(x,x_1) + \sum_{t=1}^T D(x_t,y_{t+1}) "/></p>
+<p> which carries the intuition that the regret comes from a combination of the “distance” of our initial solution from the offline optimum and of the “stability” of the algorithm, that is, the “distance” between consecutive soltuions. Nicely, the above bound measures both quantities using the same “distance” function.</p>
+<p>
+<span id="more-4249"/> </p>
+<p>
+</p><p><b>1. Bregman Divergence and Bregman Projection </b></p>
+<p/><p>
+For a strictly convex function <img alt="{R: {\mathbb R}^n \rightarrow {\mathbb R}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%3A+%7B%5Cmathbb+R%7D%5En+%5Crightarrow+%7B%5Cmathbb+R%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R: {\mathbb R}^n \rightarrow {\mathbb R}}"/>, we define the <em>Bregman divergence</em> associated to <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> as </p>
+<p/><p align="center"><img alt="\displaystyle  D_R(x,y) := R(x) - R(y) - \langle \nabla R(y), x-y \rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++D_R%28x%2Cy%29+%3A%3D+R%28x%29+-+R%28y%29+-+%5Clangle+%5Cnabla+R%28y%29%2C+x-y+%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  D_R(x,y) := R(x) - R(y) - \langle \nabla R(y), x-y \rangle "/></p>
+<p> that is, the difference between the value of <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> at <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> and the value of the linear approximation of <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> at <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> (centered at <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/>). By the strict convexity of <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> we have <img alt="{D_R(x,y) \geq 0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD_R%28x%2Cy%29+%5Cgeq+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D_R(x,y) \geq 0}"/> and <img alt="{D_R(x,y) = 0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD_R%28x%2Cy%29+%3D+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D_R(x,y) = 0}"/> iff <img alt="{x=y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%3Dy%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x=y}"/>. These properties suggest that we may think of <img alt="{D_R(x,y)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD_R%28x%2Cy%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D_R(x,y)}"/> as a kind of “distance” between <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> and <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/>, which is a useful intuition although it is important to keep in mind that the divergence need not be symmetric and need not satisfy the triangle inequality.</p>
+<p>
+Now we show that, assuming that <img alt="{R(\cdot)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%28%5Ccdot%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R(\cdot)}"/> is well defined and strictly convex on all <img alt="{{\mathbb R}^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb+R%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{{\mathbb R}^n}"/>, and that the losses are linear, the constrained optimization problem <a href="https://lucatrevisan.wordpress.com/feed/#eq.ftrl.def">(1)</a> can be solved by first solving the unconstrained problem and then “projecting” the solution on <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/> by finding the point in <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/> of smallest Bregman divergence from the unconstrained optimum:</p>
+<p/><p align="center"><img alt="\displaystyle  y_t = \arg\min _{y\in {\mathbb R}^n} \ R(y) + \sum_{k=1}^{t-1} \langle \ell_k , y \rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++y_t+%3D+%5Carg%5Cmin+_%7By%5Cin+%7B%5Cmathbb+R%7D%5En%7D+%5C+R%28y%29+%2B+%5Csum_%7Bk%3D1%7D%5E%7Bt-1%7D+%5Clangle+%5Cell_k+%2C+y+%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  y_t = \arg\min _{y\in {\mathbb R}^n} \ R(y) + \sum_{k=1}^{t-1} \langle \ell_k , y \rangle "/></p>
+<p align="center"><img alt="\displaystyle  x_t = \arg\min_{x \in K} \ D_R(x,y_t) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++x_t+%3D+%5Carg%5Cmin_%7Bx+%5Cin+K%7D+%5C+D_R%28x%2Cy_t%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  x_t = \arg\min_{x \in K} \ D_R(x,y_t) "/></p>
+<p> The proof is very simple. The optimum of the unconstrained optimization problem is the unique <img alt="{y_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y_t}"/> such that</p>
+<p/><p align="center"><img alt="\displaystyle  \nabla \left( R(y_t) + \sum_{k=1}^{t-1} \ell_k \right) = 0 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cnabla+%5Cleft%28+R%28y_t%29+%2B+%5Csum_%7Bk%3D1%7D%5E%7Bt-1%7D+%5Cell_k+%5Cright%29+%3D+0+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \nabla \left( R(y_t) + \sum_{k=1}^{t-1} \ell_k \right) = 0 "/></p>
+<p> that is, the unique <img alt="{y_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y_t}"/> such that </p>
+<p align="center"><img alt="\displaystyle  \nabla R(y_t) = - \sum_{k=1}^{t-1} \ell_k " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cnabla+R%28y_t%29+%3D+-+%5Csum_%7Bk%3D1%7D%5E%7Bt-1%7D+%5Cell_k+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \nabla R(y_t) = - \sum_{k=1}^{t-1} \ell_k "/></p>
+<p> On the other hand, <img alt="{x_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_t}"/> is defined as </p>
+<p align="center"><img alt="\displaystyle  x_t = \arg\min_{x \in K} \ D_R(x,y_t) = \arg\min_{x \in K} R(x) - R(y_t) - \langle \nabla R(y_t) , x - y_t \rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++x_t+%3D+%5Carg%5Cmin_%7Bx+%5Cin+K%7D+%5C+D_R%28x%2Cy_t%29+%3D+%5Carg%5Cmin_%7Bx+%5Cin+K%7D+R%28x%29+-+R%28y_t%29+-+%5Clangle+%5Cnabla+R%28y_t%29+%2C+x+-+y_t+%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  x_t = \arg\min_{x \in K} \ D_R(x,y_t) = \arg\min_{x \in K} R(x) - R(y_t) - \langle \nabla R(y_t) , x - y_t \rangle "/></p>
+<p> that is, </p>
+<p align="center"><img alt="\displaystyle  x_t = \arg\min_{x \in K} R(x) - R(y_t) + \langle \sum_{k=1}^{t-1} \ell_k , x - y_t \rangle = \arg\min_{x \in K} R(x) + \langle \sum_{k=1}^{t-1} \ell_k , x \rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++x_t+%3D+%5Carg%5Cmin_%7Bx+%5Cin+K%7D+R%28x%29+-+R%28y_t%29+%2B+%5Clangle+%5Csum_%7Bk%3D1%7D%5E%7Bt-1%7D+%5Cell_k+%2C+x+-+y_t+%5Crangle+%3D+%5Carg%5Cmin_%7Bx+%5Cin+K%7D+R%28x%29+%2B+%5Clangle+%5Csum_%7Bk%3D1%7D%5E%7Bt-1%7D+%5Cell_k+%2C+x+%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  x_t = \arg\min_{x \in K} R(x) - R(y_t) + \langle \sum_{k=1}^{t-1} \ell_k , x - y_t \rangle = \arg\min_{x \in K} R(x) + \langle \sum_{k=1}^{t-1} \ell_k , x \rangle "/></p>
+<p> where the second equality above follows from the fact that two functions that differ by a constant have the same optimal solutions.</p>
+<p>
+Indeed we see that the above “decoupled” characterization of the FTRL algorithm would have worked for any definition of a function of the form</p>
+<p/><p align="center"><img alt="\displaystyle  D(x,y) = R(x) - \langle \nabla R(y), x \rangle + \langle \mbox{ stuff that depends only on } y \rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++D%28x%2Cy%29+%3D+R%28x%29+-+%5Clangle+%5Cnabla+R%28y%29%2C+x+%5Crangle+%2B+%5Clangle+%5Cmbox%7B+stuff+that+depends+only+on+%7D+y+%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  D(x,y) = R(x) - \langle \nabla R(y), x \rangle + \langle \mbox{ stuff that depends only on } y \rangle "/></p>
+<p> and that our particular choice of what “stuff dependent only on <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/>” to add makes <img alt="{D(x,x) = 0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD%28x%2Cx%29+%3D+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D(x,x) = 0}"/> which is reasonable for something that we want to think of as a “distance function.”</p>
+<p>
+Note that, in all of the above, we can replace <img alt="{{\mathbb R}^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb+R%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{{\mathbb R}^n}"/> with a convex set <img alt="{K \subseteq S \subseteq {\mathbb R}^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK+%5Csubseteq+S+%5Csubseteq+%7B%5Cmathbb+R%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K \subseteq S \subseteq {\mathbb R}^n}"/> provided that <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> is a barrier function for <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{S}"/>. In that case</p>
+<p/><p align="center"><img alt="\displaystyle  y_t = \arg\min_{y\in S} R(y) + \sum_k \ell_k " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++y_t+%3D+%5Carg%5Cmin_%7By%5Cin+S%7D+R%28y%29+%2B+%5Csum_k+%5Cell_k+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  y_t = \arg\min_{y\in S} R(y) + \sum_k \ell_k "/></p>
+<p> is the unique <img alt="{y_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y_t}"/> such that </p>
+<p align="center"><img alt="\displaystyle  \nabla R(y_t) = - \sum _k \ell_k " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cnabla+R%28y_t%29+%3D+-+%5Csum+_k+%5Cell_k+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \nabla R(y_t) = - \sum _k \ell_k "/></p>
+<p> and everything else follows analogously.</p>
+<p>
+</p><p><b>2. Examples </b></p>
+<p>
+</p><p><b>  2.1. Bregman Divergence of Length-Squared </b></p>
+<p/><p>
+If <img alt="{R(x) = ||x ||^2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%28x%29+%3D+%7C%7Cx+%7C%7C%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R(x) = ||x ||^2}"/>, then </p>
+<p align="center"><img alt="\displaystyle  D(x,y) = ||x||^2 - ||y||^2 - \langle 2 y , x- y \rangle = ||x - y||^2 \ , " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++D%28x%2Cy%29+%3D+%7C%7Cx%7C%7C%5E2+-+%7C%7Cy%7C%7C%5E2+-+%5Clangle+2+y+%2C+x-+y+%5Crangle+%3D+%7C%7Cx+-+y%7C%7C%5E2+%5C+%2C+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  D(x,y) = ||x||^2 - ||y||^2 - \langle 2 y , x- y \rangle = ||x - y||^2 \ , "/></p>
+<p> so Bregman divergence is distance-squared, and Bregman projection is just (Euclidean) projection.</p>
+<p>
+</p><p><b>  2.2. Bregman Divergence of Negative Entropy </b></p>
+<p/><p>
+If, for <img alt="{x\in ({\mathbb R}_{\geq 0})^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%5Cin+%28%7B%5Cmathbb+R%7D_%7B%5Cgeq+0%7D%29%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x\in ({\mathbb R}_{\geq 0})^n}"/>, we define</p>
+<p/><p align="center"><img alt="\displaystyle  R(x) = \sum_{i=1}^n x_i \ln x_i " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++R%28x%29+%3D+%5Csum_%7Bi%3D1%7D%5En+x_i+%5Cln+x_i+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  R(x) = \sum_{i=1}^n x_i \ln x_i "/></p>
+<p> then the associated Bregman divergence is the generalized <em>KL divergence.</em></p>
+<p/><p align="center"><img alt="\displaystyle  D(x,y) = \sum_{i=1}^n x_i \ln {x_i} \ - \sum_i y_i \ln y_i \ - \langle \nabla R(y), x-y \rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++D%28x%2Cy%29+%3D+%5Csum_%7Bi%3D1%7D%5En+x_i+%5Cln+%7Bx_i%7D+%5C+-+%5Csum_i+y_i+%5Cln+y_i+%5C+-+%5Clangle+%5Cnabla+R%28y%29%2C+x-y+%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  D(x,y) = \sum_{i=1}^n x_i \ln {x_i} \ - \sum_i y_i \ln y_i \ - \langle \nabla R(y), x-y \rangle "/></p>
+<p> where <img alt="{(\nabla R(y))_i = 1 + \ln y_i}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28%5Cnabla+R%28y%29%29_i+%3D+1+%2B+%5Cln+y_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{(\nabla R(y))_i = 1 + \ln y_i}"/> so that </p>
+<p align="center"><img alt="\displaystyle D(x,y) = \sum_{i=1}^n x_i \ln x_i \ - \sum_i y_i \ln y_i \ - \sum_i x_i \ln y_i \ + \sum_i y_i \ln y_i \ - \sum_i x_i + \sum_i y_i " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+D%28x%2Cy%29+%3D+%5Csum_%7Bi%3D1%7D%5En+x_i+%5Cln+x_i+%5C+-+%5Csum_i+y_i+%5Cln+y_i+%5C+-+%5Csum_i+x_i+%5Cln+y_i+%5C+%2B+%5Csum_i+y_i+%5Cln+y_i+%5C+-+%5Csum_i+x_i+%2B+%5Csum_i+y_i+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle D(x,y) = \sum_{i=1}^n x_i \ln x_i \ - \sum_i y_i \ln y_i \ - \sum_i x_i \ln y_i \ + \sum_i y_i \ln y_i \ - \sum_i x_i + \sum_i y_i "/></p>
+<p align="center"><img alt="\displaystyle  = \sum_{i=1}^n x_i \ln \frac{x_i} {y_i} \ - \sum_i x_i + \sum_i y_i " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%3D+%5Csum_%7Bi%3D1%7D%5En+x_i+%5Cln+%5Cfrac%7Bx_i%7D+%7By_i%7D+%5C+-+%5Csum_i+x_i+%2B+%5Csum_i+y_i+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  = \sum_{i=1}^n x_i \ln \frac{x_i} {y_i} \ - \sum_i x_i + \sum_i y_i "/></p>
+<p>
+Note that, if <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> and <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> are probability distributions, then the final two terms above cancel out, leaving just the KL divergence <img alt="{\sum_i x_i \ln \frac {x_i}{y_i}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Csum_i+x_i+%5Cln+%5Cfrac+%7Bx_i%7D%7By_i%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\sum_i x_i \ln \frac {x_i}{y_i}}"/>.</p>
+<p>
+</p><p><b>3. Mirror Descent </b></p>
+<p/><p>
+We now introduce a new perspective on FTRL.</p>
+<p>
+In the unconstrained setting, if <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> is a strictly convex function and <img alt="{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D}"/> is the associated Bregman divergence, the <em>mirror descent</em> algorithm for online optimization has the update rule</p>
+<p/><p align="center"><img alt="\displaystyle  x_t = \arg\min_{x\in {\mathbb R}^n} D(x,x_{t-1}) + \langle \ell_{t-1}, x \rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++x_t+%3D+%5Carg%5Cmin_%7Bx%5Cin+%7B%5Cmathbb+R%7D%5En%7D+D%28x%2Cx_%7Bt-1%7D%29+%2B+%5Clangle+%5Cell_%7Bt-1%7D%2C+x+%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  x_t = \arg\min_{x\in {\mathbb R}^n} D(x,x_{t-1}) + \langle \ell_{t-1}, x \rangle "/></p>
+<p> The idea is that we want to find a solution that is good for the past loss functions, but that does not “overfit” too much. If, in past steps, <img alt="{x_{t-1}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_%7Bt-1%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_{t-1}}"/> had been chosen to be such a solution for the loss functions <img alt="{\ell_1,\ldots,\ell_{t-2}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cell_1%2C%5Cldots%2C%5Cell_%7Bt-2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\ell_1,\ldots,\ell_{t-2}}"/>, then, in choosing <img alt="{x_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_t}"/>, we want to balance staying close to <img alt="{x_{t-1}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_%7Bt-1%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_{t-1}}"/> but also doing well with respect to <img alt="{\ell_{t-1}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cell_%7Bt-1%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\ell_{t-1}}"/>, hence the above definition.</p>
+<blockquote><p><b>Theorem 1</b> <em> Initialized with <img alt="{x_1 = \arg\min_{x\in {\mathbb R}^n} R(x)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_1+%3D+%5Carg%5Cmin_%7Bx%5Cin+%7B%5Cmathbb+R%7D%5En%7D+R%28x%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_1 = \arg\min_{x\in {\mathbb R}^n} R(x)}"/>, the unconstrained mirror descent algorithm is identical to FTRL with regularizer <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/>. </em></p></blockquote>
+<p/><p>
+<em>Proof:</em>  We will proceed by induction on <img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t}"/>. At <img alt="{t=1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%3D1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t=1}"/>, the definition of <img alt="{x_1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_1}"/> is the same. For larger <img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t}"/>, we know that FTRL will choose the unique <img alt="{x_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_t}"/> such that <img alt="{\nabla R(x_t) = - \sum_{k=1}^{t-1} \ell_k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cnabla+R%28x_t%29+%3D+-+%5Csum_%7Bk%3D1%7D%5E%7Bt-1%7D+%5Cell_k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\nabla R(x_t) = - \sum_{k=1}^{t-1} \ell_k}"/>, so we will assume that this is true for the mirror descent algorithm for <img alt="{x_{t-1}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_%7Bt-1%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_{t-1}}"/> and prove it for <img alt="{x_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_t}"/>. </p>
+<p>
+First, we note that the function <img alt="{x \rightarrow D(x,x_{t-1}) + \langle \ell_{t-1} , x \rangle}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx+%5Crightarrow+D%28x%2Cx_%7Bt-1%7D%29+%2B+%5Clangle+%5Cell_%7Bt-1%7D+%2C+x+%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x \rightarrow D(x,x_{t-1}) + \langle \ell_{t-1} , x \rangle}"/> is strictly convex, because it equals </p>
+<p align="center"><img alt="\displaystyle  R(x) - R(x_{t-1}) - \langle \nabla R(x_{t-1}), x - x_t \rangle + \langle \ell_{t-1} , x \rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++R%28x%29+-+R%28x_%7Bt-1%7D%29+-+%5Clangle+%5Cnabla+R%28x_%7Bt-1%7D%29%2C+x+-+x_t+%5Crangle+%2B+%5Clangle+%5Cell_%7Bt-1%7D+%2C+x+%5Crangle&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  R(x) - R(x_{t-1}) - \langle \nabla R(x_{t-1}), x - x_t \rangle + \langle \ell_{t-1} , x \rangle"/></p>
+<p> and so it is a sum of a strictly convex function <img alt="{R(x)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%28x%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R(x)}"/>, linear functions in <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/>, and constants independent of <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/>. This means that <img alt="{x_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_t}"/> is the unique point at which the gradient of the above function is zero, that is, </p>
+<p align="center"><img alt="\displaystyle  \nabla R(x_t) - \nabla R(x_{t-1}) + \ell_{t-1} = 0 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cnabla+R%28x_t%29+-+%5Cnabla+R%28x_%7Bt-1%7D%29+%2B+%5Cell_%7Bt-1%7D+%3D+0+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \nabla R(x_t) - \nabla R(x_{t-1}) + \ell_{t-1} = 0 "/></p>
+<p> and so </p>
+<p align="center"><img alt="\displaystyle  \nabla R(x_t) = \nabla R(x_{t-1}) - \ell_{t-1} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cnabla+R%28x_t%29+%3D+%5Cnabla+R%28x_%7Bt-1%7D%29+-+%5Cell_%7Bt-1%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \nabla R(x_t) = \nabla R(x_{t-1}) - \ell_{t-1} "/></p>
+<p> and, using the inductive hypothesis, we have </p>
+<p align="center"><img alt="\displaystyle  \nabla R(x_t) = - \sum_{k=1}^{t-1} \ell_k " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cnabla+R%28x_t%29+%3D+-+%5Csum_%7Bk%3D1%7D%5E%7Bt-1%7D+%5Cell_k+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \nabla R(x_t) = - \sum_{k=1}^{t-1} \ell_k "/></p>
+<p> as desired. <img alt="\Box" class="latex" src="https://s0.wp.com/latex.php?latex=%5CBox&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\Box"/></p>
+<p>
+In the constrained case, there are two variants of mirror descent. Using the terminology from Elad Hazan’s survey, <em>agile</em> mirror descent is the natural generalization of the unconstrained algorithm:</p>
+<p/><p align="center"><img alt="\displaystyle  x_t = \arg\min_{x\in K} \ D(x,x_{t-1}) + \langle \ell_{t-1}, x \rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++x_t+%3D+%5Carg%5Cmin_%7Bx%5Cin+K%7D+%5C+D%28x%2Cx_%7Bt-1%7D%29+%2B+%5Clangle+%5Cell_%7Bt-1%7D%2C+x+%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  x_t = \arg\min_{x\in K} \ D(x,x_{t-1}) + \langle \ell_{t-1}, x \rangle "/></p>
+<p> Following the same steps as the proof in the previous section, it is possible to show that agile mirror descent is equivalent to solving, at each iteration, the “decoupled” optimization problems</p>
+<p/><p align="center"><img alt="\displaystyle  y_t = \arg\min_{y\in {\mathbb R}^n} D(y,x_{t-1}) + \langle \ell_{t-1}, y \rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++y_t+%3D+%5Carg%5Cmin_%7By%5Cin+%7B%5Cmathbb+R%7D%5En%7D+D%28y%2Cx_%7Bt-1%7D%29+%2B+%5Clangle+%5Cell_%7Bt-1%7D%2C+y+%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  y_t = \arg\min_{y\in {\mathbb R}^n} D(y,x_{t-1}) + \langle \ell_{t-1}, y \rangle "/></p>
+<p align="center"><img alt="\displaystyle  x_t = \arg\min_{x\in K} D(x,y_t) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++x_t+%3D+%5Carg%5Cmin_%7Bx%5Cin+K%7D+D%28x%2Cy_t%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  x_t = \arg\min_{x\in K} D(x,y_t) "/></p>
+<p> That is, we can first solve the unconstrained problem and then project on <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/>. (Again, we can always replace <img alt="{{\mathbb R}^n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb+R%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{{\mathbb R}^n}"/> by a set <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{S}"/> for which <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> is a barrier function and such that <img alt="{K \subseteq S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK+%5Csubseteq+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K \subseteq S}"/>.)</p>
+<p>
+The <em>lazy</em> mirror descent algorithm has the update rule </p>
+<p align="center"><img alt="\displaystyle  y_t = \arg\min_{x\in {\mathbb R}^n} D(y,y_{t-1}) + \langle \ell_{t-1}, y \rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++y_t+%3D+%5Carg%5Cmin_%7Bx%5Cin+%7B%5Cmathbb+R%7D%5En%7D+D%28y%2Cy_%7Bt-1%7D%29+%2B+%5Clangle+%5Cell_%7Bt-1%7D%2C+y+%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  y_t = \arg\min_{x\in {\mathbb R}^n} D(y,y_{t-1}) + \langle \ell_{t-1}, y \rangle "/></p>
+<p align="center"><img alt="\displaystyle  x_t = \arg\min_{x\in K} D(x,y_t) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++x_t+%3D+%5Carg%5Cmin_%7Bx%5Cin+K%7D+D%28x%2Cy_t%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  x_t = \arg\min_{x\in K} D(x,y_t) "/></p>
+<p> The initialization is </p>
+<p align="center"><img alt="\displaystyle  y_1 = \arg\min_{x\in {\mathbb R}^n} \ R(x) \ \ \ x_1 = \arg\min_{x\in K} R(x)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++y_1+%3D+%5Carg%5Cmin_%7Bx%5Cin+%7B%5Cmathbb+R%7D%5En%7D+%5C+R%28x%29+%5C+%5C+%5C+x_1+%3D+%5Carg%5Cmin_%7Bx%5Cin+K%7D+R%28x%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  y_1 = \arg\min_{x\in {\mathbb R}^n} \ R(x) \ \ \ x_1 = \arg\min_{x\in K} R(x)"/></p>
+<blockquote><p><b>Fact 2</b> <em> Lazy mirror descent is equivalent to FTRL. </em></p></blockquote>
+<p/><p>
+<em>Proof:</em>  The solutions <img alt="{y_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y_t}"/> are the unconstrained optimum of FTRL, and <img alt="{x_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x_t}"/> is the Bregman projection of <img alt="{y_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y_t}"/> on <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/>. We proved in the previous section that this characterizes constrained FTRL. <img alt="\Box" class="latex" src="https://s0.wp.com/latex.php?latex=%5CBox&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\Box"/></p>
+<p>
+What about agile mirror descent? In certain special cases it is equivalent to lazy mirror descent, and hence to FTRL, but it usually leads to a different set of solutions. </p>
+<p>
+We will provide an analysis of lazy mirror descent, but first we will give an analysis of the regret of unconstrained FTRL in terms of Bregman divergence, which will be the model on which we will build the proof for the constrained case.</p>
+<p>
+</p><p><b>4. A Regret Bound for FTRL in Terms of Bregman Divergence </b></p>
+<p/><p>
+In this section we prove the following regret bound.</p>
+<blockquote><p><b>Theorem 3</b> <em> Unconstrained FTRL with regularizer <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> satisfies the regret bound </em></p><em>
+<p align="center"><img alt="\displaystyle  {\rm Regret}_T(x) \leq D(x,x_1) + \sum_{t=1}^T D(x_t,x_{t+1}) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7B%5Crm+Regret%7D_T%28x%29+%5Cleq+D%28x%2Cx_1%29+%2B+%5Csum_%7Bt%3D1%7D%5ET+D%28x_t%2Cx_%7Bt%2B1%7D%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  {\rm Regret}_T(x) \leq D(x,x_1) + \sum_{t=1}^T D(x_t,x_{t+1}) "/></p>
+</em><p><em> where <img alt="{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D}"/> is the Bregman divergence associated with <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/>. </em></p></blockquote>
+<p/><p>
+We will take the mirror descent view of unconstrained FTRL, so that</p>
+<p/><p align="center"><img alt="\displaystyle  x_1 = \arg\min_{x\in {\mathbb R}^n} \ R(x) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++x_1+%3D+%5Carg%5Cmin_%7Bx%5Cin+%7B%5Cmathbb+R%7D%5En%7D+%5C+R%28x%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  x_1 = \arg\min_{x\in {\mathbb R}^n} \ R(x) "/></p>
+<p align="center"><img alt="\displaystyle  x_{t+1} = \arg\min_{x\in {\mathbb R}^n} \ D(x,x_t) + \langle \ell_t , x\rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++x_%7Bt%2B1%7D+%3D+%5Carg%5Cmin_%7Bx%5Cin+%7B%5Cmathbb+R%7D%5En%7D+%5C+D%28x%2Cx_t%29+%2B+%5Clangle+%5Cell_t+%2C+x%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  x_{t+1} = \arg\min_{x\in {\mathbb R}^n} \ D(x,x_t) + \langle \ell_t , x\rangle "/></p>
+<p> We proved that </p>
+<p align="center"><img alt="\displaystyle  \nabla R(x_{t+1} ) = \nabla R(x_t) - \ell_t " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cnabla+R%28x_%7Bt%2B1%7D+%29+%3D+%5Cnabla+R%28x_t%29+-+%5Cell_t+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \nabla R(x_{t+1} ) = \nabla R(x_t) - \ell_t "/></p>
+<p> This means that we can rewrite the regret suffered at step <img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t}"/> with respect to <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> as </p>
+<p align="center"><img alt="\displaystyle  \langle \ell_t , x_t - x \rangle = \langle \nabla R(x_t) - \nabla R(x_{t+1}), x_t - x \rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Clangle+%5Cell_t+%2C+x_t+-+x+%5Crangle+%3D+%5Clangle+%5Cnabla+R%28x_t%29+-+%5Cnabla+R%28x_%7Bt%2B1%7D%29%2C+x_t+-+x+%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \langle \ell_t , x_t - x \rangle = \langle \nabla R(x_t) - \nabla R(x_{t+1}), x_t - x \rangle "/></p>
+<p align="center"><img alt="\displaystyle  = D(x,x_t) - D(x,x_{t+1} ) +D(x_t, x_{t+1}) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%3D+D%28x%2Cx_t%29+-+D%28x%2Cx_%7Bt%2B1%7D+%29+%2BD%28x_t%2C+x_%7Bt%2B1%7D%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  = D(x,x_t) - D(x,x_{t+1} ) +D(x_t, x_{t+1}) "/></p>
+<p> and the theorem follows by adding up the above expression for <img alt="{t=1,\ldots,T}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%3D1%2C%5Cldots%2CT%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t=1,\ldots,T}"/> and recalling that <img alt="{D(x,x_{T+1}) \geq 0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD%28x%2Cx_%7BT%2B1%7D%29+%5Cgeq+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D(x,x_{T+1}) \geq 0}"/>.</p>
+<p>
+Unfortunately I have no geometric intuition about the above identity, although, as you can check yourself, the algebra works neatly.</p>
+<p>
+</p><p><b>5. A Regret Bound for Agile Mirror Descent </b></p>
+<p/><p>
+In this section we prove the following generalization of the regret bound from the previous section.</p>
+<blockquote><p><b>Theorem 4</b> <em> Agile mirror descent satisfies the regret bound </em></p><em>
+<p align="center"><img alt="\displaystyle  {\rm Regret}_T(x) \leq D(x,x_1) + \sum_{t=1}^T D(x_t,y_{t+1}) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7B%5Crm+Regret%7D_T%28x%29+%5Cleq+D%28x%2Cx_1%29+%2B+%5Csum_%7Bt%3D1%7D%5ET+D%28x_t%2Cy_%7Bt%2B1%7D%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  {\rm Regret}_T(x) \leq D(x,x_1) + \sum_{t=1}^T D(x_t,y_{t+1}) "/></p>
+</em><p><em> </em></p></blockquote>
+<p/><p>
+The first part of the update rule of agile mirror descent is </p>
+<p align="center"><img alt="\displaystyle  y_{t+1} = \arg\min_{y\in {\mathbb R}^n} D(y,x_{t}) + \langle \ell_{t}, y \rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++y_%7Bt%2B1%7D+%3D+%5Carg%5Cmin_%7By%5Cin+%7B%5Cmathbb+R%7D%5En%7D+D%28y%2Cx_%7Bt%7D%29+%2B+%5Clangle+%5Cell_%7Bt%7D%2C+y+%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  y_{t+1} = \arg\min_{y\in {\mathbb R}^n} D(y,x_{t}) + \langle \ell_{t}, y \rangle "/></p>
+<p> and, following steps that we have already carried out before, <img alt="{y_{t+1}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By_%7Bt%2B1%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y_{t+1}}"/> satisfies </p>
+<p align="center"><img alt="\displaystyle  \nabla R(y_{t+1} ) = \nabla R(x_t) - \ell_t " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cnabla+R%28y_%7Bt%2B1%7D+%29+%3D+%5Cnabla+R%28x_t%29+-+%5Cell_t+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \nabla R(y_{t+1} ) = \nabla R(x_t) - \ell_t "/></p>
+<p> This means that we can rewrite the regret suffered at step <img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t}"/> with respect to <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> as </p>
+<p align="center"><img alt="\displaystyle  \langle \ell_t , x_t - x \rangle = \langle \nabla R(x_t) - \nabla R(y_{t+1}), x_t - x \rangle " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Clangle+%5Cell_t+%2C+x_t+-+x+%5Crangle+%3D+%5Clangle+%5Cnabla+R%28x_t%29+-+%5Cnabla+R%28y_%7Bt%2B1%7D%29%2C+x_t+-+x+%5Crangle+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \langle \ell_t , x_t - x \rangle = \langle \nabla R(x_t) - \nabla R(y_{t+1}), x_t - x \rangle "/></p>
+<p align="center"><img alt="\displaystyle  = D(x,x_t) - D(x,y_{t+1} ) +D(x_t, y_{t+1}) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%3D+D%28x%2Cx_t%29+-+D%28x%2Cy_%7Bt%2B1%7D+%29+%2BD%28x_t%2C+y_%7Bt%2B1%7D%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  = D(x,x_t) - D(x,y_{t+1} ) +D(x_t, y_{t+1}) "/></p>
+<p> where the same mystery cancellations as before make the above identity true.</p>
+<p>
+Now I will wield another piece of magic, and I will state without proof the following fact about Bregman projections</p>
+<blockquote><p><b>Lemma 5</b> <em> If <img alt="{x\in K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%5Cin+K%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x\in K}"/> and <img alt="{z}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bz%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{z}"/> is the Bregman projection on <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/> of a point <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/>, then </em></p><em>
+<p align="center"><img alt="\displaystyle  D(x,y) \geq D(x,z) + D(z,y) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++D%28x%2Cy%29+%5Cgeq+D%28x%2Cz%29+%2B+D%28z%2Cy%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  D(x,y) \geq D(x,z) + D(z,y) "/></p>
+</em><p><em> </em></p></blockquote>
+<p> That is, if we think of <img alt="{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D}"/> as a “distance,” the distance from <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> to its closest point <img alt="{z}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bz%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{z}"/> in <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{K}"/> plus the distance from <img alt="{z}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bz%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{z}"/> to <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> is at most the distance from <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> to <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/>. Note that this goes in the opposite direction as the triangle inequality (which ok, because <img alt="{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D}"/> typically does not satisfy the triangle inequality).</p>
+<p>
+In particular, the above lemma gives us </p>
+<p align="center"><img alt="\displaystyle  D(x,y_{t+1}) \geq D(x,x_{t+1}) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++D%28x%2Cy_%7Bt%2B1%7D%29+%5Cgeq+D%28x%2Cx_%7Bt%2B1%7D%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  D(x,y_{t+1}) \geq D(x,x_{t+1}) "/></p>
+<p> and so </p>
+<p align="center"><img alt="\displaystyle  \langle \ell_t , x_t - x \rangle \leq D(x,x_t) - D(x,x_{t+1} ) +D(x_t, y_{t+1}) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Clangle+%5Cell_t+%2C+x_t+-+x+%5Crangle+%5Cleq+D%28x%2Cx_t%29+-+D%28x%2Cx_%7Bt%2B1%7D+%29+%2BD%28x_t%2C+y_%7Bt%2B1%7D%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \langle \ell_t , x_t - x \rangle \leq D(x,x_t) - D(x,x_{t+1} ) +D(x_t, y_{t+1}) "/></p>
+<p> Now summing over <img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t}"/> and recalling that <img alt="{D(x,x_{T+1}) \geq 0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BD%28x%2Cx_%7BT%2B1%7D%29+%5Cgeq+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{D(x,x_{T+1}) \geq 0}"/> we have our theorem.</p>
+<p/></div>
+    </content>
+    <updated>2019-05-21T01:42:49Z</updated>
+    <published>2019-05-21T01:42:49Z</published>
+    <category term="theory"/>
+    <category term="Bregman divergence"/>
+    <category term="Bregman projections"/>
+    <category term="mirror descent"/>
+    <category term="online optimization"/>
+    <author>
+      <name>luca</name>
+    </author>
+    <source>
+      <id>https://lucatrevisan.wordpress.com</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://lucatrevisan.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://lucatrevisan.wordpress.com" rel="alternate" type="text/html"/>
+      <link href="https://lucatrevisan.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
+      <title>in   theory</title>
+      <updated>2019-05-21T02:20:30Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>http://arxiv.org/abs/1905.08127</id>
@@ -471,7 +671,7 @@ Email: Jose.Fiadeiro@rhul.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-05-21T01:39:37Z</updated>
+      <updated>2019-05-21T02:21:24Z</updated>
     </source>
   </entry>
 
@@ -598,7 +798,7 @@ Courant was so impressed that ten (or so) years later Courant became Martin's Ph
       <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2019-05-20T14:19:39Z</updated>
+      <updated>2019-05-21T01:53:57Z</updated>
     </source>
   </entry>
 
@@ -823,7 +1023,7 @@ weight that runs in O(m^2(n+m)\log(n+m)) time using O(n) extra space.
     <id>http://lucatrevisan.wordpress.com/?p=4246</id>
     <link href="https://lucatrevisan.wordpress.com/2019/05/18/%e5%8a%a0%e6%b2%b9%e5%8f%b0%e7%81%a3%ef%bc%81/" rel="alternate" type="text/html"/>
     <title>加油台灣！</title>
-    <summary>I would like to congratulate my Taiwanese readers for being in the first Asian country to introduce same-sex marriage. Advertisements</summary>
+    <summary>I would like to congratulate my Taiwanese readers for being in the first Asian country to introduce same-sex marriage.</summary>
     <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><img alt="taiwan" class="alignnone size-full wp-image-4247" src="https://lucatrevisan.files.wordpress.com/2019/05/taiwan.jpg?w=584"/></p>
 <p>I would like to congratulate my Taiwanese readers for being in the first Asian country to introduce same-sex marriage.</p></div>
     </content>
@@ -844,7 +1044,7 @@ weight that runs in O(m^2(n+m)\log(n+m)) time using O(n) extra space.
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-05-21T01:20:18Z</updated>
+      <updated>2019-05-21T02:20:31Z</updated>
     </source>
   </entry>
 
@@ -942,7 +1142,7 @@ Goldmakher writes out a more conventional proof in his paper titled <em>Arnold�
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-05-21T01:39:27Z</updated>
+      <updated>2019-05-21T02:21:22Z</updated>
     </source>
   </entry>
 
@@ -970,7 +1170,7 @@ Somewhat surprisingly, we show that neither the upper bound nor the lower bound 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-21T01:39:18Z</updated>
+      <updated>2019-05-21T02:21:15Z</updated>
     </source>
   </entry>
 
@@ -999,7 +1199,7 @@ As a corollary of the pseudo-random generator, we also prove the first average c
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-21T01:39:18Z</updated>
+      <updated>2019-05-21T02:21:15Z</updated>
     </source>
   </entry>
 
@@ -1161,7 +1361,7 @@ The undesirable features of this result are that the complexity of sampling and 
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-05-21T01:20:18Z</updated>
+      <updated>2019-05-21T02:20:30Z</updated>
     </source>
   </entry>
 
@@ -1206,7 +1406,7 @@ One of these papers that didn't go far because we didn't have great applications
       <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2019-05-20T14:19:39Z</updated>
+      <updated>2019-05-21T01:53:57Z</updated>
     </source>
   </entry>
 
@@ -1305,7 +1505,7 @@ Email: suhx@bc.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-05-21T01:39:36Z</updated>
+      <updated>2019-05-21T02:21:24Z</updated>
     </source>
   </entry>
 
@@ -1371,7 +1571,7 @@ Assume that $k,l, r$ are such that any submatrix of $M$ of at least $2^{-k} \cdo
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-21T01:39:18Z</updated>
+      <updated>2019-05-21T02:21:15Z</updated>
     </source>
   </entry>
 
@@ -1472,7 +1672,7 @@ Do you know of any other inappropriate comments of this kind?</p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-05-21T01:39:28Z</updated>
+      <updated>2019-05-21T02:21:22Z</updated>
     </source>
   </entry>
 
@@ -1502,7 +1702,7 @@ We apply the above results to show a separation between locally testable codes i
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-21T01:39:18Z</updated>
+      <updated>2019-05-21T02:21:15Z</updated>
     </source>
   </entry>
 
@@ -1536,7 +1736,7 @@ We apply the above results to show a separation between locally testable codes i
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2019-05-21T01:40:21Z</updated>
+      <updated>2019-05-21T02:22:04Z</updated>
     </source>
   </entry>
 
@@ -1609,7 +1809,7 @@ These numbers seem small today since we have modern computers that can store and
       <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2019-05-20T14:19:39Z</updated>
+      <updated>2019-05-21T01:53:57Z</updated>
     </source>
   </entry>
 
@@ -1675,7 +1875,7 @@ Through this result we settle the question posed by M. Alekhnovich and A. Razbor
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-21T01:39:18Z</updated>
+      <updated>2019-05-21T02:21:15Z</updated>
     </source>
   </entry>
 
@@ -1806,7 +2006,7 @@ Can we elections be trusted? Can we formalize the connection between election an
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-05-21T01:39:29Z</updated>
+      <updated>2019-05-21T02:21:22Z</updated>
     </source>
   </entry>
 
@@ -1859,7 +2059,7 @@ Can we elections be trusted? Can we formalize the connection between election an
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-05-21T01:39:23Z</updated>
+      <updated>2019-05-21T02:21:18Z</updated>
     </source>
   </entry>
 
@@ -1886,7 +2086,7 @@ Email: alc@es.aau.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-05-21T01:39:34Z</updated>
+      <updated>2019-05-21T02:21:24Z</updated>
     </source>
   </entry>
 
@@ -1911,7 +2111,7 @@ Email: alc@es.aau.dk</p></div>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-05-21T01:40:46Z</updated>
+      <updated>2019-05-21T02:22:18Z</updated>
     </source>
   </entry>
 
@@ -1935,69 +2135,7 @@ We then propose the model of $a$-irregular resolution. Extended from regular res
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-21T01:39:18Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-3722233.post-722419176401069744</id>
-    <link href="https://blog.computationalcomplexity.org/feeds/722419176401069744/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2019/05/multiple-provers.html#comment-form" rel="replies" type="text/html"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/722419176401069744" rel="edit" type="application/atom+xml"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/722419176401069744" rel="self" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2019/05/multiple-provers.html" rel="alternate" type="text/html"/>
-    <title>Multiple Provers</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Just over thirty years ago on May 5, 1989, I defended my PhD Thesis <a href="https://lance.fortnow.com/papers/files/thesis.pdf">Complexity-Theoretic Aspects of Interactive Proof Systems</a>. It's starts off with a parable for interactive proof systems.<br/>
-<blockquote class="tr_bq">
-Victor, a venture capitalist, had everything a man could desire: money, women and power.
-But he felt something missing. He decided he lacked knowledge. So Victor packed up his
-bags and headed to the Himalayas in search of ultimate truths.
-The natives pointed Victor to a tall mountain and mentioned rumors of a great man full of
-wisdom. Victor, who smartly brought some climbing equipment, tackled the mountain until
-he reached a small cave near the summit. Victor found the great Pulu, grand guru of all that
-is known. Victor inquired to some ultimate truths and Pulu responded,
-<i>I will teach you but you must not trust my words</i>.
-Victor agreed and found he learned much even though he had to verify all the sayings
-of the great Pulu. Victor though lacked complete happiness and he asked if he could learn
-knowledge beyond what he could learn in this manner. The grand guru replied,
-<i>You may ask and I will answer</i>.
-Victor pondered this idea for a minute and said, "Since you know all that is known, why can you not predict my questions?" A silence reigned over the mountain for a short while until the guru  finally spoke,
-<i>You must use other implements, symbols of your past life</i>.
-Victor thought for a while and reached into his backpack and brought out some spare
-change he had unwittingly carried with him. Even the great Pulu can not predict the flip of
-a coin. He started flipping the coins to ask the guru and wondered what can I learn now?</blockquote>
-Without the coins, one gets the complexity class NP. My thesis didn't answer the last question, but by the end of the year, <a href="https://doi.org/10.1109/FSCS.1990.89519">Shamir</a> building on work of <a href="https://doi.org/10.1145/146585.146605">Lund, Fortnow, Karloff and Nisan</a> showed this class IP was equal to PSPACE, the problems we could solve in a polynomial amount of memory.<br/>
-<br/>
-Part of my thesis explored the class MIP where we had multiple Pulus (provers) on different mountain tops unable to communicate. The news was disappointing, we failed to get a PSPACE upper bound for MIP, only NEXP (nondeterministic exponential time) and our proof that two provers sufficed relied on a bad assumption on how errors get reduced when you run multiple protocols in parallel. Later Babai, Lund and myself showed <a href="http://doi.org/10.1007/BF01200056">MIP = NEXP</a> and Ran Raz <a href="https://doi.org/10.1137/S0097539795280895">showed</a> parallel repetition does reduce the error sufficiently.<br/>
-<br/>
-Back in the 80's we didn't even imagine the possibility that the Pulus had shared entangled quantum bits. Does the entanglement allow the provers to cheat or can the entanglement allow them to prove more things? Turns out to be much more, as a <a href="https://arxiv.org/abs/1904.05870">new result</a> by Anand Natarajan and John Wright shows that MIP*, MIP with classical communication, classical verifier and two provers with previously entangled quantum bits, can compute everything in NEEXP, nondeterministic double exponential time. This is only a lower bound for MIP*, possibly one can do even more.<br/>
-<br/>
-Neat to see my three-decade old thesis explored ideas that people are still thinking about today.</div>
-    </content>
-    <updated>2019-05-09T12:31:00Z</updated>
-    <published>2019-05-09T12:31:00Z</published>
-    <author>
-      <name>Lance Fortnow</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-3722233</id>
-      <category term="typecast"/>
-      <category term="focs metacomments"/>
-      <author>
-        <name>Lance Fortnow</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-      </author>
-      <link href="https://blog.computationalcomplexity.org/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default" rel="self" type="application/atom+xml"/>
-      <link href="https://blog.computationalcomplexity.org/" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
-      <title>Computational Complexity</title>
-      <updated>2019-05-20T14:19:39Z</updated>
+      <updated>2019-05-21T02:21:15Z</updated>
     </source>
   </entry>
 </feed>
