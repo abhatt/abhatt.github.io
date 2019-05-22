@@ -210,10 +210,10 @@ Stay up to date
 <a href="http://arxiv.org/" title="cs.CC updates on arXiv.org">arXiv.org: Computational complexity</a>
 <br>
 <a class="feedlink" href="http://export.arxiv.org/rss/cs.CG" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
-<a href="http://arxiv.org/" title="cs.CG updates on arXiv.org">arXiv.org: Computational geometry</a>
+<a href="http://arxiv.org/" class="message" title="duplicate subscription: http://export.arxiv.org/rss/cs.DS">arXiv.org: Computational geometry</a>
 <br>
 <a class="feedlink" href="http://export.arxiv.org/rss/cs.DS" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
-<a href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<a href="http://arxiv.org/" class="message" title="duplicate subscription: http://export.arxiv.org/rss/cs.CC">arXiv.org: Data structures and Algorithms</a>
 <br>
 <a class="feedlink" href="http://bit-player.org/feed/atom/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://bit-player.org" title="bit-player">bit-player</a>
@@ -225,7 +225,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at May 22, 2019 01:32 AM UTC</span>.
+Last updated <span class="datestr">at May 22, 2019 02:23 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -758,6 +758,68 @@ the uniform distribution.
 
 <p class="date">
 <a href="http://arxiv.org/abs/1905.08302"><span class="datestr">at May 22, 2019 01:25 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://11011110.github.io/blog/2019/05/21/congratulations-dr-tillman">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/eppstein.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://11011110.github.io/blog/2019/05/21/congratulations-dr-tillman.html">Congratulations, Dr. Tillman!</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>Today I participated in the successful dissertation defense of Bálint Tillman, a student of Athina Markopoulou in the <a href="http://www.networkedsystems.uci.edu/">UCI Graduate Program in Networked Systems</a>.</p>
+
+<p>Bálint has been investigating problems connected with the <a href="https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93Gallai_theorem">Erdős–Gallai theorem</a>, which states that it is possible to test whether a sequence of numbers is the degree distribution of a graph (the sequence of numbers of vertices of each possible degree) and if so, find a graph with that degree distribution, in polynomial time. The degree distribution can be extended to a matrix called the <em>joint degree distribution</em>, which specifies the number of pairs of adjacent vertices with each combination of degrees, and to higher-order tensors specifying the degrees of subgraphs with more than two vertices.</p>
+
+<p>In his INFOCOM 2015 paper “<a href="https://doi.org/10.1109/INFOCOM.2015.7218534">Construction of simple graphs with a target joint degree matrix and beyond</a>”, Bálint showed that one can recognize the joint degree distributions of simple graphs, and reconstruct a graph with that distribution, in polynomial time. The algorithm works equally well when the vertices are distinguished in other ways than by degree and the input matrix specifies the target number of edges with each pair of degrees between each class of vertices. Later, in KDD 2017, he extended these results to directed graphs and at NetSci 2018 he showed how to find a realization with as few connected components as possible.</p>
+
+<p>On the other hand, if one adds only a little bit of extra information to the joint degree distribution, such as the total number of triangles in the graph, it becomes NP-complete to recognize whether the input describes a valid graph and NP-hard to reconstruct a graph that realizes a given description. This comes from a poster by Bálint with Will Devanny and me at NetSci 2016, where we found the reduction from graph 3-coloring depicted below.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/jdm-tri-hard.svg" alt="NP-completeness reduction from 3-coloring to realizability of joint degree matrices with numbers of triangles" /></p>
+
+<p>To perform an NP-hardness reduction, one should start with a graph for which it’s hard to test 3-colorability, and translate it into an instance of whatever other problem you want to prove hard. But instead let’s pretend for now that we start with a little more information: a graph that’s known to be 3-colorable, and a specific 3-coloring of it.
+To turn this into a hard problem for realizability of joint distribution plus number of triangles, we add a triangle to the graph, representing the three colors, and connect each original graph vertex to the new triangle vertex for its color. Then we add enough hair (in the form of degree-one vertices) to the augmented graph to make all vertices have distinct degrees, except within the triangle of new vertices where all three degrees should be the same. Now take as the result of the reduction the pair  of the joint degree distribution and number of triangles in the augmented graph.</p>
+
+<p>But now the trick is that  can be computed directly from your starting graph, without knowing its coloring or even whether it is colorable.
+Because the degrees are distinct, and  tells you the number of edges for each combination of degrees, any realization of  must contain a copy of your starting graph augmented by a triangle. The graph and the triangle might be connected to each other differently than they were before, but their connection pattern must still correspond to a different valid 3-coloring, because otherwise you would form some extra triangles in the graph (one for each invalidly-colored edge) and not correctly match the value of . So  is realizable if and only if your starting graph has a 3-coloring. This reduction proves that testing realizability of pairs  is NP-complete.</p>
+
+<p>There’s even more material along these lines in Bálint’s dissertation, but some of it is not yet published. I think the plan is to get all of that submitted over the summer before
+Bálint starts a new position at Google.
+Congratulations, Bálint!</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/102137081740561085">Discuss on Mastodon</a>)</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by David Eppstein <a href="https://11011110.github.io/blog/2019/05/21/congratulations-dr-tillman.html"><span class="datestr">at May 21, 2019 06:20 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -3059,145 +3121,6 @@ Through this result we settle the question posed by M. Alekhnovich and A. Razbor
 
 <p class="date">
 <a href="https://eccc.weizmann.ac.il/report/2019/069"><span class="datestr">at May 12, 2019 09:21 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://rjlipton.wordpress.com/?p=15846">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/lipton.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://rjlipton.wordpress.com/2019/05/10/making-elections-safe/">Making Elections Safe</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://rjlipton.wordpress.com" title="Gödel’s Lost Letter and P=NP">Richard Lipton</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p>
-<font color="#0044cc"><br />
-<em>A new proof that MAJORITY is not in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BAC%7D%5E%7B0%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{AC}^{0}}" class="latex" title="{\mathsf{AC}^{0}}" />.</em><br />
-<font color="#000000"></font></font></p><font color="#0044cc"><font color="#000000">
-<table class="image alignright">
-<tbody>
-<tr>
-<td>
-<a href="https://rjlipton.wordpress.com/2019/05/10/making-elections-safe/unknown-121/" rel="attachment wp-att-15848"><img src="https://rjlipton.files.wordpress.com/2019/05/unknown.jpeg?w=600" alt="" class="alignright size-full wp-image-15848" /></a>
-</td>
-</tr>
-<tr>
-<td class="caption alignright"><font size="-2">[ Rich DeMillo ]</font></td>
-</tr>
-</tbody>
-</table>
-<p>
-Rich DeMillo is a strong leader, a famous researcher, and a long-time best friend. <i>Proof</i>: He was the first CTO at HP and was the Dean of Computing at Georgia Tech; He helped created <a href="https://en.wikipedia.org/wiki/Mutation_testing">mutation</a> a powerful software testing method and did seminal work in complexity theory. The last is clear.</p>
-<p>
-Today I want to talk about his recent work on voting systems. </p>
-<p>
-The 2020 election is over a year away, yet it is on our collective minds. People voice concerns everyday on social media, on TV, on cable, in print, everywhere. Their concerns are that our next national election will be compromised. Rich has turned his concern into activism: he is working hard to make elections trusted in general and the 2020 election in particular. </p>
-<p>
-Rich is scheduled to give a talk this coming Monday, May 13, at Georgia Tech. I wish I could be there, but cannot. I do plan to watch the video of his presentation—see <a href="https://www.cc.gatech.edu/calendar/day/2019/05/13/15151">here</a>. The talk is based on his recent <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3375755">paper</a> joint with Andrew Appel and Philip Stark titled, “Ballot-Marking devices (BMDs) cannot assure the will of the voters.” As an aside, their paper (ADS) has already generated measurable interest—it’s been downloaded over <img src="https://s0.wp.com/latex.php?latex=%7B300%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{300}" class="latex" title="{300}" /> times and viewed over <img src="https://s0.wp.com/latex.php?latex=%7B5%2C000%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{5,000}" class="latex" title="{5,000}" /> times.</p>
-<p>
-</p><p></p><h2> What Makes A Good Election? </h2><p></p>
-<p></p><p>
-There are several criterion that a “good” election should have. </p>
-<ul>
-<li>
-<i>During the voting</i>: Only eligible voters can vote. <p></p>
-</li><li>
-<i>During the tabulation</i>: Each voter gets exactly one vote. <p></p>
-</li><li>
-<i>After the election</i>: Each vote remains secret.
-</li></ul>
-<p>
-Rich says in his talk abstract: </p>
-<blockquote><p><b> </b> <em> Many people believe that, in an Internet-enabled world, secure, safe voting should be easy to achieve. For example, using known cryptographically secure protocols (maybe even blockchains), a secure website might be developed to relieve voters of the burden of driving to a polling place on election day. </em>
-</p></blockquote>
-<p></p><p>
-This belief is wrong. Elections are hard—impossible?—to safeguard. A U.S. national election is the union of about ten thousand local elections. Each has different rules and protocols, which makes safeguarding the national election difficult. </p>
-<ul>
-<li>
-<i>During the voting</i>: Who votes is subject to human decisions? People must prove they are eligible voters. Even computer identification is subject to bias. <p></p>
-</li><li>
-<i>During the tabulation</i>: Counting is usually a combination of human and computer systems. The former make errors and as do the latter. Computers can have bugs or can be hacked by adversaries. <p></p>
-</li><li>
-<i>After the election</i>: Since records are usually kept of the voting, they must be safeguarded to avoid disclosing how someone voted.
-</li></ul>
-<p>
-The last point is central. There must be a record of the votes to allow audits after the election is over. We must be able to audit and check that the tabulation was correct. This is the central question that Rich and his co-authors discuss. We will turn to this issue in a moment. </p>
-<p>
-Before that I note that keeping a vote secret is impossible in an absolute sense. Suppose that you vote “yes” in some district. After the election suppose that the count in that district is made public, as it usually is. Say <img src="https://s0.wp.com/latex.php?latex=%7B61%5C%25%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{61\%}" class="latex" title="{61\%}" /> of the votes were yes. Then clearly information is leaked about how you voted.</p>
-<p>
-</p><p></p><h2> How Are Votes Recorded? </h2><p></p>
-<p></p><p>
-There are two main ways to record votes. One method is to have voters hand-mark their ballots, in the old-fashioned way. It is simple, cheap, and not 21st century. Hand-marked ballots can be read by automatic scanners, at least in principle. A difficulty is voters are human and may mark their ballots incorrectly. They may miss a box, or mark two boxes, or make some other mistake. What if the voter is instructed to:</p>
-<blockquote><p><b> </b> <em> Select two of the following six choices. </em>
-</p></blockquote>
-<p></p><p>
-There can be other difficulties: Some voters may have special needs and may require instructions to be in a large type font, for example.</p>
-<p>
-Another recoding method is to have voters use a device to print their paper ballots. These are cleverly called <a href="https://en.wikipedia.org/wiki/Ballot_marking_device">Ballot Marking Devices</a> (BMDs). The name sounds slightly strange to me; there is an alternative name, electronic ballot markers (EBMs).</p>
-<p>
-The authors, ADS, argue that BMDs are dangerous. Such devices can fail, they argue, and not protect the election. The BMDs rely on software, complex special purpose software, and thus are subject to bugs, errors, mistakes, and to active attacks by adversaries. </p>
-<p>
-A BMD device takes input from a voter and then prints out a paper ballot. Often the ballot will contain a machine-readable bar code. This is so scanners can more easily read the paper ballots, later. The problem, the danger, is that most voters cannot tell if a bar code is correct or not. An attacker need only have the BMD confirm that you voted say “yes” and print a ballot that says “yes”. Then the attacker has the BMD cheat you by printing a bar code that says “no”. This is a nasty attack, which is hard to stop. The ADS team discusses this and related problems with BDMs. </p>
-<p>
-<a href="https://rjlipton.wordpress.com/2019/05/10/making-elections-safe/bar/" rel="attachment wp-att-15852"><img width="300" alt="" src="https://rjlipton.files.wordpress.com/2019/05/bar.png?w=300&amp;h=147" class="aligncenter size-medium wp-image-15852" height="147" /></a></p>
-<p>
-</p><p></p><h2> Mathematics and Voting </h2><p></p>
-<p></p><p>
-Can complexity theory help us design better elections? Unclear. Can election theory help us understand complexity theory? Perhaps.</p>
-<p>
-</p><p></p><h3> Elections Inform Complexity Theory </h3><p></p>
-<p>
-</p><blockquote><p><b>Theorem 1</b> <em> The <i>Election Hardness Axiom</i> implies that the MAJORITY function cannot be computed by a polynomial size constant depth Boolean circuit of NOT, AND, and OR gates. </em>
-</p></blockquote>
-<p></p><p>
-That is, the MAJORITY function is not in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BAC%7D%5E%7B0%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{AC}^{0}}" class="latex" title="{\mathsf{AC}^{0}}" />. What is the Election Hardness Axiom? It is the empirical fact that there is no practical way to compute who won an election. The MAJORITY function is the tabulation of votes: The outcome of an election is the same as computing the MAJORITY function of the votes—“yes” is a <img src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{1}" class="latex" title="{1}" /> and “no” is a <img src="https://s0.wp.com/latex.php?latex=%7B0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{0}" class="latex" title="{0}" />.</p>
-<p>
-Okay we are kidding. But not completely. Suppose that MAJORITY function were in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BAC%7D%5E%7B0%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{AC}^{0}}" class="latex" title="{\mathsf{AC}^{0}}" />. Then a series of decisions of the form:</p>
-<blockquote><p><b> </b> <em> The tabulators have looked at the following ballots <img src="https://s0.wp.com/latex.php?latex=%7BB_%7B1%7D%2C%5Cdots%2CB_%7Bm%7D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{B_{1},\dots,B_{m}}" class="latex" title="{B_{1},\dots,B_{m}}" /> and we agree that there is a “yes” vote in ballot <img src="https://s0.wp.com/latex.php?latex=%7BB_%7Bi%7D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{B_{i}}" class="latex" title="{B_{i}}" />. </em>
-</p></blockquote>
-<p>
-</p><p></p><h3> Complexity Informs Elections </h3><p></p>
-<p></p><p>
-Rich, in his talk abstract, states that it is unlikely that crypto theory could be used to create trusted elections. His reason is voters will not trust elections that rely on crypto results. I agree. But I wonder if ideas from theory could be useful. Here are two high-level thoughts.</p>
-<p>
-<img src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\bullet }" class="latex" title="{\bullet }" /> There is a vast literature on computing in the presence of faults. Usually “faults” are thought to occur at the nano level: the faults are due to hiccups in electronics. What if the faults came from errors in the counting of votes? What if the faults were at the macro level? That is at the level of human decisions? Perhaps we will revisit this in the future.</p>
-<p>
-<img src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\bullet }" class="latex" title="{\bullet }" /> There is a vast literature on computing as a “game”. An election is usually viewed as being run by some trusted party. This could be replaced by assuming that the election is a game. Imagine two parties D and R. As the tabulation is performed D and R can challenge each other. They interact as in game. Could this help make the election trusted? Perhaps we will revisit this too in the future.</p>
-<p>
-</p><p></p><h2> Open Problems </h2><p></p>
-<p></p><p>
-Can we elections be trusted? Can we formalize the connection between election and <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BAC%7D%5E%7B0%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{AC}^{0}}" class="latex" title="{\mathsf{AC}^{0}}" />? Could this connect be useful? Can theory help with future elections?</p>
-<p></p></font></font></div>
-
-
-
-
-
-
-
-<p class="date">
-by rjlipton <a href="https://rjlipton.wordpress.com/2019/05/10/making-elections-safe/"><span class="datestr">at May 10, 2019 12:35 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
