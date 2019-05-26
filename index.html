@@ -225,7 +225,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at May 26, 2019 04:24 AM UTC</span>.
+Last updated <span class="datestr">at May 26, 2019 05:23 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -233,6 +233,85 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://11011110.github.io/blog/2019/05/25/more-matching-mimicking">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/eppstein.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://11011110.github.io/blog/2019/05/25/more-matching-mimicking.html">More matching-mimicking networks</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>My <a href="https://11011110.github.io/blog/2018/02/01/parallel-matching-in.html">paper with Vijay Vazirani on parallel matching</a> (soon to appear in <a href="http://spaa.acm.org/2019/">SPAA</a>) is based on the idea of a “matching-mimicking network”. If  is a graph with a designated set  of terminal vertices, then a matching-mimicking network for  is another graph  with the same terminals that has the same pattern of matchings. Here, by a <em>pattern of matchings</em>, I mean a family of subsets of , the subsets that can be covered by a matching that also covers all non-terminal vertices. We included a messy case analysis that, after some simplifications due to symmetry, had 21 cases for the matching mimicking networks on at most three terminals.</p>
+
+<p>By now, I think I understand patterns of matchings a lot better, enough to do the three-terminal case in only four cases and to extend the analysis to four terminals in only seven more cases. The starting point is the observation that these patterns of matchings are <a href="https://en.wikipedia.org/wiki/Delta-matroid">even Δ-matroids</a>.</p>
+
+<p>One way to think of a Δ-matroid is that it’s just a convex polyhedron or polytope in Euclidean space of some dimension , with the properties that all vertex coordinates are  or  and all edge lengths are  or . An even Δ-matroid has the stronger property that all edge lengths are , as is true for the three-dimensional regular tetrahedron with vertex coordinates (written in a more compact form as bitvectors) , , , and .</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/tet-in-cube.svg" alt="Regular tetrahedron formed from alternating vertices of a cube" /></p>
+
+<p>Alternatively one can consider the same kind of structure to be a family of sets, drawn from a universe of  elements that correspond to the dimensions of the space. Each set in the family corresponds to a vertex of the polytope and includes the elements whose coordinates are one. So over the three-element set  the same regular tetrahedron can be written as the family of sets</p>
+
+
+
+<p>When expressed in this way, the sets of a Δ-matroid obey an exchange axiom: if two sets  and  differ on whether they include some element , then there must exist an element  on which they also differ, so that the symmetric difference of sets  also belongs to the Δ-matroid. By repeatedly applying this axiom one can connect  to  by a geodesic path (in Hamming distance) of two-element moves. For the bases of a matroid, we have a stronger requirement that one of the two elements belongs to  and the other belongs to , or equivalently that all sets have the same size, but a Δ-matroid relaxes this requirement. It’s not even required that ! But in an even Δ-matroid  and  must be distinct, because otherwise the step would be along an edge of length one. Another way of expressing the extra requirements of an even Δ-matroid over an arbitrary Δ-matroid is that all sets must have the same parity (all have even size, or all have odd size).</p>
+
+<p>So anyway, back to matching. Suppose that both  and  are sets drawn from a pattern of matchings. Choose arbitrarily a matching representing each set. Then the symmetric difference of these matchings is a collection of disjoint alternating paths and cycles, and we can get from  to  by 
+a sequence of steps in which we take the symmetric difference of the current matching by one of the alternating paths. So this gives us not just one geodesic from  to  but a lot of different geodesics, one for each ordering of the alternating paths. Expressed as an exchange axiom, this means that when two sets  and  differ, the elements on which they differ can be partitioned into pairs, the symmetric differences with which can be performed independently. You can pick any subset of the pairs of differing elements, and change each of those pairs, leaving the rest alone. Because this is a strengthening of the even Δ-matroid axiom, every matching pattern is an even Δ-matroid.</p>
+
+<p>Expressed in polyhedral terms, this stronger exchange axiom means that every two vertices at distance  from each other are connected by a -dimensional hypercube with side length . This is a little weird, because we started with a hypercube but then eliminated half of its vertices (by the parity condition) to get something else. Now we have hypercubes again, of lower dimension. They must be tilted with respect to the coordinate axes: each axis of one of these lower-dimensional hypercubes is tilted at a 45 degree angle with respect to the coordinate system of the overall polytope.</p>
+
+<p>Not every even Δ-matroid obeys this sub-hypercube property. On the other hand, I was expecting the matching patterns that are matroids (all sets are the same size) to be transversal matroids (maximal subsets of vertices on one side of a bipartite graph that can be covered by a matching), and they aren’t. There is a six-element non-transversal matroid, whose six elements are the edges of a triangle with doubled edges and whose sets are pairs of edges from different sides of the triangle. But it is the pattern of matchings of a tree in which the (non-terminal) root has three children, each of which has two terminals as its children.</p>
+
+<p>Conveniently, whether a 0-1 polyhedron can be represented by a pattern of matchings depends only on its shape and not on its orientation. You can obviously permute the coordinates of a polyhedron that represents a pattern of matchings, by relabeling which coordinate corresponds to which terminal vertex. But you can also reflect the polyhedron across any one of its coordinates by modifying the graph whose matchings represent it in the following way: turn the  terminal vertex for that coordinate into a non-terminal, and attach a new degree-one terminal vertex to it. These permutations and reflections generate all the symmetries of the hypercube in which the 0-1 polyhedron lives. So to find small matching-mimicking networks, we only need to look at one representative 0-1 polyhedron in each symmetry class. If we find a small network for this representative, we can modify it to create a different small matching-mimicking network for every other 0-1 polyhedron with the same shape.</p>
+
+<p>So what are the possible shapes? Let’s define the dimension of a Δ-matroid to be the number of coordinates of the polytope that take both values,  and , at different vertices. Then a 0-dimensional even Δ-matroid must be a single point (), there are no 1-dimensional even Δ-matroids, and a two-dimensional even Δ-matroid must be a line segment (). There are two three-dimensional even Δ-matroids: a triangle  and the tetrahedron shown above, . The cube exchange axiom for patterns of matching starts to kick in for four-dimensional even Δ-matroids, whose vertices must be subsets of the four-dimensional hyperoctahedron . (This is the shape formed from a four-dimensional hypercube by keeping only vertices with the same parity as each other, just as we formed a regular tetrahedron by doing the same thing to a three-dimensional cube.) Here’s a drawing of  from <a href="https://11011110.github.io/blog/2010/09/26/in-response-to.html">an earlier post</a>:</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2010/k7/cocktail2.svg" alt="The hyperoctahedral graph K_{2,2,2,2}" /></p>
+
+<p>If there are no two opposite vertices, we get  (a regular tetrahedron, again, but embedded in a four-dimensional way into the hypercube). Otherwise, we must take at least two pairs of opposite vertices to form a square, and the cases are  (only the square),  (a square pyramid),  (an octahedron), ,  (an octahedral pyramid), and  (the hyperoctahedron). All of these polyhedra can be represented as matching-mimicking networks with the additional property that all vertices are terminals:</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/4-terminal-mm.svg" alt="Matching-mimicking networks for up to four terminals" /></p>
+
+<p>Based on these small examples, it’s tempting to guess that when a pattern of matchings includes the empty set, the whole pattern is just the set of matchings on a graph whose edges are the pairs of terminals in the pattern. But it isn’t true. The square pyramid , for instance, can represent the pattern of matchings</p>
+
+
+
+<p>with the empty set at the apex of the pyramid. In this pattern, even though one can match terminal pairs <span style="white-space: nowrap;">— or —,</span> one can’t take the union of those two matchings and cover all four terminals. (This is what you get by reflecting the two middle terminals of the network shown above for ; its matching-mimicking network is a tree with two interior non-terminals and four terminal leaves.) My guess is that the number of patterns of matching should grow quickly relative to the number of graphs, so for large enough numbers of terminals it should not be possible to use graphs without non-terminals or their complements. But I haven’t taken the case analysis far enough to find an example of this.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/102160605632804102">Discuss on Mastodon</a>)</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by David Eppstein <a href="https://11011110.github.io/blog/2019/05/25/more-matching-mimicking.html"><span class="datestr">at May 25, 2019 09:32 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -1510,7 +1589,7 @@ Quasi/quasipolynomial.
 <p></p><p>
 Answers: Note 1a means question 1 and answer 1 and so on. This is a wordpress issue.</p>
 <p>
-<a href="https://rjlipton.wordpress.com/2019/05/21/making-up-tests/answers4/" rel="attachment wp-att-15899"><img width="300" alt="" src="https://rjlipton.files.wordpress.com/2019/05/answers4.png?w=300&amp;h=47" class="aligncenter size-medium wp-image-15899" height="47" /></a></p>
+<a href="https://rjlipton.wordpress.com/2019/05/21/making-up-tests/answers4/" rel="attachment wp-att-15899"><img src="https://rjlipton.files.wordpress.com/2019/05/answers4.png?w=300&amp;h=47" alt="" width="300" class="aligncenter size-medium wp-image-15899" height="47" /></a></p>
 <p></p></font></font></div>
 
 
@@ -3058,7 +3137,7 @@ The authors, ADS, argue that BMDs are dangerous. Such devices can fail, they arg
 <p>
 A BMD device takes input from a voter and then prints out a paper ballot. Often the ballot will contain a machine-readable bar code. This is so scanners can more easily read the paper ballots, later. The problem, the danger, is that most voters cannot tell if a bar code is correct or not. An attacker need only have the BMD confirm that you voted say “yes” and print a ballot that says “yes”. Then the attacker has the BMD cheat you by printing a bar code that says “no”. This is a nasty attack, which is hard to stop. The ADS team discusses this and related problems with BDMs. </p>
 <p>
-<a href="https://rjlipton.wordpress.com/2019/05/10/making-elections-safe/bar/" rel="attachment wp-att-15852"><img width="300" alt="" src="https://rjlipton.files.wordpress.com/2019/05/bar.png?w=300&amp;h=147" class="aligncenter size-medium wp-image-15852" height="147" /></a></p>
+<a href="https://rjlipton.wordpress.com/2019/05/10/making-elections-safe/bar/" rel="attachment wp-att-15852"><img src="https://rjlipton.files.wordpress.com/2019/05/bar.png?w=300&amp;h=147" alt="" width="300" class="aligncenter size-medium wp-image-15852" height="147" /></a></p>
 <p>
 </p><p></p><h2> Mathematics and Voting </h2><p></p>
 <p></p><p>
@@ -3160,47 +3239,6 @@ by rjlipton <a href="https://rjlipton.wordpress.com/2019/05/10/making-elections-
 
 <p class="date">
 by Gil Kalai <a href="https://gilkalai.wordpress.com/2019/05/10/sansation-in-the-morning-news-yaroslav-shitov-counterexamples-to-hedetniemis-conjecture/"><span class="datestr">at May 10, 2019 12:32 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://cstheory-jobs.org/2019/05/10/postdoc-in-drone-safety-at-department-of-electronic-systems-aalborg-university-apply-by-june-6-2019/">
-<div class="entryheader">
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://cstheory-jobs.org/2019/05/10/postdoc-in-drone-safety-at-department-of-electronic-systems-aalborg-university-apply-by-june-6-2019/">Postdoc in drone safety at Department of Electronic Systems, Aalborg University (apply by June 6, 2019)</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://cstheory-jobs.org" title="Theoretical Computer Science Jobs">CCI: jobs</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p>At the Faculty of IT and Design, Department of Electronic Systems, a position as postdoc in the research project SafeEYE is open for appointment from July 1st, 2019, or soon hereafter, and until May 31, 2021.</p>
-<p>Website: <a href="https://www.stillinger.aau.dk/vis-stilling/?vacancy=1042671">https://www.stillinger.aau.dk/vis-stilling/?vacancy=1042671</a><br />
-Email: alc@es.aau.dk</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by shacharlovett <a href="https://cstheory-jobs.org/2019/05/10/postdoc-in-drone-safety-at-department-of-electronic-systems-aalborg-university-apply-by-june-6-2019/"><span class="datestr">at May 10, 2019 07:42 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>

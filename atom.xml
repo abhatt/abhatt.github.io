@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-05-26T04:24:06Z</updated>
+  <updated>2019-05-26T05:23:24Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,68 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2019/05/25/more-matching-mimicking</id>
+    <link href="https://11011110.github.io/blog/2019/05/25/more-matching-mimicking.html" rel="alternate" type="text/html"/>
+    <title>More matching-mimicking networks</title>
+    <summary>My paper with Vijay Vazirani on parallel matching (soon to appear in SPAA) is based on the idea of a “matching-mimicking network”. If is a graph with a designated set of terminal vertices, then a matching-mimicking network for is another graph with the same terminals that has the same pattern of matchings. Here, by a pattern of matchings, I mean a family of subsets of , the subsets that can be covered by a matching that also covers all non-terminal vertices. We included a messy case analysis that, after some simplifications due to symmetry, had 21 cases for the matching mimicking networks on at most three terminals.</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>My <a href="https://11011110.github.io/blog/2018/02/01/parallel-matching-in.html">paper with Vijay Vazirani on parallel matching</a> (soon to appear in <a href="http://spaa.acm.org/2019/">SPAA</a>) is based on the idea of a “matching-mimicking network”. If  is a graph with a designated set  of terminal vertices, then a matching-mimicking network for  is another graph  with the same terminals that has the same pattern of matchings. Here, by a <em>pattern of matchings</em>, I mean a family of subsets of , the subsets that can be covered by a matching that also covers all non-terminal vertices. We included a messy case analysis that, after some simplifications due to symmetry, had 21 cases for the matching mimicking networks on at most three terminals.</p>
+
+<p>By now, I think I understand patterns of matchings a lot better, enough to do the three-terminal case in only four cases and to extend the analysis to four terminals in only seven more cases. The starting point is the observation that these patterns of matchings are <a href="https://en.wikipedia.org/wiki/Delta-matroid">even Δ-matroids</a>.</p>
+
+<p>One way to think of a Δ-matroid is that it’s just a convex polyhedron or polytope in Euclidean space of some dimension , with the properties that all vertex coordinates are  or  and all edge lengths are  or . An even Δ-matroid has the stronger property that all edge lengths are , as is true for the three-dimensional regular tetrahedron with vertex coordinates (written in a more compact form as bitvectors) , , , and .</p>
+
+<p style="text-align: center;"><img alt="Regular tetrahedron formed from alternating vertices of a cube" src="https://11011110.github.io/blog/assets/2019/tet-in-cube.svg"/></p>
+
+<p>Alternatively one can consider the same kind of structure to be a family of sets, drawn from a universe of  elements that correspond to the dimensions of the space. Each set in the family corresponds to a vertex of the polytope and includes the elements whose coordinates are one. So over the three-element set  the same regular tetrahedron can be written as the family of sets</p>
+
+
+
+<p>When expressed in this way, the sets of a Δ-matroid obey an exchange axiom: if two sets  and  differ on whether they include some element , then there must exist an element  on which they also differ, so that the symmetric difference of sets  also belongs to the Δ-matroid. By repeatedly applying this axiom one can connect  to  by a geodesic path (in Hamming distance) of two-element moves. For the bases of a matroid, we have a stronger requirement that one of the two elements belongs to  and the other belongs to , or equivalently that all sets have the same size, but a Δ-matroid relaxes this requirement. It’s not even required that ! But in an even Δ-matroid  and  must be distinct, because otherwise the step would be along an edge of length one. Another way of expressing the extra requirements of an even Δ-matroid over an arbitrary Δ-matroid is that all sets must have the same parity (all have even size, or all have odd size).</p>
+
+<p>So anyway, back to matching. Suppose that both  and  are sets drawn from a pattern of matchings. Choose arbitrarily a matching representing each set. Then the symmetric difference of these matchings is a collection of disjoint alternating paths and cycles, and we can get from  to  by 
+a sequence of steps in which we take the symmetric difference of the current matching by one of the alternating paths. So this gives us not just one geodesic from  to  but a lot of different geodesics, one for each ordering of the alternating paths. Expressed as an exchange axiom, this means that when two sets  and  differ, the elements on which they differ can be partitioned into pairs, the symmetric differences with which can be performed independently. You can pick any subset of the pairs of differing elements, and change each of those pairs, leaving the rest alone. Because this is a strengthening of the even Δ-matroid axiom, every matching pattern is an even Δ-matroid.</p>
+
+<p>Expressed in polyhedral terms, this stronger exchange axiom means that every two vertices at distance  from each other are connected by a -dimensional hypercube with side length . This is a little weird, because we started with a hypercube but then eliminated half of its vertices (by the parity condition) to get something else. Now we have hypercubes again, of lower dimension. They must be tilted with respect to the coordinate axes: each axis of one of these lower-dimensional hypercubes is tilted at a 45 degree angle with respect to the coordinate system of the overall polytope.</p>
+
+<p>Not every even Δ-matroid obeys this sub-hypercube property. On the other hand, I was expecting the matching patterns that are matroids (all sets are the same size) to be transversal matroids (maximal subsets of vertices on one side of a bipartite graph that can be covered by a matching), and they aren’t. There is a six-element non-transversal matroid, whose six elements are the edges of a triangle with doubled edges and whose sets are pairs of edges from different sides of the triangle. But it is the pattern of matchings of a tree in which the (non-terminal) root has three children, each of which has two terminals as its children.</p>
+
+<p>Conveniently, whether a 0-1 polyhedron can be represented by a pattern of matchings depends only on its shape and not on its orientation. You can obviously permute the coordinates of a polyhedron that represents a pattern of matchings, by relabeling which coordinate corresponds to which terminal vertex. But you can also reflect the polyhedron across any one of its coordinates by modifying the graph whose matchings represent it in the following way: turn the  terminal vertex for that coordinate into a non-terminal, and attach a new degree-one terminal vertex to it. These permutations and reflections generate all the symmetries of the hypercube in which the 0-1 polyhedron lives. So to find small matching-mimicking networks, we only need to look at one representative 0-1 polyhedron in each symmetry class. If we find a small network for this representative, we can modify it to create a different small matching-mimicking network for every other 0-1 polyhedron with the same shape.</p>
+
+<p>So what are the possible shapes? Let’s define the dimension of a Δ-matroid to be the number of coordinates of the polytope that take both values,  and , at different vertices. Then a 0-dimensional even Δ-matroid must be a single point (), there are no 1-dimensional even Δ-matroids, and a two-dimensional even Δ-matroid must be a line segment (). There are two three-dimensional even Δ-matroids: a triangle  and the tetrahedron shown above, . The cube exchange axiom for patterns of matching starts to kick in for four-dimensional even Δ-matroids, whose vertices must be subsets of the four-dimensional hyperoctahedron . (This is the shape formed from a four-dimensional hypercube by keeping only vertices with the same parity as each other, just as we formed a regular tetrahedron by doing the same thing to a three-dimensional cube.) Here’s a drawing of  from <a href="https://11011110.github.io/blog/2010/09/26/in-response-to.html">an earlier post</a>:</p>
+
+<p style="text-align: center;"><img alt="The hyperoctahedral graph K_{2,2,2,2}" src="https://11011110.github.io/blog/assets/2010/k7/cocktail2.svg"/></p>
+
+<p>If there are no two opposite vertices, we get  (a regular tetrahedron, again, but embedded in a four-dimensional way into the hypercube). Otherwise, we must take at least two pairs of opposite vertices to form a square, and the cases are  (only the square),  (a square pyramid),  (an octahedron), ,  (an octahedral pyramid), and  (the hyperoctahedron). All of these polyhedra can be represented as matching-mimicking networks with the additional property that all vertices are terminals:</p>
+
+<p style="text-align: center;"><img alt="Matching-mimicking networks for up to four terminals" src="https://11011110.github.io/blog/assets/2019/4-terminal-mm.svg"/></p>
+
+<p>Based on these small examples, it’s tempting to guess that when a pattern of matchings includes the empty set, the whole pattern is just the set of matchings on a graph whose edges are the pairs of terminals in the pattern. But it isn’t true. The square pyramid , for instance, can represent the pattern of matchings</p>
+
+
+
+<p>with the empty set at the apex of the pyramid. In this pattern, even though one can match terminal pairs <span style="white-space: nowrap;">— or —,</span> one can’t take the union of those two matchings and cover all four terminals. (This is what you get by reflecting the two middle terminals of the network shown above for ; its matching-mimicking network is a tree with two interior non-terminals and four terminal leaves.) My guess is that the number of patterns of matching should grow quickly relative to the number of graphs, so for large enough numbers of terminals it should not be possible to use graphs without non-terminals or their complements. But I haven’t taken the case analysis far enough to find an example of this.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/102160605632804102">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2019-05-25T21:32:00Z</updated>
+    <published>2019-05-25T21:32:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2019-05-26T05:06:37Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>https://eccc.weizmann.ac.il/report/2019/075</id>
@@ -43,7 +105,7 @@ We also explore consequences of circuit lower bounds for a sparse language in NP
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-26T04:20:49Z</updated>
+      <updated>2019-05-26T05:21:23Z</updated>
     </source>
   </entry>
 
@@ -158,7 +220,7 @@ What are your selected papers? </p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-05-26T04:21:15Z</updated>
+      <updated>2019-05-26T05:21:32Z</updated>
     </source>
   </entry>
 
@@ -647,7 +709,7 @@ Here's what's known: There are countably many such automorphisms. There is a def
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2019-05-26T04:22:55Z</updated>
+      <updated>2019-05-26T05:22:51Z</updated>
     </source>
   </entry>
 
@@ -684,7 +746,7 @@ Here's what's known: There are countably many such automorphisms. There is a def
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2019-05-26T04:22:39Z</updated>
+      <updated>2019-05-26T05:22:26Z</updated>
     </source>
   </entry>
 
@@ -722,7 +784,7 @@ Combining our construction with a hash family proposed by Canetti et al. [STOC 2
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-26T04:20:48Z</updated>
+      <updated>2019-05-26T05:21:23Z</updated>
     </source>
   </entry>
 
@@ -767,7 +829,7 @@ Congratulations, Bálint!</p>
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2019-05-22T01:30:30Z</updated>
+      <updated>2019-05-26T05:06:37Z</updated>
     </source>
   </entry>
 
@@ -970,7 +1032,7 @@ Answers: Note 1a means question 1 and answer 1 and so on. This is a wordpress is
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-05-26T04:21:15Z</updated>
+      <updated>2019-05-26T05:21:31Z</updated>
     </source>
   </entry>
 
@@ -1170,7 +1232,7 @@ In particular, the above lemma gives us </p>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-05-26T04:20:20Z</updated>
+      <updated>2019-05-26T05:20:29Z</updated>
     </source>
   </entry>
 
@@ -1197,7 +1259,7 @@ Email: Jose.Fiadeiro@rhul.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-05-26T04:21:24Z</updated>
+      <updated>2019-05-26T05:21:41Z</updated>
     </source>
   </entry>
 
@@ -1353,7 +1415,7 @@ Courant was so impressed that ten (or so) years later Courant became Martin's Ph
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-05-26T04:20:20Z</updated>
+      <updated>2019-05-26T05:20:29Z</updated>
     </source>
   </entry>
 
@@ -1451,7 +1513,7 @@ Goldmakher writes out a more conventional proof in his paper titled <em>Arnold�
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-05-26T04:21:15Z</updated>
+      <updated>2019-05-26T05:21:33Z</updated>
     </source>
   </entry>
 
@@ -1479,7 +1541,7 @@ Somewhat surprisingly, we show that neither the upper bound nor the lower bound 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-26T04:20:51Z</updated>
+      <updated>2019-05-26T05:21:23Z</updated>
     </source>
   </entry>
 
@@ -1508,7 +1570,7 @@ As a corollary of the pseudo-random generator, we also prove the first average c
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-26T04:20:51Z</updated>
+      <updated>2019-05-26T05:21:23Z</updated>
     </source>
   </entry>
 
@@ -1670,7 +1732,7 @@ The undesirable features of this result are that the complexity of sampling and 
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-05-26T04:20:20Z</updated>
+      <updated>2019-05-26T05:20:29Z</updated>
     </source>
   </entry>
 
@@ -1787,7 +1849,7 @@ These shapes are the intersections of equal-radius balls centered at their verti
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2019-05-22T01:30:30Z</updated>
+      <updated>2019-05-26T05:06:37Z</updated>
     </source>
   </entry>
 
@@ -1814,7 +1876,7 @@ Email: suhx@bc.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-05-26T04:21:24Z</updated>
+      <updated>2019-05-26T05:21:40Z</updated>
     </source>
   </entry>
 
@@ -1880,7 +1942,7 @@ Assume that $k,l, r$ are such that any submatrix of $M$ of at least $2^{-k} \cdo
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-26T04:20:50Z</updated>
+      <updated>2019-05-26T05:21:23Z</updated>
     </source>
   </entry>
 
@@ -1981,7 +2043,7 @@ Do you know of any other inappropriate comments of this kind?</p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-05-26T04:21:16Z</updated>
+      <updated>2019-05-26T05:21:34Z</updated>
     </source>
   </entry>
 
@@ -2011,7 +2073,7 @@ We apply the above results to show a separation between locally testable codes i
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-26T04:20:50Z</updated>
+      <updated>2019-05-26T05:21:23Z</updated>
     </source>
   </entry>
 
@@ -2045,7 +2107,7 @@ We apply the above results to show a separation between locally testable codes i
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2019-05-26T04:22:40Z</updated>
+      <updated>2019-05-26T05:22:26Z</updated>
     </source>
   </entry>
 
@@ -2149,7 +2211,7 @@ Through this result we settle the question posed by M. Alekhnovich and A. Razbor
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-05-26T04:20:52Z</updated>
+      <updated>2019-05-26T05:21:23Z</updated>
     </source>
   </entry>
 
@@ -2280,7 +2342,7 @@ Can we elections be trusted? Can we formalize the connection between election an
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-05-26T04:21:16Z</updated>
+      <updated>2019-05-26T05:21:36Z</updated>
     </source>
   </entry>
 
@@ -2333,34 +2395,7 @@ Can we elections be trusted? Can we formalize the connection between election an
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-05-26T04:21:12Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-jobs.org/2019/05/10/postdoc-in-drone-safety-at-department-of-electronic-systems-aalborg-university-apply-by-june-6-2019/</id>
-    <link href="https://cstheory-jobs.org/2019/05/10/postdoc-in-drone-safety-at-department-of-electronic-systems-aalborg-university-apply-by-june-6-2019/" rel="alternate" type="text/html"/>
-    <title>Postdoc in drone safety at Department of Electronic Systems, Aalborg University (apply by June 6, 2019)</title>
-    <summary>At the Faculty of IT and Design, Department of Electronic Systems, a position as postdoc in the research project SafeEYE is open for appointment from July 1st, 2019, or soon hereafter, and until May 31, 2021. Website: https://www.stillinger.aau.dk/vis-stilling/?vacancy=1042671 Email: alc@es.aau.dk</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>At the Faculty of IT and Design, Department of Electronic Systems, a position as postdoc in the research project SafeEYE is open for appointment from July 1st, 2019, or soon hereafter, and until May 31, 2021.</p>
-<p>Website: <a href="https://www.stillinger.aau.dk/vis-stilling/?vacancy=1042671">https://www.stillinger.aau.dk/vis-stilling/?vacancy=1042671</a><br/>
-Email: alc@es.aau.dk</p></div>
-    </content>
-    <updated>2019-05-10T07:42:15Z</updated>
-    <published>2019-05-10T07:42:15Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-jobs.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-jobs.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-jobs.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-05-26T04:21:24Z</updated>
+      <updated>2019-05-26T05:21:26Z</updated>
     </source>
   </entry>
 </feed>
