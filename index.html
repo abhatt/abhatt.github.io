@@ -116,7 +116,7 @@ Stay up to date
 <a class="feedlink" href="https://research.googleblog.com/feeds/posts/default/-/Algorithms" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="https://research.googleblog.com/search/label/Algorithms" title="Research Blog">Google Research Blog: Algorithms</a>
 <br>
-<a class="feedlink" href="https://gradientscience.org/feed.xml" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
+<a class="feedlink" href="http://gradientscience.org/feed.xml" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://gradientscience.org/" title="gradient science">Gradient Science</a>
 <br>
 <a class="feedlink" href="http://grigory.us/blog/feed.xml" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
@@ -225,7 +225,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at June 03, 2019 05:25 PM UTC</span>.
+Last updated <span class="datestr">at June 03, 2019 06:24 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -343,6 +343,379 @@ Powered by<br>
 
 <p class="date">
 <a href="http://offconvex.github.io/2019/06/03/trajectories/"><span class="datestr">at June 03, 2019 10:00 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://gradientscience.org/robust_reps/">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/madry.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="http://gradientscience.org/robust_reps/">Robustness beyond Security&amp;#58; Representation Learning</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://gradientscience.org/" title="gradient science">Gradient Science</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><a style="float: left;" href="https://gradientscience.org/paper.pdf" class="bbutton">
+<i class="fas fa-file-pdf"></i>
+    Read the paper
+</a>
+<a style="float: right;" href="http://git.io/robust-reps" class="bbutton">
+<i class="fab fa-github"></i>
+   Download the notebooks
+</a></p>
+
+<p><i>This post discusses our <a href="https://gradientscience.org/paper.pdf">latest paper</a>
+on deep network representations—while representations of standard
+networks are brittle and thus not fully reflective of the input geometry,
+we find that the representations of robust networks are amenable to all
+sorts of manipulation, and can truly be thought of (and dealt with) as just
+high-level feature representations. Our work suggests that robustness might
+be more broadly useful than just protection against adversarial examples.
+</i></p>
+
+<p>One of the most promising aspects of deep neural networks is their
+potential to learn high-level <i>features</i> that are useful beyond the
+classification task at hand. Our mental model of deep
+learning classifiers is often similar to the following diagram, in which
+the networks learns progressively higher-level features until the final
+layer, which acts as a linear classifier over these high-level features:</p>
+
+<p><img src="http://gradientscience.org/assets/rf1_images/visualization.png" alt="" /></p>
+<div class="footnote">
+A conceptual picture of our understanding of modern deep neural networks
+(NVIDIA).
+</div>
+
+<p>This picture is consistent with the surprising versatility of deep neural
+network <i>feature representations</i>—learned representations for one
+task are useful for many others
+(as in <a href="https://papers.nips.cc/paper/959-learning-many-related-tasks-at-the-same-time-with-backpropagation.pdf">transfer learning</a>), and
+distance in representation space has often been proposed as a perceptual
+metric on natural images (as in <a href="http://arxiv.org/abs/1801.03924">VGG distance</a>).</p>
+
+<div class="footnote">
+<strong>Note:</strong> In <a href="https://gradientscience.org/paper.pdf">our paper</a> and in this blog post, we refer to the
+<i>representation</i> $R(x)$ of an input $x$ for a network as the
+values of the penultimate layer in the network for that input.
+</div>
+
+<p>But to what extent is this picture accurate? It turns out that it is
+rather simple to (consistently) construct images that are <i>completely</i>
+different to a human, but share very similar representations:</p>
+
+<p><img src="http://gradientscience.org/assets/rf1_images/standard_brittleness.png" alt="Standard representations are brittle" /></p>
+<div class="footnote">
+The above two images, despite seeming completely different to humans, share very
+similar representations.
+</div>
+
+<p>This phenomenon is somewhat troubling for our conceptual picture: if
+feature representations actually encode high-level, human-meaningful
+features, we should not be able to find two images with totally different
+features that the model “sees” as very similar.</p>
+
+<p>The phenomenon at play here turns out to be more fundamental than just
+pairs of images with similar representations. Indeed, the
+representations of neural networks seem to be <i>pervasively brittle</i>:
+they can be manipulated arbitrarily without meaningful change to the input.
+(In fact, this brittleness is similar to the phenomenon that we exploit
+when making <a href="https://gradientscience.org/intro_adversarial">adversarial examples</a>.)</p>
+
+<p>Clearly, this brittleness precludes standard representations from acting
+how we want them to—in particular, distance in representation space is
+not fully <i>aligned</i> with our human perception of distance in feature
+space. So, how might we go about fixing this issue?</p>
+
+<h3 id="adversarial-robustness-as-a-feature-prior">Adversarial Robustness as a Feature Prior</h3>
+
+<p>Unfortunately, we don’t have a way to explicitly control which features
+models learn (or in what way they learn them). We can, however,
+disincentivize models from using features that humans <i>definitely</i>
+don’t use by imposing a <i>prior</i> during training. In our paper, we
+explore a very simple prior: namely, that imperceptible changes in the
+input should not cause large changes in the model’s prediction (i.e.,
+models should not rely on brittle features):</p>
+
+
+
+<p>Note that this stability is a necessary, but not sufficient property: all
+features that humans use certainly obey this property (for reasonably small
+), but not every feature obeying this property is one that we
+want our models to rely on.</p>
+
+<p>How should we enforce this prior? Well, observe that the condition
+$\eqref{eq:robustcond}$ above is actually <i>precisely</i> $\ell_2$-<a href="https://gradientscience.org/intro_adversarial">adversarial
+robustness</a>! Thus, a natural method to employ is robust optimization,
+which, as we discussed in a <a href="https://gradientscience.org/robust_opt_pt1">previous post</a>, provides reasonable
+robustness to adversarial perturbations. Concretely, instead of just
+minimizing loss, we opt to minimize <i>adversarial loss</i>:</p>
+
+
+
+<h3 id="inverting-representations">Inverting representations</h3>
+
+<p>Now, given a network trained in this manner, what happens if we look for
+images with the same representations? Concretely, fixing some image $x$,
+what happens if we look for an image $x’$ that has a matching
+representation:</p>
+
+
+
+<p>(Note that we found the image pairs presented earlier for standard networks
+by solving exactly the above problem.) It turns out that when our model is
+<i>robust</i>, we end up with an image that is remarkably similar to the
+original:</p>
+
+<div class="widget">
+    <div class="choices_one" id="left2">
+	<span class="widgetheading">Choose an Image</span>
+    </div>
+    <span class="widgetheading">Reconstructed Image</span>
+    <div class="beer-slider selected_one" id="inv_slider">
+	<img id="selectedinv1" />
+	<div style="border-right: 3px white solid;" class="beer-reveal">
+	    <img class="slider_img" id="selectedinv2" />
+	</div>
+    </div>
+</div>
+<div style="clear: both;"></div>
+<div class="footnote">
+<strong>Interactive demo</strong>: click on any of the images on the left to see its
+reconstruction via the representation of a robust network. The top row
+contains random images from the test set, and the bottom row has random
+<i>out-of-distribution</i> inputs (images without a correct class).
+</div>
+
+<p>Indeed, instead of being able to manipulate feature representations
+arbitrarily within a small radius, we now find that matching the
+representation of an image leads to (approximately) matching the image
+itself.</p>
+
+<h2 id="what-can-we-do-with-these-representations">What can we do with these representations?</h2>
+<p>We just saw that the learned representation of a robust deep classifier
+suffices to reconstruct its input pretty accurately (at least in terms of
+human perception). This highlights two crucial properties of these
+representations: a) optimizing for closeness in representation space leads
+to perceptually similar images, b) representations contain a large amount
+of information about the high-level features of the inputs. These
+properties are very desirable and prompt us to further explore the
+structure and potential of these representations.  <i>What we find is that
+the representations of robust networks can truly be thought of as
+high-level feature representations, and thus (in stark contrast to standard
+networks) are naturally amenable to various types of manipulation.</i></p>
+
+<p>In the following sections, we explore these “robust representations” in
+more depth. A crucial theme in our exploration is
+<i>model-faithfulness</i>. Though significant work has been done in
+manipulating and interpreting standard (non-robust) models, it seems as
+though getting anything meaningful from standard networks requires
+enforcing <i>priors</i> into the visualization process
+(see this excerpt <a href="https://distill.pub/2017/feature-visualization/#enemy-of-feature-vis">“The Enemy of Feature Visualization”</a>
+for a discussion and illustration of this). This comes at the cost of either hiding
+vital signals the model utilizes or introducing information that was not
+already present in the model—thus blurring the line between what
+information the model actually has, versus what information we introduced
+when interacting with it. In contrast, throughout our exploration we will
+rely on only direct optimization over representation space, without
+introducing any priors or extra information.</p>
+
+<h3 id="feature-visualization">Feature visualization</h3>
+
+<p>We begin our exploration of robust representations by trying to understand
+the features captured by their individual components. We visualize these
+components in the simplest possible way: we perform gradient descent to
+find inputs that maximally activate individual components of the
+representation. This is how a few <em>random</em> visualizations look like:</p>
+
+<p><img src="http://gradientscience.org/assets/rf1_images/features.png" style="margin: 0;" /></p>
+<div class="footnote">
+   Inputs maximizing various coordinates (separated by column) of a robust network, found via gradient descent starting from the "seed" image on the far left.
+</div>
+
+<p>We see a surprising alignment with human concepts. For instance, the last
+component above seems to correspond to “anemone” and the second-last component to
+“flowers”. In fact, these names are consistent with the test images
+maximally activating these neurons—here are the images corresponding to
+each component:</p>
+
+<div class="widget">
+    <div class="choices_one" id="left_maxact">
+	<span class="widgetheading">Choose a Coordinate (Feature)</span>
+    </div>
+    <span class="widgetheading">Top Images</span>
+    <div class="selected_one" id="maxact_selected"></div>
+</div>
+<div style="clear: both;"></div>
+<div class="footnote">
+    <strong>Interactive demo</strong>: On the left are components of the representation of a robust network
+    (the thumbnails are a visualization of the components maximized from
+    noise). On the right are the images from the test set that maximally activate the corresponding components.
+</div>
+
+<p>These visualizations might look familiar. Indeed, similar results have been
+produced in prior work using non-robust models (e.g.
+<a href="https://distill.pub/2017/feature-visualization/">here</a> or
+<a href="https://distill.pub/2018/building-blocks/">here</a>). The difference is that
+the images above are generated by directly maximizing representation
+components with gradient descent in input space—we do not enforce any
+priors or regularization. For standard networks, the same process is
+unfruitful—to circumvent this, prior work imposes priors on the
+optimization process.</p>
+
+<h3 id="feature-manipulation">Feature Manipulation</h3>
+
+<p>So far, we have seen that matching the representation of an image starting
+from random noise, recovers the high-level features of the image itself. At
+the same time, we saw that individual representation components correspond
+to high-level human-meaningful concepts. These findings suggests an
+intriguing possibility: perhaps we can directly modify high-level features
+of an image by manipulating the corresponding representation over the input
+space.</p>
+
+<p>This turns out to yield remarkably plausible results! Here we visualize the
+results of increasing a few select components via gradient descent over the
+image space for a few <em>random</em> (not cherry-picked) inputs:</p>
+
+<div class="widget">
+    <div class="choices_right" id="right1">
+	<span class="widgetheading">Choose a Coordinate</span>
+    </div>
+    <div class="selected_two">
+	<span class="widgetheading">Feature Addition</span>
+	<div class="beer-slider" id="manipulation_slider">
+	    <img id="man_selected1" /> 
+	    <div style="border-right: 3px white solid;" class="beer-reveal">
+		<img class="slider_img" id="man_selected2" /> 
+	    </div>
+	</div>
+    </div>
+    <div class="choices_left" id="left1">
+	<span class="widgetheading">Choose a Source Image</span>
+    </div>
+</div>
+<div style="clear: both;"></div>
+<div class="footnote">
+<strong>Interactive demo</strong>: On the left are randomly selected source images,
+and on the right are components of the representation of a robust network
+(the thumbnails are a visualization of the components maximized from
+noise). In the middle is the feature from the selected component, "added"
+to the selected image.
+</div>
+
+<p>These images end up actually exhibiting the relevant features in a way that
+is plausible to humans (for example, stripes appear mostly on animals
+instead of the background).</p>
+
+<p>This opens up a wide range of fine-grained manipulations that one can
+perform by leveraging the learned representations (in fact, stay tuned for
+some applications in our next blog post).</p>
+
+<h3 id="input-interpolation">Input interpolation</h3>
+<p>In fact, this outlook can be pushed even further—robust models can be
+leveraged as a tool for another kind of manipulation: input-to-input
+interpolation. That is, if we think of robust representations as encoding
+the high-level features of an input in a sensible manner, an intuitive way
+to interpolate between any two inputs is to linearly interpolate their
+representations. More precisely, given any two inputs, we can try to
+construct an interpolation between them by linearly interpolating their
+representations and then constructing inputs to match these
+representations.</p>
+
+<p>This rather intuitive way of dealing with representations turns out to work
+reasonably well—we can interpolate between arbitrary images. Randomly
+sampled interpolations are shown below:</p>
+
+<div class="widget">
+    <div class="choices_left" id="int_left1">
+	<span class="widgetheading">Choose a Source Image</span>
+    </div>
+    <div class="selected_two">
+	<span class="widgetheading">Interpolation</span>
+	<video style="width: 100%;">
+	    <source type="video/mp4" id="int_selected">
+	</source></video>
+    </div>
+    <div class="choices_right" id="int_right1">
+	<span class="widgetheading">Choose a Destination Image</span>
+    </div>
+</div>
+<div style="clear: both;"></div>
+<div class="footnote">
+<strong>Interactive demo</strong>: On the left are randomly selected source images,
+and on the right are randomly selected target images.
+In the middle is the feature interpolation from the selected source image
+to the selected target.
+</div>
+
+<p>As we can see, the interpolations appears perceptually plausible. Note
+that, in contrast to approaches based on generative models
+(e.g. <a href="https://arxiv.org/abs/1511.06434">here</a> or
+<a href="https://arxiv.org/abs/1809.11096">here</a>), this approach can interpolate
+between arbitrary inputs and not only between those produced by the
+generative model.</p>
+
+<h3 id="insight-into-model-predictions">Insight into model predictions</h3>
+<p>Expanding on our view of deep classifiers as simple linear classifiers on
+top of the learned representations, there is also a simple way to gain
+insight into predictions of (robust) models. In particular, for incorrect
+predictions, we can identify the component most heavily contributing to the
+incorrect class (in the same way we would for a linear classifier) and then
+directly manipulate the input to increase the value of that component (with
+input-space gradient descent). Here we perform this visualization for a few
+random misclassified inputs:</p>
+
+<p><img src="http://gradientscience.org/assets/rf1_images/misclassification_IN.jpg" style="margin: 0;" /></p>
+
+<p>The resulting images could provide insight into the model’s incorrect
+decision. For instance, we see the bug becoming a dog eye or negative space
+becoming the face of a dog. At a high level, these inputs demonstrate which
+parts of the image the incorrect prediction was most sensitive to.</p>
+
+<p>Still, as a word of caution, it is important to note that just as with all
+saliency methods (e.g. heatmaps, occlusion studies, etc.), visualizing
+features and studying misclassification only gives insights into a “local”
+sense of model behaviour. Deep neural networks are complex, highly
+non-linear models and it’s important to keep in mind that <i>local
+sensitivity does not necessarily entail causality</i>.</p>
+
+<h2 id="towards-better-learned-representations">Towards better learned representations</h2>
+<p>As we discussed, robust feature representations possess properties that
+make them desirable from a broader point of view. In particular, we found
+these representations to be better aligned with a perceptual notion of
+distance, while allowing us to perform direct input manipulations in a
+model-faithful way. These are properties that are fundamental to any “truly
+human-level” representation. One can thus view adversarial robustness as a
+very potent prior for obtaining representations that are more aligned with
+human perception beyond the standard goals of security and reliability.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://gradientscience.org/robust_reps/"><span class="datestr">at June 03, 2019 12:00 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -2602,129 +2975,6 @@ We also explore consequences of circuit lower bounds for a sparse language in NP
 
 <p class="date">
 <a href="https://eccc.weizmann.ac.il/report/2019/075"><span class="datestr">at May 25, 2019 06:06 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://rjlipton.wordpress.com/?p=15910">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/lipton.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://rjlipton.wordpress.com/2019/05/25/selected-papers-at-ccc-2019/">Selected Papers at CCC 2019</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://rjlipton.wordpress.com" title="Gödel’s Lost Letter and P=NP">Richard Lipton</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p><font color="#0044cc"><br />
-<em>Some papers from the accepted list of this year’s Computational Complexity Conference</em><br />
-<font color="#000000"></font></font></p><font color="#0044cc"><font color="#000000">
-<table class="image alignright">
-<tbody>
-<tr>
-<td>
-<a href="https://rjlipton.wordpress.com/2019/05/25/selected-papers-at-ccc-2019/unknown-122/" rel="attachment wp-att-15912"><img width="150" alt="" class="alignright  wp-image-15912" src="https://rjlipton.files.wordpress.com/2019/05/unknown-1.jpeg?w=150" /></a>
-</td>
-</tr>
-<tr>
-<td class="caption alignright"><font size="-2">[ UB CSE ]</font></td>
-</tr>
-</tbody>
-</table>
-<p>
-Alan Selman is a long-time friend of Ken and I, and is a long-time researcher in complexity theory. Alan was the first president of the organizing <a href="https://www.computationalcomplexity.org/governance.php">body</a> for the Computational Complexity Conferences (CCC). </p>
-<p>
-Today we salute the <img src="https://s0.wp.com/latex.php?latex=%7B0b100010%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{0b100010}" class="latex" title="{0b100010}" />th edition of the conference and discuss some of the accepted papers.</p>
-<p>
-The conference, and the governing body, have changed names over the years; by any name it remains an important conference. Alan <a href="https://www.computationalcomplexity.org/documents/first-cfp.pdf">chaired</a> the first program committee with Steve Mahaney and <a href="https://dl.acm.org/citation.cfm?id=648296&amp;picked=prox">edited</a> the first proceedings, in 1986. </p>
-<p>
-Ken recently saw Alan two weeks ago at the banquet for the <a href="http://www.fields.utoronto.ca/activities/18-19/NP50">symposium</a> honoring Steve Cook at the University of Toronto. We will cover event, once <a href="https://rjlipton.wordpress.com/2019/05/21/making-up-tests/">exams</a> are done. Ken saw another of the CCC past presidents there—if you wish to guess who, a hint is it was one of Cook’s past students.</p>
-<ul>
-<li>
-Dieter van Melkebeek, 2012-2018 <p></p>
-</li><li>
-Peter Bro Miltersen, 2009-2012 <p></p>
-</li><li>
-Pierre McKenzie, 2006-2009 <p></p>
-</li><li>
-Lance Fortnow, 2000-2006 <p></p>
-</li><li>
-Eric Allender, 1997-2000 <p></p>
-</li><li>
-Steven Homer, 1994-1997 <p></p>
-</li><li>
-Timothy Long, 1992-1994 <p></p>
-</li><li>
-Stephen Mahaney, 1988-1992 <p></p>
-</li><li>
-Alan Selman, 1985-1988
-</li></ul>
-<p>
-Although we do not usually do announcements, we note from the conference <a href="https://computationalcomplexity.org">website</a>:</p>
-<blockquote><p><b> </b> <em> Details of the local arrangements for CCC 2019 and the preceding events, including the DIMACS Day of Tutorials, are available. Early registration runs till June 26. </em>
-</p></blockquote>
-<p>
-</p><p></p><h2> Six Papers with Some Comments </h2><p></p>
-<p></p><p>
-Here are some papers that I, Dick, found interesting from the list of accepted papers. All accepted papers are interesting, of course. I selected six that were on topics that were directly connected with my interests.</p>
-<p>
-<b>Criticality of Regular Formulas</b>—<a href="http://www.math.toronto.edu/rossman/criticality.pdf">paper</a><br />
-Benjamin Rossman<br />
-<i>I thought this was about regular expressions. Shows something about me.</i> Here “regular” means the in-degree of gates being the same at each level of the circuit. This condition seems likely to be removable as Rossman conjectures, but I doubt it will be easy. The term “criticality” is a parameter that measures how much a random restriction reduces the size of a formula. Think switching lemma.</p>
-<p>
-<b>Typically-Correct Derandomization for Small Time and Space</b>—<a href="https://arxiv.org/abs/1711.00565">paper</a><br />
-William Hoza<br />
-<i>I like the notion of typically-correct.</i> Their algorithms work by treating the input as a source of randomness. This idea was pioneered by Oded Goldreich and Avi Wigderson. The title of their 2002 <a href="http://www.wisdom.weizmann.ac.il/~oded/p_rnd02.html">article</a> “Derandomization that is rarely wrong from short advice that is typically good”, gives away how one can prove such results. </p>
-<p>
-<b>Optimal Short-Circuit Resilient Formulas</b>—<a href="https://arxiv.org/abs/1807.05014">paper</a><br />
-Mark Braverman, Klim Efremenko, Ran Gelles, and Michael Yitayew <br />
-<i>This is on a kind of fault-tolerance.</i> They consider fault-tolerant boolean formulas in which the output of a faulty gate is stuck at one of the gate’s inputs. This is an interesting model of errors, and they show roughly: any formula can be converted into a formula that is not too much bigger and survives even if about <img src="https://s0.wp.com/latex.php?latex=%7B1%2F5%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{1/5}" class="latex" title="{1/5}" /> of the gates are faulty. A surprise is that they use a method related to <i>blockchains</i>. Hmmmmm. Interesting.</p>
-<p>
-<b>Fourier and Circulant Matrices are Not Rigid</b>—<a href="https://arxiv.org/pdf/1902.07334.pdf">paper</a><br />
-Allen Liu and Zeev Dvir <br />
-<i>A matrix is rigid if its rank cannot be reduced significantly by changing a small number of entries.</i> As you probably know there are plenty of rigid matrices—take random ones—but no provable examples of explicit ones. Their beautiful results prove that specific families of matrices are not rigid. These families include ones that were long thought to be rigid. The highlight of this work could be that it suggests new families that may be rigid. </p>
-<p>
-<b>Average-Case Quantum Advantage with Shallow Circuits</b>—<a href="https://arxiv.org/pdf/1810.12792.pdf">paper</a><br />
-François Le Gall <br />
-<i>A quest, the quest that tops all others—is the search for evidence that quantum computers are better than classic ones.</i> Of course, this is nearly impossible, since P=PSPACE is an open problem. So one looks at special classes of computations. See <a href="https://arxiv.org/pdf/1612.05903.pdf">here</a> for how the quest for “quantum advantage” meets up with computational complexity.</p>
-<p>
-<b>Relations and Equivalences Between Circuit Lower Bounds and Karp-Lipton Theorems</b><br />
-<a href="https://eccc.weizmann.ac.il/report/2019/075/">paper</a><br />
-Lijie Chen, Dylan McKay, Cody Murray, and Ryan Williams <br />
-<i>Of course I think this is an interesting paper.</i> There is the famous H-score. Perhaps there could be a T-score. This would be the number of times your name is in the title of a published paper. Thus Ron Rivest, for example, has a huge T-score.</p>
-<p>
-</p><p></p><h2> Open Problems </h2><p></p>
-<p></p><p>
-What are your selected papers? </p>
-<p>
-[Added link to Relations and Equivalences… paper]</p></font></font></div>
-
-
-
-
-
-
-
-<p class="date">
-by rjlipton <a href="https://rjlipton.wordpress.com/2019/05/25/selected-papers-at-ccc-2019/"><span class="datestr">at May 25, 2019 03:10 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
