@@ -225,7 +225,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at June 08, 2019 05:24 AM UTC</span>.
+Last updated <span class="datestr">at June 08, 2019 06:25 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -233,6 +233,87 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://11011110.github.io/blog/2019/06/07/little-knowledge-can">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/eppstein.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://11011110.github.io/blog/2019/06/07/little-knowledge-can.html">A little knowledge can make the next step harder</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>Suppose you have a fill-in-the-unknowns puzzle, like Sudoku. Can making some deductions and filling in those parts of the puzzle make the whole thing harder to solve than it was before you started? Sometimes, yes!</p>
+
+<p>I have in mind human-style puzzle-deduction rules, where you see a piece of the puzzle that matches some pattern and use that to deduce what one of the unknowns should be. And by “harder” I mean that a puzzle that was previously possible to solve by some set of deduction rules, after the deduction, stopped being possible for those rules to solve. Of course this is possible if you have a bad set of deduction rules. But normally, at least for the kinds of patterns I think about when solving puzzles, if a pattern matches in a partially completed puzzle, then it or a simplification of it will continue to match no matter how I fill in more of the unknowns. Most of the deduction pattern that I use are monotonic, in this sense. If you had a collection of patterns that was not monotonic, you could add all ways of partially filling them in to your collection, and get a better set of patterns, right?</p>
+
+<p>Wrong! There can be valid deduction patterns for which this extension to monotonic sets would produce invalid patterns. I’m pretty sure this can happen in Sudoku, actually, but the example I have in mind comes from a different puzzle game I’ve been playing lately, part of Simon Tatham’s puzzle collection, where it’s called “map”. It’s based on the problem of <a href="https://en.wikipedia.org/wiki/Precoloring_extension">precoloring extension</a>: you’re given a partially 4-colored planar map, and you have to fill in the rest of the colors.
+And it’s trivially NP-complete, by a reduction from planar 3-coloring (augment a 3-coloring instance by extra vertices of the fourth color, preventing any of the given instance vertices from having that color) but the puzzles usually presented by the puzzle app are solvable by hand, even when they’re large and at the highest of its levels of difficulty.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/map-screenshot.png" alt="Screenshot of the map puzzle from Simon Tatham's puzzle collection" /></p>
+
+<p>If that were all, then I think all deduction rules could be made monotonic. But I’m going to tell you one more thing about the puzzle, and this one thing makes it non-monotonic. It is that, like Sudoku, every puzzle has a unique solution.
+And <a href="https://11011110.github.io/blog/2005/10/15/assuming-uniqueness-in.html">like Sudoku, the assumption of uniqueness leads to new deduction rules</a>.
+You can infer that certain regions have to have certain colors, because if they could be colored anything else then there would be more than one solution.</p>
+
+<p>To see how this works, suppose I had a map like the one shown below (where the white squares have not yet been colored, and I’m only showing a small piece of a larger puzzle):</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/nonmon1.svg" alt="Uncolored pocket in a map puzzle" /></p>
+
+<p>There’s a pocket of uncolored squares extending into the colored region on the left. If I colored the square at the mouth of the pocket yellow, the inner square of the puzzle would be ambiguous: it has only yellow and blue neighbors, so it could be either red or black.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/nonmon2.svg" alt="Ambiguously colored pocket in a map puzzle" /></p>
+
+<p>To prevent this ambiguity, the square at the mouth of the pocket must be black. And to force it to be black, the square one step beyond the mouth must be yellow. So from the initial state and the assumption of a unique solution, it’s possible to infer the colors of three previously-blank squares:</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/nonmon3.svg" alt="Ambiguously colored pocket in a map puzzle" /></p>
+
+<p>But if I have multiple rules at hand, it’s natural for me to try the weaker and easier ones first. Suppose I had done this, and used a weaker inference rule telling me that the square at the mouth was black.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/nonmon4.svg" alt="Partially colored pocket in a map puzzle" /></p>
+
+<p>Or suppose I had used a rule that produced the valid (but even weaker) inference that the inner square must be red.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2019/nonmon5.svg" alt="Even more partially colored pocket in a map puzzle" /></p>
+
+<p>Now I can’t use my strong inference rule and color the outer squares! I’ve lost the information about why I colored the inner pocket squares the way I did, and so I’ve lost the ability to make deductions about how the outer squares should be colored to avoid ambiguities. It would not be a valid pattern to see a puzzle in these states and deduce the color of the remaining squares associated with the pocket. So the extension from my initial (valid) rule, which filled in all three squares when they were all blank, to a monotonic rule that fills in the partially-filled-in pocket in the same way, would be invalid. Of course, if the puzzle solution was unique before, it must still be unique after partially filling in the pocket. But with fewer squares colored, my deductive abilities might not be up to the task of reasoning from the remaining parts of the puzzle to its unique solution.</p>
+
+<p>For the same reason, I might not actually want to color yellow the square beyond the mouth, forgetting why it needs to be yellow. Because what I can infer from the initial state is not merely that it should be colored yellow: it’s that the three outer neighbors of this square must have a permutation of the three other colors, so that this square is forced to be yellow, so that the rest of the pocket will have an unambiguous coloring.</p>
+
+<p>I think what this means is that my knowledge representation (consisting only of blank or filled-in puzzle regions) is inadequate. In practice, I actually use a more complex knowledge representation where (either in my head or with markers provided in the puzzle app) I keep track of which colors are still available for the blank regions, but it’s still inadequate, in the same way. It’s not clear to me what the right knowledge representation is, to allow me to keep track of chains of inferences like “one of these squares must be red to prevent this square from becoming yellow to prevent its neighbor from becoming ambiguous” without the complexity of what I remember for each square blowing up to non-constant.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/102234384857906663">Discuss on Mastodon</a>)</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by David Eppstein <a href="https://11011110.github.io/blog/2019/06/07/little-knowledge-can.html"><span class="datestr">at June 07, 2019 10:37 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -3498,62 +3579,6 @@ What are your selected papers? </p>
 
 <p class="date">
 by rjlipton <a href="https://rjlipton.wordpress.com/2019/05/25/selected-papers-at-ccc-2019/"><span class="datestr">at May 25, 2019 03:10 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="tag:blogger.com,1999:blog-3722233.post-4982821151012814632">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/gasarch.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="https://blog.computationalcomplexity.org/2019/05/logic-then-and-now.html">Logic Then and Now</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://blog.computationalcomplexity.org/" title="Computational Complexity">Computational Complexity</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-This week I attended the <a href="https://asl2019.commons.gc.cuny.edu/">Association of Symbolic Logic North American Annual Meeting</a> in New York City, giving a talk on P v NP.<br />
-<br />
-First I must share the announcement that ASL member Tuna Antinel of Lyon 1 University has been arrested in Turkey for his political beliefs. <a href="http://math.univ-lyon1.fr/SoutienTunaAltinel/">This website</a> (<a href="https://webusers.imj-prg.fr/~adrien.deloro/">English version</a>) has details and how to show your support.<br />
-<br />
-I last attended the ASL annual meeting at Notre Dame in 1993 as a young assistant professor. Back then I talked about <a href="https://doi.org/10.1137/S0097539793248305">then recent work</a> using a special kind of generic oracle to make the Berman-Hartmanis isomorphism conjecture true. I remember someone coming up to me after the talk saying how excited they were to see such applications of logic. I'm not a theoretical computer scientist, I'm a applied logician.<br />
-<br />
-I asked at my talk this year and maybe 2-3 people were at that 1993 meeting. The attendance seemed smaller and younger, though that could be my memory playing tricks. I heard that the 2018 meeting in Macomb, Illinois drew a larger crowd. New York is expensive and logicians don't get large travel budgets.<br />
-<br />
-Logic like theoretical computer science has gotten more specialized so I was playing catch up trying to follow many of the talks. Mariya Soskova of Wisconsin talked about enumeration degrees that brought me back to the days I sat in logic classes and talks at the University of Chicago. A set A is enumeration reducible to B if from an enumeration of B you can compute an enumeration of A and Mariya gave a great overview of this area.<br />
-<br />
-I learned about the status of an open problem for Turing reducibility: Is there a non-trivial automorphism of the Turing Degrees? A degree is the equivalence class where each class are the languages all computably Turing-reducible to each other. So the question asks if there is a bijection f mapping degrees to degrees, other than identity, that preserves reducibility or lack thereof.<br />
-<br />
-Here's what's known: There are countably many such automorphisms. There is a definable degree C in the arithmetic hierarchy, such that if f(C) = C then f is the identity. Also if f is the identity on all the c.e.-degrees (those equivalence classes containing a computably enumerable set), then f is the identity on all the degrees. Still open if there is more than one automorphism.<br />
-<br />
-<br /></div>
-
-
-
-
-
-
-
-<p class="date">
-by Lance Fortnow (noreply@blogger.com) <a href="https://blog.computationalcomplexity.org/2019/05/logic-then-and-now.html"><span class="datestr">at May 24, 2019 01:14 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>

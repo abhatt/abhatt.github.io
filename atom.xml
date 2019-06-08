@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-06-08T05:24:16Z</updated>
+  <updated>2019-06-08T06:24:24Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,70 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2019/06/07/little-knowledge-can</id>
+    <link href="https://11011110.github.io/blog/2019/06/07/little-knowledge-can.html" rel="alternate" type="text/html"/>
+    <title>A little knowledge can make the next step harder</title>
+    <summary>Suppose you have a fill-in-the-unknowns puzzle, like Sudoku. Can making some deductions and filling in those parts of the puzzle make the whole thing harder to solve than it was before you started? Sometimes, yes!</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Suppose you have a fill-in-the-unknowns puzzle, like Sudoku. Can making some deductions and filling in those parts of the puzzle make the whole thing harder to solve than it was before you started? Sometimes, yes!</p>
+
+<p>I have in mind human-style puzzle-deduction rules, where you see a piece of the puzzle that matches some pattern and use that to deduce what one of the unknowns should be. And by “harder” I mean that a puzzle that was previously possible to solve by some set of deduction rules, after the deduction, stopped being possible for those rules to solve. Of course this is possible if you have a bad set of deduction rules. But normally, at least for the kinds of patterns I think about when solving puzzles, if a pattern matches in a partially completed puzzle, then it or a simplification of it will continue to match no matter how I fill in more of the unknowns. Most of the deduction pattern that I use are monotonic, in this sense. If you had a collection of patterns that was not monotonic, you could add all ways of partially filling them in to your collection, and get a better set of patterns, right?</p>
+
+<p>Wrong! There can be valid deduction patterns for which this extension to monotonic sets would produce invalid patterns. I’m pretty sure this can happen in Sudoku, actually, but the example I have in mind comes from a different puzzle game I’ve been playing lately, part of Simon Tatham’s puzzle collection, where it’s called “map”. It’s based on the problem of <a href="https://en.wikipedia.org/wiki/Precoloring_extension">precoloring extension</a>: you’re given a partially 4-colored planar map, and you have to fill in the rest of the colors.
+And it’s trivially NP-complete, by a reduction from planar 3-coloring (augment a 3-coloring instance by extra vertices of the fourth color, preventing any of the given instance vertices from having that color) but the puzzles usually presented by the puzzle app are solvable by hand, even when they’re large and at the highest of its levels of difficulty.</p>
+
+<p style="text-align: center;"><img alt="Screenshot of the map puzzle from Simon Tatham's puzzle collection" src="https://11011110.github.io/blog/assets/2019/map-screenshot.png"/></p>
+
+<p>If that were all, then I think all deduction rules could be made monotonic. But I’m going to tell you one more thing about the puzzle, and this one thing makes it non-monotonic. It is that, like Sudoku, every puzzle has a unique solution.
+And <a href="https://11011110.github.io/blog/2005/10/15/assuming-uniqueness-in.html">like Sudoku, the assumption of uniqueness leads to new deduction rules</a>.
+You can infer that certain regions have to have certain colors, because if they could be colored anything else then there would be more than one solution.</p>
+
+<p>To see how this works, suppose I had a map like the one shown below (where the white squares have not yet been colored, and I’m only showing a small piece of a larger puzzle):</p>
+
+<p style="text-align: center;"><img alt="Uncolored pocket in a map puzzle" src="https://11011110.github.io/blog/assets/2019/nonmon1.svg"/></p>
+
+<p>There’s a pocket of uncolored squares extending into the colored region on the left. If I colored the square at the mouth of the pocket yellow, the inner square of the puzzle would be ambiguous: it has only yellow and blue neighbors, so it could be either red or black.</p>
+
+<p style="text-align: center;"><img alt="Ambiguously colored pocket in a map puzzle" src="https://11011110.github.io/blog/assets/2019/nonmon2.svg"/></p>
+
+<p>To prevent this ambiguity, the square at the mouth of the pocket must be black. And to force it to be black, the square one step beyond the mouth must be yellow. So from the initial state and the assumption of a unique solution, it’s possible to infer the colors of three previously-blank squares:</p>
+
+<p style="text-align: center;"><img alt="Ambiguously colored pocket in a map puzzle" src="https://11011110.github.io/blog/assets/2019/nonmon3.svg"/></p>
+
+<p>But if I have multiple rules at hand, it’s natural for me to try the weaker and easier ones first. Suppose I had done this, and used a weaker inference rule telling me that the square at the mouth was black.</p>
+
+<p style="text-align: center;"><img alt="Partially colored pocket in a map puzzle" src="https://11011110.github.io/blog/assets/2019/nonmon4.svg"/></p>
+
+<p>Or suppose I had used a rule that produced the valid (but even weaker) inference that the inner square must be red.</p>
+
+<p style="text-align: center;"><img alt="Even more partially colored pocket in a map puzzle" src="https://11011110.github.io/blog/assets/2019/nonmon5.svg"/></p>
+
+<p>Now I can’t use my strong inference rule and color the outer squares! I’ve lost the information about why I colored the inner pocket squares the way I did, and so I’ve lost the ability to make deductions about how the outer squares should be colored to avoid ambiguities. It would not be a valid pattern to see a puzzle in these states and deduce the color of the remaining squares associated with the pocket. So the extension from my initial (valid) rule, which filled in all three squares when they were all blank, to a monotonic rule that fills in the partially-filled-in pocket in the same way, would be invalid. Of course, if the puzzle solution was unique before, it must still be unique after partially filling in the pocket. But with fewer squares colored, my deductive abilities might not be up to the task of reasoning from the remaining parts of the puzzle to its unique solution.</p>
+
+<p>For the same reason, I might not actually want to color yellow the square beyond the mouth, forgetting why it needs to be yellow. Because what I can infer from the initial state is not merely that it should be colored yellow: it’s that the three outer neighbors of this square must have a permutation of the three other colors, so that this square is forced to be yellow, so that the rest of the pocket will have an unambiguous coloring.</p>
+
+<p>I think what this means is that my knowledge representation (consisting only of blank or filled-in puzzle regions) is inadequate. In practice, I actually use a more complex knowledge representation where (either in my head or with markers provided in the puzzle app) I keep track of which colors are still available for the blank regions, but it’s still inadequate, in the same way. It’s not clear to me what the right knowledge representation is, to allow me to keep track of chains of inferences like “one of these squares must be red to prevent this square from becoming yellow to prevent its neighbor from becoming ambiguous” without the complexity of what I remember for each square blowing up to non-constant.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/102234384857906663">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2019-06-07T22:37:00Z</updated>
+    <published>2019-06-07T22:37:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2019-06-08T05:49:29Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>tag:typepad.com,2003:post-6a00d83452383469e20240a48c6624200d</id>
@@ -171,7 +235,7 @@ I hope that this discussion helps shed some light on the new result of GR. I hop
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-06-08T05:21:34Z</updated>
+      <updated>2019-06-08T06:22:15Z</updated>
     </source>
   </entry>
 
@@ -312,7 +376,7 @@ Finally, we show that any two $(k, \delta)$-indistinguishable distributions are 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-06-08T05:21:19Z</updated>
+      <updated>2019-06-08T06:21:43Z</updated>
     </source>
   </entry>
 
@@ -343,7 +407,7 @@ Finally, we show that any two $(k, \delta)$-indistinguishable distributions are 
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-06-08T05:21:32Z</updated>
+      <updated>2019-06-08T06:22:11Z</updated>
     </source>
   </entry>
 
@@ -374,7 +438,7 @@ Finally, we show that any two $(k, \delta)$-indistinguishable distributions are 
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2019-06-08T05:23:16Z</updated>
+      <updated>2019-06-08T06:23:26Z</updated>
     </source>
   </entry>
 
@@ -766,7 +830,7 @@ beyond the security and reliability contexts this goal was considered in so far.
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-06-08T05:21:19Z</updated>
+      <updated>2019-06-08T06:21:43Z</updated>
     </source>
   </entry>
 
@@ -793,7 +857,7 @@ Email: jakob.nordstrom@cs.lth.se</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-06-08T05:21:57Z</updated>
+      <updated>2019-06-08T06:22:22Z</updated>
     </source>
   </entry>
 
@@ -819,7 +883,7 @@ Goldreich recently introduced a generalization of this model in which one endows
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-06-08T05:21:19Z</updated>
+      <updated>2019-06-08T06:21:44Z</updated>
     </source>
   </entry>
 
@@ -869,7 +933,7 @@ We invite you to submit your papers to the 11th Innovations in<br/>Theoretical C
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-06-08T05:22:32Z</updated>
+      <updated>2019-06-08T06:23:05Z</updated>
     </source>
   </entry>
 
@@ -1068,7 +1132,7 @@ We hope that we have begun to convey how our paper uncovers a lot of fun computa
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-06-08T05:21:35Z</updated>
+      <updated>2019-06-08T06:22:15Z</updated>
     </source>
   </entry>
 
@@ -1141,7 +1205,7 @@ David Woodruff, Carnegie Mellon University</p></div>
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2019-06-08T05:23:36Z</updated>
+      <updated>2019-06-08T06:23:46Z</updated>
     </source>
   </entry>
 
@@ -1930,7 +1994,7 @@ These upper and lower bounds were also previously only known in the case $f=$ AN
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-06-08T05:21:19Z</updated>
+      <updated>2019-06-08T06:21:46Z</updated>
     </source>
   </entry>
 
@@ -1962,7 +2026,7 @@ We then use the above result to fully characterize the complexity of differentia
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-06-08T05:21:19Z</updated>
+      <updated>2019-06-08T06:21:44Z</updated>
     </source>
   </entry>
 
@@ -1999,7 +2063,7 @@ In the current work we obtain the following results:
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-06-08T05:21:19Z</updated>
+      <updated>2019-06-08T06:21:44Z</updated>
     </source>
   </entry>
 
@@ -2029,7 +2093,7 @@ In the current work we obtain the following results:
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-06-08T05:21:19Z</updated>
+      <updated>2019-06-08T06:21:42Z</updated>
     </source>
   </entry>
 
@@ -2058,7 +2122,7 @@ Furthermore, the vertices of these graphs can be represented by string of length
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-06-08T05:21:19Z</updated>
+      <updated>2019-06-08T06:21:41Z</updated>
     </source>
   </entry>
 
@@ -2130,7 +2194,7 @@ Furthermore, the vertices of these graphs can be represented by string of length
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2019-06-06T07:22:51Z</updated>
+      <updated>2019-06-08T05:49:29Z</updated>
     </source>
   </entry>
 
@@ -2166,7 +2230,7 @@ Motivated by this and related questions about the interaction between mathematic
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-06-08T05:21:19Z</updated>
+      <updated>2019-06-08T06:21:41Z</updated>
     </source>
   </entry>
 
@@ -2325,7 +2389,7 @@ Email: edc@es.aau.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-06-08T05:21:56Z</updated>
+      <updated>2019-06-08T06:22:22Z</updated>
     </source>
   </entry>
 
@@ -2352,7 +2416,7 @@ Email: edc@es.aau.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-06-08T05:21:55Z</updated>
+      <updated>2019-06-08T06:22:22Z</updated>
     </source>
   </entry>
 
@@ -2463,7 +2527,7 @@ It is greater than the size of the smallest non-extensible set, because if you t
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2019-06-06T07:22:51Z</updated>
+      <updated>2019-06-08T05:49:29Z</updated>
     </source>
   </entry>
 
@@ -2593,7 +2657,7 @@ We also extend equivalence to another system, as we show an augmented version of
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-06-08T05:21:19Z</updated>
+      <updated>2019-06-08T06:21:40Z</updated>
     </source>
   </entry>
 
@@ -2655,7 +2719,7 @@ a sequence of steps in which we take the symmetric difference of the current mat
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2019-06-06T07:22:51Z</updated>
+      <updated>2019-06-08T05:49:29Z</updated>
     </source>
   </entry>
 
@@ -2771,58 +2835,7 @@ What are your selected papers? </p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-06-08T05:21:37Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-3722233.post-4982821151012814632</id>
-    <link href="https://blog.computationalcomplexity.org/feeds/4982821151012814632/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2019/05/logic-then-and-now.html#comment-form" rel="replies" type="text/html"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/4982821151012814632" rel="edit" type="application/atom+xml"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/4982821151012814632" rel="self" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2019/05/logic-then-and-now.html" rel="alternate" type="text/html"/>
-    <title>Logic Then and Now</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">This week I attended the <a href="https://asl2019.commons.gc.cuny.edu/">Association of Symbolic Logic North American Annual Meeting</a> in New York City, giving a talk on P v NP.<br/>
-<br/>
-First I must share the announcement that ASL member Tuna Antinel of Lyon 1 University has been arrested in Turkey for his political beliefs. <a href="http://math.univ-lyon1.fr/SoutienTunaAltinel/">This website</a> (<a href="https://webusers.imj-prg.fr/~adrien.deloro/">English version</a>) has details and how to show your support.<br/>
-<br/>
-I last attended the ASL annual meeting at Notre Dame in 1993 as a young assistant professor. Back then I talked about <a href="https://doi.org/10.1137/S0097539793248305">then recent work</a> using a special kind of generic oracle to make the Berman-Hartmanis isomorphism conjecture true. I remember someone coming up to me after the talk saying how excited they were to see such applications of logic. I'm not a theoretical computer scientist, I'm a applied logician.<br/>
-<br/>
-I asked at my talk this year and maybe 2-3 people were at that 1993 meeting. The attendance seemed smaller and younger, though that could be my memory playing tricks. I heard that the 2018 meeting in Macomb, Illinois drew a larger crowd. New York is expensive and logicians don't get large travel budgets.<br/>
-<br/>
-Logic like theoretical computer science has gotten more specialized so I was playing catch up trying to follow many of the talks. Mariya Soskova of Wisconsin talked about enumeration degrees that brought me back to the days I sat in logic classes and talks at the University of Chicago. A set A is enumeration reducible to B if from an enumeration of B you can compute an enumeration of A and Mariya gave a great overview of this area.<br/>
-<br/>
-I learned about the status of an open problem for Turing reducibility: Is there a non-trivial automorphism of the Turing Degrees? A degree is the equivalence class where each class are the languages all computably Turing-reducible to each other. So the question asks if there is a bijection f mapping degrees to degrees, other than identity, that preserves reducibility or lack thereof.<br/>
-<br/>
-Here's what's known: There are countably many such automorphisms. There is a definable degree C in the arithmetic hierarchy, such that if f(C) = C then f is the identity. Also if f is the identity on all the c.e.-degrees (those equivalence classes containing a computably enumerable set), then f is the identity on all the degrees. Still open if there is more than one automorphism.<br/>
-<br/>
-<br/></div>
-    </content>
-    <updated>2019-05-24T13:14:00Z</updated>
-    <published>2019-05-24T13:14:00Z</published>
-    <author>
-      <name>Lance Fortnow</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-3722233</id>
-      <category term="typecast"/>
-      <category term="focs metacomments"/>
-      <author>
-        <name>Lance Fortnow</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-      </author>
-      <link href="https://blog.computationalcomplexity.org/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default" rel="self" type="application/atom+xml"/>
-      <link href="https://blog.computationalcomplexity.org/" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
-      <title>Computational Complexity</title>
-      <updated>2019-06-07T21:33:11Z</updated>
+      <updated>2019-06-08T06:22:16Z</updated>
     </source>
   </entry>
 </feed>
