@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-07-03T13:21:45Z</updated>
+  <updated>2019-07-03T14:21:44Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,156 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://rjlipton.wordpress.com/?p=16070</id>
+    <link href="https://rjlipton.wordpress.com/2019/07/03/mathematics-of-gerrymandering/" rel="alternate" type="text/html"/>
+    <title>Mathematics of Gerrymandering</title>
+    <summary>Can theory help? [ art: Bill Hennessy ] John Roberts is the Chief Justice of the United States. Today I will discuss the recent Supreme Court decision on gerrymandering. The 5-4 decision in Rucho v. Common Cause takes the courts out of deciding if redistricting was done fairly. Roberts, penning the majority argument, felt that […]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>
+<font color="#0044cc"><br/>
+<em>Can theory help?</em><br/>
+<font color="#000000"/></font></p><font color="#0044cc"><font color="#000000">
+<table class="image alignright">
+<tbody>
+<tr>
+<td>
+<a href="https://rjlipton.wordpress.com/2019/07/03/mathematics-of-gerrymandering/unknown-124/" rel="attachment wp-att-16073"><img alt="" class="alignright size-full wp-image-16073" src="https://rjlipton.files.wordpress.com/2019/07/unknown.jpeg?w=600"/></a>
+</td>
+</tr>
+<tr>
+<td class="caption alignright"><font size="-2">[ art: Bill Hennessy ]</font></td>
+</tr>
+</tbody>
+</table>
+<p>
+John Roberts is the Chief Justice of the United States.</p>
+<p>
+Today I will discuss the recent Supreme Court <a href="https://www.scotusblog.com/case-files/cases/rucho-v-common-cause-2/">decision</a> on gerrymandering.</p>
+<p>
+The 5-4 decision in Rucho v. Common Cause takes the courts out of deciding if redistricting was done fairly. Roberts, penning the majority argument, felt that it was hard, if not impossible, for courts to determine whether districts were reasonably drawn. That is, whether partisan motives dominated when they were created.</p>
+<p>
+I will explain what <a href="https://en.wikipedia.org/wiki/Gerrymandering">gerrymandering</a> is, and how computational methods may play a role. I must add a takeaway: </p>
+<blockquote><p><b> </b> <em> <i>The current view of computational methods to avoid gerrymandering may be based on incorrect assumptions.</i> </em>
+</p></blockquote>
+<p>More on this later.</p>
+<p>
+</p><p/><h2> How It Works </h2><p/>
+<p/><p>
+You probably know that gerrymandering is used, negatively, to describe creating voting districts that do not reflect the voters will. The term was coined as part of an attack on the then Governor of Massachusetts in 1812. Then district shapes looked like a salamander. Since his name was Elbridge Gerry, it became <i>gerrymandering</i>. He was a Democratic-Republican and was not re-elected. </p>
+<p>
+<a href="https://rjlipton.wordpress.com/2019/07/03/mathematics-of-gerrymandering/gerry/" rel="attachment wp-att-16071"><img alt="" class="aligncenter size-full wp-image-16071" src="https://rjlipton.files.wordpress.com/2019/07/gerry.png?w=600"/></a></p>
+<p>
+Here is a figure from our friends at Wikipedia that presents examples of gerrymandering. </p>
+<p>
+<a href="https://rjlipton.wordpress.com/2019/07/03/mathematics-of-gerrymandering/divide/" rel="attachment wp-att-16072"><img alt="" class="aligncenter  wp-image-16072" src="https://rjlipton.files.wordpress.com/2019/07/divide.png?w=270" width="270"/></a></p>
+<p>
+By redistricting in the above, one can achieve anything from districts all won by the majority, to most won by the majority. These examples, show how the party who controls the districts can control the outcome.</p>
+<p>
+Well that is an overstatement. They can control the believed leanings of the voters in the districts. In the above example, they can control how yellow a district is. Real life is complicated by other factors: </p>
+<ol>
+<li>
+A candidate may win because they are just more popular. That is a green candidate could still win in a yellow district. <p/>
+</li><li>
+A candidate may win because of random fluctuations. If the voter margin is small enough, random fluctuations could change the “expected” outcome.
+</li></ol>
+<p>
+The latter is a danger for gerrymanderers. This <a href="https://www.brennancenter.org/blog/what-is-extreme-gerrymandering">site</a> on gerrymandering says: </p>
+<blockquote><p><b> </b> <em> The trick is not to spread your voters out so much that districts become vulnerable to flipping to the other party in the normal give and take of electoral politics. </em>
+</p></blockquote>
+<p>
+</p><p/><h2> How We Model It </h2><p/>
+<p/><p>
+Since Roberts is not our intended audience we will use mathematical definitions. I am sure Roberts and the rest of the Supreme Court justices are smart, but we have our own methods. We do not use legal jargon such as “prima facie” and suspect they do not use math jargon like “prime” numbers.</p>
+<p>
+So let the yellow party have <img alt="{\alpha}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\alpha}"/> fraction of the voters. Suppose the voters have to be divided into <img alt="{d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{d}"/> districts of the same size. A division is just a vector <img alt="{y=(y_{1},\dots,y_{d})}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%3D%28y_%7B1%7D%2C%5Cdots%2Cy_%7Bd%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y=(y_{1},\dots,y_{d})}"/> so that 	</p>
+<p align="center"><img alt="\displaystyle  y_{1} + \cdots + y_{d} = 1, " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++y_%7B1%7D+%2B+%5Ccdots+%2B+y_%7Bd%7D+%3D+1%2C+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  y_{1} + \cdots + y_{d} = 1, "/></p>
+<p>and each <img alt="{y_{i}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By_%7Bi%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y_{i}}"/> is non-negative. For such a vector <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> the number that yellow <i>wins</i> is the number of indices <img alt="{k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{k}"/> so that 	</p>
+<p align="center"><img alt="\displaystyle  y_{k} \ge \frac{1}{2d}. " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++y_%7Bk%7D+%5Cge+%5Cfrac%7B1%7D%7B2d%7D.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  y_{k} \ge \frac{1}{2d}. "/></p>
+<p>Note, we assume that <img alt="{1/2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1/2}"/> of the voters makes a district a win. We can change this to strictly larger than <img alt="{1/2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1/2}"/>, but will leave it for now.</p>
+<blockquote><p><b>Definition 1</b> <em> Define <img alt="{{\rm MaxWin}(d, \alpha)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7B%5Crm+MaxWin%7D%28d%2C+%5Calpha%29%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{{\rm MaxWin}(d, \alpha)}"/> to the maximum over all <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{y}"/> of the number of wins; and define <img alt="{{\rm MinWin}(d, \alpha)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7B%5Crm+MinWin%7D%28d%2C+%5Calpha%29%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{{\rm MinWin}(d, \alpha)}"/> to be the minimum number of wins. </em>
+</p></blockquote>
+<p>Note, we do not care who is doing the redistricting. Nor do we care about the geometry. For example 	</p>
+<p align="center"><img alt="\displaystyle  {\rm MaxWin}(5, 0.60) = 5 \text{ and } {\rm MinWin}(5, 0.60) = 1. " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7B%5Crm+MaxWin%7D%285%2C+0.60%29+%3D+5+%5Ctext%7B+and+%7D+%7B%5Crm+MinWin%7D%285%2C+0.60%29+%3D+1.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  {\rm MaxWin}(5, 0.60) = 5 \text{ and } {\rm MinWin}(5, 0.60) = 1. "/></p>
+<p>What can we say about these functions? Here are some simple observations.</p>
+<p>
+<img alt="{\bullet }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet }"/> If <img alt="{\alpha \ge 0.5}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Calpha+%5Cge+0.5%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\alpha \ge 0.5}"/>, then <img alt="{{\rm MaxWin}(d, \alpha) = d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7B%5Crm+MaxWin%7D%28d%2C+%5Calpha%29+%3D+d%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{{\rm MaxWin}(d, \alpha) = d}"/>. Just place <img alt="{\alpha }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Calpha+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\alpha }"/> fraction of the voters in each district.</p>
+<p>
+<img alt="{\bullet }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet }"/> If <img alt="{\alpha &gt; 0.5}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Calpha+%3E+0.5%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\alpha &gt; 0.5}"/>, then <img alt="{{\rm MinWin}(d, \alpha) \ge 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7B%5Crm+MinWin%7D%28d%2C+%5Calpha%29+%5Cge+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{{\rm MinWin}(d, \alpha) \ge 1}"/>. No matter how the districts are drawn there must be at least one where yellow has a majority. </p>
+<p>
+An advantage of these functions is that now we can discuss growth rates, not just present examples. A strength of theory is that we have replaced statements like “this algorithm is fast” by formulas for their running time. Another advantage is that these functions are <i>independent of geometry</i>. Previously I thought the dominating issue was how regions looked. Now I believe the issue is how close one gets to the best and worst case: <img alt="{\rm MaxWin}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Crm+MaxWin%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\rm MaxWin}"/> and <img alt="{\rm MinWin}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Crm+MinWin%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\rm MinWin}"/>. </p>
+<blockquote><p><b>Lemma 2</b> <em> Suppose that <img alt="{\alpha &gt; 1/2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Calpha+%3E+1%2F2%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{\alpha &gt; 1/2}"/>. Then 	</em></p><em>
+<p align="center"><img alt="\displaystyle  {\rm MinWin}(d, \alpha) = d-\lfloor 2(1-\alpha) d \rfloor " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7B%5Crm+MinWin%7D%28d%2C+%5Calpha%29+%3D+d-%5Clfloor+2%281-%5Calpha%29+d+%5Crfloor+&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="\displaystyle  {\rm MinWin}(d, \alpha) = d-\lfloor 2(1-\alpha) d \rfloor "/></p>
+</em><p><em/>
+</p></blockquote>
+<p/><p>
+<em>Proof:</em>  Let <img alt="{\beta = 1-\alpha}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbeta+%3D+1-%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\beta = 1-\alpha}"/>. Let’s create the arrangement that makes green win as many districts as possible. If <img alt="{g}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bg%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{g}"/> regions are mostly green then that takes <img alt="{\frac{g}{2d}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cfrac%7Bg%7D%7B2d%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\frac{g}{2d}}"/> of the <img alt="{\beta}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbeta%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\beta}"/> green voters. This implies that 	</p>
+<p align="center"><img alt="\displaystyle  \frac{g}{2d} \le \beta. " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac%7Bg%7D%7B2d%7D+%5Cle+%5Cbeta.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \frac{g}{2d} \le \beta. "/></p>
+<p>So it follows 	</p>
+<p align="center"><img alt="\displaystyle  g \le 2\beta d. " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++g+%5Cle+2%5Cbeta+d.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  g \le 2\beta d. "/></p>
+<p>This proves that <img alt="{g}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bg%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{g}"/> is equal to <img alt="{\lfloor 2\beta d \rfloor}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clfloor+2%5Cbeta+d+%5Crfloor%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\lfloor 2\beta d \rfloor}"/>. <img alt="\Box" class="latex" src="https://s0.wp.com/latex.php?latex=%5CBox&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\Box"/></p>
+<p>
+It may help to set <img alt="{\alpha = 1/2 + \epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Calpha+%3D+1%2F2+%2B+%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\alpha = 1/2 + \epsilon}"/> where <img alt="{\epsilon&gt;0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%3E0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon&gt;0}"/>. Let’s agree to ignore the rounding off and delete the floor and ceiling functions. Then 	</p>
+<p align="center"><img alt="\displaystyle  {\rm MinWin}(d, \alpha) = d-2(1-\alpha) d " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7B%5Crm+MinWin%7D%28d%2C+%5Calpha%29+%3D+d-2%281-%5Calpha%29+d+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  {\rm MinWin}(d, \alpha) = d-2(1-\alpha) d "/></p>
+<p>and so 	</p>
+<p align="center"><img alt="\displaystyle  {\rm MinWin}(d, \alpha) = 2\epsilon d. " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7B%5Crm+MinWin%7D%28d%2C+%5Calpha%29+%3D+2%5Cepsilon+d.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  {\rm MinWin}(d, \alpha) = 2\epsilon d. "/></p>
+<p>Thus for <img alt="{\epsilon = 1/10}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon+%3D+1%2F10%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon = 1/10}"/> we get that 	</p>
+<p align="center"><img alt="\displaystyle  {\rm MaxWin}(d, \alpha) = d \text{ and } {\rm MinWin}(d, \alpha) = 0.2d. " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7B%5Crm+MaxWin%7D%28d%2C+%5Calpha%29+%3D+d+%5Ctext%7B+and+%7D+%7B%5Crm+MinWin%7D%28d%2C+%5Calpha%29+%3D+0.2d.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  {\rm MaxWin}(d, \alpha) = d \text{ and } {\rm MinWin}(d, \alpha) = 0.2d. "/></p>
+<p>This says that independent of any geometry if yellow has a ten percent majority, then best case if they set the districts they could win all, and if green sets the districts the worst they can get is twenty percent of the districts.</p>
+<p>
+</p><p/><h2> How Algorithms Can Help </h2><p/>
+<p/><p>
+There is long-term and continuing interest in algorithms that automate redistricting. The hope is that automated systems will be able to create districts that are fair. A trouble with this research is that there is no universal notion of what makes districts fair. The mantra is: </p>
+<blockquote><p><b> </b> <em> <i>A redistricting is fair if and only if the districts satisfies some geometric criterion</i>. </em>
+</p></blockquote>
+<p>An explicit statement from a <a href="https://bdistricting.com/about.html">site</a> on such algorithms is: </p>
+<blockquote><p><b> </b> <em> <i>The best district map is the one where people have the lowest average distance to the center of their district</i>. </em>
+</p></blockquote>
+<p>Of course the name “gerrymandering” came from how districts looked. Somehow this enshrined the notion that districts must look right. I feel this could be wrong.</p>
+<p>
+Here is a quote from a recent <a href="http://district.cs.brown.edu">paper</a> on an algorithm for redistricting. </p>
+<blockquote><p><b> </b> <em> We propose a method for redistricting, decomposing a geographical area into subareas, called districts, so that the populations of the districts are as close as possible and the districts are compact and contiguous. Each district is the intersection of a polygon with the geographical area. The polygons are convex and the average number of sides per polygon is less than six. </em>
+</p></blockquote>
+<p>The authors are Philip Klein and Neal Young, who are well known researchers on various aspects of algorithms. They do interesting work, their paper is interesting, but the assumption that geometry is the key I do not get.</p>
+<p>
+</p><p/><h2> How To Do Better? </h2><p/>
+<p/><p>
+I think that we need to go beyond geometry to understand and avoid gerrymandering. The connection between geometry and fairness is driven—I believe—by tradition. Voters in the same district probably want to be near each other. In the past being near each other was probably important, since travel was so difficult. Perhaps today location is less of an issue then it was before cars, phones, cell phones, internet access, and email. Perhaps districts can be fair and yet do not look good. </p>
+<p>
+</p><p/><h2> Open Problems </h2><p/>
+<p/><p>
+An analogy to <a href="https://en.wikipedia.org/wiki/Fair_cake-cutting">cake cutting</a> may occur to you. Recall in the cake cutting problem success is <i>not</i> measured in how the pieces of the cake look. It is only measured by whether the parties cutting the cake are happy. Is there some way to push this analogy? I just came across a <a href="https://arxiv.org/pdf/1710.08781.pdf">paper</a> using the cake cutting method: <i>A Partisan Districting Protocol With Provably Nonpartisan Outcomes</i> by Wesley Pegden, Ariel Procaccia, and Dingli Yu. More in the future.</p>
+<p>
+Can algorithmic methods help? Is geometry the fundamental issue? </p></font></font></div>
+    </content>
+    <updated>2019-07-03T13:51:13Z</updated>
+    <published>2019-07-03T13:51:13Z</published>
+    <category term="Ideas"/>
+    <category term="News"/>
+    <category term="Open Problems"/>
+    <category term="cake-cutting"/>
+    <category term="districts"/>
+    <category term="fair"/>
+    <category term="geometry"/>
+    <category term="gerrymander"/>
+    <category term="gerrymandering"/>
+    <category term="reasonable"/>
+    <category term="voters"/>
+    <author>
+      <name>rjlipton</name>
+    </author>
+    <source>
+      <id>https://rjlipton.wordpress.com</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://rjlipton.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://rjlipton.wordpress.com" rel="alternate" type="text/html"/>
+      <link href="https://rjlipton.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>a personal view of the theory of computation</subtitle>
+      <title>Gödel’s Lost Letter and P=NP</title>
+      <updated>2019-07-03T14:20:45Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-US">
     <id>http://ptreview.sublinear.info/?p=1136</id>
@@ -639,7 +789,7 @@ I have nothing more to say than wow, just wow.</div>
       <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2019-07-03T12:06:48Z</updated>
+      <updated>2019-07-03T13:51:32Z</updated>
     </source>
   </entry>
 
@@ -672,7 +822,7 @@ But it’s easy to show that for every matrix <img alt="B" class="latex" src="ht
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-07-03T13:20:51Z</updated>
+      <updated>2019-07-03T14:21:03Z</updated>
     </source>
   </entry>
 
@@ -699,7 +849,7 @@ But it’s easy to show that for every matrix <img alt="B" class="latex" src="ht
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-07-03T13:20:31Z</updated>
+      <updated>2019-07-03T14:20:41Z</updated>
     </source>
   </entry>
 
@@ -724,7 +874,7 @@ But it’s easy to show that for every matrix <img alt="B" class="latex" src="ht
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-07-03T13:21:18Z</updated>
+      <updated>2019-07-03T14:21:22Z</updated>
     </source>
   </entry>
 
@@ -784,7 +934,7 @@ But it’s easy to show that for every matrix <img alt="B" class="latex" src="ht
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-07-03T13:21:18Z</updated>
+      <updated>2019-07-03T14:21:22Z</updated>
     </source>
   </entry>
 
@@ -907,7 +1057,7 @@ But it’s easy to show that for every matrix <img alt="B" class="latex" src="ht
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-07-03T13:20:30Z</updated>
+      <updated>2019-07-03T14:20:40Z</updated>
     </source>
   </entry>
 
@@ -1495,62 +1645,6 @@ the optimal deterministic algorithm against the fair adversary as well.
       <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
       <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
       <title>cs.DS updates on arXiv.org</title>
-      <updated>2019-07-02T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/1907.00309</id>
-    <link href="http://arxiv.org/abs/1907.00309" rel="alternate" type="text/html"/>
-    <title>Isomorphism problems for tensors, groups, and cubic forms: completeness and reductions</title>
-    <feedworld_mtime>1562025600</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Grochow:Joshua_A=.html">Joshua A. Grochow</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/q/Qiao:Youming.html">Youming Qiao</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/1907.00309">PDF</a><br/><b>Abstract: </b>In this paper we consider the problems of testing isomorphism of tensors,
-$p$-groups, cubic forms, algebras, and more, which arise from a variety of
-areas, including machine learning, group theory, and cryptography. These
-problems can all be cast as orbit problems on multi-way arrays under different
-group actions. Our first two main results are:
-</p>
-<p>1. All the aforementioned isomorphism problems are equivalent under
-polynomial-time reductions, in conjunction with the recent results of
-Futorny-Grochow-Sergeichuk (Lin. Alg. Appl., 2019).
-</p>
-<p>2. Isomorphism of $d$-tensors reduces to isomorphism of 3-tensors, for any $d
-\geq 3$.
-</p>
-<p>Our results suggest that these isomorphism problems form a rich and robust
-equivalence class, which we call Tensor Isomorphism-complete, or TI-complete.
-We then leverage the techniques used in the above results to prove two
-first-of-their-kind results for Group Isomorphism (GpI):
-</p>
-<p>3. We give a reduction from GpI for $p$-groups of exponent $p$ and small
-class ($c &lt; p$) to GpI for $p$-groups of exponent $p$ and class 2. The latter
-are widely believed to be the hardest cases of GpI, but as far as we know, this
-is the first reduction from any more general class of groups to this class.
-</p>
-<p>4. We give a search-to-decision reduction for isomorphism of $p$-groups of
-exponent $p$ and class 2 in time $|G|^{O(\log \log |G|)}$. While
-search-to-decision reductions for Graph Isomorphism (GI) have been known for
-more than 40 years, as far as we know this is the first non-trivial
-search-to-decision reduction in the context of GpI.
-</p>
-<p>Our main technique for (1), (3), and (4) is a linear-algebraic analogue of
-the classical graph coloring gadget, which was used to obtain the
-search-to-decision reduction for GI. This gadget construction may be of
-independent interest and utility. The technique for (2) gives a method for
-encoding an arbitrary tensor into an algebra.
-</p></div>
-    </summary>
-    <updated>2019-07-02T23:20:28Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Computational Complexity"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.CC" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Computational Complexity (cs.CC) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.CC updates on arXiv.org</title>
       <updated>2019-07-02T01:30:00Z</updated>
     </source>
   </entry>
