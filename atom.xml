@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-08-11T00:22:32Z</updated>
+  <updated>2019-08-11T01:22:45Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,33 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://blog.ilyaraz.org/rss/12</id>
+    <link href="https://blog.ilyaraz.org/?go=all/cuckoo-hashing-for-sketching-sets/" rel="alternate" type="text/html"/>
+    <title>Cuckoo hashing for sketching sets</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><i>Sign up for the new posts via the <a href="https://blog.ilyaraz.org/rss/">RSS feed</a></i>.</p>
+<p>Below I show a neat application of <a href="https://en.wikipedia.org/wiki/Perfect_hash_function">perfect hashing</a>, which is one of my favorite (cluster of) algorithms. Amazingly, we use it to obtain a purely information-theoretic (rather than algorithmic) statement.</p>
+<p>Suppose we have a finite universe $U$ of size $n$ and a $k$-element subset of it $S \subseteq U$ with $k \ll n$. How many bits do we need to encode it? The obvious answer is $\log_2 \binom{n}{k} = \Theta(k \cdot \log(n / k))$.<br/>
+Can we, however, improve this bound if we allow some approximation?</p>
+<p>Even if $n = k$, it is not difficult to show the lower bound of $k \cdot \log_2(1 / \delta)$ bits if we allow to be wrong when answering queries “does $x$ belong to $S$?” with probability at most $\delta$ (hint: $\varepsilon$-nets). Can we match this lower bound?</p>
+<p>One approach that does not quite work is to hash each element of $S$ to an $l$-bit string using a sufficiently good hash function $h \colon U \to \{0, 1\}^l$, and, when checking if $x$ lies in $S$, compute $h(x)$ and check if this value is among the hashes of $S$. To see why it does not work, let us analyze it: if $x \notin S$, then the probability that $h(x)$ coincides with at least one hash of an element of $S$ is around $k \cdot 2^{-l}$. To make the latter less than $\delta$, we need to take $l = \log_2(k / \delta)$ yielding the overall bound of $k \cdot \log_2(k / \delta)$ falling short of the desired size.</p>
+<p>To get the optimal size, we need to avoid using the union bound in the above argument. In order to accomplish this, let us use perfect hashing on top of the above hashing scheme! It is convenient to use a particular approach to perfect hashing called <a href="https://en.wikipedia.org/wiki/Cuckoo_hashing">Cuckoo hashing</a>. In short, there is a way to generate two simple hash functions $h_1, h_2 \in U \to [m]$ for $m = O(k)$ and place the elements of our set $S$ into $m$ bins without collisions so that for every $x \in S$, the element $x$ is placed either in $h_1(x)$ or in $h_2(x)$. Now, to encode our set $S$, we build a Cuckoo hash table for it, and then for each of the $m$ bins, we either store one bit indicating that it’s empty, or store an $l$-bit hash of an element that is placed into it. Now we can set $l = \log_2(2 / \delta)$, since we compare the hash of a query to merely two hashes, instead of $k$. This gives the overall size $m + k \cdot \log_2 (2 / \delta) = k \cdot (\log_2(1 / \delta) + O(1))$, which is optimal up to a low-order term. Of course, the encoding should include $h_1$, $h_2$ and $h$, but it turns out they can be taken to be sufficiently simple so that their size does not really matter.</p>
+<p>Two remarks are in order. First, in this context people usually bring up <a href="https://en.wikipedia.org/wiki/Bloom_filter">Bloom filters</a>. However, they require space, which is $1.44$ times bigger, and, arguably, they are more mysterious (if technically simple). Second, one may naturally wonder why anyone would care about distinguishing bounds like $k \cdot \log_2 (1 / \delta)$ and $k \cdot \log_2(k / \delta)$. In my opinion, there are two answers to this. First, it is just a cool application of perfect hashing (an obligatory link to <a href="https://www.smbc-comics.com/comic/2010-12-09">one of my favorite comic strips</a>). Second, compressing sets is actually important in practice and constant factors do matter, for instance when we are aiming to transfer the set over the network.</p></div>
+    </summary>
+    <updated>2019-08-11T01:21:23Z</updated>
+    <published>2019-08-11T01:21:23Z</published>
+    <source>
+      <id>https://blog.ilyaraz.org/</id>
+      <author>
+        <name>Ilya Razenshteyn</name>
+      </author>
+      <link href="https://blog.ilyaraz.org/" rel="alternate" type="text/html"/>
+      <link href="https://blog.ilyaraz.org/rss/" rel="self" type="application/rss+xml"/>
+      <title>Lullaby of Cape Cod</title>
+      <updated>2019-08-11T01:22:43Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>https://eccc.weizmann.ac.il/report/2019/102</id>
@@ -43,7 +70,7 @@ Determining the complexity of testing graph isomorphism (in the bounded-degree g
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-08-11T00:20:42Z</updated>
+      <updated>2019-08-11T01:20:50Z</updated>
     </source>
   </entry>
 
@@ -427,7 +454,7 @@ using our knowledge from symplectic geometry?</p>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-08-11T00:20:50Z</updated>
+      <updated>2019-08-11T01:21:04Z</updated>
     </source>
   </entry>
 
@@ -454,7 +481,7 @@ Email: sfifellowship@santafe.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-08-11T00:21:00Z</updated>
+      <updated>2019-08-11T01:21:14Z</updated>
     </source>
   </entry>
 
@@ -481,7 +508,7 @@ Email: registrar@cmi.ac.in</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-08-11T00:21:00Z</updated>
+      <updated>2019-08-11T01:21:14Z</updated>
     </source>
   </entry>
 
@@ -712,7 +739,7 @@ How useful is this advice for the vast majority of us who are <em>not</em> claim
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-08-11T00:20:55Z</updated>
+      <updated>2019-08-11T01:21:10Z</updated>
     </source>
   </entry>
 
@@ -737,7 +764,7 @@ How useful is this advice for the vast majority of us who are <em>not</em> claim
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-08-11T00:21:51Z</updated>
+      <updated>2019-08-11T01:22:11Z</updated>
     </source>
   </entry>
 
@@ -761,7 +788,7 @@ How useful is this advice for the vast majority of us who are <em>not</em> claim
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-08-11T00:20:42Z</updated>
+      <updated>2019-08-11T01:20:50Z</updated>
     </source>
   </entry>
 
@@ -788,7 +815,7 @@ Email: R.S.Lazic@warwick.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-08-11T00:21:00Z</updated>
+      <updated>2019-08-11T01:21:14Z</updated>
     </source>
   </entry>
 
@@ -815,7 +842,7 @@ Email: search@openu.ac.il</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-08-11T00:21:00Z</updated>
+      <updated>2019-08-11T01:21:14Z</updated>
     </source>
   </entry>
 
@@ -846,7 +873,7 @@ Email: search@openu.ac.il</p></div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2019-08-11T00:21:25Z</updated>
+      <updated>2019-08-11T01:21:48Z</updated>
     </source>
   </entry>
 
@@ -911,7 +938,7 @@ Email: search@openu.ac.il</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-08-11T00:20:49Z</updated>
+      <updated>2019-08-11T01:21:03Z</updated>
     </source>
   </entry>
 
@@ -1071,7 +1098,7 @@ For comparison, the college term paper which eventually became the <a href="http
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-08-11T00:20:55Z</updated>
+      <updated>2019-08-11T01:21:10Z</updated>
     </source>
   </entry>
 
@@ -1096,7 +1123,7 @@ For comparison, the college term paper which eventually became the <a href="http
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-08-11T00:21:51Z</updated>
+      <updated>2019-08-11T01:22:11Z</updated>
     </source>
   </entry>
 
@@ -1234,7 +1261,7 @@ For comparison, the college term paper which eventually became the <a href="http
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-08-11T00:20:49Z</updated>
+      <updated>2019-08-11T01:21:03Z</updated>
     </source>
   </entry>
 
@@ -1262,7 +1289,7 @@ For comparison, the college term paper which eventually became the <a href="http
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-08-11T00:20:42Z</updated>
+      <updated>2019-08-11T01:20:50Z</updated>
     </source>
   </entry>
 
@@ -1287,7 +1314,7 @@ For comparison, the college term paper which eventually became the <a href="http
       <link href="https://adamsheffer.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Discrete geometry and other typos</subtitle>
       <title>Some Plane Truths</title>
-      <updated>2019-08-11T00:21:33Z</updated>
+      <updated>2019-08-11T01:22:04Z</updated>
     </source>
   </entry>
 
@@ -1406,7 +1433,7 @@ Our results follow from a new, nearly optimal, explicit pseudorandom generator f
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-08-11T00:20:42Z</updated>
+      <updated>2019-08-11T01:20:50Z</updated>
     </source>
   </entry>
 
@@ -1592,7 +1619,7 @@ A key component of our upper bounds is a new primitive of domain compression, a 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-08-11T00:20:42Z</updated>
+      <updated>2019-08-11T01:20:50Z</updated>
     </source>
   </entry>
 
@@ -1627,7 +1654,7 @@ A key component of our upper bounds is a new primitive of domain compression, a 
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-08-11T00:20:14Z</updated>
+      <updated>2019-08-11T01:20:14Z</updated>
     </source>
   </entry>
 
@@ -1865,7 +1892,7 @@ Can the last two talks at the conference be further connected?</p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-08-11T00:20:56Z</updated>
+      <updated>2019-08-11T01:21:11Z</updated>
     </source>
   </entry>
 
@@ -1903,7 +1930,7 @@ Can the last two talks at the conference be further connected?</p>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-08-11T00:20:50Z</updated>
+      <updated>2019-08-11T01:21:05Z</updated>
     </source>
   </entry>
 
@@ -1927,31 +1954,7 @@ Can the last two talks at the conference be further connected?</p>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-08-11T00:20:42Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2019/096</id>
-    <link href="https://eccc.weizmann.ac.il/report/2019/096" rel="alternate" type="text/html"/>
-    <title>TR19-096 |  On the $\text{AC}^0[\oplus]$ complexity of Andreev&amp;#39;s Problem | 
-
-	Aditya Potukuchi</title>
-    <summary>Andreev's Problem asks the following: Given an integer $d$ and a subset of $S \subseteq \mathbb{F}_q \times \mathbb{F}_q$, is there a polynomial $y = p(x)$ of degree at most $d$ such that  for every $a \in \mathbb{F}_q$, $(a,p(a)) \in S$? We show an $\text{AC}^0[\oplus]$ lower bound for this problem. 
-
-This problem appears to be similar to the list recovery problem for degree $d$-Reed-Solomon codes over $\mathbb{F}_q$ which asks the following: Given subsets $A_1,\ldots,A_q$ of $\mathbb{F}_q$, output all (if any) Reed-Solomon codewords contained in $A_1\times \cdots \times A_q$. For our purpose, we study this problem when $A_1, \ldots, A_q$ are random subsets of a given size, which may be of independent interest.</summary>
-    <updated>2019-07-23T17:29:25Z</updated>
-    <published>2019-07-23T17:29:25Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2019-08-11T00:20:42Z</updated>
+      <updated>2019-08-11T01:20:50Z</updated>
     </source>
   </entry>
 </feed>
