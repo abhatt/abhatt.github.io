@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-08-12T02:22:10Z</updated>
+  <updated>2019-08-12T03:23:14Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,130 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://rjlipton.wordpress.com/?p=16151</id>
+    <link href="https://rjlipton.wordpress.com/2019/08/11/leaps-and-bounds-practice-meets-theory/" rel="alternate" type="text/html"/>
+    <title>Leaps and Bounds: Practice Meets Theory</title>
+    <summary>Solving the runtime selection problem Composite from src1, src2 Brendan Lucier and Csaba Szepesvári were consecutive speakers at this week’s workshop at the Tokyo Technological Institute in Chicago on “Automated Algorithm Design.” Today I will discuss their talks, which I enjoyed greatly at the workshop. The workshop’s general theme was the use of machine-learning techniques […]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>
+<font color="#0044cc"><br/>
+<em>Solving the runtime selection problem</em><br/>
+<font color="#000000"/></font></p><font color="#0044cc"><font color="#000000">
+<table class="image alignright">
+<tbody>
+<tr>
+<td>
+<a href="https://rjlipton.files.wordpress.com/2019/08/lucierszepesvari.png"><img alt="" class="alignright wp-image-16153" height="129" src="https://rjlipton.files.wordpress.com/2019/08/lucierszepesvari.png?w=180&amp;h=129" width="180"/></a>
+</td>
+</tr>
+<tr>
+<td class="caption alignright"><font size="-2">Composite from <a href="https://www.microsoft.com/en-us/research/people/brlucier/">src1</a>, <a href="https://www.microsoft.com/en-us/research/video/sparse-stochastic-bandits/">src2</a></font></td>
+</tr>
+</tbody>
+</table>
+<p>
+Brendan Lucier and Csaba Szepesvári were consecutive speakers at this week’s <a href="http://www.cs.cmu.edu/~ckingsf/AutoAlg2019/">workshop</a> at the Tokyo Technological Institute in Chicago on “Automated Algorithm Design.”</p>
+<p>
+Today I will discuss their talks, which I enjoyed greatly at the workshop.</p>
+<p>
+The workshop’s general theme was the use of machine-learning techniques to improve the tuning of algorithms. Indeed, the goal is to have the algorithm tune itself by selecting strategies from a collection of possible ones. Besides better performance with less human work, this promises better logical reliability than with hand-tuning programs and debugging. </p>
+<p>
+A common component of this work used in both talks is an interesting oracle model. Since oracles are familiar to many of us theorists this will give us an avenue into the talks and the <a href="https://pdfs.semanticscholar.org/0dce/10ed863423e2e9b1b77a0becfc23111578be.pdf">two</a> recent <a href="https://arxiv.org/pdf/1807.00755.pdf">papers</a> they were based on.</p>
+<p>
+</p><p/><h2> Runtime Oracles </h2><p/>
+<p/><p>
+The oracle has a nonnegative matrix <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> of shape <img alt="{n \times M}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn+%5Ctimes+M%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n \times M}"/>. Think of the entry <img alt="{R(i,j)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%28i%2Cj%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R(i,j)}"/> as the <i>runtime</i> of the <img alt="{i^{th}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bi%5E%7Bth%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{i^{th}}"/> program on the <img alt="{j^{th}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bj%5E%7Bth%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{j^{th}}"/> input. You know <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n}"/> and <img alt="{M}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BM%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{M}"/>, but must ask the oracle for information about <img alt="{R(i,j)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%28i%2Cj%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R(i,j)}"/>. You may ask the oracle a question <img alt="{(i,j,t)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28i%2Cj%2Ct%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{(i,j,t)}"/>:</p>
+<blockquote><p><b> </b> <em> <i>Is the entry <img alt="{R(i,j)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%28i%2Cj%29%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{R(i,j)}"/> less than or equal to <img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{t}"/>?</i> </em>
+</p></blockquote>
+<p/><p>
+Here <img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t}"/> is a time bound. Further they assume that the oracle charges you 	</p>
+<p align="center"><img alt="\displaystyle  \min(R(i,j),t). " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cmin%28R%28i%2Cj%29%2Ct%29.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \min(R(i,j),t). "/></p>
+<p>Thus an algorithm is charged in total 	</p>
+<p align="center"><img alt="\displaystyle  \sum_{t} \min(R(i,j),t), " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_%7Bt%7D+%5Cmin%28R%28i%2Cj%29%2Ct%29%2C+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \sum_{t} \min(R(i,j),t), "/></p>
+<p>where the sum is over all questions <img alt="{(i,j,t)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28i%2Cj%2Ct%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{(i,j,t)}"/> you asked. 	 The rationale is that the oracle can run a program <img alt="{i}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{i}"/> on a task <img alt="{j}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bj%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{j}"/> and stop after at most <img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{t}"/> steps. Thus returning the minimum is realistic. Since their research is motivated by practical problems, this is a useful model for studying questions about program performance. </p>
+<p>
+In passing I believe the reason this oracle model is new is that theorists do not often think about running arbitrary programs. Well those in recursion type did, but those designing classic algorithms do not. </p>
+<p>
+</p><p/><h2> A Selection Problem </h2><p/>
+<p/><p>
+This model to used to study a selection problem. Assume <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> is as above. The task is to find the row with the smallest row sum <img alt="{s_{i}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_%7Bi%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{s_{i}}"/>: </p>
+<p align="center"><img alt="\displaystyle  s_{i} = \sum_{j=1}^{M} R(i,j). " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++s_%7Bi%7D+%3D+%5Csum_%7Bj%3D1%7D%5E%7BM%7D+R%28i%2Cj%29.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  s_{i} = \sum_{j=1}^{M} R(i,j). "/></p>
+<p>That is to find the program that takes the least total time on the inputs—hence the least average time.</p>
+<p>
+The trouble is that in the worst case this can require examining all the entries. So they introduce approximations to make the problem doable, but still useful in practice:</p>
+<ol>
+<li>
+The rows need only be a <img alt="{(1+\epsilon)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%281%2B%5Cepsilon%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{(1+\epsilon)}"/> approximation to the smallest row. <p/>
+</li><li>
+The entries can be assumed to be truncated by a value <img alt="{\tau}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctau%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\tau}"/>. That is you can assume that 	<p/>
+<p align="center"><img alt="\displaystyle  R(i,j) \le \tau. " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++R%28i%2Cj%29+%5Cle+%5Ctau.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  R(i,j) \le \tau. "/></p>
+</li><li>
+The governing algorithm can be randomized and need only meet the performance goal with high probability.
+</li></ol>
+<p>
+Now we can state the problem formally. It is parameterized by <img alt="{(\epsilon, \tau)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28%5Cepsilon%2C+%5Ctau%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{(\epsilon, \tau)}"/>:</p>
+<blockquote><p><b> </b> <em> <b>Runtime Selection Problem (RSP)</b>: Given a matrix <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{R}"/> with all entries bounded by <img alt="{\tau}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctau%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{\tau}"/>, find a row <img alt="{i}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{i}"/> so that 	</em></p><em>
+<p align="center"><img alt="\displaystyle  s_{i} \le (1 + \epsilon)s_{k}, " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++s_%7Bi%7D+%5Cle+%281+%2B+%5Cepsilon%29s_%7Bk%7D%2C+&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="\displaystyle  s_{i} \le (1 + \epsilon)s_{k}, "/></p>
+</em><p><em>for all <img alt="{k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{k}"/>, while minimizing the oracle charges for all questions “is <img alt="{R(i,j) \leq t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%28i%2Cj%29+%5Cleq+t%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{R(i,j) \leq t}"/>?” that are asked. </em>
+</p></blockquote>
+<p>The talks gave a variety of randomized algorithms that solve such problems for various parameter assumptions. </p>
+<p>
+</p><p/><h2> Fast and Slow </h2><p/>
+<p/><p>
+See their papers for details on the results. The algorithms they have are interesting not only from a theory viewpoint but also in practice. Indeed, they not only prove theorems but also give experimental timings.</p>
+<p>
+In order to establish some intuition, let’s look at the following simple case. Assume that all entries <img alt="{R(i,j)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%28i%2Cj%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R(i,j)}"/> are either <img alt="{1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1}"/> or some <img alt="{\alpha \gg 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Calpha+%5Cgg+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\alpha \gg 1}"/>. This is the “fast-or-slow” running time stipulation. As theorists we often are drawn to binary values, so this might be a good case to look at initially.</p>
+<p>
+The first observation is that we will always ask questions of the form 	</p>
+<p align="center"><img alt="\displaystyle  (i, j, 1.0001). " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%28i%2C+j%2C+1.0001%29.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  (i, j, 1.0001). "/></p>
+<p>This gives us the value of the entry <img alt="{R(i,j)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%28i%2Cj%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R(i,j)}"/> for almost unit cost: if it is the <img alt="{R(i,j) \gg 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%28i%2Cj%29+%5Cgg+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R(i,j) \gg 1}"/> case then we are only charged <img alt="{1.0001}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1.0001%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1.0001}"/>. Thus, we have reduced the original problem to a classic oracle problem. There is no complicated oracle cost measure: the cost is just the number of entries we read. Well okay the cost is slightly higher, but we can make it as close as we wish.</p>
+<p>
+The selection problem then comes down to this: </p>
+<ul>
+<li>
+We have a <img alt="{n \times M}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn+%5Ctimes+M%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n \times M}"/> nonnegative matrix <img alt="{R}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{R}"/> whose entries are all either <img alt="{1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1}"/> or <img alt="{\alpha}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\alpha}"/>. <p/>
+</li><li>
+We must find a row sum that is within a factor of <img alt="{1+\epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1+\epsilon}"/> of the smallest.
+</li></ul>
+<p>
+I believe that the analysis of this problem should be generally known. In any event it seems clear that randomly sampling each row is a good start.</p>
+<p>
+</p><p/><h2> Open Problems </h2><p/>
+<p/><p>
+Are there other natural problems where the runtime cost oracle is useful?</p>
+<p/></font></font></div>
+    </content>
+    <updated>2019-08-12T02:34:46Z</updated>
+    <published>2019-08-12T02:34:46Z</published>
+    <category term="algorithms"/>
+    <category term="All Posts"/>
+    <category term="fast"/>
+    <category term="Ideas"/>
+    <category term="News"/>
+    <category term="Results"/>
+    <category term="Algorithms"/>
+    <category term="Brendan Lucier"/>
+    <category term="complexity"/>
+    <category term="Csaba Szepesvari"/>
+    <category term="machine learning"/>
+    <category term="oracles"/>
+    <category term="practice"/>
+    <author>
+      <name>RJLipton+KWRegan</name>
+    </author>
+    <source>
+      <id>https://rjlipton.wordpress.com</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://rjlipton.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://rjlipton.wordpress.com" rel="alternate" type="text/html"/>
+      <link href="https://rjlipton.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>a personal view of the theory of computation</subtitle>
+      <title>Gödel’s Lost Letter and P=NP</title>
+      <updated>2019-08-12T03:20:47Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>http://arxiv.org/abs/1908.03519</id>
@@ -362,7 +486,7 @@ Our result solves an open problem posed in \cite{GKL12} (STOC, 2012). Indeed, pr
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-08-12T02:20:31Z</updated>
+      <updated>2019-08-12T03:20:36Z</updated>
     </source>
   </entry>
 
@@ -396,7 +520,7 @@ Our result has two main motivations: First, allowing a larger variety of gadgets
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-08-12T02:20:32Z</updated>
+      <updated>2019-08-12T03:20:36Z</updated>
     </source>
   </entry>
 
@@ -660,7 +784,7 @@ Determining the complexity of testing graph isomorphism (in the bounded-degree g
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-08-12T02:20:32Z</updated>
+      <updated>2019-08-12T03:20:36Z</updated>
     </source>
   </entry>
 
@@ -845,7 +969,7 @@ using our knowledge from symplectic geometry?</p>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-08-12T02:20:38Z</updated>
+      <updated>2019-08-12T03:20:42Z</updated>
     </source>
   </entry>
 
@@ -872,7 +996,7 @@ Email: sfifellowship@santafe.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-08-12T02:20:48Z</updated>
+      <updated>2019-08-12T03:20:51Z</updated>
     </source>
   </entry>
 
@@ -899,7 +1023,7 @@ Email: registrar@cmi.ac.in</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-08-12T02:20:48Z</updated>
+      <updated>2019-08-12T03:20:51Z</updated>
     </source>
   </entry>
 
@@ -1037,7 +1161,8 @@ Note that some choices made in some factoring algorithms don't count as paramete
 <p>
 James Randi is a magician who has challenged paranormal claims of all kinds.</p>
 <p>
-Today Ken and I want to make a suggestion to those who claim they have proved P=NP.</p>
+Today Ken and I want to make a suggestion to those who claim they have proved P=NP.<br/>
+<span id="more-16143"/></p>
 <p>
 No the claim to have a proof that P=NP is not a paranormal claim. But such claims are related to Randi—or the Amazing Randi as he is called. We talked about him before <a href="https://rjlipton.wordpress.com/2012/02/23/an-amazing-result/">here</a>.</p>
 <p>
@@ -1130,7 +1255,7 @@ How useful is this advice for the vast majority of us who are <em>not</em> claim
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-08-12T02:20:44Z</updated>
+      <updated>2019-08-12T03:20:46Z</updated>
     </source>
   </entry>
 
@@ -1155,7 +1280,7 @@ How useful is this advice for the vast majority of us who are <em>not</em> claim
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-08-12T02:21:35Z</updated>
+      <updated>2019-08-12T03:22:14Z</updated>
     </source>
   </entry>
 
@@ -1179,7 +1304,7 @@ How useful is this advice for the vast majority of us who are <em>not</em> claim
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-08-12T02:20:32Z</updated>
+      <updated>2019-08-12T03:20:36Z</updated>
     </source>
   </entry>
 
@@ -1206,7 +1331,7 @@ Email: R.S.Lazic@warwick.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-08-12T02:20:48Z</updated>
+      <updated>2019-08-12T03:20:51Z</updated>
     </source>
   </entry>
 
@@ -1233,7 +1358,7 @@ Email: search@openu.ac.il</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-08-12T02:20:48Z</updated>
+      <updated>2019-08-12T03:20:51Z</updated>
     </source>
   </entry>
 
@@ -1264,7 +1389,7 @@ Email: search@openu.ac.il</p></div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2019-08-12T02:21:20Z</updated>
+      <updated>2019-08-12T03:21:31Z</updated>
     </source>
   </entry>
 
@@ -1329,7 +1454,7 @@ Email: search@openu.ac.il</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-08-12T02:20:37Z</updated>
+      <updated>2019-08-12T03:20:41Z</updated>
     </source>
   </entry>
 
@@ -1489,7 +1614,7 @@ For comparison, the college term paper which eventually became the <a href="http
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-08-12T02:20:44Z</updated>
+      <updated>2019-08-12T03:20:47Z</updated>
     </source>
   </entry>
 
@@ -1514,7 +1639,7 @@ For comparison, the college term paper which eventually became the <a href="http
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-08-12T02:21:35Z</updated>
+      <updated>2019-08-12T03:22:14Z</updated>
     </source>
   </entry>
 
@@ -1652,7 +1777,7 @@ For comparison, the college term paper which eventually became the <a href="http
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-08-12T02:20:37Z</updated>
+      <updated>2019-08-12T03:20:41Z</updated>
     </source>
   </entry>
 
@@ -1680,32 +1805,7 @@ For comparison, the college term paper which eventually became the <a href="http
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-08-12T02:20:32Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://adamsheffer.wordpress.com/?p=5424</id>
-    <link href="https://adamsheffer.wordpress.com/2019/07/31/updates/" rel="alternate" type="text/html"/>
-    <title>Updates</title>
-    <summary>I did not post anything for almost five months – life has been very busy lately! I hope to get back to posting regularly relatively soon. In the meantime, I wanted to at least have a brief updates post. I just made a revision of my book about incidences and polynomial methods. Joshua Zahl and […]</summary>
-    <updated>2019-07-31T02:25:50Z</updated>
-    <published>2019-07-31T02:25:50Z</published>
-    <category term="Incidences"/>
-    <category term="Math events"/>
-    <author>
-      <name>Adam Sheffer</name>
-    </author>
-    <source>
-      <id>https://adamsheffer.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://adamsheffer.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://adamsheffer.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://adamsheffer.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://adamsheffer.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Discrete geometry and other typos</subtitle>
-      <title>Some Plane Truths</title>
-      <updated>2019-08-12T02:21:29Z</updated>
+      <updated>2019-08-12T03:20:36Z</updated>
     </source>
   </entry>
 </feed>
