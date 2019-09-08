@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-09-08T20:22:09Z</updated>
+  <updated>2019-09-08T21:21:55Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,121 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://rjlipton.wordpress.com/?p=16231</id>
+    <link href="https://rjlipton.wordpress.com/2019/09/08/separating-words-by-automata/" rel="alternate" type="text/html"/>
+    <title>Separating Words by Automata</title>
+    <summary>Another exponential gap in complexity theory? [ From his home page ] Jeffrey Shallit is a famous researcher into many things, including number theory and being a skeptic. He has a colorful website with an extensive quotation page—one of my favorites by Howard Aiken is right at the top: Don’t worry about people stealing an […]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>
+<font color="#0044cc"><br/>
+<em>Another exponential gap in complexity theory?</em><br/>
+<font color="#000000"/></font></p><font color="#0044cc"><font color="#000000">
+<table class="image alignright">
+<tbody>
+<tr>
+<td>
+<a href="https://rjlipton.wordpress.com/2019/09/08/separating-words-by-automata/unknown-127/" rel="attachment wp-att-16234"><img alt="" class="alignright size-full wp-image-16234" src="https://rjlipton.files.wordpress.com/2019/09/unknown-1.jpeg?w=600"/></a>
+</td>
+</tr>
+<tr>
+<td class="caption alignright"><font size="-2">[ From his home page ]</font></td>
+</tr>
+</tbody>
+</table>
+<p>
+Jeffrey Shallit is a famous researcher into many things, including number theory and being a skeptic. He has a colorful website with an extensive quotation <a href="https://cs.uwaterloo.ca/~shallit/quotes.html">page</a>—one of my favorites by Howard Aiken is right at the top:</p>
+<blockquote><p><b> </b> <em> Don’t worry about people stealing an idea. If it’s original, you will have to ram it down their throats. </em>
+</p></blockquote>
+<p/><p>
+Today I thought I would discuss a wonderful problem that Jeffrey has worked on.</p>
+<p>
+Jeffrey’s <a href="https://arxiv.org/abs/1103.4513">paper</a> is joint with Erik Demaine, Sarah Eisenstat, and David Wilson. See also his <a href="https://cs.uwaterloo.ca/~shallit/Talks/bc4.pdf">talk</a>. They say in their introduction:</p>
+<blockquote><p><b> </b> <em> Imagine a computing device with very limited powers. What is the simplest computational problem you could ask it to solve? It is not the addition of two numbers, nor sorting, nor string matching—it is telling two inputs apart: distinguishing them in some way. </em>
+</p></blockquote>
+<p/><p>
+More formally: </p>
+<blockquote><p><b> </b> <em> Let <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{x}"/> and <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{y}"/> be two distinct <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{n}"/> long strings over the usual binary alphabet. What is the size of the smallest deterministic automaton <img alt="{M}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BM%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{M}"/> that can accept one of the strings and reject the other? </em>
+</p></blockquote>
+<p/><p>
+That is, how hard is it for a simple type of machine to tell <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> apart from <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/>? There is no super cool name for the question—it is called the <i>Separating Words Problem</i> (<a href="https://en.wikipedia.org/wiki/Separating_words_problem">SWP</a>). </p>
+<p>
+</p><p/><h2> Some History </h2><p/>
+<p/><p>
+Pavel Goral&amp;ccaron;ik and Vaclav Koubek introduced the problem in 1986—see their paper <a href="https://link.springer.com/chapter/10.1007/3-540-16761-7_61">here</a>. Suppose that <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> and <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> are distinct binary words of length <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n}"/>. Define <img alt="{\bf{SEP}(x,y)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbf%7BSEP%7D%28x%2Cy%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bf{SEP}(x,y)}"/> to be the number of states of the smallest automaton that accepts <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> and rejects <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> or vice-versa. They proved the result that got people interested:</p>
+<blockquote><p><b>Theorem 1</b> <em> For all distinct binary words <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{x}"/> and <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{y}"/> of length <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{n}"/>, 	</em></p><em>
+<p align="center"><img alt="\displaystyle  {\bf SEP}(x,y) =o(n). " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7B%5Cbf+SEP%7D%28x%2Cy%29+%3Do%28n%29.+&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="\displaystyle  {\bf SEP}(x,y) =o(n). "/></p>
+</em><p><em/>
+</p></blockquote>
+<p>That is the size of the automaton is asymptotically sub-linear. Of course there is trivially a way to tell the words apart with order <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n}"/> states. The surprise is that one can do better, always.</p>
+<p>
+In 1989 John Robson obtained the best known result: </p>
+<blockquote><p><b>Theorem 2</b> <em> For all distinct binary words <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{x}"/> and <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{y}"/> of length <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{n}"/>, 	</em></p><em>
+<p align="center"><img alt="\displaystyle  {\bf SEP}(x,y) = O(n^{2/5}(\log n)^{3/5}). " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7B%5Cbf+SEP%7D%28x%2Cy%29+%3D+O%28n%5E%7B2%2F5%7D%28%5Clog+n%29%5E%7B3%2F5%7D%29.+&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="\displaystyle  {\bf SEP}(x,y) = O(n^{2/5}(\log n)^{3/5}). "/></p>
+</em><p><em/>
+</p></blockquote>
+<p/><p>
+This bound is pretty strange. We rarely see bounds like it. This suggest to me that it is either special or it is not optimal. Not clear which is the case. By the way it is also known that there are <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> and <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> so that </p>
+<p align="center"><img alt="\displaystyle  {\bf SEP}(x,y) = \Omega(\log n). " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7B%5Cbf+SEP%7D%28x%2Cy%29+%3D+%5COmega%28%5Clog+n%29.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  {\bf SEP}(x,y) = \Omega(\log n). "/></p>
+<p>Thus there is an exponential gap between the known lower and upper bounds. Welcome to complexity theory.</p>
+<p>
+What heightens interest in this gap is that whenever the words have different lengths, there is always a logarithmic-size automaton that separates them. The reason is our old friend, the Chinese Remainder Theorem. Simply, if <img alt="{m &lt; n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bm+%3C+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{m &lt; n}"/> there is always a short prime <img alt="{p}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bp%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{p}"/> that does not divide <img alt="{n - m}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn+-+m%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n - m}"/>, which means that the DFA that goes in a cycle of length <img alt="{p}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bp%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{p}"/> will end in a different state on any <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> of length <img alt="{m}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bm%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{m}"/> from the state on any <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> of length <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n}"/>. Moreover, the strings <img alt="{0^m}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B0%5Em%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{0^m}"/> and <img alt="{0^N}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B0%5EN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{0^N}"/> where <img alt="{N}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{N}"/> equals <img alt="{m}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bm%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{m}"/> plus the least common multiple of <img alt="{1,\dots,m+1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2C%5Cdots%2Cm%2B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1,\dots,m+1}"/> require <img alt="{\Omega(\log N)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5COmega%28%5Clog+N%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\Omega(\log N)}"/> states to separate. Padding these with <img alt="{1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{1}"/>s gives equal-length pairs of all lengths <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n}"/> giving <b>SEP</b>(x,y)<img alt="{\sim \log n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Csim+%5Clog+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\sim \log n}"/>.</p>
+<p>
+Some other facts about SWP can be found in the paper:</p>
+<ul>
+<li>
+(a) It does not matter whether the alphabet is binary or larger. <p/>
+</li><li>
+(b) For random distinct <img alt="{x,y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%2Cy%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x,y}"/>, the expected number of states needed to separate them is at most <img alt="{4}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B4%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{4}"/>. <p/>
+</li><li>
+(c) All length-<img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{n}"/> pairs <img alt="{x,y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%2Cy%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x,y}"/> can be distinguished by deterministic pushdown automata (with two-way input tape) of size <img alt="{O(\log n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Clog+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{O(\log n)}"/>.
+</li></ul>
+<p>
+Point (b) underscores why it has been hard to find “bad pairs” that defeat all small DFAs. All this promotes belief that logarithmic is the true upper bound as well. Jeffrey stopped short of calling this a conjecture in his talk, but he did offer a 100-pound prize (the talk was in Britain) for improving Robson’s bound. </p>
+<p>
+</p><p/><h2> Some Questions </h2><p/>
+<p/><p>
+There are many partial results in cases where <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> and <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> are restricted in some way. See the papers for details. I thought I would just repeat a couple of interesting open cases.</p>
+<p>
+<img alt="{\bullet }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet }"/> How hard is it to tell words from their reversal? That is, if <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> is a word can we prove a better bound on 	</p>
+<p align="center"><img alt="\displaystyle  {\bf SEP}(x,x^{R}). " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7B%5Cbf+SEP%7D%28x%2Cx%5E%7BR%7D%29.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  {\bf SEP}(x,x^{R}). "/></p>
+<p>Recall <img alt="{x^{R}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%5E%7BR%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x^{R}}"/> is the reversal of the word <img alt="{w}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bw%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{w}"/>. Of course we assume that <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> is not the same as its reversal—that is, we assume that <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/> is not a palindrome.</p>
+<p>
+<img alt="{\bullet }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet }"/> How hard is it to tell words apart from their cyclic shifts?</p>
+<p>
+<img alt="{\bullet }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet }"/> How hard is it to tell words from their <img alt="{\dots}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cdots%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\dots}"/> You get the idea: try other operations on words. </p>
+<p>
+</p><p/><h2> Open Problems </h2><p/>
+<p/><p>
+The SWP is a neat question in my opinion. I wonder if there would be some interesting consequence if we could always tell two words apart with few states. The good measure of a conjecture is: how many consequences are there that follow from it? I wonder if there could be some interesting applications. What do you think?</p>
+<p/></font></font></div>
+    </content>
+    <updated>2019-09-08T20:47:05Z</updated>
+    <published>2019-09-08T20:47:05Z</published>
+    <category term="History"/>
+    <category term="Open Problems"/>
+    <category term="People"/>
+    <category term="Proofs"/>
+    <category term="automata"/>
+    <category term="exponential gap"/>
+    <category term="open problem"/>
+    <category term="seperate"/>
+    <category term="words"/>
+    <author>
+      <name>rjlipton</name>
+    </author>
+    <source>
+      <id>https://rjlipton.wordpress.com</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://rjlipton.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://rjlipton.wordpress.com" rel="alternate" type="text/html"/>
+      <link href="https://rjlipton.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>a personal view of the theory of computation</subtitle>
+      <title>Gödel’s Lost Letter and P=NP</title>
+      <updated>2019-09-08T21:20:39Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>https://eccc.weizmann.ac.il/report/2019/114</id>
@@ -33,7 +148,7 @@
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-09-08T20:20:42Z</updated>
+      <updated>2019-09-08T21:20:30Z</updated>
     </source>
   </entry>
 
@@ -442,7 +557,7 @@ Being a chair certainly ate up plenty of time but it feels different as dean wit
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-09-08T20:20:42Z</updated>
+      <updated>2019-09-08T21:20:30Z</updated>
     </source>
   </entry>
 
@@ -470,7 +585,7 @@ Being a chair certainly ate up plenty of time but it feels different as dean wit
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2019-09-08T20:21:20Z</updated>
+      <updated>2019-09-08T21:21:09Z</updated>
     </source>
   </entry>
 
@@ -548,7 +663,7 @@ Being a chair certainly ate up plenty of time but it feels different as dean wit
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-09-08T20:20:47Z</updated>
+      <updated>2019-09-08T21:20:33Z</updated>
     </source>
   </entry>
 
@@ -610,7 +725,7 @@ End Sub
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-09-08T20:21:09Z</updated>
+      <updated>2019-09-08T21:20:59Z</updated>
     </source>
   </entry>
 
@@ -638,7 +753,7 @@ End Sub
 <p>
 Avrim Blum is the CAO for TTIC. That is he is the Chief Academic Officer at the Toyota Technological Institute of Chicago. Avrim has and continues to make key contributions to many areas of theory—including machine learning, approximation algorithms, on-line algorithms, algorithmic game theory, the theory of database privacy, and non-worst-case analysis of algorithms. </p>
 <p>
-Today I want to discuss a suggestion of Avrim for research on self-play.</p>
+Today I want to discuss a suggestion of Avrim for research on self-play.<span id="more-16223"/></p>
 <p>
 Self-play is the key to many recent AI results on playing games. These results include essentially solving the games Chess, Go, Shogi, forms of poker, and many others. They were solved by algorithms that start with no knowledge of the game, save the rules. The algorithm then learn the secrets of playing the game by self-play: by playing games against itself. For example, the AI chess programs did not know that “a rook is worth more than a pawn.” But they discover that by playing the game over and over. Impressive. </p>
 <p>
@@ -722,7 +837,7 @@ Perhaps someone should take Avrim’s suggestion and try it out. A natural idea 
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-09-08T20:20:53Z</updated>
+      <updated>2019-09-08T21:20:39Z</updated>
     </source>
   </entry>
 
@@ -816,7 +931,7 @@ and related items.</div>
       <link href="https://adamsheffer.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Discrete geometry and other typos</subtitle>
       <title>Some Plane Truths</title>
-      <updated>2019-09-08T20:21:30Z</updated>
+      <updated>2019-09-08T21:21:14Z</updated>
     </source>
   </entry>
 
@@ -914,7 +1029,7 @@ What has gotten harder? What has gotten easier?<br/>
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2019-09-08T20:21:38Z</updated>
+      <updated>2019-09-08T21:21:36Z</updated>
     </source>
   </entry>
 
@@ -946,7 +1061,7 @@ Our analysis relies on a new random walk on simplicial complexes which we call t
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-09-08T20:20:42Z</updated>
+      <updated>2019-09-08T21:20:30Z</updated>
     </source>
   </entry>
 
@@ -985,7 +1100,7 @@ Our analysis relies on a new random walk on simplicial complexes which we call t
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-09-08T20:20:47Z</updated>
+      <updated>2019-09-08T21:20:34Z</updated>
     </source>
   </entry>
 
@@ -1129,7 +1244,7 @@ Our analysis relies on a new random walk on simplicial complexes which we call t
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2019-09-08T20:21:09Z</updated>
+      <updated>2019-09-08T21:21:00Z</updated>
     </source>
   </entry>
 
@@ -1329,7 +1444,7 @@ Perhaps the lesson of MOSIS is not lost on us. Today there are “MOSIS” like 
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-09-08T20:20:53Z</updated>
+      <updated>2019-09-08T21:20:39Z</updated>
     </source>
   </entry>
 
@@ -1355,7 +1470,7 @@ Perhaps the lesson of MOSIS is not lost on us. Today there are “MOSIS” like 
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-09-08T20:20:49Z</updated>
+      <updated>2019-09-08T21:20:35Z</updated>
     </source>
   </entry>
 
@@ -1425,7 +1540,7 @@ Perhaps the lesson of MOSIS is not lost on us. Today there are “MOSIS” like 
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-09-08T20:20:49Z</updated>
+      <updated>2019-09-08T21:20:36Z</updated>
     </source>
   </entry>
 
@@ -1711,7 +1826,7 @@ The point is that in the explosion case, the inclusion of the factors for wisps 
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-09-08T20:20:52Z</updated>
+      <updated>2019-09-08T21:20:38Z</updated>
     </source>
   </entry>
 
@@ -1803,7 +1918,7 @@ We complement this result by a matching upper bound, constructing a noise-resili
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-09-08T20:20:42Z</updated>
+      <updated>2019-09-08T21:20:30Z</updated>
     </source>
   </entry>
 
@@ -1832,7 +1947,7 @@ intersection of each pair is equal to the intersection of all. Erd\H{o}s and Rad
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-09-08T20:20:42Z</updated>
+      <updated>2019-09-08T21:20:30Z</updated>
     </source>
   </entry>
 
@@ -1860,7 +1975,7 @@ intersection of each pair is equal to the intersection of all. Erd\H{o}s and Rad
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-09-08T20:20:49Z</updated>
+      <updated>2019-09-08T21:20:35Z</updated>
     </source>
   </entry>
 
@@ -1886,7 +2001,7 @@ intersection of each pair is equal to the intersection of all. Erd\H{o}s and Rad
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-09-08T20:20:42Z</updated>
+      <updated>2019-09-08T21:20:30Z</updated>
     </source>
   </entry>
 
@@ -1913,7 +2028,7 @@ A well-known probabilistic argument shows an existence lower bound on $R_q$, nam
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-09-08T20:20:42Z</updated>
+      <updated>2019-09-08T21:20:30Z</updated>
     </source>
   </entry>
 
@@ -1944,49 +2059,7 @@ A well-known probabilistic argument shows an existence lower bound on $R_q$, nam
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-09-08T20:20:48Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>https://11011110.github.io/blog/2019/08/22/serpentine-belts</id>
-    <link href="https://11011110.github.io/blog/2019/08/22/serpentine-belts.html" rel="alternate" type="text/html"/>
-    <title>Serpentine belts</title>
-    <summary>Many car engines use a serpentine belt, passing across multiple pulleys and tensioner wheels, to transmit mechanical power and timing information from the car’s crankshaft to its alternator, engine fan, water pump, air conditioning, steering pump, and other systems. Another (usually separate) belt, the timing belt, similarly connects the crankshaft to the camshaft, which controls and drives the timing of the engine’s valves. The Volvo bus engine below shows both of these belts:</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Many car engines use a <a href="https://en.wikipedia.org/wiki/Serpentine_belt">serpentine belt</a>, passing across multiple pulleys and <a href="https://en.wikipedia.org/wiki/Tensioner">tensioner wheels</a>, to transmit mechanical power and timing information from the car’s crankshaft to its alternator, engine fan, water pump, air conditioning, steering pump, and other systems. Another (usually separate) belt, the <a href="https://en.wikipedia.org/wiki/Timing_belt_(camshaft)">timing belt</a>, similarly connects the crankshaft to the camshaft, which controls and drives the timing of the engine’s valves.
-The <a href="https://commons.wikimedia.org/wiki/File:Belt_drive_systen_01.JPG">Volvo bus engine</a> below shows both of these belts:</p>
-
-<p style="text-align: center;"><img alt="Timing and serpentine belts of a Volvo bus engine; CC-BY-SA photo by Miya.m from https://commons.wikimedia.org/wiki/File:Belt_drive_systen_01.JPG" src="https://11011110.github.io/blog/assets/2019/Volvo-bus-engine-belts.jpg" style="border-style: solid; border-color: black;" width="60%"/></p>
-
-<p>But suppose you encounter such an engine with its belt removed. How can you tell where to run the belt to connect it all back together again? There may be many different orderings in which you can connect a given set of wheels by a belt. On a real engine (such as the one in a Ford Escort on which I loosely modeled the top image below), you might get a little more information from which of the wheels are ribbed (inside the belt) and which are smooth (outside the belt) but even that extra information won’t always give you a unique solution:</p>
-
-<p style="text-align: center;"><img alt="Two serpentine belts for the Ford Escort" src="https://11011110.github.io/blog/assets/2019/escort.svg"/></p>
-
-<p>Connecting wheels with belts like this is the topic of my latest preprint, “Existence and hardness of conveyor belts” (<a href="https://arxiv.org/abs/1908.07668">arXiv:1908.07668</a>, with a large group of co-authors merging groups from the University of Washington and the Bellairs workshops). The name isn’t really accurate, because most conveyor belts have simpler geometry, but that’s what the question was called in past work. At least we managed to avoid the misspelling “conveyer” of some of that work.</p>
-
-<p>To be tight, a belt for a system of disjoint disks (representing the pulleys and wheels) must be a smooth simple closed curve, made by connecting arcs of the disks with <a href="https://en.wikipedia.org/wiki/Tangent_lines_to_circles#Tangent_lines_to_two_circles">bitangents</a> between pairs of disks. It was already known that some systems of disks have no belt, and conjectured that unit disks always have one. Our work shows that it’s -complete to tell whether a belt exists, that they do exist for certain special systems of disks (e.g. when no vertical line crosses multiple disks), and that by adding a linear number of extra disks one can always make a belt exist.</p>
-
-<p>The question of how many different belts can connect the same system of disks (posed to me by co-author Sara Billey) was to a large extent the inspiration for <a href="https://11011110.github.io/blog/2019/03/12/counting-polygon-triangulations.html">my earlier paper on counting triangulations</a>. If counting simple polygons through a set of points is hard, then so is counting belts for tiny disks. And when I couldn’t prove that counting simple polygons is hard, I turned to other problems for which the proof was easier.</p>
-
-<p>As part of this project I wrote <a href="https://11011110.github.io/blog/assets/2019/drawbelts.py">a little Python program to draw systems of disks and their belts</a>, used for the image above and for some of the images in the paper. It doesn’t find which belts are possible itself; instead, you have to specify the belt by listing the disks that it touches in order (allowing repetitions although some of the versions of the problem that we studied do not) and specifying for each disk which direction it turns when the belt touches it (equivalently, whether it is inside or outside the belt). To use it, you’ll need my <a href="https://www.ics.uci.edu/~eppstein/PADS/">PADS Python library</a>, or at least <a href="https://www.ics.uci.edu/~eppstein/PADS/SVG.py">the package in it for generating SVG files</a>.</p>
-
-<p>(<a href="https://mathstodon.xyz/@11011110/102664433496197083">Discuss on Mastodon</a>)</p></div>
-    </content>
-    <updated>2019-08-22T21:19:00Z</updated>
-    <published>2019-08-22T21:19:00Z</published>
-    <author>
-      <name>David Eppstein</name>
-    </author>
-    <source>
-      <id>https://11011110.github.io/blog/feed.xml</id>
-      <author>
-        <name>David Eppstein</name>
-      </author>
-      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
-      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
-      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
-      <title>11011110</title>
-      <updated>2019-08-31T22:03:01Z</updated>
+      <updated>2019-09-08T21:20:34Z</updated>
     </source>
   </entry>
 </feed>
