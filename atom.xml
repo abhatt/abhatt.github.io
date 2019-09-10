@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-09-10T10:22:36Z</updated>
+  <updated>2019-09-10T11:22:30Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,42 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>tag:blogger.com,1999:blog-25562705.post-4980143336209093039</id>
+    <link href="http://aaronsadventures.blogspot.com/feeds/4980143336209093039/comments/default" rel="replies" type="application/atom+xml"/>
+    <link href="http://www.blogger.com/comment.g?blogID=25562705&amp;postID=4980143336209093039" rel="replies" type="text/html"/>
+    <link href="http://www.blogger.com/feeds/25562705/posts/default/4980143336209093039" rel="edit" type="application/atom+xml"/>
+    <link href="http://www.blogger.com/feeds/25562705/posts/default/4980143336209093039" rel="self" type="application/atom+xml"/>
+    <link href="http://aaronsadventures.blogspot.com/2019/09/a-new-analysis-of-adaptive-data-analysis.html" rel="alternate" type="text/html"/>
+    <title>A New Analysis of "Adaptive Data Analysis"</title>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><div style="text-align: center;"><i>This is a blog post about our new paper, which you can read here: </i><a href="https://arxiv.org/abs/1909.03577">https://arxiv.org/abs/1909.03577</a> </div><div style="text-align: center;"><br/></div>The most basic statistical estimation task is estimating the expected value of some predicate $q$ over a distribution $\mathcal{P}$: $\mathrm{E}_{x \sim \mathcal{P}}[q(x)]$, which I'll just write as $q(\mathcal{P})$. Think about estimating the mean of some feature in your data, or the error rate of a classifier that you have just trained.  There's a really obvious way to come up with a good estimate if you've got a dataset $S \sim \mathcal{P}^n$ of $n$ points that were sampled i.i.d. from the distribution: just use the empirical mean $a = \frac{1}{n}\sum_{i=1}^n q(S_i)$! In fact, this is a great way to estimate the values of a really large number of predicates, so long as they were chosen <i>non-adaptively</i>: that is, so long as you came up with all of the predicates you wanted to estimate before you estimated any of the answers. This phenomenon is, for example, what classical generalization theorems in machine learning rely on: the empirical error of a set of classifiers in some model class will be a good estimate of their actual, out-of-sample error, so long as your dataset is at least as large as the logarithm of your model class.<br/><div><br/></div><div>But this guarantee breaks down if the predicates that you want to estimate are chosen in sequence, adaptively. For example, suppose you are trying to fit a machine learning model to data. If you train your first model, estimate its error, and then as a result of the estimate tweak your model and estimate its error again, you are engaging in exactly this kind of adaptivity. If you repeat this many times (as you might when you are tuning hyper-parameters in your model) you could quickly get yourself into big trouble. Of course there is a simple way around this problem: just don't re-use your data. The most naive baseline that gives statistically valid answers is called "data splitting". If you want to test k models in sequence, just randomly partition your data into k equal sized parts, and test each model on a fresh part. The holdout method is just the special case of k = 2.  But this "naive" method doesn't make efficient use of data: its data requirements grow <i>linearly</i> with the number of models you want to estimate. </div><div><br/></div><div>It turns out its possible to do better by perturbing the empirical means with a little bit of noise before you use them: this is what we (Dwork, Feldman, Hardt, Pitassi, Reingold, and Roth --- DFHPRR) showed back in 2014 in <a href="https://arxiv.org/abs/1411.2664">this paper</a>, which helped kick off a small subfield known as "adaptive data analysis". In a nutshell, we proved a "transfer theorem" that says the following: if your statistical estimator is simultaneously <i>differentially private</i> and <i>sample accurate</i> --- meaning that with high probability it provides estimates that are close to the empirical means, then it will also be accurate out of sample. When paired with a simple differentially private mechanism for answering queries --- just perturbing their answers with Gaussian noise --- this gave a significant asymptotic improvement in data efficiency over the naive baseline! You can see how well it does in this figure (click to enlarge it): </div><div class="separator" style="clear: both; text-align: center;"><a href="https://1.bp.blogspot.com/-Eip3yKJl5mE/XXWfXoqt8KI/AAAAAAAATxY/FMSJHq4ClJgZXOhuACMC5ZMFFQ0W8cmOgCLcBGAs/s1600/DFHPRRonly.png" style="margin-left: 1em; margin-right: 1em;"><img border="0" height="205" src="https://1.bp.blogspot.com/-Eip3yKJl5mE/XXWfXoqt8KI/AAAAAAAATxY/FMSJHq4ClJgZXOhuACMC5ZMFFQ0W8cmOgCLcBGAs/s320/DFHPRRonly.png" width="320"/></a></div><div style="text-align: left;">Well... Hmm. In this figure, we are plotting how many adaptively chosen queries can be answered accurately as a function of dataset size. By "accurately" we have arbitrarily chosen to mean: answers that have confidence intervals of width 0.1 and uniform coverage probability 95%. On the x axis, we've plotted the dataset size n, ranging from 100,000 to about 12 million. And we've plotted two methods: the "naive" sample splitting baseline, and using the sophisticated Gaussian perturbation technique, as analyzed by the bound we proved in the "DFHPRR" paper. (Actually --- a numerically optimized variant of that bound!) You can see the problem. Even with a dataset size in the tens of millions, the sophisticated method does substantially worse than the naive method! You can extrapolate from the curve that the DFHPRR bound will <i>eventually</i> beat the naive bound, but it would require a truly enormous dataset. When I try extending the plot out that far my optimizer runs into numeric instability issues. </div><div style="text-align: left;"><br/></div><div style="text-align: left;">There has been improvement since then. In particular, DFHPRR didn't even obtain the best bound asymptotically. It is folklore that differentially private estimates generalize in expectation: the trickier part is to show that they enjoy <i>high probability</i> generalization bounds. This is what we showed in a sub-optimal way in DFHPRR. In 2015, a <a href="https://arxiv.org/abs/1511.02513">beautiful paper</a> by Bassily, Nissim, Steinke, Smith, Stemmer, and Ullman (BNSSSU) introduced the amazing "monitor technique" to obtain the asymptotically optimal high probability bound. An upshot of the bound was that the Gaussian mechanism can be used to answer roughly $k = n^2$ queries --- a quadratic improvement over the naive sample splitting mechanism! You can read about this technique in the lecture notes of the <a href="https://adaptivedataanalysis.com/">adaptive data analysis class</a> Adam Smith and I taught a few years back.  Lets see how it does (click to enlarge):</div><div class="separator" style="clear: both; text-align: center;"><a href="https://1.bp.blogspot.com/-C83SCyN8uzc/XXWjUcHmTHI/AAAAAAAATxk/GbtveNxoh18E7xOA2HQf67OGj9ujeCAuwCLcBGAs/s1600/DFHPRRandBNSSSU.png" style="margin-left: 1em; margin-right: 1em;"><img border="0" height="206" src="https://1.bp.blogspot.com/-C83SCyN8uzc/XXWjUcHmTHI/AAAAAAAATxk/GbtveNxoh18E7xOA2HQf67OGj9ujeCAuwCLcBGAs/s320/DFHPRRandBNSSSU.png" width="320"/></a></div><div style="text-align: left;">Substantially better! Now we're plotting n from 100,000 up to about only 1.7 million. At this scale, the DFHPRR bound appears to be constant (at essentially 0), whereas the BNSSSU bound clearly exhibits quadratic behavior. It even beats the baseline --- by a little bit, so long as your dataset has somewhat more than a million entries... I should add that what we're plotting here is again a numerically optimized variant of the BNSSSU bound, not the closed-form version from their paper. So maybe not yet a practical technique. The problem is that the monitor argument --- while brilliant --- seems unavoidably to lead to large constant overhead.  </div><div style="text-align: left;"><br/></div><div style="text-align: left;">Which brings us to our new work (this is joint work with Christopher Jung, Katrina Ligett, Seth Neel, Saeed Sharifi-Malvajerdi, and Moshe Shenfeld). We give a brand new proof of the transfer theorem. It is elementary, and in particular, obtains high probability generalization bounds directly from high probability sample-accuracy bounds, avoiding the need for the monitor argument. I think the proof is the most interesting part --- its simple and (I think) illuminating --- but an upshot is that we get <i>substantially</i> better bounds, even though the improvement is just in the constants (the existing BNSSSU bound is known to be asymptotically tight). Here's the plot with our bound included --- the x-axis is the same, but note the substantially scaled-up y axis (click to enlarge): </div><div style="text-align: left;"><br/></div><div class="separator" style="clear: both; text-align: center;"><a href="https://1.bp.blogspot.com/-oR4HDFR07bE/XXWlv1vVIDI/AAAAAAAATxw/Fqbm-weNbMoQ5WbOgeOY3f0p6N2QN9bMACLcBGAs/s1600/allthree.png" style="margin-left: 1em; margin-right: 1em;"><img border="0" height="200" src="https://1.bp.blogspot.com/-oR4HDFR07bE/XXWlv1vVIDI/AAAAAAAATxw/Fqbm-weNbMoQ5WbOgeOY3f0p6N2QN9bMACLcBGAs/s320/allthree.png" width="320"/></a></div><div style="text-align: center;"><br/></div><div style="text-align: left;"><br/><b><u>Proof Sketch</u></b><br/>Ok: on to the proof. Here is the trick. In actuality, the dataset S is first sampled from $\mathcal{P}^n$, and then some data analyst interacts with a differentially private statistical estimator, resulting in some transcript $\pi$ of query answer pairs. But now imagine that <i>after the interaction is complete</i>, S is <i>resampled</i> from $Q_\pi = (\mathcal{P}^n)|\pi$, the posterior distribution on datasets conditioned on $\pi$. If you reflect on this for a moment, you'll notice that this resampling experiment doesn't change the joint distribution on dataset transcript pairs $(S,\pi)$ at all. So if the mechanism promised high probability sample accuracy bounds, it still promises them in this resampling experiment. But lets think about what that means: the mechanism can <i>first commit</i> to some set of answers $a_i$, and promise that with high probability, <i>after</i> S is resampled from $Q_\pi$, $|a_i - \frac{1}{n}\sum_{j=1}^n q_i(S_j)|$ is small. But under the resampling experiment, it is quite likely that the empirical value of the query $\frac{1}{n}\sum_{j=1}^n q_i(S_j)$ will end up being close to its expectation over the posterior: $q_i(Q_{\pi}) = \mathrm{E}_{S \sim Q_{\pi}}[\frac{1}{n}\sum_{j=1}^n q_i(S_j)]$. So the only way that a mechanism can promise high probability sample accuracy is if it actually promises high probability posterior accuracy: i.e. with high probability, for every query $q_i$ that was asked and answered, we must have that $|a_i - q_i(Q_\pi)|$ is small.<br/><br/>That part of the argument was generic --- it didn't use differential privacy at all! But it serves to focus attention on these posterior distributions $Q_\pi$ that our statistical estimator induces. And it turns out its not hard to see that the expected value of queries on posteriors induced by differentially private mechanisms have to be close to their true answers. For $(\epsilon,0)$-differential privacy, it follows almost immediately from the definition. Here is the derivation. Pick your favorite query $q$ and your favorite transcript $\pi$, and write $S_j \sim S$ to denote a uniformly randomly selected element of a dataset $S$:</div><div style="text-align: left;">$$q (Q_\pi) =  \sum_{x} q (x) \cdot \Pr_{S \sim \mathcal{P}^n, S_j \sim S} [S_j = x | \pi]= \sum_{x} q (x) \cdot \frac{\Pr [\pi | S_j = x ] \cdot \Pr_{S \sim \mathcal{P}^n, S_j \sim S} [S_j = x]}{\Pr[\pi]}$$<br/>$$\leq \sum_{x} q (x) \cdot \frac{e^\epsilon \Pr [\pi] \cdot \Pr_{S_j \sim \mathcal{P}} [S_j = x]}{\Pr[\pi]}<br/>= e^\epsilon \cdot q (\mathcal{P})$$<br/><br/>Here, the inequality follows from the definition of differential privacy, which controls the effect that fixing a single element of the dataset to any value $(S_j = x)$ can have on the probability of any transcript: it can increase it multiplicatively by a factor of at most $e^\epsilon$. </div><div style="text-align: left;"><br/>And thats it: So we must have that (with probability 1!), $|q(Q_\pi) - q(\mathcal{P})| \leq e^\epsilon-1 \approx \epsilon$. The transfer theorem then follows from the triangle inequality. We get a high probability bound for free, with no need for any heavy machinery.<br/><br/>The argument is just a little more delicate in the case of $(\epsilon,\delta)$-differential privacy, and can be extended beyond linear queries --- but I think this gives the basic idea. The details are in <a href="https://arxiv.org/abs/1909.03577">our new "JLNRSS" paper</a>. Incidentally, once nice thing about having many different proofs of the same theorem is that you can start to see some commonalities. One seems to be: it takes six authors to prove a transfer theorem!</div><div style="text-align: left;"><br/></div><div style="text-align: left;"><br/></div></div>
+    </content>
+    <updated>2019-09-10T10:40:00Z</updated>
+    <published>2019-09-10T10:40:00Z</published>
+    <author>
+      <name>Aaron</name>
+      <email>noreply@blogger.com</email>
+      <uri>http://www.blogger.com/profile/09952936358739421126</uri>
+    </author>
+    <source>
+      <id>tag:blogger.com,1999:blog-25562705</id>
+      <category term="game theory"/>
+      <category term="news"/>
+      <author>
+        <name>Aaron</name>
+        <email>noreply@blogger.com</email>
+        <uri>http://www.blogger.com/profile/09952936358739421126</uri>
+      </author>
+      <link href="http://aaronsadventures.blogspot.com/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
+      <link href="http://www.blogger.com/feeds/25562705/posts/default" rel="self" type="application/atom+xml"/>
+      <link href="http://aaronsadventures.blogspot.com/" rel="alternate" type="text/html"/>
+      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
+      <link href="http://www.blogger.com/feeds/25562705/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
+      <title>Adventures in Computation</title>
+      <updated>2019-09-10T10:40:41Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>http://arxiv.org/abs/1909.03951</id>
@@ -827,7 +863,7 @@ additional contribution, we offer a list of open problems on graph spanners.
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-09-10T10:20:38Z</updated>
+      <updated>2019-09-10T11:21:00Z</updated>
     </source>
   </entry>
 
@@ -854,7 +890,7 @@ Email: quics-coordinator@umiacs.umd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-09-10T10:20:53Z</updated>
+      <updated>2019-09-10T11:21:17Z</updated>
     </source>
   </entry>
 
@@ -968,7 +1004,7 @@ Email: postdoc-advice@irif.fr</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-09-10T10:20:53Z</updated>
+      <updated>2019-09-10T11:21:17Z</updated>
     </source>
   </entry>
 
@@ -1006,7 +1042,7 @@ We also consider the parameterized k-Shortest Vector Problem (SVP), in which we 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-09-10T10:20:38Z</updated>
+      <updated>2019-09-10T11:21:00Z</updated>
     </source>
   </entry>
 
@@ -1061,7 +1097,7 @@ We also consider the parameterized k-Shortest Vector Problem (SVP), in which we 
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-09-10T10:20:43Z</updated>
+      <updated>2019-09-10T11:21:09Z</updated>
     </source>
   </entry>
 
@@ -1407,7 +1443,7 @@ The SWP is a neat question in my opinion. I wonder if there would be some intere
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-09-10T10:20:50Z</updated>
+      <updated>2019-09-10T11:21:14Z</updated>
     </source>
   </entry>
 
@@ -1433,7 +1469,7 @@ The SWP is a neat question in my opinion. I wonder if there would be some intere
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-09-10T10:20:38Z</updated>
+      <updated>2019-09-10T11:21:00Z</updated>
     </source>
   </entry>
 
@@ -1597,36 +1633,6 @@ Being a chair certainly ate up plenty of time but it feels different as dean wit
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
       <updated>2019-09-10T00:01:52Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2019/113</id>
-    <link href="https://eccc.weizmann.ac.il/report/2019/113" rel="alternate" type="text/html"/>
-    <title>TR19-113 |  Instance Complexity and Unlabeled Certificates in the Decision Tree Model | 
-
-	Tomer Grossman, 
-
-	Ilan Komargodski, 
-
-	Moni Naor</title>
-    <summary>Instance complexity is a measure of goodness of an algorithm in which the performance of one algorithm is compared to others per input. This is in sharp contrast to worst-case and average-case complexity measures, where the performance is compared either on the worst input or on an average one, respectively.
-
-  We initiate the systematic study of instance complexity and optimality in the query model (a.k.a. the decision tree model). In this model, instance optimality of an algorithm for computing a function is the requirement that the complexity of an algorithm on any input is at most a constant factor larger than the complexity of the best correct algorithm. That is we compare the decision tree to one that receives a certificate and its complexity is measured only if the certificate is correct (but correctness should hold on any input).  We study both deterministic and randomized decision trees and provide various characterizations and barriers for more general results.
-
-  We introduce a new measure of complexity called unlabeled-certificate complexity, appropriate for graph properties and other functions with symmetries, where information about the structure of the graph is given as a certificate, but not labels of individual vertices. More precisely, the certificate is some permutation of the input (rather than the input itself) and the correctness should be maintained even if the certificate is wrong. We study both worst case complexity and instance optimality with respect to this measure of complexity. In this setting an algorithm is said to be instance optimal if for every input it performs roughly as well as the best algorithm that is given an unlabeled certificate (but is correct on every input).  We show that instance optimality depends on the group of permutations in consideration. Our proofs rely on techniques from hypothesis testing and analysis of random graphs.</summary>
-    <updated>2019-09-05T15:39:45Z</updated>
-    <published>2019-09-05T15:39:45Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2019-09-10T10:20:38Z</updated>
     </source>
   </entry>
 </feed>
