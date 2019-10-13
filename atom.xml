@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-10-12T23:30:38Z</updated>
+  <updated>2019-10-13T00:21:41Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -81,6 +81,84 @@ and related items.</div>
     </source>
   </entry>
 
+  <entry>
+    <id>https://11011110.github.io/blog/2019/10/12/hardness-planar-hamiltonian</id>
+    <link href="https://11011110.github.io/blog/2019/10/12/hardness-planar-hamiltonian.html" rel="alternate" type="text/html"/>
+    <title>Hardness of planar Hamiltonian decomposition and linear arboricity</title>
+    <summary>I was getting ready to start writing a paper proving that Hamiltonian decomposition and linear arboricity are both -complete for planar graphs of maximum degree four. But then I realized that there’s a trivial proof, based on known results:</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>I was getting ready to start writing a paper proving that <a href="https://en.wikipedia.org/wiki/Hamiltonian_decomposition">Hamiltonian decomposition</a> and <a href="https://en.wikipedia.org/wiki/Linear_arboricity">linear arboricity</a> are both <span style="white-space: nowrap;">-complete</span> for planar graphs of maximum degree four. But then I realized that there’s a trivial proof, based on known results:</p>
+
+<ol>
+  <li>
+    <p>Finding a Hamiltonian cycle is <span style="white-space: nowrap;">-complete</span> in 3-regular planar graphs.<sup id="fnref:gjs"><a class="footnote" href="https://11011110.github.io/blog/2019/10/12/hardness-planar-hamiltonian.html#fn:gjs">1</a></sup></p>
+  </li>
+  <li>
+    <p>A 3-regular graph has a Hamiltonian cycle if and only if its <a href="https://en.wikipedia.org/wiki/Line_graph">line graph</a> has a Hamiltonian decomposition.<sup id="fnref:k"><a class="footnote" href="https://11011110.github.io/blog/2019/10/12/hardness-planar-hamiltonian.html#fn:k">2</a></sup><sup id="fnref:m"><a class="footnote" href="https://11011110.github.io/blog/2019/10/12/hardness-planar-hamiltonian.html#fn:m">3</a></sup></p>
+  </li>
+  <li>
+    <p>The line graph of a 3-regular planar graph (its <a href="https://en.wikipedia.org/wiki/Medial_graph">medial graph</a>) is a 4-regular planar graph.</p>
+  </li>
+  <li>
+    <p>A 4-regular graph has a Hamiltonian decomposition if and only if the subgraph formed by removing an arbitrarily chosen single vertex has linear arboricity two.</p>
+  </li>
+</ol>
+
+<p>That’s not enough for a paper, even though the linear arboricity result resolves a conjecture of Cygan, Hou, Kowalik, Lužar, and Wu (2012).<sup id="fnref:c"><a class="footnote" href="https://11011110.github.io/blog/2019/10/12/hardness-planar-hamiltonian.html#fn:c">4</a></sup> So instead I’ll just leave this here, together with two illustrations I already drew of the gadgets for my proof. It’s a reduction from monotone planar 3-sat, in which the variables are connected in a cycle in the plane, the 3-sat clauses with all variables positive are on one side of the cycle, and the 3-sat clauses with all variables negative are on the other side. Here “planar” means that if you represent each variable and clause as a vertex, draw edges from each variable to each clause that uses it, and also draw edges connecting consecutive variables in the cycle, the result is a planar graph.</p>
+
+<p>My reduction adds a special “truth-setting gadget” to the cycle of variables. It represents the variables by regions of the plane, bounded by edges that are forced to belong to the same cycle in any Hamiltonian decomposition. The truth-setting gadget also forms regions of the plane, again bounded by edges that belong to the same cycle. The truth-setting regions extend through the clause gadgets so that they can reach the other clause gadgets on the other sides of them. A variable or negated variable is true if its region’s bounding edges are in the other cycle than the truth-setting gadget.</p>
+
+<p>Here is the truth-setting gadget (the colored parts of the figure), and the (very simple) variable gadgets (gray shaded regions). Each variable gadget will have one loop of one color above the midline, and another loop of the opposite color below the midline.</p>
+
+<p style="text-align: center;"><img alt="Truth-setting and variable gadgets for a reduction from monotone planar 3-sat to Hamiltonian decomposition" src="https://11011110.github.io/blog/assets/2019/truth.svg"/></p>
+
+<p>And here is the clause gadget:</p>
+
+<p style="text-align: center;"><img alt="Clause gadget for a reduction from monotone planar 3-sat to Hamiltonian decomposition" src="https://11011110.github.io/blog/assets/2019/clause.svg"/></p>
+
+<p>The 4- and 8-vertex subunits in the light yellow disks force the partition into two parts of Hamiltonian cycles to be uniquely determined within each gadget, and the 5-vertex subunits between the variable and clause gadget allow the variable to either connect to the parts of the cycles within the clause gadget or to remain separate from them. To construct a Hamiltonian decomposition, you have to have at least one true variable per clause, so that the clause gadget can be connected to the other cycle than the one from the truth-setting gadget. The reduction produces a multigraph rather than a graph, but that’s easy to fix by replacing some of the vertices by wheels.</p>
+
+<p>Maybe the same idea of having a truth-setting gadget that passes through the clause gadgets can be useful in some other reductions?</p>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:gjs">
+      <p>Garey, M. R., Johnson, D. S., and Stockmeyer, L. (1974), “Some simplified <span style="white-space: nowrap;">-complete</span> problems”, <em>Proc. 6th ACM Symposium on Theory of Computing (STOC ‘74)</em>, pp. 47–63, <a href="https://doi.org/10.1145/800119.803884">doi:10.1145/800119.803884</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2019/10/12/hardness-planar-hamiltonian.html#fnref:gjs">↩</a></p>
+    </li>
+    <li id="fn:k">
+      <p>Kotzig, Anton (1957), “Aus der Theorie der endlichen regulären Graphen dritten und vierten Grades”, <em>Časopis Pěst. Mat.</em> 82: 76–92. As cited by Bondy and Häggkvist.<sup id="fnref:bh"><a class="footnote" href="https://11011110.github.io/blog/2019/10/12/hardness-planar-hamiltonian.html#fn:bh">5</a></sup> <a class="reversefootnote" href="https://11011110.github.io/blog/2019/10/12/hardness-planar-hamiltonian.html#fnref:k">↩</a></p>
+    </li>
+    <li id="fn:m">
+      <p>Martin, Pierre (1976), “Cycles hamiltoniens dans les graphes 4-réguliers 4-connexes”, <em>Aequationes Mathematicae</em> 14 (1/2): 37–40, <a href="https://doi.org/10.1007/BF01836203">doi:10.1007/BF01836203</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2019/10/12/hardness-planar-hamiltonian.html#fnref:m">↩</a></p>
+    </li>
+    <li id="fn:c">
+      <p>Cygan, Marek, Hou, Jian-Feng, Kowalik, Łukasz, Lužar, Borut, and  Wu, Jian-Liang (2012), “A planar linear arboricity conjecture”, <em>Journal of Graph Theory</em> 69 (4): 403–425, <a href="https://doi.org/10.1002/jgt.20592">doi:10.1002/jgt.20592</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2019/10/12/hardness-planar-hamiltonian.html#fnref:c">↩</a></p>
+    </li>
+    <li id="fn:bh">
+      <p>Bondy, J. A. and Häggkvist, R. (1981), “Edge-disjoint Hamilton cycles in 4-regular planar graphs”, <em>Aequationes Mathematicae</em>, 22 (1): 42–45, <a href="https://doi.org/10.1007/BF02190157">doi:10.1007/BF02190157</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2019/10/12/hardness-planar-hamiltonian.html#fnref:bh">↩</a></p>
+    </li>
+  </ol>
+</div>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/102952166572844694">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2019-10-12T16:13:00Z</updated>
+    <published>2019-10-12T16:13:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2019-10-13T00:11:07Z</updated>
+    </source>
+  </entry>
+
   <entry xml:lang="en">
     <id>http://lucatrevisan.wordpress.com/?p=4263</id>
     <link href="https://lucatrevisan.wordpress.com/2019/10/12/whats-new/" rel="alternate" type="text/html"/>
@@ -126,7 +204,7 @@ physicist: “don’t forget that we are interested in the limit <img alt="n \ri
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2019-10-12T23:20:11Z</updated>
+      <updated>2019-10-13T00:20:11Z</updated>
     </source>
   </entry>
 
@@ -577,7 +655,7 @@ Is there some one line proof of the problem? Do you know any references? There a
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-10-12T23:28:55Z</updated>
+      <updated>2019-10-13T00:20:41Z</updated>
     </source>
   </entry>
 
@@ -604,7 +682,7 @@ Email: cstheory@dovgordon.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-10-12T23:29:00Z</updated>
+      <updated>2019-10-13T00:21:04Z</updated>
     </source>
   </entry>
 
@@ -631,7 +709,7 @@ Email: alexandra.kolla@colorado.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-10-12T23:29:00Z</updated>
+      <updated>2019-10-13T00:21:04Z</updated>
     </source>
   </entry>
 
@@ -659,7 +737,7 @@ Email: alexandra.kolla@colorado.edu</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-10-12T23:28:36Z</updated>
+      <updated>2019-10-13T00:20:31Z</updated>
     </source>
   </entry>
 
@@ -765,7 +843,7 @@ Email: TA-search@cs.purdue.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-10-12T23:29:00Z</updated>
+      <updated>2019-10-13T00:21:04Z</updated>
     </source>
   </entry>
 
@@ -793,7 +871,7 @@ We also present a different test, which queries the function at most (d+2) times
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-10-12T23:28:36Z</updated>
+      <updated>2019-10-13T00:20:31Z</updated>
     </source>
   </entry>
 
@@ -827,7 +905,7 @@ The arXiv version is more complete than the proceedings version will be, because
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2019-10-08T05:51:02Z</updated>
+      <updated>2019-10-13T00:11:07Z</updated>
     </source>
   </entry>
 
@@ -853,7 +931,7 @@ The arXiv version is more complete than the proceedings version will be, because
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-10-12T23:28:51Z</updated>
+      <updated>2019-10-13T00:20:37Z</updated>
     </source>
   </entry>
 
@@ -957,7 +1035,7 @@ Email: esi@mmmi.sdu.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-10-12T23:29:00Z</updated>
+      <updated>2019-10-13T00:21:04Z</updated>
     </source>
   </entry>
 
@@ -1080,7 +1158,7 @@ In this paper, we characterize the probabilistic degrees of all symmetric Boolea
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-10-12T23:28:36Z</updated>
+      <updated>2019-10-13T00:20:31Z</updated>
     </source>
   </entry>
 
@@ -1110,7 +1188,7 @@ An ingredient in our proof is a new random restriction lemma, which allows to an
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-10-12T23:28:36Z</updated>
+      <updated>2019-10-13T00:20:31Z</updated>
     </source>
   </entry>
 
@@ -1142,7 +1220,7 @@ To the best of our knowledge, it was not even known prior to this work whether t
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-10-12T23:28:36Z</updated>
+      <updated>2019-10-13T00:20:31Z</updated>
     </source>
   </entry>
 
@@ -1169,7 +1247,7 @@ Email: chekuri@illinois.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-10-12T23:29:00Z</updated>
+      <updated>2019-10-13T00:21:04Z</updated>
     </source>
   </entry>
 
@@ -1196,7 +1274,7 @@ Email: HR@cs.illinois.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-10-12T23:29:00Z</updated>
+      <updated>2019-10-13T00:21:04Z</updated>
     </source>
   </entry>
 
@@ -1227,7 +1305,7 @@ Email: HR@cs.illinois.edu</p></div>
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-10-12T23:28:51Z</updated>
+      <updated>2019-10-13T00:20:37Z</updated>
     </source>
   </entry>
 
@@ -1251,7 +1329,7 @@ Email: HR@cs.illinois.edu</p></div>
       <link href="https://adamsheffer.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Discrete geometry and other typos</subtitle>
       <title>Some Plane Truths</title>
-      <updated>2019-10-12T23:29:49Z</updated>
+      <updated>2019-10-13T00:21:08Z</updated>
     </source>
   </entry>
 
@@ -1281,7 +1359,7 @@ Email: pbarcelo@ing.puc.cl</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-10-12T23:29:00Z</updated>
+      <updated>2019-10-13T00:21:04Z</updated>
     </source>
   </entry>
 
@@ -1406,7 +1484,7 @@ We show a doubly-efficient pseudo-deterministic proof for the Zero Weight Triang
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-10-12T23:28:36Z</updated>
+      <updated>2019-10-13T00:20:31Z</updated>
     </source>
   </entry>
 
@@ -1434,7 +1512,7 @@ We show a doubly-efficient pseudo-deterministic proof for the Zero Weight Triang
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-10-12T23:28:36Z</updated>
+      <updated>2019-10-13T00:20:31Z</updated>
     </source>
   </entry>
 
@@ -1462,7 +1540,7 @@ Email: tom.gur@warwick.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-10-12T23:29:00Z</updated>
+      <updated>2019-10-13T00:21:04Z</updated>
     </source>
   </entry>
 
@@ -1504,7 +1582,7 @@ Email: tom.gur@warwick.ac.uk</p></div>
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2019-10-12T23:28:51Z</updated>
+      <updated>2019-10-13T00:20:37Z</updated>
     </source>
   </entry>
 
@@ -1700,34 +1778,7 @@ Finally, I think this is an exciting time for quantum computing and to witness t
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-10-12T23:28:49Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-jobs.org/2019/10/03/faculty-position-at-university-of-minnesota-twin-cities-apply-by-november-1-2019/</id>
-    <link href="https://cstheory-jobs.org/2019/10/03/faculty-position-at-university-of-minnesota-twin-cities-apply-by-november-1-2019/" rel="alternate" type="text/html"/>
-    <title>Faculty position at University of Minnesota-Twin Cities (apply by November 1, 2019)</title>
-    <summary>The Department of Computer Science &amp; Engineering at the University of Minnesota-Twin Cities is hiring to fill multiple tenure-track positions at the assistant professor level, although higher levels of appointments may be considered when commensurate with experience and accomplishments. One of the areas of interest is theoretical computer science. Website: https://www.cs.umn.edu/news/cse-now-hiring-new-faculty Email: csciadmin@umn.edu</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The Department of Computer Science &amp; Engineering at the University of Minnesota-Twin Cities is hiring to fill multiple tenure-track positions at the assistant professor level, although higher levels of appointments may be considered when commensurate with experience and accomplishments. One of the areas of interest is theoretical computer science.</p>
-<p>Website: <a href="https://www.cs.umn.edu/news/cse-now-hiring-new-faculty">https://www.cs.umn.edu/news/cse-now-hiring-new-faculty</a><br/>
-Email: csciadmin@umn.edu</p></div>
-    </content>
-    <updated>2019-10-03T18:02:59Z</updated>
-    <published>2019-10-03T18:02:59Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-jobs.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-jobs.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-jobs.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-10-12T23:29:00Z</updated>
+      <updated>2019-10-13T00:20:35Z</updated>
     </source>
   </entry>
 </feed>
