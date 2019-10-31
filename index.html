@@ -228,7 +228,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at October 31, 2019 08:21 PM UTC</span>.
+Last updated <span class="datestr">at October 31, 2019 09:21 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -236,6 +236,131 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://minimizingregret.wordpress.com/?p=231">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/hazan.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://minimizingregret.wordpress.com/2019/10/31/new-methods-in-control-the-gradient-perturbation-controller/">New Methods in Control: The Gradient Perturbation Controller</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://minimizingregret.wordpress.com" title="Minimizing Regret">Elad Hazan</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p><em>by Naman Agarwal, Karan Singh and Elad Hazan, based on <a href="https://arxiv.org/abs/1902.08721">this paper</a> and <a href="https://arxiv.org/abs/1909.05062">this paper</a>. </em></p>
+<p>The mainstream thought in classical control operates under the simplifying principle that nature evolves according to well-specified dynamics perturbed by i.i.d. Gaussian noise, a field called <b>Optimal Control</b>. While this principle has proven very successful in some real world systems, it does not lend itself to the construction of truly <b>robust</b> controllers. In the real world one can expect all sorts of deviations from this setting, including:</p>
+<ul>
+<li>Inherent correlations between perturbations across time due to the environment.</li>
+<li>Modeling misspecification, which can introduce unforeseeable, non-stochastic deviations from the assumed dynamics.</li>
+<li>Completely adversarial perturbations introduced by a malicious entity.</li>
+</ul>
+<p>Indeed, in the world of classical supervised learning, the presence of the above factors has led to the adoption of <a href="https://ocobook.cs.princeton.edu/">online learning</a> in lieu of statistical learning, which allows for robust noise models and game-theoretic / strategic learning. A natural question arises: <i>what is the analogue of online learning and worst-case regret in robust control? </i></p>
+<h2>Linear Dynamical Systems and Optimal Control</h2>
+<p>Dynamical systems constitute the formalism to describe time-dependent, dynamic real-world phenomenon, ranging from fluid flow through a pipe, the movement of a pendulum, to the change of weather. The archetypal example here is a linear dynamical system, which permits a particularly intuitive interpretation as a (configurable) vector field (from <a href="https://en.wikipedia.org/wiki/Dynamical_system">wikipedia</a>):</p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/10/null.png?w=624&amp;h=158" alt="" title="" width="624" height="158" /></p>
+<p>A linear dynamical system (LDS) posits the state of a system evolves via the following dynamical relation:</p>
+<p style="text-align: center;"><img src="https://s0.wp.com/latex.php?latex=x_%7Bt%2B1%7D+%3D+Ax_t+%2B+Bu_t+%2B+w_t&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="x_{t+1} = Ax_t + Bu_t + w_t" class="latex" title="x_{t+1} = Ax_t + Bu_t + w_t" /></p>
+<div style="width: 1100px; height: 620px;" class="video-player" id="v-3UT37VGe-1">
+</div>
+<p>(video by @<a href="https://twitter.com/robertghrist/status/1185864562299539456">robertghrist</a>)</p>
+<p>Here <img src="https://s0.wp.com/latex.php?latex=x_t&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="x_t" class="latex" title="x_t" /> represents the state of the system, <img src="https://s0.wp.com/latex.php?latex=u_t&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="u_t" class="latex" title="u_t" /> represents a control input and <img src="https://s0.wp.com/latex.php?latex=w_t&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="w_t" class="latex" title="w_t" /> is a perturbation introduced to the dynamics, for the time step t. The vector fields above illustrate the behavior of the system for a few different choices of A, when the control input <img src="https://s0.wp.com/latex.php?latex=u_t&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="u_t" class="latex" title="u_t" /> is set to zero. The control inputs, when correctly chosen, can modify the dynamics to induce a particular desired behavior. For example, controlling the thermostat in a data center to achieve a particular temperature, applying a force to a pendulum to keep it upright, or driving a drone to a destination.</p>
+<p>The goal of the controller is to produce a sequence of control actions <img src="https://s0.wp.com/latex.php?latex=u_1+%5Cldots+u_T&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="u_1 \ldots u_T" class="latex" title="u_1 \ldots u_T" /> aimed at minimizing the cumulative loss <img src="https://s0.wp.com/latex.php?latex=%5Csum_t+c_t%28x_t%2C+u_t%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\sum_t c_t(x_t, u_t)" class="latex" title="\sum_t c_t(x_t, u_t)" />. In classical control the loss functions are convex quadratics and known ahead of time. However, in the quest for more robust controllers, henceforth we will consider a broader class of general (possibly non-quadratic) convex cost functions, which may be adversarially chosen, and only be revealed online per-time-step to the controller.</p>
+<h2>Previous notions: LQR and H-infinity control</h2>
+<p>Perhaps the most fundamental setting in control theory is a LDS is with quadratic costs <img src="https://s0.wp.com/latex.php?latex=c_t&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="c_t" class="latex" title="c_t" /> and i.i.d Gaussian perturbations <img src="https://s0.wp.com/latex.php?latex=w_t&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="w_t" class="latex" title="w_t" />. The solution known as the <a href="https://en.wikipedia.org/wiki/Linear–quadratic_regulator">Linear Quadratic Regulator</a>, derived by solving the Riccati equation, is well understood and corresponds to a linear policy (i.e. the control input is a linear function of the state).</p>
+<p>The assumption of i.i.d perturbations has been relaxed in classical control theory, with the introduction of a min-max notion, in a subfield known as <a href="https://stephentu.github.io/blog/h-infinity-control/2018/07/01/hinf-optimal-control-dynamic-games.html"><img src="https://s0.wp.com/latex.php?latex=H_%7B%5Cinfty%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="H_{\infty}" class="latex" title="H_{\infty}" /> control</a>. Informally, the idea behind <img src="https://s0.wp.com/latex.php?latex=H_%7B%5Cinfty%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="H_{\infty}" class="latex" title="H_{\infty}" /> control is to design a controller which performs well against <i>all </i>sequences of bounded perturbations. There are two shortcomings of this approach; firstly computing such a controller can be a difficult optimization problem in itself. While a closed form for such a controller is known for linear dynamical systems with quadratic costs, no such form is known when costs can be non-quadratic. Secondly and perhaps more importantly, the min-max notion is non-adaptive and hence often too pessimistic. It is possible that during the execution of the system, nature produces a <i>benign (predictable)</i> sequence of perturbations (say, for instance, the perturbations are, in truth, highly correlated). The <img src="https://s0.wp.com/latex.php?latex=H_%7B%5Cinfty%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="H_{\infty}" class="latex" title="H_{\infty}" /> controller in this setting could be overly pessimistic and lead to a higher cost than what could be achieved via a potentially more adaptive controller. This motivates our approach of minimizing regret, which we describe next.</p>
+<h2>A less pessimistic metric: Policy regret</h2>
+<p>Our starting point for more robust control is regret minimization in games. Regret minimization is a well-accepted metric in online learning, and we consider applying it to online control.</p>
+<p>Formally, we measure the efficacy of a controller through the following notion of <i>policy </i>regret.</p>
+<p style="text-align: center;"><img src="https://s0.wp.com/latex.php?latex=%5Cmathrm%7BRegret%7D+%3D+%5Csum_%7Bt%7D+c_t%28x_t%2C+u_t%29+-+%5Cmin_%7B%5Cmathrm%7Bstable+%7D+K%7D+c_t%28x_t%28K%29%2C+-Kx_t%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\mathrm{Regret} = \sum_{t} c_t(x_t, u_t) - \min_{\mathrm{stable } K} c_t(x_t(K), -Kx_t)" class="latex" title="\mathrm{Regret} = \sum_{t} c_t(x_t, u_t) - \min_{\mathrm{stable } K} c_t(x_t(K), -Kx_t)" /></p>
+<p>Here in, <img src="https://s0.wp.com/latex.php?latex=x_t%28K%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="x_t(K)" class="latex" title="x_t(K)" /> represents the state encountered when executing the linear policy $K$. In particular, the second term represents the total cost paid by the best(in hindsight) stable linear policy had it executed in the system facing the same sequence of perturbations as the controller. In this regard the above notion of regret is <b>counterfactual</b> and hence more challenging than the more common stateless notion of regret.<br />
+(Remark: a <span style="font-weight: 400;">stable linear policy K is one which ensures that the spectral radius of  A-BK is strictly less than one. For a formal quantitative definition, please see the </span><a href="https://arxiv.org/abs/1902.08721"><span style="font-weight: 400;">paper</span></a><span style="font-weight: 400;">.)</span></p>
+<p>Furthermore, the choice of comparing to a linear policy is made keeping tractability in mind. Note that this nevertheless generalizes the standard Linear Quadratic Regulator and <img src="https://s0.wp.com/latex.php?latex=H_%7B%5Cinfty%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="H_{\infty}" class="latex" title="H_{\infty}" /> control on Linear Dynamical Systems, as the optimal choice of controllers in those settings is indeed a linear policy (if the cost functions are quadratic, our setting allows more general loss functions).</p>
+<p>Algorithms which achieve low regret on the above objective are naturally adaptive as they perform as well as the best controller (upto a negligible additive regret) oblivious to whether the sequence is <i>friendly </i>or <i>adversarial. </i></p>
+<h2>A new type of controller</h2>
+<p>In successive recent works (<a href="https://arxiv.org/abs/1902.08721">[1] </a>and <a href="https://arxiv.org/abs/1909.05062">[2]</a>), we show that the above notion of policy regret is tractable and can be sublinear (even logarithmic under certain conditions). Using a new parameterization for controller that we detail next, we obtain the following results:</p>
+<ul>
+<li><b>Robustness to Adversarial Perturbations (<a href="https://arxiv.org/abs/1902.08721">[1]</a>) – </b>For arbitrary, but bounded, perturbations $w_t$, which may even be chosen adversarially, we provide an efficient algorithm that achieves regret of <b><img src="https://s0.wp.com/latex.php?latex=O%28%5Csqrt%7BT%7D%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="O(\sqrt{T})" class="latex" title="O(\sqrt{T})" /></b>.</li>
+<li><b>Fast Rates under Stochastic Perturbations (</b>[2]<b>) – </b>Further, for strongly convex costs, and i.i.d. perturbations, we give an efficient algorithm with a poly-logarithmic (in T) regret guarantee.</li>
+</ul>
+<p>The former result is the first such result to establish vanishing average regret in an online setting for control with adversarial perturbations. The latter result offers a significant improvement over the work of <a href="https://arxiv.org/abs/1806.07104">Cohen et al. </a>who established a rate of <img src="https://s0.wp.com/latex.php?latex=O%28%5Csqrt%7BT%7D%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="O(\sqrt{T})" class="latex" title="O(\sqrt{T})" /> in a similar (stochastic) setting.</p>
+<p>We assume that the dynamical system i.e. (A,B) is completely known to us and the state is fully observable. These assumptions have been eliminated in further work with our collaborators, and will be a subject of a future blog post. We now describe the core ideas which go into achieving both our results.</p>
+<h2>The Gradient Perturbation Controller</h2>
+<p>Consider how the choice of the linear controller determines the control input.</p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/10/null-1.png?w=624&amp;h=120" alt="" title="" width="624" height="120" /></p>
+<p>The above display demonstrates that the action, state, and hence the cost are <b>non-convex</b> functions of the linear controller K. The first piece of our result evades this lack of convexity by over-parametrization, ie. relaxing the notion of a linear policy as described next.</p>
+<p>In place of learning a direct representation of a linear controller K, we learn a sequence of matrices <img src="https://s0.wp.com/latex.php?latex=M_1%2C+M_2+%5Cldots+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="M_1, M_2 \ldots " class="latex" title="M_1, M_2 \ldots " /> which represent the dependence of <img src="https://s0.wp.com/latex.php?latex=u_t&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="u_t" class="latex" title="u_t" /> on <img src="https://s0.wp.com/latex.php?latex=w_%7Bt+-+i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="w_{t - i}" class="latex" title="w_{t - i}" /> under the execution of some linear policy. Schematically, we parameterize our policy as follows</p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/10/null-2.png?w=624&amp;h=62" alt="" title="" width="624" height="62" /></p>
+<p>Note that, the assumption that the dynamics is known permits the exact inference of <img src="https://s0.wp.com/latex.php?latex=w_t&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="w_t" class="latex" title="w_t" />’s and thereby making the execution of such a controller possible. While the choice of the controller ensures that control inputs are linear in <img src="https://s0.wp.com/latex.php?latex=%5C%7BM_i%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\{M_i\}" class="latex" title="\{M_i\}" />, the superposition principle for linear dynamical systems ensures that the state sequence too is linear in the same variables. Therefore, the cost of execution of such a controller parameterized via <img src="https://s0.wp.com/latex.php?latex=%5C%7BM_i%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\{M_i\}" class="latex" title="\{M_i\}" /> is convex and we can hope to learn them using standard techniques like Gradient Descent. Observe that, by construction, it is possible to emulate the behavior any linear controller K by a suitable choice of <img src="https://s0.wp.com/latex.php?latex=%5C%7BM_i%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\{M_i\}" class="latex" title="\{M_i\}" />’s.</p>
+<p>There are two barriers though. First, the number of parameters grows with time $T$ and so can regret and running time. Secondly, since there is a state, the decision a controller makes at a particular instance affects the future. We deal with these two problems formally in the paper and show how they may be circumvented. One of the important techniques we use is <a href="https://arxiv.org/abs/1302.6937">Online Convex Optimization with Memory</a>.</p>
+<p>With all the core components in place, we provide a brief specification of our algorithm. Let’s fix some memory length H, and a time step t. Define a proxy cost as</p>
+<table>
+<tbody>
+<tr>
+<td>
+<p style="text-align: center;"><img src="https://s0.wp.com/latex.php?latex=c_t%28M_1%2C+%5Cldots+M_H%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="c_t(M_1, \ldots M_H)" class="latex" title="c_t(M_1, \ldots M_H)" /> =</p>
+</td>
+<td>Cost Paid at Time t, had we execute the policy <img src="https://s0.wp.com/latex.php?latex=%5C%7BM_1%2C+%5Cldots+M_H%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\{M_1, \ldots M_H\}" class="latex" title="\{M_1, \ldots M_H\}" /> for t-H steps, with the system reset to 0</td>
+</tr>
+</tbody>
+</table>
+<p>The algorithm now as suggested by <a href="https://arxiv.org/abs/1302.6937">Anava, Hazan and Manor</a>, is to take a gradient step on the above proxy.</p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/10/null-3.png?w=624&amp;h=29" alt="" title="" width="624" height="29" /></p>
+<p>The above algorithm achieves <img src="https://s0.wp.com/latex.php?latex=O%28%5Csqrt%7BT%7D%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="O(\sqrt{T})" class="latex" title="O(\sqrt{T})" /> regret against <b>worst-case</b> noise. For the full proof and the precise derivation of the algorithm, check out the paper.</p>
+<h2>Achieving Logarithmic Regret</h2>
+<p>Algorithms for (state-less) online learning often enjoy logarithmic regret guarantees in the presence of strongly convex loss functions. Prima facie, one could hope that for dynamical systems with strongly convex costs, such a stronger regret guarantee would hold. The cautionary note here is that <b>strong convexity of the cost <img src="https://s0.wp.com/latex.php?latex=c_t%28x_t%2C+u_t%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="c_t(x_t, u_t)" class="latex" title="c_t(x_t, u_t)" /> in the control input does not imply strong convexity in the controller representation</b>.,</p>
+<p>In fact, the strong convexity of our proxy cost function <img src="https://s0.wp.com/latex.php?latex=c%28M_1%2C+%5Cldots+M_H%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="c(M_1, \ldots M_H)" class="latex" title="c(M_1, \ldots M_H)" /> in its natural parameterization over M’s is further hindered by the fact that the space of M’s constitutes a highly over-parametrized representation (say, vs. K). Indeed in the case of adversarial perturbations, it is easy to construct a case where the strong convexity does not transfer over from the control to the controller.</p>
+<p>In a future blog post we detail how this technical difficulty can be overcome using the natural gradient method, giving rise to a logarithmic regret algorithm for control.</p>
+<h2>Experimental Validation</h2>
+<p>Below we provide empirical evaluations of the GPC controller in various scenarios, demonstrating it is indeed more robust to correlated noise than previous notions. <b>(All the plots below are produced by a new research-first control and time series library in the works — Alpha version scheduled to be released soon! STAY TUNED!!!) </b></p>
+<p>To start, let’s reproduce the classical setting of controlling an LDS with i.i.d. Gaussian noise. Here, the LQR program is <i>optimal</i>. Yet, the plot below attests that our new control methodology offers a slightly suboptimal, yet comparable, performance. This observation also underlines the message the the proposed controller tracks the optimal controller without any foreknowledge of the structure of the perturbations. Here, for example, GPC is not made aware of the i.i.d. nature of the perturbations.</p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/10/null-4.png?w=624&amp;h=205" alt="" title="" width="624" height="205" /></p>
+<p>Moving on to correlated perturbations across time, a simple such setting is when the perturbations are drawn from a Gaussian Random Walk (as opposed to independent Gaussians). Note that here it is possible to derive the <i>optimal </i>controller via the separation principle. Here is the performance plot:</p>
+<h1><img src="https://minimizingregret.files.wordpress.com/2019/10/null-5.png?w=624&amp;h=205" alt="" title="" width="624" height="205" /></h1>
+<p>Note that the default LQR controller performs much worse, where as GPC is able to track the performance of the optimal controller quite closely. Next up, <b>sinusoidal noise</b>:</p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/10/null-6.png?w=624&amp;h=205" alt="" title="" width="624" height="205" /></p>
+<p>Here the full power of regret minimization is exhibited as the consecutive samples of the sine function are very correlated, yet predictable. GPC vastly outperforms LQR as one would expect. But, is this fundamentally a hard setting? What would happen if we use the H-infinity controller, or, god forbid, no control at all? We see this in the next plot (on the log-linear scale):</p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/10/null-7.png?w=624&amp;h=202" alt="" title="" width="624" height="202" /></p>
+<h1>What’s next?</h1>
+<p>We have surveyed a new family of controls that are fundamentally different than classical optimal control: they are adaptive and attain regret guarantees vs. adversarial noise. Their preliminary experimental tests seem quite promising.</p>
+<p>In the coming posts we will:</p>
+<ol>
+<li>Explain how GPC can obtain the first logarithmic regret in the tracking/Kalman setting,</li>
+<li>Reveal our new research-first library for control / time-series prediction,</li>
+<li>Tackle more general settings.</li>
+</ol>
+<h1>Stay tuned! Preferably using the GPC… <img src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/1f642.png" alt="🙂" style="height: 1em;" class="wp-smiley" /></h1>
+<p> </p>
+<div><a href="https://minimizingregret.wordpress.com/2019/10/31/new-methods-in-control-the-gradient-perturbation-controller/"><img src="https://videos.files.wordpress.com/3UT37VGe/cdhbdot0d1kix22v_std.original.jpg" alt="cDhBDoT0d1KIX22V" width="160" height="120" /></a></div></div>
+
+
+
+
+
+
+
+<p class="date">
+by Elad Hazan <a href="https://minimizingregret.wordpress.com/2019/10/31/new-methods-in-control-the-gradient-perturbation-controller/"><span class="datestr">at October 31, 2019 09:10 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2569,76 +2694,6 @@ by shacharlovett <a href="https://cstheory-jobs.org/2019/10/24/simons-berkeley-r
 
 <p class="date">
 by aviad.rubinstein <a href="https://theorydish.blog/2019/10/24/shopping-for-grain-in-the-market-works-a-fine-job/"><span class="datestr">at October 24, 2019 05:59 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://windowsontheory.org/?p=7561">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/wot.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://windowsontheory.org/2019/10/24/boazs-inferior-classical-inferiority-faq/">Boaz’s inferior classical inferiority FAQ</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://windowsontheory.org" title="Windows On Theory">Windows on Theory</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p>(For better info, see <a href="https://www.scottaaronson.com/blog/?p=4317">Scott’s Supreme Quantum Superiority FAQ</a> and also his <a href="https://www.scottaaronson.com/blog/?p=4372">latest post on the Google paper</a>; also this is not really an FAQ but was inspired by a question about the Google paper from a former <a href="https://cs121.boazbarak.org/schedule/">CS 121 </a>student)</p>
-
-
-
-<blockquote class="wp-block-quote"><p><em> “Suppose aliens invade the earth and threaten to obliterate it in a year’s time unless human beings can find the Ramsey number for red five and blue five. We could marshal the world’s best minds and fastest computers, and within a year we could probably calculate the value. If the aliens demanded the Ramsey number for red six and blue six, however, we would have no choice but to launch a preemptive attack.</em>“</p><cite>Paul Erdős (as quoted by Graham and Spencer, 1990, hat tip: <a href="https://windowsontheory.org/2017/10/30/the-different-forms-of-quantum-computing-skepticism/#comment-42659">Lamaze Tishallishmi</a>)</cite></blockquote>
-
-
-
-<p>In a <a href="https://www.nature.com/articles/s41586-019-1666-5">Nature paper</a> published this week, a group of researchers from John Martinis’s lab at Google announced arguably the first demonstration of “quantum supremacy” – a computational task carried out by a 53 qubit quantum computer that would require a prohibitive amount of time to simulate classically. </p>
-
-
-
-<p>Google’s calculations of the “classical computation time” might have been overly pessimistic (from the classical point of view), and there has been work from <a href="https://arxiv.org/abs/1910.09534">IBM</a> as well as some <a href="https://www.caltech.edu/campus-life-events/master-calendar/iqi-weekly-seminar-2019-10-01">work of Johnnie Gray</a> suggesting that there are significant savings to be made. Indeed, given the lessons that we learned from private key cryptography, where techniques such as linear and differential cryptanalysis were used to “shave factors from exponents”, we know that even if a problem requires exponential time in general, this does not mean that by being very clever we can’t make significant savings over the naive brute force algorithm. This holds doubly  so in this case, where, unlike the designers of block ciphers, the Google researchers were severely constrained by factors of geometry and the kind of gates they can reliably implement.</p>
-
-
-
-<p>I would not be terribly surprised if we will see more savings and even an actual classical simulation of the same sampling task that Google achieved. In fact, I very much hope this happens, since it will allow us to independently verify the reliability of Google’s chip and whether it actually did in fact sample from the distribution it is supposed to have sampled from (or at least rule out some “null hypothesis”).  But this would not change the main point that the resources for classical simulation, as far as we know, scale exponentially with the number of qubits and their quality. While we could perhaps with great effort simulate a 53 qubit depth 20 circuit classically, once we reach something like 100 qubits and depth then all current approaches will be hopelessly behind.</p>
-
-
-
-<p>In the language of <a href="https://windowsontheory.org/2017/10/30/the-different-forms-of-quantum-computing-skepticism/">my essay on quantum skepticism</a>, I think this latest result, and the rest of the significant experimental progress that has been going on, all but rules out the possibility of “Skepticland”  where there would be some fundamental physical reason why it is not possible to build quantum computers that offer exponential advantage in the amount of resources to achieve certain tasks over classical computers.</p>
-
-
-
-<p>While the worlds of “Popscitopia”  (quantum computers can do everything) and “Classicatopia” (there is an efficient classical algorithm to simulate BQP) remain mathematical possiblities (just as P=NP is), most likely we live in <strong>“Superiorita”</strong> where quantum computers do offer exponential advantage for <em>some</em> computational problems.</p>
-
-
-
-<p>Some people question whether these kind of “special purpose” devices that might be very expensive to build are worth the investment. First of all (and most importantly for me), as I argued in <a href="https://windowsontheory.org/2017/10/30/the-different-forms-of-quantum-computing-skepticism/">my essay</a>, exploring the limits of physically realizable computation is a grand scientific goal in its own right worthy of investment regardless  of applications. Second, technology is now a <a href="https://www.gartner.com/en/newsroom/press-releases/2019-01-28-gartner-says-global-it-spending-to-reach--3-8-trillio#targetText=Worldwide%20IT%20spending%20is%20projected,latest%20forecast%20by%20Gartner%2C%20Inc.">3.8 trillion dollar </a>per year industry, and quantum computers are in a very real sense the first qualitatively different computing devices since the days of Babbage and Turing. Spending a fraction of a percent of the industry’s worth to the economy on exploring the potential for quantum computing seems like a good investment, even if there will be no practical application in the next decade or two. (By the same token, spending a fraction of a percent on exploring algorithm design and the limitations of <em>classical </em>algorithms is a very good investment as well.)</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by Boaz Barak <a href="https://windowsontheory.org/2019/10/24/boazs-inferior-classical-inferiority-faq/"><span class="datestr">at October 24, 2019 01:32 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
