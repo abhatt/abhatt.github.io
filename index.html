@@ -228,7 +228,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at November 09, 2019 11:21 AM UTC</span>.
+Last updated <span class="datestr">at November 09, 2019 12:21 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -2034,7 +2034,7 @@ by David Eppstein <a href="https://11011110.github.io/blog/2019/10/31/halloween-
 <p>Indeed, in the world of classical supervised learning, the presence of the above factors has led to the adoption of <a href="https://ocobook.cs.princeton.edu/">online learning</a> in lieu of statistical learning, which allows for robust noise models and game-theoretic / strategic learning. A natural question arises: <i>what is the analogue of online learning and worst-case regret in robust control? </i></p>
 <h2>Linear Dynamical Systems and Optimal Control</h2>
 <p>Dynamical systems constitute the formalism to describe time-dependent, dynamic real-world phenomenon, ranging from fluid flow through a pipe, the movement of a pendulum, to the change of weather. The archetypal example here is a linear dynamical system, which permits a particularly intuitive interpretation as a (configurable) vector field (from <a href="https://en.wikipedia.org/wiki/Dynamical_system">wikipedia</a>):</p>
-<p><img width="624" alt="" src="https://minimizingregret.files.wordpress.com/2019/10/null.png?w=624&amp;h=158" title="" height="158" /></p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/10/null.png?w=624&amp;h=158" alt="" title="" width="624" height="158" /></p>
 <p>A linear dynamical system (LDS) posits the state of a system evolves via the following dynamical relation:</p>
 <p style="text-align: center;"><img src="https://s0.wp.com/latex.php?latex=x_%7Bt%2B1%7D+%3D+Ax_t+%2B+Bu_t+%2B+w_t&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="x_{t+1} = Ax_t + Bu_t + w_t" class="latex" title="x_{t+1} = Ax_t + Bu_t + w_t" /></p>
 <div style="width: 1100px; height: 620px;" class="video-player" id="v-3UT37VGe-1">
@@ -2063,10 +2063,10 @@ by David Eppstein <a href="https://11011110.github.io/blog/2019/10/31/halloween-
 <p>We assume that the dynamical system i.e. (A,B) is completely known to us and the state is fully observable. These assumptions have been eliminated in further work with our collaborators, and will be a subject of a future blog post. We now describe the core ideas which go into achieving both our results.</p>
 <h2>The Gradient Perturbation Controller</h2>
 <p>Consider how the choice of the linear controller determines the control input.</p>
-<p><img width="624" alt="" src="https://minimizingregret.files.wordpress.com/2019/10/null-1.png?w=624&amp;h=120" title="" height="120" /></p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/10/null-1.png?w=624&amp;h=120" alt="" title="" width="624" height="120" /></p>
 <p>The above display demonstrates that the action, state, and hence the cost are <b>non-convex</b> functions of the linear controller K. The first piece of our result evades this lack of convexity by over-parametrization, ie. relaxing the notion of a linear policy as described next.</p>
 <p>In place of learning a direct representation of a linear controller K, we learn a sequence of matrices <img src="https://s0.wp.com/latex.php?latex=M_1%2C+M_2+%5Cldots+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="M_1, M_2 \ldots " class="latex" title="M_1, M_2 \ldots " /> which represent the dependence of <img src="https://s0.wp.com/latex.php?latex=u_t&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="u_t" class="latex" title="u_t" /> on <img src="https://s0.wp.com/latex.php?latex=w_%7Bt+-+i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="w_{t - i}" class="latex" title="w_{t - i}" /> under the execution of some linear policy. Schematically, we parameterize our policy as follows</p>
-<p><img width="624" alt="" src="https://minimizingregret.files.wordpress.com/2019/10/null-2.png?w=624&amp;h=62" title="" height="62" /></p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/10/null-2.png?w=624&amp;h=62" alt="" title="" width="624" height="62" /></p>
 <p>Note that, the assumption that the dynamics is known permits the exact inference of <img src="https://s0.wp.com/latex.php?latex=w_t&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="w_t" class="latex" title="w_t" />’s and thereby making the execution of such a controller possible. While the choice of the controller ensures that control inputs are linear in <img src="https://s0.wp.com/latex.php?latex=%5C%7BM_i%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\{M_i\}" class="latex" title="\{M_i\}" />, the superposition principle for linear dynamical systems ensures that the state sequence too is linear in the same variables. Therefore, the cost of execution of such a controller parameterized via <img src="https://s0.wp.com/latex.php?latex=%5C%7BM_i%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\{M_i\}" class="latex" title="\{M_i\}" /> is convex and we can hope to learn them using standard techniques like Gradient Descent. Observe that, by construction, it is possible to emulate the behavior any linear controller K by a suitable choice of <img src="https://s0.wp.com/latex.php?latex=%5C%7BM_i%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\{M_i\}" class="latex" title="\{M_i\}" />’s.</p>
 <p>There are two barriers though. First, the number of parameters grows with time $T$ and so can regret and running time. Secondly, since there is a state, the decision a controller makes at a particular instance affects the future. We deal with these two problems formally in the paper and show how they may be circumvented. One of the important techniques we use is <a href="https://arxiv.org/abs/1302.6937">Online Convex Optimization with Memory</a>.</p>
 <p>With all the core components in place, we provide a brief specification of our algorithm. Let’s fix some memory length H, and a time step t. Define a proxy cost as</p>
@@ -2081,7 +2081,7 @@ by David Eppstein <a href="https://11011110.github.io/blog/2019/10/31/halloween-
 </tbody>
 </table>
 <p>The algorithm now as suggested by <a href="https://arxiv.org/abs/1302.6937">Anava, Hazan and Manor</a>, is to take a gradient step on the above proxy.</p>
-<p><img width="624" alt="" src="https://minimizingregret.files.wordpress.com/2019/10/null-3.png?w=624&amp;h=29" title="" height="29" /></p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/10/null-3.png?w=624&amp;h=29" alt="" title="" width="624" height="29" /></p>
 <p>The above algorithm achieves <img src="https://s0.wp.com/latex.php?latex=O%28%5Csqrt%7BT%7D%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="O(\sqrt{T})" class="latex" title="O(\sqrt{T})" /> regret against <b>worst-case</b> noise. For the full proof and the precise derivation of the algorithm, check out the paper.</p>
 <h2>Achieving Logarithmic Regret</h2>
 <p>Algorithms for (state-less) online learning often enjoy logarithmic regret guarantees in the presence of strongly convex loss functions. Prima facie, one could hope that for dynamical systems with strongly convex costs, such a stronger regret guarantee would hold. The cautionary note here is that <b>strong convexity of the cost <img src="https://s0.wp.com/latex.php?latex=c_t%28x_t%2C+u_t%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="c_t(x_t, u_t)" class="latex" title="c_t(x_t, u_t)" /> in the control input does not imply strong convexity in the controller representation</b>.,</p>
@@ -2090,13 +2090,13 @@ by David Eppstein <a href="https://11011110.github.io/blog/2019/10/31/halloween-
 <h2>Experimental Validation</h2>
 <p>Below we provide empirical evaluations of the GPC controller in various scenarios, demonstrating it is indeed more robust to correlated noise than previous notions. <b>(All the plots below are produced by a new research-first control and time series library in the works — Alpha version scheduled to be released soon! STAY TUNED!!!) </b></p>
 <p>To start, let’s reproduce the classical setting of controlling an LDS with i.i.d. Gaussian noise. Here, the LQR program is <i>optimal</i>. Yet, the plot below attests that our new control methodology offers a slightly suboptimal, yet comparable, performance. This observation also underlines the message the the proposed controller tracks the optimal controller without any foreknowledge of the structure of the perturbations. Here, for example, GPC is not made aware of the i.i.d. nature of the perturbations.</p>
-<p><img width="624" alt="" src="https://minimizingregret.files.wordpress.com/2019/10/null-4.png?w=624&amp;h=205" title="" height="205" /></p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/10/null-4.png?w=624&amp;h=205" alt="" title="" width="624" height="205" /></p>
 <p>Moving on to correlated perturbations across time, a simple such setting is when the perturbations are drawn from a Gaussian Random Walk (as opposed to independent Gaussians). Note that here it is possible to derive the <i>optimal </i>controller via the separation principle. Here is the performance plot:</p>
-<h1><img width="624" alt="" src="https://minimizingregret.files.wordpress.com/2019/10/null-5.png?w=624&amp;h=205" title="" height="205" /></h1>
+<h1><img src="https://minimizingregret.files.wordpress.com/2019/10/null-5.png?w=624&amp;h=205" alt="" title="" width="624" height="205" /></h1>
 <p>Note that the default LQR controller performs much worse, where as GPC is able to track the performance of the optimal controller quite closely. Next up, <b>sinusoidal noise</b>:</p>
-<p><img width="624" alt="" src="https://minimizingregret.files.wordpress.com/2019/10/null-6.png?w=624&amp;h=205" title="" height="205" /></p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/10/null-6.png?w=624&amp;h=205" alt="" title="" width="624" height="205" /></p>
 <p>Here the full power of regret minimization is exhibited as the consecutive samples of the sine function are very correlated, yet predictable. GPC vastly outperforms LQR as one would expect. But, is this fundamentally a hard setting? What would happen if we use the H-infinity controller, or, god forbid, no control at all? We see this in the next plot (on the log-linear scale):</p>
-<p><img width="624" alt="" src="https://minimizingregret.files.wordpress.com/2019/10/null-7.png?w=624&amp;h=202" title="" height="202" /></p>
+<p><img src="https://minimizingregret.files.wordpress.com/2019/10/null-7.png?w=624&amp;h=202" alt="" title="" width="624" height="202" /></p>
 <h1>What’s next?</h1>
 <p>We have surveyed a new family of controls that are fundamentally different than classical optimal control: they are adaptive and attain regret guarantees vs. adversarial noise. Their preliminary experimental tests seem quite promising.</p>
 <p>In the coming posts we will:</p>
@@ -2107,7 +2107,7 @@ by David Eppstein <a href="https://11011110.github.io/blog/2019/10/31/halloween-
 </ol>
 <h1>Stay tuned! Preferably using the GPC… <img src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/1f642.png" alt="🙂" style="height: 1em;" class="wp-smiley" /></h1>
 <p> </p>
-<div><a href="https://minimizingregret.wordpress.com/2019/10/31/new-methods-in-control-the-gradient-perturbation-controller/"><img width="160" alt="cDhBDoT0d1KIX22V" src="https://videos.files.wordpress.com/3UT37VGe/cdhbdot0d1kix22v_std.original.jpg" height="120" /></a></div></div>
+<div><a href="https://minimizingregret.wordpress.com/2019/10/31/new-methods-in-control-the-gradient-perturbation-controller/"><img src="https://videos.files.wordpress.com/3UT37VGe/cdhbdot0d1kix22v_std.original.jpg" alt="cDhBDoT0d1KIX22V" width="160" height="120" /></a></div></div>
 
 
 
