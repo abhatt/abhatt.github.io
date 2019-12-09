@@ -231,7 +231,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at December 09, 2019 06:21 PM UTC</span>.
+Last updated <span class="datestr">at December 09, 2019 07:21 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -239,6 +239,68 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://theorydish.blog/?p=1541">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/theorydish.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://theorydish.blog/2019/12/09/quantum-dna-sequencing-the-ultimate-hardness-hypothesis/">Quantum DNA sequencing &amp; the ultimate hardness hypothesis</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://theorydish.blog" title="Theory Dish">Theory Dish: Stanford blog</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p>Longest common subsequence (LCS) and edit distance (ED) are fundamental similarity measures of interest to genomic applications (insertions/deletions/substitutions are a pretty good proxy for both mutations and read errors). The fastest known algorithms for computing the LCS/ED between two <img src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="n" class="latex" title="n" />-character strings run in nearly quadratic time. Breakthroughs in fine-grained complexity <a href="https://arxiv.org/abs/1412.0348">[BI18]</a><a href="https://arxiv.org/abs/1511.06022">[AHWW16]</a> from the last few years provide some nice formal barriers further progress: in particular, substantially faster algorithms would refute <em>NC-SETH</em>, the hypothesis that given an NC circuit with <img src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="n" class="latex" title="n" /> input bits,  deciding if the circuit has any satisfying assignment requires <img src="https://s0.wp.com/latex.php?latex=2%5E%7B%281-o%281%29%29n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="2^{(1-o(1))n}" class="latex" title="2^{(1-o(1))n}" /> time. (Note that this is a weaker, aka safer, hypothesis than the standard SETH.)</p>
+<p> </p>
+<h2>Quantum algorithms for edit distance?</h2>
+<p>One way to try to circumvent the computational barriers is by approximation algorithms (see my <a href="https://theorydish.blog/2018/07/20/approximating-edit-distance/">blog post</a>). A different approach is to go with quantum algorithms: Grover’s search can solve NC-SAT in <img src="https://s0.wp.com/latex.php?latex=2%5E%7Bn%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="2^{n/2}" class="latex" title="2^{n/2}" /> time. Even those of us less skeptic than <a href="https://gilkalai.wordpress.com/2019/11/13/gils-collegial-quantum-supremacy-skepticism-faq/">Gil Kalai</a> can probably agree that quadratic quantum speedups won’t be practical anytime soon. But in theory, I find the question of whether we can design subquadratic quantum algorithms for edit distance very interesting (see also <a href="https://arxiv.org/abs/1804.04178">[BEG+18]</a>).</p>
+<p>Alas, even with the power of quantum computers we don’t know any truly subquadratic algorithms for computing LCS/ED. On the other hand, it is not clear how to rule out even linear-time algorithms. A few weeks ago, Buhrman, Patro, and Speelman, posted a <a href="https://arxiv.org/abs/1911.05686">paper</a> that gives a <img src="https://s0.wp.com/latex.php?latex=n%5E%7B3%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="n^{3/2}" class="latex" title="n^{3/2}" /> quantum <em>query complexity </em>lower bound for LCS/ED.</p>
+<blockquote><p>Open Problem: Close the <img src="https://s0.wp.com/latex.php?latex=n%5E%7B3%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="n^{3/2}" class="latex" title="n^{3/2}" /> vs <img src="https://s0.wp.com/latex.php?latex=n%5E2&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="n^2" class="latex" title="n^2" /> gap for quantum query complexity of ED/LCS.</p></blockquote>
+<p>What is “query complexity” of ED/LCS? Buhrman et al. consider the following query model: In LCS, we want a <strong>maximum monotone matching</strong> between the characters of the two strings, where we can match two characters if they’re identical. Now suppose that in the query complexity problem we still want to find a maximum monotone matching, but instead of the character-equality graph (which is a union of disjoint cliques), we have an arbitrary bipartite graph, and <strong>given a pair of vertices, the oracle tells you if there is an edge between them</strong>.</p>
+<p>This model may seem a bit counter-intuitive at first since the graphs may not correspond to any pair of strings; and indeed other models have been considered before <a href="https://dl.acm.org/citation.cfm?id=321922">[UAH76]</a><a href="https://arxiv.org/abs/1005.4033">[AKO10]</a>. But it turns out that this model is well-motivated by the NC-SETH lower bound (see discussion below).</p>
+<p> </p>
+<h2>The ultimate hardness hypothesis</h2>
+<p>What does the <img src="https://s0.wp.com/latex.php?latex=n%5E%7B3%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="n^{3/2}" class="latex" title="n^{3/2}" /> query complexity lower bound mean for algorithms on actual strings? Instead of a black box oracle, our algorithms have access to an NC-circuit that implements it. Intuitively, we don’t know how to do very much with white box circuits, so it seems plausible to hypothesize that the running time will be lower bound by the query complexity. In some sense, this is a special case of the following <em>ultimate hardness hypothesis </em>that unifies a lot of the computational hardness assumptions that we like to assume but have no idea how to prove (e.g. P!=NP, P!=BQP, NC-SETH, FP!=PPAD, etc):</p>
+<blockquote><p>[Ultimate Hardness Hypothesis] For every problem, the white-box computational complexity is lower bounded by the black-box query complexity.”</p></blockquote>
+<p>In communication complexity similar statements are known and are called simulation/lifting theorems (see e.g. <a href="https://theory.stanford.edu/~mika/thesis.pdf">Mika’s thesis</a>). For computational complexity, there are obvious counter examples such as “decide if the oracle can be implemented by a small circuit”. So it only makes sense to continue to assume the ultimate hardness hypothesis for “reasonable problems” instead of “every problem”.</p>
+<p>But Burhman et al. identify the following variant of the ultimate hardness hypothesis which I find very interesting. It is defined with respect to a function <img src="https://s0.wp.com/latex.php?latex=T%3A%5C%7B0%2C1%5C%7D%5E%7B2%5En%7D+%5Crightarrow+%5C%7B0%2C1%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="T:\{0,1\}^{2^n} \rightarrow \{0,1\}" class="latex" title="T:\{0,1\}^{2^n} \rightarrow \{0,1\}" /> which takes as input the truth-table of a circuit and outputs True or False. Roughly, they hypothesize that:</p>
+<blockquote><p>[Burhman et al.-QSETH, paraphrased] For <em>every</em> <img src="https://s0.wp.com/latex.php?latex=T&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="T" class="latex" title="T" />, deciding if <img src="https://s0.wp.com/latex.php?latex=T&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="T" class="latex" title="T" /> is true or false is as hard whether we’re given the actual circuit, or only the guarantee that the oracle is implemented by a small circuit”</p></blockquote>
+<p>At a first read, I thought that arguments a-la impossibility of obfuscation <a href="https://www.iacr.org/archive/crypto2001/21390001.pdf">[BGI+01]</a> should refute this hypothesis, but a few weeks later I still don’t know how to prove it. Do you?</p>
+<p> </p>
+<h2>A tip for the upcoming holidays</h2>
+<p>During my postdoc, I worked on the quantum query complexity of ED/LCS with Shalev Ben-David, Rolando La Placa, and John Wright. I was a bit bummed to find out that we got scooped by Buhrman et al, but I know of at least 3 other groups that were also scooped by the same paper, so at least we’re in good company <img src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/1f642.png" alt="🙂" style="height: 1em;" class="wp-smiley" /></p>
+<p>At the time, a fellow postdoc from Psychology asked me what I was working on. I resisted the temptation to try to explain the various quantum variants of NC-SETH, and instead told him I was working on “DNA sequencing with quantum computers”. His reaction was priceless. Regardless of what you’re actually working on, try this line during the holidays when your relatives ask you about your work.</p>
+<p> </p></div>
+
+
+
+
+
+
+
+<p class="date">
+by aviad.rubinstein <a href="https://theorydish.blog/2019/12/09/quantum-dna-sequencing-the-ultimate-hardness-hypothesis/"><span class="datestr">at December 09, 2019 06:20 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2611,47 +2673,6 @@ Email: h.sun@ed.ac.uk</p></div>
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-jobs.org/2019/12/05/postdoc-at-university-of-edinburgh-apply-by-december-9-2019-2/"><span class="datestr">at December 05, 2019 10:53 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://cstheory-jobs.org/2019/12/05/postdoc-at-university-of-edinburgh-apply-by-december-9-2019/">
-<div class="entryheader">
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://cstheory-jobs.org/2019/12/05/postdoc-at-university-of-edinburgh-apply-by-december-9-2019/">postdoc at University of Edinburgh (apply by December 9, 2019)</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://cstheory-jobs.org" title="Theoretical Computer Science Jobs">CCI: jobs</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p>Applications are invited for a postdoctoral position in algorithms in the School of Informatics at the University of Edinburgh. The position is for a period of up to 3 years, and can start at any time in 2020.</p>
-<p>Website: <a href="https://www.vacancies.ed.ac.uk/pls/corehrrecruit/erq_jobspec_version_4.display_form">https://www.vacancies.ed.ac.uk/pls/corehrrecruit/erq_jobspec_version_4.display_form</a><br />
-Email: h.sun@ed.ac.uk</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by shacharlovett <a href="https://cstheory-jobs.org/2019/12/05/postdoc-at-university-of-edinburgh-apply-by-december-9-2019/"><span class="datestr">at December 05, 2019 10:49 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
