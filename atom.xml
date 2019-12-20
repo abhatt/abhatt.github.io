@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2019-12-20T07:21:54Z</updated>
+  <updated>2019-12-20T08:21:56Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -34,7 +34,7 @@ Email: jakob.nordstrom@cs.lth.se</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-12-20T07:20:43Z</updated>
+      <updated>2019-12-20T08:20:50Z</updated>
     </source>
   </entry>
 
@@ -61,7 +61,98 @@ Email: jakob.nordstrom@cs.lth.se</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-12-20T07:20:43Z</updated>
+      <updated>2019-12-20T08:20:50Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2019/12/20/asymptotics-recamans-sequence</id>
+    <link href="https://11011110.github.io/blog/2019/12/20/asymptotics-recamans-sequence.html" rel="alternate" type="text/html"/>
+    <title>Asymptotics of Recamán’s sequence</title>
+    <summary>Recamán’s sequence is a sequence of natural numbers in which the first number is zero and the th number adds or subtracts from the previous number, subtracting if that would lead to a new value and adding otherwise. It was popularized in a 2018 Numberphile video that showed both an interesting visualization of it using nested circles and a spooky piano composition obtained by using its values as notes.</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><a href="https://en.wikipedia.org/wiki/Recam%C3%A1n%27s_sequence">Recamán’s sequence</a> is a sequence of natural numbers in which the first number is zero and the th number adds or subtracts  from the previous number, subtracting if that would lead to a new value and adding otherwise. It was popularized in a 2018 Numberphile video that showed both an interesting visualization of it using nested circles and a spooky piano composition obtained by using its values as notes.</p>
+
+
+
+<p>In <a href="https://oeis.org/A005132">the OEIS entry for this sequence</a> Benjamin Chaffin claims to have computed and plotted its first  numbers. Can it really be done this fast?
+And until recently, the sequence’s Wikipedia article claimed that when computing this sequence, each number takes  time to compute, sourced to the analysis in <a href="https://blogs.mathworks.com/cleve/2018/07/09/the-oeis-and-the-recaman-sequence/">a blog post with a MATLAB implementation</a>. Can it really be this slow?</p>
+
+<p>In analyzing the complexity of computing integer sequences, it’s often important to consider numerical precision. The standard computational model used for algorithm analysis, the unit-cost RAM, allows constant-time arithmetic on -bit integers, enough to allow the model to index its memory. Models of computing with larger word sizes are less standard. And some sequences need linearly many bits just to represent a single sequence value, too many to handle in constant time. But that’s not an issue for Recamán’s sequence. Even a sequence that always added  at each step, rather than sometimes, subtracting, would grow at most quadratically, allowing the first  numbers to be computed using only -bit arithmetic.</p>
+
+<p>Using this model, we can analyze a naive algorithm for the sequence that directly implements its recurrence while maintaining a set data structure to keep track of what has been seen already.</p>
+
+<figure class="highlight"><pre><code class="language-python"><span class="k">def</span> <span class="nf">recaman</span><span class="p">():</span>
+    <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">a</span>
+        <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">n</span> <span class="ow">and</span> <span class="n">a</span> <span class="o">-</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">-=</span> <span class="n">n</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">+=</span> <span class="n">n</span>
+        <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></code></pre></figure>
+
+<p>If sets are represented using hash tables with provable constant expected time per operation (say, <a href="https://en.wikipedia.org/wiki/Linear_probing#Choice_of_hash_function">linear probing with tabulation hashing</a>), then this takes constant expected time per number, or  for the first  numbers. So much for being quadratic. Alternatively, if we knew that the sequence grew only linearly, we could avoid hashing and expected time analysis by using a bitvector to get deterministic constant time per number.</p>
+
+<p>So the next question to ask is: does the sequence grow only linearly, or more quickly? Before running an experiment to test this, my intuition was that if the choice to add or subtract were uniformly random, then the sequence would grow like a random walk, typically  steps away from the origin, which with step size  would give growth . On the other hand, to achieve equal probability of going up or down you need roughly half of the integers to be visited, and for that to happen the sequence should grow only as . For any faster growth rate, the density of visited integers would be less than half and the sequence would be pulled downward. So I expected that the true growth rate should be at a level where the upward pressure of a uniform random walk and the downward pressure of less-than-half occupancy balance each other, but I didn’t have a strong a priori feeling whether this meant linear growth (with constant but somewhat less than half occupancy) or slightly superlinear growth.</p>
+
+<p>This is something we can check experimentally, so I used the naive algorithm to generate a quarter-billion sequence elements, sampled them down to 629 pairs of  by keeping only elements at cubic positions, and fit a line to their log-log plot using Siegel’s repeated median estimator in R. The result has weird stripy patterns that don’t look much like a line, but its exponent looks a lot like a 1 to me.</p>
+
+<p style="text-align: center;"><img alt="Log-log plot of samples from Recam&#xE1;n's sequence" src="https://11011110.github.io/blog/assets/2019/recaman/density.png"/></p>
+
+<p>We can get a cleaner curve (and a more informative picture of how big a bitvector we might need) by plotting only the points where the sequence reaches a new high point. There were too many data points to fit easily, so I thinned them out by including only high points that were half a percent higher than the previous one, giving me 254 data points. To look more carefully at near-linear growth rates, I plotted  against  this time. Again, the results had weird stripy patterns that I didn’t expect (I thought filtering for the high points would have eliminated that), but the plot seems to clearly show that the growth rate of the sequence is nonlinear. Although the fit line shows growth of the form , I don’t think the data is clear enough to conclude that this is the right growth rate.</p>
+
+<p style="text-align: center;"><img alt="Plot of high points of Recam&#xE1;n's sequence, divided by n" src="https://11011110.github.io/blog/assets/2019/recaman/highpoint.png"/></p>
+
+<p>So, sadly, the bitvector solution doesn’t appear to give us a deterministic solution with constant time per element. It takes a nonlinear amount of time to initialize a nonzero number of bits. Maybe instead some deterministic choice of hash function allows the hashing solution to work without randomization, but proving that seems difficult. On the other hand there’s a lot of other structure in the sequence. Maybe we can take advantage of it and get even faster, computing an implicit representation of the sequence (rather than an explicit list of each of its elements) in time sublinear in the number of elements generated? Surely, if the claim of having generated  elements is to be believed, this must be possible.</p>
+
+<p>A hint comes from the plots in the MATLAB post showing that Recamán’s sequence contains long alternations between addition and subtraction that fill in two contiguous blocks of integers. A comment by Jan Van lent from <a href="https://mathlesstraveled.com/2016/06/12/the-recaman-sequence/">a 2016 blog post on <em>The Math Less Traveled</em></a> suggests that there should be few (maybe ) of these blocks, and that we can save space using a data structure that stores blocks rather than individual numbers. This would have advantages even in the naive algorithm: when I tried bumping my data sets to a full billion elements they bogged down, not because I didn’t have enough time to run four times slower, but because I ran out of memory for the hash table.</p>
+
+<p>We can use a data structure that allows for integer predecessor queries to store only the starting endpoints of each block of occupied integers, associating with each start the end of the same block. Then, we could test whether a query integer  is in one of the blocks by finding the predecessor of  (the first block start at or before ) and checking whether its block extends as far as . A similar but more complicated calculation could also be used, for each sequence element, to find the length of the alternation starting at that element (stopping the alternation when the negative steps in the alternation run into another block), and then to update the collection of blocks to cover all of the elements encountered during this alternation. The obvious choice of predecessor data structure would be a balanced binary search tree, but (because we’re dealing with integers of polynomial magnitude) it’s better in theory to use a <a href="https://en.wikipedia.org/wiki/Van_Emde_Boas_tree">Van Emde Boas tree</a>, which can handle each data structure operation in time . If we generate Recamán’s sequence one alternation at a time in this way, and it has  alternations and  blocks in its first  elements, then the improved generation algorithm will take time  and space . I have a VEB-tree implementation, but it lacks predecessor queries, and four times more elements are only a small step on my log plots, so I haven’t tested this. But we can still use the naive algorithm to compute  and  and study how they grow. Here, first, is .</p>
+
+<p style="text-align: center;"><img alt="Plot of number of alternating subsequences of Recam&#xE1;n's sequence" src="https://11011110.github.io/blog/assets/2019/recaman/alternations.png"/></p>
+
+<p>The number of alternations looks like a reasonable fit for .
+The number of blocks can be at most twice the number of alternations, but it could well be smaller as blocks coalesce after they are formed. The plot of numbers of blocks looks almost the same as the one above, so instead I plotted a ratio. I don’t think the fit line in the plot is particularly convincing. Nevertheless to me this looks like  and  have the same exponent but differ by a lower-order factor like a log or log-log.</p>
+
+<p style="text-align: center;"><img alt="Plot of ratio of alternating subsequences to contiguous occupied blocks for Recam&#xE1;n's sequence" src="https://11011110.github.io/blog/assets/2019/recaman/blocks.png"/></p>
+
+<p>So what have we learned?</p>
+
+<ul>
+  <li>
+    <p>Even the obvious hashtable-based methods can achieve constant expected time per element. But their limiting factor is memory, not time.</p>
+  </li>
+  <li>
+    <p>It’s tempting to use bitvectors instead, and that might not be a bad choice in practice, but in theory that appears to take more than constant time per element. Deterministic hashing might take constant time per element but this is unproven.</p>
+  </li>
+  <li>
+    <p>Generating the sequence implicitly in terms of its alternations, and using a data structure that represents the generated elements in terms of their blocks, looks like it can achieve something like  in both time and space,
+but again this is unproven.</p>
+  </li>
+  <li>
+    <p>This is still not anywhere near fast enough to get  elements, nor even  as the largest generated value. So either something is wrong with that claim (most likely a typo in the number of elements), or there are significant algorithmic achievements to be gained beyond just using alternations and blocks.</p>
+  </li>
+</ul>
+
+<p>For the source code for these plots, see <a href="https://11011110.github.io/blog/assets/2019/recaman/density.py">density generation</a>/<a href="https://11011110.github.io/blog/assets/2019/recaman/density.R">analysis</a>, <a href="https://11011110.github.io/blog/assets/2019/recaman/highpoint.py">high point generation</a>/<a href="https://11011110.github.io/blog/assets/2019/recaman/highpoint.R">analysis</a>, <a href="https://11011110.github.io/blog/assets/2019/recaman/alternations.py">alternation generation</a>/<a href="https://11011110.github.io/blog/assets/2019/recaman/alternations.R">analysis</a>, and <a href="https://11011110.github.io/blog/assets/2019/recaman/blocks.py">block generation</a>/<a href="https://11011110.github.io/blog/assets/2019/recaman/blocks.R">analysis</a>.</p></div>
+    </content>
+    <updated>2019-12-20T00:02:00Z</updated>
+    <published>2019-12-20T00:02:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2019-12-20T08:21:03Z</updated>
     </source>
   </entry>
 
@@ -561,7 +652,7 @@ asymptotic scaling and constant prefactor.
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2019-12-20T07:21:26Z</updated>
+      <updated>2019-12-20T08:21:30Z</updated>
     </source>
   </entry>
 
@@ -1068,7 +1159,7 @@ global efficiency, complexity, passenger, driver, and platform incentives.
     </summary>
     <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>I would like to report on <del>seven</del> eight mathematical events taking place in Jerusalem, the Tel Aviv area, and Haifa in the next few weeks. (Probably I missed quite a few other mathematical events, feel free to update in the comment section.)</p>
 <p>1. <a href="https://mathematics.huji.ac.il/event/abel-jerusalem">Abel in Jerusalem: Sunday, January 12, 2020, 09:45-19:00</a>, featuring: <strong>Christopher Hacon, Ulrike Tillmann, Claire Voisin, and François Labourie</strong>.</p>
-<p>2. <a href="http://ias.huji.ac.il/SchoolCSE4">Winter School: The Mathematics of Quantum computing</a> (starting  Dec. 15, 2019, <a href="https://docs.google.com/document/d/1OcFzE1PHxBN4l87sOQB033FZLTgY934GHxnpVKi3NaM/edit">program</a>): The Rabin lecture by <strong>Boaz Barak</strong> Monday Dec 16 14:00 CS building;  and also including <strong>a panel/debate on quantum supremacy</strong> moderated by <strong>Sandy Irani</strong>, Dec. 19 , 2019 16:00 CS building. (I am one of the seven panelists and for an introduction to my stance, see <a href="https://sites.google.com/view/tau-theory-fest/home">this post</a>.) There are great videotaped lectures! <span style="color: #ff6600;">Important massage</span>: Most lectures are in IIAS, at Feldman building. In the first days the lecture rooms were completely full but from today some seats are available!</p>
+<p>2. <a href="http://ias.huji.ac.il/SchoolCSE4">Winter School: The Mathematics of Quantum computing</a> (starting  Dec. 15, 2019, <a href="https://docs.google.com/document/d/1OcFzE1PHxBN4l87sOQB033FZLTgY934GHxnpVKi3NaM/edit">program</a>): The Rabin lecture by <strong>Boaz Barak</strong> Monday Dec 16 14:00 CS building;  and also including <strong>a panel/debate on quantum supremacy</strong> moderated by <strong>Sandy Irani</strong>, Dec. 19 , 2019 16:00 CS building. (I am one of the seven panelists and for an introduction to my stance, see <a href="https://sites.google.com/view/tau-theory-fest/home">this post</a>.) There are great videotaped lectures!</p>
 <p>3. <a href="https://sites.google.com/view/tau-theory-fest/home">TAU Theory Fest  December 29, 2019  – January, 3, 2020.</a> Great line of speakers, and various workshops.</p>
 <p>4. <a href="https://sites.google.com/view/boolean-functions/home">Boolean function day, Friday, January 3, 2020,</a> featuring <strong>Esty Kelman, Noam Lifschitz, Renan Gross, Ohad Klein, and Naomi Kirshner</strong>.</p>
 <p>5. <a href="https://mathematics.huji.ac.il/node/92491">Zabrodsky’s lecture, <strong>Paul Seidel</strong>, December 19, 23, 24 2019, The Hebrew University of Jerusalem.</a> (See <a href="https://gilkalai.wordpress.com/2019/12/14/old-lecture-notes-by-alex-zabrodsky/">this previous post</a>.)</p>
@@ -1105,7 +1196,7 @@ global efficiency, complexity, passenger, driver, and platform incentives.
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2019-12-20T07:20:33Z</updated>
+      <updated>2019-12-20T08:20:33Z</updated>
     </source>
   </entry>
 
@@ -1133,7 +1224,7 @@ Email: kousha@inf.ed.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-12-20T07:20:43Z</updated>
+      <updated>2019-12-20T08:20:50Z</updated>
     </source>
   </entry>
 
@@ -1242,7 +1333,7 @@ Why are simple complexity questions about primes so hard? Why indeed?</p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2019-12-20T07:20:39Z</updated>
+      <updated>2019-12-20T08:20:39Z</updated>
     </source>
   </entry>
 
@@ -1405,7 +1496,7 @@ Why are simple complexity questions about primes so hard? Why indeed?</p>
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2019-12-16T00:37:30Z</updated>
+      <updated>2019-12-20T08:21:03Z</updated>
     </source>
   </entry>
 
@@ -1431,7 +1522,7 @@ We also consider the one-way measure-once quantum finite automaton (1QFA), defin
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-12-20T07:20:29Z</updated>
+      <updated>2019-12-20T08:20:29Z</updated>
     </source>
   </entry>
 
@@ -1457,7 +1548,7 @@ We also consider the one-way measure-once quantum finite automaton (1QFA), defin
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2019-12-20T07:20:29Z</updated>
+      <updated>2019-12-20T08:20:29Z</updated>
     </source>
   </entry>
 
@@ -1615,7 +1706,7 @@ Email: lreyzin@uic.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-12-20T07:20:43Z</updated>
+      <updated>2019-12-20T08:20:50Z</updated>
     </source>
   </entry>
 
@@ -1642,7 +1733,7 @@ Email: cploucha@fas.harvard.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-12-20T07:20:43Z</updated>
+      <updated>2019-12-20T08:20:50Z</updated>
     </source>
   </entry>
 
@@ -1669,7 +1760,7 @@ Email: mkcrum@iastate.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-12-20T07:20:43Z</updated>
+      <updated>2019-12-20T08:20:50Z</updated>
     </source>
   </entry>
 
@@ -1696,7 +1787,7 @@ Email: itcsc@cuhk.edu.hk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-12-20T07:20:43Z</updated>
+      <updated>2019-12-20T08:20:50Z</updated>
     </source>
   </entry>
 
@@ -1724,53 +1815,7 @@ Email: lreyzin@uic.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2019-12-20T07:20:43Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://theorydish.blog/?p=1541</id>
-    <link href="https://theorydish.blog/2019/12/09/quantum-dna-sequencing-the-ultimate-hardness-hypothesis/" rel="alternate" type="text/html"/>
-    <title>Quantum DNA sequencing &amp; the ultimate hardness hypothesis</title>
-    <summary>Longest common subsequence (LCS) and edit distance (ED) are fundamental similarity measures of interest to genomic applications (insertions/deletions/substitutions are a pretty good proxy for both mutations and read errors). The fastest known algorithms for computing the LCS/ED between two -character strings run in nearly quadratic time. Breakthroughs in fine-grained complexity [BI18][AHWW16] from the last few years provide some nice formal barriers further progress: in particular, substantially faster algorithms would refute NC-SETH, the hypothesis that given an NC circuit with input bits,  deciding if the circuit has any satisfying assignment requires time. (Note that this is a weaker, aka safer, hypothesis than the standard SETH.)   Quantum algorithms for edit distance? One way to try to circumvent the computational barriers is by approximation algorithms (see my blog post). A different approach is to go with quantum algorithms: Grover’s search can solve NC-SAT in time. Even those of us less skeptic than Gil Kalai can probably agree that quadratic quantum speedups won’t be practical anytime soon. But in theory, I find the question of whether we can design subquadratic quantum algorithms for edit distance very interesting (see also [BEG+18]). Alas, even with the power of quantum computers we don’t know any truly [...]</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Longest common subsequence (LCS) and edit distance (ED) are fundamental similarity measures of interest to genomic applications (insertions/deletions/substitutions are a pretty good proxy for both mutations and read errors). The fastest known algorithms for computing the LCS/ED between two <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="n"/>-character strings run in nearly quadratic time. Breakthroughs in fine-grained complexity <a href="https://arxiv.org/abs/1412.0348">[BI18]</a><a href="https://arxiv.org/abs/1511.06022">[AHWW16]</a> from the last few years provide some nice formal barriers further progress: in particular, substantially faster algorithms would refute <em>NC-SETH</em>, the hypothesis that given an NC circuit with <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="n"/> input bits,  deciding if the circuit has any satisfying assignment requires <img alt="2^{(1-o(1))n}" class="latex" src="https://s0.wp.com/latex.php?latex=2%5E%7B%281-o%281%29%29n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="2^{(1-o(1))n}"/> time. (Note that this is a weaker, aka safer, hypothesis than the standard SETH.)</p>
-<p> </p>
-<h2>Quantum algorithms for edit distance?</h2>
-<p>One way to try to circumvent the computational barriers is by approximation algorithms (see my <a href="https://theorydish.blog/2018/07/20/approximating-edit-distance/">blog post</a>). A different approach is to go with quantum algorithms: Grover’s search can solve NC-SAT in <img alt="2^{n/2}" class="latex" src="https://s0.wp.com/latex.php?latex=2%5E%7Bn%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="2^{n/2}"/> time. Even those of us less skeptic than <a href="https://gilkalai.wordpress.com/2019/11/13/gils-collegial-quantum-supremacy-skepticism-faq/">Gil Kalai</a> can probably agree that quadratic quantum speedups won’t be practical anytime soon. But in theory, I find the question of whether we can design subquadratic quantum algorithms for edit distance very interesting (see also <a href="https://arxiv.org/abs/1804.04178">[BEG+18]</a>).</p>
-<p>Alas, even with the power of quantum computers we don’t know any truly subquadratic algorithms for computing LCS/ED. On the other hand, it is not clear how to rule out even linear-time algorithms. A few weeks ago, Buhrman, Patro, and Speelman, posted a <a href="https://arxiv.org/abs/1911.05686">paper</a> that gives a <img alt="n^{3/2}" class="latex" src="https://s0.wp.com/latex.php?latex=n%5E%7B3%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="n^{3/2}"/> quantum <em>query complexity </em>lower bound for LCS/ED.</p>
-<blockquote><p>Open Problem: Close the <img alt="n^{3/2}" class="latex" src="https://s0.wp.com/latex.php?latex=n%5E%7B3%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="n^{3/2}"/> vs <img alt="n^2" class="latex" src="https://s0.wp.com/latex.php?latex=n%5E2&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="n^2"/> gap for quantum query complexity of ED/LCS.</p></blockquote>
-<p>What is “query complexity” of ED/LCS? Buhrman et al. consider the following query model: In LCS, we want a <strong>maximum monotone matching</strong> between the characters of the two strings, where we can match two characters if they’re identical. Now suppose that in the query complexity problem we still want to find a maximum monotone matching, but instead of the character-equality graph (which is a union of disjoint cliques), we have an arbitrary bipartite graph, and <strong>given a pair of vertices, the oracle tells you if there is an edge between them</strong>.</p>
-<p>This model may seem a bit counter-intuitive at first since the graphs may not correspond to any pair of strings; and indeed other models have been considered before <a href="https://dl.acm.org/citation.cfm?id=321922">[UAH76]</a><a href="https://arxiv.org/abs/1005.4033">[AKO10]</a>. But it turns out that this model is well-motivated by the NC-SETH lower bound (see discussion below).</p>
-<p> </p>
-<h2>The ultimate hardness hypothesis</h2>
-<p>What does the <img alt="n^{3/2}" class="latex" src="https://s0.wp.com/latex.php?latex=n%5E%7B3%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="n^{3/2}"/> query complexity lower bound mean for algorithms on actual strings? Instead of a black box oracle, our algorithms have access to an NC-circuit that implements it. Intuitively, we don’t know how to do very much with white box circuits, so it seems plausible to hypothesize that the running time will be lower bound by the query complexity. In some sense, this is a special case of the following <em>ultimate hardness hypothesis </em>that unifies a lot of the computational hardness assumptions that we like to assume but have no idea how to prove (e.g. P!=NP, P!=BQP, NC-SETH, FP!=PPAD, etc):</p>
-<blockquote><p>[Ultimate Hardness Hypothesis] For every problem, the white-box computational complexity is lower bounded by the black-box query complexity.”</p></blockquote>
-<p>In communication complexity similar statements are known and are called simulation/lifting theorems (see e.g. <a href="https://theory.stanford.edu/~mika/thesis.pdf">Mika’s thesis</a>). For computational complexity, there are obvious counter examples such as “decide if the oracle can be implemented by a small circuit”. So it only makes sense to continue to assume the ultimate hardness hypothesis for “reasonable problems” instead of “every problem”.</p>
-<p>But Burhman et al. identify the following variant of the ultimate hardness hypothesis which I find very interesting. It is defined with respect to a function <img alt="T:\{0,1\}^{2^n} \rightarrow \{0,1\}" class="latex" src="https://s0.wp.com/latex.php?latex=T%3A%5C%7B0%2C1%5C%7D%5E%7B2%5En%7D+%5Crightarrow+%5C%7B0%2C1%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="T:\{0,1\}^{2^n} \rightarrow \{0,1\}"/> which takes as input the truth-table of a circuit and outputs True or False. Roughly, they hypothesize that:</p>
-<blockquote><p>[Burhman et al.-QSETH, paraphrased] For <em>every</em> <img alt="T" class="latex" src="https://s0.wp.com/latex.php?latex=T&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="T"/>, deciding if <img alt="T" class="latex" src="https://s0.wp.com/latex.php?latex=T&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="T"/> is true or false is as hard whether we’re given the actual circuit, or only the guarantee that the oracle is implemented by a small circuit”</p></blockquote>
-<p>At a first read, I thought that arguments a-la impossibility of obfuscation <a href="https://www.iacr.org/archive/crypto2001/21390001.pdf">[BGI+01]</a> should refute this hypothesis, but a few weeks later I still don’t know how to prove it. Do you?</p>
-<p> </p>
-<h2>A tip for the upcoming holidays</h2>
-<p>During my postdoc, I worked on the quantum query complexity of ED/LCS with Shalev Ben-David, Rolando La Placa, and John Wright. I was a bit bummed to find out that we got scooped by Buhrman et al, but I know of at least 3 other groups that were also scooped by the same paper, so at least we’re in good company <img alt="&#x1F642;" class="wp-smiley" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/1f642.png" style="height: 1em;"/></p>
-<p>At the time, a fellow postdoc from Psychology asked me what I was working on. I resisted the temptation to try to explain the various quantum variants of NC-SETH, and instead told him I was working on “DNA sequencing with quantum computers”. His reaction was priceless. Regardless of what you’re actually working on, try this line during the holidays when your relatives ask you about your work.</p>
-<p> </p></div>
-    </content>
-    <updated>2019-12-09T18:20:46Z</updated>
-    <published>2019-12-09T18:20:46Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>aviad.rubinstein</name>
-    </author>
-    <source>
-      <id>https://theorydish.blog</id>
-      <logo>https://theorydish.files.wordpress.com/2017/03/cropped-nightdish1.jpg?w=32</logo>
-      <link href="https://theorydish.blog/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://theorydish.blog" rel="alternate" type="text/html"/>
-      <link href="https://theorydish.blog/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Stanford's CS Theory Research Blog</subtitle>
-      <title>Theory Dish</title>
-      <updated>2019-12-20T07:21:27Z</updated>
+      <updated>2019-12-20T08:20:50Z</updated>
     </source>
   </entry>
 </feed>
