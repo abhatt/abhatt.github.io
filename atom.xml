@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-01-05T22:21:47Z</updated>
+  <updated>2020-01-05T23:45:13Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,53 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>http://ptreview.sublinear.info/?p=1250</id>
+    <link href="https://ptreview.sublinear.info/?p=1250" rel="alternate" type="text/html"/>
+    <title>News for December 2019</title>
+    <summary>Happy new year! And now for the last post of 2019 papers. We have found a diverse collection of six papers, ranging from classic property testing topics to new perspectives on sublinear computation. Sublinear Optimal Policy Value Estimation in Contextual Bandits by Weihao Kong, Gregory Valiant, Emma Brunskill (arXiv). This isn’t our usual sublinear paper, but it […]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Happy new year! And now for the last post of 2019 papers. We have found a diverse collection of six papers, ranging from classic property testing topics to new perspectives on sublinear computation. </p>
+
+
+
+<p><strong>Sublinear Optimal Policy Value Estimation in Contextual Bandits</strong> by Weihao Kong, Gregory Valiant, Emma Brunskill (<a href="https://arxiv.org/abs/1912.06111">arXiv</a>). This isn’t our usual sublinear paper, but it is definitely of interest to us sublinear folk. Let’s start with a stripped down definition of the problem (or rather, game). There are \(K\) “arms”, where the \(i\)th arm is represented by an unknown vector in \(\beta_i \in \mathbb{R}^d\). We are presented with a “context”, which is a vector \(x \in \mathbb{R}^d\). Our job is to choose an arm \(i \in [K]\). We get the reward \(x \cdot \beta_i\) (with some noise added). The contexts appears from a known distribution. To aid us, we observe the rewards of \(N\) iid contexts, so we observe a total of \(T = KN\) rewards. There has been much work on figuring out the minimum value of \(T\) required to learn the optimal policy. One requires at least \(d\) (the dimension) samples to estimate any of the arm vectors. This papers shows that one can actually estimate the expected reward of the optimal policy, without being able to describe it, with sublinear in \(d\) (technically, \(\widetilde{)}(\sqrt{d})\)) samples. We see this a lot in property testing, where producing the “optimal” solution for a problem requires linear-in-dimension samples, but estimating the optimal value is much cheaper (consider, for example, the situation of linearity testing, where we wish to find the closest linear function).</p>
+
+
+
+<p><strong>Sublinear Time Numerical Linear Algebra for Structured Matrices </strong>by Xiaofei Shi and David P. Woodruff (<a href="https://arxiv.org/pdf/1912.06060.pdf">arXiv</a>). This follows the recent linear of advances in sublinear time linear algebra. Given a matrix \(A \in \mathbb{R}^{n \times d}\), the aim is to get algorithms that only look at \(o(nnz(A))\) entries (where \(nnz(A)\) is the number of non-zeroes, or the support). Consider the classic talk of low rank approximation. Unfortunately, suppose one entry is extremely large, and the others are extremely small. One has to find this large entry for any reasonable approximation, which (in the worst-case) requires \(nnz(A)\) queries into \(A\). Thus, previous papers make structural assumption (such as, \(A\) being a Vandermonde matrix) to get sublinear bounds. This paper gives a clean black box method to get a variety of such results. Basically, one can replace the usual \(nnz(A)\) term in many algorithms, by \(T(A)\), which is the time to compute the matrix-vector product \( Ay\), for \(y \in \mathbb{R}^d\). In many cases \(T(A) = \widetilde{O}(n)\), which can be significantly smaller than \(nnz(A)\). This paper gives such results for low-rank approximations and many regression problems.</p>
+
+
+
+<p><strong>Robust and Sample Optimal Algorithms for PSD Low-Rank Approximation</strong> by Ainesh Bakshi, Nadiia Chepurko, and David P. Woodruff. Consider the low rank problem discussed above. As mentioned in the previous paragraph, we need structural assumptions on \(A\). Previous results gave sublinear time low-rank approximations assuming that \(A\) is positive semidefinite (PSD). The aim is to get a rank \(k\) matrix \(B\) such that \(\|A-B\|^2_2\) is at most \((1+\epsilon)\)-times the optimal such approximation. The previous algorithm of <a href="https://arxiv.org/abs/1704.03371">Musco-Woodruff</a> makes \(\widetilde{O}(nk/\epsilon^{2.5})\) queries in to \(A\), while there is a lower bound of \(\Omega(nk/\epsilon)\). This gap between the complexities is resolved in this paper with an upper bound of \(\widetilde{O}(nk/\epsilon)\) queries.</p>
+
+
+
+<p><strong>Constructive derandomization of query algorithms </strong>by Guy Blanc, Jane Lange, and Li-Yang Tan (<a href="https://arxiv.org/abs/1912.03042">arXiv</a>). This paper discusses an intriguing angle to sublinear question: when can they be derandomized? Abstractly, consider a randomized algorithm \(R\) that makes \(q\) queries. Think of \(R\) as a function \(R(x,r)\), where \(x\) is the input, and \(r\) is the randomness. We would like to design a deterministic algorithm \(D\) making, ideally, close to \(q\) queries and approximates \(\mathop{E}_r[R(x,r)]\). For starters, consider some distribution over \(x\), and suppose we want \(\mathbb{E}_x[D(x) – \mathbb{E}_r[R(x,r)]] &lt; \epsilon\). By (the easy direction of) Yao’s minimax lemma, one can show the existence of such an algorithm \(D\) that makes \(O(q/\epsilon)\) queries. But how to explicitly construct it? Indeed, the first result of this paper gives a “meta-algorithm” that takes as input the description of \(R\) (which is of size \(N\)), has running time \(poly(N)2^{O(q/\epsilon)}\) and outputs a description of \(D\). When \(R\) satisfies the stronger property of “bounded error”, one can get a \(O(q^3)\)-query algorithm \(D\) that approximates \(\mathop{E}_r[R(x,r)]\) for all \(x\) (again, the existence is proven by a classic theorem of Nisan). Overall, this paper gives a method to derandomize sublinear time algorithms, and I wonder if there could be some applications of this method for proving lower bounds. After all, Yao’s minimax theorem is <em>the</em> tool for property testing lower bounds, and any perspective on Yao’s theorem is likely of relevance. </p>
+
+
+
+<p><strong>Testing Membership for Timed Automata</strong> by Richard Lassaigne and Michel de Rougemont (<a href="https://arxiv.org/abs/1912.08277">arXiv</a>). Property testing for regular languages is a classic result in sublinear algorithms. This paper focuses on the more complex notion of timed automata. The technical definition is quite complicated, but here’s an overview. There is a finite automaton and a collection of “clocks”. Imagine a string being processed, where each alphabet symbol appears with a new timestamp. Thus, the input word is called a “timed word”. The transitions of the automaton involve the new symbol read, as well as constraints involving the clock times and the timestamp. Thus, we can enforce conditions like “only transition if another symbol is read within a single time unit”. In general, deciding whether a timed word is accepted by a timed automaton is NP-complete. This papers studies the property testing viewpoint. The paper gives a new definition of “timed edit distance” between timed words. The main result shows that one can distinguish time words accepted by a timed automaton from words that are far (according to timed edit distance), by querying a constant number of word positions.</p>
+
+
+
+<p><strong>On the query complexity of estimating the distance to hereditary graph properties</strong> by Carlos Hoppen, Yoshiharu Kohayakawa, Richard Lang, Hanno Lefmann, and Henrique Stagni (<a href="https://arxiv.org/abs/1912.01081">arXiv</a>). This paper concerns the classic setting of property testing of dense graphs. It is well-known that all hereditary graph properties are testable, and are moreover, one can estimate the distance to the property in time that only depends on \(\varepsilon\). Unfortunately, the queries complexities have large tower dependencies on \(\varepsilon\), arising from the use of the Szemeredi regularity lemma. The question of property testing in dense graphs can be reduced to finding “removal” lemmas (such as the classic triangle remove lemma). Such a lemma states that if at least \(\varepsilon n^2\) edges need to be removed from \(G\) to destroy all “forbidden subgraphs”, then there must be “many” forbidden subgraphs in \(G\). There is much recent research on finding families of forbidden subgraphs, where the “many” (in the above statement) is at least \(poly(\varepsilon)\) times  the trivial upper bound. This paper shows that one can also estimate the distance to any hereditary property, in a query complexity that depends directly on the corresponding removal lemma parameters. As a compelling example, one can estimate the distance to being chordal in \(\exp(1/\varepsilon)\) queries, a significant improvement over standard tower bounds.</p></div>
+    </content>
+    <updated>2020-01-05T23:35:14Z</updated>
+    <published>2020-01-05T23:35:14Z</published>
+    <category term="Monthly digest"/>
+    <author>
+      <name>Seshadhri</name>
+    </author>
+    <source>
+      <id>https://ptreview.sublinear.info</id>
+      <link href="https://ptreview.sublinear.info/?feed=rss2" rel="self" type="application/atom+xml"/>
+      <link href="https://ptreview.sublinear.info" rel="alternate" type="text/html"/>
+      <subtitle>The latest in property testing and sublinear time algorithms</subtitle>
+      <title>Property Testing Review</title>
+      <updated>2020-01-05T23:45:00Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://rjlipton.wordpress.com/?p=16522</id>
@@ -115,7 +162,7 @@ I hope you did not mind this diversion from hard core math. I think that applyin
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-01-05T22:20:47Z</updated>
+      <updated>2020-01-05T23:43:23Z</updated>
     </source>
   </entry>
 
@@ -123,7 +170,7 @@ I hope you did not mind this diversion from hard core math. I think that applyin
     <id>http://arxiv.org/abs/2001.00562</id>
     <link href="http://arxiv.org/abs/2001.00562" rel="alternate" type="text/html"/>
     <title>Optimal Entropy Compression and Purification in Quantum Bits</title>
-    <feedworld_mtime>1578096000</feedworld_mtime>
+    <feedworld_mtime>1578182400</feedworld_mtime>
     <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Varad R. Pande <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2001.00562">PDF</a><br/><b>Abstract: </b>Global unitary transformations (optswaps) that optimally increase the bias of
 any mixed computation qubit in a quantum system - represented by a diagonal
 density matrix - towards a particular state of the computational basis which,
@@ -141,7 +188,7 @@ two of DiVincenzo's criteria for quantum computation in some architectures, the
 implications of this work for quantum data compression are discussed.
 </p></div>
     </summary>
-    <updated>2020-01-04T00:00:00Z</updated>
+    <updated>2020-01-05T23:42:35Z</updated>
     <author>
       <name/>
     </author>
@@ -160,7 +207,7 @@ implications of this work for quantum data compression are discussed.
     <id>http://arxiv.org/abs/2001.00413</id>
     <link href="http://arxiv.org/abs/2001.00413" rel="alternate" type="text/html"/>
     <title>Analysis and Evaluation of Non-Blocking Interpolation Search Trees</title>
-    <feedworld_mtime>1578096000</feedworld_mtime>
+    <feedworld_mtime>1578182400</feedworld_mtime>
     <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Prokopec:Aleksandar.html">Aleksandar Prokopec</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Brown:Trevor.html">Trevor Brown</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Alistarh:Dan.html">Dan Alistarh</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2001.00413">PDF</a><br/><b>Abstract: </b>We start by summarizing the recently proposed implementation of the first
 non-blocking concurrent interpolation search tree (C-IST) data structure. We
 then analyze the individual operations of the C-IST, and show that they are
@@ -176,7 +223,7 @@ number of threads. Finally, we present an extended experimental evaluation of
 the non-blocking IST performance.
 </p></div>
     </summary>
-    <updated>2020-01-04T00:00:00Z</updated>
+    <updated>2020-01-05T23:40:24Z</updated>
     <author>
       <name/>
     </author>
@@ -195,7 +242,7 @@ the non-blocking IST performance.
     <id>http://arxiv.org/abs/2001.00387</id>
     <link href="http://arxiv.org/abs/2001.00387" rel="alternate" type="text/html"/>
     <title>Algorithmic Number On the Forehead Protocols Yielding Dense Ruzsa-Szemer\'{e}di Graphs and Hypergraphs</title>
-    <feedworld_mtime>1578096000</feedworld_mtime>
+    <feedworld_mtime>1578182400</feedworld_mtime>
     <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Alon:Noga.html">Noga Alon</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Shraibman:Adi.html">Adi Shraibman</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2001.00387">PDF</a><br/><b>Abstract: </b>We describe algorithmic Number On the Forehead protocols that provide dense
 Ruzsa-Szemer\'{e}di graphs. One protocol leads to a simple and natural
 extension of the original construction of Ruzsa and Szemer\'{e}di. The graphs
@@ -208,7 +255,7 @@ construct dense uniform hypergraphs in which every edge lies in a positive
 small number of simplices.
 </p></div>
     </summary>
-    <updated>2020-01-04T23:21:03Z</updated>
+    <updated>2020-01-05T23:21:05Z</updated>
     <author>
       <name/>
     </author>
@@ -227,7 +274,7 @@ small number of simplices.
     <id>http://arxiv.org/abs/2001.00336</id>
     <link href="http://arxiv.org/abs/2001.00336" rel="alternate" type="text/html"/>
     <title>Coarse-Grained Complexity for Dynamic Algorithms</title>
-    <feedworld_mtime>1578096000</feedworld_mtime>
+    <feedworld_mtime>1578182400</feedworld_mtime>
     <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Bhattacharya:Sayan.html">Sayan Bhattacharya</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Nanongkai:Danupon.html">Danupon Nanongkai</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Saranurak:Thatchaphol.html">Thatchaphol Saranurak</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2001.00336">PDF</a><br/><b>Abstract: </b>To date, the only way to argue polynomial lower bounds for dynamic algorithms
 is via fine-grained complexity arguments. These arguments rely on strong
 assumptions about specific problems such as the Strong Exponential Time
@@ -258,7 +305,7 @@ subset union, and 3-vs-4 diameter.
 in the pdf file).
 </p></div>
     </summary>
-    <updated>2020-01-04T00:00:00Z</updated>
+    <updated>2020-01-05T00:00:00Z</updated>
     <author>
       <name/>
     </author>
@@ -277,7 +324,7 @@ in the pdf file).
     <id>http://arxiv.org/abs/2001.00303</id>
     <link href="http://arxiv.org/abs/2001.00303" rel="alternate" type="text/html"/>
     <title>Spectral Independence in High-Dimensional Expanders and Applications to the Hardcore Model</title>
-    <feedworld_mtime>1578096000</feedworld_mtime>
+    <feedworld_mtime>1578182400</feedworld_mtime>
     <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Anari:Nima.html">Nima Anari</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Liu:Kuikui.html">Kuikui Liu</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Gharan:Shayan_Oveis.html">Shayan Oveis Gharan</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2001.00303">PDF</a><br/><b>Abstract: </b>We say a probability distribution $\mu$ is spectrally independent if an
 associated correlation matrix has a bounded largest eigenvalue for the
 distribution and all of its conditional distributions. We prove that if $\mu$
@@ -295,7 +342,7 @@ estimating the hardcore partition function, also answering a long-standing open
 problem of mixing time of Glauber dynamics \cite{LV97,LV99,DG00,Vig01,EHSVY16}.
 </p></div>
     </summary>
-    <updated>2020-01-04T00:00:00Z</updated>
+    <updated>2020-01-05T23:39:50Z</updated>
     <author>
       <name/>
     </author>
@@ -314,7 +361,7 @@ problem of mixing time of Glauber dynamics \cite{LV97,LV99,DG00,Vig01,EHSVY16}.
     <id>http://arxiv.org/abs/2001.00257</id>
     <link href="http://arxiv.org/abs/2001.00257" rel="alternate" type="text/html"/>
     <title>Multi-transversals for Triangles and the Tuza's Conjecture</title>
-    <feedworld_mtime>1578096000</feedworld_mtime>
+    <feedworld_mtime>1578182400</feedworld_mtime>
     <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Chalermsook:Parinya.html">Parinya Chalermsook</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Khuller:Samir.html">Samir Khuller</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Sukprasert:Pattara.html">Pattara Sukprasert</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/u/Uniyal:Sumedha.html">Sumedha Uniyal</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2001.00257">PDF</a><br/><b>Abstract: </b>In this paper, we study a primal and dual relationship about triangles: For
 any graph $G$, let $\nu(G)$ be the maximum number of edge-disjoint triangles in
 $G$, and $\tau(G)$ be the minimum subset $F$ of edges such that $G \setminus F$
@@ -340,7 +387,7 @@ studying the primal-dual relations in general and the Tuza's conjecture in
 particular.
 </p></div>
     </summary>
-    <updated>2020-01-04T00:00:00Z</updated>
+    <updated>2020-01-05T23:40:52Z</updated>
     <author>
       <name/>
     </author>
@@ -359,7 +406,7 @@ particular.
     <id>http://arxiv.org/abs/2001.00218</id>
     <link href="http://arxiv.org/abs/2001.00218" rel="alternate" type="text/html"/>
     <title>Lossless Compression of Deep Neural Networks</title>
-    <feedworld_mtime>1578096000</feedworld_mtime>
+    <feedworld_mtime>1578182400</feedworld_mtime>
     <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Serra:Thiago.html">Thiago Serra</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Kumar:Abhinav.html">Abhinav Kumar</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/r/Ramalingam:Srikumar.html">Srikumar Ramalingam</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2001.00218">PDF</a><br/><b>Abstract: </b>Deep neural networks have been successful in many predictive modeling tasks,
 such as image and language recognition, where large neural networks are often
 used to obtain good accuracy. Consequently, it is challenging to deploy these
@@ -374,7 +421,7 @@ training over a larger architecture than we would later use in the environment
 where the trained neural network is deployed.
 </p></div>
     </summary>
-    <updated>2020-01-04T00:00:00Z</updated>
+    <updated>2020-01-05T00:00:00Z</updated>
     <author>
       <name/>
     </author>
@@ -393,7 +440,7 @@ where the trained neural network is deployed.
     <id>http://arxiv.org/abs/2001.00211</id>
     <link href="http://arxiv.org/abs/2001.00211" rel="alternate" type="text/html"/>
     <title>Approximating Text-to-Pattern Hamming Distances</title>
-    <feedworld_mtime>1578096000</feedworld_mtime>
+    <feedworld_mtime>1578182400</feedworld_mtime>
     <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Chan:Timothy_M=.html">Timothy M. Chan</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Golan:Shay.html">Shay Golan</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Kociumaka:Tomasz.html">Tomasz Kociumaka</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Kopelowitz:Tsvi.html">Tsvi Kopelowitz</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Porat:Ely.html">Ely Porat</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2001.00211">PDF</a><br/><b>Abstract: </b>We revisit a fundamental problem in string matching: given a pattern of
 length m and a text of length n, both over an alphabet of size $\sigma$,
 compute the Hamming distance between the pattern and the text at every
@@ -428,7 +475,7 @@ Previously, streaming algorithms were known for the exact problem with \~O(k)
 space or for the approximate problem with $\~O(\epsilon^{-O(1)}\sqrt m)$ space.
 </p></div>
     </summary>
-    <updated>2020-01-04T23:40:53Z</updated>
+    <updated>2020-01-05T23:36:25Z</updated>
     <author>
       <name/>
     </author>
@@ -447,7 +494,7 @@ space or for the approximate problem with $\~O(\epsilon^{-O(1)}\sqrt m)$ space.
     <id>http://arxiv.org/abs/2001.00204</id>
     <link href="http://arxiv.org/abs/2001.00204" rel="alternate" type="text/html"/>
     <title>A polynomial-time partitioning algorithm for weighted cactus graphs</title>
-    <feedworld_mtime>1578096000</feedworld_mtime>
+    <feedworld_mtime>1578182400</feedworld_mtime>
     <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Buchin:Maike.html">Maike Buchin</a>, Leonie Selbach <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2001.00204">PDF</a><br/><b>Abstract: </b>Partitioning problems where the goal is to partition a graph into connected
 components are known to be NP-hard for some graph classes but polynomial-time
 solvable for others. We consider different variants of the $(l,u)$-partition
@@ -461,7 +508,7 @@ paper we present partitioning algorithms for cactus graphs to show that these
 partition problems are polynomial-time solvable for this graph class as well.
 </p></div>
     </summary>
-    <updated>2020-01-04T00:00:00Z</updated>
+    <updated>2020-01-05T00:00:00Z</updated>
     <author>
       <name/>
     </author>
@@ -480,7 +527,7 @@ partition problems are polynomial-time solvable for this graph class as well.
     <id>http://arxiv.org/abs/2001.00076</id>
     <link href="http://arxiv.org/abs/2001.00076" rel="alternate" type="text/html"/>
     <title>Scalable Hierarchical Clustering with Tree Grafting</title>
-    <feedworld_mtime>1578096000</feedworld_mtime>
+    <feedworld_mtime>1578182400</feedworld_mtime>
     <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Monath:Nicholas.html">Nicholas Monath</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Kobren:Ari.html">Ari Kobren</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Krishnamurthy:Akshay.html">Akshay Krishnamurthy</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Glass:Michael.html">Michael Glass</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/McCallum:Andrew.html">Andrew McCallum</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2001.00076">PDF</a><br/><b>Abstract: </b>We introduce Grinch, a new algorithm for large-scale, non-greedy hierarchical
 clustering with general linkage functions that compute arbitrary similarity
 between two point sets. The key components of Grinch are its rotate and graft
@@ -495,7 +542,7 @@ Grinch is more accurate than other scalable methods, and orders of magnitude
 faster than hierarchical agglomerative clustering.
 </p></div>
     </summary>
-    <updated>2020-01-04T00:00:00Z</updated>
+    <updated>2020-01-05T00:00:00Z</updated>
     <author>
       <name/>
     </author>
@@ -514,7 +561,7 @@ faster than hierarchical agglomerative clustering.
     <id>http://arxiv.org/abs/2001.00072</id>
     <link href="http://arxiv.org/abs/2001.00072" rel="alternate" type="text/html"/>
     <title>Near-Optimal Schedules for Simultaneous Multicasts</title>
-    <feedworld_mtime>1578096000</feedworld_mtime>
+    <feedworld_mtime>1578182400</feedworld_mtime>
     <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Haeupler:Bernhard.html">Bernhard Haeupler</a>, D Ellis Hershkowitz, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/w/Wajc:David.html">David Wajc</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2001.00072">PDF</a><br/><b>Abstract: </b>We study the store-and-forward packet routing problem for simultaneous
 multicasts, in which multiple packets have to be forwarded along given trees as
 fast as possible.
@@ -533,7 +580,7 @@ schedules are near-optimal, since our lower bound shows that this length cannot
 be improved to $O(C+D) + o(\log n)$.
 </p></div>
     </summary>
-    <updated>2020-01-04T00:00:00Z</updated>
+    <updated>2020-01-05T00:00:00Z</updated>
     <author>
       <name/>
     </author>
@@ -552,7 +599,7 @@ be improved to $O(C+D) + o(\log n)$.
     <id>http://arxiv.org/abs/2001.00066</id>
     <link href="http://arxiv.org/abs/2001.00066" rel="alternate" type="text/html"/>
     <title>Nested Column Generation decomposition for solving the Routing and Spectrum Allocation problem in Elastic Optical Networks</title>
-    <feedworld_mtime>1578096000</feedworld_mtime>
+    <feedworld_mtime>1578182400</feedworld_mtime>
     <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/e/Enoch:Julian.html">Julian Enoch</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/j/Jaumard:Brigitte.html">Brigitte Jaumard</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2001.00066">PDF</a><br/><b>Abstract: </b>With the continued growth of Internet traffic, and the scarcity of the
 optical spectrum, there is a continuous need to optimize the usage of this
 resource. In the process of provisioning elastic optical networks using the
@@ -573,7 +620,7 @@ opposed to 14.3% for the previous study, and a running time two orders of
 magnitude faster on average.
 </p></div>
     </summary>
-    <updated>2020-01-04T00:00:00Z</updated>
+    <updated>2020-01-05T00:00:00Z</updated>
     <author>
       <name/>
     </author>
@@ -592,7 +639,7 @@ magnitude faster on average.
     <id>http://arxiv.org/abs/2001.00021</id>
     <link href="http://arxiv.org/abs/2001.00021" rel="alternate" type="text/html"/>
     <title>Efficient classical simulation of random shallow 2D quantum circuits</title>
-    <feedworld_mtime>1578096000</feedworld_mtime>
+    <feedworld_mtime>1578182400</feedworld_mtime>
     <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Napp:John.html">John Napp</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Placa:Rolando_L=_La.html">Rolando L. La Placa</a>, Alexander M. Dalzell, Fernando G. S. L. Brandao, Aram W. Harrow <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2001.00021">PDF</a><br/><b>Abstract: </b>Random quantum circuits are commonly viewed as hard to simulate classically.
 In some regimes this has been formally conjectured, and there had been no
 evidence against the more general possibility that for circuits with uniformly
@@ -618,7 +665,7 @@ architecture like the local Hilbert space dimension and circuit depth are
 varied.
 </p></div>
     </summary>
-    <updated>2020-01-04T00:00:00Z</updated>
+    <updated>2020-01-05T00:00:00Z</updated>
     <author>
       <name/>
     </author>
@@ -637,7 +684,7 @@ varied.
     <id>http://arxiv.org/abs/2001.00004</id>
     <link href="http://arxiv.org/abs/2001.00004" rel="alternate" type="text/html"/>
     <title>New Competitive Analysis Results of Online List Scheduling Algorithm</title>
-    <feedworld_mtime>1578096000</feedworld_mtime>
+    <feedworld_mtime>1578182400</feedworld_mtime>
     <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Mohanty:Rakesh.html">Rakesh Mohanty</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Dwibedy:Debasis.html">Debasis Dwibedy</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Sahoo:Shreeya_Swagatika.html">Shreeya Swagatika Sahoo</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2001.00004">PDF</a><br/><b>Abstract: </b>Online algorithm has been an emerging area of interest for researchers in
 various domains of computer science. The online $m$-machine list scheduling
 problem introduced by Graham has gained theoretical as well as practical
@@ -655,7 +702,7 @@ $m$-machine list scheduling problem by characterization of real life input
 sequences.
 </p></div>
     </summary>
-    <updated>2020-01-04T00:00:00Z</updated>
+    <updated>2020-01-05T23:40:12Z</updated>
     <author>
       <name/>
     </author>
@@ -707,7 +754,7 @@ sequences.
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-01-05T22:20:42Z</updated>
+      <updated>2020-01-05T23:43:16Z</updated>
     </source>
   </entry>
 
@@ -734,7 +781,7 @@ Email: johanh@kth.se</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-01-05T22:20:51Z</updated>
+      <updated>2020-01-05T23:43:28Z</updated>
     </source>
   </entry>
 
@@ -789,7 +836,7 @@ Email: johanh@kth.se</p></div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2020-01-05T22:21:15Z</updated>
+      <updated>2020-01-05T23:43:55Z</updated>
     </source>
   </entry>
 
@@ -817,7 +864,7 @@ Email: johanh@kth.se</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-01-05T22:20:38Z</updated>
+      <updated>2020-01-05T23:43:03Z</updated>
     </source>
   </entry>
 
@@ -932,7 +979,7 @@ Have a happy new year, and make some fun resolutions. Please let us know some of
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-01-05T22:20:46Z</updated>
+      <updated>2020-01-05T23:43:23Z</updated>
     </source>
   </entry>
 
@@ -1110,7 +1157,7 @@ In particular, this implies that the standard decision tree complexity and the p
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-01-05T22:20:38Z</updated>
+      <updated>2020-01-05T23:43:02Z</updated>
     </source>
   </entry>
 
@@ -1164,7 +1211,7 @@ In particular, this implies that the standard decision tree complexity and the p
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-01-05T22:21:07Z</updated>
+      <updated>2020-01-05T23:43:46Z</updated>
     </source>
   </entry>
 
@@ -1191,7 +1238,7 @@ Email: sasha.shen@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-01-05T22:20:51Z</updated>
+      <updated>2020-01-05T23:43:28Z</updated>
     </source>
   </entry>
 
@@ -1252,7 +1299,7 @@ Email: sasha.shen@gmail.com</p></div>
       <link href="https://blogs.princeton.edu/imabandit" rel="alternate" type="text/html"/>
       <subtitle>Random topics in optimization, probability, and statistics. By Sébastien Bubeck</subtitle>
       <title>I’m a bandit</title>
-      <updated>2020-01-04T23:50:23Z</updated>
+      <updated>2020-01-05T23:44:16Z</updated>
     </source>
   </entry>
 
@@ -1278,7 +1325,7 @@ We prove that this problem is PSPACE-Complete already for Minimum Poset Games an
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-01-05T22:20:38Z</updated>
+      <updated>2020-01-05T23:43:02Z</updated>
     </source>
   </entry>
 
@@ -1372,7 +1419,7 @@ We prove that this problem is PSPACE-Complete already for Minimum Poset Games an
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-01-05T22:21:07Z</updated>
+      <updated>2020-01-05T23:43:46Z</updated>
     </source>
   </entry>
 
@@ -1558,7 +1605,7 @@ Hope that you liked this puzzle. I think it shows that are sometimes methods tha
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-01-05T22:20:47Z</updated>
+      <updated>2020-01-05T23:43:23Z</updated>
     </source>
   </entry>
 
@@ -1680,7 +1727,7 @@ Hope that you liked this puzzle. I think it shows that are sometimes methods tha
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-01-05T22:20:42Z</updated>
+      <updated>2020-01-05T23:43:16Z</updated>
     </source>
   </entry>
 
@@ -1708,7 +1755,7 @@ Email: lynch@csail.mit.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-01-05T22:20:51Z</updated>
+      <updated>2020-01-05T23:43:28Z</updated>
     </source>
   </entry>
 
@@ -1761,7 +1808,7 @@ Email: lynch@csail.mit.edu</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-01-05T22:20:42Z</updated>
+      <updated>2020-01-05T23:43:17Z</updated>
     </source>
   </entry>
 
@@ -1920,7 +1967,7 @@ Email: jn@di.ku.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-01-05T22:20:51Z</updated>
+      <updated>2020-01-05T23:43:28Z</updated>
     </source>
   </entry>
 
@@ -2068,7 +2115,7 @@ There are many rebuttals to the Doomsday Argument, some general and some context
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-01-05T22:20:47Z</updated>
+      <updated>2020-01-05T23:43:23Z</updated>
     </source>
   </entry>
 
@@ -2088,7 +2135,7 @@ There are many rebuttals to the Doomsday Argument, some general and some context
       <link href="https://decentralizedthoughts.github.io/feed.xml" rel="self" type="application/atom+xml"/>
       <subtitle>Decentralized thoughts about decentralization</subtitle>
       <title>Decentralized Thoughts</title>
-      <updated>2020-01-04T23:51:07Z</updated>
+      <updated>2020-01-05T23:45:13Z</updated>
     </source>
   </entry>
 
@@ -2124,7 +2171,7 @@ The class of adversarial sources generalizes several previously studied classes 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-01-05T22:20:38Z</updated>
+      <updated>2020-01-05T23:43:02Z</updated>
     </source>
   </entry>
 
@@ -2157,53 +2204,7 @@ Email: Helwig.Hauser@UiB.no</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-01-05T22:20:51Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2019/183</id>
-    <link href="https://eccc.weizmann.ac.il/report/2019/183" rel="alternate" type="text/html"/>
-    <title>TR19-183 |  Randomness Extraction from Somewhat Dependent Sources | 
-
-	Marshall Ball, 
-
-	Oded Goldreich, 
-
-	Tal Malkin</title>
-    <summary>We initiate a comprehensive study of the question of randomness extractions from two somewhat dependent sources of defective randomness. 
-Specifically, we present three natural models, which are based on different natural perspectives on the notion of bounded dependency between a pair of distributions.
-Going from the more restricted model to the less restricted one, our models and main results are as follows. 
-
-\begin{enumerate}
-\item{\em Bounded dependence as bounded coordination}:
-Here we consider pairs of distributions that arise from independent random processes that are applied to the outcome of a single global random source, which may be viewed as a mechanism of coordination (which is adversarial from our perspective). 
-
-We show that if the min-entropy of each of the two outcomes is larger than the length of the global source, then extraction is possible (and is, in fact, feasible). We stress that the extractor has no access to the global random source nor to the internal randomness that the two processes use, but rather gets only the two dependent outcomes.
-
-This model is equivalent to a setting in which the two outcomes are generated by two independent sources, but then each outcome is modified based on limited leakage (equiv., communication) between the two sources.  (Here this leakage is measured in terms of the number of bits that were communicated, but in the next model we consider the actual influence of this leakage.)
-
-\item{\em Bounded dependence as bounded cross influence}:
-Here we consider pairs of outcomes that are produced by a pair of sources such that each source has bounded (worst-case) influence on the outcome of the other source.  We stress that the extractor has no access to the randomness that the two processes use, but rather gets only the two dependent outcomes.
-
-We show that, while (proper) randomness extraction is impossible in this case, randomness condensing is possible and feasible; specifically, the randomness deficiency of condensing is linear in our measure of cross influence, and this upper-bound is tight.  We also discuss various applications of such condensers, including for cryptography, standard randomized algorithms, and sublinear-time algorithms, while pointing out their benefit over using a seeded (single-source) extractor. 
-
-\item{\em Bounded dependence as bounded mutual information}:
-Due to the average-case nature of this mutual information, here there is a trade-off between the error (or deviation) probability and the randomness deficiency.  Loosely speaking, for joint distributions of mutual information $t$, we can condense with randomness deficiency $O(t/\epsilon)$ and error $\epsilon$, and this trade-off is optimal.  
-\end{enumerate}
-All positive results are obtained by using a standard two-source extractor (or condenser) as a black-box.</summary>
-    <updated>2019-12-20T23:18:53Z</updated>
-    <published>2019-12-20T23:18:53Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2020-01-05T22:20:38Z</updated>
+      <updated>2020-01-05T23:43:28Z</updated>
     </source>
   </entry>
 </feed>
