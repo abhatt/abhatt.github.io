@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-01-19T00:21:31Z</updated>
+  <updated>2020-01-19T01:22:24Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,51 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2020/01/18/when-does-2sat</id>
+    <link href="https://11011110.github.io/blog/2020/01/18/when-does-2sat.html" rel="alternate" type="text/html"/>
+    <title>When does 2SAT have an integral relaxation?</title>
+    <summary>In the 2-satisfiability problem, or 2SAT, the input is a system of constraints between pairs of Boolean variables, and the problem is to find a truth assignment satisfying all the constraints. Although the usual formulation writes the constraints as disjunctions (Boolean or), it’s convenient and equivalent to use implications instead, where each side of an implication can be either one of the variables or its negation. If you encode the variables as numbers, with for true and for false, then the negation of a variable is and the implication can be encoded as the linear inequality . If we forget the restriction that the values are or , this system of inequalities defines a convex polytope, which can be thought of as a relaxation of the given 2SAT problem. Each solution to the 2SAT problem corresponds to a vertex of this polytope but there might be other vertices as well, with fractional coordinates. We don’t want those; it’s more useful to have a polytope all of whose coordinates are integers, coming from solutions to the underlying 2SAT problem. When does this happen (without adding extra inequalities)?</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>In the <a href="https://en.wikipedia.org/wiki/2-satisfiability">2-satisfiability problem</a>, or 2SAT, the input is a system of constraints between pairs of Boolean variables, and the problem is to find a truth assignment satisfying all the constraints. Although the usual formulation writes the constraints as disjunctions (Boolean or), it’s convenient and equivalent to use implications instead, where each side of an implication can be either one of the variables or its negation. If you encode the variables as numbers, with  for true and  for false, then the negation of a variable  is  and the implication  can be encoded as the linear inequality . If we forget the restriction that the values are  or , this system of inequalities defines a convex polytope, which can be thought of as a <a href="https://en.wikipedia.org/wiki/Linear_programming_relaxation">relaxation</a> of the given 2SAT problem. Each solution to the 2SAT problem corresponds to a vertex of this polytope but there might be other vertices as well, with fractional coordinates. We don’t want those; it’s more useful to have a polytope <a href="https://en.wikipedia.org/wiki/Integral_polytope">all of whose coordinates are integers</a>, coming from solutions to the underlying 2SAT problem. When does this happen (without adding extra inequalities)?</p>
+
+<p>I’m pretty sure the answer has been known, at least implicitly, for a long time, and that there are no new ideas in the rest of this post. See e.g. the answer to <a href="https://cstheory.stackexchange.com/a/46188/95">this very closely related question on relaxations of the vertex cover problem</a> and note that vertex cover can be formulated as 2SAT, with a variable per vertex and two constraints per edge of the input graph. But when I looked for it, I found it difficult to find references that give the answer explicitly. So here it is. The following conditions are equivalent:</p>
+
+<ul>
+  <li>The given 2SAT instance has an integral relaxation.</li>
+  <li>The given 2SAT instance has two solutions that are the complements of each other (each variable is true in one of the solutions and false in the other).</li>
+  <li>The compatibility graph of the given 2SAT instance is bipartite.</li>
+</ul>
+
+<p>Here, the compatibility graph is an undirected graph defined by Feder in “Network Flow and 2-Satisfiability” (<em>Algorithmica</em> 1994). It has a vertex for each literal (a variable or its negation). The two vertices for a variable and its negation are connected by an edge, called a “trivial edge”. Additionally,
+for each implication , the two literals  and  cannot both be true, and we add an edge between them.</p>
+
+<p>If the compatibility graph is bipartite, two-color it, make the vertices of one color be true, and make the vertices of the other color be false. Then this gives a solution to the 2SAT instance whose complement is also a solution. So the third condition implies the second condition.</p>
+
+<p>The relaxation of any 2SAT instance contains the point whose coordinates all equal , and if the given instance has an integral relaxation then this point can be represented as a weighted average of integer solutions. An odd cycle in the compatibility graph would prevent that from being possible. For any point in the relaxation, and any literal, we consider the value of the literal to be either its coordinate value (if it represents a variable) or one minus that value (if it represents a negated variable). If some cycle has odd length , then each integer point in the weighted average could only have total value at most  on the literals of the cycle, so their weighted average would also be at most , less than the cycle’s total value of  in the all- solution. So the first condition implies the third condition.</p>
+
+<p>Finally, suppose that there are two complementary solutions, and flip the variables if necessary so that these are the all-false and all-true assignments to the variables. (This flipping simplifies the problem without changing any of the three conditions.) Consider any fractional solution , and construct from it a probability distribution on truth assignments as follows: choose a uniformly random number , set to true the variables whose coordinate value is at least , and set to false the remaining variables.
+All truth assignments generated in this way solve the 2SAT problem, because any violation of an implication constraint in the 2SAT problem would translate to a violation of the corresponding coordinate inequality constraint in the relaxation. The given fractional solution  is a weighted average of the resulting collection of 2SAT solutions, where the weight of a solution is the probability of generating it. Therefore, the second condition implies the first condition.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/103507316629491293">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2020-01-18T16:31:00Z</updated>
+    <published>2020-01-18T16:31:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2020-01-19T01:12:49Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-US">
     <id>https://www.scottaaronson.com/blog/?p=4536</id>
@@ -325,7 +370,7 @@ large family of new exponential classical-quantum communication separations.
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2020-01-19T00:20:58Z</updated>
+      <updated>2020-01-19T01:21:27Z</updated>
     </source>
   </entry>
 
@@ -435,7 +480,7 @@ Physics, 24(05):1250012, 2012. (A few enlightening comments by Fritz on SO: <a h
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-01-19T00:20:30Z</updated>
+      <updated>2020-01-19T01:20:40Z</updated>
     </source>
   </entry>
 
@@ -465,7 +510,7 @@ In this work, we present a simple algorithm which in polynomial time solves the 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-01-19T00:20:27Z</updated>
+      <updated>2020-01-19T01:20:29Z</updated>
     </source>
   </entry>
 
@@ -704,7 +749,7 @@ Email: mrs@ualberta.ca</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-01-19T00:20:37Z</updated>
+      <updated>2020-01-19T01:20:50Z</updated>
     </source>
   </entry>
 
@@ -772,7 +817,7 @@ Email: mrs@ualberta.ca</p></div>
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2020-01-16T07:09:19Z</updated>
+      <updated>2020-01-19T01:12:49Z</updated>
     </source>
   </entry>
 
@@ -881,7 +926,7 @@ There are comments below querying whether the theorem is in first-order arithmet
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-01-19T00:20:34Z</updated>
+      <updated>2020-01-19T01:20:46Z</updated>
     </source>
   </entry>
 
@@ -939,7 +984,7 @@ There are comments below querying whether the theorem is in first-order arithmet
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-01-19T00:20:50Z</updated>
+      <updated>2020-01-19T01:21:13Z</updated>
     </source>
   </entry>
 
@@ -966,7 +1011,7 @@ Email: postdoc@us.ibm.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-01-19T00:20:37Z</updated>
+      <updated>2020-01-19T01:20:51Z</updated>
     </source>
   </entry>
 
@@ -994,7 +1039,7 @@ Finally, our results also imply static lower bounds for the non-adaptive predece
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-01-19T00:20:27Z</updated>
+      <updated>2020-01-19T01:20:29Z</updated>
     </source>
   </entry>
 
@@ -1159,7 +1204,7 @@ and related items.</div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-01-19T00:20:50Z</updated>
+      <updated>2020-01-19T01:21:12Z</updated>
     </source>
   </entry>
 
@@ -1280,7 +1325,7 @@ and related items.</div>
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2020-01-19T00:20:32Z</updated>
+      <updated>2020-01-19T01:20:43Z</updated>
     </source>
   </entry>
 
@@ -1335,7 +1380,7 @@ Yet the characterization MIP=NEXP of its classical counterpart by Babai et al. i
       <link href="https://mycqstate.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>In superposition</subtitle>
       <title>MyCQstate</title>
-      <updated>2020-01-19T00:21:23Z</updated>
+      <updated>2020-01-19T01:22:11Z</updated>
     </source>
   </entry>
 
@@ -1418,7 +1463,7 @@ This was said by a very good math/cs ugrad at UMCP. I do not know if he was kidd
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2020-01-19T00:21:10Z</updated>
+      <updated>2020-01-19T01:21:53Z</updated>
     </source>
   </entry>
 
@@ -1531,7 +1576,7 @@ Email: maguilar@cs.utexas.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-01-19T00:20:37Z</updated>
+      <updated>2020-01-19T01:20:51Z</updated>
     </source>
   </entry>
 
@@ -1650,7 +1695,7 @@ We also forgot to ask her about her own work in Teichmüller theory. Here are a 
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-01-19T00:20:34Z</updated>
+      <updated>2020-01-19T01:20:46Z</updated>
     </source>
   </entry>
 
@@ -1678,7 +1723,7 @@ Email: chebyshev.msc@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-01-19T00:20:37Z</updated>
+      <updated>2020-01-19T01:20:51Z</updated>
     </source>
   </entry>
 
@@ -1756,7 +1801,7 @@ so the total number of choices is within a polynomial factor of the number of ch
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2020-01-16T07:09:19Z</updated>
+      <updated>2020-01-19T01:12:49Z</updated>
     </source>
   </entry>
 
@@ -1782,7 +1827,7 @@ so the total number of choices is within a polynomial factor of the number of ch
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-01-19T00:20:27Z</updated>
+      <updated>2020-01-19T01:20:29Z</updated>
     </source>
   </entry>
 
@@ -1807,7 +1852,7 @@ so the total number of choices is within a polynomial factor of the number of ch
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2020-01-19T00:21:10Z</updated>
+      <updated>2020-01-19T01:21:52Z</updated>
     </source>
   </entry>
 
@@ -1849,7 +1894,7 @@ so the total number of choices is within a polynomial factor of the number of ch
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2020-01-19T00:21:12Z</updated>
+      <updated>2020-01-19T01:21:59Z</updated>
     </source>
   </entry>
 
@@ -1959,7 +2004,7 @@ They should have mined a few bitcoins.</div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-01-19T00:20:30Z</updated>
+      <updated>2020-01-19T01:20:40Z</updated>
     </source>
   </entry>
 
@@ -2089,7 +2134,7 @@ How practical do you find the “no-password” idea? At least the above suggest
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-01-19T00:20:34Z</updated>
+      <updated>2020-01-19T01:20:45Z</updated>
     </source>
   </entry>
 
@@ -2119,7 +2164,7 @@ How practical do you find the “no-password” idea? At least the above suggest
       <link href="https://thmatters.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://thmatters.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theory Matters</title>
-      <updated>2020-01-19T00:20:46Z</updated>
+      <updated>2020-01-19T01:21:08Z</updated>
     </source>
   </entry>
 
@@ -2196,131 +2241,7 @@ How practical do you find the “no-password” idea? At least the above suggest
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2020-01-19T00:21:10Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-32902056.post-8905653443034252450</id>
-    <link href="http://paulwgoldberg.blogspot.com/feeds/8905653443034252450/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="http://www.blogger.com/comment.g?blogID=32902056&amp;postID=8905653443034252450" rel="replies" type="text/html"/>
-    <link href="http://www.blogger.com/feeds/32902056/posts/default/8905653443034252450" rel="edit" type="application/atom+xml"/>
-    <link href="http://www.blogger.com/feeds/32902056/posts/default/8905653443034252450" rel="self" type="application/atom+xml"/>
-    <link href="http://paulwgoldberg.blogspot.com/2020/01/on-leaving-eu.html" rel="alternate" type="text/html"/>
-    <title>On leaving the EU</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><div dir="ltr" style="text-align: left;">For someone based in the UK who works in any kind of international market, it looks reasonable to consider how his business strategy should be affected by leaving the EU. In the case of CS theory research, this perhaps runs counter to an idealised view in which all research is global, and should not be affected by squalid political considerations. The interest inherent in any specific problem or result ought to be independent of where it was studied. On a related note, it may be felt that it’s the research topic that chooses the researcher, not the researcher who chooses the topic. On the other hand, even in CS theory, ones political environment and associated social networks may have a stronger effect than we would like to acknowledge.<br/><br/>When I was a graduate student, Algorithms and Computational Complexity was relatively under-represented in the UK, compared with today. The UK theory community was dominated by so-called “Euro-theory”, which at the time did not seem to exhibit obvious points of contact with algorithms research. People like me had to look west for assurance that our research was of wider interest than what was apparent in our own backyard. To further justify that west-looking approach, it was clear that the USA was, in terms of research, the undisputed world leader. Then as now, it collected the lion’s share of Nobel prizes. It had industrial research labs producing leading CS theory research, such as IBM, AT&amp;T, and NEC, while Europe had nothing similar. For me, this sowed the seeds of a defiantly Atlanticist attitude to CS theory research — appropriate for Brexit Britain, perhaps? — that the best way to pursue high-quality research was via links with colleagues in the USA.<br/><br/>Fast-forward to about five years ago, and my attitude had softened. The UK’s algorithms-and-complexity community steadily grew, and is much larger than it was in the early 90’s. Travel within Europe is relatively quick and cheap, with no visa issues. The European research community became a bit of a comfort-zone, while the USA’s research ethic seemed comparatively intense and high-pressure. The perennial question of “Where’s my next STOC/FOCS paper going to come from?” has always seemed less urgent in Europe.<br/><br/>The EU has attempted to unify Europe’s academic research activity, which is supported by diverse governments, and gives rise to diverse complaints among European colleagues. I am reminded of the “<a href="https://en.wikipedia.org/wiki/Anna_Karenina_principle">unhappy families</a>” quote from <i>Anna Karenina</i>. In an attempt to give it a bit of unity, there’s some EU funding for research, concerning which we have this criticism from <a href="https://www.nobelprize.org/uploads/2018/06/geim_lecture.pdf">Andre Geim’s Nobel prize speech</a>:  “I can offer no nice words for the EU Framework programmes which, except for the  European Research Council, can be praised only by Europhobes for discrediting the whole idea of an effectively working Europe.” For my part, I recently tried to get a grant from the European Research Council but they turned me down. If I were a rational agent, I should at this point be one of Geim’s Europhobes; of course in reality things are not quite so simple. But at this point I reckon the US research funding system looks like the least worst. <a href="http://occamstypewriter.org/athenedonald/2019/12/16/post-election-christmas-reading-list/">A recent article</a> at Athene Donald’s blog discusses the post-EU era and the idea of a DARPA-like research agency for the UK.<br/><br/>So, leaving the EU looks like an opportune point to dust off the above-mentioned “Atlanticist attitude”. These days China is also becoming more important. But I hope that Europe will not give up on us, but will compete strenuously with them for our attention.</div></div>
-    </content>
-    <updated>2020-01-06T12:21:00Z</updated>
-    <published>2020-01-06T12:21:00Z</published>
-    <category scheme="http://www.blogger.com/atom/ns#" term="aggregator"/>
-    <category scheme="http://www.blogger.com/atom/ns#" term="politics"/>
-    <category scheme="http://www.blogger.com/atom/ns#" term="UK"/>
-    <author>
-      <name>Paul Goldberg</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/10952445127830395305</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-32902056</id>
-      <category term="aggregator"/>
-      <category term="UK academia"/>
-      <category term="politics"/>
-      <category term="meetings"/>
-      <category term="research"/>
-      <category term="research directions"/>
-      <category term="conferences"/>
-      <category term="funding"/>
-      <category term="people"/>
-      <category term="rant"/>
-      <category term="economics"/>
-      <category term="academia"/>
-      <category term="forecasts"/>
-      <category term="internet"/>
-      <category term="advertisement"/>
-      <category term="game theory"/>
-      <category term="trips"/>
-      <category term="University of Liverpool"/>
-      <category term="editorial"/>
-      <category term="technical"/>
-      <category term="times higher"/>
-      <category term="announcements"/>
-      <category term="publications"/>
-      <category term="teaching"/>
-      <category term="work"/>
-      <category term="postgraduate research"/>
-      <category term="technology"/>
-      <category term="books"/>
-      <category term="social choice"/>
-      <category term="talks"/>
-      <category term="CACM"/>
-      <category term="games"/>
-      <category term="liverpool"/>
-      <category term="open problems"/>
-      <category term="problems"/>
-      <category term="research assessment"/>
-      <category term="tongue in cheek"/>
-      <category term="administration"/>
-      <category term="architecture"/>
-      <category term="email"/>
-      <category term="environment"/>
-      <category term="mechanism design"/>
-      <category term="puzzles"/>
-      <category term="web sites"/>
-      <category term="URLs"/>
-      <category term="USS"/>
-      <category term="education"/>
-      <category term="higher education"/>
-      <category term="oxford"/>
-      <category term="schools"/>
-      <category term="UCU"/>
-      <category term="UK"/>
-      <category term="go"/>
-      <category term="intellectual property"/>
-      <category term="jobs"/>
-      <category term="league table"/>
-      <category term="math education"/>
-      <category term="money"/>
-      <category term="products"/>
-      <category term="science"/>
-      <category term="students"/>
-      <category term="Liberal democrats"/>
-      <category term="XJTLU"/>
-      <category term="behavioural economics"/>
-      <category term="china"/>
-      <category term="current affairs"/>
-      <category term="diversity"/>
-      <category term="epsrc"/>
-      <category term="family"/>
-      <category term="geography"/>
-      <category term="holidays"/>
-      <category term="joke"/>
-      <category term="misc"/>
-      <category term="nerd humour"/>
-      <category term="pensions"/>
-      <category term="predictions"/>
-      <category term="proposals"/>
-      <category term="psephology"/>
-      <category term="region"/>
-      <category term="student finance"/>
-      <category term="visits"/>
-      <category term="warwick"/>
-      <category term="web"/>
-      <category term="weekends"/>
-      <category term="wikipedia"/>
-      <category term="writing"/>
-      <author>
-        <name>Paul Goldberg</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/10952445127830395305</uri>
-      </author>
-      <link href="http://paulwgoldberg.blogspot.com/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="http://www.blogger.com/feeds/32902056/posts/default/-/aggregator" rel="self" type="application/atom+xml"/>
-      <link href="http://paulwgoldberg.blogspot.com/search/label/aggregator" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="http://www.blogger.com/feeds/32902056/posts/default/-/aggregator/-/aggregator?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>theoretical computer science, economics, and academic life in general. Writing in personal capacity, not representing my employer or other colleagues</subtitle>
-      <title>Paul Goldberg</title>
-      <updated>2020-01-16T13:03:46Z</updated>
+      <updated>2020-01-19T01:21:53Z</updated>
     </source>
   </entry>
 </feed>
