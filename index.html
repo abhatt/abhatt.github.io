@@ -56,7 +56,7 @@ Stay up to date
 
 <h3>Blogs/feeds</h3>
 <div class="subscriptionlist">
-<a class="feedlink" href="http://aaronsadventures.blogspot.com/feeds/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
+<a class="feedlink" href="http://www.blogger.com/feeds/25562705/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://aaronsadventures.blogspot.com/" title="Adventures in Computation">Aaron Roth</a>
 <br>
 <a class="feedlink" href="https://adamsheffer.wordpress.com/feed/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
@@ -231,7 +231,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at February 17, 2020 03:21 PM UTC</span>.
+Last updated <span class="datestr">at February 17, 2020 04:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -239,6 +239,126 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="tag:blogger.com,1999:blog-25562705.post-3683250814233232375">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/roth.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="http://aaronsadventures.blogspot.com/2020/02/fair-prediction-with-endogenous-behavior.html">Fair Prediction with Endogenous Behavior</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://aaronsadventures.blogspot.com/" title="Adventures in Computation">Aaron Roth</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<h2 style="text-align: center;">Can Game Theory Help Us Choose Among Fairness Constraints?</h2><br /><div style="text-align: center;"><i>This blog post is about a <a href="https://www.cis.upenn.edu/~aaroth/Papers/endogenous.pdf">new paper</a>, joint with Christopher Jung, Sampath Kannan, Changhwa Lee, Mallesh M. Pai, and Rakesh Vohra.</i></div><br /><br />A lot of the recent boom in interest in fairness in machine learning can be traced back to the 2016 Propublica article <a href="https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing">Machine Bias</a>. To summarize what you will already know if you have interacted with the algorithmic fairness literature at all --- Propublica discovered that the COMPAS recidivism prediction instrument (used to inform bail and parole decisions by predicting whether individuals would go on to commit violent crimes if released)  made errors of different sorts on different populations. The false positive rate (i.e. the rate at which it incorrectly labeled people "high risk") was much higher on the African American population than on the white population, and the false negative rate (i.e. the rate at which it incorrectly labeled people as "low risk") was much higher on the white population. Because being falsely labeled high risk is harmful (it decreases the chance you are released), this was widely and reasonably viewed as unfair.<br /><br />But the story wasn't so simple. Northpointe, the company that produced COMPAS (They have since changed their name) <a href="https://go.volarisgroup.com/rs/430-MBX-989/images/ProPublica_Commentary_Final_070616.pdf">responded </a>by pointing out that their instrument satisfied predictive parity across the two populations --- i.e. that the <i>positive predictive value </i>of their instrument was roughly the same for both white and African American populations. This means that their predictions conveyed the same meaning across the two populations: the people that COMPAS predicted were high risk had roughly the same chance of recidivating, on average, whether or not they were black or white. This is also desirable, because if we use an instrument that produces predictions whose meanings differ according to an individual's demographic group, then we are explicitly incentivizing judges to make decisions based on race, after they are shown the prediction of the instrument. Of course, we now know that simultaneously equalizing false positive rates, false negative rates, and positive predictive values across populations is <a href="https://arxiv.org/abs/1610.07524">generically impossible</a> --- i.e. it is impossible except under very special conditions, such as when the underlying crime rate is exactly the same in both populations. This <a href="http://aaronsadventures.blogspot.com/2019/02/impossibility-results-in-fairness-as.html">follows from thinking about Bayes Rule</a>.<br /><br />Another sensible notion of fairness suggests that "similarly risky people should be treated similarly". This harkens back to notions of <a href="https://arxiv.org/abs/1104.3913">individual fairness</a>, and suggests that we should do something like the following: we should gather as much information about an individual as we possibly can, and condition on all of it to find a (hopefully correct) posterior belief that they will go on to commit a crime. Then, we should make incarceration decisions by subjecting everyone to the same threshold on these posterior beliefs --- any individual who crosses some uniform threshold should be incarcerated; anyone who doesn't cross the threshold should not be. This is the approach that <a href="https://arxiv.org/abs/1808.00023">Corbett-Davies and Goel </a>advocate for, and it seems to have a lot going for it. In addition to uniform thresholds feeling fair, its also easy to see that doing this is the Bayes-optimal decision rule to optimize any societal cost function that differently weights the cost of false positives and false negatives. But applying a uniform threshold on posterior distributions unfortunately will generally result in a decision rule that neither equalizes false positive and false negative rates, nor positive predictive value. Similarly, satisfying these other notions of fairness will generally result in a decision rule that is sub-optimal in terms of its predictive performance.<br /><br />Unfortunately, this leaves us with little guidance --- should we aim to equalize false positive and negative rates (sometime called <i><a href="https://arxiv.org/abs/1610.02413">equalized odds</a></i> in this literature)? Should we aim to equalize positive predictive value? Or should we aim for using uniform thresholds on posterior beliefs? Should we aim for something else entirely? More importantly, by what means should we aim to make these decisions?<br /><br /><h2>A Game Theoretic Model</h2><div>One way we can attempt to choose among different fairness "solution concepts" is to try and think about the larger societal effects that imposing a fairness constraint on a classifier will have. This is tricky, of course --- if we don't commit to some model of the world, then different fairness constraints can have either <a href="https://arxiv.org/abs/1803.04383">good or bad long term effects</a>, which still doesn't give us much guidance. Of course making modeling assumptions has its own risks: inevitably the model won't match reality, and we should worry that the results that we derive in our stylized model will not tell us anything useful about the real world. Nevertheless, it is worth trying to proceed: all models are wrong, but some are useful. Our goal will be to come up with a clean, simple model, in which results are robust to modelling choices, and the necessary assumptions are clearly identified. Hopefully the result is some nugget of insight that applies outside of the model. This is what we try to do in our new paper with Chris Jung, Sampath Kannan, Changwa Lee, Mallesh Pai, and Rakesh Vohra. We'll use the language of criminal justice here, but the model is simple enough that you could apply it to a number of other settings of interest in which we need to design binary classification rules. </div><div><br /></div><div>In our model, individuals make rational choices about whether or not to commit crimes: that is, individuals have some "outside option" (their opportunity for legal employment, for example), some expected monetary benefit of crime, and some dis-utility for being incarcerated. In deciding whether or not to commit a crime, an individual will weigh their expected benefit of committing a crime, compared to taking their outside option ---- and this calculation will involve their risk of being incarcerated if they commit a crime, and also if they do not (since inevitably any policy will both occasionally free the guilty as well as incarcerate the innocent). Different people might make different decisions because their benefits and costs of crime may differ --- for example, some people will have better opportunities for legal employment than others. And in our model, the only way two different populations differ is in their distributions of these benefits and costs. Each person draws, i.i.d. from a distribution corresponding to their group, a type which encodes this outside option value and cost for incarceration. So in our model, populations differ e.g. only in their access to legal employment opportunities, and this is what will underlie any difference in criminal base rates.  </div><div><br /></div><div>As a function of whether each person commits a crime or not, a "noisy signal" is generated. In general, think of higher signals as corresponding to increased evidence of guilt, and so if someone commits a crime, they will tend to draw higher signals than those who don't commit crimes --- but the signals are noisy, so there is no way to perfectly identify the guilty. </div><div><br /></div><div>Incarceration decisions are made as a function of these noisy signals: society has a choice as to what incarceration rule to choose, and can potentially choose a different rule for different groups. Once an incarceration rule is chosen, this determines each person's incentive to commit crime, which in turn fixes a base rate of crime in each population. In general, base rates will be different across different groups (because outside option distributions differ), so the impossibility of e.g. equalizing false positive rates, false negative rates, and positive predictive value across groups will hold in our setting. Since crime rates in our setting are a function of the incarceration rule we choose, there is a natural objective to consider: finding the policy that <i>minimizes crime</i>. </div><div><br /></div><div>Lets think about how we might implement different fairness notions in this setting. First, how should we think about posterior probabilities that an individual will commit a crime? Before we see an individual's noisy signal, but after we see his group membership, we can form our <i>prior </i>belief that he has committed a crime --- this is just the base crime rate in his population. After we observe his noisy signal, we can use Bayes rule to calculate a posterior probability that he has committed a crime. So we could apply the "uniform posterior threshold" approach to fairness and use an incarceration rule that would incarcerate an individual exactly when their posterior probability of having committed a crime exceeded some uniform threshold. But note that because crime rates (and hence prior probabilities of crime) will generically differ between populations (because outside option distributions differ), setting the -same- threshold on posterior probability of crime for both groups corresponds to setting <i>different</i> thresholds on the raw noisy signals. This makes sense --- a Bayesian doesn't need as strong evidence to convince her that someone from a high crime group has committed a crime, as she would need to be convinced that someone from a low crime group has committed a crime, because she started off with a higher prior belief about the person from the high crime group. This (as we already know) results in a classification rule that has different false positive rates and false negative rates across groups. </div><div><br /></div><div>On the other hand, if we want to equalize false positive and false negative rates across groups, we need an incarceration rule that sets the same threshold on raw noisy signals, independently of group. This will of course correspond to setting different thresholds on the posterior probability of crime (i.e. thresholding calibrated risk scores differently for different groups). And this will always be sub-optimal from the point of view of predicting crime --- the Bayes optimal predictor uniformly thresholds posterior probabilities. </div><div><br /></div><h2>Which Notions of Fairness Lead to Desirable Outcomes?</h2><div><br /></div><div>But only one of these solutions is consistent with our social goal of minimizing crime. And its not the Bayes optimal predictor. The crime-minimizing solution is the one that sets <i>different</i> thresholds on posterior probabilities (i.e. uniform thresholds on signals) so as to equalize false positive rates and false negative rates. In other words, to minimize crime, society should explicitly commit to <i>not</i> conditioning on group membership, even when group membership is statistically informative for the goal of predicting crime. </div><div><br /></div><div>Why? Its because although using demographic information is statistically informative for the goal of predicting crime when base rates differ, it is not something that is under the control of individuals --- they can control their own choices, but not what group they were born into. And making decisions about individuals using information that is not under their control has the effect of distorting their dis-incentive to commit crime --- it ends up providing less of a dis-incentive to individuals from the higher crime group (since they are more likely to be wrongly incarcerated even if they don't commit a crime). And because in our model people are rational actors, minimizing crime is all about managing incentives. </div><div><br /></div><div>This is our baseline model, and in <a href="https://www.cis.upenn.edu/~aaroth/Papers/endogenous.pdf">the paper</a> we introduce a number of extensions, generalizations, and elaborations on the model in order to stress-test it. The conclusions continue to hold in more elaborate and general settings, but at a high level, the key assumptions that are needed to reach them are that:</div><div><div><ol><li>The underlying base rates are rationally responsive to the decision rule used by society.</li><li>Signals are observed at the same rates across populations, and</li><li>The signals are conditionally independent of an individual’s group, conditioned on the individual’s decision about whether or not to commit crime.</li></ol></div><div>Here, conditions (2) and (3) are unlikely to hold precisely in most situations,  but we show that they can be relaxed in various ways while still preserving the core conclusion.</div><div><br /></div><div>But more generally, if we are in a setting in which we believe that individual decisions are rationally made in response to the deployed classifier, and yet the deployed classifier does not equalize false  positive and negative rates, then this is an indication that <i>either </i>the deployed classifier is sub-optimal (for the purpose of minimizing crime rates), or that one of conditions (2) and (3) fails to hold.  Since in fairness relevant settings, the failure of conditions (2) and (3) is itself undesirable, this can be a diagnostic to highlight discriminatory conditions earlier in the pipeline than the final incarceration rule.  In particular, if conditions (2) or (3) fail to hold, then imposing technical fairness constraints on a deployed classifier may be premature, and instead attention should be focused on structural differences in the observations that are being fed into the deployed classifier.</div></div></div>
+
+
+
+
+
+
+
+<p class="date">
+by Aaron (noreply@blogger.com) <a href="http://aaronsadventures.blogspot.com/2020/02/fair-prediction-with-endogenous-behavior.html"><span class="datestr">at February 17, 2020 04:08 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://gilkalai.wordpress.com/?p=19341">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/kalai.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://gilkalai.wordpress.com/2020/02/17/hoi-neguyen-and-melanie-wood-remarkable-formulas-for-the-probability-that-projections-of-lattices-are-surjective/">Hoi Neguyen and Melanie Wood: Remarkable Formulas for the Probability that Projections of Lattices are Surjective</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://gilkalai.wordpress.com" title="Combinatorics and more">Gil Kalai</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p>Following a lecture by <a href="https://math.osu.edu/people/nguyen.1261">Hoi Neguyen</a> at Oberwolfach, I would like to tell you a little about the paper: <a href="https://arxiv.org/abs/1806.00596">Random integral matrices: universality of surjectivity and the cokernel</a> by Hoi Neguyen and <a href="https://math.berkeley.edu/~mmwood/">Melanie Wood</a>.</p>
+<h2>Two background questions:</h2>
+<p>Hoi started with two background questions –</p>
+<p>Background Question 1: Consider an <img src="https://s0.wp.com/latex.php?latex=n+%5Ctimes+n&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n \times n" class="latex" title="n \times n" /> 0-1 matrix where the entries are taken at random. What is the probability that the matrix is singular (over the rationals)?</p>
+<p>Hoi mentioned the <a href="https://gilkalai.wordpress.com/2019/02/02/konstantin-tikhomrov-the-probability-that-a-bernoulli-matrix-is-singular/">recent result of Konstantin Tikhomirov,</a> and moved to talk about matrices over the integers.</p>
+<p>Background Question 2: Now, think about the lattice spanned by the rows of the matrix. How likely it is that this is the full <img src="https://s0.wp.com/latex.php?latex=%5Cmathbb+Z%5En&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\mathbb Z^n" class="latex" title="\mathbb Z^n" />? (In other words that the determinant is +1 or -1.)</p>
+<p>Probably, I thought, the answer is less than exponentially small.</p>
+<h2>The main question</h2>
+<p>Hoi moved quickly to the main question</p>
+<p><strong>Main question:</strong> Now think about the rows of a random 0-1 <img src="https://s0.wp.com/latex.php?latex=%28n%2B1%29+%5Ctimes+n&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="(n+1) \times n" class="latex" title="(n+1) \times n" /> matrix. How likely it is that this is the full <img src="https://s0.wp.com/latex.php?latex=%5Cmathbb+Z%5En&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\mathbb Z^n" class="latex" title="\mathbb Z^n" />?</p>
+<p>Hmm, I was not sure how quickly the answer should tend to zero. But I learnt quickly that the answer does not tend to zero at all!</p>
+<h3><span style="color: #ff0000;">A remarkable heuristic formula: the probability for a random integral matrix from (n+1)-dimensions to n-dimenssions to be surjective is </span></h3>
+<h3 style="text-align: center;"><span style="color: #ff0000;"><strong><span style="color: #ff0000;">one over <em> (ζ(2)ζ(3)ζ(4)ζ(5)…) </em></span></strong></span></h3>
+<p>What would justify this formula? Hoi described the following heuristic argument.</p>
+<ol>
+<li>To be surjective you need to be surjective modulo p for every prime number p.</li>
+<li> Take some p. The probability to be surjective modulo p when the entries are uniformly random (independently) numbers modulo p is <img src="https://s0.wp.com/latex.php?latex=%5Cprod_%7Bj%3D2%7D%5E%7Bn%2B1%7D%281-p%5E%7B-j%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\prod_{j=2}^{n+1}(1-p^{-j})" class="latex" title="\prod_{j=2}^{n+1}(1-p^{-j})" />.</li>
+<li>This probability continues to work if you consider 0-1 entries.</li>
+<li>You can assume that all these probabilities for different primes are statistically independent.</li>
+<li>When you multiply all these probabilities you get</li>
+</ol>
+<p style="text-align: center;"><img src="https://s0.wp.com/latex.php?latex=%5Czeta%282%29%5E%7B-1%7D%5Czeta%283%29%5E%7B-1%7D%5Czeta%285%29%5E%7B-1%7D%5Czeta%287%29%5E%7B-1%7D%5Ccdots&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\zeta(2)^{-1}\zeta(3)^{-1}\zeta(5)^{-1}\zeta(7)^{-1}\cdots" class="latex" title="\zeta(2)^{-1}\zeta(3)^{-1}\zeta(5)^{-1}\zeta(7)^{-1}\cdots" /></p>
+<p>When Hoi reached this formula in his Oberfolfach lecture my immediate thought was this: This is a remarkable formula; maybe it is even true although it looks very hard to justify the two crucial steps  in the heuristics. Why you can assume that 0-1 matrices behave like random matrices with uniform entries and why we have statistical independence that allows us to multiply probabilities just like in high school probability class? And maybe it is not true.</p>
+<p>(This heuristics is known as the Cohen Lenstra heuristics and it was made for understanding the structure of class groups of quadratic fields.)</p>
+<p>And then came the next slide of the presentation.</p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/02/w2j-1.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/02/w2j-1.png?w=640&amp;h=335" class="alignnone size-full wp-image-19345" height="335" /></a></p>
+<p> </p>
+<h3>Hoi Neguyen and Melanie Wood actually proved this formula!</h3>
+<p>This is  a special case of a considerably more general formula. Look at<a href="https://arxiv.org/abs/1806.00596"> the paper for more details</a> and for the proofs.</p>
+<p>It looks to me that the proof is tour de force and it uses various difficult and delicious techniques and earlier results. Various new and old Littlewood-Oﬀord type results which are independently interesting are used.</p>
+<p>And here is a related paper by Hoi and Melanie:<a href="https://arxiv.org/abs/1806.10068"> Cokernels of adjacency matrices of random r-regular graphs</a>.</p>
+<p> </p>
+<h3>Little more</h3>
+<p>As for background problem 2, the paper mentioned that the fact that the probability tends to 0 follows from Corollary 3.4 from a paper by Melanie Wood: <a href="https://arxiv.org/abs/1504.04391">Random integral matrices and the Cohen Lenstra Heuristics.</a>  (Maybe there are different avenues for showing that there is a vanishing probability for every specific value of the determinant as well.) I don’t know if it is known that the probability that the determinant is 1 is exponentially small. (You can guess it is like square root of n! or something like that.) Also I don’t know if the ratio between the probabilities that the determinant is 3 and that it is 7 respects the Cohen Lenstra heuristics. Do we expect it at all? You can regard the determinant as a strange random walk what is the reason that stopping at 3 will be different than stopping at 7?  It is also not known and this is raised as a question in the paper if the probability that the determinant is a perfect square respects the Cohen-Lenstra heuristics (and this seems reasonable).</p>
+<p>There are similar nice questions for simplicial complexes. See the paper <a href="https://arxiv.org/abs/1710.05683">Cohen–Lenstra heuristics for torsion in homology of random complexes</a>, by Matthew Kahle, Frank Lutz, Andrew Newman, and Kyle Parsons.</p>
+<p>So if you consider the torsion of the 7 dimensional homology of a random 14 dimensional manifolds. Then (unless there are theorems to the contrary) it is natural to guess that the torsion will obey a Cohen-Lenstra heuristic of some kind.  This also applies to rationally acyclic complexes (hypertrees) and various other gadgets.</p>
+<p> </p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Gil Kalai <a href="https://gilkalai.wordpress.com/2020/02/17/hoi-neguyen-and-melanie-wood-remarkable-formulas-for-the-probability-that-projections-of-lattices-are-surjective/"><span class="datestr">at February 17, 2020 03:29 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2221,7 +2341,7 @@ by Omer Reingold <a href="https://theorydish.blog/2020/02/11/approx-random-2020/
 <tbody>
 <tr>
 <td>
-<a href="https://rjlipton.wordpress.com/2020/02/11/using-negative-nodes-to-count/grothendieckstructureobject/" rel="attachment wp-att-16674"><img src="https://rjlipton.files.wordpress.com/2020/02/grothendieckstructureobject.png?w=150&amp;h=180" alt="" width="150" class="alignright wp-image-16674" height="180" /></a>
+<a href="https://rjlipton.wordpress.com/2020/02/11/using-negative-nodes-to-count/grothendieckstructureobject/" rel="attachment wp-att-16674"><img width="150" alt="" src="https://rjlipton.files.wordpress.com/2020/02/grothendieckstructureobject.png?w=150&amp;h=180" class="alignright wp-image-16674" height="180" /></a>
 </td>
 </tr>
 <tr>
@@ -2255,7 +2375,7 @@ In our previous <a href="https://rjlipton.wordpress.com/2020/02/01/subliminal-gr
 There is, however, an asterisk: the structure <img src="https://s0.wp.com/latex.php?latex=%7B%28E%2Cr_G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{(E,r_G)}" class="latex" title="{(E,r_G)}" /> ignores any isolated nodes <img src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{G}" class="latex" title="{G}" /> may have. Isolated nodes do not contribute anything to any subset of <img src="https://s0.wp.com/latex.php?latex=%7BE%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{E}" class="latex" title="{E}" />. Thus we really have <img src="https://s0.wp.com/latex.php?latex=%7B%28G%5E%7B%2A%7D%29%5E%2A+%3D+G%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{(G^{*})^* = G}" class="latex" title="{(G^{*})^* = G}" /> <em>iff <img src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{G}" class="latex" title="{G}" /> has no isolated nodes</em>. </p>
 <p>
 Our last post showed examples where deleting an edge in <img src="https://s0.wp.com/latex.php?latex=%7BG%5E%2A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{G^*}" class="latex" title="{G^*}" /> corresponded to “exploding” it in <img src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{G}" class="latex" title="{G}" />. Let us flip that around so that the deletion occurs in <img src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{G}" class="latex" title="{G}" />, the explosion in <img src="https://s0.wp.com/latex.php?latex=%7BG%5E%2A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{G^*}" class="latex" title="{G^*}" />. Here is the example of the “lollipop” graph:</p>
-<p><a href="https://rjlipton.wordpress.com/2020/02/11/using-negative-nodes-to-count/lollipopnegativeisol/" rel="attachment wp-att-16670"><img src="https://rjlipton.files.wordpress.com/2020/02/lollipopnegativeisol.jpg?w=360&amp;h=153" alt="" width="360" class="aligncenter wp-image-16670" height="153" /></a></p>
+<p><a href="https://rjlipton.wordpress.com/2020/02/11/using-negative-nodes-to-count/lollipopnegativeisol/" rel="attachment wp-att-16670"><img width="360" alt="" src="https://rjlipton.files.wordpress.com/2020/02/lollipopnegativeisol.jpg?w=360&amp;h=153" class="aligncenter wp-image-16670" height="153" /></a></p>
 <p>
 The operations do not quite commute because the deletion of the edge <img src="https://s0.wp.com/latex.php?latex=%7Bb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{b}" class="latex" title="{b}" /> leaves an isolated node, whereas the explosion of <img src="https://s0.wp.com/latex.php?latex=%7Bb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{b}" class="latex" title="{b}" /> in the dual—as it was defined—does not. What should go in place of the ‘(?)’? We contend that the answer is: <em>a negative isolated node</em>. We denote it by <img src="https://s0.wp.com/latex.php?latex=%7B%5Cominus%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\ominus}" class="latex" title="{\ominus}" />, whereas an ordinary isolated node is <img src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\bullet}" class="latex" title="{\bullet}" />.</p>
 <p>
@@ -2463,7 +2583,7 @@ by shacharlovett <a href="https://cstheory-jobs.org/2020/02/11/postdoc-in-quantu
 <h3>A surprising connection</h3>
 <p>Now, if you have a set <img src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="A" class="latex" title="A" /> where the difference between any two elements is a square then in <img src="https://s0.wp.com/latex.php?latex=A+%5Ctimes+A&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="A \times A" class="latex" title="A \times A" /> all directions, <img src="https://s0.wp.com/latex.php?latex=%28a-b%29%2F%28c-d%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="(a-b)/(c-d)" class="latex" title="(a-b)/(c-d)" />, are also squares. To Daniel, József, and Ethan’s  great surprise applying their bound on the clique number of the Paley graph gave the very same bound as Hanson and Petridis!</p>
 <p>I am thankful to Józsi Solymosi for very helpful clarifications.</p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/02/1024px-paley13.svg_.png"><img src="https://gilkalai.files.wordpress.com/2020/02/1024px-paley13.svg_.png?w=640&amp;h=640" alt="" width="640" class="alignnone size-full wp-image-19289" height="640" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/02/1024px-paley13.svg_.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/02/1024px-paley13.svg_.png?w=640&amp;h=640" class="alignnone size-full wp-image-19289" height="640" /></a></p>
 <p><span style="color: #ff0000;">Payley graph with 13 vertices (source: <a href="https://en.wikipedia.org/wiki/Paley_graph">wikipedea</a>)</span></p>
 <h3><em>A quick Sum-Product update, and associations.</em></h3>
 <p>Now that I mention Józsi’s work let me also use this opportunity to give a quick update about Erdős-Szemeredi’s sum product conjecture. In an <a href="https://gilkalai.wordpress.com/2008/07/17/extermal-combinatorics-ii-some-geometry-and-number-theory/">old post</a> from 2009, I presented Elekes’ pioneering geometric proof for his sum-product world record and gave a link to a paper and <a href="https://ilaba.wordpress.com/2008/06/24/the-sum-product-problem/">a blog post</a> written by Izabella Laba about József Solymosi’s new (then) world record. I just saw <a href="https://www.quantamagazine.org/the-sum-product-problem-shows-how-addition-and-multiplication-constrain-each-other-20190206/?fbclid=IwAR2MqPEVRiFYhL5MIKCwhhIn038DDCwm4XZumNOw6n4XwKoN6F9uQ88MwbA">an article by Kevin Hartnett about the problem</a> in Quanta Magazine describing several subsequent records. The current world record is <a href="https://arxiv.org/abs/1803.04637">in a 2019 paper by George Shakan</a>.   (Sergei Konyagin and Ilya Shkredov broke József’s record in 2015, and the new record improved a 2016 world record by Misha Rudnev, Ilya Shkredov and Sophie Stevens; I also updated my related <a href="https://mathoverflow.net/a/217602/1532">MO answer.</a>) Of course, the sum-product phenomena is a huge area with amazing applications (See, <a href="https://terrytao.wordpress.com/2007/12/06/milliman-lecture-iii-sum-product-estimates-expanders-and-exponential-sums/">here</a>, here, <a href="https://terrytao.wordpress.com/2014/05/07/stickiness-graininess-planiness-and-a-sum-product-approach-to-the-kakeya-problem/">here,</a> and <a href="https://ilaba.wordpress.com/2008/12/25/expanders-and-the-sum-product-problem/">here</a>; I recall that Jean Bourgain referred to it as a gold mine or something like that). Now, talking about sum-product theorems, and about Bourgain, and about Quanta Magazine, I should mention a lovely <a href="https://www.quantamagazine.org/alex-kontorovich-on-the-absolute-truth-of-pure-math-20200128/">Quanta podcast featuring Alex Kontorovich interviewed by Steven Strogatz </a> .</p></div>
@@ -2655,7 +2775,7 @@ by shacharlovett <a href="https://cstheory-jobs.org/2020/02/08/postdoc-at-northw
 <tbody>
 <tr>
 <td>
-<a href="https://rjlipton.files.wordpress.com/2020/02/tonyprice.jpg"><img src="https://rjlipton.files.wordpress.com/2020/02/tonyprice.jpg?w=145&amp;h=198" alt="" width="145" class="alignright wp-image-16649" height="198" /></a>
+<a href="https://rjlipton.files.wordpress.com/2020/02/tonyprice.jpg"><img width="145" alt="" src="https://rjlipton.files.wordpress.com/2020/02/tonyprice.jpg?w=145&amp;h=198" class="alignright wp-image-16649" height="198" /></a>
 </td>
 </tr>
 <tr>
@@ -2805,105 +2925,6 @@ by RJLipton+KWRegan <a href="https://rjlipton.wordpress.com/2020/02/07/counting-
 
 <p class="date">
 by plustcs <a href="https://tcsplus.wordpress.com/2020/02/06/tcs-talk-wednesday-february-12-albert-atserias-universitat-politecnica-de-catalunya/"><span class="datestr">at February 06, 2020 10:05 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://eccc.weizmann.ac.il/report/2020/009">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eccc.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="https://eccc.weizmann.ac.il/report/2020/009">TR20-009 |  Theorems of KKL, Friedgut, and Talagrand via Random Restrictions and Log-Sobolev Inequality | 
-
-	Subhash Khot, 
-
-	Dor Minzer, 
-
-	Muli Safra, 
-
-	Guy Kindler, 
-
-	Esty Kelman</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://eccc.weizmann.ac.il/" title="ECCC - Reports">ECCC papers</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-We give alternate proofs for three related results in analysis of Boolean functions, namely the KKL
-Theorem, Friedgut’s Junta Theorem, and Talagrand’s strengthening of the KKL Theorem. We follow a
-new approach: looking at the first Fourier level of the function after a suitable random restriction and
-applying the Log-Sobolev inequality appropriately. In particular, we avoid using the hypercontractive inequality
-that is common to the original proofs. Our proofs might serve as an alternate, uniform exposition
-to these theorems and the techniques might benefit further research.</div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="https://eccc.weizmann.ac.il/report/2020/009"><span class="datestr">at February 06, 2020 09:02 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://adamsheffer.wordpress.com/?p=5488">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/sheffer.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://adamsheffer.wordpress.com/2020/02/04/an-algorithms-course-with-minimal-prerequisites/">An Algorithms Course with Minimal Prerequisites</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://adamsheffer.wordpress.com" title="Some Plane Truths">Adam Sheffer</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-There are amazing materials for teaching theoretical algorithms courses: excellent books, lecture notes, and online courses. But none of the resources I am familiar with fits the algorithms course I was supposed to prepare. I wanted to teach a course for students who hardly have any prerequisites. My students are non-CS majors (mostly math majors), […]</div>
-
-
-
-
-
-
-
-<p class="date">
-by Adam Sheffer <a href="https://adamsheffer.wordpress.com/2020/02/04/an-algorithms-course-with-minimal-prerequisites/"><span class="datestr">at February 04, 2020 08:21 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
