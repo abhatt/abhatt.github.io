@@ -141,7 +141,7 @@ Stay up to date
 <a class="message" title="internal server error">Learning with Errors: Student Theory Blog</a>
 <br>
 <a class="feedlink" href="http://processalgebra.blogspot.com/feeds/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
-<a href="http://processalgebra.blogspot.com/" title="Process Algebra Diary">Luca Aceto</a>
+<a href="http://processalgebra.blogspot.com/" class="message" title="403: forbidden">Luca Aceto</a>
 <br>
 <a class="feedlink" href="https://lucatrevisan.wordpress.com/feed/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="https://lucatrevisan.wordpress.com" title="in   theory">Luca Trevisan</a>
@@ -231,7 +231,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at February 20, 2020 07:21 AM UTC</span>.
+Last updated <span class="datestr">at February 20, 2020 07:22 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -1870,6 +1870,64 @@ $(m+n)^{O(\sqrt{k})}$.
 
 <div class="channelgroup">
 <div class="entrygroup" 
+	id="https://11011110.github.io/blog/2020/02/19/snowflake-spanners">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/eppstein.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://11011110.github.io/blog/2020/02/19/snowflake-spanners.html">Snowflake spanners</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><a href="https://11011110.github.io/blog/2020/02/17/spanners-have-sparse.html">My previous post</a> gave an example of a largish random point set where the <a href="https://en.wikipedia.org/wiki/Greedy_geometric_spanner">greedy geometric spanner</a> for distance ratio 2 had no crossings, while the spanner for the lower distance ratio had many (linearly many) crossings. And you might think from that example that there is some threshold for which distance ratios above the threshold always have planar greedy spanners, or even that the threshold is at or below 2. But it’s not true.</p>
+
+<p>To see why not, we have to turn to an idea from an earlier paper of mine, “<a href="https://arxiv.org/abs/cs.CG/9907031">Beta-skeletons have unbounded dilation</a>” (<em>CGTA</em> 2002). In it, I used a flattened variant of the <a href="https://en.wikipedia.org/wiki/Koch_snowflake">Koch snowflake fractal</a> to find bad examples for a different kind of spanner, and the same thing works here too. The intuitive idea is that these fractals form curves that, locally, look nice to a spanner algorithm (just connect consecutive pairs of points along the curve). But they pack a lot of length into a small area, forcing the spanner algorithm to eventually add some shortcuts to the curve. If we can control where it adds the shortcuts, maybe we can make pairs of shortcuts cross.</p>
+
+<p>In fact the Koch snowflake itself almost works, but it has some closest pairs that are non-consecutive along the curve, allowing the greedy spanner algorithm to choose those pairs instead of the consecutive curve points that we want it to choose. If we flatten the snowflake just a little bit, that complication goes away. If we choose the distance ratio of the spanner large enough, we can make it so that the greedy spanner algorithm doesn’t add any shortcuts until it reaches pairs of points that are opposite each other on the curve. And if we make it just barely large enough for that to be true, it will be forced to add those shortcuts once it does reach that distance in the sorted ordering of the distances. For instance, here’s a point set and its non-planar greedy spanner generated in this way with spanning ratio 4:</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2020/snowflake.svg" alt="Greedy spanner of snowflake-like curve with distance ratio 4" /></p>
+
+<p>This pretty picture, with the three crossing shortcuts between opposite pairs of points, doesn’t quite generalize to arbitrary-order snowflake-like curves, unfortunately. It will always be possible to find a distance ratio  such that the greedy algorithm adds one of these three shortcuts, as the first shortcut it needs to add. But then once it has added it, that shortcut can make the other two opposite pairs of points closer to each other in the spanner than they were, so that the greedy algorithm doesn’t need to add them. We might only get one of these three crossing edges, instead of all three. (In fact, for the point set shown here, this is exactly what happens for spanning ratio 4.5.)</p>
+
+<p>Instead, let’s look for a slightly lower distance ratio , for which the first shortcuts added by the greedy spanner algorithm cut off two lobes of the snowflake instead of three. For the same points as above,  works:</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2020/snowflake2.svg" alt="Greedy spanner of snowflake-like curve with distance ratio 3.5" /></p>
+
+<p>These two-lobe shortcuts are shorter than the three-lobe shortcuts, so they’re considered earlier by the greedy algorithm. There are two crossing equilateral triangles of two-lobe shortcuts (forming a Star of David pattern) and the greedy algorithm has to include two edges from each equilateral triangle. This is because, for each of these potential shortcuts, the greedy spanner won’t include a better path between its endpoints until it has either that shortcut itself or the two other shortcuts of the same triangle. No matter which two shortcuts we choose from each of the two equilateral triangles, we get either two crossings or, as here, three crossings.</p>
+
+<p>For any order of flattened Koch snowflake, there’s a distance ratio  producing a greedy spanner that looks like this picture, with two or three crossings. And by choosing a snowflake of high-enough order, we can make  become arbitrarily large. Or, to put it another way, the greedy spanner algorithm can generate crossings for arbitrarily large distance ratios.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by David Eppstein <a href="https://11011110.github.io/blog/2020/02/19/snowflake-spanners.html"><span class="datestr">at February 19, 2020 11:01 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
 	id="https://eccc.weizmann.ac.il/report/2020/019">
 <div class="entryheader">
 <span class="face">
@@ -2532,54 +2590,6 @@ $k$-center.
 
 <p class="date">
 <a href="http://arxiv.org/abs/2002.07682"><span class="datestr">at February 19, 2020 12:00 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/2002.07674">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2002.07674">How incomputable is Kolmogorov complexity?</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.CC updates on arXiv.org">arXiv.org: Computational complexity</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b>Paul Vitanyi, CWI, University of Amsterdam <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2002.07674">PDF</a><br /><b>Abstract: </b>Kolmogorov complexity is the length of the ultimately compressed version of a
-file (that is, anything which can be put in a computer). Formally, it is the
-length of a shortest program from which the file can be reconstructed. We
-discuss the incomputabilty of Kolmogorov complexity, which formal loopholes
-this leaves us, recent approaches to compute or approximate Kolmogorov
-complexity, which approaches fail and which approaches are viable.
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/2002.07674"><span class="datestr">at February 19, 2020 12:00 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
