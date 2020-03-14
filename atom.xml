@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-03-14T17:22:17Z</updated>
+  <updated>2020-03-14T18:21:57Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,93 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>http://bit-player.org/?p=2230</id>
+    <link href="http://bit-player.org/2020/mathjax-turns-3-0" rel="alternate" type="text/html"/>
+    <link href="http://bit-player.org/2020/mathjax-turns-3-0#comments" rel="replies" type="text/html"/>
+    <link href="http://bit-player.org/2020/mathjax-turns-3-0/feed/atom" rel="replies" type="application/atom+xml"/>
+    <title xml:lang="en-US">MathJax turns 3.0</title>
+    <summary type="xhtml" xml:lang="en-US"><div xmlns="http://www.w3.org/1999/xhtml">When I launched bit-player.org in 2006, displaying any sort of mathematical notation on the web was torture. I would typeset an equation in LaTeX, convert the output to a JPEG image, upload the image file to a directory on the … <a href="http://bit-player.org/2020/mathjax-turns-3-0">Continue reading <span class="meta-nav">→</span></a></div>
+    </summary>
+    <content type="xhtml" xml:lang="en-US"><div xmlns="http://www.w3.org/1999/xhtml"><p>When I launched bit-player.org in 2006, displaying any sort of mathematical notation on the web was torture. I would typeset an equation in LaTeX, convert the output to a JPEG image, upload the image file to a directory on the server, and embed a reference to the file in an HTML <code>img</code> tag. The process was cumbersome and the product was ugly. In 2009 I wrote <a href="http://bit-player.org/bph-publications/AmSci-2009-03-Hayes-webmath.pdf">an <em>American Scientist</em> article</a> whining about this sorry state of affairs—but at just that moment an elegant solution was coming on the scene. Davide Cervone of Union College had created a program called jsMath, which could process TeX commands placed directly in an HTML document. For example, I could write:</p>
+<pre style="text-align: center;"><code>e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \cdots</code></pre>
+<p>and it would appear on your screen as:</p>
+<p>\[e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \cdots\]</p>
+<p class="undent">All the work of parsing the TeX code and typesetting the math was done by a JavaScript program downloaded into your browser along with the rest of the web page.</p>
+<p>Cervone’s jsMath soon evolved into <a href="https://www.mathjax.org/">MathJax</a>, an <a href="https://github.com/mathjax">open-source project</a> initially supported by the AMS and SIAM. There are now about two dozen sponsors, and the project is under the aegis of <a href="https://numfocus.org/">NumFOCUS</a>. From the MathJax web page: “The MathJax team consists of Davide Cervone and Volker Sorge. Regular contributors include Christian Lawson-Perfect, Omar Al-Ithawi, and Peter Krautzberger.”Cervone remains the principal author, though not the only contributor.</p>
+<p>MathJax has made a big difference in my working life, transforming a problem into a pleasure. Putting math on the web is fun! Sometimes I do it just to show off. Furthermore, the software has served as an inspiration as well as a helpful tool. Until I saw MathJax in action, it simply never occurred to me that interesting computations could be done within the JavaScript environment of a web browser, which I had thought was there mainly to make things blink and jiggle. With the example of MathJax in front of me, I realized that I could not only display mathematical ideas but also explore and animate them within a web page.</p>
+<hr/>
+<p>Last fall I began hearing rumors about MathJax 3.0, “a complete rewrite of MathJax from the ground up using modern techniques.” It’s the kind of announcement that inspires both excitement and foreboding. What will the new version add? What will it take away? What will it fix? What will it break?</p>
+<p>Before committing all of bit-player to the new version, I thought I would try a small-scale experiment. I have a standalone web page that makes particularly tricky use of MathJax. The page is a repository of the <a href="https://bit-player.github.io/dotster/">Dotster</a> programs extracted from a recent bit-player post, <a href="http://bit-player.org/2019/my-god-its-full-of-dots">My God, it’s full of dots</a>. In January I got the Dotster page running with MathJax 3.</p>
+<p>Most math in web documents is static content: An equation needs to be formatted once, when the page is first displayed, and it never changes after that. The initial type­setting is handled automatically by MathJax, in both the old and the new versions. As soon as the page is downloaded from the server, MathJax makes a pass through the entire text, identifying elements flagged as TeX code and replacing them with typeset math. Once that job is done, MathJax can go to sleep.</p>
+<p>The Dotster programs are a little different; they include equations that change dynamically in response to user input. Here’s an example:</p>
+
+
+<p>The slider on the left sets a numerical value that gets plugged into the two equation on the right. Each time the slider is moved, the equations need to be updated and reformatted. Thus with each change to the slider setting, MathJax has to wake up from its slumbers and run again to typeset the altered content.</p>
+<p>The MathJax program running in the little demo above is the older version, 2.7. Cosmetically, the result is not ideal. With each change in the slider value, the two equations contract a bit, as if pinched between somebody’s fingers, and then snap back to their original size. They seem to wink at us. The progress banner would normally appear in the lower left corner of the browser window, where it is less intrusive. It has a more prominent position here because the demo is encapsulated in an iFrame, which acts as a window within the window. This structure is necessary in order to run two versions of MathJax in a single page. Also, a small gray progress indicator pops up in the lower left corner and hangs around just long enough to grab your attention. It says: “Typesetting math: 100%.” I find these visual distractions pretty annoying. They are analogous to the dreaded FOUC—the “flash of unstyled content”—that appears when a web browser displays the text of a page before the associated stylesheets are fully loaded and processed.</p>
+<p>The winking effect is caused by a MathJax feature called Fast Preview. The system does a quick-and-dirty rendering of the math content without calculating <img alt="Math settings submenus" border="0" class="alignright" height="180" src="http://bit-player.org/wp-content/uploads/2020/02/math-settings-submenus.png" width="350"/> the correct final sizes for the various typographic ele­ments. (Evi­dently that calculation takes a little time). You can turn off Fast Preview by right-clicking or control-clicking one of the equa­tions and then navigating through the sub­menus shown at right. How­ever, you’ll probably judge the result to be worse rather than better. Without Fast Preview, you’ll get a  glimpse of the raw TeX commands. Instead of winking, the equations do jumping jacks.</p>
+<p>I am delighted to report that all of this visual noise has been eliminated in the new MathJax. On changing a slider setting, the equations are updated in place, with no unnecessary visual fuss. And there’s no need for a progress indication, because the change is so quick it appears to be instantaneous. See for yourself:</p>
+
+
+<p>Thus version 3 looks like a big win. There’s a caveat: Getting it to work did not go quite as smoothly as I had hoped. Nevertheless, this is a story with a happy ending.</p>
+<hr/>
+<p>If you have only static math content in your documents, making the switch to MathJax 3 is easy. In your HTML file you change a URL to load the new MathJax version, and convert any configuration options to a new format. As it happens, all the default options work for me, so I had nothing to convert. What’s most important about the upgrade path is what you <em>don’t</em> need to do. In most cases you should not have to alter any of the TeX commands present in the HTML files being processed by MathJax. (There are a <a href="http://docs.mathjax.org/en/latest/upgrading/v2.html#input-changes">few small exceptions</a>.)</p>
+<p>With dynamic content, further steps are needed. Here is the JavaScript statement I used to reawaken the typesetting engine in MathJax version 2.7:</p>
+<pre class="language-js"><code>MathJax.Hub.Queue(["Typeset", MathJax.Hub, mathjax_demo_box]);
+</code></pre>
+<p>The statement enters a <code>Typeset</code> command into a queue of pending tasks. When the command reaches the front of the queue, MathJax will typeset any math found inside the HTML element designated by the identifier <code>mathjax_demo_box</code>, ignoring the rest of the document.</p>
+<p>In MathJax 3, the <a href="http://docs.mathjax.org/en/latest/web/typeset.html#typesetting-math-in-a-web-page">documentation</a> suggested I could simply replace this command with a slightly different and more direct one:</p>
+<pre class="language-js"><code>MathJax.typeset([mathjax_demo_box]);
+</code></pre>
+<p>I did that. It didn’t work. When I moved the slider, the displayed math reverted to raw TeX form, and I found an error message in the JavaScript console:</p>
+<p><img alt="AppendChild null error 530x170" border="0" class="centered" height="170" src="http://bit-player.org/wp-content/uploads/2020/02/appendChild-null-error-530x170.png" width="530"/></p>
+<p>What has gone wrong here? JavaScript’s <code>appendChild</code> method adds a new node to the treelike structure of an HTML document. It’s like hanging an ornament from some specified branch of a Christmas tree. The error reported here indicates that the specified branch does not exist; it is <code>null</code>.</p>
+<p>Let’s not tarry over my various false starts and wrong turns as I puzzled over the source of this bug. I eventually found the cause and the solution in the “issues” section of the MathJax repository on GitHub. Back in September of last year Mihai Borobocea had <a href="https://github.com/mathjax/MathJax/issues/2191">reported a similar problem</a>, along with the interesting observation that the error occurs only when an existing TeX expression is being replaced in a document, not when a new expression is being added. Borobocea had also discovered that invoking the procedure <code>MathJax.typesetClear()</code> before <code>MathJax.typeset()</code> would prevent the error.</p>
+<p>A comment by Cervone explains much of what’s going on:</p>
+<blockquote><p>You are correct that you should use <code>MathJax.typesetClear()</code> if you have removed previously typeset math from the page. (In version 3, there is information stored about the math in a list of typeset expressions, and if you remove typeset math from the page and replace it with new math, that list will hold pointers to math that no longer exists in the page. That is what is causing the error you are seeing . . . )</p></blockquote>
+<p>I found that adding <code>MathJax.typesetClear()</code> did indeed eliminate the error. As a practical matter, that solved my problem. But Borobocea pointed out a remaining loose end. Whereas <code>MathJax.typeset([mathjax_demo_box])</code> operates only on the math inside a specific container, <code>MathJax.typesetClear()</code> destroys the list of math objects for the entire document, an act that might later have unwanted consequences. Thus it seemed best to reformat all the math in the document whenever any one expression changes. This is inefficient, but with the 20-some equations in the Dotster web page the typesetting is so fast there’s no perceptible delay.</p>
+<p>In January a fix for this problem was merged into MathJax 3.0.1, which is now the shipping version. Cervone’s comment on this change says that it “prevents the error message,” which left me with the impression that it might suppress the message without curing the error itself. But as far as I can tell the entire issue has been cleared up. There’s no longer any need to invoke <code>MathJax.typesetClear()</code>.</p>
+<hr/>
+<p>In my first experiments with version 3.0 I stumbled onto another bit of weirdness, but it turned out to be a quirk of my own code, not something amiss in MathJax. </p>
+<p>I was seeing occasional size variations in typeset math that seemed reminiscent of the winking problem in version 2.7. <img alt="large and small math superimposed" border="0" class="alignright" height="99" src="http://bit-player.org/wp-content/uploads/2020/02/zs-large-and-small-math.png" width="159"/>Sometimes the initial, automatic typesetting would leave the equations in a slightly smaller size; they would grow back to normal as soon as <code>MathJax.typeset()</code> was applied. In the image at right I have superimposed the two states, with the correct, larger image colored red. It looks like Fast Preview has come back to haunt us, but that can’t be right, because Fast Preview has been removed entirely from version 3.</p>
+<p>My efforts to solve this mystery turned into quite a debugging debacle. I got a promising clue from an exchange on the <a href="https://github.com/mathjax/mathjax-docs/wiki/Dealing-with-display:none">MathJax wiki</a>, discussing size anomalies when math is composed inside an HTML element temporarily flagged <code>display: none</code>, a style rule that makes the math invisible. In that circumstance MathJax has no information about the surrounding text, and so it leaves the typeset math in a default state. The same mechanism might account for what I was seeing—except that my page has no elements with a <code>display: none</code> style.</p>
+<p>I first observed this problem in the Chrome browser, where it is intermittent; when I repeatedly reloaded the page, the small type would appear about one time out of five. What fun! It takes multiple trials just to know whether an attempted fix has had any effect. Thus I was pleased to discover that in Firefox the shrunken type appears consistently, every time the page is loaded. Testing became a great deal easier.</p>
+<p>I soon found a cure, though not a diagnosis. While browsing again in the MathJax issues archive and in a <a href="https://groups.google.com/forum/?pli=1#!forum/mathjax-users">MathJax user forum</a>, I came across suggestions to try a different form of output, with mathematical expressions constructed not from text elements in HTML and style rules in CSS but from paths drawn in Scalable Vector Graphics, or SVG. I found that the SVG expressions were stable and consistent in size, and in other respects indistinguishable from their HTML siblings. Again my problem was solved, but I still wanted to know the underlying cause.</p>
+<p>Here’s where the troubleshooting report gets a little embarrassing. Thinking I might have a new bug to report, I set out to build a minimal exemplar—the smallest and simplest program that would trigger the bug. I failed. I was starting from a blank page and adding more and more elements of the original program—<code>div</code>s nested inside <code>div</code>s in the HTML, various stylesheet rules in the CSS, bigger collections of more complex equations—but none of these additions produced the slightest glitch in typesetting. So I tried working in the other direction, starting with the complex misbehaving program and stripping away elements until the problem disappeared. But it didn’t disappear, even when I reduced the page to a single equation in a plain white box.</p>
+<p>As often happens, I found the answer not by banging my head against the problem but by going for a walk. Out in the fresh air, I finally noticed the one oddity that distinguished the failing program from all of the correctly working ones. Because the Dotster program began life embedded in a WordPress blog post, I could not include a link to the CSS stylesheet in the <code>head</code> section of the HTML file. Instead, a JavaScript function constructed the link and inserted it into the <code>head</code>. That happened <em>after</em> MathJax made its initial pass over the text. At the time of typesetting, the elements in which the equations were placed had no styles applied, and so MathJax had no way of determining appropriate sizes.</p>
+<hr/>
+<p>When Don Knuth unveiled TeX, circa 1980, I was amazed. Back then, typewriter-style word processing was impressive enough. TeX did much more: real typesetting, with multiple fonts (which Knuth also had to create from scratch), automatic hyphenation and justification, and beautiful mathematics.</p>
+<p>Thirty years later, when Cervone created MathJax, I was amazed again—though perhaps not for the right reasons. I had supposed that the major programming challenge would be capturing all the finicky rules and heuristics for building up math expressions—placing and sizing superscripts, adjusting the height and width of parentheses or a radical sign to match the dimensions of the expression enclosed, spacing and aligning the elements of a matrix. Those are indeed nontrivial tasks, but they are just the beginning. My recent adventures have helped me see that another major challenge is making TeX work in an alien environment.</p>
+<p>In classic TeX, the module that typesets equations has direct access to everything it might ever need to know about the surrounding text—type sizes, line spacing, column width, the amount of interword “glue” needed to justify a line of type. Sharing this information is easy because all the formatting is done by the same program. MathJax faces a different situation. Formatting duties are split, with MathJax handling mathematical content but the browser’s layout engine doing everything else. Indeed, the document is written in two different languages, TeX for the math and HTML/CSS for the rest. Coordinating actions in the two realms is not straightforward.</p>
+<p>There are other complications of importing TeX into a web page. The classic TeX system runs in batch mode. It takes some inputs, produces its output, and then quits. Batch processing would not offer a pleasant experience in a web browser. The entire user interface (such as the buttons and sliders in my Dotster programs) would be frozen for the duration. To avoid this kind of rudeness to the user, MathJax is never allowed to monopolize JavaScript’s single thread of execution for more than a fraction of a second. To ensure this cooperative behavior, earlier versions relied on a hand-built scheme of queues (where procedures wait their turn to execute) and callbacks (which signal when a task is complete). Version 3 takes advantage of a new JavaScript construct called a <em>promise</em>. When a procedure cannot compute a result immediately, it hands out a promise, which it then redeems when the result becomes available.</p>
+<p>Wait, there’s more! MathJax is not just a TeX system. It also accepts input written in MathML, a dialect of XML specialized for mathematical notation. Indeed, the internal language of MathJax is based on MathML. And MathJax can also be configured to handle <a href="http://asciimath.org/">AsciiMath</a>, a cute markup language that aims to make even the raw form of an expression readable. Think of it as math with emoticons: Type <code>`oo`</code> and you’ll get \(\infty\), or <code>`:-`</code> for \(\div\).</p>
+<p>MathJax also provides an extensive suite of tools for accessibility. Visually impaired readers can have an equation read aloud. As I learned at the January Joint Math Meetings, there are even provisions for generating Braille output—but that’s a subject that deserves a post of its own.</p>
+<hr/>
+<p>When I first encountered MathJax, I saw it as a marvel, but I also considered it a workaround or stopgap. Reading a short document that includes a single equation entails downloading the entire MathJax program, which can be much larger than the document itself. And you need to download it all again for every other mathy document (unless your browser cache hangs onto a copy). What an appalling waste of bandwidth. </p>
+<p>Several alternatives seemed more promising as a long-term solution. The best approach, it seemed to me then, was to have support for mathematical notation built into the browser. Modern browsers handle images, audio, video, SVG, animations—why not math? But it hasn’t happened. Firefox and Safari have limited support for MathML; none of the browsers I know are equipped to deal with TeX.</p>
+<p>Another strategy that once seemed promising was the browser plugin. A plugin could offer the same capabilities as MathJax, but you would download and install it only once. This sounds like a good deal for readers, but it’s not so attractive for the author of web content. If there are multiple plugins in circulation, they are sure to have quirks, and you need to accommodate all of them. Furthermore, you need some sort of fallback plan for those who have not installed a plugin.</p>
+<p>Still another option is to run MathJax on the server, rather than sending the whole program to the browser. The document arrives with TeX or MathML already converted to HTML/CSS or SVG for display. This is the preferred modus operandi for several large websites, most notably Wikipedia. I’ve considered it for bit-player, but it has a drawback: Running on the server, MathJax cannot provide the kind of on-demand typesetting seen in the demos above.</p>
+<p>As the years go by, I am coming around to the view that MathJax is not just a useful stopgap while we wait for the right thing to come along; it’s quite a good approximation to the right thing. As the author of a web page, I get to write mathematics in a familiar and well-tested notation, and I can expect that any reader with an up-to-date browser will see output that’s much like what I see on my own screen. At the same time, the reader also has control over how the math is rendered, via the context menu. And the program offers accessibility features that I could never match on my own.</p>
+<p>To top it off, the software is open-source—freely available to everyone. That is not just an economic advantage but also a social one. The project has a community that stands ready to fix bugs, listen to suggestions and complaints, offer help and advice. Without that resource, I would still be struggling with the hitches and hiccups described above.</p></div>
+    </content>
+    <updated>2020-03-14T18:06:50Z</updated>
+    <published>2020-03-14T18:06:50Z</published>
+    <category scheme="http://bit-player.org" term="computing"/>
+    <category scheme="http://bit-player.org" term="mathematics"/>
+    <author>
+      <name>Brian Hayes</name>
+      <uri>http://bit-player.org</uri>
+    </author>
+    <source>
+      <id>http://bit-player.org/feed/atom</id>
+      <link href="http://bit-player.org" rel="alternate" type="text/html"/>
+      <link href="http://bit-player.org/feed/atom" rel="self" type="application/atom+xml"/>
+      <subtitle xml:lang="en-US">An amateur's outlook on computation and mathematics</subtitle>
+      <title xml:lang="en-US">bit-player</title>
+      <updated>2020-03-14T18:13:33Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>https://eccc.weizmann.ac.il/report/2020/034</id>
@@ -34,7 +121,7 @@
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-03-14T17:20:29Z</updated>
+      <updated>2020-03-14T18:20:28Z</updated>
     </source>
   </entry>
 
@@ -61,7 +148,7 @@ Email: h.sun@ed.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-03-14T17:20:58Z</updated>
+      <updated>2020-03-14T18:20:45Z</updated>
     </source>
   </entry>
 
@@ -97,7 +184,7 @@ Email: h.sun@ed.ac.uk</p></div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2020-03-14T17:21:22Z</updated>
+      <updated>2020-03-14T18:21:06Z</updated>
     </source>
   </entry>
 
@@ -487,7 +574,7 @@ Is group testing a practical <em>mechanism</em> for mapping and constraining the
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-03-14T17:20:55Z</updated>
+      <updated>2020-03-14T18:20:43Z</updated>
     </source>
   </entry>
 
@@ -541,7 +628,7 @@ Is group testing a practical <em>mechanism</em> for mapping and constraining the
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-03-14T17:21:15Z</updated>
+      <updated>2020-03-14T18:20:59Z</updated>
     </source>
   </entry>
 
@@ -565,7 +652,7 @@ Is group testing a practical <em>mechanism</em> for mapping and constraining the
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-03-14T17:20:32Z</updated>
+      <updated>2020-03-14T18:20:28Z</updated>
     </source>
   </entry>
 
@@ -738,7 +825,7 @@ After we see a slate of conferences held virtually due to the virus, networking 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-03-14T17:20:32Z</updated>
+      <updated>2020-03-14T18:20:28Z</updated>
     </source>
   </entry>
 
@@ -766,7 +853,7 @@ Email: engradr@uvic.ca</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-03-14T17:20:58Z</updated>
+      <updated>2020-03-14T18:20:45Z</updated>
     </source>
   </entry>
 
@@ -799,7 +886,7 @@ We close with additional observations on VQP and the closure of VNP which allows
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-03-14T17:20:32Z</updated>
+      <updated>2020-03-14T18:20:28Z</updated>
     </source>
   </entry>
 
@@ -867,7 +954,7 @@ We close with additional observations on VQP and the closure of VNP which allows
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2020-03-14T17:21:35Z</updated>
+      <updated>2020-03-14T18:21:23Z</updated>
     </source>
   </entry>
 
@@ -947,7 +1034,7 @@ We close with additional observations on VQP and the closure of VNP which allows
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2020-03-14T17:21:36Z</updated>
+      <updated>2020-03-14T18:21:29Z</updated>
     </source>
   </entry>
 
@@ -1064,7 +1151,7 @@ like reducibility.  As such we all owe a debit to Paul Young.</div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-03-14T17:20:32Z</updated>
+      <updated>2020-03-14T18:20:28Z</updated>
     </source>
   </entry>
 
@@ -1108,7 +1195,7 @@ like reducibility.  As such we all owe a debit to Paul Young.</div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2020-03-14T17:20:09Z</updated>
+      <updated>2020-03-14T18:20:11Z</updated>
     </source>
   </entry>
 
@@ -1232,7 +1319,7 @@ Does the AS paper say something about cryptography? How widely does their condit
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-03-14T17:20:56Z</updated>
+      <updated>2020-03-14T18:20:43Z</updated>
     </source>
   </entry>
 
@@ -1431,7 +1518,7 @@ Does the AS paper say something about cryptography? How widely does their condit
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-03-14T17:20:32Z</updated>
+      <updated>2020-03-14T18:20:28Z</updated>
     </source>
   </entry>
 
@@ -1469,7 +1556,7 @@ Does the AS paper say something about cryptography? How widely does their condit
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-03-14T17:20:46Z</updated>
+      <updated>2020-03-14T18:20:38Z</updated>
     </source>
   </entry>
 
@@ -1496,7 +1583,7 @@ Email: arnabb@nus.edu.sg</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-03-14T17:20:58Z</updated>
+      <updated>2020-03-14T18:20:46Z</updated>
     </source>
   </entry>
 
@@ -1642,7 +1729,7 @@ We will do it all by keeping the core principle of the original "million-dollar 
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2020-03-14T17:21:33Z</updated>
+      <updated>2020-03-14T18:21:17Z</updated>
     </source>
   </entry>
 
@@ -1904,7 +1991,7 @@ The search for proving transcendental numbers has gone in other directions. Thes
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-03-14T17:20:55Z</updated>
+      <updated>2020-03-14T18:20:42Z</updated>
     </source>
   </entry>
 
@@ -1943,141 +2030,7 @@ The search for proving transcendental numbers has gone in other directions. Thes
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2020-03-14T17:21:22Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-3722233.post-4788940302272898721</id>
-    <link href="https://blog.computationalcomplexity.org/feeds/4788940302272898721/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2020/03/logic-examples-for-your-discrete-math.html#comment-form" rel="replies" type="text/html"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/4788940302272898721" rel="edit" type="application/atom+xml"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/4788940302272898721" rel="self" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2020/03/logic-examples-for-your-discrete-math.html" rel="alternate" type="text/html"/>
-    <title>Logic examples for your Discrete Math class</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><div>
-<br/>
-<br/>
-(I injured my hand about a month ago so I have had a hard time typing. That is why<br/>
-I have not blogged for a while. I'm better now but still slow. This is a post I prepared<br/>
-a while back.)<br/>
-<br/>
-<br/>
-<br/>
-Here are some examples of English and logic for your discrete math class. Or for mine anyway.<br/>
-<br/>
-<br/></div>
-<div>
-1) <i>A computer programmer leaves work and heads for home. Being the good spouse that he is, he calls  his partner and asks if there's anything that needs to be picked up on the way.</i></div>
-<div>
-<i><br/></i></div>
-<div>
-<i>Yes, a gallon of milk and, oh, if they have <span class="il">eggs</span>, get a dozen.</i></div>
-<div>
-<i><br/></i></div>
-<div>
-<i>Later he arrives home and stumbles into the kitchen burdened with a dozen gallons of milk. His partner  perplexed, asks him ``why in the world did you buy 12 gallons of milk?''</i></div>
-<div>
-<i><br/></i></div>
-<div>
-<i>What did he answer?</i></div>
-<div>
-<br/></div>
-<div>
-When I told this to my class one student said that he should answer:</div>
-<div>
-<br/>
-                                                      <i>I love you too Darling</i></div>
-<div>
-<br/></div>
-<div>
-while that is always a good thing to tell Darling, it is not the answer I had in mind.<br/>
-<br/></div>
-<div>
-The  answer is  <a href="https://www.cs.umd.edu/users/gasarch/BLOGPAPERS/eggs.txt">here</a>.</div>
-<div>
-<br/></div>
-<div>
-2) I saw a headline:</div>
-<div>
-<br/></div>
-<div>
-                                                 <i> Rise in faux-incest porn alarming</i></div>
-<div>
-<br/></div>
-<div>
-Give two different interpretations of this sentence. (Note- One you might agree with, the other you will likely disagree with.)<br/>
-<br/>
-My answer is  <a href="https://www.cs.umd.edu/users/gasarch/BLOGPAPERS/faux.txt">here</a></div>
-<div>
-<br/>
-3) Recently someone was describing what I work on to someone else and he said the following wonderfully ambiguous sentence<br/>
-<br/>
-                           <i>Bill works on puzzles and games. He also work on cake cutting, to be fair.</i><br/>
-<br/>
-Give two different interpretations of this sentence.  My answer is <a href="https://www.cs.umd.edu/users/gasarch/BLOGPAPERS/billcake.txt">here</a><br/>
-<br/>
-<br/>
-4) A common saying is<br/>
-<br/>
-                          <i> All that glitters is not gold</i><br/>
-<br/>
-What does this mean literally? What did they really mean to say? My answer is <a href="https://www.cs.umd.edu/users/gasarch/BLOGPAPERS/gold.txt">here.</a><br/>
-<br/>
-(I had originally thought this was a quote from the Led Zeppelin song <i>Stairway to Heaven</i>;<br/>
-however, an astute reader left a comment reminding me that, in that song, they actually<br/>
-say that there is a lady who believes <i>All that Glitters is Gold. </i>The song implies that she is incorrect, so really<br/>
-NOT(All that Glitters is Gold) which means (exists x)[x glitters but x is not gold] which actually<br/>
-IS what they meant to say. Yeah!)<br/>
-<br/>
-5)When the chess player Bobby Fisher died I saw in one article about him the sentence<br/>
-<i><br/></i>
-<i>                                Bobby Fisher was a terrible anti-semite.</i><br/>
-<br/>
-<i/>This can be interpreted two ways. What are they? Which one did the writer probably mean? My answer is <a href="https://www.cs.umd.edu/users/gasarch/BLOGPAPERS/fisher.txt">here</a><br/>
-<br/>
-6) When Donald Trump broke the Nuclear Treaty with Iran he said<br/>
-<br/>
-                             <i> Iran is the worse enabler of terrorist in the mideast</i><br/>
-<br/>
-This can be interpreted two ways. What are they? Which one did Trump mean? My answer is <a href="https://www.cs.umd.edu/users/gasarch/BLOGPAPERS/iran.txt">here.</a><br/>
-<br/></div>
-<div>
-<br/>
-7) I saw the headline (see <a href="https://www.dailykos.com/stories/2019/12/31/1905544/-There-was-actually-good-news-in-the-War-on-Women-in-2019-news-we-have-to-build-on-in-2020">here</a>)<br/>
-<br/>
-<i>There was actually good news in the War on Women in 2019, news we have to build on in 2020</i>.<br/>
-<br/>
-This can be interepreted in two ways. This one I leave to you, or read the article.<br/>
-<br/>
-<br/>
-<br/>
-<br/></div></div>
-    </content>
-    <updated>2020-03-02T15:32:00Z</updated>
-    <published>2020-03-02T15:32:00Z</published>
-    <author>
-      <name>GASARCH</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/03615736448441925334</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-3722233</id>
-      <category term="typecast"/>
-      <category term="focs metacomments"/>
-      <author>
-        <name>Lance Fortnow</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-      </author>
-      <link href="https://blog.computationalcomplexity.org/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default" rel="self" type="application/atom+xml"/>
-      <link href="https://blog.computationalcomplexity.org/" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
-      <title>Computational Complexity</title>
-      <updated>2020-03-14T08:08:47Z</updated>
+      <updated>2020-03-14T18:21:06Z</updated>
     </source>
   </entry>
 </feed>
