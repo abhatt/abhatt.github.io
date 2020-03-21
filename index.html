@@ -237,7 +237,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at March 21, 2020 08:21 PM UTC</span>.
+Last updated <span class="datestr">at March 21, 2020 09:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -245,6 +245,178 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://rjlipton.wordpress.com/?p=16828">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/lipton.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://rjlipton.wordpress.com/2020/03/21/star-free-regular-languages-and-logic/">Star-Free Regular Languages and Logic</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://rjlipton.wordpress.com" title="Gödel’s Lost Letter and P=NP">Richard Lipton</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p>
+<font color="#0044cc"><br />
+<em>Part 1 of a two-part series</em><br />
+<font color="#000000"></font></font></p><font color="#0044cc"><font color="#000000">
+<p><a href="https://rjlipton.wordpress.com/2020/03/21/star-free-regular-languages-and-logic/wintonprofile/" rel="attachment wp-att-16830"><img width="150" alt="" src="https://rjlipton.files.wordpress.com/2020/03/wintonprofile.png?w=150&amp;h=165" class="alignright wp-image-16830" height="165" /></a></p>
+<p>
+Daniel Winton is a graduate student in mathematics at Buffalo. He did an independent study with me last semester on descriptive complexity.</p>
+<p>
+Today we begin a two-part series written by Daniel on a foundational result in this area involving first-order logic and <em>star-free</em> languages.</p>
+<p>
+Dick and I have discussed how GLL might act during the terrible coronavirus developments. We could collect quantitative and theoretical insights to help understand what is happening and possibly contribute to background for attempts to deal with it. Our March 12 <a href="https://rjlipton.wordpress.com/2020/03/12/group-testing-for-the-coronavirus/">post</a> was this kind, and was on the wavelength of an actual advance in group testing announced in Israel two days ago, as noted in a <a href="https://rjlipton.wordpress.com/2020/03/12/group-testing-for-the-coronavirus/#comment-109506">comment</a>. We could try to be even more active than that. We could focus on entertainment and diversion. Our traditional St. Patrick’s Day <a href="https://rjlipton.wordpress.com/2020/03/17/leprechauns-stay-home/">post</a> mentioned the ongoing <a href="https://en.candidates-2020.com/main">Candidates</a> <a href="https://new.uschess.org/news/2020-candidates-couch-potatoes/">Tournament</a> in chess, with links to follow the games live from 7am EDT. </p>
+<p>
+Here we’re doing what we most often do: present a hopefully sprightly angle on a technical subject. We offer this in solidarity with the many professors and teachers who are beginning to teach online to many students. The subject of regular languages is the start of many theory courses and sometimes taught in high schools. Accordingly, Dick and I decided to prefix a section introducing regular languages as a teaching topic and motivating the use of logic, before entering the main body written by Daniel.</p>
+<p>
+</p><p></p><h2> Regular Languages and Logic </h2><p></p>
+<p></p><p>
+<a href="https://en.wikipedia.org/wiki/Regular_language">Regular</a> languages are building blocks used throughout computer science. They can be defined in many ways. Two major types of descriptions are:</p>
+<ol>
+<li>
+Regular expressions. For example, the regular expression <p></p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++b%5E%7B%2A%7D%28a+b%5E%7B%2A%7D+a+b%5E%7B%2A%7D%29%5E%7B%2A%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  b^{*}(a b^{*} a b^{*})^{*} " class="latex" title="\displaystyle  b^{*}(a b^{*} a b^{*})^{*} " /></p>
+<p>describes the set of strings over the alphabet <img src="https://s0.wp.com/latex.php?latex=%7B%5C%7Ba%2Cb%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\{a,b\}}" class="latex" title="{\{a,b\}}" /> that have an even number of <img src="https://s0.wp.com/latex.php?latex=%7Ba%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{a}" class="latex" title="{a}" />‘s. </p>
+</li><li>
+Finite automata, for example:
+</li></ol>
+<p>
+<a href="https://rjlipton.wordpress.com/2020/03/21/star-free-regular-languages-and-logic/evendfa/" rel="attachment wp-att-16832"><img width="300" alt="" src="https://rjlipton.files.wordpress.com/2020/03/evendfa.jpg?w=300&amp;h=140" class="aligncenter wp-image-16832" height="140" /></a></p>
+<p>
+The regular languages defined by (1) and (2) are the same. All regular expressions have corresponding finite automata. This equivalence makes a powerful statement about the concept of regular languages. The more and more diverse definitions we have, the better we understand a concept. This leads us to consider other possible definitions.</p>
+<p>
+A natural kind of definition involves <em>logic</em>. Studying complexity classes through logic and <a href="https://en.wikipedia.org/wiki/Model_theory">model theory</a> has proven fruitful, creating <a href="https://en.wikipedia.org/wiki/Descriptive_complexity_theory">descriptive complexity</a> as an area. <em>Good news:</em> there are logic definitions equivalent to the regular languages. <em>Bad news:</em> they require going up to second-order logic. We would like to stay with first-order logic. So we ask:</p>
+<blockquote><p><b> </b> <em> What kind of languages can we define using only first-order logic (FOL) and simple predicates like “the <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{i}" class="latex" title="{i}" />th bit of <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{x}" class="latex" title="{x}" /> is <img src="https://s0.wp.com/latex.php?latex=%7Ba%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{a}" class="latex" title="{a}" />” and “place <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{i}" class="latex" title="{i}" /> comes before place <img src="https://s0.wp.com/latex.php?latex=%7Bj%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{j}" class="latex" title="{j}" />“? </em>
+</p></blockquote>
+<p></p><p>
+The answer is the <em>star-free</em> languages, which form a subclass <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BSF%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{SF}}" class="latex" title="{\mathsf{SF}}" /> of the regular languages. They were made famous in the book <em>Counter-Free Automata</em> by Robert McNaughton and Seymour Papert, where the equivalence to FOL was proved. A portentous fact is that these automata cannot solve simple tasks involving modular counting. Nor can <em>perceptrons</em>—the title subject of a book at the same time by Papert with Marvin Minsky, which we <a href="https://rjlipton.wordpress.com/2016/01/27/minsky-the-theorist/">discussed</a> in relation to both AI and circuit complexity. This post will introduce <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BSF%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{SF}}" class="latex" title="{\mathsf{SF}}" /> and FOL, prove the easier direction of the characterization, and give two lemmas for next time. The second post will present a new way to visualize the other direction. <b>The rest of this post is by Daniel Winton.</b></p>
+<p>
+</p><p></p><h2> No Stars Upon Thars </h2><p></p>
+<p></p><p>
+A regular language over an alphabet <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\Sigma}" class="latex" title="{\Sigma}" /> is one with an expression that can be obtained by applying the union, concatenation, and Kleene star operations a finite number of times on the empty set and singleton subsets of <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\Sigma}" class="latex" title="{\Sigma}" />. Star-free languages are defined similarly but give up the use of the Kleene star <img src="https://s0.wp.com/latex.php?latex=%7B%7B%7D%5E%2A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{{}^*}" class="latex" title="{{}^*}" /> operation, while adding complementation (<img src="https://s0.wp.com/latex.php?latex=%7B%5Csim%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\sim}" class="latex" title="{\sim}" />) as a basic operation. The star-free languages are a subset of the regular languages, because regular languages are closed under complementation. </p>
+<p>
+Complementation often helps find star-free expressions that we ordinarily write using stars. For instance, if the alphabet <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\Sigma}" class="latex" title="{\Sigma}" /> is <img src="https://s0.wp.com/latex.php?latex=%7B%5C%7Ba%2Cb%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\{a,b\}}" class="latex" title="{\{a,b\}}" />, then <img src="https://s0.wp.com/latex.php?latex=%7B%28%5Csim+%5Cemptyset%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{(\sim \emptyset)}" class="latex" title="{(\sim \emptyset)}" /> gives <img src="https://s0.wp.com/latex.php?latex=%7B%28a+%2B+b%29%5E%2A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{(a + b)^*}" class="latex" title="{(a + b)^*}" />. The following lemma gives a family of regular expressions that use Kleene star but are really star-free.</p>
+<blockquote><p><b>Lemma 1</b> <em> The language given by taking the Kleene star operation on a union of singleton elements in an alphabet <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{\Sigma}" class="latex" title="{\Sigma}" /> is star-free. </em>
+</p></blockquote>
+<p></p><p>
+<em>Proof.</em> For <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma%3D%5C%7Ba_1%2C+...%2C+a_n%2C+b_1%2C+...%2C+b_m%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\Sigma=\{a_1, ..., a_n, b_1, ..., b_m\}}" class="latex" title="{\Sigma=\{a_1, ..., a_n, b_1, ..., b_m\}}" /> we have that <img src="https://s0.wp.com/latex.php?latex=%7B%28b_1%2B+...+%2B+b_m%29%5E%2A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{(b_1+ ... + b_m)^*}" class="latex" title="{(b_1+ ... + b_m)^*}" /> can be given by </p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csim%28%28%5Csim%5Cemptyset%29+%28a_1%2B+...+%2B+a_n%29+%28%5Csim%5Cemptyset%29%29.+%5Cquad++&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \sim((\sim\emptyset) (a_1+ ... + a_n) (\sim\emptyset)). \quad  " class="latex" title="\displaystyle  \sim((\sim\emptyset) (a_1+ ... + a_n) (\sim\emptyset)). \quad  " /></p>
+<p><img src="https://s0.wp.com/latex.php?latex=%5CBox&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\Box" class="latex" title="\Box" /></p>
+<p>For example, the language <img src="https://s0.wp.com/latex.php?latex=%7Bb%5E%2Aab%5E%2Aab%5E%2A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{b^*ab^*ab^*}" class="latex" title="{b^*ab^*ab^*}" /> is star-free because <img src="https://s0.wp.com/latex.php?latex=%7Bb%5E%2A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{b^*}" class="latex" title="{b^*}" /> is by this lemma. This idea extends also to forbidden substrings—e.g., the set of strings with no <img src="https://s0.wp.com/latex.php?latex=%7Baa%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{aa}" class="latex" title="{aa}" /> is <img src="https://s0.wp.com/latex.php?latex=%7B%5C%3B%5Csim%28%28%5Csim%5Cemptyset%29aa%28%5Csim%5Cemptyset%29%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\;\sim((\sim\emptyset)aa(\sim\emptyset))}" class="latex" title="{\;\sim((\sim\emptyset)aa(\sim\emptyset))}" />. </p>
+<p>
+The language <img src="https://s0.wp.com/latex.php?latex=%7B%28ab+%2B+ba+%2B+bb%29%5E%2A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{(ab + ba + bb)^*}" class="latex" title="{(ab + ba + bb)^*}" /> is not the same, however, and it is not star-free. Intuitively this is because it involves modular counting: an <img src="https://s0.wp.com/latex.php?latex=%7Baa%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{aa}" class="latex" title="{aa}" /> in an odd position is OK but not even. The parity language <img src="https://s0.wp.com/latex.php?latex=%7Bb%5E%2A%28ab%5E%2Aab%5E%2A%29%5E%2A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{b^*(ab^*ab^*)^*}" class="latex" title="{b^*(ab^*ab^*)^*}" /> from the introduction is another example. So <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BSF%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{SF}}" class="latex" title="{\mathsf{SF}}" /> is a proper subset of the regular languages. What kind of subset? This is where having a third description via logic is really useful.</p>
+<p>
+</p><p></p><h2> The First Order of Business </h2><p></p>
+<p></p><p>
+In addition to the familiar Boolean operations <img src="https://s0.wp.com/latex.php?latex=%7B%5Cwedge%2C%5Cvee%2C%5Cneg%2C%5Crightarrow%2C%5Cleftrightarrow%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\wedge,\vee,\neg,\rightarrow,\leftrightarrow}" class="latex" title="{\wedge,\vee,\neg,\rightarrow,\leftrightarrow}" /> and truth values, <em>first-order logic</em> provides variables that range over elements of a structure and quantifiers on those variables. Since we will be concerned with Boolean strings <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{x}" class="latex" title="{x}" />, the variables will range over places in the string <img src="https://s0.wp.com/latex.php?latex=%7B0%2C%5Cdots%2Cn-1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{0,\dots,n-1}" class="latex" title="{0,\dots,n-1}" />, where <img src="https://s0.wp.com/latex.php?latex=%7Bn+%3D+%7Cx%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{n = |x|}" class="latex" title="{n = |x|}" />. A logic also specifies a set of predicates that relate variables and interact with the structure. For strings we have:</p>
+<ul>
+<li>
+<img src="https://s0.wp.com/latex.php?latex=%7BX_c%28i%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{X_c(i)}" class="latex" title="{X_c(i)}" />, meaning that the symbol indexed <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i}" class="latex" title="{i}" /> in <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{x}" class="latex" title="{x}" /> is the character <img src="https://s0.wp.com/latex.php?latex=%7Bc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{c}" class="latex" title="{c}" />. The logic gives one such predicate for each <img src="https://s0.wp.com/latex.php?latex=%7Bc+%5Cin+%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{c \in \Sigma}" class="latex" title="{c \in \Sigma}" />. <p></p>
+</li><li>
+<img src="https://s0.wp.com/latex.php?latex=%7Bi+%3C+j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i &lt; j}" class="latex" title="{i &lt; j}" />, with the obvious meaning for natural numbers <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i}" class="latex" title="{i}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bj%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{j}" class="latex" title="{j}" />.
+</li></ul>
+<p>
+We can take the <img src="https://s0.wp.com/latex.php?latex=%7BX_c%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{X_c}" class="latex" title="{X_c}" /> for granted since we are talking about strings, but we need to say that predicates like <img src="https://s0.wp.com/latex.php?latex=%7Bi+%2B+j+%3D+k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i + j = k}" class="latex" title="{i + j = k}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bi%5Ccdot+j+%3D+k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i\cdot j = k}" class="latex" title="{i\cdot j = k}" /> are excluded, so we call this <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%5B%3C%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}[&lt;]}" class="latex" title="{\mathsf{FO}[&lt;]}" />. We could define equality by <img src="https://s0.wp.com/latex.php?latex=%7Bi+%3D+j+%5Cequiv+%5Clnot%28i+%3C+j+%5Clor+i+%3E+j%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i = j \equiv \lnot(i &lt; j \lor i &gt; j)}" class="latex" title="{i = j \equiv \lnot(i &lt; j \lor i &gt; j)}" /> but we regard equality as inherent.</p>
+<p>
+We can use <img src="https://s0.wp.com/latex.php?latex=%7B%3C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{&lt;}" class="latex" title="{&lt;}" /> to define the successor relation <img src="https://s0.wp.com/latex.php?latex=%7BS%28i%2Cj%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{S(i,j)}" class="latex" title="{S(i,j)}" />, which denotes that position <img src="https://s0.wp.com/latex.php?latex=%7Bj%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{j}" class="latex" title="{j}" /> comes immediately after position <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i}" class="latex" title="{i}" />:</p>
+<p></p><p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++S%28i%2Cj%29+%5Cequiv+i%3Cj+%5Cland+%5Cforall+k+%28i%3Ck+%5Crightarrow+j%5Cleq+k%29.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  S(i,j) \equiv i&lt;j \land \forall k (i&lt;k \rightarrow j\leq k). " class="latex" title="\displaystyle  S(i,j) \equiv i&lt;j \land \forall k (i&lt;k \rightarrow j\leq k). " /></p>
+<p>
+Note the use of quantifiers. We can use quantifiers to say things about the string <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{x}" class="latex" title="{x}" /> too. For instance, the language <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L}" class="latex" title="{L}" /> of strings having no <img src="https://s0.wp.com/latex.php?latex=%7Baa%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{aa}" class="latex" title="{aa}" /> substrings is defined by the logical sentence</p>
+<p></p><p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csigma_L+%3D+%28%5Cforall+i%2Cj%29%3AS%28i%2Cj%29+%5Crightarrow+%5Cneg+%28X_a%28i%29+%5Cland+X_a%28j%29%29.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \sigma_L = (\forall i,j):S(i,j) \rightarrow \neg (X_a(i) \land X_a(j)). " class="latex" title="\displaystyle  \sigma_L = (\forall i,j):S(i,j) \rightarrow \neg (X_a(i) \land X_a(j)). " /></p>
+<p>
+It is implicit here that <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i}" class="latex" title="{i}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bj%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{j}" class="latex" title="{j}" /> are always in-bounds. If <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{n}" class="latex" title="{n}" /> were a legal constant with <img src="https://s0.wp.com/latex.php?latex=%7BX_c%28n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{X_c(n)}" class="latex" title="{X_c(n)}" /> always false then a string like <img src="https://s0.wp.com/latex.php?latex=%7Bbbba%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{bbba}" class="latex" title="{bbba}" /> (which belongs to <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L}" class="latex" title="{L}" />) would falsify <img src="https://s0.wp.com/latex.php?latex=%7B%5Csigma_L%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\sigma_L}" class="latex" title="{\sigma_L}" /> with <img src="https://s0.wp.com/latex.php?latex=%7Bi+%3D+n-1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i = n-1}" class="latex" title="{i = n-1}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bj+%3D+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{j = n}" class="latex" title="{j = n}" />. </p>
+<p>
+How big is <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%5B%3C%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}[&lt;]}" class="latex" title="{\mathsf{FO}[&lt;]}" />? We’ll see it is no more and no less than <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BSF%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{SF}}" class="latex" title="{\mathsf{SF}}" />.</p>
+<p>
+</p><p></p><h2> From SF to FO </h2><p></p>
+<p></p><p>
+To prove that any language <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L}" class="latex" title="{L}" /> in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BSF%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{SF}}" class="latex" title="{\mathsf{SF}}" /> has a definition in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}}" class="latex" title="{\mathsf{FO}}" />, we will not only give a sentence <img src="https://s0.wp.com/latex.php?latex=%7B%5Csigma_L%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\sigma_L}" class="latex" title="{\sigma_L}" /> but also a <em>formula</em> <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi_L%28i%2Cj%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi_L(i,j)}" class="latex" title="{\phi_L(i,j)}" />. We will define this formula to indicate that for a given string <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{x}" class="latex" title="{x}" />, the portion of the string between indices <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i}" class="latex" title="{i}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bj-1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{j-1}" class="latex" title="{j-1}" /> is in <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L}" class="latex" title="{L}" />. Then for the correct choices of <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i}" class="latex" title="{i}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bj%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{j}" class="latex" title="{j}" />, <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi_L%28i%2Cj%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi_L(i,j)}" class="latex" title="{\phi_L(i,j)}" /> gives <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L}" class="latex" title="{L}" />. We define <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi}" class="latex" title="{\phi}" /> to test middle portions of strings, because it handles lengths better for the induction in the concatenation case. </p>
+<blockquote><p><b>Theorem 2</b> <em></em></p><em>
+<p>
+Every language in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BSF%7D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{\mathsf{SF}}" class="latex" title="{\mathsf{SF}}" /> is definable in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%5B%3C%5D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}[&lt;]}" class="latex" title="{\mathsf{FO}[&lt;]}" />.</p>
+</em><p><em>
+</em>
+</p></blockquote>
+<p>
+The proof is a nice example where “building up” to prove something more general—involving two extra variables—makes induction go smoothly.</p>
+<p>
+<em>Proof:</em>  Let <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L}" class="latex" title="{L}" /> be a star-free regular language and <img src="https://s0.wp.com/latex.php?latex=%7BL%27%3D%5C%7B%5Clangle+x%2C+i+%2Cj+%5Crangle%3A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L'=\{\langle x, i ,j \rangle:}" class="latex" title="{L'=\{\langle x, i ,j \rangle:}" /> the portion of the string <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{x}" class="latex" title="{x}" /> between indices <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i}" class="latex" title="{i}" /> (inclusive) and <img src="https://s0.wp.com/latex.php?latex=%7Bj%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{j}" class="latex" title="{j}" /> (exclusive) is contained in <img src="https://s0.wp.com/latex.php?latex=%7BL%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L\}}" class="latex" title="{L\}}" />. Let <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi_L%28i%2Cj%29%5Cin+%5Csf%7BFO%7D%5B%3C%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi_L(i,j)\in \sf{FO}[&lt;]}" class="latex" title="{\phi_L(i,j)\in \sf{FO}[&lt;]}" /> be the formula denoting that for a given string <img src="https://s0.wp.com/latex.php?latex=%7Bx%2C+x%5Bi%2Cj%29%5Cin+L%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{x, x[i,j)\in L}" class="latex" title="{x, x[i,j)\in L}" />, that is, <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi_L%28i%2Cj%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi_L(i,j)}" class="latex" title="{\phi_L(i,j)}" /> is the representation of <img src="https://s0.wp.com/latex.php?latex=%7BL%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L'}" class="latex" title="{L'}" /> in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%5B%3C%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}[&lt;]}" class="latex" title="{\mathsf{FO}[&lt;]}" />. We will show that such a <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi_L%28i%2Cj%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi_L(i,j)}" class="latex" title="{\phi_L(i,j)}" /> exists via induction on <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L}" class="latex" title="{L}" />. This is sufficient, as for a given symbol <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{n}" class="latex" title="{n}" /> that always represents the length of a string <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{x}" class="latex" title="{x}" />, <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi_L%280%2Cn%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi_L(0,n)}" class="latex" title="{\phi_L(0,n)}" /> is the formula in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%5B%3C%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}[&lt;]}" class="latex" title="{\mathsf{FO}[&lt;]}" /> representing the language <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L}" class="latex" title="{L}" />. </p>
+<p>
+First, we must show that <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi_L%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi_L}" class="latex" title="{\phi_L}" /> is in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%5B%3C%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}[&lt;]}" class="latex" title="{\mathsf{FO}[&lt;]}" /> for <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L}" class="latex" title="{L}" /> one of the basis languages, <img src="https://s0.wp.com/latex.php?latex=%7B%5Cemptyset%2C+%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\emptyset, \epsilon}" class="latex" title="{\emptyset, \epsilon}" />, and <img src="https://s0.wp.com/latex.php?latex=%7Bc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{c}" class="latex" title="{c}" />, for some <img src="https://s0.wp.com/latex.php?latex=%7Bc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{c}" class="latex" title="{c}" /> in <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\Sigma}" class="latex" title="{\Sigma}" />. We have that:</p>
+<p></p><p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cbegin%7Barray%7D%7Brcl%7D++%5Cphi_%5Cemptyset%28i%2Cj%29+%26%3D%26+%5Ctexttt%7Bfalse%7D%3B%5C%5C+%5Cphi_%5Cepsilon%28i%2Cj%29+%26%3D%26+i%3Dj%3B%5C%5C+%5Cphi_c%28i%2Cj%29+%26%3D%26+%28X_c%28i%29%5Cland+S%28i%2Cj%29%29.+%5Cend%7Barray%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \begin{array}{rcl}  \phi_\emptyset(i,j) &amp;=&amp; \texttt{false};\\ \phi_\epsilon(i,j) &amp;=&amp; i=j;\\ \phi_c(i,j) &amp;=&amp; (X_c(i)\land S(i,j)). \end{array} " class="latex" title="\displaystyle  \begin{array}{rcl}  \phi_\emptyset(i,j) &amp;=&amp; \texttt{false};\\ \phi_\epsilon(i,j) &amp;=&amp; i=j;\\ \phi_c(i,j) &amp;=&amp; (X_c(i)\land S(i,j)). \end{array} " /></p>
+<p>
+Now, we must show that given star-free languages <img src="https://s0.wp.com/latex.php?latex=%7BL_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L_1}" class="latex" title="{L_1}" /> and <img src="https://s0.wp.com/latex.php?latex=%7BL_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L_2}" class="latex" title="{L_2}" /> with FO<img src="https://s0.wp.com/latex.php?latex=%7B%5B%3C%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{[&lt;]}" class="latex" title="{[&lt;]}" /> translations <img src="https://s0.wp.com/latex.php?latex=%7B%5Cpsi_1%28i%2Cj%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\psi_1(i,j)}" class="latex" title="{\psi_1(i,j)}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B%5Cpsi_2%28i%2Cj%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\psi_2(i,j)}" class="latex" title="{\psi_2(i,j)}" /> respectively, we have <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi_%7BL_1%5Ccup+L_2%7D%28i%2Cj%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi_{L_1\cup L_2}(i,j)}" class="latex" title="{\phi_{L_1\cup L_2}(i,j)}" />, <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi_%7BL_1%5Ccdot+L_2%7D%28i%2Cj%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi_{L_1\cdot L_2}(i,j)}" class="latex" title="{\phi_{L_1\cdot L_2}(i,j)}" />, and <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi_%7B%5Csim+L_1%7D%28i%2Cj%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi_{\sim L_1}(i,j)}" class="latex" title="{\phi_{\sim L_1}(i,j)}" /> are in <img src="https://s0.wp.com/latex.php?latex=%7B%5Csf%7BFO%7D%5B%3C%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\sf{FO}[&lt;]}" class="latex" title="{\sf{FO}[&lt;]}" />. Then: </p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cbegin%7Barray%7D%7Brcl%7D++%5Cphi_%7BL_1%5Ccup+L_2%7D%28i%2Cj%29%26%3D%26%5Cpsi_1%28i%2Cj%29+%5Clor+%5Cpsi_2%28i%2Cj%29%3B%5C%5C+%5C%5C+%5Cphi_%7BL_1%5Ccdot+L_2%7D%28i%2Cj%29%26%3D%26%5Cexists+k%28i%5Cleq+k+%5Cland+k+%5Cleq+j%29+%28%5Cpsi_1%28i%2Ck%29+%5Cland+%5Cpsi_2%28k%2Cj%29%29%3B%5C%5C+%5C%5C+%5Cphi_%7B%5Csim+L_1%7D%28i%2Cj%29%26%3D%26%5Clnot+%5Cpsi_%7B1%7D%28i%2Cj%29.+%5Cend%7Barray%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \begin{array}{rcl}  \phi_{L_1\cup L_2}(i,j)&amp;=&amp;\psi_1(i,j) \lor \psi_2(i,j);\\ \\ \phi_{L_1\cdot L_2}(i,j)&amp;=&amp;\exists k(i\leq k \land k \leq j) (\psi_1(i,k) \land \psi_2(k,j));\\ \\ \phi_{\sim L_1}(i,j)&amp;=&amp;\lnot \psi_{1}(i,j). \end{array} " class="latex" title="\displaystyle  \begin{array}{rcl}  \phi_{L_1\cup L_2}(i,j)&amp;=&amp;\psi_1(i,j) \lor \psi_2(i,j);\\ \\ \phi_{L_1\cdot L_2}(i,j)&amp;=&amp;\exists k(i\leq k \land k \leq j) (\psi_1(i,k) \land \psi_2(k,j));\\ \\ \phi_{\sim L_1}(i,j)&amp;=&amp;\lnot \psi_{1}(i,j). \end{array} " /></p>
+<p>
+Since star-free languages can be obtained by applying the union, concatenation, and complementation operations a finite number of times on <img src="https://s0.wp.com/latex.php?latex=%7B%5Cemptyset%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\emptyset}" class="latex" title="{\emptyset}" /> and singleton subsets of <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\Sigma}" class="latex" title="{\Sigma}" />, this completes the proof of <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BSF%7D+%5Csubseteq+%5Cmathsf%7BFO%7D%5B%3C%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{SF} \subseteq \mathsf{FO}[&lt;]}" class="latex" title="{\mathsf{SF} \subseteq \mathsf{FO}[&lt;]}" />. <img src="https://s0.wp.com/latex.php?latex=%5CBox&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\Box" class="latex" title="\Box" /></p>
+<p>
+</p><p></p><h2> Two Lemmas For Next Time </h2><p></p>
+<p></p><p>
+Prefatory to showing (in the next post) that <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%5B%3C%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}[&lt;]}" class="latex" title="{\mathsf{FO}[&lt;]}" /> is contained in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BSF%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{SF}}" class="latex" title="{\mathsf{SF}}" />, we prove properties about substrings on the ends of star-free languages, rather than in the middle as with the trick in the proof of Theorem 2.</p>
+<p>
+Let <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L}" class="latex" title="{L}" /> be a language over an alphabet <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\Sigma}" class="latex" title="{\Sigma}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bw%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w}" class="latex" title="{w}" /> be a word in <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\Sigma^n}" class="latex" title="{\Sigma^n}" /> for some <img src="https://s0.wp.com/latex.php?latex=%7Bn%5Cin+%5Cmathbb%7BN%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{n\in \mathbb{N}}" class="latex" title="{n\in \mathbb{N}}" />. Define <img src="https://s0.wp.com/latex.php?latex=%7BL%2Fw%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L/w}" class="latex" title="{L/w}" />, the <em>right quotient</em> of <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L}" class="latex" title="{L}" /> by <img src="https://s0.wp.com/latex.php?latex=%7Bw%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w}" class="latex" title="{w}" />, by <img src="https://s0.wp.com/latex.php?latex=%7BL%2Fw+%3D%5C%7Bv%3A+vw+%5Cin+L%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L/w =\{v: vw \in L\}}" class="latex" title="{L/w =\{v: vw \in L\}}" /> and <img src="https://s0.wp.com/latex.php?latex=%7BL%5Cbackslash+w%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L\backslash w}" class="latex" title="{L\backslash w}" />, the <em>left quotient</em> of <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L}" class="latex" title="{L}" /> by <img src="https://s0.wp.com/latex.php?latex=%7Bw%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w}" class="latex" title="{w}" />, by <img src="https://s0.wp.com/latex.php?latex=%7BL%5Cbackslash+w%3D%5C%7Bv%3Awv+%5Cin+L%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L\backslash w=\{v:wv \in L\}}" class="latex" title="{L\backslash w=\{v:wv \in L\}}" />.  First we handle right quotients:</p>
+<blockquote><p><b>Lemma 3</b> <em> If <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{L}" class="latex" title="{L}" /> is star-free, then <img src="https://s0.wp.com/latex.php?latex=%7BL%2Fw%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{L/w}" class="latex" title="{L/w}" /> is star-free. </em>
+</p></blockquote>
+<p></p><p>
+<em>Proof:</em>  For any word <img src="https://s0.wp.com/latex.php?latex=%7Bw%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w}" class="latex" title="{w}" /> over <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\Sigma}" class="latex" title="{\Sigma}" /> we define a function <img src="https://s0.wp.com/latex.php?latex=%7Bf_w%28%5Calpha%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{f_w(\alpha)}" class="latex" title="{f_w(\alpha)}" /> by <img src="https://s0.wp.com/latex.php?latex=%7Bf_w%28%5Calpha%29%3D%5Calpha%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{f_w(\alpha)=\alpha'}" class="latex" title="{f_w(\alpha)=\alpha'}" /> where <img src="https://s0.wp.com/latex.php?latex=%7BL%28%5Calpha%27%29%3DL%28%5Calpha%29%2Fw%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L(\alpha')=L(\alpha)/w}" class="latex" title="{L(\alpha')=L(\alpha)/w}" />. If <img src="https://s0.wp.com/latex.php?latex=%7Bw+%3D+%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w = \epsilon}" class="latex" title="{w = \epsilon}" />, then <img src="https://s0.wp.com/latex.php?latex=%7Bf_w%28%5Calpha%29%3D%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{f_w(\alpha)=\alpha}" class="latex" title="{f_w(\alpha)=\alpha}" />, and so the statement of the lemma trivially holds. So let <img src="https://s0.wp.com/latex.php?latex=%7Bw+%3D+vc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w = vc}" class="latex" title="{w = vc}" /> for some string <img src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{v}" class="latex" title="{v}" /> and character <img src="https://s0.wp.com/latex.php?latex=%7Bc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{c}" class="latex" title="{c}" />. Note that <img src="https://s0.wp.com/latex.php?latex=%7BL%2F%28vc%29+%3D+%28L%2Fc%29%2Fv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L/(vc) = (L/c)/v}" class="latex" title="{L/(vc) = (L/c)/v}" />. Thus <img src="https://s0.wp.com/latex.php?latex=%7Bf_%7Bvc%7D%28%5Calpha%29+%3D+f_v%28f_c%28%5Calpha%29%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{f_{vc}(\alpha) = f_v(f_c(\alpha))}" class="latex" title="{f_{vc}(\alpha) = f_v(f_c(\alpha))}" /> for all <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\alpha}" class="latex" title="{\alpha}" />. Hence it suffices to define <img src="https://s0.wp.com/latex.php?latex=%7Bf_c%28%5Calpha%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{f_c(\alpha)}" class="latex" title="{f_c(\alpha)}" /> for any single character <img src="https://s0.wp.com/latex.php?latex=%7Bc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{c}" class="latex" title="{c}" /> by recursion on <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\alpha}" class="latex" title="{\alpha}" />. We have:</p>
+<p></p><p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cbegin%7Barray%7D%7Brcl%7D++f_c%28%5Cemptyset%29%26%3D%26%5Cemptyset%3B%5C%5C+f_c%28%5Cepsilon%29%26%3D%26%5Cemptyset%3B%5C%5C+f_c%28c%29%26%3D%26%5Cepsilon%3B%5C%5C+f_c%28a%29%26%3D%26%5Cemptyset%2C+%5Cend%7Barray%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \begin{array}{rcl}  f_c(\emptyset)&amp;=&amp;\emptyset;\\ f_c(\epsilon)&amp;=&amp;\emptyset;\\ f_c(c)&amp;=&amp;\epsilon;\\ f_c(a)&amp;=&amp;\emptyset, \end{array} " class="latex" title="\displaystyle  \begin{array}{rcl}  f_c(\emptyset)&amp;=&amp;\emptyset;\\ f_c(\epsilon)&amp;=&amp;\emptyset;\\ f_c(c)&amp;=&amp;\epsilon;\\ f_c(a)&amp;=&amp;\emptyset, \end{array} " /></p>
+<p>
+and recursively:</p>
+<p></p><p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cbegin%7Barray%7D%7Brcl%7D++f_c%28%5Calpha+%5Ccup%5Cbeta%29%26%3D%26f_c%28%5Calpha%29+%5Ccup+f_c%28%5Cbeta%29%3B%5C%5C%5C%5C+f_c%28%5Calpha%5Ccdot%5Cbeta%29%26%3D%26%5Cbegin%7Bcases%7D+%5Calpha%5Ccdot+f_c%28%5Cbeta%29+%26+%5Cepsilon%5Cnot%5Cin+L%28%5Cbeta%29%2C+%5C%5C+%5Calpha%5Ccdot+f_c%28%5Cbeta%29+%5Ccup+f_c%28%5Calpha%29+%26+otherwise%5Ctext%7B%3B%7D+%5Cend%7Bcases%7D%5C%5C%5C%5C+f_c%28%5Csim%5Calpha%29%26%3D%26%5Csim+f_c%28%5Calpha%29.+%5Cend%7Barray%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \begin{array}{rcl}  f_c(\alpha \cup\beta)&amp;=&amp;f_c(\alpha) \cup f_c(\beta);\\\\ f_c(\alpha\cdot\beta)&amp;=&amp;\begin{cases} \alpha\cdot f_c(\beta) &amp; \epsilon\not\in L(\beta), \\ \alpha\cdot f_c(\beta) \cup f_c(\alpha) &amp; otherwise\text{;} \end{cases}\\\\ f_c(\sim\alpha)&amp;=&amp;\sim f_c(\alpha). \end{array} " class="latex" title="\displaystyle  \begin{array}{rcl}  f_c(\alpha \cup\beta)&amp;=&amp;f_c(\alpha) \cup f_c(\beta);\\\\ f_c(\alpha\cdot\beta)&amp;=&amp;\begin{cases} \alpha\cdot f_c(\beta) &amp; \epsilon\not\in L(\beta), \\ \alpha\cdot f_c(\beta) \cup f_c(\alpha) &amp; otherwise\text{;} \end{cases}\\\\ f_c(\sim\alpha)&amp;=&amp;\sim f_c(\alpha). \end{array} " /></p>
+<p>
+In general, if <img src="https://s0.wp.com/latex.php?latex=%7Bw+%3D+c_1+c_2+%5Ccdots+c_%7Bn-1%7D+c_n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w = c_1 c_2 \cdots c_{n-1} c_n}" class="latex" title="{w = c_1 c_2 \cdots c_{n-1} c_n}" />, then</p>
+<p></p><p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+L%2Fw+%3D+f_%7Bc_1%7D%28f_%7Bc_2%7D%28%5Cdots+f_%7Bc_%7Bn-1%7D%7D%28f_%7Bc_n%7D%28%5Calpha%29%29%5Cdots%29%29.&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle L/w = f_{c_1}(f_{c_2}(\dots f_{c_{n-1}}(f_{c_n}(\alpha))\dots))." class="latex" title="\displaystyle L/w = f_{c_1}(f_{c_2}(\dots f_{c_{n-1}}(f_{c_n}(\alpha))\dots))." /></p>
+<p><img src="https://s0.wp.com/latex.php?latex=%5CBox&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\Box" class="latex" title="\Box" /></p>
+<blockquote><p><b>Lemma 4</b> <em> If <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{L}" class="latex" title="{L}" /> is star-free, then <img src="https://s0.wp.com/latex.php?latex=%7BL%5Cbackslash+w%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" alt="{L\backslash w}" class="latex" title="{L\backslash w}" /> is star-free. </em>
+</p></blockquote>
+<p></p><p>
+The proof of Lemma 4 is similar to the proof of Lemma 3. The main differences lie in the concatenation subcase for the <img src="https://s0.wp.com/latex.php?latex=%7Bw%3Dc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w=c}" class="latex" title="{w=c}" /> case and the order of quotienting when using this operation repeatedly.</p>
+<p>
+<em>Proof:</em>  For any word <img src="https://s0.wp.com/latex.php?latex=%7Bw%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w}" class="latex" title="{w}" /> over <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\Sigma}" class="latex" title="{\Sigma}" /> we define a function <img src="https://s0.wp.com/latex.php?latex=%7Bf_w%28%5Calpha%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{f_w(\alpha)}" class="latex" title="{f_w(\alpha)}" /> by <img src="https://s0.wp.com/latex.php?latex=%7Bf_w%28%5Calpha%29%3D%5Calpha%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{f_w(\alpha)=\alpha'}" class="latex" title="{f_w(\alpha)=\alpha'}" /> where <img src="https://s0.wp.com/latex.php?latex=%7BL%28%5Calpha%27%29%3DL%28%5Calpha%29%5Cbackslash+w%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L(\alpha')=L(\alpha)\backslash w}" class="latex" title="{L(\alpha')=L(\alpha)\backslash w}" />. If <img src="https://s0.wp.com/latex.php?latex=%7Bw+%3D+%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w = \epsilon}" class="latex" title="{w = \epsilon}" />, then <img src="https://s0.wp.com/latex.php?latex=%7Bf_w%28%5Calpha%29%3D%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{f_w(\alpha)=\alpha}" class="latex" title="{f_w(\alpha)=\alpha}" />, and so the statement of the lemma trivially holds. So let <img src="https://s0.wp.com/latex.php?latex=%7Bw+%3D+vc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w = vc}" class="latex" title="{w = vc}" /> for some string <img src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{v}" class="latex" title="{v}" /> and character <img src="https://s0.wp.com/latex.php?latex=%7Bc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{c}" class="latex" title="{c}" />. Note that <img src="https://s0.wp.com/latex.php?latex=%7BL%5Cbackslash%28vc%29+%3D+%28L%5Cbackslash+v%29%5Cbackslash+c%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L\backslash(vc) = (L\backslash v)\backslash c}" class="latex" title="{L\backslash(vc) = (L\backslash v)\backslash c}" />. Thus <img src="https://s0.wp.com/latex.php?latex=%7Bf_%7Bvc%7D%28%5Calpha%29+%3D+f_c%28f_v%28%5Calpha%29%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{f_{vc}(\alpha) = f_c(f_v(\alpha))}" class="latex" title="{f_{vc}(\alpha) = f_c(f_v(\alpha))}" /> for all <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\alpha}" class="latex" title="{\alpha}" />. Hence it suffices to define <img src="https://s0.wp.com/latex.php?latex=%7Bf_c%28%5Calpha%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{f_c(\alpha)}" class="latex" title="{f_c(\alpha)}" /> for any single character <img src="https://s0.wp.com/latex.php?latex=%7Bc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{c}" class="latex" title="{c}" /> by recursion on <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\alpha}" class="latex" title="{\alpha}" />. We have:</p>
+<p></p><p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cbegin%7Barray%7D%7Brcl%7D++f_c%28%5Cemptyset%29%26%3D%26%5Cemptyset%3B%5C%5C+f_c%28%5Cepsilon%29%26%3D%26%5Cemptyset%3B%5C%5C+f_c%28c%29%26%3D%26%5Cepsilon%3B%5C%5C+f_c%28a%29%26%3D%26%5Cemptyset.%5C%5C+%5Cend%7Barray%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \begin{array}{rcl}  f_c(\emptyset)&amp;=&amp;\emptyset;\\ f_c(\epsilon)&amp;=&amp;\emptyset;\\ f_c(c)&amp;=&amp;\epsilon;\\ f_c(a)&amp;=&amp;\emptyset.\\ \end{array} " class="latex" title="\displaystyle  \begin{array}{rcl}  f_c(\emptyset)&amp;=&amp;\emptyset;\\ f_c(\epsilon)&amp;=&amp;\emptyset;\\ f_c(c)&amp;=&amp;\epsilon;\\ f_c(a)&amp;=&amp;\emptyset.\\ \end{array} " /></p>
+<p>
+and recursively:</p>
+<p></p><p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cbegin%7Barray%7D%7Brcl%7D++f_c%28%5Calpha%5Ccup%5Cbeta%29%26%3D%26f_c%28%5Calpha%29%5Ccup+f_c%28%5Cbeta%29%3B%5C%5C%5C%5C+f_c%28%5Calpha%5Ccdot%5Cbeta%29%26%3D%26%5Cbegin%7Bcases%7D+f_c%28%5Calpha%29%5Ccdot%5Cbeta+%26+%5Cepsilon%5Cnot%5Cin+L%28%5Calpha%29%2C+%5C%5C+f_c%28%5Calpha%29%5Ccdot%5Cbeta+%5Ccup+f_c%5Cbeta%29+%26+otherwise%5Ctext%7B%3B%7D+%5Cend%7Bcases%7D%5C%5C%5C%5C+f_c%28%5Csim+%5Calpha%29%26%3D%26%5Csim+f_c%28%5Calpha%29.+%5Cend%7Barray%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  \begin{array}{rcl}  f_c(\alpha\cup\beta)&amp;=&amp;f_c(\alpha)\cup f_c(\beta);\\\\ f_c(\alpha\cdot\beta)&amp;=&amp;\begin{cases} f_c(\alpha)\cdot\beta &amp; \epsilon\not\in L(\alpha), \\ f_c(\alpha)\cdot\beta \cup f_c\beta) &amp; otherwise\text{;} \end{cases}\\\\ f_c(\sim \alpha)&amp;=&amp;\sim f_c(\alpha). \end{array} " class="latex" title="\displaystyle  \begin{array}{rcl}  f_c(\alpha\cup\beta)&amp;=&amp;f_c(\alpha)\cup f_c(\beta);\\\\ f_c(\alpha\cdot\beta)&amp;=&amp;\begin{cases} f_c(\alpha)\cdot\beta &amp; \epsilon\not\in L(\alpha), \\ f_c(\alpha)\cdot\beta \cup f_c\beta) &amp; otherwise\text{;} \end{cases}\\\\ f_c(\sim \alpha)&amp;=&amp;\sim f_c(\alpha). \end{array} " /></p>
+<p>
+In general, if <img src="https://s0.wp.com/latex.php?latex=%7Bw+%3D+c_1+c_2+%5Ccdots+c_%7Bn-1%7D+c_n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w = c_1 c_2 \cdots c_{n-1} c_n}" class="latex" title="{w = c_1 c_2 \cdots c_{n-1} c_n}" />, then</p>
+<p></p><p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+L%5Cbackslash+w+%3D+f_%7Bc_n%7D%28f_%7Bc_%7Bn-1%7D%7D%28%5Cdots+f_%7Bc_%7B2%7D%7D%28f_%7Bc_1%7D%28%5Calpha%29%29%5Cdots%29%29.&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle L\backslash w = f_{c_n}(f_{c_{n-1}}(\dots f_{c_{2}}(f_{c_1}(\alpha))\dots))." class="latex" title="\displaystyle L\backslash w = f_{c_n}(f_{c_{n-1}}(\dots f_{c_{2}}(f_{c_1}(\alpha))\dots))." /></p>
+<p><img src="https://s0.wp.com/latex.php?latex=%5CBox&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\Box" class="latex" title="\Box" /></p>
+<p>
+</p><p></p><h2> Open Problems </h2><p></p>
+<p></p><p>
+There are richer systems such as <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%28%2B%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}(+)}" class="latex" title="{\mathsf{FO}(+)}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%28%2B%2C%5Ccdot%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}(+,\cdot)}" class="latex" title="{\mathsf{FO}(+,\cdot)}" />. Note that <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%28%2B%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}(+)}" class="latex" title="{\mathsf{FO}(+)}" /> allows defining the <img src="https://s0.wp.com/latex.php?latex=%7B%3C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{&lt;}" class="latex" title="{&lt;}" /> relation via <img src="https://s0.wp.com/latex.php?latex=%7Bi+%3C+j+%5Cequiv+%28%5Cexists+k%29+%5Clnot%28k%3D+0%29+%5Cland+i+%2B+k+%3D+j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i &lt; j \equiv (\exists k) \lnot(k= 0) \land i + k = j}" class="latex" title="{i &lt; j \equiv (\exists k) \lnot(k= 0) \land i + k = j}" />. We can define non-regular languages such as <img src="https://s0.wp.com/latex.php?latex=%7B%7Ba%5En+b%5En%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{{a^n b^n}}" class="latex" title="{{a^n b^n}}" /> in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%28%2B%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}(+)}" class="latex" title="{\mathsf{FO}(+)}" />. The class <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%28%2B%2C%5Ctimes%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}(+,\times)}" class="latex" title="{\mathsf{FO}(+,\times)}" /> famously equals uniform <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BAC%5E0%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{AC^0}}" class="latex" title="{\mathsf{AC^0}}" />, see chapter 5 of Neil Immerman’s <a href="https://link.springer.com/book/10.1007/978-1-4612-0539-5">book</a> <em>Descriptive Complexity</em>. Thus we hope our new style for proving <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%5B%3C%5D+%5Csubseteq+%5Cmathsf%7BSF%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}[&lt;] \subseteq \mathsf{SF}}" class="latex" title="{\mathsf{FO}[&lt;] \subseteq \mathsf{SF}}" /> (to come in the next part) will build a nice foundation for visualizing these higher results.</p>
+<p></p></font></font></div>
+
+
+
+
+
+
+
+<p class="date">
+by KWRegan <a href="https://rjlipton.wordpress.com/2020/03/21/star-free-regular-languages-and-logic/"><span class="datestr">at March 21, 2020 08:54 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -1067,7 +1239,7 @@ by dstheory <a href="https://dstheory.wordpress.com/2020/03/19/friday-march-27-s
 
 
 
-<figure class="wp-block-image size-large is-resized"><img src="https://theorydish.files.wordpress.com/2020/03/blog_fig1.png?w=1024" alt="" width="404" class="wp-image-1572" height="192" /></figure>
+<figure class="wp-block-image size-large is-resized"><img width="404" alt="" src="https://theorydish.files.wordpress.com/2020/03/blog_fig1.png?w=1024" class="wp-image-1572" height="192" /></figure>
 
 
 
@@ -1099,7 +1271,7 @@ by dstheory <a href="https://dstheory.wordpress.com/2020/03/19/friday-march-27-s
 
 
 
-<figure class="wp-block-image size-large is-resized"><img src="https://theorydish.files.wordpress.com/2020/03/blog_fig2.png?w=1024" alt="" width="452" class="wp-image-1581" height="223" /></figure>
+<figure class="wp-block-image size-large is-resized"><img width="452" alt="" src="https://theorydish.files.wordpress.com/2020/03/blog_fig2.png?w=1024" class="wp-image-1581" height="223" /></figure>
 
 
 
@@ -1127,7 +1299,7 @@ by dstheory <a href="https://dstheory.wordpress.com/2020/03/19/friday-march-27-s
 
 
 
-<figure class="wp-block-image size-large is-resized"><img src="https://theorydish.files.wordpress.com/2020/03/blog_fig3.png?w=856" alt="" width="370" class="wp-image-1590" height="157" /></figure>
+<figure class="wp-block-image size-large is-resized"><img width="370" alt="" src="https://theorydish.files.wordpress.com/2020/03/blog_fig3.png?w=856" class="wp-image-1590" height="157" /></figure>
 
 
 
@@ -1402,18 +1574,18 @@ by Scott <a href="https://www.scottaaronson.com/blog/?p=4684"><span class="dates
 <p style="text-align: center;"><img src="https://s0.wp.com/latex.php?latex=%7B%5Crm+vol%7D+%28rK%29+%5Cle+cn%5E2&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="{\rm vol} (rK) \le cn^2" class="latex" title="{\rm vol} (rK) \le cn^2" />.</p>
 <p>The best earlier upper bound was <img src="https://s0.wp.com/latex.php?latex=n%5E%7B%5Clog+%5Clog+n%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="n^{\log \log n}" class="latex" title="n^{\log \log n}" />.</p>
 <p>One surprising aspect of the proof is the use of finite field Kakeya-type questions. Since the<a href="https://arxiv.org/abs/0803.2336"> breakthrough</a> by <a href="https://terrytao.wordpress.com/2008/03/24/dvirs-proof-of-the-finite-field-kakeya-conjecture/">Zeev Dvir</a>, many people had hopes for applications from the finite fields results to the Euclidean setting (in particular, to the Euclidean Kakeya problem itself) and it is rare to see such applications. The proof here relies on results by  Dvir, Kopparty, Saraf, Sudan, and Lev. The Ordentlich-Regev-Weiss paper is not yet on the arXiv but the lecture gives a good picture about the results and the proofs.</p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/covering-radius.png"><img src="https://gilkalai.files.wordpress.com/2020/03/covering-radius.png?w=640&amp;h=325" alt="" width="640" class="alignnone size-full wp-image-19534" height="325" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/covering-radius.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/03/covering-radius.png?w=640&amp;h=325" class="alignnone size-full wp-image-19534" height="325" /></a></p>
 <p><span style="color: #ff0000;">The definition of the covering density of L with respect to a convex body K</span></p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/coveringdensity.png"><img src="https://gilkalai.files.wordpress.com/2020/03/coveringdensity.png?w=640&amp;h=291" alt="" width="640" class="alignnone size-full wp-image-19536" height="291" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/coveringdensity.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/03/coveringdensity.png?w=640&amp;h=291" class="alignnone size-full wp-image-19536" height="291" /></a></p>
 <p><span style="color: #ff0000;">The definition of the covering density of K</span></p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/bw2.png"><img src="https://gilkalai.files.wordpress.com/2020/03/bw2.png?w=640&amp;h=388" alt="" width="640" class="alignnone size-full wp-image-19537" height="388" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/bw2.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/03/bw2.png?w=640&amp;h=388" class="alignnone size-full wp-image-19537" height="388" /></a></p>
 <p><span style="color: #ff0000;">Old results for the Euclidean ball</span></p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/bw3.png"><img src="https://gilkalai.files.wordpress.com/2020/03/bw3.png?w=640&amp;h=453" alt="" width="640" class="alignnone size-full wp-image-19538" height="453" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/bw3.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/03/bw3.png?w=640&amp;h=453" class="alignnone size-full wp-image-19538" height="453" /></a></p>
 <p><span style="color: #ff0000;">Old results for general convex bodies</span></p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/bw6.png"><img src="https://gilkalai.files.wordpress.com/2020/03/bw6.png?w=640&amp;h=519" alt="" width="640" class="alignnone size-full wp-image-19539" height="519" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/bw6.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/03/bw6.png?w=640&amp;h=519" class="alignnone size-full wp-image-19539" height="519" /></a></p>
 <p><span style="color: #ff0000;">The first main result</span></p>
 <p> </p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/bw7.png"><img src="https://gilkalai.files.wordpress.com/2020/03/bw7.png?w=640&amp;h=474" alt="" width="640" class="alignnone size-full wp-image-19541" height="474" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/bw7.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/03/bw7.png?w=640&amp;h=474" class="alignnone size-full wp-image-19541" height="474" /></a></p>
 <p><span style="color: #ff0000;">The required finite field Kakeya theorem.</span></p></div>
 
 
@@ -1532,7 +1704,8 @@ by plustcs <a href="https://tcsplus.wordpress.com/2020/03/17/updated-spring-sche
 <p>
 Neil L. is a Leprechaun. He has visited me once every year since I started GLL. I had never seen a leprechaun before I began the blog—there must be some connection.</p>
 <p>
-Today, Ken and I want to share the experiences we had with him on this morning of St. Patrick’s Day.</p>
+Today, Ken and I want to share the experiences we had with him on this morning of St. Patrick’s Day.<br />
+<span id="more-16804"></span></p>
 <p>
 I thought because of the pandemic that he might not come. I thought that since New York City is on virtual lock-down he might not come. So I decided not to wait up for his visit, which always occurs in the wee hours of the morning. I looked it up: Wee hours is between 1am and 4am. We—that is Kathryn and I not wee—went to bed before midnight.</p>
 <p>
@@ -1934,7 +2107,7 @@ We revisit one original motivation for the study of no-signaling multi-prover
 <div class="entry">
 <div class="content" lang="en">
 <p>Things do not look that good, and these are difficult times. But here on the blog we have plenty of things to cheer you up and assure you. And today we point to two book proofs — two book proofs to the same theorem– and, as a matter of fact, two book proofs to the same theorem by the same person, <a href="http://www2.math.technion.ac.il/~room/">Rom Pinchasi</a>.  One of the proofs, the one chosen for presentation, is by Rom Pinchasi and  <a href="http://polyanskii.com/">Alexandr Polyanskii</a>.</p>
-<p><a href="https://gilkalai.files.wordpress.com/2015/08/drg_1567-douglas-guthrie-photos.jpg"><img src="https://gilkalai.files.wordpress.com/2015/08/drg_1567-douglas-guthrie-photos.jpg?w=640&amp;h=424" alt="" width="640" class="alignnone size-full wp-image-13104" height="424" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2015/08/drg_1567-douglas-guthrie-photos.jpg"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2015/08/drg_1567-douglas-guthrie-photos.jpg?w=640&amp;h=424" class="alignnone size-full wp-image-13104" height="424" /></a></p>
 <p><span style="color: #ff0000;">Rom Pinchasi has an immense proving power, both for difficult proofs at all costs, for book proofs, and for a large variety of proofs in between. (See, for example, <a href="https://gilkalai.wordpress.com/2010/02/03/a-discrepency-problem-for-planar-configurations/"> this post</a>.)</span></p>
 <p>Before moving on, let me mention that there is a <a href="https://terrytao.wordpress.com/2020/03/10/options-for-giving-math-talks-and-lectures-online/">timely blog post</a> by Terry Tao on Online teaching, and here is <a href="https://mathoverflow.net/questions/349283/software-and-ideas-for-workshops-and-conferences-with-long-distance-participants">a related MO question about online conferences</a> that I asked last December.</p>
 <h2>Proofs from the book</h2>
@@ -2287,7 +2460,7 @@ by Manu <a href="https://emanueleviola.wordpress.com/2020/03/12/1348-1665-2020/"
 <tbody>
 <tr>
 <td>
-<a href="https://rjlipton.files.wordpress.com/2020/03/dorfman.jpg"><img src="https://rjlipton.files.wordpress.com/2020/03/dorfman.jpg?w=125&amp;h=170" alt="" width="125" class="alignright wp-image-16780" height="170" /></a>
+<a href="https://rjlipton.files.wordpress.com/2020/03/dorfman.jpg"><img width="125" alt="" src="https://rjlipton.files.wordpress.com/2020/03/dorfman.jpg?w=125&amp;h=170" class="alignright wp-image-16780" height="170" /></a>
 </td>
 </tr>
 <tr>
@@ -2308,7 +2481,7 @@ The point of group testing is that it can reduce the number of tests needed to f
 </p><p></p><h2> Group Testing </h2><p></p>
 <p></p><p>
 Dorfman created the notion of <em>group testing</em> in 1943. You could say he was driven by the need to test light bulbs:</p>
-<p><a href="https://rjlipton.files.wordpress.com/2020/03/test.png"><img src="https://rjlipton.files.wordpress.com/2020/03/test.png?w=300&amp;h=188" alt="" width="300" class="aligncenter size-medium wp-image-16781" height="188" /></a></p>
+<p><a href="https://rjlipton.files.wordpress.com/2020/03/test.png"><img width="300" alt="" src="https://rjlipton.files.wordpress.com/2020/03/test.png?w=300&amp;h=188" class="aligncenter size-medium wp-image-16781" height="188" /></a></p>
 <p>As Wikipedia group-testing <a href="https://en.wikipedia.org/wiki/Group_testing">article</a> explains:</p>
 <blockquote><p><b> </b> <em> [Suppose] one is searching for a broken bulb among six light bulbs. Here, the first three are connected to a power supply, and they light up (A). This indicates that the broken bulb must be one of the last three (B). If instead the bulbs did not light up, one could be sure that the broken bulb was among the first three. Continuing this procedure can locate the broken bulb in no more than three tests, compared to a maximum of six tests if the bulbs are checked individually. </em>
 </p></blockquote>
@@ -2332,7 +2505,7 @@ As we write, New York Governor Andrew Cuomo has just declared a cap of 500 atten
 The cap is based on the likelihood of <img src="https://s0.wp.com/latex.php?latex=%7BN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{N}" class="latex" title="{N}" /> persons including someone who is already infected. That likelihood in turn is based on the density of known cases and what is known about the proportion of unknown to known cases. The virus has a long (two weeks) incubation time during which it is contagious but not symptomatic.</p>
 <p>
 Here is a graph from a PSA <a href="https://marginalrevolution.com/marginalrevolution/2020/03/covid-19-event-risk-assessment-planner.html">item</a> posted just today by Alex Tabarrok for the <em>Marginal Revolution</em> blog (note that the calculations are by <a href="https://biosciences.gatech.edu/people/joshua-weitz">Joshua</a> <a href="http://ecotheory.biology.gatech.edu/">Weitz</a> of Georgia Tech):</p>
-<p><a href="https://rjlipton.files.wordpress.com/2020/03/riskassessment-1024x776-1.jpg"><img src="https://rjlipton.files.wordpress.com/2020/03/riskassessment-1024x776-1.jpg?w=550&amp;h=425" alt="" width="550" class="aligncenter wp-image-16782" height="425" /></a></p>
+<p><a href="https://rjlipton.files.wordpress.com/2020/03/riskassessment-1024x776-1.jpg"><img width="550" alt="" src="https://rjlipton.files.wordpress.com/2020/03/riskassessment-1024x776-1.jpg?w=550&amp;h=425" class="aligncenter wp-image-16782" height="425" /></a></p>
 <p>
 The <img src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{y}" class="latex" title="{y}" />-axis is the number of cases (in proportion to the US on the whole) and the <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{x}" class="latex" title="{x}" />-axis is the group size. Which axis is more important—has more effect on the danger? Tabarrok notes:</p>
 <blockquote><p><b> </b> <em> Now here is the most important point. It’s the size of the group, not the number of carriers that most drives the result. </em>
@@ -2343,7 +2516,7 @@ This involves comparing two partial derivatives. The <a href="https://marginalre
 I, Ken, have been connected this week to another example. I was statistically monitoring the World Senior Team Chess Championship, which began last Friday in Prague. Almost 500 players in teams of 4 or 5 players took part. Initially the players were roughly evenly divided between two halls. Effective Tuesday, a cap of 100 was declared for the Czech Republic, so more playing rooms were found and spectators were banned. Today, however, after an update on the density of cases in the Czech Republic, the cap was lowered to 30 effective tomorrow.  Thus the tournament was forced to finish today, two rounds earlier than planned. Even though chess events have a lower size footprint than all of the spectator sports whose seasons have been suspended in recent days, the growth of the outbreak is making cancellation the only reasonable policy for all but the smallest events.</p>
 <p>
 The main purpose of these and other <em>social isolation</em> measures is to flatten out the growth of cases. The target is not just to contain the outbreak but also to stay below the number of serious cases that our treatment systems can bear at once. Here is one of numerous versions of a <a href="https://healthblog.uofmhealth.org/wellness-prevention/flattening-curve-for-covid-19-what-does-it-mean-and-how-can-you-help">graphic</a> that is being widely circulated:</p>
-<p><a href="https://rjlipton.files.wordpress.com/2020/03/coronavirus_flattening_curve_1.jpg"><img src="https://rjlipton.files.wordpress.com/2020/03/coronavirus_flattening_curve_1.jpg?w=400&amp;h=223" alt="" width="400" class="aligncenter wp-image-16783" height="223" /></a></p>
+<p><a href="https://rjlipton.files.wordpress.com/2020/03/coronavirus_flattening_curve_1.jpg"><img width="400" alt="" src="https://rjlipton.files.wordpress.com/2020/03/coronavirus_flattening_curve_1.jpg?w=400&amp;h=223" class="aligncenter wp-image-16783" height="223" /></a></p>
 <p>
 The graphic is not necessarily talking about reducing the number of cases <em>total</em>. The area under both curves is the same. A sentence in accompanying article—</p>
 <blockquote><p><b> </b> <em> If individuals and communities take steps to slow the virus’s spread, that means the number of cases of COVID-19 will stretch out across a longer period of time. </em>
@@ -3009,100 +3182,6 @@ by Scott <a href="https://www.scottaaronson.com/blog/?p=4671"><span class="dates
 
 <p class="date">
 by Omer Reingold <a href="https://theorydish.blog/2020/03/10/cacm-through-the-lens-of-a-passionate-theoretician/"><span class="datestr">at March 10, 2020 04:14 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="tag:blogger.com,1999:blog-3722233.post-2996231259381150068">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/gasarch.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="https://blog.computationalcomplexity.org/2020/03/theorist-paul-r-young-passed-away.html">Theorist Paul R Young passed away</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://blog.computationalcomplexity.org/" title="Computational Complexity">Computational Complexity</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-In the early days of theoretical computer science, say 1960-1990 the main tools used were logic.<br />
-This made sense since, early on:<br />
-<br />
-a) Some of the basic notions like DTIME(T(n)), P, NP used Turing Machines in their definitions<br />
-<br />
-b) Some of the basic notions like reductions were modeled after similar concepts in<br />
-computability theory.<br />
-<br />
-One of the people who did much work in the interface between Logic and TCS was Paul Young.<br />
-He <a href="https://news.cs.washington.edu/2020/03/05/remembering-paul-young-1936-2019/">passed away</a> in December. Here are some highlights of his work:<br />
-<br />
-1) One of the first books that covered both computability and complexity:<br />
-<br />
-An Introduction to the general theory of Algorithms<br />
-by Machtey and Young.<br />
-<br />
-2) In Computability theory all many-one complete sets are computably isomorphic. Berman and<br />
-Hartmanis conjectured that the poly-many-one degree of the NP-complete sets was the same. This<br />
-would mean that all NP-complete sets were poly-isom (all of the known ones are).<br />
-<br />
-Mahaney and Young in the paper<br />
-<br />
-<i>Reductions Among Polynomial Isomorphism Types</i><br />
-<br />
-showed that every many-one poly degree either has one degree or has an infinite number of<br />
-degrees in a very complicated way.<br />
-<br />
-3) Recall that a <i>Cook Reduction from A to B </i>allows many queries to B, whereas a <i>Karp Reduction</i><br />
-only allows one query and your answer must be the same sense as the query.<br />
-Are there  cases where a Cook reduction is faster? Yes, from the paper<br />
-<br />
-<i>Cook reducibility is faster than Karp Reducibility</i><br />
-<br />
-by Longpre and Young<br />
-<br />
-(The original title was going to be <i>Cook is Faster than Karp</i>, but it was changed since it invoked<br />
-images of Cook and Karp in a footrace.  Hmmm. Which one would be faster?)<br />
-<br />
-<br />
-4) The <i>Boolean Hierarchy </i>is a hierarchy of iterations of NP sets. What if instead of starting with P<br />
-one started with RP (Randomized Poly time). What an intriguing notion! To find out read<br />
-<br />
-<br />
-<i>Generalized Boolean Hierarchies over RP</i><br />
-<br />
-by  Alberto Bertoni, Danilo Bruschi, Deborah Joseph, Meera Sitharam, Paul Young<br />
-<br />
-5) There are many more, mostly on the theme of the interaction of logic and computer science.<br />
-<br />
-                       I saw him speak on some of these topics and was inspired by how much one could<br />
-take notions of computability and translate them into complexity theory.  The field has gone in a<br />
-different direction since then (more combinatorial) but we still use many of the basic concepts<br />
-like reducibility.  As such we all owe a debit to Paul Young.</div>
-
-
-
-
-
-
-
-<p class="date">
-by GASARCH (noreply@blogger.com) <a href="https://blog.computationalcomplexity.org/2020/03/theorist-paul-r-young-passed-away.html"><span class="datestr">at March 10, 2020 11:42 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
