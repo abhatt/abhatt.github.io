@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-04-01T14:21:47Z</updated>
+  <updated>2020-04-01T15:21:52Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,86 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>https://blog.simons.berkeley.edu/?p=146</id>
+    <link href="https://blog.simons.berkeley.edu/2020/04/lattice-blog-reduction-part-i-bkz/" rel="alternate" type="text/html"/>
+    <title>Lattice Blog Reduction – Part I: BKZ</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">This is the first entry in a (planned) series of at least three, potentially four or five, posts about lattice block reduction. The purpose of this series is to give a high level introduction to the most popular algorithms and … <a href="https://blog.simons.berkeley.edu/2020/04/lattice-blog-reduction-part-i-bkz/">Continue reading <span class="meta-nav">→</span></a></div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>This is the first entry in a (planned) series of at least three, potentially four or five, posts about lattice block reduction. The purpose of this series is to give a high level introduction to the most popular algorithms and their analysis, with pointers to the literature for more details. The idea is to start with the obvious – the classic BKZ algorithm. In the next two posts we will look at two lesser known algorithm, which allow to highlight useful tools in lattice reduction. These three posts will focus on provable results. I have not decided how to proceed from there, but I could see the series being extended to topics involving heuristic analyses, practical considerations, and/or a survey of more exotic algorithms that have been considered in the literature.</p>
+<h4 id="target-audience">Target Audience</h4>
+<p>I will assume that readers of this series are already familiar with basic concepts of lattices, e.g. bases, determinants, successive minima, Minkowski’s bound, Gram-Schmidt orthogonalization, dual lattices and dual bases, etc. If any of these concepts seem new to you, there are great resources to familiarize yourself with them first (see e.g. lecture notes by <a href="http://cseweb.ucsd.edu/classes/fa19/cse206A-a/">Daniele</a>, <a href="https://cims.nyu.edu/~regev/teaching/lattices_fall_2009/index.html">Oded</a>, <a href="https://homepages.cwi.nl/~dadush/teaching/lattices-2018/">Daniel/Léo</a>). It will probably help if you are familiar with the LLL algorithm (also covered in aforementioned notes), but I’ll try to phrase everything so it is understandable even if if you aren’t.</p>
+<p>Ok, so let’s get started. Before we look at BKZ in particular, first some comments about lattice block reduction in general.</p>
+<h1 id="sec:basics">The Basics</h1>
+<h4 id="the-goal">The Goal</h4>
+<p>Why would anyone use block reduction? There are (at least) two reasons.</p>
+<h4 id="section"/>
+<p>1) Block reduction allows you to find short vectors in a lattice. Recall that finding the shortest vector in a lattice (i.e. solving SVP) is really hard (as far as we know, this takes at least <span class="math inline">\(2^{\Omega(n)}\)</span> time or even <span class="math inline">\(n^{\Omega(n)}\)</span> if you are not willing to also spend exponential amounts of memory). On the other hand, finding somewhat short vectors that are longer than the shortest vector by “only” an exponential factor is really easy (see LLL). So what do you do if you need something that is shorter than what LLL gives you, but you don’t have enough time to actually find the shortest vector? (This situation arises practically every time you use lattice reduction for cryptanalysis.) You can try to find something in between and hope that it doesn’t take as long. This is where lattice reduction comes in: it gives you a smooth trade-off between the two settings. It is worth mentioning that when it comes to approximation algorithms, block reduction is essentially the only game in town, i.e. there are, as far as I know, no non-trivial approximation algorithms that cannot be viewed as block reduction. (In fact, this is related to an open problem that Noah stated during the program: to come up with a non-trivial approximation algorithm that does not rely on a subroutine to find the shortest lattice vector in smaller dimensions.) The only exception to this are quantum algorithms that are able to find subexponential approximations in polynomial time in lattices with certain (cryptographically highly relevant) structure (see <span class="citation">[CDPR16]</span> and follow up work).</p>
+<h4 id="section-1"/>
+<p>2) Block reduction actually gives you more than just short vectors. It gives you guarantees on the “quality” of the basis. What do we mean by the quality of the basis? Consider the Gram-Schmidt vectors <span class="math inline">\({\mathbf{b}}_i^*\)</span> (GSO vectors) associated to a lattice basis <span class="math inline">\({\mathbf{B}}\)</span>. What we want is that the length of these Gram-Schmidt vectors (the GSO norms) does not drop off too quickly. The reason why this is a useful measure of quality for lattice bases is that it gives a sense of how orthogonal the basis vectors are: conditioned on being bases of the same lattice, the less accentuated the drop off in the GSO vectors, the more orthogonal the basis, and the more useful this basis is to solve several problems in a lattice. In fact, recall that the product of the GSO norms is equal to the determinant of the lattice and thus remains constant. Accordingly, if the GSO norms do not drop off too quickly, the first vector can be shown to be relatively short. So by analyzing the quality of the basis that block reduction achieves, a guarantee on the length of the first vector comes for free (see goal 1)). If you are familiar with the analysis of LLL, this should not come as a surprise to you.</p>
+<h4 id="tools">Tools</h4>
+<p>In order to ensure that the GSO norms do not drop off to quickly, it seems useful to be able to reduce them locally. To this end, we will work with projected lattice blocks (this is where the term “block” in block reduction comes from). More formally, given a basis <span class="math inline">\({\mathbf{B}}\)</span> we will consider the block <span class="math inline">\({\mathbf{B}}_{[i,j]}\)</span> for <span class="math inline">\(i &lt; j\)</span> as the basis formed by the basis vectors <span class="math inline">\({\mathbf{b}}_i, {\mathbf{b}}_{i+1}, \dots, {\mathbf{b}}_{j}\)</span> <em>projected orthogonally to the first <span class="math inline">\(i-1\)</span> basis vectors</em>. So <span class="math inline">\({\mathbf{B}}_{[i,j]}\)</span> is a basis for the lattice given by the sublattice formed by <span class="math inline">\({\mathbf{b}}_1, {\mathbf{b}}_{2}, \dots, {\mathbf{b}}_{j}\)</span> projected onto the orthogonal subspace of the vectors <span class="math inline">\({\mathbf{b}}_1, {\mathbf{b}}_{2}, \dots, {\mathbf{b}}_{i-1}\)</span>. Notice that the first vector of <span class="math inline">\({\mathbf{B}}_{[i,j]}\)</span> is exactly <span class="math inline">\({\mathbf{b}}^*_i\)</span> – the <span class="math inline">\(i\)</span>-th GSO vector. Another way to view this is to consider the QR-factorization of <span class="math inline">\({\mathbf{B}} = {\mathbf{Q}} {\mathbf{R}}\)</span>, where <span class="math inline">\({\mathbf{B}}\)</span> is the matrix whose columns are the basis vectors <span class="math inline">\({\mathbf{b}}_i\)</span>. Since <span class="math inline">\({\mathbf{Q}}\)</span> is orthonormal, it represents a rotation of the lattice and we can consider the lattice generated by the columns of <span class="math inline">\({\mathbf{R}}\)</span> instead, which is an upper triangular matrix. For an upper triangular basis, the projection of a basis vector orthogonal to the previous basis vectors simply results in dropping the first entries from the vector. So considering a projected block <span class="math inline">\({\mathbf{R}}_{i,j}\)</span> is simply to consider the square submatrix of <span class="math inline">\({\mathbf{R}}\)</span> consisting of the rows and columns with index <span class="math inline">\(k\)</span> between <span class="math inline">\(i \leq k \leq j\)</span>.</p>
+<p>Now we need a tool that allows us to control these GSO vectors, which we view as the first basis vectors in projected sublattices. For this, we will fall back to algorithms that solve SVP. Recall that this is very expensive, so we will not call this on the basis <span class="math inline">\({\mathbf{B}}\)</span> but rather on the projected blocks <span class="math inline">\({\mathbf{B}}_{[i,j]}\)</span>, where we ensure that the dimension <span class="math inline">\(k = j-i+1\)</span> of the lattice generated by this projected block is not too large. In fact, the maximum dimension <span class="math inline">\(k\)</span> that we call the SVP algorithm on will control the time/quality trade-off achieved by our block reduction algorithms and is usually denoted by the block size. So we will assume that we have access to such an SVP algorithm. Actually, we will assume something slightly stronger: we will assume access to a subroutine that takes as input the basis <span class="math inline">\({\mathbf{B}}\)</span> and indices <span class="math inline">\(i,j\)</span> and outputs a basis <span class="math inline">\({\mathbf{C}}\)</span> such that</p>
+<ul>
+<li><p>the lattice generated by the basis remains the same</p></li>
+<li><p>the first <span class="math inline">\(i-1\)</span> and the last vectors starting from <span class="math inline">\(j+1\)</span> remain unchanged</p></li>
+<li><p>the projected block <span class="math inline">\({\mathbf{C}}_{[i,j]}\)</span> is <em>SVP reduced</em>, meaning that <span class="math inline">\({\mathbf{c}}^*_i\)</span> is the shortest vector in the lattice generated by <span class="math inline">\({\mathbf{C}}_{[i,j]}\)</span>. Additionally, if <span class="math inline">\({\mathbf{B}}_{[i,j]}\)</span> is already SVP reduced, we assume that the basis <span class="math inline">\({\mathbf{B}}\)</span> is left unchanged.</p></li>
+</ul>
+<p>We will call an algorithm that achieves this an <em>SVP oracle</em>. Such an oracle can be implemented given any algorithm that solves SVP (for arbitrary lattices). The technical detail of filling in the gap is left as homework to the reader.</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-156" height="315" src="https://blog.simons.berkeley.edu/wp-content/uploads/2020/04/svp.png" width="267"/>Effect of a call to the SVP oracle. GSO log norms of the input in black, of the output in red. Note that the sum of the GSO log norms is a constant, so reducing the first vector, increases the (average of the) remaining vectors.</figure></div>
+
+
+
+<p>For the analysis we need to know what such an SVP oracle buys us. This is where Minkowski’s theorem comes in: we know that for any <span class="math inline">\(n\)</span>-dimensional lattice <span class="math inline">\(\Lambda\)</span> we have <span class="math inline">\(\lambda_1(\Lambda) \leq \sqrt{\gamma_n} \det(\Lambda)^{1/n}\)</span> (where <span class="math inline">\(\lambda_1(\Lambda)\)</span> is the length of the shortest vector in <span class="math inline">\(\Lambda\)</span> and <span class="math inline">\(\gamma_n = \Theta(n)\)</span> is Hermite’s constant). This tells us that after we’ve applied the SVP oracle to a projected block <span class="math inline">\({\mathbf{B}}_{[i,i+k-1]}\)</span>, we have <span class="math display">\[\|{\mathbf{b}}^*_i \| \leq \sqrt{\gamma_{k}} \left(\prod_{j = i}^{i+k-1} \|{\mathbf{b}}_j^* \| \right)^{1/k}.\]</span> Almost all of the analyses of block reduction algorithms, at least in terms of their output quality, rely on this single inequality.</p>
+<h4 id="disclaimer">Disclaimer</h4>
+<p>Before we finally get to talk about BKZ, I want to remark that throughout this series I will punt on a technical (but very important) topic: the number of arithmetic operations (outside of the oracle calls) and the size of the numbers. The number of arithmetic operations is usually not a problem, since it will be dominated by the calls to the SVP oracle. We will only compute projections of sublattices corresponding to projected blocks as described above to pass them to the oracle, which can be done efficiently using the Gram-Schmidt orthogonalization. The size of the numbers is a more delicate issue. We need to ensure that the required precision for these projections does not explode somehow. This is usually addressed by interleaving the calls to the SVP oracle with calls to LLL. If you are familiar with the LLL algorithm, it should be intuitive that this allows to control the size of the number. For a clean example of how this can be handled, we refer to e.g. <span class="citation">[GN08a]</span>. So, in summary, we will measure the running time of our algorithms thoughout simply in the number of calls to the SVP oracle.</p>
+<h1 id="sec:bkz">BKZ</h1>
+<p>Schnorr <span class="citation">[S87]</span> introduced the concept of BKZ reduction in the 80’s as a generalization of LLL. The first version of the BKZ algorithm as we consider it today was proposed by Schnorr and Euchner <span class="citation">[SE94]</span> a few years later. With our setup above, the algorithm can be described in a very simple way. Let <span class="math inline">\({\mathbf{B}}\)</span> be a lattice basis of an <span class="math inline">\(n\)</span>-dimensional lattice and <span class="math inline">\(k\)</span> be the block size. Recall that this is a parameter that will determine the time/quality trade-off as we shall see in the analysis. We start by calling the SVP oracle on the first block <span class="math inline">\({\mathbf{B}}_{[1,k]}\)</span> of size <span class="math inline">\(k\)</span>. Once this block is SVP reduced, we shift our attention to the next block <span class="math inline">\({\mathbf{B}}_{[2,k+1]}\)</span> and call the oracle on that. Notice that SVP reduction of <span class="math inline">\({\mathbf{B}}_{[2,k+1]}\)</span> may change the lattice generated by <span class="math inline">\({\mathbf{B}}_{[1,k]}\)</span> and <span class="math inline">\({\mathbf{b}}_1\)</span> may not be the shortest vector in the first block anymore, i.e. it can potentially be reduced even further. However, instead of going back and fixing that, we will simply leave this as a problem to “future us”. For now, we continue in this fashion until we reach the end of the basis, i.e. until we called the oracle on <span class="math inline">\({\mathbf{B}}_{n-k,n}\)</span>. Note that so far this can be viewed as considering a constant sized window moving from the start of the basis to the end and reducing the first vector of the projected block in this window as much as possible using the oracle. Once we have reached the end of the basis, we start reducing the window size, i.e. we call the oracle on <span class="math inline">\({\mathbf{B}}_{n-k+1,n}\)</span>, then on <span class="math inline">\({\mathbf{B}}_{n-k+2,n}\)</span>, etc. This whole process is called a <em>BKZ tour</em>.</p>
+<p>Now that we have finished a tour, it is time to go back and fix the blocks that are not SVP reduced anymore. We do this simply by running another tour. Again, if the second tour modified the basis, there is no guarantee that all the blocks are SVP redcued. So we simply repeat, and repeat, and … you get the idea. We run as many tours as required until the basis does not change anymore. That’s it. If this looks familiar to you, that’s not a coincidence: if we plug in <span class="math inline">\(k=2\)</span> as our block size, we obtain (a version of) LLL! So BKZ is a proper generalization of LLL.</p>
+
+
+
+<figure class="wp-block-image size-large"><img alt="" class="wp-image-157" src="https://blog.simons.berkeley.edu/wp-content/uploads/2020/04/bkz.png"/>BKZ in one picture: apply the SVP oracle to the projected blocks from start to finish and when you reach the end, repeat.</figure>
+
+
+
+<p>The obvious questions now are: what can we expect from the output? And how long does it take?</p>
+<h4 id="the-good">The Good</h4>
+<p>We will now take a closer look at the approximation factor achieved by BKZ. If you want to follow this analysis along, you might want to get out pen and paper. Otherwise, feel free to trust me on the calculations (I wouldn’t!) and/or jump ahead to the end of this section for the result (no spoilers!). Let’s assume for now that the BKZ algorithm terminates. If it does, we know that the projected block <span class="math inline">\({\mathbf{B}}_{[i, i+k-1]}\)</span> is SVP reduced for every <span class="math inline">\(i \in [1,\dots,n-k+1]\)</span>. This means that we have <span class="math display">\[\|{\mathbf{b}}^*_i \|^k \leq \gamma_{k}^{k/2} \prod_{j = i}^{i+k-1} \|{\mathbf{b}}_j^* \|\]</span> for all these <span class="math inline">\(n-k+1\)</span> values of <span class="math inline">\(i\)</span>. Multiplying all of these inequalities and canceling terms gives the inequality <span class="math display">\[\|{\mathbf{b}}^*_1 \|^{k-1}\|{\mathbf{b}}^*_2 \|^{k-2} \dots \|{\mathbf{b}}^*_{k-1} \| \leq \gamma_{k}^{\frac{(n-k+1)k}{2}} \|{\mathbf{b}}_{n-k+2}^* \|^{k-1} \|{\mathbf{b}}_{n-k+3}^* \|^{k-2} \dots \|{\mathbf{b}}_{n}^* \|.\]</span> Now we make two more observations: 1) not only is <span class="math inline">\({\mathbf{B}}_{[1, k]}\)</span> SVP reduced, but so is <span class="math inline">\({\mathbf{B}}_{[1, i]}\)</span> for every <span class="math inline">\(i &lt; k\)</span>. (Why? Think about it for 2 seconds!) This means we can multiply the inequalities <span class="math display">\[\|{\mathbf{b}}^*_1 \|^i \leq \gamma_{i}^{i/2} \prod_{j = 1}^{i} \|{\mathbf{b}}_j^* \|\]</span> for all <span class="math inline">\(i \in [2,k-1]\)</span> together with the trivial inequality <span class="math inline">\(\|{\mathbf{b}}^*_1 \| \leq \|{\mathbf{b}}^*_1 \|\)</span>, which gives <span class="math display">\[\|{\mathbf{b}}^*_1 \|^{\frac{k(k-1)}{2}} \leq \left(\prod_{i = 2}^{k-1} \gamma_{i}^{i/2} \right) \prod_{i = 1}^{k-1} \|{\mathbf{b}}_i^* \|^{k-1}\]</span> Now we use the fact that <span class="math inline">\(\gamma_k^k \geq \gamma_i^i\)</span> for all <span class="math inline">\(i \leq k\)</span> (Why? Homework!) and combine with our long inequality above to get <span class="math display">\[\|{\mathbf{b}}^*_1 \|^{\frac{k(k-1)}{2}} \leq \gamma_k^{\frac{k(n-1)}{2}} \|{\mathbf{b}}_{n-k+2}^* \|^{k-1} \|{\mathbf{b}}_{n-k+3}^* \|^{k-2} \dots \|{\mathbf{b}}_{n}^* \|.\]</span> (I’m aware that this is a lengthy calculation for a blog post, but we’re almost there, so bear with me. It’s worth it!)</p>
+<p>We now use one final observation, which is a pretty common trick in lattice algorithms: w.l.o.g. assume that for some shortest vector <span class="math inline">\({\mathbf{v}}\)</span> in our lattice its projection orthogonal to the first <span class="math inline">\(n-1\)</span> basis vectors is non-zero (if it is zero for all of the shortest vectors, simply drop the last vector from the basis, the result is still BKZ reduced, so use induction). Then we must have that <span class="math inline">\(\lambda_1 = \| {\mathbf{v}} \| \geq \|{\mathbf{b}}_i^* \|\)</span> for all <span class="math inline">\(i \in [n-k+2, \dots, n]\)</span>, since otherwise the projected block <span class="math inline">\({\mathbf{B}}_{i,n}\)</span> would not be SVP reduced. This means, we have <span class="math inline">\(\lambda_1 \geq \max_{i \in [n-k+2, \dots, n]} \|{\mathbf{b}}_i^* \|\)</span>. This is the final puzzle piece to get our approximation bound: <span class="math display">\[\|{\mathbf{b}}^*_1 \| \leq \gamma_{k}^{\frac{n-1}{k-1}} \lambda_1.\]</span> Note that this analysis (dating back to Schnorr <span class="citation">[S94]</span>) is reminiscent of the analysis of LLL and if we plug in <span class="math inline">\(k=2\)</span>, we get exactly what we’d expect from LLL. Though we do note a gap in the other extreme: if we plug in <span class="math inline">\(k=n\)</span>, we know that the approximation factor is <span class="math inline">\(1\)</span> (we are solving SVP in the entire lattice), but the bound above yields a factor <span class="math inline">\(\gamma_n = \Theta(n)\)</span>.</p>
+<h4 id="the-bad">The Bad</h4>
+<p>Now that we’ve looked at the output quality of the basis, let’s see what we can say about the running time (recall that our focus is on the number of calls to the SVP oracle). The short answer is: not much and that’s very unfortunate. Ideally, we’d want a bound on the number of SVP calls that is polynomial in <span class="math inline">\(n\)</span> and <span class="math inline">\(k\)</span>. This would mean that the overall running time for large <span class="math inline">\(k\)</span> is dominated by the running time of the SVP oracle in dimension <span class="math inline">\(k\)</span> and the block size would give us exactly the expected trade-off. However, an LLL style analysis has so far only yielded a bound on the number of tours which is <span class="math inline">\(O(k^n)\)</span> <span class="citation">[HPS11, Appendix]</span>. This is quite bad – for large <span class="math inline">\(k\)</span> the number of calls will be the dominating factor in the running time.</p>
+<h4 id="the-ugly">The Ugly</h4>
+<p>Recall that the analysis of LLL does not only provide a bound on the approximation factor, but also on the Hermite factor, i.e. on the ratio of <span class="math inline">\(\| {\mathbf{b}}_1\|/\det(\Lambda)^{1/n}\)</span>. Since an LLL-style analysis worked out nicely for the approximation factor of BKZ, it stands to reason that a similar analysis should yield a similar bound for BKZ. By extrapolating from LLL, one could expect a bound along the lines of <span class="math inline">\(\| {\mathbf{b}}_1\|/\det(\Lambda)^{1/n} \leq \gamma_{k}^{n/2k}\)</span> (note the square root improvement w.r.t. the trivial bound obtained from the approximation factor). And, in fact, a bound of <span class="math inline">\(\gamma_{k}^{\frac{n-1}{2(k-1)} + 1}\)</span> has been claimed in <span class="citation">[GN08b]</span> but without proof (as pointed out in <span class="citation">[HPS11]</span>) and it is not clear, how one would prove this. (<span class="citation">[GN08b]</span> claims that one can use a similar argument as we did for the approximation factor, but I don’t see it.)</p>
+<h4 id="the-rescue">The Rescue</h4>
+<p>So it seems different techniques are necessary to complete the analysis of BKZ. The work of <span class="citation">[HPS11]</span> introduced such a new technique based on the analysis of dynamical systems. This work applied the technique successfully to BKZ, but the analysis is quite involved. What it shows is that one can terminate BKZ after a polynomial number of tours and still get a guarantee on the output quality, which is very close to the conjectured bound on the Hermite factor above. (Caveat: Technically, <span class="citation">[HPS11]</span> only showed this result for a slight variant of BKZ, but the difference to the standard BKZ algorithm only lies in the scope of the interleaving LLL applications, which is something that we glossed over above.) This is in line with experimental studies <span class="citation">[SE94,GN08b,MW16]</span>, which show that BKZ produces high quality bases after a few tours already.</p>
+<p>We will revisit this approach when considering a different block reduction variant, SDBKZ, where the analysis is much cleaner. As a teaser for the next post though, recall that BKZ can be viewed as a generalization of LLL (which corresponds to BKZ with block size <span class="math inline">\(k=2\)</span>). Since the analysis of LLL did not carry entirely to BKZ, one could wonder if there is a different generalization of LLL such that an LLL-style analysis also generalizes naturally. The answer to this is yes, and we will consider such an algorithm in the next post.</p>
+
+
+
+<ul><li>[CDPR16] Cramer, Ducas, Peikert, Regev. <em>Recovering short generators of principal ideals in cyclotomic rings.</em> EUROCRYPT 2016</li><li>[GN08a] Gama, Nguyen. <em>Finding short lattice vectors within Mordell’s inequality</em>. STOC 2008</li><li>[GN08b] Gama, Nguyen. <em>Predicting lattice reduction</em>. EUROCRYPT 2008</li><li>[HPS11] Hanrot, Pujol, Stehlé.<em> Analyzing blockwise lattice algorithms using dynamical systems.</em> CRYPTO 2011</li><li>[MW16] Micciancio, Walter. <em>Practical, predictable lattice basis reduction.</em> EUROCRYPT 2016</li><li>[SE94] Schnorr, Euchner. <em>Lattice basis reduction: Improved practical algorithms and solving subset sum problems.</em> Mathematical Programming 1994</li><li>[S87] Schnorr. <em>A hierarchy of polynomial time lattice basis reduction algorithms.</em> Theoretical Computer Science 1987</li><li>[S94] Schnorr. <em>Block reduced lattice bases and successive minima.</em> Combinatorics, Probability and Computing 1994</li></ul></div>
+    </content>
+    <updated>2020-04-01T15:17:39Z</updated>
+    <published>2020-04-01T15:17:39Z</published>
+    <category term="General"/>
+    <category term="BKZ"/>
+    <category term="Lattice Block Reduction"/>
+    <author>
+      <name>Michael Walter</name>
+    </author>
+    <source>
+      <id>https://blog.simons.berkeley.edu</id>
+      <link href="https://blog.simons.berkeley.edu/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://blog.simons.berkeley.edu" rel="alternate" type="text/html"/>
+      <subtitle>What's New at the Simons Institute for the Theory of Computing.</subtitle>
+      <title>Calvin Café: The Simons Institute Blog</title>
+      <updated>2020-04-01T15:21:15Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://rjlipton.wordpress.com/?p=16904</id>
@@ -134,7 +214,7 @@ We hope that your April Fool’s Day is such as to allow a time to laugh. But al
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-04-01T14:20:33Z</updated>
+      <updated>2020-04-01T15:20:41Z</updated>
     </source>
   </entry>
 
@@ -575,7 +655,7 @@ Our new techniques comprise-- (1) an ROABP computing a homogeneous polynomial ca
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-04-01T14:20:23Z</updated>
+      <updated>2020-04-01T15:20:31Z</updated>
     </source>
   </entry>
 
@@ -1448,7 +1528,7 @@ resolution-limited or subject to some uncertainty.
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2020-04-01T14:21:24Z</updated>
+      <updated>2020-04-01T15:21:21Z</updated>
     </source>
   </entry>
 
@@ -1686,7 +1766,7 @@ Our final question is: how well do our “stacked words” help to visualize the
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-04-01T14:20:33Z</updated>
+      <updated>2020-04-01T15:20:41Z</updated>
     </source>
   </entry>
 
@@ -1747,7 +1827,7 @@ Our final question is: how well do our “stacked words” help to visualize the
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2020-04-01T14:20:09Z</updated>
+      <updated>2020-04-01T15:20:10Z</updated>
     </source>
   </entry>
 
@@ -1774,7 +1854,7 @@ Email: pbarcelo@ing.puc.cl</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-04-01T14:20:36Z</updated>
+      <updated>2020-04-01T15:20:44Z</updated>
     </source>
   </entry>
 
@@ -1858,7 +1938,7 @@ Our methods are elementary and short and rely on a polynomial map of Shpilka and
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-04-01T14:20:23Z</updated>
+      <updated>2020-04-01T15:20:31Z</updated>
     </source>
   </entry>
 
@@ -1934,38 +2014,7 @@ Our methods are elementary and short and rely on a polynomial map of Shpilka and
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-04-01T14:20:27Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://tcsplus.wordpress.com/?p=410</id>
-    <link href="https://tcsplus.wordpress.com/2020/03/28/tcs-talk-wednesday-april-1-venkat-guruswami-cmu/" rel="alternate" type="text/html"/>
-    <title>TCS+ talk: Wednesday, April 1 — Venkat Guruswami, CMU</title>
-    <summary>The next TCS+ talk will take place this coming Wednesday, April 1th at 1:00 PM Eastern Time (10:00 AM Pacific Time, 19:00 Central European Time, 17:00 UTC). Venkat Guruswami from CMU will speak about “Arıkan meets Shannon: Polar codes with near-optimal convergence to channel capacity” (abstract below). You can reserve a spot as an individual […]</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The next TCS+ talk will take place this coming Wednesday, April 1th at 1:00 PM Eastern Time (10:00 AM Pacific Time, 19:00 Central European Time, 17:00 UTC). <strong>Venkat Guruswami</strong> from CMU will speak about “<em>Arıkan meets Shannon: Polar codes with near-optimal convergence to channel capacity</em>” (abstract below).</p>
-<p>You can reserve a spot as an individual or a group to join us live by signing up on <a href="https://sites.google.com/site/plustcs/livetalk/live-seat-reservation">the online form</a>. (The link will also be posted <a href="https://sites.google.com/site/plustcs/livetalk">on our website</a> on the day of the talk, so people who did not sign up will still be able to join, until the maximum capacity of 300 seats is reached.) As usual, for more information about the TCS+ online seminar series and the upcoming talks, or to <a href="https://sites.google.com/site/plustcs/suggest">suggest</a> a possible topic or speaker, please see <a href="https://sites.google.com/site/plustcs/">the website</a>.</p>
-<blockquote><p>Abstract: We establish a constructive version of Shannon’s noisy coding theorem for binary codes, with information rate converging near-optimally fast to channel capacity as a function of code length. Specifically, let <img alt="W" class="latex" src="https://s0.wp.com/latex.php?latex=W&amp;bg=fff&amp;fg=444444&amp;s=0" title="W"/> be an arbitrary binary-input memoryless symmetric channel with Shannon capacity <img alt="I(W)" class="latex" src="https://s0.wp.com/latex.php?latex=I%28W%29&amp;bg=fff&amp;fg=444444&amp;s=0" title="I(W)"/>, and fix any <img alt="\delta &gt;0" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdelta+%3E0&amp;bg=fff&amp;fg=444444&amp;s=0" title="\delta &gt;0"/>. We construct, for any sufficiently small <img alt="\varepsilon &gt;0" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvarepsilon+%3E0&amp;bg=fff&amp;fg=444444&amp;s=0" title="\varepsilon &gt;0"/>, binary linear codes of block length <img alt="O(1/\varepsilon^{2+\delta})" class="latex" src="https://s0.wp.com/latex.php?latex=O%281%2F%5Cvarepsilon%5E%7B2%2B%5Cdelta%7D%29&amp;bg=fff&amp;fg=444444&amp;s=0" title="O(1/\varepsilon^{2+\delta})"/> and rate <img alt="I(W)-\varepsilon" class="latex" src="https://s0.wp.com/latex.php?latex=I%28W%29-%5Cvarepsilon&amp;bg=fff&amp;fg=444444&amp;s=0" title="I(W)-\varepsilon"/> that enable reliable communication on <img alt="W" class="latex" src="https://s0.wp.com/latex.php?latex=W&amp;bg=fff&amp;fg=444444&amp;s=0" title="W"/> with quasi-linear time encoding and decoding. Shannon’s theorem implies the existence of such codes (without efficient constructions or decoding) with block length <img alt="O(1/\varepsilon^2)" class="latex" src="https://s0.wp.com/latex.php?latex=O%281%2F%5Cvarepsilon%5E2%29&amp;bg=fff&amp;fg=444444&amp;s=0" title="O(1/\varepsilon^2)"/>. This quadratic dependence on the gap epsilon to capacity is known to be best possible. Previously such a construction was only known for the case of the erasure channel.</p>
-<p>Our codes are a variant of Arıkan’s polar codes based on multiple carefully constructed local kernels, one for each intermediate channel that arises in the decoding. A key technical ingredient in the analysis is a strong converse to the noisy coding theorem that shows extreme unpredictability of even a single message bit when communicating via random linear codes at rates slightly above capacity.</p>
-<p>Joint work with Andrii Riazanov and Min Ye.</p></blockquote>
-<p> </p></div>
-    </content>
-    <updated>2020-03-28T16:46:12Z</updated>
-    <published>2020-03-28T16:46:12Z</published>
-    <category term="Announcements"/>
-    <author>
-      <name>plustcs</name>
-    </author>
-    <source>
-      <id>https://tcsplus.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://tcsplus.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://tcsplus.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://tcsplus.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
-      <title>TCS+</title>
-      <updated>2020-04-01T14:21:04Z</updated>
+      <updated>2020-04-01T15:20:35Z</updated>
     </source>
   </entry>
 </feed>
