@@ -237,7 +237,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at April 03, 2020 12:21 PM UTC</span>.
+Last updated <span class="datestr">at April 03, 2020 01:21 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -245,6 +245,339 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://francisbach.com/?p=2445">
+<div class="entryheader">
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-US"><a class="entryheader" href="https://francisbach.com/computer-aided-analyses/">Computer-aided analyses in optimization</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://francisbach.com" title="Machine Learning Research Blog">Francis Bach</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en-US">
+<p class="justify-text">In this blog post, I want to illustrate how computers can be great allies in designing (and verifying) convergence proofs for first-order optimization methods. This task can be daunting, and highly non-trivial, but nevertheless usually unavoidable when performing complexity analyses. A notable example is probably the convergence analysis of the stochastic average gradient (SAG) [<a href="https://arxiv.org/pdf/1309.2388.pdf">1</a>], whose original proof was computer assisted.</p>
+
+
+
+<p class="justify-text">To this end, we will mostly spend time on what is referred to as <em>performance estimation problems</em> (PEPs), introduced by Yoel Drori and Marc Teboulle [<a href="https://link.springer.com/article/10.1007/s10107-013-0653-0">2</a>]. Performance estimation is also closely related to the topic of <em>integral quadratic constraints</em> (IQCs), introduced in the context of optimization by Laurent Lessard, Benjamin Recht and Andrew Packard [<a href="https://epubs.siam.org/doi/abs/10.1137/15M1009597">3</a>]. In terms of presentations, IQCs  leverages control theory, whereas PEPs might seem more natural in the optimization community. This blog post essentially presents PEPs from the point of view of [<a href="https://link.springer.com/article/10.1007/s10107-016-1009-3">4</a>], instantiated on a running example.</p>
+
+
+
+<h2>Overview, motivations</h2>
+
+
+
+<p class="justify-text">First-order methods for continuous optimization belong to the large panel of algorithms that are usually approached via worst-case analyses. In this context, analyses rely on combining inequalities (that are due to assumptions on the problem classes), in potentially long, non-intuitive, and technical, proofs. For the insiders, those proofs all look very similar. For the outsiders, those proofs all look rather repelling, technical (long pages of chained inequalities), probably not interesting, and like computer codes: usually intuitive mostly for their authors.</p>
+
+
+
+<p class="justify-text">In what follows, I want to show how (and why) those proofs are indeed all very similar. On the way, I want to emphasize how those combinations of inequalities are related to the “true essence” of worst-case analyses (which rely on computing worst-case scenarios), and to provide examples on how to constructively obtain them.</p>
+
+
+
+<p class="justify-text">We take the stand of illustrating the PEP approach on a single iteration of gradient descent, as it essentially contains all necessary ingredients to understand the methodology in other contexts as well. Certain details of the following text are (probably unavoidably) a bit technical. However, going through the detailed computations is not essential, and the text should contain the necessary ingredients for understanding the essence of the methodology.</p>
+
+
+
+<h2>Running example: gradient descent</h2>
+
+
+
+<p class="justify-text">Let us consider a naive, but standard, example: unconstrained convex minimization $$x_\star= \underset{x\in\mathbb{R}^d}{\mathrm{arg min}} f(x)$$with gradient descent: \(x_{k+1}=x_k-\gamma \nabla f(x_k)\). Let us assume \(f(\cdot)\) to be continuously differentiable, to have a \(L\)-Lipschitz gradient (a.k.a., \(L\)-smoothness), and to be \(\mu\)-strongly convex. Those functions satisfy, for all \(x,y\in\mathbb{R}^d\):<br />– strong convexity, see e.g., [<a href="https://link.springer.com/book/10.1007/978-1-4419-8853-9">5</a>, Definition 2.1.2]: $$\tag{1}f(x) \geqslant      f(y)+\langle{\nabla f(y)}; {x-y}\rangle+\tfrac{\mu}{2} \lVert x-y\rVert^2,$$- smoothness, see e.g., [<a href="https://link.springer.com/book/10.1007/978-1-4419-8853-9">5</a>, Theorem 2.1.5]: $$\tag{2} f(x) \leqslant      f(y)+\langle{\nabla f(y)}; {x-y}\rangle+\tfrac{L}{2}\lVert x-y\rVert^2.$$Let us recall that in the case of twice continuously differentiable functions, smoothness and strong convexity amount to requiring  that $$\mu I \preccurlyeq \nabla^2 f(x) \preccurlyeq L I,$$ for some \(0&lt; \mu&lt;L&lt; \infty\) and for all \(x\in\mathbb{R}^d\) (in other words, all eigenvalues of \(\nabla^2 f(x)\) are between \(\mu\) and \(L\)). In what follows, we denote by \(\mathcal{F}_{\mu,L}\) the class of \(L\)-smooth \(\mu\)-strongly convex functions (irrespective of the dimension \(d\)).</p>
+
+
+
+<div class="wp-block-group"><div class="wp-block-group__inner-container">
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img src="https://www.di.ens.fr/~ataylor/BlogPost/SmoothStronglyConvex.png" alt="" width="473" height="204" />Figure 1: the blue function is \(L\)-smooth and \(\mu\)-strongly convex (it is possible to create respectively global upper and lower quadratic bounds from every \(x\in\mathbb{R}^d\) with respectively curvatures \(L\) and \(\mu\)).</figure></div>
+</div></div>
+
+
+
+<p class="justify-text">In this context, convergence of gradient descent can be studied in many ways. Here, for the sake of the example, we will do it in terms of two base quantities: distance to optimality \(\lVert x_k-x_\star\rVert\), and function value accuracy \(f(x_k)-f(x_\star)\). There are, of course, infinitely many other possibilities, such as gradient norm \(\rVert \nabla f(x_k)\lVert\), Bregman divergence \(f(x_\star)-f(x_k)-\langle{\nabla f(x_k)};{x_\star-x_k}\rangle\), or even best function value observed throughout the iterations \(\min_{0\leq i\leq k} \{f(x_i)-f(x_\star)\}\): the reader can adapt the lines below for his/her favorite criterion. </p>
+
+
+
+<p class="justify-text">For later reference, let us provide another inequality that is known to  hold for all \(x,y\in\mathbb{R}^d\) for any \(L\)-smooth \( \mu\)-strongly convex function: <br />– bound on inner product, see, e.g., [<a href="https://link.springer.com/book/10.1007/978-1-4419-8853-9">5</a>,  Theorem 2.1.11]: $$\langle{\nabla f(x)-\nabla f(y)};{x-y}\rangle  \geqslant        \tfrac{1}{L+\mu} \lVert{\nabla f(x)-\nabla f(y)}\rVert^2+\tfrac{\mu  L}{L+\mu}\lVert{x-y}\rVert^2.\tag{3}$$ In the case \(\mu=0\) this inequality is known as “cocoercivity”. This (perhaps mysterious) inequality happens to play an important role in convergence proofs.</p>
+
+
+
+<h3>A standard convergence result</h3>
+
+
+
+<p class="justify-text">Let us start by stating two known results along with their simple proofs (see, e.g.,  [<a href="https://link.springer.com/book/10.1007/978-1-4419-8853-9">5</a>, Theorem 2.1.14] or [6, Section 1.4.2, Theorems 2 &amp; 3]):<br />– convergence in distance:  $$\begin{array}{rl}    \rVert{x_{k+1}-x_\star}\lVert^2&amp;= \lVert{x_k-x_\star}\rVert^2+\gamma^2\lVert{\nabla f(x_k)}\rVert-2\gamma\langle{\nabla f(x_k)};{x_k-x_\star}\rangle \\ \     &amp; \leqslant      \left(1-\tfrac{2\gamma L \mu}{L+\mu}\right)\lVert{x_k-x_\star}\rVert^2+\gamma\left(\gamma-\tfrac2{L+\mu}\right)\lVert{\nabla f(x_k)}\rVert^2, \end{array} $$ where the second line follows from smoothness and strong convexity of \(f\) via the bound (3) on the inner product (with \(x=x_k\) and \(y=x_\star\)). For the particular choice \(\gamma=\tfrac2{L+\mu}\), the second term on the right hand side disappears, and we end up with<br />     $$\lVert{x_{k+1}-x_\star}\rVert^2 \leqslant      \left(\tfrac{L-\mu}{L+\mu}\right)^2\lVert{x_k-x_\star}\rVert^2,$$ which, following from \(0&lt;\mu&lt;L&lt;\infty\), satisfies \(0&lt; \tfrac{L-\mu}{L+\mu}&lt;1\), hence proving linear convergence of gradient descent in this setup, by recursively applying the previous inequality: $$ \lVert{x_{k}-x_\star}\rVert^2 \leqslant      \left(\tfrac{L-\mu}{L+\mu}\right)^{2k}\lVert{x_0-x_\star}\rVert^2.$$ – Convergence in function values: one can simply use the result in distance along with the previous basic inequalities (1) and (2) characterizing smoothness and strong convexity (both with \(y=x_\star\)):<br />     $$f(x_k)-f(x_\star) \leqslant \hspace{-.15cm}\tfrac{L}{2}\hspace{-.1cm}\rVert{x_k-x_\star}\lVert^2  \leqslant  \hspace{-.15cm}    \tfrac{L}{2}\hspace{-.1cm}\left(\tfrac{L-\mu}{L+\mu}\right)^{\hspace{-.1cm}2k} \rVert{x_0-x_\star}\lVert^2 \leqslant  \hspace{-.15cm}     \tfrac{L}{\mu}\hspace{-.1cm} \left(\tfrac{L-\mu}{L+\mu}\right)^{\hspace{-.1cm}2k}(f(x_0)-f(x_\star)).$$  It is also possible to directly look for convergence in terms of function values, but it is then usually unclear in the literature what inequalities to use, and I am not aware of any such proof leading to the same rate without the leading \(\tfrac{L}{\mu}\) (except the proof presented below).</p>
+
+
+
+<p class="justify-text">At this point, even in this toy example, a few very legitimate questions can be raised:<br />– can we improve anything? Can gradient descent really behaves like that on this class of functions?<br />– How could we have guessed the inequality to use, and the shape of the corresponding proof? Obviously, the obscure fact is to arrive to inequality (1).  Therefore, is there a principled way for choosing the right inequalities to use, for example for studying convergence in terms of other quantities, such as  function values?<br />– Is this the unique way to arrive to the desired result? If yes, how likely are we to find such proofs for more complicated cases (algorithms and/or function class)?</p>
+
+
+
+<p class="justify-text">For the specific step size choice \(\gamma=\tfrac2{L+\mu}\), a partial answer to the first question is obtained by the observation that the rate is actually achieved on the quadratic function<br /> $$f(x)=\tfrac12 \, x^\top \begin{bmatrix}<br /> L &amp; 0\\ 0 &amp; \mu<br /> \end{bmatrix}x.$$ The following lines precisely target the missing answers.</p>
+
+
+
+<h2>Worst-case analysis through worst-case scenarios</h2>
+
+
+
+<p class="justify-text">Let us start by rephrasing our goal, and restrict ourselves to the study of a single iteration. We fix our target to finding the smallest possible value of \(\rho\) such that the inequality<br /> $$ \lVert{x_{k+1}-x_\star}\rVert^2  \leqslant       \rho^2 \lVert{x_k-x_\star}\rVert^2 $$ is valid for all \(x_k\) and \(x_{k+1}=x_k-\gamma \nabla f(x_k)\) (hence \(\rho\) is a function of \(\gamma\)). In other words, our goal is to solve<br />$$ \rho^2(\gamma):= \sup \left\{ \frac{\lVert{x_{k+1}-x_\star}\rVert^2}{\lVert{x_k-x_\star}\rVert^2}\, \big|\, f\in\mathcal{F}_{\mu,L},\, x_{k+1}=x_k-\gamma \nabla f(x_k),\, \nabla f(x_\star)=0\right\}.$$<br />Alternatively, we could be interested in studying convergence in other forms: for function values, we could target to solve the slightly modified problem:<br /> $$ \sup  \left\{ \frac{f(x_{k+1})-f(x_\star)}{f(x_{k})-f(x_\star)}\, \big|\, f\in\mathcal{F}_{\mu,L},\, x_{k+1}=x_k-\gamma \nabla f(x_k),\, \nabla f(x_\star)=0 \right\}.$$ It turns out that in both cases, the problem can be solved both numerically to high precision, and analytically, and that the answer is \(\rho^2(\gamma)=\max\{(1-\mu\gamma)^2,(1-L\gamma)^2\}\).</p>
+
+
+
+<p class="justify-text">The only thing we did, so far, was to explicitly reformulate the problem of finding the best (smallest) convergence rate as the problem of finding the worst-case scenario, nothing more. In what follows, some parts might become slightly technical, but the overall idea is only to reformulate this problem of finding the worst-case scenarios, for solving it.</p>
+
+
+
+<h3>Dealing with an infinite-dimensional variable: the function \(f\)</h3>
+
+
+
+<p class="justify-text">The first observation is that the problem of computing \(\rho\) is stated as an infinite-dimensional optimization problem: we are looking for the worst possible problem instance (a function \(f\) and an initial point \(x_k\)) within a predefined class of problems. The first step we take to work around this is to reformulate it in the following equivalent  form (note that we maximize also over the dimension \(d\)—we discuss later how to remove it):<br />$$\begin{array}{rl} \rho^2:= \underset{f,\, x_k,\,x_\star,\, g_k,\,d}{\sup} &amp;\displaystyle \frac{\lVert{x_{k}-\gamma g_k-x_\star}\rVert^2}{\lVert{x_k-x_\star}\rVert^2}\\<br /> \text{s.t. }    &amp; \exists f\in\mathcal{F}_{\mu,L}:\, g_k= \nabla f(x_k),\, 0=\nabla f(x_\star).<br />\end{array}$$<br />This problem intrinsically does not look better (it contains an  existence constraint), but it allows using mathematical tools which are referred to as  <em>interpolation,</em> or <em>extension</em>, theorems [<a href="https://link.springer.com/article/10.1007/s10107-016-1009-3">4</a>, <a href="https://arxiv.org/pdf/1603.00241.pdf">7</a>, <a href="https://hal.archives-ouvertes.fr/hal-01530908/file/DHLL_appendix.pdf">8</a>]. The problem is depicted on Figure 2:</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img src="https://www.di.ens.fr/~ataylor/BlogPost/Interpolation.png" alt="" width="490" height="209" />Figure 2: discrete interpolation (or extension) problem: given a set of triplets \(\{(\text{coordinate}, \text{gradient}, \text{function value})\}\) can we recover a function within a determined class that explains those triplets?</figure></div>
+
+
+
+<p class="justify-text">It turns out that convex interpolation (that is, neglecting smoothness and strong convexity) is actually rather simple:</p>
+
+
+
+<ul class="justify-text"><li>given a convex function and an index set \(I\), any set of samples \(\{(x_i,g_i,f_i)\}_{i\in I}\) of the form \(\{(\text{coordinate}, \text{(sub)gradient}, \text{function value})\}\)) satisfies, for all \(i,j\in I\): $$f_i \geqslant      f_j+\langle g_j; x_i-x_j\rangle,$$ by definition of subgradient, as illustrated on Figure 3.</li></ul>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img src="https://www.di.ens.fr/~ataylor/BlogPost/SamplingCvx.png" alt="" width="485" height="205" />Figure 3: sampling from a convex function.</figure></div>
+
+
+
+<ul class="justify-text"><li>In the other direction, given a set of triplets \(\{(x_i,g_i,f_i)\}_{i\in I}\) satisfying the previous inequality for all pairs \(i,j\in I\), one can simply recover a  convex function by the following construction: $$f(x)=\underset{i\in I}{\max}\{ f_i+\langle g_i;x-x_i\rangle\},$$ which is depicted on Figure 4.</li></ul>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img src="https://www.di.ens.fr/~ataylor/BlogPost/InterpolateCvx.png" alt="" width="487" height="207" />Figure 4: some set \(\{(x_i,g_i,f_i)\}_{i\in I}\) and its piecewise affine interpolant \(f(x)=\underset{i\in I}{\max}\{ f_i+\langle g_i;x-x_i\rangle\}\).</figure></div>
+
+
+
+<ul class="justify-text"><li>Formally, the reasoning allows arriving to the following “convex interpolation” (or “convex extension”) result, where we denote the set of (closed, proper) convex functions by \(\mathcal{F}_{0,\infty}\) (to be understood as \(L\)-smooth \(\mu\)-strongly convex functions with \(\mu=0\) and \(L=\infty\)): $$\begin{array}{c}\exists f\in\mathcal{F}_{0,\infty}: \,  g_k\in\partial f(x_k) \text{ and } f_k=f(x_k) \ \ \forall k\in  I\\ \Leftrightarrow\\ f_i \geqslant       f_j+\langle{g_j};{x_i-x_j}\rangle\quad \forall i,j\in I,\end{array}$$ where \(\partial f(x)\) denotes the subdifferential of \(f\) at \(x\).</li></ul>
+
+
+
+<p class="justify-text">In the next section, we use a similar interpolation result for taking smoothness and strong convexity into account. The result is a bit more technical, but follows from similar constructions as those for convex interpolation—the main difference being that the interpolation is done on the Fenchel conjugate instead, in order to incorporate smoothness, see [<a href="https://link.springer.com/article/10.1007/s10107-016-1009-3">4</a>, Section 2].</p>
+
+
+
+<h3>Reformulation through convex interpolation</h3>
+
+
+
+<p class="justify-text">Back to the problem of computing worst-case scenarios, we can now reformulate the existence constraint <em>exactly</em> using the following result (see [<a href="https://link.springer.com/article/10.1007/s10107-016-1009-3">4</a>,  Theorem 4]): let \(I\) be a finite index set and let \( S=\{(x_i,g_i,f_i)\}_{i\in I}\) be a set of triplets, then<br />  $$\begin{array}{c}\exists f\in\mathcal{F}_{\mu,L}: \,  g_i=\nabla f(x_i) \text{ and } f_i=f(x_i) \text{ for all } i\in  I\\ \Leftrightarrow\\  f_i \geqslant      f_j+\langle{g_j};{x_i-x_j}\rangle+\frac{1}{2L}\lVert{g_i-g_j}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_i-x_j-\frac{{1}}{L}(g_i-g_j)}\rVert^2  \,\,\, \forall i,j\in I.\end{array}$$ Therefore, the previous problem can be reformulated as (recalling that \(g_\star=0\))<br />$$  \begin{array}{rl} \underset{{f_k,\,f_\star,\, x_k,\,x_\star,\, g_k,\,d}} {\sup}&amp;\displaystyle\frac{\rVert{x_{k}-\gamma  g_k-x_\star}\lVert^2}{\rVert{x_k-x_\star}\lVert^2}\\<br />      \text{s.t. }    &amp; f_\star \geqslant      f_k+\langle{g_k};{x_\star-x_k}\rangle+\frac{1}{2L}\lVert{g_k}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}g_k}\rVert^2\\<br />      &amp; f_k \geqslant      f_\star+\frac{1}{2L}\lVert{g_k}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}g_k}\rVert^2.<br />\end{array}$$ </p>
+
+
+
+<h3>Quadratic reformulation</h3>
+
+
+
+<p class="justify-text">The next step is to remove the ratio appearing in the objective function, which we do via an homogeneity argument, as follows.</p>
+
+
+
+<p class="justify-text">Starting from a feasible point, scale \(x_k,\,x_\star,g_k\) by some \(\alpha&gt;0\) and \(f_k,\,f_\star\) by \(\alpha^2\) and observe it does not change the value of the objective, while still being a feasible point. Therefore, the problem can be reformulated as a nonconvex QCQP (quadratically constrained quadratic program): $$  \begin{array}{rl} \underset{{f_k,\,f_\star,\, x_k,\,x_\star,\, g_k,\,d}} {\sup}&amp;\displaystyle{\rVert{x_{k}-\gamma  g_k-x_\star}\lVert^2}\\<br />       \text{s.t. }    &amp; f_\star \geqslant      f_k+\langle{g_k};{x_\star-x_k}\rangle+\frac{1}{2L}\lVert{g_k}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}g_k}\rVert^2\\<br />       &amp; f_k \geqslant      f_\star+\frac{1}{2L}\lVert{g_k}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}g_k}\rVert^2\\ &amp;{\rVert{x_k-x_\star}\lVert^2} \leqslant      1,<br /> \end{array}$$  which is quadratic in \(x_k\), \(x_\star\) and  \(g_k\), and linear in \(f_\star\) and \(f_k\). Actually, in the current form, nonconvexity comes from the term “\(\langle{g_k};{x_\star-x_k}\rangle\)” in the second constraint. It turns out that this problem can be reformulated <em>losslessly</em> using semidefinite programming (this is due to the maximization over \(d\)). </p>
+
+
+
+<h3>Semidefinite reformulation</h3>
+
+
+
+<p class="justify-text">At the end of this section, we will be able to compute, numerically, the values of the rate \(\rho^2(\gamma)\) for given values of the parameters \(\mu,\,L\), and \(\gamma\).</p>
+
+
+
+<p class="justify-text">The last step in the reformulation goes as follows: the previous problem can be reformulated as a semidefinite program, as it is linear in terms of the entries of the following Gram matrix<br />$$G = \begin{pmatrix}<br />     \lVert{x_k-x_\star}\rVert^2 &amp; \langle{g_k};{x_k-x_\star}\rangle \\ \langle{g_k};{x_k-x_\star}\rangle &amp; \lVert{g_k}\rVert^2<br />     \end{pmatrix}\succcurlyeq 0,$$ and in terms of the function values \(f_k\) and \(f_\star\). From those variables, one reformulate the previous problem as $$\begin{array}{rl} \underset{f_k,\,f_\star,\, G\succeq 0}{\sup} \, &amp;{\mathrm{Tr} (A_\text{num} G)}\\<br />      \text{s.t. }    &amp; f_k-f_\star+\mathrm{Tr} (A_1 G)\leqslant 0\\<br />      &amp;  f_\star-f_k+\mathrm{Tr} (A_2 G)\leqslant 0 \\<br />      &amp;\mathrm{Tr} (A_\text{denom} G) \leqslant      1,\end{array}$$ which is a gentle semidefinite program where we picked matrices \(A_{\text{num}}\), \(A_{\text{denom}}\), \(A_1\) and \(A_2\) for encoding the previous terms. That is, we choose those matrices such that<br /> $$\begin{array}{rl}<br />\mathrm{Tr}(A_{\text{denom}} G)&amp;=\lVert{x_k-x_\star}\rVert^2,\\  \mathrm{Tr}(A_{\text{num}} G)&amp;=\lVert{x_k-\gamma g_k-x_\star}\rVert^2,\\ \mathrm{Tr}(A_1G)&amp;=\langle{g_k};{x_\star-x_k}\rangle+\frac{1}{2L}\lVert{g_k}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}g_k}\rVert^2,\\ \mathrm{Tr}(A_2G)&amp;=\tfrac{1}{2L}\lVert g_k\rVert^2+\tfrac{\mu}{2(1-\mu/L)}\lVert x_k-x_\star-\tfrac1L g_k\rVert^2.\end{array}$$ One possibility is to choose \(A_{\text{num}}\), \(A_{\text{denom}}\), \(A_1\) and \(A_2\) as symmetric matrices, as follows: $$\begin{array}{cc}<br /> A_{\text{denom}}=\begin{pmatrix}     1 &amp; 0\\ 0 &amp; 0     \end{pmatrix}, &amp; A_{\text{num}}=\begin{pmatrix}     1 &amp; -\gamma\\ -\gamma &amp; \gamma^2     \end{pmatrix}, \\ A_1=\begin{pmatrix}\tfrac{\mu}{2(1-\mu/L)} &amp; -\tfrac12-\tfrac{\mu}{2(L-\mu)} \\ -\tfrac12-\tfrac{\mu}{2(L-\mu)} &amp; \tfrac{1}{2L}+\tfrac{\mu}{2L(L-\mu)}\end{pmatrix}, &amp;  A_2=\begin{pmatrix}\tfrac{\mu}{2(1-\mu/L)} &amp; -\tfrac{\mu}{2(L-\mu)} \\ -\tfrac{\mu}{2(L-\mu)} &amp; \tfrac{1}{2L}+\tfrac{\mu}{2L(L-\mu)} \end{pmatrix}.\end{array}$$</p>
+
+
+
+<p class="justify-text">All those steps can be carried out in the exact same way for the problem of computing the convergence rate for function values, reaching a similar problem with \(6\) inequality constraints instead—because interpolation conditions have to be imposed on all pairs of points in a set of \(3\) points: \(x_k\), \(x_{k+1}\) and \(x_\star\), instead of only \(2\) for the distance problem. The objective function is then \(f_{k+1}-f_\star\), the de-homogenization constraint (arising from the denominator of the objective function) is \(f_{k}-f_\star \leqslant     1\), and the Gram matrix is \(3\times 3\):<br />$$G=\begin{pmatrix}<br />     \lVert{x_k-x_\star}\rVert^2 &amp; \langle{g_k};{x_k-x_\star}\rangle&amp; \langle{g_{k+1}};{x_k-x_\star}\rangle\\ \langle{g_k};{x_k-x_\star}\rangle &amp; \lVert{g_k}\rVert^2 &amp; \langle{g_k};{g_{k+1}}\rangle \\<br />     \langle{g_{k+1}};{x_k-x_\star}\rangle &amp; \langle{g_{k+1}};{g_k}\rangle &amp; \lVert{g_{k+1}}\rVert^2<br />     \end{pmatrix}\succcurlyeq 0, $$ and the function values variables are \(f_k\), \(f_{k+1}\) and \(f_\star\).</p>
+
+
+
+<p class="justify-text">We provide the numerical optimal values of those semidefinite programs on Figure 5 for both convergence in distances and in function values. </p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img src="https://www.di.ens.fr/~ataylor/BlogPost/ObjectiveValues.png" alt="" width="534" height="324" />Figure 5: worst-cases of the ratio \(\frac{\lVert{x_{k+1}-x_\star}\rVert^2}{\lVert{x_k-x_\star}\rVert^2}\) (red) and \(\frac{f(x_{k+1})-f_\star}{f(x_k)-f_\star}\) (dashed blue) as functions of the step size \(\gamma\), for the case where \(f\) is \(1\)-smooth and \(0.1\)-strongly convex. The results match exactly the expected \(\max\{(1-\gamma L)^2,(1-\gamma\mu)^2\}\) in both cases. Note that the corresponding SDPs can be solved both for “good and bad” choices of step sizes: if the step size is chosen wisely then \(\rho(\gamma)&lt;1\), and otherwise \(\rho(\gamma)\geqslant 1\). The SDP confirms the common knowledge that \(\gamma\in (0,2/L)\Rightarrow \rho(\gamma)&lt; 1\). Numerical values obtained through YALMIP [<a href="https://yalmip.github.io/">9</a>] and Mosek [<a href="https://www.mosek.com/">10</a>].</figure></div>
+
+
+
+<p class="justify-text">As a conclusion for this section, let us note that we showed how to compute the “best” rates that are dimension independent. Technically, requiring \(x_k\) and \(g_k\) to lie in \(\mathbb{R}^d\) is equivalent to adding a rank constraint in the SDP.</p>
+
+
+
+<h2>Duality between worst-case scenarios and combinations of inequalities</h2>
+
+
+
+<p class="justify-text">Any feasible point to the previous SDP corresponds to a <em>lower bound</em>: a sampled version of a potentially difficult function for gradient descent. If we want to find <em>upper bounds</em> on the rate, a natural way to proceed is to go to the dual side of the previous SDPs, where any feasible point will naturally correspond to an upper bound on the convergence rate (by <em>weak duality</em>). As the primal problems were SDPs, their Lagrangian duals are SDPs as well. Let us associate one multiplier per constraint: $$ \begin{array}{rl}<br />f_k-f_\star+\mathrm{Tr} (A_1 G)\leqslant 0&amp;:\lambda_1\\<br />f_\star-f_k+\mathrm{Tr} (A_2 G)\leqslant 0&amp;:\lambda_2\\<br />\mathrm{Tr}(A_\text{denom} G) \leqslant 1&amp;: \tau.<br />\end{array}$$The dual is then<br />$$\begin{array}{rl}<br /> \underset{\tau,\,\lambda_1,\,\lambda_2}{\min} &amp; \, \tau \\<br /> \text{s.t. } &amp; \lambda_1=\lambda_2,\\<br /> &amp; S:=A_\text{num}-\tau A_\text{denom}-\lambda_1A_1-\lambda_2A_2 \preccurlyeq 0,\\<br /> &amp;\tau,\lambda_1,\lambda_2 \geqslant  0.<br /> \end{array}$$ Hence, by weak duality, any feasible point to this last SDP corresponds to an upper bound on the rate: \(\tau \geqslant \rho^2\). A mere rephrasing of weak duality can be obtained through the following reasoning: assume we received some feasible \(\tau,\lambda_1,\lambda_2\) (and hence \(\lambda_1=\lambda_2\) and a corresponding \(S\preccurlyeq 0\)), we then get, for any primal feasible \(G\succcurlyeq0\):<br />$$\begin{array}{rl}\mathrm{Tr}(SG)&amp;=\mathrm{Tr}(A_{\text{num}}G)-\tau\mathrm{Tr}(A_{\text{denom}}G)-\lambda_1\mathrm{Tr}(A_1G)-\lambda_2\mathrm{Tr}(A_2G)\\&amp;=\lVert x_{k+1}-x_\star\rVert^2-\tau\lVert x_{k}-x_\star\rVert^2\\ \,&amp;\,\,\,-\lambda_1[     f_k-f_\star+\langle{g_k};{x_\star-x_k}\rangle+\frac{1}{2L}\lVert{g_k}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}g_k}\rVert^2]\\ &amp;\,\,\,-\lambda_2 [f_\star-f_k+\frac{1}{2L}\lVert{g_k}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}g_k}\rVert^2]\\ &amp;\geqslant \lVert x_{k+1}-x_\star\rVert^2-\tau\lVert x_{k}-x_\star\rVert^2, \end{array}$$ where the first equality follows from the definition of \(S\), the second equality corresponds to the definitions of \(A_{\text{num}}\), \(A_{\text{denom}}\), \(A_1\) and \(A_2\), and the last inequality follows from the sign of the interpolation inequalities (constraints in the primal) for any primal feasible point. Hence, we indeed have that any feasible \(\tau\) corresponds to a valid upper bound on the convergence rate, as $$S\preccurlyeq 0 \,\,\Rightarrow \,\, \mathrm{Tr}(SG)\leqslant 0\,\,\Rightarrow  \lVert x_{k+1}-x_\star\rVert^2-\tau\lVert x_{k}-x_\star\rVert^2\leqslant 0.$$ In order to obtain analytical proofs, we therefore need to find analytical dual feasible points, and numerics can of course help in this process! Let’s look at what the optimal dual solutions look like for our two running examples.</p>
+
+
+
+<ul class="justify-text"><li> in Figure 6, we provide the numerical values for \(\lambda_1\) and \(\lambda_2\) for the distance problem.</li></ul>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img src="https://www.di.ens.fr/~ataylor/BlogPost/Multipliers_distance.png" alt="" width="467" height="316" />Figure 6: numerical values of optimal dual variables: \(\lambda_1\) (red) and \(\lambda_2\) (dashed blue) as functions of the step size \(\gamma\), for the case where \(f\) is \(1\)-smooth and \(0.1\)-strongly convex. The results match \(\lambda_1=\lambda_2=2\gamma \rho(\gamma)\) with \(\rho(\gamma)=\max\{|1-\gamma L|,|1-\gamma\mu|\}\). Numerical values obtained with YALMIP [<a href="https://yalmip.github.io/">9</a>] and Mosek [<a href="https://www.mosek.com/">10</a>].</figure></div>
+
+
+
+<ul class="justify-text"><li>For function values, the SDP is slightly more complicated, as more inequalities are involved (6 interpolation inequalities). We provide raw numerical values for the six multipliers in Figure 7.</li></ul>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img src="https://www.di.ens.fr/~ataylor/BlogPost/Multipliers_function.png" alt="" width="463" height="348" />Figure 7: numerical values of optimal dual variables (for the rate in function values): \(\lambda_1,\lambda_2, …,\lambda_6\) as functions of the step size \(\gamma\), for the case where \(f\) is \(1\)-smooth and \(0.1\)-strongly convex. Numerical values obtained with YALMIP [<a href="https://yalmip.github.io/">9</a>] and Mosek [<a href="https://www.mosek.com/">10</a>].</figure></div>
+
+
+
+<p>For those who want a bit more details, here are a few additional pointers:</p>
+
+
+
+<ul class="justify-text"><li>Strong duality holds—a way to prove it is to show that there exists a Slater point in the primal, see e.g., [<a href="https://link.springer.com/article/10.1007/s10107-016-1009-3">4</a>, Theorem 6]—, and hence primal and dual optimal values match.</li><li>There might be different ways to optimaly combine the interpolation inequalities for proving the desired results. In other words: dual optimal solutions are often not unique—which is, in fact, quite a good news: I am sure nobody want to find the analytical version of the multipliers provided in Figure 7.</li><li>It is often possible to simplify the proofs by using fewer, or weaker, inequalities. This might lead to ”cleaner” results, typically (but not always) at the cost of ”weaker” rates. This was done for designing the proof for function values, later in this text.</li></ul>
+
+
+
+<h2>Combinations of inequalities: same proofs without SDPs</h2>
+
+
+
+<p class="justify-text">So far, we showed that computing convergence rates can be done in a very principled way. To this end, one can solve semidefinite programs—which may have arbitrarily complicated analytical solutions. Here, I want to emphasize that the process of <em>verifying</em> a solution can be quite different to that of<em> finding</em> a solution. Put in other words, although the dual certificates (a.k.a., the proofs) might have been found by solving SDPs, they can be formulated in ways that do not require the reader to know anything about the PEP methodology, nor on any SDP material, for verifying them. This fact might actually not be very surprising to the reader, as many proofs arising in the first-order optimization literature actually “only consists” in linear combinations of (quadratic) inequalities. On the one hand, those proofs can be seen as feasible points to “dual SDPs”, although generally not explicitely proved as such. On the other hand, proofs arising from the SDPs might therefore be expected to be writable without any explicit reference to semidefinite programing and performance estimation problems.<br /></p>
+
+
+
+<p class="justify-text">In what follows, we provide the proofs for gradient descent, using the previous numerical inspiration, but without explicitly relying on any semidefinite program. The reader is not expected to verify any of those computations, as our goal is rather to emphasize that the principles underlying both proofs are exactly the same: reformulating linear combinations of inequalities.</p>
+
+
+
+<p class="justify-text">For both proofs below, we limit ourselves to the step size regime \(0\leq   \gamma \leq \tfrac{2}{L+\mu}\), and we prove  that, in  this regime, \(\rho(\gamma)=(1-\gamma\mu)\)—actually we only proof the upper bounds, but one can easily verify that they are <em>tight</em> on simple quadratic functions.  The complete proofs (for the proximal gradient method),  can be found in [<a href="https://arxiv.org/pdf/1705.04398.pdf">11</a>]. </p>
+
+
+
+<h3>Example 1: distance to optimality</h3>
+
+
+
+<p class="justify-text">Recall the notations: \(g_k:=\nabla f(x_k)\), \(f_k:= f(x_k)\), \(g_\star:=\nabla f(x_\star)\), and \(f_\star:= f(x_\star)\).</p>
+
+
+
+<p class="justify-text">For distance to optimality, sum the following inequalities with their corresponding weights: $$\begin{array}{r}     f_\star \geqslant      f_k+\langle{g_k};{x_\star-x_k}\rangle+\frac{1}{2L}\lVert{g_k-g_\star}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}(g_k-g_\star)}\rVert^2  :\lambda_1,  \\     f_k \geqslant      f_\star+\langle{g_\star};{x_k-x_\star}\rangle+\frac{1}{2L}\lVert{g_k-g_\star}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}(g_k-g_\star)}\rVert^2:\lambda_2.     \end{array}$$ We use the following values for the multipliers: \(\lambda_1=\lambda_2=2\gamma\rho(\gamma) \geqslant      0\) (see Figure 6). </p>
+
+
+
+<p class="justify-text">After appropriate substitutions of \(g_\star\), \(x_{k+1}\), and \(\rho(\gamma)\), using respectively \(g_\star=0\), \(x_{k+1}=x_k-\gamma g_k\) and \(\rho(\gamma)=(1-\gamma\mu)\), and with little effort, one can check that the previous weighted sum of inequalities can be written in the form: $$ \begin{array}{rl}    \lVert{x_{k+1}-x_\star}\rVert^2  \leqslant      &amp; \left(1-\gamma \mu \right)^2\lVert{x_{k}-x_\star}\rVert^2 -\frac{\gamma(2-\gamma (L+\mu))}{L-\mu} \lVert{\mu {(x_k  -x_\star)} – g_k}\rVert^2. \end{array}$$ This statement can be checked simply by expanding both expressions (i.e., the weighted sum and its reformulation) and verifying that all terms indeed match.</p>
+
+
+
+<p class="justify-text">Finally, using $$\gamma(2-\gamma (L+\mu)) \geqslant      0,  \text{ and } L-\mu \geqslant      0,$$ which are nonnegative by assumptions on the values of \(L\in(0,\infty)\), \(\mu\in (0,L)\) and \(\gamma\in(0,2/(L+\mu))\), we arrive to the desired $$ \lVert{x_{k+1}-x_\star}\rVert^2 \leqslant      \left(1-\gamma \mu \right)^2\lVert{x_{k}-x_\star}\rVert^2.$$</p>
+
+
+
+<p class="justify-text">Note that, by using \(\lambda_1=\lambda_2\), the weighted sum exactly corresponds to the (scaled by a positive constant) inequality introduced in the early stage of this note for studying distance to optimality. However, the resulting expression is tight for all values of the step size here, whereas it was only tight for \(\gamma=2/(L+\mu)\) earlier, due to a different choice of weights! </p>
+
+
+
+<p class="justify-text">The curious reader might wonder how to find such a reformulation. Actually, back in terms of SDPs, and using the expressions for the multipliers, it simply corresponds to $$\mathrm{Tr}(SG)=-\frac{\gamma(2-\gamma (L+\mu))}{L-\mu} \lVert{\mu {(x_k  -x_\star)} – g_k}\rVert^2.$$ In the example below, the reformulation is a bit more tricky—as \(\mathrm{Tr}(SG)\)  has two nonnegative terms, which were simply obtained by doing an analytical Cholesky factorization of the term \(\mathrm{Tr}(SG)\)—, but the idea is exactly the same.</p>
+
+
+
+<h3>Example 2: function values</h3>
+
+
+
+<p class="justify-text">For function values, we combine the following inequalities after multiplication with their respective coefficients:    </p>
+
+
+
+<p class="justify-text">$$\scriptsize \begin{array}{lr}     f_k \geqslant      f_{k+1}+\langle{g_{k+1}};{x_k-x_{k+1}}\rangle+\frac{1}{2L}\lVert{g_k-g_{k+1}}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_{k+1}-\frac{1}{L}(g_k-g_{k+1})}\rVert^2    &amp;:\lambda_1,\\<br />f_\star \geqslant      f_k+\langle{g_k};{x_\star-x_k}\rangle+\frac{1}{2L}\lVert{g_k-g_\star}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{1}{L}(g_k-g_\star)}\rVert^2  &amp;:\lambda_2, \\<br />f_\star \geqslant      f_{k+1}+\langle{g_{k+1}};{x_\star-x_{k+1}}\rangle+\frac{1}{2L}\lVert{g_\star-g_{k+1}}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_\star-x_{k+1}-\frac{1}{L}(g_\star-g_{k+1})}\rVert^2  &amp;:\lambda_3.     \end{array}$$ We use the following multipliers \(\lambda_1=\rho(\gamma)\), \(\lambda_2=(1-\rho(\gamma))\rho(\gamma)\), and  \(\lambda_3=1-\rho(\gamma)\) (obtained by greedily trying to set different combinations of multipliers to \(0\) in the SDP—see Figure 7 for the values without such simplifications).</p>
+
+
+
+<p class="justify-text">Again, after appropriate substitutions of \(g_\star\), \(x_{k+1}\), and \(\rho(\gamma)\), using respectively \(g_\star=0\), \(x_{k+1}=x_k-\gamma g_k\) and \(\rho(\gamma)=(1-\gamma\mu)\), we obtain that the weighted sum of inequalities can be reformulated exactly as $$  \begin{array}{rl}          f(x_{k+1})-f_\star \leqslant      &amp;\left(1-\gamma \mu\right)^2 \left(f(x_k)-f_\star\right)\\&amp;-\frac{1}{2 (L-\mu)}\lVert \nabla f(x_{k+1})-(1-\gamma  (L+\mu))\nabla f(x_k) +\gamma  \mu  L (x_\star-x_k)\rVert^2\\<br />&amp;-\frac{\gamma  L(2- \gamma  (L+\mu))}{2 (L-\mu )}\lVert \nabla f(x_k)+\mu  (x_\star-x_k)\rVert^2.\end{array}$$ Again, this statement can be checked simply by expanding both expressions (i.e., the weighted sum and its reformulation), and verifying that all terms match. The desired conclusion $$ f(x_{k+1})-f_\star \leqslant \left(1-\gamma \mu\right)^2 \left(f(x_k)-f_\star\right), $$ follows from the signs of the leading coefficients: \(\gamma(2-\gamma (L+\mu)) \geqslant      0\), and \(L-\mu \geqslant      0\).</p>
+
+
+
+<h3>To go further</h3>
+
+
+
+<p class="justify-text">Before finishing, let us mention that we only dealt with linear convergence through a single iteration of gradient descent.</p>
+
+
+
+<p class="justify-text">There are quite a few ways to handle both more iterations and sublinear convergence rates. Using SDPs, probably the most natural approach is to directly incorporate several iterations in the problem by  studying, for example, ratios of the form  $$\sup_{f\in\mathcal{F}_{\mu,L},\, x_0}  \frac{f(x_{N})-f_\star}{\lVert x_0-x_\star\rVert^2}. $$ This type of approach was used in the work of Drori and Teboulle [<a href="https://arxiv.org/pdf/1206.3209.pdf">2</a>] and in most consecutive PEP-related works: it has the advantage of providing  comfortable “non-improvable results” [<a href="https://link.springer.com/article/10.1007/s10107-016-1009-3">4</a>, <a href="https://arxiv.org/pdf/1512.07516.pdf">12</a>]   (by providing matching lower bounds) for any given \(N\), but requires solving larger and larger SDPs. Alternatively, simpler proofs can often be obtained through the use of  Lyapunov (or potential) functions—i.e., study a single iteration to produce recursable inequalities; a nice introduction is provided in [<a href="http://www.theoryofcomputing.org/articles/v015a004/v015a004.pdf">13</a>]. This idea can be exploited in PEPs [<a href="https://arxiv.org/pdf/1902.00947.pdf">14</a>] by enforcing the proofs to have a certain structure. Those principles are also at the heart of the related approach using integral quadratic constraints [<a href="https://epubs.siam.org/doi/abs/10.1137/15M1009597">3</a>, <a href="http://proceedings.mlr.press/v70/hu17a/hu17a.pdf">15</a>]. </p>
+
+
+
+<h2>Take-home message and conclusions</h2>
+
+
+
+<p class="justify-text">The overall message of this note is that first-order methods can often be studied directly using the definition of their “worst-cases” (i.e., by trying to find worst-case scenarios), along with their dual counterparts (linear combinations of inequalities), by translating them into semidefinite programs.</p>
+
+
+
+<p class="justify-text">What we saw might look like an overkill for studying gradient descent. However, as long as we deal with Euclidean spaces, the same approach actually works beyond this simple case. In particular, the same technique applies to first-order methods performing explicit, projected, proximal, conditional, and inexact (sub)gradient steps [<a href="https://arxiv.org/pdf/1512.07516.pdf">12</a>].</p>
+
+
+
+<p class="justify-text">Finally, let us mention a few previous works illustrating that the use of such computer-assisted proofs allowed obtaining results that are apparently too complicated for us to find bare-handed—even in apparently simple contexts.  Reasonable examples include the direct proof for convergence rates in  function values [<a href="https://arxiv.org/pdf/1705.04398.pdf">11</a>] presented above, but also proofs arising in the context of optimized numerical schemes [<a href="https://arxiv.org/pdf/1206.3209.pdf">2</a>, <a href="https://arxiv.org/abs/1409.2636">16</a>, <a href="https://arxiv.org/pdf/1406.5468.pdf">17</a>, <a href="https://arxiv.org/pdf/1803.06600.pdf">18</a>]—in particular [<a href="https://arxiv.org/pdf/1803.06600.pdf">18</a>] presents a method for minimizing the gradient norm at the last iterate, in smooth convex minimization—,  in the context of monotone inclusions,  and even for more general fixed-point problems (e.g., for Halpern iterations [<a href="http://www.optimization-online.org/DB_FILE/2017/11/6336.pdf">19</a>]).</p>
+
+
+
+<h3>Toolbox</h3>
+
+
+
+<p class="justify-text">The PErformance EStimation TOolbox (PESTO) [<a href="https://perso.uclouvain.be/julien.hendrickx/availablepublications/PESTO_CDC_2017.pdf">20</a>, see <a href="https://github.com/AdrienTaylor/Performance-Estimation-Toolbox/graphs/traffic">Github</a>] allows a quick access to the methodology without worrying about details of semidefinite reformulations. The toolbox contains many  examples (about 50) in different settings, and include progresses on the approach, and results, by other groups (which are much more thoroughly referenced in the <a href="https://github.com/AdrienTaylor/Performance-Estimation-Toolbox/blob/master/UserGuide.pdf">user guide</a>). In particular, we included standard classes of functions and operators, along with examples for analyzing recent optimized methods.</p>
+
+
+
+<h2>References</h2>
+
+
+
+<p class="justify-text">[1] Mark Schmidt, Nicolas Le Roux, Francis Bach. <a href="https://arxiv.org/pdf/1309.2388.pdf">Minimizing finite sums with the stochastic average gradient</a>. <em>Mathematical Programming</em>, <em>162</em>(1-2), 83-112, 2017.<br />[2] Yoel Drori, Marc Teboulle. <a href="https://arxiv.org/pdf/1206.3209.pdf">Performance of first-order methods for smooth convex minimization: a novel approach</a>. <em>Mathematical Programming</em>, 145(1-2), 451-482, 2014.<br />[3] Laurent Lessard, Benjamin Recht, Andrew Packard. <a href="https://epubs.siam.org/doi/abs/10.1137/15M1009597">Analysis and design of  optimization algorithms via integral quadratic constraints</a>. <em>SIAM Journal on Optimization</em>, 26(1), 57-95, 2016.<br />[4] Adrien Taylor,  Julien Hendrickx, François Glineur. <a href="https://link.springer.com/article/10.1007/s10107-016-1009-3">Smooth strongly convex interpolation and exact worst-case performance of first-order methods</a>. <em>Mathematical Programming</em>, 161(1-2), 307-345, 2017.<br />[5] Yurii Nesterov. <a href="https://link.springer.com/book/10.1007/978-1-4419-8853-9">Introductory Lectures on Convex Optimization : a Basic Course</a>. <em>Applied optimization</em>. Kluwer Academic Publishing, 2004.<br />[6]  Boris Polyak. Introduction to Optimization. Optimization Software New York, 1987.<br />[7] Daniel Azagra, Carlos Mudarra. <a href="https://arxiv.org/pdf/1603.00241.pdf">An extension theorem for convex functions of class \(C^{1,1}\) on Hilbert spaces</a>. <em>Journal of Mathematical Analysis and Applications</em>, 446(2):1167–1182, 2017.<br />[8] Aris Daniilidis, Mounir Haddou, Erwan Le Gruyer, Olivier Ley. <a href="https://hal.archives-ouvertes.fr/hal-01530908/file/DHLL_appendix.pdf">Explicit formulas for \(C^{1,1}\) Glaeser-Whitney extensions of 1-Taylor fields in Hilbert spaces</a>. <em>Proceedings of the American Mathematical Society</em>, 146(10):4487–4495, 2018.<br />[9] Johan Löfberg. <a href="https://yalmip.github.io/">YALMIP : A toolbox for modeling and optimization in MATLAB</a>. <em>Proceedings of the CACSD Conference</em>, 2004.<br />[10] APS Mosek. <a href="https://www.mosek.com/">The MOSEK optimization software</a>. Online at http://www.mosek.com, 54, 2010.<br />[11] Adrien Taylor, Julien Hendrickx, François Glineur. <a href="https://arxiv.org/pdf/1705.04398.pdf">Exact worst-case convergence rates of the proximal gradient method for  composite convex minimization</a>. <em>Journal of Optimization Theory and Applications</em>, vol. 178, no 2, p. 455-476, 2018.<br />[12] Adrien Taylor, Julien Hendrickx, François Glineur. <a href="https://arxiv.org/pdf/1512.07516.pdf">Exact worst-case performance of first-order methods for composite convex optimization</a>. <em>SIAM Journal on Optimization</em>, vol. 27, no 3, p. 1283-1313, 2017.<br />[13] Nikhil Bansal, Anupam Gupta. <a href="http://www.theoryofcomputing.org/articles/v015a004/v015a004.pdf">Potential-Function Proofs for Gradient Methods. <em>Theory of Computing</em></a>, <em>15</em>(1), 1-32, 2019.<br />[14] Adrien Taylor, Francis Bach. <a href="https://arxiv.org/pdf/1902.00947.pdf">Stochastic first-order methods: non-asymptotic and computer-aided analyses via potential functions</a>, <em>Proceedings of the 32nd Conference on Learning Theory (COLT)</em>, 99:2934-2992, 2019.  <br />[15] Bin Hu, Laurent Lessard. <a href="http://proceedings.mlr.press/v70/hu17a/hu17a.pdf">Dissipativity theory for Nesterov’s accelerated method</a>, <em>Proceedings of the 34th International Conference on Machine Learning</em>, 70:1549-1557, 2017. <br />[16] Yoel Drori, Marc Teboulle. <a href="https://arxiv.org/abs/1409.2636">An optimal variant of Kelley’s cutting-plane method</a>. <em>Mathematical Programming</em> 160.1-2: 321-351, 2016.<br />[17] Donghwan<strong> </strong>Kim, Jeffrey Fessler. <a href="https://arxiv.org/pdf/1406.5468.pdf">Optimized first-order methods for smooth convex minimization</a>, <em>Mathematical programming</em>, <em>159</em>(1-2), 81-107, 2016.<br />[18] Donghwan Kim, Jeffrey Fessler. <a href="https://arxiv.org/pdf/1803.06600.pdf">Optimizing the efficiency of first-order methods for decreasing the gradient of smooth convex functions</a>, <em>preprint arXiv:1803.06600</em>, 2018.   <br />[19] Felix Lieder. <a href="http://www.optimization-online.org/DB_FILE/2017/11/6336.pdf">On the convergence rate of the Halpern-iteration</a>. Technical Report, 2019.<br />[20] Adrien Taylor, Julien Hendrickx, François Glineur.  <a href="https://perso.uclouvain.be/julien.hendrickx/availablepublications/PESTO_CDC_2017.pdf">Performance estimation toolbox (PESTO): automated worst-case analysis of  first-order optimization methods</a>,<em> Proceedings of the 56th Annual Conference on Decision and Control (CDC)</em>, pp. 1278-1283, 2017.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Adrien Taylor <a href="https://francisbach.com/computer-aided-analyses/"><span class="datestr">at April 03, 2020 11:37 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -272,7 +605,7 @@ Powered by<br>
 <div class="entry">
 <div class="content" lang="en">
 <p>This post is devoted to a few memories of Boris Tsirelson who passed away at the end of January. I would like to mention that a few days ago graph theorist Robin Thomas passed away after long battle with ALS. I hope  to tell about Robin’s stunning mathematics in a future post.</p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/tsirelson_boris.jpg"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/03/tsirelson_boris.jpg?w=640&amp;h=480" class="alignnone size-full wp-image-19552" height="480" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/tsirelson_boris.jpg"><img src="https://gilkalai.files.wordpress.com/2020/03/tsirelson_boris.jpg?w=640&amp;h=480" alt="" width="640" class="alignnone size-full wp-image-19552" height="480" /></a></p>
 <p>Boris Tsirelson (1950 – 2020); <a href="http://www.math.tau.ac.il/~tsirel/">Boris’ home-page</a>, and <a href="https://en.wikipedia.org/wiki/Boris_Tsirelson">Wikipedia</a>. (More links, below.)</p>
 <p>The title of the post is taken from the title of a very interesting 1999 paper by Boris Tsirelson and Oded Schramm: <a href="https://arxiv.org/abs/math/9902116">Trees, not cubes: hypercontractivity, cosiness, and noise stability</a></p>
 <p>I was very sad and shocked to hear that Boris Tsirelson had passed away. Boris was one of the greatest Israeli mathematicians, and since 1997 or so we established mathematical connections surrounding several matters of common interest.  Here are a few memories.</p>
@@ -1336,12 +1669,12 @@ by Luca Aceto (noreply@blogger.com) <a href="http://processalgebra.blogspot.com/
 <p>Eight weeks ago <a href="https://gilkalai.wordpress.com/2020/02/03/thinking-about-the-people-of-wuhan-and-china/">I wrote</a> that my heart goes out to the people of Wuhan and China, and these days my heart goes out to people in Italy, Spain, the US, Iran, France, the United Kingdom, Germany, Netherland and many other countries all over the world. Of course, I am especially worried about the situation here in my beloved country Israel, and let me tell you a little about it.</p>
 <p>The pandemic started here late but it hit us pretty hard with 5,358 identified cases yesterday. Severe measures of social distancing were gradually introduced, and right now it is too early to tell if the pandemic is under control.</p>
 <p>My part in this struggle is to stay at home. (Many Israeli scientists are making various endeavors and proposing ideas of various kind for fighting the disease and I salute them all for their efforts.) Like all of us I am very thankful to medical and other essential workers who are in the front-lines. As a scientist, I am especially impressed by the people from the Ministry of Health who manage the crisis and communicate with the public. They represent the very best we can offer in terms of science and medicine, decision making, gathering information, communicating with the public, and managing the crisis. In the picture below you can see three of the leaders – Moshe Bar Siman Tov (middle) Prof. Itamar Grotto (right) and Professor Sigal Sadetzki (left).</p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/listen.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/03/listen.png?w=640&amp;h=371" class="alignnone size-full wp-image-19695" height="371" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/listen.png"><img src="https://gilkalai.files.wordpress.com/2020/03/listen.png?w=640&amp;h=371" alt="" width="640" class="alignnone size-full wp-image-19695" height="371" /></a></p>
 <h2>And now for today’s post</h2>
 <p>We had a tradition of sharing entertaining taxi-and-more stories and this post belongs to this category. We note that our highest quality story teller Michal Linial, a prominent Israeli biologist, is now involved in various aspects of the struggle against the disease. Our post today is part of<a href="https://gilkalai.files.wordpress.com/2020/03/gil-michal.docx"> a report by Michal Feldman and me on our experience from the ICA3 conferences in Singapore and Birmingham</a>.</p>
 <h2>Partha Dasgupta, Robin Mason, Frank Ramsey, and James Bond</h2>
 <p>After hearing about him for many years, it was a great pleasure for both Michal Feldman and myself to finally meet Partha Dasgupta in person and to listen to his lecture. Partha who is the Frank Ramsey Professor of Economics at Cambridge was introduced by a person, who entered the room directly from an intercontinental flight, whom we did not know but who made a strong impression on us. He devoted part of his introduction to Frank Ramsey who was a mathematician, philosopher and economist, and who had made fundamental contributions to algebra and had developed the canonical model of saving in economic growth, before he died at the young age of 26. (And yes! also Ramsey’s theorem!)</p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/james-bond.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/03/james-bond.png?w=640&amp;h=423" class="alignnone size-full wp-image-19699" height="423" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/james-bond.png"><img src="https://gilkalai.files.wordpress.com/2020/03/james-bond.png?w=640&amp;h=423" alt="" width="640" class="alignnone size-full wp-image-19699" height="423" /></a></p>
 <p>Seeing the introducer, Robin Mason, three words came into our minds (more precisely two words, one repeated twice): “Bond, James Bond.”</p>
 <p>Indeed, this has led to the following sequence of profound ideas:</p>
 <p>1) Robin Mason is a perfect choice for a new generation James Bond.</p>
@@ -1414,7 +1747,7 @@ by Gil Kalai <a href="https://gilkalai.wordpress.com/2020/04/01/an-update-from-i
 
 
 
-<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img width="267" alt="" src="https://blog.simons.berkeley.edu/wp-content/uploads/2020/04/svp.png" class="wp-image-156" height="315" />Effect of a call to the SVP oracle. GSO log norms of the input in black, of the output in red. Note that the sum of the GSO log norms is a constant, so reducing the first vector, increases the (average of the) remaining vectors.</figure></div>
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img src="https://blog.simons.berkeley.edu/wp-content/uploads/2020/04/svp.png" alt="" width="267" class="wp-image-156" height="315" />Effect of a call to the SVP oracle. GSO log norms of the input in black, of the output in red. Note that the sum of the GSO log norms is a constant, so reducing the first vector, increases the (average of the) remaining vectors.</figure></div>
 
 
 
@@ -1495,7 +1828,7 @@ by Michael Walter <a href="https://blog.simons.berkeley.edu/2020/04/lattice-blog
 <tbody>
 <tr>
 <td>
-<a href="https://rjlipton.wordpress.com/2020/04/01/research-at-home/femalefool/" rel="attachment wp-att-16906"><img width="137" alt="" src="https://rjlipton.files.wordpress.com/2020/03/femalefool.png?w=137&amp;h=213" class="alignright wp-image-16906" height="213" /></a>
+<a href="https://rjlipton.wordpress.com/2020/04/01/research-at-home/femalefool/" rel="attachment wp-att-16906"><img src="https://rjlipton.files.wordpress.com/2020/03/femalefool.png?w=137&amp;h=213" alt="" width="137" class="alignright wp-image-16906" height="213" /></a>
 </td>
 </tr>
 <tr>
@@ -2065,7 +2398,7 @@ by Aaron (noreply@blogger.com) <a href="http://aaronsadventures.blogspot.com/202
 <tbody>
 <tr>
 <td>
-<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/perrinpin/" rel="attachment wp-att-16863"><img width="200" alt="" src="https://rjlipton.files.wordpress.com/2020/03/perrinpin.png?w=200&amp;h=154" class="alignright wp-image-16863" height="154" /></a>
+<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/perrinpin/" rel="attachment wp-att-16863"><img src="https://rjlipton.files.wordpress.com/2020/03/perrinpin.png?w=200&amp;h=154" alt="" width="200" class="alignright wp-image-16863" height="154" /></a>
 </td>
 </tr>
 <tr>
@@ -2090,7 +2423,7 @@ A key trick was to focus not on <img src="https://s0.wp.com/latex.php?latex=%7B%
 <p></p><p>
 We implement the “marked words” idea of Perrin and Pin by using extra dimensions rather than marks. Consider any formula <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi%28u_1%2C+%5Cdots%2C+u_j%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi(u_1, \dots, u_j)}" class="latex" title="{\phi(u_1, \dots, u_j)}" /> in FO[<img src="https://s0.wp.com/latex.php?latex=%7B%3C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{&lt;}" class="latex" title="{&lt;}" />] where <img src="https://s0.wp.com/latex.php?latex=%7Bu_1%2C%5Cdots%2Cu_j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{u_1,\dots,u_j}" class="latex" title="{u_1,\dots,u_j}" /> are the free variables. Our "stacked words" have <img src="https://s0.wp.com/latex.php?latex=%7Bj%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{j}" class="latex" title="{j}" /> extra rows underneath the top level holding the string <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{x}" class="latex" title="{x}" />. Each row <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i}" class="latex" title="{i}" /> has the same length <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{n}" class="latex" title="{n}" /> as <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{x}" class="latex" title="{x}" /> and contains a single <img src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{1}" class="latex" title="{1}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B%28n-1%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{(n-1)}" class="latex" title="{(n-1)}" /> <img src="https://s0.wp.com/latex.php?latex=%7B0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{0}" class="latex" title="{0}" />s. The column <img src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{k}" class="latex" title="{k}" /> in which the <img src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{1}" class="latex" title="{1}" /> lies gives the value of the variable <img src="https://s0.wp.com/latex.php?latex=%7Bu_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{u_i}" class="latex" title="{u_i}" />. Thus the alphabet of our stacked words is <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma%5E%7B%28j%29%7D+%3D+%5CSigma%5Ctimes%5C%7B0%2C1%5C%7D%5Ej%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\Sigma^{(j)} = \Sigma\times\{0,1\}^j}" class="latex" title="{\Sigma^{(j)} = \Sigma\times\{0,1\}^j}" />. Here is an example:</p>
 <p></p><p><br />
-<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/stackedword/" rel="attachment wp-att-16865"><img width="242" alt="" src="https://rjlipton.files.wordpress.com/2020/03/stackedword.jpg?w=242&amp;h=248" class="aligncenter wp-image-16865" height="248" /></a></p>
+<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/stackedword/" rel="attachment wp-att-16865"><img src="https://rjlipton.files.wordpress.com/2020/03/stackedword.jpg?w=242&amp;h=248" alt="" width="242" class="aligncenter wp-image-16865" height="248" /></a></p>
 <p></p><p><br />
 Each column is really a single character <img src="https://s0.wp.com/latex.php?latex=%7BC+%5Cin+%5CSigma%5E%7B%28j%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{C \in \Sigma^{(j)}}" class="latex" title="{C \in \Sigma^{(j)}}" />, but we picture its entries as characters in <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\Sigma}" class="latex" title="{\Sigma}" /> or <img src="https://s0.wp.com/latex.php?latex=%7B%5C%7B0%2C1%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\{0,1\}}" class="latex" title="{\{0,1\}}" />. For any row <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i}" class="latex" title="{i}" />, define <img src="https://s0.wp.com/latex.php?latex=%7BY_%7Bi%2C0%7D%28%5Ccdot%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Y_{i,0}(\cdot)}" class="latex" title="{Y_{i,0}(\cdot)}" /> to be the disjunction of <img src="https://s0.wp.com/latex.php?latex=%7BX_C%28%5Ccdot%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{X_C(\cdot)}" class="latex" title="{X_C(\cdot)}" /> over all <img src="https://s0.wp.com/latex.php?latex=%7BC%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{C}" class="latex" title="{C}" /> that have a <img src="https://s0.wp.com/latex.php?latex=%7B0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{0}" class="latex" title="{0}" /> in entry <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i}" class="latex" title="{i}" />, and define <img src="https://s0.wp.com/latex.php?latex=%7BY_%7Bi%2C1%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Y_{i,1}}" class="latex" title="{Y_{i,1}}" /> similarly. Then the following sentence expresses the “format condition” that row <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i}" class="latex" title="{i}" /> has exactly one <img src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{1}" class="latex" title="{1}" />: </p>
 <p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%28%5Cexists+k%29%5BY_%7Bi%2C1%7D%28k%29+%5Cland+%28%5Cforall+%5Cell%29+%5B%5Cell+%5Cneq+k+%5Crightarrow+Y_%7Bi%2C0%7D%28k%29%5D%5D.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle  (\exists k)[Y_{i,1}(k) \land (\forall \ell) [\ell \neq k \rightarrow Y_{i,0}(k)]]. " class="latex" title="\displaystyle  (\exists k)[Y_{i,1}(k) \land (\forall \ell) [\ell \neq k \rightarrow Y_{i,0}(k)]]. " /></p>
@@ -2112,15 +2445,15 @@ Without loss of generality we may suppose <img src="https://s0.wp.com/latex.php?
 <p>
 <em>Proof:</em>  Quantifier free formulas in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BFO%7D%5B%3C%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mathsf{FO}[&lt;]}" class="latex" title="{\mathsf{FO}[&lt;]}" /> are Boolean combinations of the <em>atomic predicates</em> <img src="https://s0.wp.com/latex.php?latex=%7BX_c%28u_i%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{X_c(u_i)}" class="latex" title="{X_c(u_i)}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bu_h+%3C+u_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{u_h &lt; u_i}" class="latex" title="{u_h &lt; u_i}" />. Here <img src="https://s0.wp.com/latex.php?latex=%7BX_c%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{X_c}" class="latex" title="{X_c}" /> is only for the characters <img src="https://s0.wp.com/latex.php?latex=%7Bc+%5Cin+%5CSigma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{c \in \Sigma}" class="latex" title="{c \in \Sigma}" />, not the stacked characters <img src="https://s0.wp.com/latex.php?latex=%7BC+%5Cin+%5CSigma%5E%7B%28j%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{C \in \Sigma^{(j)}}" class="latex" title="{C \in \Sigma^{(j)}}" />. But inside <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmu%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\mu}" class="latex" title="{\mu}" /> (when we have <img src="https://s0.wp.com/latex.php?latex=%7Bj+%3D+r%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{j = r}" class="latex" title="{j = r}" />) we have to deal with the whole stack to represent <img src="https://s0.wp.com/latex.php?latex=%7BX_c%28u_i%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{X_c(u_i)}" class="latex" title="{X_c(u_i)}" />. Putting <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma+%3D+%5C%7Bc_1%2C%5Cdots%2Cc_%7B%5Cell%7D%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\Sigma = \{c_1,\dots,c_{\ell}\}}" class="latex" title="{\Sigma = \{c_1,\dots,c_{\ell}\}}" />, the expression can be viewed schematically as:</p>
 <p></p><p><br />
-<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/xcstackedexp/" rel="attachment wp-att-16867"><img width="600" alt="" src="https://rjlipton.files.wordpress.com/2020/03/xcstackedexp.jpg?w=600&amp;h=126" class="aligncenter size-large wp-image-16867" height="126" /></a></p>
+<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/xcstackedexp/" rel="attachment wp-att-16867"><img src="https://rjlipton.files.wordpress.com/2020/03/xcstackedexp.jpg?w=600&amp;h=126" alt="" width="600" class="aligncenter size-large wp-image-16867" height="126" /></a></p>
 <p></p><p><br />
 As illustrated above, using the initial lemma in the part-1 <a href="https://rjlipton.wordpress.com/2020/03/21/star-free-regular-languages-and-logic/">post</a>, this is equivalent to a star-free regular expression. The other atomic predicate, <img src="https://s0.wp.com/latex.php?latex=%7Bu_h+%3C+u_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{u_h &lt; u_i}" class="latex" title="{u_h &lt; u_i}" />, is true when we have a stacked word <img src="https://s0.wp.com/latex.php?latex=%7BY%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Y}" class="latex" title="{Y}" /> of the form: </p>
 <p></p><p><br />
-<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/ltstackedword2/" rel="attachment wp-att-16891"><img width="300" alt="" src="https://rjlipton.files.wordpress.com/2020/03/ltstackedword2.jpg?w=300&amp;h=250" class="aligncenter wp-image-16891" height="250" /></a></p>
+<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/ltstackedword2/" rel="attachment wp-att-16891"><img src="https://rjlipton.files.wordpress.com/2020/03/ltstackedword2.jpg?w=300&amp;h=250" alt="" width="300" class="aligncenter wp-image-16891" height="250" /></a></p>
 <p></p><p><br />
 It is not important to have <img src="https://s0.wp.com/latex.php?latex=%7Bh+%3C+i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{h &lt; i}" class="latex" title="{h &lt; i}" />; these are just the labels of the variables. Their values <img src="https://s0.wp.com/latex.php?latex=%7Bk_1%2Ck_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{k_1,k_2}" class="latex" title="{k_1,k_2}" /> must obey <img src="https://s0.wp.com/latex.php?latex=%7Bk_1+%3C+k_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{k_1 &lt; k_2}" class="latex" title="{k_1 &lt; k_2}" />, meaning that the <img src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{1}" class="latex" title="{1}" /> in row <img src="https://s0.wp.com/latex.php?latex=%7Bh%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{h}" class="latex" title="{h}" /> comes in an earlier column than the <img src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{1}" class="latex" title="{1}" /> in row <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{i}" class="latex" title="{i}" />. The characters of <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{x}" class="latex" title="{x}" /> in the top row are immaterial. We can capture this condition over all strings <img src="https://s0.wp.com/latex.php?latex=%7BY%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Y}" class="latex" title="{Y}" /> over <img src="https://s0.wp.com/latex.php?latex=%7B%5CSigma%5E%7B%28j%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\Sigma^{(j)}}" class="latex" title="{\Sigma^{(j)}}" /> by the expression:</p>
 <p></p><p><br />
-<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/ltstackedexp/" rel="attachment wp-att-16872"><img width="600" alt="" src="https://rjlipton.files.wordpress.com/2020/03/ltstackedexp.jpg?w=600&amp;h=212" class="aligncenter size-large wp-image-16872" height="212" /></a></p>
+<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/ltstackedexp/" rel="attachment wp-att-16872"><img src="https://rjlipton.files.wordpress.com/2020/03/ltstackedexp.jpg?w=600&amp;h=212" alt="" width="600" class="aligncenter size-large wp-image-16872" height="212" /></a></p>
 <p></p><p><br />
 Again by the lemma in Part 1, this yields a star-free expression. To complete the basis, we note that if <img src="https://s0.wp.com/latex.php?latex=%7BL_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L_1}" class="latex" title="{L_1}" /> and <img src="https://s0.wp.com/latex.php?latex=%7BL_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L_2}" class="latex" title="{L_2}" /> have star-free expressions <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\alpha_1}" class="latex" title="{\alpha_1}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\alpha_2}" class="latex" title="{\alpha_2}" /> corresponding to <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi_1%2C+%5Cphi_2%5Cin+%5Cmathsf%7BFO%7D%5B%3C%5D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi_1, \phi_2\in \mathsf{FO}[&lt;]}" class="latex" title="{\phi_1, \phi_2\in \mathsf{FO}[&lt;]}" />, then <img src="https://s0.wp.com/latex.php?latex=%7B%5Clnot%5Cphi_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\lnot\phi_1}" class="latex" title="{\lnot\phi_1}" /> is represented by <img src="https://s0.wp.com/latex.php?latex=%7B%5Csim%7B%5Calpha_1%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\sim{\alpha_1}}" class="latex" title="{\sim{\alpha_1}}" /> and <img src="https://s0.wp.com/latex.php?latex=%7B%5Cphi_1%5Clor%5Cphi_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\phi_1\lor\phi_2}" class="latex" title="{\phi_1\lor\phi_2}" /> by <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha_1%5Ccup%5Calpha_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\alpha_1\cup\alpha_2}" class="latex" title="{\alpha_1\cup\alpha_2}" />, both of which are clearly star-free. </p>
 <p>
@@ -2141,25 +2474,25 @@ Since we have an existential quantifier we might think we can simply delete the 
 <p>
 Let <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%3D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\alpha=}" class="latex" title="{\alpha=}" /> </p>
 <p>
-<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/alphastackedexp/" rel="attachment wp-att-16875"><img width="600" alt="" src="https://rjlipton.files.wordpress.com/2020/03/alphastackedexp.jpg?w=600&amp;h=56" class="aligncenter size-large wp-image-16875" height="56" /></a></p>
+<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/alphastackedexp/" rel="attachment wp-att-16875"><img src="https://rjlipton.files.wordpress.com/2020/03/alphastackedexp.jpg?w=600&amp;h=56" alt="" width="600" class="aligncenter size-large wp-image-16875" height="56" /></a></p>
 <p>
 and <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%27%3D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\alpha'=}" class="latex" title="{\alpha'=}" /> </p>
 <p>
-<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/alphaprime/" rel="attachment wp-att-16876"><img width="600" alt="" src="https://rjlipton.files.wordpress.com/2020/03/alphaprime.jpg?w=600&amp;h=43" class="aligncenter size-large wp-image-16876" height="43" /></a></p>
+<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/alphaprime/" rel="attachment wp-att-16876"><img src="https://rjlipton.files.wordpress.com/2020/03/alphaprime.jpg?w=600&amp;h=43" alt="" width="600" class="aligncenter size-large wp-image-16876" height="43" /></a></p>
 <p>
 Notice that <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\alpha'}" class="latex" title="{\alpha'}" /> equals <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\alpha}" class="latex" title="{\alpha}" /> with its final row removed. We have <img src="https://s0.wp.com/latex.php?latex=%7BL_%5Calpha%3D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L_\alpha=}" class="latex" title="{L_\alpha=}" /></p>
 <p>
-<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/lalpha/" rel="attachment wp-att-16878"><img width="357" alt="" src="https://rjlipton.files.wordpress.com/2020/03/lalpha.jpg?w=357&amp;h=44" class="aligncenter wp-image-16878" height="44" /></a></p>
+<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/lalpha/" rel="attachment wp-att-16878"><img src="https://rjlipton.files.wordpress.com/2020/03/lalpha.jpg?w=357&amp;h=44" alt="" width="357" class="aligncenter wp-image-16878" height="44" /></a></p>
 <p>
 and <img src="https://s0.wp.com/latex.php?latex=%7BL_%7B%5Calpha%27%7D%3D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L_{\alpha'}=}" class="latex" title="{L_{\alpha'}=}" /></p>
 <p>
-<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/lalphaprime/" rel="attachment wp-att-16880"><img width="300" alt="" src="https://rjlipton.files.wordpress.com/2020/03/lalphaprime.jpg?w=300&amp;h=44" class="aligncenter wp-image-16880" height="44" /></a></p>
+<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/lalphaprime/" rel="attachment wp-att-16880"><img src="https://rjlipton.files.wordpress.com/2020/03/lalphaprime.jpg?w=300&amp;h=44" alt="" width="300" class="aligncenter wp-image-16880" height="44" /></a></p>
 <p></p><p><br />
 Then <img src="https://s0.wp.com/latex.php?latex=%7BL_%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L_\alpha}" class="latex" title="{L_\alpha}" /> is the language of strings with at least three zeroes in a row and <img src="https://s0.wp.com/latex.php?latex=%7BL_%7B%5Calpha%27%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L_{\alpha'}}" class="latex" title="{L_{\alpha'}}" /> is the language of strings with at least two zeroes in a row.</p>
 <p>
 We cannot add a second row consisting of zeroes and one 1 to each word <img src="https://s0.wp.com/latex.php?latex=%7Bw%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w}" class="latex" title="{w}" /> in <img src="https://s0.wp.com/latex.php?latex=%7BL_%5Calpha%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L_\alpha'}" class="latex" title="{L_\alpha'}" /> to force <img src="https://s0.wp.com/latex.php?latex=%7Bw%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w}" class="latex" title="{w}" /> to be in <img src="https://s0.wp.com/latex.php?latex=%7BL_%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{L_\alpha}" class="latex" title="{L_\alpha}" />. For a trivial example, consider the word <img src="https://s0.wp.com/latex.php?latex=%7Bw%3D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{w=}" class="latex" title="{w=}" /></p>
 <p>
-<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/w00/" rel="attachment wp-att-16881"><img width="75" alt="" src="https://rjlipton.files.wordpress.com/2020/03/w00.jpg?w=75&amp;h=36" class="aligncenter wp-image-16881" height="36" /></a></p>
+<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/w00/" rel="attachment wp-att-16881"><img src="https://rjlipton.files.wordpress.com/2020/03/w00.jpg?w=75&amp;h=36" alt="" width="75" class="aligncenter wp-image-16881" height="36" /></a></p>
 <p></p><p></p>
 <p>
 The fault can be interpreted as <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\alpha}" class="latex" title="{\alpha}" /> not being recoverable uniquely from <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\alpha'}" class="latex" title="{\alpha'}" /> owing to a loss of information. We could also pin the fault in this case on the central <img src="https://s0.wp.com/latex.php?latex=%7B%5Ccap%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\cap}" class="latex" title="{\cap}" />, noting that <img src="https://s0.wp.com/latex.php?latex=%7B%28%5Cexists+u%29%28f%28u%29+%5Cwedge+g%28u%29%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{(\exists u)(f(u) \wedge g(u))}" class="latex" title="{(\exists u)(f(u) \wedge g(u))}" /> is generally not equivalent to <img src="https://s0.wp.com/latex.php?latex=%7B%28%5Cexists+u%29f%28u%29+%5Cwedge+%28%5Cexists+u%29g%28u%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{(\exists u)f(u) \wedge (\exists u)g(u)}" class="latex" title="{(\exists u)f(u) \wedge (\exists u)g(u)}" />. </p>
@@ -2172,7 +2505,7 @@ By the Myhill-Nerode Theorem, there must exist a unique minimal automaton <img s
 <p>
 The state set <img src="https://s0.wp.com/latex.php?latex=%7BQ%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Q}" class="latex" title="{Q}" /> of <img src="https://s0.wp.com/latex.php?latex=%7BM_%5Cphi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{M_\phi}" class="latex" title="{M_\phi}" /> can be partitioned into the set <img src="https://s0.wp.com/latex.php?latex=%7BQ_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Q_1}" class="latex" title="{Q_1}" /> of states before any <img src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{1}" class="latex" title="{1}" /> is read in the final row, the set <img src="https://s0.wp.com/latex.php?latex=%7BQ_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Q_2}" class="latex" title="{Q_2}" /> of states reached after reading a <img src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{1}" class="latex" title="{1}" /> in the final row, plus a dead state <img src="https://s0.wp.com/latex.php?latex=%7Bq_D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{q_D}" class="latex" title="{q_D}" /> belonging to neither <img src="https://s0.wp.com/latex.php?latex=%7BQ_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Q_1}" class="latex" title="{Q_1}" /> nor <img src="https://s0.wp.com/latex.php?latex=%7BQ_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Q_2}" class="latex" title="{Q_2}" />. The start state belongs to <img src="https://s0.wp.com/latex.php?latex=%7BQ_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Q_1}" class="latex" title="{Q_1}" /> and all accepting states belong to <img src="https://s0.wp.com/latex.php?latex=%7BQ_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Q_2}" class="latex" title="{Q_2}" />. Since any stacked word and therefore accepting computation has exactly one <img src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{1}" class="latex" title="{1}" /> in any row, all arcs within <img src="https://s0.wp.com/latex.php?latex=%7BQ_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Q_1}" class="latex" title="{Q_1}" /> and <img src="https://s0.wp.com/latex.php?latex=%7BQ_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Q_2}" class="latex" title="{Q_2}" /> must have a only <img src="https://s0.wp.com/latex.php?latex=%7B0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{0}" class="latex" title="{0}" />s in their final row, while the letters connecting states in <img src="https://s0.wp.com/latex.php?latex=%7BQ_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Q_1}" class="latex" title="{Q_1}" /> and <img src="https://s0.wp.com/latex.php?latex=%7BQ_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Q_2}" class="latex" title="{Q_2}" /> must have a <img src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{1}" class="latex" title="{1}" /> in their final row. The minimality of <img src="https://s0.wp.com/latex.php?latex=%7BM_%5Cphi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{M_\phi}" class="latex" title="{M_\phi}" /> enforces these properties. Here is a sketch, omitting <img src="https://s0.wp.com/latex.php?latex=%7Bq_D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{q_D}" class="latex" title="{q_D}" />: </p>
 <p></p><p><br />
-<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/lphidfa/" rel="attachment wp-att-16883"><img width="600" alt="" src="https://rjlipton.files.wordpress.com/2020/03/lphidfa.jpg?w=600&amp;h=324" class="aligncenter size-large wp-image-16883" height="324" /></a></p>
+<a href="https://rjlipton.wordpress.com/2020/03/29/logic-and-star-free-part-deux/lphidfa/" rel="attachment wp-att-16883"><img src="https://rjlipton.files.wordpress.com/2020/03/lphidfa.jpg?w=600&amp;h=324" alt="" width="600" class="aligncenter size-large wp-image-16883" height="324" /></a></p>
 <p></p><p><br />
 Let <img src="https://s0.wp.com/latex.php?latex=%7BE%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{E}" class="latex" title="{E}" /> be the set of edges that cross from <img src="https://s0.wp.com/latex.php?latex=%7BQ_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Q_1}" class="latex" title="{Q_1}" /> to <img src="https://s0.wp.com/latex.php?latex=%7BQ_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{Q_2}" class="latex" title="{Q_2}" />. With <img src="https://s0.wp.com/latex.php?latex=%7Bm+%3D+%7CE%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{m = |E|}" class="latex" title="{m = |E|}" /> we can label their origins by states <img src="https://s0.wp.com/latex.php?latex=%7Bp_1%2C%5Cdots%2Cp_m%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{p_1,\dots,p_m}" class="latex" title="{p_1,\dots,p_m}" /> (not necessarily all distinct), and similarly label their characters by <img src="https://s0.wp.com/latex.php?latex=%7Bc_1%2C%5Cdots%2Cc_m%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{c_1,\dots,c_m}" class="latex" title="{c_1,\dots,c_m}" /> and the destination states by <img src="https://s0.wp.com/latex.php?latex=%7Br_1%2C%5Cdots%2Cr_m%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{r_1,\dots,r_m}" class="latex" title="{r_1,\dots,r_m}" />. Then <img src="https://s0.wp.com/latex.php?latex=%7BC+%3D+%5C%7Bc_1%2C%5Cdots%2Cc_m%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{C = \{c_1,\dots,c_m\}}" class="latex" title="{C = \{c_1,\dots,c_m\}}" /> collects all the characters used by <img src="https://s0.wp.com/latex.php?latex=%7BM%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{M}" class="latex" title="{M}" /> that have a <img src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{1}" class="latex" title="{1}" /> in row <img src="https://s0.wp.com/latex.php?latex=%7Bj%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{j}" class="latex" title="{j}" /> (except those into or at the dead state <img src="https://s0.wp.com/latex.php?latex=%7Bq_D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{q_D}" class="latex" title="{q_D}" />). We can identify <img src="https://s0.wp.com/latex.php?latex=%7BE%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{E}" class="latex" title="{E}" /> with the set of instructions <img src="https://s0.wp.com/latex.php?latex=%7B%5C%7B%28p_e%2C+c_e%2C+r_e%29%3A+1+%5Cleq+e+%5Cleq+m%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\{(p_e, c_e, r_e): 1 \leq e \leq m\}}" class="latex" title="{\{(p_e, c_e, r_e): 1 \leq e \leq m\}}" />. </p>
 <p>
@@ -2526,21 +2859,21 @@ Our methods are elementary and short and rely on a polynomial map of Shpilka and
 <p>A small memory: In 1970 there was a strike in Israelis’ high schools and I took a few classes at the university. One of these classes was Game theory and it was taught by <a href="https://gilkalai.wordpress.com/?s=Michael+Maschler">Michael Maschler</a>. (I also took that trimester a course on art taught by Ziva <span class="st"><span dir="ltr">Meisels</span></span>.) Our department at HUJI is very strong in game theory, but once all the “professional” game theorists retired, I gave twice a game theory course which I enjoyed a lot and it was well accepted by students. In term of the number of registered students, it seems that this year’s course at IDC is quite popular and I hope it will be successful.</p>
 <h2>The first six slides of the first presentation</h2>
 <p>(Click to enlarge)</p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/gt1.png"><img width="300" alt="" src="https://gilkalai.files.wordpress.com/2020/03/gt1.png?w=300&amp;h=225" class="alignnone size-medium wp-image-19661" height="225" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/gt1.png"><img src="https://gilkalai.files.wordpress.com/2020/03/gt1.png?w=300&amp;h=225" alt="" width="300" class="alignnone size-medium wp-image-19661" height="225" /></a></p>
 <p>Game Theory 2020, games, decisions, competition, strategies, mechanisms, cooperation</p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/gt2.png"><img width="300" alt="" src="https://gilkalai.files.wordpress.com/2020/03/gt2.png?w=300&amp;h=131" class="alignnone size-medium wp-image-19662" height="131" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/gt2.png"><img src="https://gilkalai.files.wordpress.com/2020/03/gt2.png?w=300&amp;h=131" alt="" width="300" class="alignnone size-medium wp-image-19662" height="131" /></a></p>
 <p>The course deals with basic notions, central mathematical results, and important examples in non-cooperative game theory and in cooperative game theory, and with connections of game theory with computer science, economics and other areas.</p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/gt3.png"><img width="300" alt="" src="https://gilkalai.files.wordpress.com/2020/03/gt3.png?w=300&amp;h=226" class="alignnone size-medium wp-image-19663" height="226" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/gt3.png"><img src="https://gilkalai.files.wordpress.com/2020/03/gt3.png?w=300&amp;h=226" alt="" width="300" class="alignnone size-medium wp-image-19663" height="226" /></a></p>
 <p>What we will learn</p>
 <p>1. Full information zero-sum games. The value of a game. Combinatorial games.</p>
 <p>2. Zero-sum games with incomplete information. Mixed strategies, the Minmax Theorem and the value of the game.</p>
 <p>3. Non cooperative games, the prisoner dilemma, Nash equilibrium, Nash’s theorem on the existence of equilibrium.</p>
 <p>4. Cooperative games, the core and the Shapley value. Nash bargaining problem, voting rules and social choice.</p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/gt4.png"><img width="300" alt="" src="https://gilkalai.files.wordpress.com/2020/03/gt4.png?w=300&amp;h=225" class="alignnone size-medium wp-image-19664" height="225" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/gt4.png"><img src="https://gilkalai.files.wordpress.com/2020/03/gt4.png?w=300&amp;h=225" alt="" width="300" class="alignnone size-medium wp-image-19664" height="225" /></a></p>
 <p>Background material:</p>
 <p><a href="https://homes.cs.washington.edu/~karlin/GameTheoryBook.pdf">Game theory alive</a> by Anna Karlin and Yuval Peres (available on-line).</p>
 <p>In addition I may use material from several books in Hebrew by Maschler, Solan, Zamir, by Hefetz, and by Megiddo (based on lectures by Peleg). (If only I will manage to unite with my books that are not here.) We will also use a site by Ariel Rubinstein for playing games and some material from the book by Osborne and Rubinstein.</p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/gt5.png"><img width="300" alt="" src="https://gilkalai.files.wordpress.com/2020/03/gt5.png?w=300&amp;h=226" class="alignnone size-medium wp-image-19665" height="226" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/gt5.png"><img src="https://gilkalai.files.wordpress.com/2020/03/gt5.png?w=300&amp;h=226" alt="" width="300" class="alignnone size-medium wp-image-19665" height="226" /></a></p>
 <p>Requirement and challenges:</p>
 <ul>
 <li><strong>Play, play, play games</strong>, in Ariel Rubinshtein site and various other games.</li>
@@ -2548,7 +2881,7 @@ Our methods are elementary and short and rely on a polynomial map of Shpilka and
 <li>Final assignment, including some programming project that can be carried out during the semester.</li>
 <li>Of course, we will experience on-line study which is a huge challenge for us all.</li>
 </ul>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/gt6.png"><img width="300" alt="" src="https://gilkalai.files.wordpress.com/2020/03/gt6.png?w=300&amp;h=226" class="alignnone size-medium wp-image-19667" height="226" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/gt6.png"><img src="https://gilkalai.files.wordpress.com/2020/03/gt6.png?w=300&amp;h=226" alt="" width="300" class="alignnone size-medium wp-image-19667" height="226" /></a></p>
 <p>Games and computers</p>
 <ul>
 <li>Computer games</li>
@@ -2562,7 +2895,7 @@ Our methods are elementary and short and rely on a polynomial map of Shpilka and
 </li>
 <li>Games, logic and automata: there will be a parallel course by <a href="http://www.faculty.idc.ac.il/udiboker/">Prof. Udi Boker</a></li>
 </ul>
-<p><a href="https://gilkalai.files.wordpress.com/2020/03/z9.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/03/z9.png?w=640&amp;h=192" class="alignnone size-large wp-image-19668" height="192" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/03/z9.png"><img src="https://gilkalai.files.wordpress.com/2020/03/z9.png?w=640&amp;h=192" alt="" width="640" class="alignnone size-large wp-image-19668" height="192" /></a></p>
 <p><span style="color: #ff0000;">I still have some difficulty with the virtual background in ZOOM.</span></p></div>
 
 
@@ -2909,58 +3242,6 @@ The approximate graph colouring problem concerns colouring a $k$-colourable
 
 <p class="date">
 by Boaz Barak <a href="https://windowsontheory.org/2020/03/26/technology-for-theory-covid-19-edition/"><span class="datestr">at March 26, 2020 12:52 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://eccc.weizmann.ac.il/report/2020/039">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eccc.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="https://eccc.weizmann.ac.il/report/2020/039">TR20-039 |  Lower bounds on the sum of 25th-powers of univariates lead to complete derandomization of PIT | 
-
-	Pranjal Dutta, 
-
-	Nitin Saxena, 
-
-	Thomas Thierauf</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://eccc.weizmann.ac.il/" title="ECCC - Reports">ECCC papers</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-We consider the univariate polynomial $f_d:=(x+1)^d$ when represented as a sum of constant-powers of univariate polynomials. We define a natural measure for the model, the support-union, and conjecture that it is $\Omega(d)$ for $f_d$. 
-
-We show a stunning connection of the conjecture to the two main problems in algebraic complexity: Polynomial Identity Testing (PIT) and VP vs VNP. Our conjecture on $f_d$ implies blackbox-PIT in P. Assuming the  Generalized Riemann Hypothesis (GRH), it also implies VP $\neq$ VNP. No such connection to PIT, from lower bounds on constant-powers representation of polynomials was known before. We establish that studying the expression of $(x+1)^d$, as the sum of $25^{th}$-powers of univariates, suffices to solve the two major open questions.   
-
-In support, we show that our conjecture holds over the integer ring of any number field. We also establish a connection with the well-studied notion of matrix rigidity.</div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="https://eccc.weizmann.ac.il/report/2020/039"><span class="datestr">at March 25, 2020 09:21 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>

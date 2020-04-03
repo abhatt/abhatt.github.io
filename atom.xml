@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-04-03T12:21:36Z</updated>
+  <updated>2020-04-03T13:21:51Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,324 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>https://francisbach.com/?p=2445</id>
+    <link href="https://francisbach.com/computer-aided-analyses/" rel="alternate" type="text/html"/>
+    <title>Computer-aided analyses in optimization</title>
+    <summary>In this blog post, I want to illustrate how computers can be great allies in designing (and verifying) convergence proofs for first-order optimization methods. This task can be daunting, and highly non-trivial, but nevertheless usually unavoidable when performing complexity analyses. A notable example is probably the convergence analysis of the stochastic average gradient (SAG) [1],...</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p class="justify-text">In this blog post, I want to illustrate how computers can be great allies in designing (and verifying) convergence proofs for first-order optimization methods. This task can be daunting, and highly non-trivial, but nevertheless usually unavoidable when performing complexity analyses. A notable example is probably the convergence analysis of the stochastic average gradient (SAG) [<a href="https://arxiv.org/pdf/1309.2388.pdf">1</a>], whose original proof was computer assisted.</p>
+
+
+
+<p class="justify-text">To this end, we will mostly spend time on what is referred to as <em>performance estimation problems</em> (PEPs), introduced by Yoel Drori and Marc Teboulle [<a href="https://link.springer.com/article/10.1007/s10107-013-0653-0">2</a>]. Performance estimation is also closely related to the topic of <em>integral quadratic constraints</em> (IQCs), introduced in the context of optimization by Laurent Lessard, Benjamin Recht and Andrew Packard [<a href="https://epubs.siam.org/doi/abs/10.1137/15M1009597">3</a>]. In terms of presentations, IQCs  leverages control theory, whereas PEPs might seem more natural in the optimization community. This blog post essentially presents PEPs from the point of view of [<a href="https://link.springer.com/article/10.1007/s10107-016-1009-3">4</a>], instantiated on a running example.</p>
+
+
+
+<h2>Overview, motivations</h2>
+
+
+
+<p class="justify-text">First-order methods for continuous optimization belong to the large panel of algorithms that are usually approached via worst-case analyses. In this context, analyses rely on combining inequalities (that are due to assumptions on the problem classes), in potentially long, non-intuitive, and technical, proofs. For the insiders, those proofs all look very similar. For the outsiders, those proofs all look rather repelling, technical (long pages of chained inequalities), probably not interesting, and like computer codes: usually intuitive mostly for their authors.</p>
+
+
+
+<p class="justify-text">In what follows, I want to show how (and why) those proofs are indeed all very similar. On the way, I want to emphasize how those combinations of inequalities are related to the “true essence” of worst-case analyses (which rely on computing worst-case scenarios), and to provide examples on how to constructively obtain them.</p>
+
+
+
+<p class="justify-text">We take the stand of illustrating the PEP approach on a single iteration of gradient descent, as it essentially contains all necessary ingredients to understand the methodology in other contexts as well. Certain details of the following text are (probably unavoidably) a bit technical. However, going through the detailed computations is not essential, and the text should contain the necessary ingredients for understanding the essence of the methodology.</p>
+
+
+
+<h2>Running example: gradient descent</h2>
+
+
+
+<p class="justify-text">Let us consider a naive, but standard, example: unconstrained convex minimization $$x_\star= \underset{x\in\mathbb{R}^d}{\mathrm{arg min}} f(x)$$with gradient descent: \(x_{k+1}=x_k-\gamma \nabla f(x_k)\). Let us assume \(f(\cdot)\) to be continuously differentiable, to have a \(L\)-Lipschitz gradient (a.k.a., \(L\)-smoothness), and to be \(\mu\)-strongly convex. Those functions satisfy, for all \(x,y\in\mathbb{R}^d\):<br/>– strong convexity, see e.g., [<a href="https://link.springer.com/book/10.1007/978-1-4419-8853-9">5</a>, Definition 2.1.2]: $$\tag{1}f(x) \geqslant      f(y)+\langle{\nabla f(y)}; {x-y}\rangle+\tfrac{\mu}{2} \lVert x-y\rVert^2,$$- smoothness, see e.g., [<a href="https://link.springer.com/book/10.1007/978-1-4419-8853-9">5</a>, Theorem 2.1.5]: $$\tag{2} f(x) \leqslant      f(y)+\langle{\nabla f(y)}; {x-y}\rangle+\tfrac{L}{2}\lVert x-y\rVert^2.$$Let us recall that in the case of twice continuously differentiable functions, smoothness and strong convexity amount to requiring  that $$\mu I \preccurlyeq \nabla^2 f(x) \preccurlyeq L I,$$ for some \(0&lt; \mu&lt;L&lt; \infty\) and for all \(x\in\mathbb{R}^d\) (in other words, all eigenvalues of \(\nabla^2 f(x)\) are between \(\mu\) and \(L\)). In what follows, we denote by \(\mathcal{F}_{\mu,L}\) the class of \(L\)-smooth \(\mu\)-strongly convex functions (irrespective of the dimension \(d\)).</p>
+
+
+
+<div class="wp-block-group"><div class="wp-block-group__inner-container">
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img alt="" height="204" src="https://www.di.ens.fr/~ataylor/BlogPost/SmoothStronglyConvex.png" width="473"/>Figure 1: the blue function is \(L\)-smooth and \(\mu\)-strongly convex (it is possible to create respectively global upper and lower quadratic bounds from every \(x\in\mathbb{R}^d\) with respectively curvatures \(L\) and \(\mu\)).</figure></div>
+</div></div>
+
+
+
+<p class="justify-text">In this context, convergence of gradient descent can be studied in many ways. Here, for the sake of the example, we will do it in terms of two base quantities: distance to optimality \(\lVert x_k-x_\star\rVert\), and function value accuracy \(f(x_k)-f(x_\star)\). There are, of course, infinitely many other possibilities, such as gradient norm \(\rVert \nabla f(x_k)\lVert\), Bregman divergence \(f(x_\star)-f(x_k)-\langle{\nabla f(x_k)};{x_\star-x_k}\rangle\), or even best function value observed throughout the iterations \(\min_{0\leq i\leq k} \{f(x_i)-f(x_\star)\}\): the reader can adapt the lines below for his/her favorite criterion. </p>
+
+
+
+<p class="justify-text">For later reference, let us provide another inequality that is known to  hold for all \(x,y\in\mathbb{R}^d\) for any \(L\)-smooth \( \mu\)-strongly convex function: <br/>– bound on inner product, see, e.g., [<a href="https://link.springer.com/book/10.1007/978-1-4419-8853-9">5</a>,  Theorem 2.1.11]: $$\langle{\nabla f(x)-\nabla f(y)};{x-y}\rangle  \geqslant        \tfrac{1}{L+\mu} \lVert{\nabla f(x)-\nabla f(y)}\rVert^2+\tfrac{\mu  L}{L+\mu}\lVert{x-y}\rVert^2.\tag{3}$$ In the case \(\mu=0\) this inequality is known as “cocoercivity”. This (perhaps mysterious) inequality happens to play an important role in convergence proofs.</p>
+
+
+
+<h3>A standard convergence result</h3>
+
+
+
+<p class="justify-text">Let us start by stating two known results along with their simple proofs (see, e.g.,  [<a href="https://link.springer.com/book/10.1007/978-1-4419-8853-9">5</a>, Theorem 2.1.14] or [6, Section 1.4.2, Theorems 2 &amp; 3]):<br/>– convergence in distance:  $$\begin{array}{rl}    \rVert{x_{k+1}-x_\star}\lVert^2&amp;= \lVert{x_k-x_\star}\rVert^2+\gamma^2\lVert{\nabla f(x_k)}\rVert-2\gamma\langle{\nabla f(x_k)};{x_k-x_\star}\rangle \\ \     &amp; \leqslant      \left(1-\tfrac{2\gamma L \mu}{L+\mu}\right)\lVert{x_k-x_\star}\rVert^2+\gamma\left(\gamma-\tfrac2{L+\mu}\right)\lVert{\nabla f(x_k)}\rVert^2, \end{array} $$ where the second line follows from smoothness and strong convexity of \(f\) via the bound (3) on the inner product (with \(x=x_k\) and \(y=x_\star\)). For the particular choice \(\gamma=\tfrac2{L+\mu}\), the second term on the right hand side disappears, and we end up with<br/>     $$\lVert{x_{k+1}-x_\star}\rVert^2 \leqslant      \left(\tfrac{L-\mu}{L+\mu}\right)^2\lVert{x_k-x_\star}\rVert^2,$$ which, following from \(0&lt;\mu&lt;L&lt;\infty\), satisfies \(0&lt; \tfrac{L-\mu}{L+\mu}&lt;1\), hence proving linear convergence of gradient descent in this setup, by recursively applying the previous inequality: $$ \lVert{x_{k}-x_\star}\rVert^2 \leqslant      \left(\tfrac{L-\mu}{L+\mu}\right)^{2k}\lVert{x_0-x_\star}\rVert^2.$$ – Convergence in function values: one can simply use the result in distance along with the previous basic inequalities (1) and (2) characterizing smoothness and strong convexity (both with \(y=x_\star\)):<br/>     $$f(x_k)-f(x_\star) \leqslant \hspace{-.15cm}\tfrac{L}{2}\hspace{-.1cm}\rVert{x_k-x_\star}\lVert^2  \leqslant  \hspace{-.15cm}    \tfrac{L}{2}\hspace{-.1cm}\left(\tfrac{L-\mu}{L+\mu}\right)^{\hspace{-.1cm}2k} \rVert{x_0-x_\star}\lVert^2 \leqslant  \hspace{-.15cm}     \tfrac{L}{\mu}\hspace{-.1cm} \left(\tfrac{L-\mu}{L+\mu}\right)^{\hspace{-.1cm}2k}(f(x_0)-f(x_\star)).$$  It is also possible to directly look for convergence in terms of function values, but it is then usually unclear in the literature what inequalities to use, and I am not aware of any such proof leading to the same rate without the leading \(\tfrac{L}{\mu}\) (except the proof presented below).</p>
+
+
+
+<p class="justify-text">At this point, even in this toy example, a few very legitimate questions can be raised:<br/>– can we improve anything? Can gradient descent really behaves like that on this class of functions?<br/>– How could we have guessed the inequality to use, and the shape of the corresponding proof? Obviously, the obscure fact is to arrive to inequality (1).  Therefore, is there a principled way for choosing the right inequalities to use, for example for studying convergence in terms of other quantities, such as  function values?<br/>– Is this the unique way to arrive to the desired result? If yes, how likely are we to find such proofs for more complicated cases (algorithms and/or function class)?</p>
+
+
+
+<p class="justify-text">For the specific step size choice \(\gamma=\tfrac2{L+\mu}\), a partial answer to the first question is obtained by the observation that the rate is actually achieved on the quadratic function<br/> $$f(x)=\tfrac12 \, x^\top \begin{bmatrix}<br/> L &amp; 0\\ 0 &amp; \mu<br/> \end{bmatrix}x.$$ The following lines precisely target the missing answers.</p>
+
+
+
+<h2>Worst-case analysis through worst-case scenarios</h2>
+
+
+
+<p class="justify-text">Let us start by rephrasing our goal, and restrict ourselves to the study of a single iteration. We fix our target to finding the smallest possible value of \(\rho\) such that the inequality<br/> $$ \lVert{x_{k+1}-x_\star}\rVert^2  \leqslant       \rho^2 \lVert{x_k-x_\star}\rVert^2 $$ is valid for all \(x_k\) and \(x_{k+1}=x_k-\gamma \nabla f(x_k)\) (hence \(\rho\) is a function of \(\gamma\)). In other words, our goal is to solve<br/>$$ \rho^2(\gamma):= \sup \left\{ \frac{\lVert{x_{k+1}-x_\star}\rVert^2}{\lVert{x_k-x_\star}\rVert^2}\, \big|\, f\in\mathcal{F}_{\mu,L},\, x_{k+1}=x_k-\gamma \nabla f(x_k),\, \nabla f(x_\star)=0\right\}.$$<br/>Alternatively, we could be interested in studying convergence in other forms: for function values, we could target to solve the slightly modified problem:<br/> $$ \sup  \left\{ \frac{f(x_{k+1})-f(x_\star)}{f(x_{k})-f(x_\star)}\, \big|\, f\in\mathcal{F}_{\mu,L},\, x_{k+1}=x_k-\gamma \nabla f(x_k),\, \nabla f(x_\star)=0 \right\}.$$ It turns out that in both cases, the problem can be solved both numerically to high precision, and analytically, and that the answer is \(\rho^2(\gamma)=\max\{(1-\mu\gamma)^2,(1-L\gamma)^2\}\).</p>
+
+
+
+<p class="justify-text">The only thing we did, so far, was to explicitly reformulate the problem of finding the best (smallest) convergence rate as the problem of finding the worst-case scenario, nothing more. In what follows, some parts might become slightly technical, but the overall idea is only to reformulate this problem of finding the worst-case scenarios, for solving it.</p>
+
+
+
+<h3>Dealing with an infinite-dimensional variable: the function \(f\)</h3>
+
+
+
+<p class="justify-text">The first observation is that the problem of computing \(\rho\) is stated as an infinite-dimensional optimization problem: we are looking for the worst possible problem instance (a function \(f\) and an initial point \(x_k\)) within a predefined class of problems. The first step we take to work around this is to reformulate it in the following equivalent  form (note that we maximize also over the dimension \(d\)—we discuss later how to remove it):<br/>$$\begin{array}{rl} \rho^2:= \underset{f,\, x_k,\,x_\star,\, g_k,\,d}{\sup} &amp;\displaystyle \frac{\lVert{x_{k}-\gamma g_k-x_\star}\rVert^2}{\lVert{x_k-x_\star}\rVert^2}\\<br/> \text{s.t. }    &amp; \exists f\in\mathcal{F}_{\mu,L}:\, g_k= \nabla f(x_k),\, 0=\nabla f(x_\star).<br/>\end{array}$$<br/>This problem intrinsically does not look better (it contains an  existence constraint), but it allows using mathematical tools which are referred to as  <em>interpolation,</em> or <em>extension</em>, theorems [<a href="https://link.springer.com/article/10.1007/s10107-016-1009-3">4</a>, <a href="https://arxiv.org/pdf/1603.00241.pdf">7</a>, <a href="https://hal.archives-ouvertes.fr/hal-01530908/file/DHLL_appendix.pdf">8</a>]. The problem is depicted on Figure 2:</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img alt="" height="209" src="https://www.di.ens.fr/~ataylor/BlogPost/Interpolation.png" width="490"/>Figure 2: discrete interpolation (or extension) problem: given a set of triplets \(\{(\text{coordinate}, \text{gradient}, \text{function value})\}\) can we recover a function within a determined class that explains those triplets?</figure></div>
+
+
+
+<p class="justify-text">It turns out that convex interpolation (that is, neglecting smoothness and strong convexity) is actually rather simple:</p>
+
+
+
+<ul class="justify-text"><li>given a convex function and an index set \(I\), any set of samples \(\{(x_i,g_i,f_i)\}_{i\in I}\) of the form \(\{(\text{coordinate}, \text{(sub)gradient}, \text{function value})\}\)) satisfies, for all \(i,j\in I\): $$f_i \geqslant      f_j+\langle g_j; x_i-x_j\rangle,$$ by definition of subgradient, as illustrated on Figure 3.</li></ul>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img alt="" height="205" src="https://www.di.ens.fr/~ataylor/BlogPost/SamplingCvx.png" width="485"/>Figure 3: sampling from a convex function.</figure></div>
+
+
+
+<ul class="justify-text"><li>In the other direction, given a set of triplets \(\{(x_i,g_i,f_i)\}_{i\in I}\) satisfying the previous inequality for all pairs \(i,j\in I\), one can simply recover a  convex function by the following construction: $$f(x)=\underset{i\in I}{\max}\{ f_i+\langle g_i;x-x_i\rangle\},$$ which is depicted on Figure 4.</li></ul>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img alt="" height="207" src="https://www.di.ens.fr/~ataylor/BlogPost/InterpolateCvx.png" width="487"/>Figure 4: some set \(\{(x_i,g_i,f_i)\}_{i\in I}\) and its piecewise affine interpolant \(f(x)=\underset{i\in I}{\max}\{ f_i+\langle g_i;x-x_i\rangle\}\).</figure></div>
+
+
+
+<ul class="justify-text"><li>Formally, the reasoning allows arriving to the following “convex interpolation” (or “convex extension”) result, where we denote the set of (closed, proper) convex functions by \(\mathcal{F}_{0,\infty}\) (to be understood as \(L\)-smooth \(\mu\)-strongly convex functions with \(\mu=0\) and \(L=\infty\)): $$\begin{array}{c}\exists f\in\mathcal{F}_{0,\infty}: \,  g_k\in\partial f(x_k) \text{ and } f_k=f(x_k) \ \ \forall k\in  I\\ \Leftrightarrow\\ f_i \geqslant       f_j+\langle{g_j};{x_i-x_j}\rangle\quad \forall i,j\in I,\end{array}$$ where \(\partial f(x)\) denotes the subdifferential of \(f\) at \(x\).</li></ul>
+
+
+
+<p class="justify-text">In the next section, we use a similar interpolation result for taking smoothness and strong convexity into account. The result is a bit more technical, but follows from similar constructions as those for convex interpolation—the main difference being that the interpolation is done on the Fenchel conjugate instead, in order to incorporate smoothness, see [<a href="https://link.springer.com/article/10.1007/s10107-016-1009-3">4</a>, Section 2].</p>
+
+
+
+<h3>Reformulation through convex interpolation</h3>
+
+
+
+<p class="justify-text">Back to the problem of computing worst-case scenarios, we can now reformulate the existence constraint <em>exactly</em> using the following result (see [<a href="https://link.springer.com/article/10.1007/s10107-016-1009-3">4</a>,  Theorem 4]): let \(I\) be a finite index set and let \( S=\{(x_i,g_i,f_i)\}_{i\in I}\) be a set of triplets, then<br/>  $$\begin{array}{c}\exists f\in\mathcal{F}_{\mu,L}: \,  g_i=\nabla f(x_i) \text{ and } f_i=f(x_i) \text{ for all } i\in  I\\ \Leftrightarrow\\  f_i \geqslant      f_j+\langle{g_j};{x_i-x_j}\rangle+\frac{1}{2L}\lVert{g_i-g_j}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_i-x_j-\frac{{1}}{L}(g_i-g_j)}\rVert^2  \,\,\, \forall i,j\in I.\end{array}$$ Therefore, the previous problem can be reformulated as (recalling that \(g_\star=0\))<br/>$$  \begin{array}{rl} \underset{{f_k,\,f_\star,\, x_k,\,x_\star,\, g_k,\,d}} {\sup}&amp;\displaystyle\frac{\rVert{x_{k}-\gamma  g_k-x_\star}\lVert^2}{\rVert{x_k-x_\star}\lVert^2}\\<br/>      \text{s.t. }    &amp; f_\star \geqslant      f_k+\langle{g_k};{x_\star-x_k}\rangle+\frac{1}{2L}\lVert{g_k}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}g_k}\rVert^2\\<br/>      &amp; f_k \geqslant      f_\star+\frac{1}{2L}\lVert{g_k}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}g_k}\rVert^2.<br/>\end{array}$$ </p>
+
+
+
+<h3>Quadratic reformulation</h3>
+
+
+
+<p class="justify-text">The next step is to remove the ratio appearing in the objective function, which we do via an homogeneity argument, as follows.</p>
+
+
+
+<p class="justify-text">Starting from a feasible point, scale \(x_k,\,x_\star,g_k\) by some \(\alpha&gt;0\) and \(f_k,\,f_\star\) by \(\alpha^2\) and observe it does not change the value of the objective, while still being a feasible point. Therefore, the problem can be reformulated as a nonconvex QCQP (quadratically constrained quadratic program): $$  \begin{array}{rl} \underset{{f_k,\,f_\star,\, x_k,\,x_\star,\, g_k,\,d}} {\sup}&amp;\displaystyle{\rVert{x_{k}-\gamma  g_k-x_\star}\lVert^2}\\<br/>       \text{s.t. }    &amp; f_\star \geqslant      f_k+\langle{g_k};{x_\star-x_k}\rangle+\frac{1}{2L}\lVert{g_k}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}g_k}\rVert^2\\<br/>       &amp; f_k \geqslant      f_\star+\frac{1}{2L}\lVert{g_k}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}g_k}\rVert^2\\ &amp;{\rVert{x_k-x_\star}\lVert^2} \leqslant      1,<br/> \end{array}$$  which is quadratic in \(x_k\), \(x_\star\) and  \(g_k\), and linear in \(f_\star\) and \(f_k\). Actually, in the current form, nonconvexity comes from the term “\(\langle{g_k};{x_\star-x_k}\rangle\)” in the second constraint. It turns out that this problem can be reformulated <em>losslessly</em> using semidefinite programming (this is due to the maximization over \(d\)). </p>
+
+
+
+<h3>Semidefinite reformulation</h3>
+
+
+
+<p class="justify-text">At the end of this section, we will be able to compute, numerically, the values of the rate \(\rho^2(\gamma)\) for given values of the parameters \(\mu,\,L\), and \(\gamma\).</p>
+
+
+
+<p class="justify-text">The last step in the reformulation goes as follows: the previous problem can be reformulated as a semidefinite program, as it is linear in terms of the entries of the following Gram matrix<br/>$$G = \begin{pmatrix}<br/>     \lVert{x_k-x_\star}\rVert^2 &amp; \langle{g_k};{x_k-x_\star}\rangle \\ \langle{g_k};{x_k-x_\star}\rangle &amp; \lVert{g_k}\rVert^2<br/>     \end{pmatrix}\succcurlyeq 0,$$ and in terms of the function values \(f_k\) and \(f_\star\). From those variables, one reformulate the previous problem as $$\begin{array}{rl} \underset{f_k,\,f_\star,\, G\succeq 0}{\sup} \, &amp;{\mathrm{Tr} (A_\text{num} G)}\\<br/>      \text{s.t. }    &amp; f_k-f_\star+\mathrm{Tr} (A_1 G)\leqslant 0\\<br/>      &amp;  f_\star-f_k+\mathrm{Tr} (A_2 G)\leqslant 0 \\<br/>      &amp;\mathrm{Tr} (A_\text{denom} G) \leqslant      1,\end{array}$$ which is a gentle semidefinite program where we picked matrices \(A_{\text{num}}\), \(A_{\text{denom}}\), \(A_1\) and \(A_2\) for encoding the previous terms. That is, we choose those matrices such that<br/> $$\begin{array}{rl}<br/>\mathrm{Tr}(A_{\text{denom}} G)&amp;=\lVert{x_k-x_\star}\rVert^2,\\  \mathrm{Tr}(A_{\text{num}} G)&amp;=\lVert{x_k-\gamma g_k-x_\star}\rVert^2,\\ \mathrm{Tr}(A_1G)&amp;=\langle{g_k};{x_\star-x_k}\rangle+\frac{1}{2L}\lVert{g_k}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}g_k}\rVert^2,\\ \mathrm{Tr}(A_2G)&amp;=\tfrac{1}{2L}\lVert g_k\rVert^2+\tfrac{\mu}{2(1-\mu/L)}\lVert x_k-x_\star-\tfrac1L g_k\rVert^2.\end{array}$$ One possibility is to choose \(A_{\text{num}}\), \(A_{\text{denom}}\), \(A_1\) and \(A_2\) as symmetric matrices, as follows: $$\begin{array}{cc}<br/> A_{\text{denom}}=\begin{pmatrix}     1 &amp; 0\\ 0 &amp; 0     \end{pmatrix}, &amp; A_{\text{num}}=\begin{pmatrix}     1 &amp; -\gamma\\ -\gamma &amp; \gamma^2     \end{pmatrix}, \\ A_1=\begin{pmatrix}\tfrac{\mu}{2(1-\mu/L)} &amp; -\tfrac12-\tfrac{\mu}{2(L-\mu)} \\ -\tfrac12-\tfrac{\mu}{2(L-\mu)} &amp; \tfrac{1}{2L}+\tfrac{\mu}{2L(L-\mu)}\end{pmatrix}, &amp;  A_2=\begin{pmatrix}\tfrac{\mu}{2(1-\mu/L)} &amp; -\tfrac{\mu}{2(L-\mu)} \\ -\tfrac{\mu}{2(L-\mu)} &amp; \tfrac{1}{2L}+\tfrac{\mu}{2L(L-\mu)} \end{pmatrix}.\end{array}$$</p>
+
+
+
+<p class="justify-text">All those steps can be carried out in the exact same way for the problem of computing the convergence rate for function values, reaching a similar problem with \(6\) inequality constraints instead—because interpolation conditions have to be imposed on all pairs of points in a set of \(3\) points: \(x_k\), \(x_{k+1}\) and \(x_\star\), instead of only \(2\) for the distance problem. The objective function is then \(f_{k+1}-f_\star\), the de-homogenization constraint (arising from the denominator of the objective function) is \(f_{k}-f_\star \leqslant     1\), and the Gram matrix is \(3\times 3\):<br/>$$G=\begin{pmatrix}<br/>     \lVert{x_k-x_\star}\rVert^2 &amp; \langle{g_k};{x_k-x_\star}\rangle&amp; \langle{g_{k+1}};{x_k-x_\star}\rangle\\ \langle{g_k};{x_k-x_\star}\rangle &amp; \lVert{g_k}\rVert^2 &amp; \langle{g_k};{g_{k+1}}\rangle \\<br/>     \langle{g_{k+1}};{x_k-x_\star}\rangle &amp; \langle{g_{k+1}};{g_k}\rangle &amp; \lVert{g_{k+1}}\rVert^2<br/>     \end{pmatrix}\succcurlyeq 0, $$ and the function values variables are \(f_k\), \(f_{k+1}\) and \(f_\star\).</p>
+
+
+
+<p class="justify-text">We provide the numerical optimal values of those semidefinite programs on Figure 5 for both convergence in distances and in function values. </p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img alt="" height="324" src="https://www.di.ens.fr/~ataylor/BlogPost/ObjectiveValues.png" width="534"/>Figure 5: worst-cases of the ratio \(\frac{\lVert{x_{k+1}-x_\star}\rVert^2}{\lVert{x_k-x_\star}\rVert^2}\) (red) and \(\frac{f(x_{k+1})-f_\star}{f(x_k)-f_\star}\) (dashed blue) as functions of the step size \(\gamma\), for the case where \(f\) is \(1\)-smooth and \(0.1\)-strongly convex. The results match exactly the expected \(\max\{(1-\gamma L)^2,(1-\gamma\mu)^2\}\) in both cases. Note that the corresponding SDPs can be solved both for “good and bad” choices of step sizes: if the step size is chosen wisely then \(\rho(\gamma)&lt;1\), and otherwise \(\rho(\gamma)\geqslant 1\). The SDP confirms the common knowledge that \(\gamma\in (0,2/L)\Rightarrow \rho(\gamma)&lt; 1\). Numerical values obtained through YALMIP [<a href="https://yalmip.github.io/">9</a>] and Mosek [<a href="https://www.mosek.com/">10</a>].</figure></div>
+
+
+
+<p class="justify-text">As a conclusion for this section, let us note that we showed how to compute the “best” rates that are dimension independent. Technically, requiring \(x_k\) and \(g_k\) to lie in \(\mathbb{R}^d\) is equivalent to adding a rank constraint in the SDP.</p>
+
+
+
+<h2>Duality between worst-case scenarios and combinations of inequalities</h2>
+
+
+
+<p class="justify-text">Any feasible point to the previous SDP corresponds to a <em>lower bound</em>: a sampled version of a potentially difficult function for gradient descent. If we want to find <em>upper bounds</em> on the rate, a natural way to proceed is to go to the dual side of the previous SDPs, where any feasible point will naturally correspond to an upper bound on the convergence rate (by <em>weak duality</em>). As the primal problems were SDPs, their Lagrangian duals are SDPs as well. Let us associate one multiplier per constraint: $$ \begin{array}{rl}<br/>f_k-f_\star+\mathrm{Tr} (A_1 G)\leqslant 0&amp;:\lambda_1\\<br/>f_\star-f_k+\mathrm{Tr} (A_2 G)\leqslant 0&amp;:\lambda_2\\<br/>\mathrm{Tr}(A_\text{denom} G) \leqslant 1&amp;: \tau.<br/>\end{array}$$The dual is then<br/>$$\begin{array}{rl}<br/> \underset{\tau,\,\lambda_1,\,\lambda_2}{\min} &amp; \, \tau \\<br/> \text{s.t. } &amp; \lambda_1=\lambda_2,\\<br/> &amp; S:=A_\text{num}-\tau A_\text{denom}-\lambda_1A_1-\lambda_2A_2 \preccurlyeq 0,\\<br/> &amp;\tau,\lambda_1,\lambda_2 \geqslant  0.<br/> \end{array}$$ Hence, by weak duality, any feasible point to this last SDP corresponds to an upper bound on the rate: \(\tau \geqslant \rho^2\). A mere rephrasing of weak duality can be obtained through the following reasoning: assume we received some feasible \(\tau,\lambda_1,\lambda_2\) (and hence \(\lambda_1=\lambda_2\) and a corresponding \(S\preccurlyeq 0\)), we then get, for any primal feasible \(G\succcurlyeq0\):<br/>$$\begin{array}{rl}\mathrm{Tr}(SG)&amp;=\mathrm{Tr}(A_{\text{num}}G)-\tau\mathrm{Tr}(A_{\text{denom}}G)-\lambda_1\mathrm{Tr}(A_1G)-\lambda_2\mathrm{Tr}(A_2G)\\&amp;=\lVert x_{k+1}-x_\star\rVert^2-\tau\lVert x_{k}-x_\star\rVert^2\\ \,&amp;\,\,\,-\lambda_1[     f_k-f_\star+\langle{g_k};{x_\star-x_k}\rangle+\frac{1}{2L}\lVert{g_k}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}g_k}\rVert^2]\\ &amp;\,\,\,-\lambda_2 [f_\star-f_k+\frac{1}{2L}\lVert{g_k}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}g_k}\rVert^2]\\ &amp;\geqslant \lVert x_{k+1}-x_\star\rVert^2-\tau\lVert x_{k}-x_\star\rVert^2, \end{array}$$ where the first equality follows from the definition of \(S\), the second equality corresponds to the definitions of \(A_{\text{num}}\), \(A_{\text{denom}}\), \(A_1\) and \(A_2\), and the last inequality follows from the sign of the interpolation inequalities (constraints in the primal) for any primal feasible point. Hence, we indeed have that any feasible \(\tau\) corresponds to a valid upper bound on the convergence rate, as $$S\preccurlyeq 0 \,\,\Rightarrow \,\, \mathrm{Tr}(SG)\leqslant 0\,\,\Rightarrow  \lVert x_{k+1}-x_\star\rVert^2-\tau\lVert x_{k}-x_\star\rVert^2\leqslant 0.$$ In order to obtain analytical proofs, we therefore need to find analytical dual feasible points, and numerics can of course help in this process! Let’s look at what the optimal dual solutions look like for our two running examples.</p>
+
+
+
+<ul class="justify-text"><li> in Figure 6, we provide the numerical values for \(\lambda_1\) and \(\lambda_2\) for the distance problem.</li></ul>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img alt="" height="316" src="https://www.di.ens.fr/~ataylor/BlogPost/Multipliers_distance.png" width="467"/>Figure 6: numerical values of optimal dual variables: \(\lambda_1\) (red) and \(\lambda_2\) (dashed blue) as functions of the step size \(\gamma\), for the case where \(f\) is \(1\)-smooth and \(0.1\)-strongly convex. The results match \(\lambda_1=\lambda_2=2\gamma \rho(\gamma)\) with \(\rho(\gamma)=\max\{|1-\gamma L|,|1-\gamma\mu|\}\). Numerical values obtained with YALMIP [<a href="https://yalmip.github.io/">9</a>] and Mosek [<a href="https://www.mosek.com/">10</a>].</figure></div>
+
+
+
+<ul class="justify-text"><li>For function values, the SDP is slightly more complicated, as more inequalities are involved (6 interpolation inequalities). We provide raw numerical values for the six multipliers in Figure 7.</li></ul>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img alt="" height="348" src="https://www.di.ens.fr/~ataylor/BlogPost/Multipliers_function.png" width="463"/>Figure 7: numerical values of optimal dual variables (for the rate in function values): \(\lambda_1,\lambda_2, …,\lambda_6\) as functions of the step size \(\gamma\), for the case where \(f\) is \(1\)-smooth and \(0.1\)-strongly convex. Numerical values obtained with YALMIP [<a href="https://yalmip.github.io/">9</a>] and Mosek [<a href="https://www.mosek.com/">10</a>].</figure></div>
+
+
+
+<p>For those who want a bit more details, here are a few additional pointers:</p>
+
+
+
+<ul class="justify-text"><li>Strong duality holds—a way to prove it is to show that there exists a Slater point in the primal, see e.g., [<a href="https://link.springer.com/article/10.1007/s10107-016-1009-3">4</a>, Theorem 6]—, and hence primal and dual optimal values match.</li><li>There might be different ways to optimaly combine the interpolation inequalities for proving the desired results. In other words: dual optimal solutions are often not unique—which is, in fact, quite a good news: I am sure nobody want to find the analytical version of the multipliers provided in Figure 7.</li><li>It is often possible to simplify the proofs by using fewer, or weaker, inequalities. This might lead to ”cleaner” results, typically (but not always) at the cost of ”weaker” rates. This was done for designing the proof for function values, later in this text.</li></ul>
+
+
+
+<h2>Combinations of inequalities: same proofs without SDPs</h2>
+
+
+
+<p class="justify-text">So far, we showed that computing convergence rates can be done in a very principled way. To this end, one can solve semidefinite programs—which may have arbitrarily complicated analytical solutions. Here, I want to emphasize that the process of <em>verifying</em> a solution can be quite different to that of<em> finding</em> a solution. Put in other words, although the dual certificates (a.k.a., the proofs) might have been found by solving SDPs, they can be formulated in ways that do not require the reader to know anything about the PEP methodology, nor on any SDP material, for verifying them. This fact might actually not be very surprising to the reader, as many proofs arising in the first-order optimization literature actually “only consists” in linear combinations of (quadratic) inequalities. On the one hand, those proofs can be seen as feasible points to “dual SDPs”, although generally not explicitely proved as such. On the other hand, proofs arising from the SDPs might therefore be expected to be writable without any explicit reference to semidefinite programing and performance estimation problems.<br/></p>
+
+
+
+<p class="justify-text">In what follows, we provide the proofs for gradient descent, using the previous numerical inspiration, but without explicitly relying on any semidefinite program. The reader is not expected to verify any of those computations, as our goal is rather to emphasize that the principles underlying both proofs are exactly the same: reformulating linear combinations of inequalities.</p>
+
+
+
+<p class="justify-text">For both proofs below, we limit ourselves to the step size regime \(0\leq   \gamma \leq \tfrac{2}{L+\mu}\), and we prove  that, in  this regime, \(\rho(\gamma)=(1-\gamma\mu)\)—actually we only proof the upper bounds, but one can easily verify that they are <em>tight</em> on simple quadratic functions.  The complete proofs (for the proximal gradient method),  can be found in [<a href="https://arxiv.org/pdf/1705.04398.pdf">11</a>]. </p>
+
+
+
+<h3>Example 1: distance to optimality</h3>
+
+
+
+<p class="justify-text">Recall the notations: \(g_k:=\nabla f(x_k)\), \(f_k:= f(x_k)\), \(g_\star:=\nabla f(x_\star)\), and \(f_\star:= f(x_\star)\).</p>
+
+
+
+<p class="justify-text">For distance to optimality, sum the following inequalities with their corresponding weights: $$\begin{array}{r}     f_\star \geqslant      f_k+\langle{g_k};{x_\star-x_k}\rangle+\frac{1}{2L}\lVert{g_k-g_\star}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}(g_k-g_\star)}\rVert^2  :\lambda_1,  \\     f_k \geqslant      f_\star+\langle{g_\star};{x_k-x_\star}\rangle+\frac{1}{2L}\lVert{g_k-g_\star}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{{1}}{L}(g_k-g_\star)}\rVert^2:\lambda_2.     \end{array}$$ We use the following values for the multipliers: \(\lambda_1=\lambda_2=2\gamma\rho(\gamma) \geqslant      0\) (see Figure 6). </p>
+
+
+
+<p class="justify-text">After appropriate substitutions of \(g_\star\), \(x_{k+1}\), and \(\rho(\gamma)\), using respectively \(g_\star=0\), \(x_{k+1}=x_k-\gamma g_k\) and \(\rho(\gamma)=(1-\gamma\mu)\), and with little effort, one can check that the previous weighted sum of inequalities can be written in the form: $$ \begin{array}{rl}    \lVert{x_{k+1}-x_\star}\rVert^2  \leqslant      &amp; \left(1-\gamma \mu \right)^2\lVert{x_{k}-x_\star}\rVert^2 -\frac{\gamma(2-\gamma (L+\mu))}{L-\mu} \lVert{\mu {(x_k  -x_\star)} – g_k}\rVert^2. \end{array}$$ This statement can be checked simply by expanding both expressions (i.e., the weighted sum and its reformulation) and verifying that all terms indeed match.</p>
+
+
+
+<p class="justify-text">Finally, using $$\gamma(2-\gamma (L+\mu)) \geqslant      0,  \text{ and } L-\mu \geqslant      0,$$ which are nonnegative by assumptions on the values of \(L\in(0,\infty)\), \(\mu\in (0,L)\) and \(\gamma\in(0,2/(L+\mu))\), we arrive to the desired $$ \lVert{x_{k+1}-x_\star}\rVert^2 \leqslant      \left(1-\gamma \mu \right)^2\lVert{x_{k}-x_\star}\rVert^2.$$</p>
+
+
+
+<p class="justify-text">Note that, by using \(\lambda_1=\lambda_2\), the weighted sum exactly corresponds to the (scaled by a positive constant) inequality introduced in the early stage of this note for studying distance to optimality. However, the resulting expression is tight for all values of the step size here, whereas it was only tight for \(\gamma=2/(L+\mu)\) earlier, due to a different choice of weights! </p>
+
+
+
+<p class="justify-text">The curious reader might wonder how to find such a reformulation. Actually, back in terms of SDPs, and using the expressions for the multipliers, it simply corresponds to $$\mathrm{Tr}(SG)=-\frac{\gamma(2-\gamma (L+\mu))}{L-\mu} \lVert{\mu {(x_k  -x_\star)} – g_k}\rVert^2.$$ In the example below, the reformulation is a bit more tricky—as \(\mathrm{Tr}(SG)\)  has two nonnegative terms, which were simply obtained by doing an analytical Cholesky factorization of the term \(\mathrm{Tr}(SG)\)—, but the idea is exactly the same.</p>
+
+
+
+<h3>Example 2: function values</h3>
+
+
+
+<p class="justify-text">For function values, we combine the following inequalities after multiplication with their respective coefficients:    </p>
+
+
+
+<p class="justify-text">$$\scriptsize \begin{array}{lr}     f_k \geqslant      f_{k+1}+\langle{g_{k+1}};{x_k-x_{k+1}}\rangle+\frac{1}{2L}\lVert{g_k-g_{k+1}}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_{k+1}-\frac{1}{L}(g_k-g_{k+1})}\rVert^2    &amp;:\lambda_1,\\<br/>f_\star \geqslant      f_k+\langle{g_k};{x_\star-x_k}\rangle+\frac{1}{2L}\lVert{g_k-g_\star}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_k-x_\star-\frac{1}{L}(g_k-g_\star)}\rVert^2  &amp;:\lambda_2, \\<br/>f_\star \geqslant      f_{k+1}+\langle{g_{k+1}};{x_\star-x_{k+1}}\rangle+\frac{1}{2L}\lVert{g_\star-g_{k+1}}\rVert^2+\frac{\mu}{2(1-\mu/L)}\lVert{x_\star-x_{k+1}-\frac{1}{L}(g_\star-g_{k+1})}\rVert^2  &amp;:\lambda_3.     \end{array}$$ We use the following multipliers \(\lambda_1=\rho(\gamma)\), \(\lambda_2=(1-\rho(\gamma))\rho(\gamma)\), and  \(\lambda_3=1-\rho(\gamma)\) (obtained by greedily trying to set different combinations of multipliers to \(0\) in the SDP—see Figure 7 for the values without such simplifications).</p>
+
+
+
+<p class="justify-text">Again, after appropriate substitutions of \(g_\star\), \(x_{k+1}\), and \(\rho(\gamma)\), using respectively \(g_\star=0\), \(x_{k+1}=x_k-\gamma g_k\) and \(\rho(\gamma)=(1-\gamma\mu)\), we obtain that the weighted sum of inequalities can be reformulated exactly as $$  \begin{array}{rl}          f(x_{k+1})-f_\star \leqslant      &amp;\left(1-\gamma \mu\right)^2 \left(f(x_k)-f_\star\right)\\&amp;-\frac{1}{2 (L-\mu)}\lVert \nabla f(x_{k+1})-(1-\gamma  (L+\mu))\nabla f(x_k) +\gamma  \mu  L (x_\star-x_k)\rVert^2\\<br/>&amp;-\frac{\gamma  L(2- \gamma  (L+\mu))}{2 (L-\mu )}\lVert \nabla f(x_k)+\mu  (x_\star-x_k)\rVert^2.\end{array}$$ Again, this statement can be checked simply by expanding both expressions (i.e., the weighted sum and its reformulation), and verifying that all terms match. The desired conclusion $$ f(x_{k+1})-f_\star \leqslant \left(1-\gamma \mu\right)^2 \left(f(x_k)-f_\star\right), $$ follows from the signs of the leading coefficients: \(\gamma(2-\gamma (L+\mu)) \geqslant      0\), and \(L-\mu \geqslant      0\).</p>
+
+
+
+<h3>To go further</h3>
+
+
+
+<p class="justify-text">Before finishing, let us mention that we only dealt with linear convergence through a single iteration of gradient descent.</p>
+
+
+
+<p class="justify-text">There are quite a few ways to handle both more iterations and sublinear convergence rates. Using SDPs, probably the most natural approach is to directly incorporate several iterations in the problem by  studying, for example, ratios of the form  $$\sup_{f\in\mathcal{F}_{\mu,L},\, x_0}  \frac{f(x_{N})-f_\star}{\lVert x_0-x_\star\rVert^2}. $$ This type of approach was used in the work of Drori and Teboulle [<a href="https://arxiv.org/pdf/1206.3209.pdf">2</a>] and in most consecutive PEP-related works: it has the advantage of providing  comfortable “non-improvable results” [<a href="https://link.springer.com/article/10.1007/s10107-016-1009-3">4</a>, <a href="https://arxiv.org/pdf/1512.07516.pdf">12</a>]   (by providing matching lower bounds) for any given \(N\), but requires solving larger and larger SDPs. Alternatively, simpler proofs can often be obtained through the use of  Lyapunov (or potential) functions—i.e., study a single iteration to produce recursable inequalities; a nice introduction is provided in [<a href="http://www.theoryofcomputing.org/articles/v015a004/v015a004.pdf">13</a>]. This idea can be exploited in PEPs [<a href="https://arxiv.org/pdf/1902.00947.pdf">14</a>] by enforcing the proofs to have a certain structure. Those principles are also at the heart of the related approach using integral quadratic constraints [<a href="https://epubs.siam.org/doi/abs/10.1137/15M1009597">3</a>, <a href="http://proceedings.mlr.press/v70/hu17a/hu17a.pdf">15</a>]. </p>
+
+
+
+<h2>Take-home message and conclusions</h2>
+
+
+
+<p class="justify-text">The overall message of this note is that first-order methods can often be studied directly using the definition of their “worst-cases” (i.e., by trying to find worst-case scenarios), along with their dual counterparts (linear combinations of inequalities), by translating them into semidefinite programs.</p>
+
+
+
+<p class="justify-text">What we saw might look like an overkill for studying gradient descent. However, as long as we deal with Euclidean spaces, the same approach actually works beyond this simple case. In particular, the same technique applies to first-order methods performing explicit, projected, proximal, conditional, and inexact (sub)gradient steps [<a href="https://arxiv.org/pdf/1512.07516.pdf">12</a>].</p>
+
+
+
+<p class="justify-text">Finally, let us mention a few previous works illustrating that the use of such computer-assisted proofs allowed obtaining results that are apparently too complicated for us to find bare-handed—even in apparently simple contexts.  Reasonable examples include the direct proof for convergence rates in  function values [<a href="https://arxiv.org/pdf/1705.04398.pdf">11</a>] presented above, but also proofs arising in the context of optimized numerical schemes [<a href="https://arxiv.org/pdf/1206.3209.pdf">2</a>, <a href="https://arxiv.org/abs/1409.2636">16</a>, <a href="https://arxiv.org/pdf/1406.5468.pdf">17</a>, <a href="https://arxiv.org/pdf/1803.06600.pdf">18</a>]—in particular [<a href="https://arxiv.org/pdf/1803.06600.pdf">18</a>] presents a method for minimizing the gradient norm at the last iterate, in smooth convex minimization—,  in the context of monotone inclusions,  and even for more general fixed-point problems (e.g., for Halpern iterations [<a href="http://www.optimization-online.org/DB_FILE/2017/11/6336.pdf">19</a>]).</p>
+
+
+
+<h3>Toolbox</h3>
+
+
+
+<p class="justify-text">The PErformance EStimation TOolbox (PESTO) [<a href="https://perso.uclouvain.be/julien.hendrickx/availablepublications/PESTO_CDC_2017.pdf">20</a>, see <a href="https://github.com/AdrienTaylor/Performance-Estimation-Toolbox/graphs/traffic">Github</a>] allows a quick access to the methodology without worrying about details of semidefinite reformulations. The toolbox contains many  examples (about 50) in different settings, and include progresses on the approach, and results, by other groups (which are much more thoroughly referenced in the <a href="https://github.com/AdrienTaylor/Performance-Estimation-Toolbox/blob/master/UserGuide.pdf">user guide</a>). In particular, we included standard classes of functions and operators, along with examples for analyzing recent optimized methods.</p>
+
+
+
+<h2>References</h2>
+
+
+
+<p class="justify-text">[1] Mark Schmidt, Nicolas Le Roux, Francis Bach. <a href="https://arxiv.org/pdf/1309.2388.pdf">Minimizing finite sums with the stochastic average gradient</a>. <em>Mathematical Programming</em>, <em>162</em>(1-2), 83-112, 2017.<br/>[2] Yoel Drori, Marc Teboulle. <a href="https://arxiv.org/pdf/1206.3209.pdf">Performance of first-order methods for smooth convex minimization: a novel approach</a>. <em>Mathematical Programming</em>, 145(1-2), 451-482, 2014.<br/>[3] Laurent Lessard, Benjamin Recht, Andrew Packard. <a href="https://epubs.siam.org/doi/abs/10.1137/15M1009597">Analysis and design of  optimization algorithms via integral quadratic constraints</a>. <em>SIAM Journal on Optimization</em>, 26(1), 57-95, 2016.<br/>[4] Adrien Taylor,  Julien Hendrickx, François Glineur. <a href="https://link.springer.com/article/10.1007/s10107-016-1009-3">Smooth strongly convex interpolation and exact worst-case performance of first-order methods</a>. <em>Mathematical Programming</em>, 161(1-2), 307-345, 2017.<br/>[5] Yurii Nesterov. <a href="https://link.springer.com/book/10.1007/978-1-4419-8853-9">Introductory Lectures on Convex Optimization : a Basic Course</a>. <em>Applied optimization</em>. Kluwer Academic Publishing, 2004.<br/>[6]  Boris Polyak. Introduction to Optimization. Optimization Software New York, 1987.<br/>[7] Daniel Azagra, Carlos Mudarra. <a href="https://arxiv.org/pdf/1603.00241.pdf">An extension theorem for convex functions of class \(C^{1,1}\) on Hilbert spaces</a>. <em>Journal of Mathematical Analysis and Applications</em>, 446(2):1167–1182, 2017.<br/>[8] Aris Daniilidis, Mounir Haddou, Erwan Le Gruyer, Olivier Ley. <a href="https://hal.archives-ouvertes.fr/hal-01530908/file/DHLL_appendix.pdf">Explicit formulas for \(C^{1,1}\) Glaeser-Whitney extensions of 1-Taylor fields in Hilbert spaces</a>. <em>Proceedings of the American Mathematical Society</em>, 146(10):4487–4495, 2018.<br/>[9] Johan Löfberg. <a href="https://yalmip.github.io/">YALMIP : A toolbox for modeling and optimization in MATLAB</a>. <em>Proceedings of the CACSD Conference</em>, 2004.<br/>[10] APS Mosek. <a href="https://www.mosek.com/">The MOSEK optimization software</a>. Online at http://www.mosek.com, 54, 2010.<br/>[11] Adrien Taylor, Julien Hendrickx, François Glineur. <a href="https://arxiv.org/pdf/1705.04398.pdf">Exact worst-case convergence rates of the proximal gradient method for  composite convex minimization</a>. <em>Journal of Optimization Theory and Applications</em>, vol. 178, no 2, p. 455-476, 2018.<br/>[12] Adrien Taylor, Julien Hendrickx, François Glineur. <a href="https://arxiv.org/pdf/1512.07516.pdf">Exact worst-case performance of first-order methods for composite convex optimization</a>. <em>SIAM Journal on Optimization</em>, vol. 27, no 3, p. 1283-1313, 2017.<br/>[13] Nikhil Bansal, Anupam Gupta. <a href="http://www.theoryofcomputing.org/articles/v015a004/v015a004.pdf">Potential-Function Proofs for Gradient Methods. <em>Theory of Computing</em></a>, <em>15</em>(1), 1-32, 2019.<br/>[14] Adrien Taylor, Francis Bach. <a href="https://arxiv.org/pdf/1902.00947.pdf">Stochastic first-order methods: non-asymptotic and computer-aided analyses via potential functions</a>, <em>Proceedings of the 32nd Conference on Learning Theory (COLT)</em>, 99:2934-2992, 2019.  <br/>[15] Bin Hu, Laurent Lessard. <a href="http://proceedings.mlr.press/v70/hu17a/hu17a.pdf">Dissipativity theory for Nesterov’s accelerated method</a>, <em>Proceedings of the 34th International Conference on Machine Learning</em>, 70:1549-1557, 2017. <br/>[16] Yoel Drori, Marc Teboulle. <a href="https://arxiv.org/abs/1409.2636">An optimal variant of Kelley’s cutting-plane method</a>. <em>Mathematical Programming</em> 160.1-2: 321-351, 2016.<br/>[17] Donghwan<strong> </strong>Kim, Jeffrey Fessler. <a href="https://arxiv.org/pdf/1406.5468.pdf">Optimized first-order methods for smooth convex minimization</a>, <em>Mathematical programming</em>, <em>159</em>(1-2), 81-107, 2016.<br/>[18] Donghwan Kim, Jeffrey Fessler. <a href="https://arxiv.org/pdf/1803.06600.pdf">Optimizing the efficiency of first-order methods for decreasing the gradient of smooth convex functions</a>, <em>preprint arXiv:1803.06600</em>, 2018.   <br/>[19] Felix Lieder. <a href="http://www.optimization-online.org/DB_FILE/2017/11/6336.pdf">On the convergence rate of the Halpern-iteration</a>. Technical Report, 2019.<br/>[20] Adrien Taylor, Julien Hendrickx, François Glineur.  <a href="https://perso.uclouvain.be/julien.hendrickx/availablepublications/PESTO_CDC_2017.pdf">Performance estimation toolbox (PESTO): automated worst-case analysis of  first-order optimization methods</a>,<em> Proceedings of the 56th Annual Conference on Decision and Control (CDC)</em>, pp. 1278-1283, 2017.</p></div>
+    </content>
+    <updated>2020-04-03T11:37:27Z</updated>
+    <published>2020-04-03T11:37:27Z</published>
+    <category term="Machine learning"/>
+    <category term="Tools"/>
+    <author>
+      <name>Adrien Taylor</name>
+    </author>
+    <source>
+      <id>https://francisbach.com</id>
+      <link href="https://francisbach.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://francisbach.com" rel="alternate" type="text/html"/>
+      <subtitle>Francis Bach</subtitle>
+      <title>Machine Learning Research Blog</title>
+      <updated>2020-04-03T13:21:51Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://gilkalai.wordpress.com/?p=19411</id>
@@ -166,7 +484,7 @@ is basically dead. But maybe for others…</p>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-04-03T12:20:28Z</updated>
+      <updated>2020-04-03T13:20:37Z</updated>
     </source>
   </entry>
 
@@ -725,7 +1043,7 @@ numerical errors may destroy the privacy guarantee.
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2020-04-03T12:21:12Z</updated>
+      <updated>2020-04-03T13:21:27Z</updated>
     </source>
   </entry>
 
@@ -817,7 +1135,7 @@ numerical errors may destroy the privacy guarantee.
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-04-03T12:20:28Z</updated>
+      <updated>2020-04-03T13:20:38Z</updated>
     </source>
   </entry>
 
@@ -1024,7 +1342,7 @@ We hope that your April Fool’s Day is such as to allow a time to laugh. But al
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-04-03T12:20:34Z</updated>
+      <updated>2020-04-03T13:20:44Z</updated>
     </source>
   </entry>
 
@@ -1237,7 +1555,7 @@ Our new techniques comprise-- (1) an ROABP computing a homogeneous polynomial ca
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-04-03T12:20:24Z</updated>
+      <updated>2020-04-03T13:20:33Z</updated>
     </source>
   </entry>
 
@@ -1346,7 +1664,7 @@ Our new techniques comprise-- (1) an ROABP computing a homogeneous polynomial ca
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2020-04-03T12:21:12Z</updated>
+      <updated>2020-04-03T13:21:27Z</updated>
     </source>
   </entry>
 
@@ -1584,7 +1902,7 @@ Our final question is: how well do our “stacked words” help to visualize the
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-04-03T12:20:33Z</updated>
+      <updated>2020-04-03T13:20:44Z</updated>
     </source>
   </entry>
 
@@ -1645,7 +1963,7 @@ Our final question is: how well do our “stacked words” help to visualize the
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2020-04-03T12:20:09Z</updated>
+      <updated>2020-04-03T13:20:11Z</updated>
     </source>
   </entry>
 
@@ -1672,7 +1990,7 @@ Email: pbarcelo@ing.puc.cl</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-04-03T12:20:36Z</updated>
+      <updated>2020-04-03T13:20:46Z</updated>
     </source>
   </entry>
 
@@ -1756,7 +2074,7 @@ Our methods are elementary and short and rely on a polynomial map of Shpilka and
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-04-03T12:20:24Z</updated>
+      <updated>2020-04-03T13:20:33Z</updated>
     </source>
   </entry>
 
@@ -1832,7 +2150,7 @@ Our methods are elementary and short and rely on a polynomial map of Shpilka and
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-04-03T12:20:28Z</updated>
+      <updated>2020-04-03T13:20:37Z</updated>
     </source>
   </entry>
 
@@ -1863,7 +2181,7 @@ Our methods are elementary and short and rely on a polynomial map of Shpilka and
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2020-04-03T12:21:01Z</updated>
+      <updated>2020-04-03T13:21:17Z</updated>
     </source>
   </entry>
 
@@ -1935,7 +2253,7 @@ Robin Thomas was already confined to a wheelchair when I arrived at Georgia Tech
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2020-04-03T12:20:30Z</updated>
+      <updated>2020-04-03T13:20:40Z</updated>
     </source>
   </entry>
 
@@ -1971,7 +2289,7 @@ Robin Thomas was already confined to a wheelchair when I arrived at Georgia Tech
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-04-03T12:20:24Z</updated>
+      <updated>2020-04-03T13:20:33Z</updated>
     </source>
   </entry>
 
@@ -2093,37 +2411,7 @@ Robin Thomas was already confined to a wheelchair when I arrived at Georgia Tech
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-04-03T12:20:48Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2020/039</id>
-    <link href="https://eccc.weizmann.ac.il/report/2020/039" rel="alternate" type="text/html"/>
-    <title>TR20-039 |  Lower bounds on the sum of 25th-powers of univariates lead to complete derandomization of PIT | 
-
-	Pranjal Dutta, 
-
-	Nitin Saxena, 
-
-	Thomas Thierauf</title>
-    <summary>We consider the univariate polynomial $f_d:=(x+1)^d$ when represented as a sum of constant-powers of univariate polynomials. We define a natural measure for the model, the support-union, and conjecture that it is $\Omega(d)$ for $f_d$. 
-
-We show a stunning connection of the conjecture to the two main problems in algebraic complexity: Polynomial Identity Testing (PIT) and VP vs VNP. Our conjecture on $f_d$ implies blackbox-PIT in P. Assuming the  Generalized Riemann Hypothesis (GRH), it also implies VP $\neq$ VNP. No such connection to PIT, from lower bounds on constant-powers representation of polynomials was known before. We establish that studying the expression of $(x+1)^d$, as the sum of $25^{th}$-powers of univariates, suffices to solve the two major open questions.   
-
-In support, we show that our conjecture holds over the integer ring of any number field. We also establish a connection with the well-studied notion of matrix rigidity.</summary>
-    <updated>2020-03-25T21:21:25Z</updated>
-    <published>2020-03-25T21:21:25Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2020-04-03T12:20:24Z</updated>
+      <updated>2020-04-03T13:21:03Z</updated>
     </source>
   </entry>
 </feed>
