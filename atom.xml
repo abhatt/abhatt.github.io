@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-04-22T06:22:01Z</updated>
+  <updated>2020-04-22T07:22:29Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,111 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://theorydish.blog/?p=1650</id>
+    <link href="https://theorydish.blog/2020/04/22/private-libraries/" rel="alternate" type="text/html"/>
+    <title>Reading in Private</title>
+    <summary>(This blog post is based on joint work with Dima Kogan.) One of the great unsung perks of being a college student is having access to the university library. There is something thrilling about hunting down exactly the right reference deep in the stacks, or reading through the archived papers of a public figure from years back. The pandemic has closed all of our libraries for the time being. Even so, through the fruits of computer science—databases, the Internet, e-readers, and so on—we can get access to much of the same information even when we are cooped up at home. But for me, one of the true pleasures of using a library is the fact that I can browse through any book I want in complete privacy. If I want to go up to the stacks and read about tulip gardening, or road-bike maintenance, or strategies for managing anxiety, I can do that pretty much without anyone else knowing. In contrast, if I go online today and search for “tulip gardening,” Google will take careful note of my interest in tulips and I will be seeing ads about gardening tools for months. An ideal digital library would let us download [...]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><i>(This blog post is based on joint work with </i><a href="https://cs.stanford.edu/~dkogan/"><i>Dima Kogan</i></a><i>.)</i></p>
+<p>One of the great unsung perks of being a college student is having access to the university library. There is something thrilling about hunting down exactly the right reference deep in the stacks, or reading through the archived papers of a public figure from years back.</p>
+<p>The pandemic has closed all of our libraries for the time being. Even so, through the fruits of computer science—databases, the Internet, e-readers, and so on—we can get access to much of the same information even when we are cooped up at home.</p>
+<p>But for me, one of the true pleasures of using a library is the fact that I can browse through any book I want in complete privacy. If I want to go up to the stacks and read about tulip gardening, or road-bike maintenance, or strategies for managing anxiety, I can do that pretty much without anyone else knowing.</p>
+<p>In contrast, if I go online today and search for “tulip gardening,” Google will take careful note of my interest in tulips and I will be seeing ads about gardening tools for months.</p>
+<p>An ideal digital library would let us download and read books without anyone—not even the library itself—learning which books we are reading. How could we build such a privacy-respecting digital library?</p>
+<p>In this post, we will discuss the private-library problem and how <a href="https://eprint.iacr.org/2019/1075">our recent work on private information retrieval</a> might be able to help solve it.</p>
+<h3><b>The Private-Library Problem</b></h3>
+<p>Let us define the problem a little more precisely. We will imagine a protocol running between a library, which holds the books, and a student, who wants to download a particular book.</p>
+<p>Say that the library has <img alt="N" class="latex" src="https://s0.wp.com/latex.php?latex=N&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="N"/> books—let’s call the books <img alt="x=(x_1, \dots, x_N)" class="latex" src="https://s0.wp.com/latex.php?latex=x%3D%28x_1%2C+%5Cdots%2C+x_N%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="x=(x_1, \dots, x_N)"/>. To keep things simple, let’s pretend that each book consists of just a single bit of information, so <img alt="x_i \in \{0,1\}" class="latex" src="https://s0.wp.com/latex.php?latex=x_i+%5Cin+%5C%7B0%2C1%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="x_i \in \{0,1\}"/> for all <img alt="i \in \{1, \dots, N\}" class="latex" src="https://s0.wp.com/latex.php?latex=i+%5Cin+%5C%7B1%2C+%5Cdots%2C+N%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="i \in \{1, \dots, N\}"/>.</p>
+<p>The student starts out holding the index <img alt="i \in \{1, \dots, N\}" class="latex" src="https://s0.wp.com/latex.php?latex=i+%5Cin+%5C%7B1%2C+%5Cdots%2C+N%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="i \in \{1, \dots, N\}"/> of her desired book. To fetch the digital book from the library, the student and library exchange some messages. At the end of the interaction, we want the following two properties to hold:</p>
+<ul>
+<li><b>Correctness.</b> The student should have her desired book (i.e., the bit <img alt="x_i" class="latex" src="https://s0.wp.com/latex.php?latex=x_i&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="x_i"/>).</li>
+<li><b>Privacy. </b>The library should have not learned any information, in a cryptographic sense, about which book the student downloaded.</li>
+</ul>
+<p>Of course, we have grossly simplified the problem: a real book is more than a single bit in length, book titles are not consecutive integers, maybe the student would like to find a book using a keyword search, etc. But even this simplified private-information-retrieval problem, which <a href="http://www.tau.ac.il/~bchor/PIR.pdf">Chor, Goldreich, Kushilevitz, and Sudan introduced</a> in the 90s, is already interesting enough.</p>
+<h3><b>A simple but inefficient solution</b></h3>
+<p>There is a simple solution to this problem: the student can just ask the library to send her the contents of all <img alt="N" class="latex" src="https://s0.wp.com/latex.php?latex=N&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="N"/> books. This solution achieves both correctness and privacy, so what’s the problem? Are we done?</p>
+<p>Well, there are two problems:</p>
+<ol>
+<li>The amount of <b>communication</b> is large: Just to read a single book, the client must download the contents of the entire library! So this is terribly inefficient.</li>
+<li>The amount of <b>computation</b> is large: Just to fetch a single book, the library must do work proportional to the size of the entire library. So “checking out” a book from this digital library will take a long time.</li>
+</ol>
+<p>Research on private information retrieval typically focuses on the first problem: how can we reduce the <i>communication</i> cost? Using a <a href="https://dl.acm.org/doi/abs/10.1145/2968443">variety</a> of <a href="https://ieeexplore.ieee.org/abstract/document/646125">clever</a> <a href="https://dl.acm.org/doi/abs/10.1145/2976749.2978429">techniques</a>, it is possible to drive down the communication cost to something very small—sub-polynomial or even logarithmic in the library size <img alt="N" class="latex" src="https://s0.wp.com/latex.php?latex=N&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="N"/>.</p>
+<p>But today we are interested in the <i>computational</i> burden on the library. Is there any way that the student can privately download a book from the library while requiring the library to do only <img alt="o(N)" class="latex" src="https://s0.wp.com/latex.php?latex=o%28N%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="o(N)"/> work in the process?</p>
+<h3><b>Doing the hard work in advance</b></h3>
+<p>To have both correctness and privacy, it seems that the library needs to touch each of the <img alt="N" class="latex" src="https://s0.wp.com/latex.php?latex=N&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="N"/> books in the process of responding to each student’s request. And, in some sense, <a href="http://groups.csail.mit.edu/cis/pubs/malkin/BIM.ps">this is true</a>. So, to allow the library to run in time sublinear in <img alt="N" class="latex" src="https://s0.wp.com/latex.php?latex=N&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="N"/>, we will have to tweak the problem slightly.</p>
+<p>Our idea is to have the library do the <img alt="O(N)" class="latex" src="https://s0.wp.com/latex.php?latex=O%28N%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="O(N)"/>-time computation in an <b>offline phase</b>, which takes place <i>before</i> the student decides which book she wants to read. For example, this offline phase might happen overnight while the library’s servers would otherwise be idle.</p>
+<p>Later on, once the student decides which book in the library she wants to read, the student and library can run a <img alt="o(N)" class="latex" src="https://s0.wp.com/latex.php?latex=o%28N%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="o(N)"/>-time <b>online phase</b> in which the student is able to retrieve her desired book. The total communication cost, in both offline and online phases, will be <img alt="o(N)" class="latex" src="https://s0.wp.com/latex.php?latex=o%28N%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="o(N)"/>.</p>
+<p>So, by pushing the library’s expensive linear scan to an offline phase, the library can service the student’s request for a book in sublinear online time.</p>
+<h3><b>Our offline/online private information retrieval scheme</b></h3>
+<p>Let’s see how to construct such an offline/online scheme. To make things simple for the purposes of this post, let’s assume that the student has access to two non-colluding libraries that hold the same set of books. To be concrete, let’s call the two libraries “Stanford” and “Berkeley.”</p>
+<p>The privacy property will hold as long as the librarians at Stanford and Berkeley don’t get together and share the information that they learned while running the protocol with the student. So Stanford and Berkeley here are “non-colluding.” (Equivalently, our scheme that protects privacy against an adversary that controls one of the two libraries—but not both.)</p>
+<div class="wp-caption aligncenter" id="attachment_1670" style="width: 571px;"><img alt="Offline-online PIR" class=" wp-image-1670" height="365" src="https://theorydish.files.wordpress.com/2020/04/offlineonline.png?w=561&amp;h=365" width="561"/><p class="wp-caption-text" id="caption-attachment-1670">In the offline phase, which happens before the student knows which book she wants to read, the Stanford library does linear work. In the online phase, which runs once the student has the index of her desired book, the Berkeley library runs in sublinear time. (We are suppressing log factors here.)</p></div>
+<p>Now, let’s describe an offline/online protocol by which the student can privately fetch a book from the digital library:</p>
+<p><b>Offline Phase.</b></p>
+<ul>
+<li>The student partitions the integers <img alt="\{1, .., N\}" class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7B1%2C+..%2C+N%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\{1, .., N\}"/> into <img alt="\sqrt{N}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Csqrt%7BN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\sqrt{N}"/> non-overlapping sets chosen at random, where each set has size <img alt="\sqrt{N}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Csqrt%7BN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\sqrt{N}"/>. Call these sets <img alt="S_1, \dots, S_{\sqrt{N}}" class="latex" src="https://s0.wp.com/latex.php?latex=S_1%2C+%5Cdots%2C+S_%7B%5Csqrt%7BN%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="S_1, \dots, S_{\sqrt{N}}"/>.</li>
+<li>The student sends these sets <img alt="S_1, \dots, S_{\sqrt{N}}" class="latex" src="https://s0.wp.com/latex.php?latex=S_1%2C+%5Cdots%2C+S_%7B%5Csqrt%7BN%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="S_1, \dots, S_{\sqrt{N}}"/> to Stanford (the first library). To reduce the communication cost here, the student can compress these sets using pseudorandomness.</li>
+<li>For each set <img alt="S_j" class="latex" src="https://s0.wp.com/latex.php?latex=S_j&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="S_j"/>, the Stanford library computes the <i>parity</i> of all of the books indexed by set <img alt="S_j" class="latex" src="https://s0.wp.com/latex.php?latex=S_j&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="S_j"/> and returns the parity bits <img alt="(b_1, \dots, b_{\sqrt{N}})" class="latex" src="https://s0.wp.com/latex.php?latex=%28b_1%2C+%5Cdots%2C+b_%7B%5Csqrt%7BN%7D%7D%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="(b_1, \dots, b_{\sqrt{N}})"/> to the student. In other words, if the books are <img alt="x=(x_1, \dots, x_N) \in \{0,1\}^n" class="latex" src="https://s0.wp.com/latex.php?latex=x%3D%28x_1%2C+%5Cdots%2C+x_N%29+%5Cin+%5C%7B0%2C1%5C%7D%5En&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="x=(x_1, \dots, x_N) \in \{0,1\}^n"/>, then <img alt="b_j = \sum_{k \in S_j} x_k \bmod 2" class="latex" src="https://s0.wp.com/latex.php?latex=b_j+%3D+%5Csum_%7Bk+%5Cin+S_j%7D+x_k+%5Cbmod+2&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="b_j = \sum_{k \in S_j} x_k \bmod 2"/>.</li>
+</ul>
+<p>The total communication in this phase is only <img alt="O(\sqrt{N})" class="latex" src="https://s0.wp.com/latex.php?latex=O%28%5Csqrt%7BN%7D%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="O(\sqrt{N})"/> bits and the student and the Stanford library can run this step <i>before</i> the student decides which book she wants to read.</p>
+<p><b>Online Phase.</b> Once the student decides that she wants to read book <img alt="i \in \{1, \dots, N\}" class="latex" src="https://s0.wp.com/latex.php?latex=i+%5Cin+%5C%7B1%2C+%5Cdots%2C+N%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="i \in \{1, \dots, N\}"/>, the student and Berkeley (the second library) run the following steps:</p>
+<ul>
+<li>The student finds the set <img alt="S_j" class="latex" src="https://s0.wp.com/latex.php?latex=S_j&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="S_j"/> that contains the index <img alt="i" class="latex" src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="i"/> of her desired book.</li>
+<li>The student flips a coin that is weighted to come up heads with some probability <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="p"/>, to be fixed later.</li>
+<li>If the coin lands <span style="text-decoration: underline;">heads</span>:
+<ul>
+<li>The student sends <img alt="S \gets S_j \setminus \{i\}" class="latex" src="https://s0.wp.com/latex.php?latex=S+%5Cgets+S_j+%5Csetminus+%5C%7Bi%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="S \gets S_j \setminus \{i\}"/> to the Berkeley library.</li>
+</ul>
+</li>
+<li>If the coin lands <span style="text-decoration: underline;">tails</span>:
+<ul>
+<li>The student samples <img alt="i' \gets_R S_j \setminus \{i\}" class="latex" src="https://s0.wp.com/latex.php?latex=i%27+%5Cgets_R+S_j+%5Csetminus+%5C%7Bi%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="i' \gets_R S_j \setminus \{i\}"/>.</li>
+<li>The student sends <img alt="S \gets S_j \setminus \{i'\}" class="latex" src="https://s0.wp.com/latex.php?latex=S+%5Cgets+S_j+%5Csetminus+%5C%7Bi%27%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="S \gets S_j \setminus \{i'\}"/> to the Berkeley library.</li>
+</ul>
+</li>
+<li>The Berkeley library receives the set <img alt="S \subseteq \{1, \dots, N\}" class="latex" src="https://s0.wp.com/latex.php?latex=S+%5Csubseteq+%5C%7B1%2C+%5Cdots%2C+N%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="S \subseteq \{1, \dots, N\}"/> from the student. The Berkeley library returns the contents of all books whose indices appear in set <img alt="S" class="latex" src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="S"/> to the student.</li>
+<li>Now, the student can recover its desired book as follows:
+<ul>
+<li>If <span style="text-decoration: underline;">heads</span>: the student now has the parity of the books in <img alt="S_j" class="latex" src="https://s0.wp.com/latex.php?latex=S_j&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="S_j"/> (from the offline phase) and the value of all books in <img alt="S_j" class="latex" src="https://s0.wp.com/latex.php?latex=S_j&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="S_j"/> that are not book <img alt="i" class="latex" src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="i"/>. This is enough to recover the contents of book <img alt="i" class="latex" src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="i"/>.</li>
+<li>If <span style="text-decoration: underline;">tails</span>: <img alt="i \in S" class="latex" src="https://s0.wp.com/latex.php?latex=i+%5Cin+S&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="i \in S"/>. In this case the Berkeley library has sent the contents of book <img alt="i" class="latex" src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="i"/> to the student in the online phase.</li>
+</ul>
+</li>
+</ul>
+<p>Even before we fix the weight <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="p"/> of the coin, we see that the protocol satisfies <b>correctness</b>, since no matter how the coin lands the client recovers its desired book. Also, the total communication cost is <img alt="O(\sqrt{N} \log N)" class="latex" src="https://s0.wp.com/latex.php?latex=O%28%5Csqrt%7BN%7D+%5Clog+N%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="O(\sqrt{N} \log N)"/> bits, which is sublinear as we had hoped. Finally, the <b>online computation cost</b> is also sublinear: the Berkeley library just needs to return <img alt="\sqrt{N}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Csqrt%7BN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\sqrt{N}"/> books to the client, which it can do in time roughly <img alt="O(\sqrt{N})" class="latex" src="https://s0.wp.com/latex.php?latex=O%28%5Csqrt%7BN%7D%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="O(\sqrt{N})"/>.</p>
+<p>The last matter to address is <b>privacy</b>. Again, we are assuming that the adversary controls only one of the two libraries.</p>
+<ul>
+<li>In the offline phase, the student’s message to the Stanford library is independent of <img alt="i" class="latex" src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="i"/>, so the protocol is perfectly private with respect to Stanford.</li>
+<li>In the online phase, we must be more careful. It turns out that if we choose the weight <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="p"/> of the coin as <img alt="p = 1 - (\sqrt{N} - 1)/N" class="latex" src="https://s0.wp.com/latex.php?latex=p+%3D+1+-+%28%5Csqrt%7BN%7D+-+1%29%2FN&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="p = 1 - (\sqrt{N} - 1)/N"/>, then the set <img alt="S" class="latex" src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="S"/> that the student sends to UC Berkeley in the online phase is just a uniformly random size-<img alt="(\sqrt{N}-1)" class="latex" src="https://s0.wp.com/latex.php?latex=%28%5Csqrt%7BN%7D-1%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="(\sqrt{N}-1)"/> subset of <img alt="\{1, \dots, N\}" class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7B1%2C+%5Cdots%2C+N%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\{1, \dots, N\}"/>.</li>
+</ul>
+<h3><b>Open problems</b></h3>
+<p>So, the student can privately fetch a book from our digital libraries in sublinear online time. What else is left to do?</p>
+<ul>
+<li>Getting rid of the need for two non-colluding libraries is a clear next step. <a href="https://eprint.iacr.org/2019/1075">Our work</a> has some results along these lines, but they pay a price either in (a) asymptotic efficiency or in (b) the strength of the cryptographic assumptions required.</li>
+<li>A beautiful paper of <a href="https://www.cs.bgu.ac.il/~beimel/Papers/BIM.pdf">Beimel, Ishai, and Malkin</a> shows that if the library can store its collection of books using a special type of error-correcting encoding, the <b>total</b> computational time at the libraries (not just the online time) can be sublinear in <img alt="N" class="latex" src="https://s0.wp.com/latex.php?latex=N&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="N"/>. As far as we know, these schemes are not concretely efficient enough to use in practice. Could they be made so?</li>
+<li>Privacy is just one of the many pleasures of using a physical library. During this period of confinement, I also miss the smell of the books, the beauty of light filtering through the stacks, and the peacefulness of thinking in a study carrel. Can a digital library ever give us these things too?</li>
+</ul>
+<p>If any of these questions catch your fancy, please check out <a href="https://eprint.iacr.org/2019/1075">our Eurocrypt paper</a> for more background, pointers, and results.</p>
+<p>Don Knuth <a href="http://jmlr.csail.mit.edu/reviewing-papers/knuth_mathematical_writing.pdf">has reportedly said</a> “Using a great library to solve a specific problem… Now <i>that</i> […] is real living.” With better digital libraries, maybe we could all live a little bit more during these challenging days.</p></div>
+    </content>
+    <updated>2020-04-22T07:07:04Z</updated>
+    <published>2020-04-22T07:07:04Z</published>
+    <category term="Uncategorized"/>
+    <author>
+      <name>Henry Corrigan-Gibbs</name>
+    </author>
+    <source>
+      <id>https://theorydish.blog</id>
+      <logo>https://theorydish.files.wordpress.com/2017/03/cropped-nightdish1.jpg?w=32</logo>
+      <link href="https://theorydish.blog/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://theorydish.blog" rel="alternate" type="text/html"/>
+      <link href="https://theorydish.blog/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>Stanford's CS Theory Research Blog</subtitle>
+      <title>Theory Dish</title>
+      <updated>2020-04-22T07:22:01Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>http://arxiv.org/abs/2004.10163</id>
@@ -468,7 +573,7 @@ functions over an n-sphere.
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2020-04-22T06:20:39Z</updated>
+      <updated>2020-04-22T07:21:14Z</updated>
     </source>
   </entry>
 
@@ -616,7 +721,7 @@ functions over an n-sphere.
       <link href="https://kamathematics.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://kamathematics.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Kamathematics</title>
-      <updated>2020-04-22T06:21:55Z</updated>
+      <updated>2020-04-22T07:22:23Z</updated>
     </source>
   </entry>
 
@@ -1592,55 +1697,6 @@ science, and machine learning. Our goal is to simplify the presentation of
 proof techniques introduced in [CEM+15] and [CMM17] so that they can serve as a
 guide for future work. We also refer the reader to [CYD19], which gives a
 similar simplified exposition of the proof covered in Section 2.
-</p></div>
-    </summary>
-    <updated>2020-04-21T00:00:00Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2020-04-21T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2004.08432</id>
-    <link href="http://arxiv.org/abs/2004.08432" rel="alternate" type="text/html"/>
-    <title>Fully-Dynamic Graph Sparsifiers Against an Adaptive Adversary</title>
-    <feedworld_mtime>1587427200</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Bernstein:Aaron.html">Aaron Bernstein</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Brand:Jan_van_den.html">Jan van den Brand</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Gutenberg:Maximilian_Probst.html">Maximilian Probst Gutenberg</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Nanongkai:Danupon.html">Danupon Nanongkai</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Saranurak:Thatchaphol.html">Thatchaphol Saranurak</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Sidford:Aaron.html">Aaron Sidford</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Sun:He.html">He Sun</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2004.08432">PDF</a><br/><b>Abstract: </b>Designing dynamic graph algorithms against an adaptive adversary is a major
-goal in the field of dynamic graph algorithms. While a few such algorithms are
-known for spanning trees, matchings, and single-source shortest paths, very
-little was known for an important primitive like graph sparsifiers. The
-challenge is how to approximately preserve so much information about the graph
-(e.g., all-pairs distances and all cuts) without revealing the algorithms'
-underlying randomness to the adaptive adversary.
-</p>
-<p>In this paper we present the first non-trivial efficient adaptive algorithms
-for maintaining spanners and cut sparisifers. These algorithms in turn imply
-improvements over existing algorithms for other problems. Our first algorithm
-maintains a polylog$(n)$-spanner of size $\tilde{O}(n)$ in polylog$(n)$
-amortized update time. The second algorithm maintains an $O(k)$-approximate cut
-sparsifier of size $\tilde{O}(n)$ in $\tilde{O}(n^{1/k})$ amortized update
-time, for any $k\ge1$, which is polylog$(n)$ time when $k=\log(n)$. The
-amortized update time of both algorithms can be made worst-case by paying some
-sub-polynomial factors. Prior to our result, there were near-optimal algorithms
-against oblivious adversaries (e.g. Baswana et al. [TALG'12] and Abraham et al.
-[FOCS'16]), but the only non-trivial adaptive dynamic algorithm requires $O(n)$
-amortized update time to maintain $3$- and $5$-spanner of size $O(n^{1+1/2})$
-and $O(n^{1+1/3})$, respectively [Ausiello et al. ESA'05].
-</p>
-<p>Our results are based on two novel techniques. First of all, we show a
-generic black-box reduction that allows us to assume that the graph undergoes
-only edge deletions and, more importantly, remains an expander with
-almost-uniform degree. The second is a new technique called proactive
-resampling. [Abstract was shortened]
 </p></div>
     </summary>
     <updated>2020-04-21T00:00:00Z</updated>
