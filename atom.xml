@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-04-24T04:22:23Z</updated>
+  <updated>2020-04-24T05:21:41Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,123 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>http://offconvex.github.io/2020/04/23/ExpLR1/</id>
+    <link href="http://offconvex.github.io/2020/04/23/ExpLR1/" rel="alternate" type="text/html"/>
+    <title>Exponential Learning Rate Schedules for Deep Learning (Part 1)</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>This blog post concerns our <a href="https://arxiv.org/pdf/1910.07454.pdf">ICLR20 paper</a> on a surprising discovery about learning rate (LR), the most basic hyperparameter in deep learning.</p>
+
+<p>As illustrated in many online blogs, setting LR too small  might slow down the optimization, and setting it too large  might make the network overshoot the area of low losses. The standard mathematical analysis for  the right choice of LR relates it to <a href="https://en.wikipedia.org/wiki/Smoothness">smoothness</a> of the loss function.</p>
+
+<p>Many practitioners use a ‘step decay’ LR schedule, which systematically drops the LR after specific training epochs. One often hears the intuition—with some mathematical justification if one treats SGD as a random walk in the  loss landscape— that large learning rates are useful in the initial (“exploration”) phase of training whereas lower rates  in later epochs allow a slow settling down to a local minimum in the landscape. Intriguingly, this intuition is called into  question by the success of exotic learning rate schedules such as <a href="https://arxiv.org/abs/1608.03983">cosine</a> (Loshchilov&amp;Hutter, 2016), and <a href="https://arxiv.org/abs/1506.01186">triangular</a> (Smith, 2015), featuring an oscillatory LR.  These divergent approaches suggest that LR, the most basic and intuitive hyperparameter in deep learning, has not revealed all its mysteries yet.</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/lr_schedules.png" style="width: 450px;"/>
+<br/>
+<b>Figure 1.</b> Examples of Step Decay, Triangular and Cosine LR schedules.
+</div>
+<p><br/></p>
+
+<h1 id="surprise-exponentially-increasing-lr">Surprise: Exponentially increasing LR</h1>
+
+<p>We report experiments that state-of-the-art networks for image recognition tasks can be trained with an exponentially increasing LR (ExpLR): in each iteration it increases by $(1+\alpha)$ for some $\alpha &gt; 0$.  (The $\alpha$ can be varied over epochs.) Here $\alpha$ is not too small in our experiments, so as you would imagine, the LR hits astronomical values in no time.  To the best of our knowledge, this is the first time such a rate schedule has been successfully used, let alone for highly successful architectures. In fact, as we will see below, the reason we even did this bizarre experiment  was that we already had a mathematical proof that it would work. Specifically, we could show that such ExpLR schedules are at least as powerful as the standard step-decay ones, by which we mean that ExpLR can let us achieve (in function space) all the nets obtainable via the currently popular step-decay schedules.</p>
+
+<h2 id="so-why-does-this-work">So why does this work?</h2>
+
+<p>One key property of state-of-the-art nets we rely on is that they all use some normalization of parameters within layers, usually Batch Norm (BN), which has been shown to give benefits in optimization and generalization across architectures. Our result also holds for other normalizations, including Group Normalization (Wu &amp; He, 2018), Layer Normalization (Ba et al., 2016), Instance Norm (Ulyanov et al., 2016), etc.</p>
+
+<p>The second key property of current training is that they use weight decay (aka $\ell_2$ regularizer). When combined with BN, this implies strange dynamics in parameter space, and the experimental papers (<a href="https://arxiv.org/abs/1706.05350">van Laarhoven, 2017</a>, <a href="https://arxiv.org/abs/1803.01814">Hoffer et al., 2018a</a> and <a href="https://openreview.net/forum?id=B1lz-3Rct7">Zhang et al., 2019</a>),  noticed that combining BN and weight decay can  be viewed as increasing the LR.</p>
+
+<p>Our paper gives a rigorous proof of the power of ExpLR by showing the following about the end-to-end function  being computed (see Main Thm in the paper):</p>
+
+<blockquote>
+  <p>(Informal Theorem) For commonly  used values of the paremeters, every net produced by <em>Weight Decay + Constant LR + BN + Momentum</em> can also be produced (in function space) via <em>ExpLR + BN + Momentum</em></p>
+</blockquote>
+
+<p>*NB: If the LR is not fixed but decaying in discrete steps, then the equivalent ExpLR training decays the exponent. (See our paper for details.)</p>
+
+<p>At first sight such a claim may seem difficult (if not impossible) to prove given that we lack any mathematical characterization of nets produced by training (note that the theorem makes no mention of the dataset!).  The  equivalence is shown by reasoning about <em>trajectory</em> of optimization, instead of the usual “landscape view” of stationary points, gradient norms, Hessian norms, smoothness, etc.. This is an example of the importance of trajectory analysis, as argued in <a href="http://www.offconvex.org/2019/06/03/trajectories/">earlier blog post of Sanjeev’s</a> because optimization and generalization are deeply intertwined for deep learning. Conventional wisdom says LR controls optimization, and the regularizer controls generalization. Our result shows that the effect of weight decay can  under fairly normal conditions be * exactly*  realized by the ExpLR rate schedule.</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/exp_lr.png" style="width: 550px;"/>
+</div>
+<p><strong>Figure 2.</strong> Training PreResNet32 on CIFAR10 with fixed LR $0.1$, momentum $0.9$ and other standard hyperparameters. Trajectory was unchanged when WD was turned off  and LR at iteration $t$ was $\tilde{\eta}_ t = 0.1\times1.481^t$. (The constant $1.481$ is predicted by our theory given the original hyperparameters.) Plot on right shows  weight norm $\pmb{w}$ of the first convolutional layer in the second residual block. It grows exponentially as one would expect, satisfying $|\pmb{w}_ t|_ 2^2/\tilde{\eta}_ t = $ constant.</p>
+
+<p><a href="http://www.offconvex.org/feed.xml# (We first want to clarify that the exponential LR schedules work for normalized networks only and will lead parameter and output explosion for networks without normalization. )">comment</a>:# (In the rest of the post, we will first explain how does this equivalence result arises from various types of normalization schemes and then sketch the proof. We will also present a more general exponential growing learning schedule called ‘'’Tapered Exponential Learning Rate Schedule’, or TEXP, which is both experimentally and theoretically equivalent to the standard Step Decay schedule + Weight Decay. )</p>
+
+<h2 id="scale-invariance-and-equivalence">Scale Invariance and Equivalence</h2>
+
+<p>The formal proof holds for any training loss satisfying 
+what we call <em>Scale Invariance</em>:</p>
+
+
+
+<p>BN and other normalization schemes result in a Scale-Invariant Loss for the popular deep architectures (Convnet, Resnet, DenseNet etc.) if the output layer –where normally no normalization is used– is fixed throughout training. Empirically, <a href="https://openreview.net/forum?id=S1Dh8Tg0-">Hoffer et al. (2018b)</a>  found that randomly fixing the output layer at the start does not harm the final accuracy. 
+(Appendix C of our paper demonstrates scale invariance for  various architectures; it is somewhat nontrivial.)</p>
+
+<p>For batch ${\mathcal{B}}={x_ i}_ {i=1}^B$, network parameter ${\pmb{\theta}}$, we  denote the network by $f_ {\pmb{\theta}}$ and the loss function at iteration $t$ by $L_ t(f_ {\theta}) = L(f_ {\theta}, {\mathcal{B}}_ t)$ . We also use $L_ t({\theta})$ for convenience. We say the network $f_ {\pmb{\theta}}$ is <em>scale invariant</em> if $\forall c&gt;0$, $f_ {c{\pmb{\theta}}} = f_ {\pmb{\theta}}$, which implies the loss $L_ t$ is also scale invariant, i.e., $L_  t(c{\pmb{\theta}}_ t)=L_ t({\pmb{\theta}}_ t)$, $\forall c&gt;0$. A key source of intuition is the following lemma provable via chain  rule:</p>
+
+<blockquote>
+  <p><strong>Lemma 1</strong>. A scale-invariant loss L satisfies</p>
+
+  <p>(1). $\langle\nabla_ }L,{\pmb{\theta}}\rangle=0$;<br/>
+(2). $\left.\nabla_ }L \right|_  = {\pmb{\theta}}_  0} = c \left.\nabla_ }L\right|_  = c{\pmb{\theta}}_  0}$, for any $c&gt;0$.</p>
+</blockquote>
+
+<p>The first property immediately implies that $|{\pmb{\theta}}_ t|$ is monotone increasing for SGD if WD is turned off by Pythagoren Theorem. And based on this, <a href="https://arxiv.org/pdf/1812.03981.pdf">our previous work</a> with Kaifeng Lyu shows that GD with any fixed learning rate can reach $\varepsilon$ approximate stationary point for scale invariant objectives in $O(1/\varepsilon^2)$.</p>
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/inv_lemma.png" style="width: 360px;"/>
+<br/>
+<b>Figure 3.</b> Illustration of Lemma 1. 
+</div>
+<p><br/></p>
+
+<p>Below is the main result of the paper. We will explain the proof idea (using scale-invariance) in a later post.</p>
+<blockquote>
+  <p><strong>Theorem 1(Main, Informal).</strong> SGD on a scale-invariant objective with initial learning rate $\eta$, weight decay factor $\lambda$, and momentum factor $\gamma$ is equivalent to SGD with momentum factor $\gamma$ where at iteration $t$, the ExpLR $\tilde{\eta}_ t$  is defined as $\tilde{\eta}_ t = \alpha^{-2t-1} \eta$ without weight decay($\tilde{\lambda} = 0$) where $\alpha$ is a non-zero root of equation 
+     </p>
+</blockquote>
+
+<blockquote>
+  <p>Specifically, when momentum $\gamma=0$,  the above schedule can be simplified as $\tilde{\eta}_ t = (1-\lambda\eta)^{-2t-1} \eta$.</p>
+</blockquote>
+
+<h3 id="sota-performance-with-exponential-lr">SOTA performance with exponential LR</h3>
+
+<p>As mentioned, reaching state-of-the-art accuracy  requires reducing the learning rate a few times. Suppose the training has $K$ phases, and the learning rate is divided by some constant $C_I&gt;1$ when entering phase $I$. To realize the same effect with an exponentially increasing LR, we have:</p>
+
+<blockquote>
+  <p><strong>Theorem 2:</strong> ExpLR with the below modification generates the same network sequence as Step Decay with momentum factor $\gamma$ and WD $\lambda$ does. We call it <em>Tapered Exponential LR schedule</em> (TEXP).<br/>
+<strong>Modification when entering a new phase $I$</strong>: (1). switching to some smaller exponential growing rate; (2). divinding the current LR by $C_I$.</p>
+</blockquote>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/texp_lr.png" style="width: 235px;"/>
+<img src="http://www.offconvex.org/assets/TEXP.png" style="width: 500px;"/>
+</div>
+<p><strong>Figure 5.</strong> PreResNet32 trained with Step Decay (as in Figure 1) and its corresponding TEXP schedule. As predicted by Theorem 2, they have similar trajectories and performances.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We hope that this bit of theory and supporting experiments have changed your outlook on learning rates for deep learning.</p>
+
+<p>A follow-up post will present the proof idea and give more insight into why ExpLR suggests a rethinking of the “landscape view” of optimization in deep learning.</p></div>
+    </summary>
+    <updated>2020-04-24T02:00:00Z</updated>
+    <published>2020-04-24T02:00:00Z</published>
+    <source>
+      <id>http://offconvex.github.io/</id>
+      <author>
+        <name>Off the Convex Path</name>
+      </author>
+      <link href="http://offconvex.github.io/" rel="alternate" type="text/html"/>
+      <link href="http://offconvex.github.io/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Algorithms off the convex path.</subtitle>
+      <title>Off the convex path</title>
+      <updated>2020-04-24T05:21:10Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>http://arxiv.org/abs/2004.11315</id>
@@ -503,7 +620,7 @@ not allowed.
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2020-04-24T04:21:39Z</updated>
+      <updated>2020-04-24T05:21:09Z</updated>
     </source>
   </entry>
 
@@ -539,7 +656,7 @@ Our results rely on a new class of exponential sums that interpolate between the
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-04-24T04:20:46Z</updated>
+      <updated>2020-04-24T05:20:28Z</updated>
     </source>
   </entry>
 
@@ -748,7 +865,7 @@ We present general upper and lower bounds on the communication complexity in the
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-04-24T04:20:46Z</updated>
+      <updated>2020-04-24T05:20:28Z</updated>
     </source>
   </entry>
 
@@ -892,7 +1009,7 @@ We present general upper and lower bounds on the communication complexity in the
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2020-04-24T04:22:30Z</updated>
+      <updated>2020-04-24T05:21:15Z</updated>
     </source>
   </entry>
 
@@ -937,7 +1054,7 @@ We present general upper and lower bounds on the communication complexity in the
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2020-04-24T04:20:57Z</updated>
+      <updated>2020-04-24T05:20:35Z</updated>
     </source>
   </entry>
 
@@ -1085,7 +1202,7 @@ We present general upper and lower bounds on the communication complexity in the
       <link href="https://kamathematics.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://kamathematics.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Kamathematics</title>
-      <updated>2020-04-24T04:22:17Z</updated>
+      <updated>2020-04-24T05:21:36Z</updated>
     </source>
   </entry>
 
@@ -1190,7 +1307,7 @@ We present general upper and lower bounds on the communication complexity in the
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2020-04-24T04:21:43Z</updated>
+      <updated>2020-04-24T05:21:13Z</updated>
     </source>
   </entry>
 
@@ -1240,7 +1357,7 @@ and unit propagation policies.</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-04-24T04:20:44Z</updated>
+      <updated>2020-04-24T05:20:28Z</updated>
     </source>
   </entry>
 
@@ -1387,7 +1504,7 @@ Removing one edge from each four-cycle leaves  eight-cycles, each of which has a
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2020-04-24T04:21:39Z</updated>
+      <updated>2020-04-24T05:21:09Z</updated>
     </source>
   </entry>
 
@@ -1452,7 +1569,7 @@ Removing one edge from each four-cycle leaves  eight-cycles, each of which has a
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-04-24T04:20:53Z</updated>
+      <updated>2020-04-24T05:20:33Z</updated>
     </source>
   </entry>
 
@@ -1603,7 +1720,7 @@ They are also difficult to find—this is why cake cutting questions have been r
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-04-24T04:21:03Z</updated>
+      <updated>2020-04-24T05:20:39Z</updated>
     </source>
   </entry>
 
@@ -1633,7 +1750,7 @@ In doing so, we present the first natural, and well-studied, computational probl
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-04-24T04:20:43Z</updated>
+      <updated>2020-04-24T05:20:28Z</updated>
     </source>
   </entry>
 
@@ -1661,7 +1778,7 @@ This result follows from a more general study of interactive puzzles---a general
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-04-24T04:20:44Z</updated>
+      <updated>2020-04-24T05:20:28Z</updated>
     </source>
   </entry>
 
@@ -1695,7 +1812,7 @@ We also establish a firm link between non-trivial satisfiability algorithms and 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-04-24T04:20:44Z</updated>
+      <updated>2020-04-24T05:20:28Z</updated>
     </source>
   </entry>
 
@@ -1729,7 +1846,7 @@ The first result extends the recent breakthrough of Atserias and Muller (FOCS 20
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-04-24T04:20:44Z</updated>
+      <updated>2020-04-24T05:20:28Z</updated>
     </source>
   </entry>
 
@@ -1757,7 +1874,7 @@ We focus on one of the most widely used gadgets, the index gadget. For this gadg
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-04-24T04:20:44Z</updated>
+      <updated>2020-04-24T05:20:28Z</updated>
     </source>
   </entry>
 
@@ -1795,7 +1912,7 @@ Our approach builds on previous explicit list decodable codes for space bounded 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-04-24T04:20:46Z</updated>
+      <updated>2020-04-24T05:20:28Z</updated>
     </source>
   </entry>
 
@@ -1895,36 +2012,6 @@ Our approach builds on previous explicit list decodable codes for space bounded 
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
       <updated>2020-04-20T01:32:31Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2020/046</id>
-    <link href="https://eccc.weizmann.ac.il/report/2020/046" rel="alternate" type="text/html"/>
-    <title>TR20-046 |  A Robust Version of Heged\H{u}s&amp;#39;s Lemma, with Applications | 
-
-	Srikanth Srinivasan</title>
-    <summary>Heged\H{u}s's lemma is the following combinatorial statement regarding polynomials over finite fields. Over a field $\mathbb{F}$ of characteristic $p &gt; 0$ and for $q$ a  power of $p$, the lemma says that any multilinear polynomial $P\in \mathbb{F}[x_1,\ldots,x_n]$ of degree less than $q$ that vanishes at all points in $\{0,1\}^n$ of Hamming weight $k\in [q,n-q]$ must also vanish at all points in $\{0,1\}^n$ of weight $k + q$. This lemma was used by Heged\H{u}s (2009) to give a solution to \emph{Galvin's problem}, an extremal problem about set systems; by Alon, Kumar and Volk (2018) to improve the best-known multilinear circuit lower bounds; and by Hrube\v{s}, Ramamoorthy, Rao and Yehudayoff (2019) to prove optimal lower bounds against depth-$2$ threshold circuits for computing some symmetric functions. 
-		
-		In this paper, we formulate a robust version of Heged\H{u}s's lemma. Informally, this version says that if a polynomial of degree $o(q)$ vanishes at most points of weight $k$, then it vanishes at many points of weight $k+q$. We prove this lemma and give the following three different applications.
-		
-		1. Degree lower bounds for the coin problem: The \emph{$\delta$-Coin Problem} is the problem of distinguishing between a coin that is heads with probability $((1/2) + \delta)$ and a coin that is heads with probability $1/2$. We show that over a field of positive (fixed) characteristic, any polynomial that solves the $\delta$-coin problem with error $\varepsilon$ must have degree $\Omega(\frac{1}{\delta}\log(1/\varepsilon)),$ which is tight up to constant factors.
-		
-		2. Probabilistic degree lower bounds: The \emph{Probabilistic degree} of a Boolean function is the minimum $d$ such that there is a random polynomial of degree $d$ that agrees with the function at each point with high probability. We give tight lower bounds on the probabilistic degree of \emph{every} symmetric Boolean function over positive (fixed) characteristic. As far as we know, this was not known even for some very simple functions such as unweighted Exact Threshold functions, and constant error.
-		
-		3. A robust version of the combinatorial result of Heged\H{u}s (2009) mentioned above.</summary>
-    <updated>2020-04-15T16:25:07Z</updated>
-    <published>2020-04-15T16:25:07Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2020-04-24T04:20:46Z</updated>
     </source>
   </entry>
 </feed>
