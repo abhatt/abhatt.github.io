@@ -237,7 +237,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at April 24, 2020 01:22 PM UTC</span>.
+Last updated <span class="datestr">at April 24, 2020 02:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -245,6 +245,143 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://offconvex.github.io/2020/04/24/ExpLR1/">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/convex.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="http://offconvex.github.io/2020/04/24/ExpLR1/">Exponential Learning Rate Schedules for Deep Learning (Part 1)</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://offconvex.github.io/" title="Off the convex path">Off the Convex Path</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>This blog post concerns our <a href="https://arxiv.org/pdf/1910.07454.pdf">ICLR20 paper</a> on a surprising discovery about learning rate (LR), the most basic hyperparameter in deep learning.</p>
+
+<p>As illustrated in many online blogs, setting LR too small  might slow down the optimization, and setting it too large  might make the network overshoot the area of low losses. The standard mathematical analysis for  the right choice of LR relates it to <a href="https://en.wikipedia.org/wiki/Smoothness">smoothness</a> of the loss function.</p>
+
+<p>Many practitioners use a ‘step decay’ LR schedule, which systematically drops the LR after specific training epochs. One often hears the intuition—with some mathematical justification if one treats SGD as a random walk in the  loss landscape— that large learning rates are useful in the initial (“exploration”) phase of training whereas lower rates  in later epochs allow a slow settling down to a local minimum in the landscape. Intriguingly, this intuition is called into  question by the success of exotic learning rate schedules such as <a href="https://arxiv.org/abs/1608.03983">cosine</a> (Loshchilov&amp;Hutter, 2016), and <a href="https://arxiv.org/abs/1506.01186">triangular</a> (Smith, 2015), featuring an oscillatory LR.  These divergent approaches suggest that LR, the most basic and intuitive hyperparameter in deep learning, has not revealed all its mysteries yet.</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/lr_schedules.png" style="width: 450px;" />
+<br />
+<b>Figure 1.</b> Examples of Step Decay, Triangular and Cosine LR schedules.
+</div>
+<p><br /></p>
+
+<h1 id="surprise-exponentially-increasing-lr">Surprise: Exponentially increasing LR</h1>
+
+<p>We report experiments that state-of-the-art networks for image recognition tasks can be trained with an exponentially increasing LR (ExpLR): in each iteration it increases by $(1+\alpha)$ for some $\alpha &gt; 0$.  (The $\alpha$ can be varied over epochs.) Here $\alpha$ is not too small in our experiments, so as you would imagine, the LR hits astronomical values in no time.  To the best of our knowledge, this is the first time such a rate schedule has been successfully used, let alone for highly successful architectures. In fact, as we will see below, the reason we even did this bizarre experiment  was that we already had a mathematical proof that it would work. Specifically, we could show that such ExpLR schedules are at least as powerful as the standard step-decay ones, by which we mean that ExpLR can let us achieve (in function space) all the nets obtainable via the currently popular step-decay schedules.</p>
+
+<h2 id="so-why-does-this-work">So why does this work?</h2>
+
+<p>One key property of state-of-the-art nets we rely on is that they all use some normalization of parameters within layers, usually Batch Norm (BN), which has been shown to give benefits in optimization and generalization across architectures. Our result also holds for other normalizations, including Group Normalization (Wu &amp; He, 2018), Layer Normalization (Ba et al., 2016), Instance Norm (Ulyanov et al., 2016), etc.</p>
+
+<p>The second key property of current training is that they use weight decay (aka $\ell_2$ regularizer). When combined with BN, this implies strange dynamics in parameter space, and the experimental papers (<a href="https://arxiv.org/abs/1706.05350">van Laarhoven, 2017</a>, <a href="https://arxiv.org/abs/1803.01814">Hoffer et al., 2018a</a> and <a href="https://openreview.net/forum?id=B1lz-3Rct7">Zhang et al., 2019</a>),  noticed that combining BN and weight decay can  be viewed as increasing the LR.</p>
+
+<p>Our paper gives a rigorous proof of the power of ExpLR by showing the following about the end-to-end function  being computed (see Main Thm in the paper):</p>
+
+<blockquote>
+  <p>(Informal Theorem) For commonly  used values of the paremeters, every net produced by <em>Weight Decay + Constant LR + BN + Momentum</em> can also be produced (in function space) via <em>ExpLR + BN + Momentum</em></p>
+</blockquote>
+
+<p>*NB: If the LR is not fixed but decaying in discrete steps, then the equivalent ExpLR training decays the exponent. (See our paper for details.)</p>
+
+<p>At first sight such a claim may seem difficult (if not impossible) to prove given that we lack any mathematical characterization of nets produced by training (note that the theorem makes no mention of the dataset!).  The  equivalence is shown by reasoning about <em>trajectory</em> of optimization, instead of the usual “landscape view” of stationary points, gradient norms, Hessian norms, smoothness, etc.. This is an example of the importance of trajectory analysis, as argued in <a href="http://www.offconvex.org/2019/06/03/trajectories/">earlier blog post of Sanjeev’s</a> because optimization and generalization are deeply intertwined for deep learning. Conventional wisdom says LR controls optimization, and the regularizer controls generalization. Our result shows that the effect of weight decay can  under fairly normal conditions be * exactly*  realized by the ExpLR rate schedule.</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/exp_lr.png" style="width: 550px;" />
+</div>
+<p><strong>Figure 2.</strong> Training PreResNet32 on CIFAR10 with fixed LR $0.1$, momentum $0.9$ and other standard hyperparameters. Trajectory was unchanged when WD was turned off  and LR at iteration $t$ was $\tilde{\eta}_ t = 0.1\times1.481^t$. (The constant $1.481$ is predicted by our theory given the original hyperparameters.) Plot on right shows  weight norm $\pmb{w}$ of the first convolutional layer in the second residual block. It grows exponentially as one would expect, satisfying $|\pmb{w}_ t|_ 2^2/\tilde{\eta}_ t = $ constant.</p>
+
+<p><a href="http://www.offconvex.org/feed.xml# (We first want to clarify that the exponential LR schedules work for normalized networks only and will lead parameter and output explosion for networks without normalization. )">comment</a>:# (In the rest of the post, we will first explain how does this equivalence result arises from various types of normalization schemes and then sketch the proof. We will also present a more general exponential growing learning schedule called ‘'’Tapered Exponential Learning Rate Schedule’, or TEXP, which is both experimentally and theoretically equivalent to the standard Step Decay schedule + Weight Decay. )</p>
+
+<h2 id="scale-invariance-and-equivalence">Scale Invariance and Equivalence</h2>
+
+<p>The formal proof holds for any training loss satisfying 
+what we call <em>Scale Invariance</em>:</p>
+
+
+
+<p>BN and other normalization schemes result in a Scale-Invariant Loss for the popular deep architectures (Convnet, Resnet, DenseNet etc.) if the output layer –where normally no normalization is used– is fixed throughout training. Empirically, <a href="https://openreview.net/forum?id=S1Dh8Tg0-">Hoffer et al. (2018b)</a>  found that randomly fixing the output layer at the start does not harm the final accuracy. 
+(Appendix C of our paper demonstrates scale invariance for  various architectures; it is somewhat nontrivial.)</p>
+
+<p>For batch ${\mathcal{B}} = \{ x_ i \} _ {i=1}^B$, network parameter ${\pmb{\theta}}$, we  denote the network by $f_ {\pmb{\theta}}$ and the loss function at iteration $t$ by $L_ t(f_ {\pmb{\theta}}) = L(f_ {\pmb{\theta}}, {\mathcal{B}}_ t)$ . We also use $L_ t({\pmb{\theta}})$ for convenience. We say the network $f_ {\pmb{\theta}}$ is <em>scale invariant</em> if $\forall c&gt;0$, $f_ {c{\pmb{\theta}}} = f_ {\pmb{\theta}}$, which implies the loss $L_ t$ is also scale invariant, i.e., $L_  t(c{\pmb{\theta}}_ t)=L_ t({\pmb{\theta}}_ t)$, $\forall c&gt;0$. A key source of intuition is the following lemma provable via chain rule:</p>
+
+<blockquote>
+  <p><strong>Lemma 1</strong>. A scale-invariant loss $L$ satisfies
+(1). $\langle\nabla_ {\pmb{\theta}} L, {\pmb{\theta}} \rangle=0$ ;<br />
+(2). $\left.\nabla_ {\pmb{\theta}} L \right|_ {\pmb{\theta} = \pmb{\theta}_ 0} = c \left.\nabla_ {\pmb{\theta}} L\right|_  {\pmb{\theta} = c\pmb{\theta}_ 0}$, for any $c&gt;0$.</p>
+</blockquote>
+
+<p>The first property immediately implies that $|{\pmb{\theta}}_ t|$ is monotone increasing for SGD if WD is turned off by Pythagoren Theorem. And based on this, <a href="https://arxiv.org/pdf/1812.03981.pdf">our previous work</a> with Kaifeng Lyu shows that GD with any fixed learning rate can reach $\varepsilon$ approximate stationary point for scale invariant objectives in $O(1/\varepsilon^2)$ iterations.</p>
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/inv_lemma.png" style="width: 360px;" />
+<br />
+<b>Figure 3.</b> Illustration of Lemma 1. 
+</div>
+<p><br /></p>
+
+<p>Below is the main result of the paper. We will explain the proof idea (using scale-invariance) in a later post.</p>
+<blockquote>
+  <p><strong>Theorem 1(Main, Informal).</strong> SGD on a scale-invariant objective with initial learning rate $\eta$, weight decay factor $\lambda$, and momentum factor $\gamma$ is equivalent to SGD with momentum factor $\gamma$ where at iteration $t$, the ExpLR $\tilde{\eta}_ t$  is defined as $\tilde{\eta}_ t = \alpha^{-2t-1} \eta$ without weight decay($\tilde{\lambda} = 0$) where $\alpha$ is a non-zero root of equation 
+     </p>
+</blockquote>
+
+<blockquote>
+  <p>Specifically, when momentum $\gamma=0$,  the above schedule can be simplified as $\tilde{\eta}_ t = (1-\lambda\eta)^{-2t-1} \eta$.</p>
+</blockquote>
+
+<h3 id="sota-performance-with-exponential-lr">SOTA performance with exponential LR</h3>
+
+<p>As mentioned, reaching state-of-the-art accuracy  requires reducing the learning rate a few times. Suppose the training has $K$ phases, and the learning rate is divided by some constant $C_I&gt;1$ when entering phase $I$. To realize the same effect with an exponentially increasing LR, we have:</p>
+
+<blockquote>
+  <p><strong>Theorem 2:</strong> ExpLR with the below modification generates the same network sequence as Step Decay with momentum factor $\gamma$ and WD $\lambda$ does. We call it <em>Tapered Exponential LR schedule</em> (TEXP).<br />
+<strong>Modification when entering a new phase $I$</strong>: (1). switching to some smaller exponential growing rate; (2). divinding the current LR by $C_I$.</p>
+</blockquote>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/texp_lr.png" style="width: 235px;" />
+<img src="http://www.offconvex.org/assets/TEXP.png" style="width: 500px;" />
+</div>
+<p><strong>Figure 5.</strong> PreResNet32 trained with Step Decay (as in Figure 1) and its corresponding TEXP schedule. As predicted by Theorem 2, they have similar trajectories and performances.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We hope that this bit of theory and supporting experiments have changed your outlook on learning rates for deep learning.</p>
+
+<p>A follow-up post will present the proof idea and give more insight into why ExpLR suggests a rethinking of the “landscape view” of optimization in deep learning.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://offconvex.github.io/2020/04/24/ExpLR1/"><span class="datestr">at April 24, 2020 10:00 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -1602,7 +1739,7 @@ by Lance Fortnow (noreply@blogger.com) <a href="https://blog.computationalcomple
 <h3><b>Our offline/online private information retrieval scheme</b></h3>
 <p>Let’s see how to construct such an offline/online scheme. To make things simple for the purposes of this post, let’s assume that the student has access to two non-colluding libraries that hold the same set of books. To be concrete, let’s call the two libraries “Stanford” and “Berkeley.”</p>
 <p>The privacy property will hold as long as the librarians at Stanford and Berkeley don’t get together and share the information that they learned while running the protocol with the student. So Stanford and Berkeley here are “non-colluding.” (Equivalently, our scheme that protects privacy against an adversary that controls one of the two libraries—but not both.)</p>
-<div style="width: 571px;" class="wp-caption aligncenter" id="attachment_1670"><img src="https://theorydish.files.wordpress.com/2020/04/offlineonline.png?w=561&amp;h=365" alt="Offline-online PIR" width="561" class=" wp-image-1670" height="365" /><p class="wp-caption-text" id="caption-attachment-1670">In the offline phase, which happens before the student knows which book she wants to read, the Stanford library does linear work. In the online phase, which runs once the student has the index of her desired book, the Berkeley library runs in sublinear time. (We are suppressing log factors here.)</p></div>
+<div style="width: 571px;" class="wp-caption aligncenter" id="attachment_1670"><img width="561" alt="Offline-online PIR" src="https://theorydish.files.wordpress.com/2020/04/offlineonline.png?w=561&amp;h=365" class=" wp-image-1670" height="365" /><p class="wp-caption-text" id="caption-attachment-1670">In the offline phase, which happens before the student knows which book she wants to read, the Stanford library does linear work. In the online phase, which runs once the student has the index of her desired book, the Berkeley library runs in sublinear time. (We are suppressing log factors here.)</p></div>
 <p>Now, let’s describe an offline/online protocol by which the student can privately fetch a book from the digital library:</p>
 <p><b>Offline Phase.</b></p>
 <ul>
@@ -1781,7 +1918,7 @@ by Jason Hartline <a href="https://agtb.wordpress.com/2020/04/21/ec-2020-will-be
 <p>and</p>
 <p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+%5CPhi_%7BX%7D%285%29+%3D+f_%7B2%2C1%7D+%2B+f_%7B1%2C3%7D+%2B+f_%7B0%2C7%7D.+%5C+%5C+%5C+%5C+%5C+%288%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle \Phi_{X}(5) = f_{2,1} + f_{1,3} + f_{0,7}. \ \ \ \ \ (8)" class="latex" title="\displaystyle \Phi_{X}(5) = f_{2,1} + f_{1,3} + f_{0,7}. \ \ \ \ \ (8)" /></p>
 <p>See the following diagram for a visual representation of the decomposition.</p>
-<p><img src="https://kamathematics.files.wordpress.com/2020/04/bin-tree-mech.png?w=547&amp;h=300" alt="bin-tree-mech" width="547" class=" wp-image-142 aligncenter" height="300" /></p>
+<p><img width="547" alt="bin-tree-mech" src="https://kamathematics.files.wordpress.com/2020/04/bin-tree-mech.png?w=547&amp;h=300" class=" wp-image-142 aligncenter" height="300" /></p>
 <p>This shows hierarchical decomposition of the domain <img src="https://s0.wp.com/latex.php?latex=%7B%5C%7B1%2C%5Cdots%2C8%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\{1,\dots,8\}}" class="latex" title="{\{1,\dots,8\}}" /> using 14 intervals. The highlighted squares represent the interval <img src="https://s0.wp.com/latex.php?latex=%7B%5C%7B1%2C%5Cdots%2C7%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\{1,\dots,7\}}" class="latex" title="{\{1,\dots,7\}}" /> and the highlighted circles show the decomposition of this interval into a union of <img src="https://s0.wp.com/latex.php?latex=%7B3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{3}" class="latex" title="{3}" /> intervals in the tree.</p>
 <p>Thus we can construct the matrix <img src="https://s0.wp.com/latex.php?latex=%7BA%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{A}" class="latex" title="{A}" /> using this information. Note that each entry of <img src="https://s0.wp.com/latex.php?latex=%7BA+f%28X%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{A f(X)}" class="latex" title="{A f(X)}" /> is the sum of at most <img src="https://s0.wp.com/latex.php?latex=%7B%5Clog%28D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{\log(D)}" class="latex" title="{\log(D)}" /> entries of <img src="https://s0.wp.com/latex.php?latex=%7Bf%28X%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{f(X)}" class="latex" title="{f(X)}" />. Thus, if we use the output of <img src="https://s0.wp.com/latex.php?latex=%7BM%27%28X_%7B1+%5Ccdots+n%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{M'(X_{1 \cdots n})}" class="latex" title="{M'(X_{1 \cdots n})}" /> in place of <img src="https://s0.wp.com/latex.php?latex=%7Bf%28X_%7B1+%5Ccdots+n%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{f(X_{1 \cdots n})}" class="latex" title="{f(X_{1 \cdots n})}" />, for every <img src="https://s0.wp.com/latex.php?latex=%7Bj%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="{j}" class="latex" title="{j}" /> we obtain</p>
 <p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+%5CPhi_%7BX%7D%28j%29+%2B+%5Cmathcal%7BN%7D%280%2C+%5Csigma%5E2%29+%5Cquad+%5Ctextrm%7Bfor%7D+%5Cquad+%5Csigma%5E2+%3D+%5Cfrac%7B+2+%5Clog%5E2%28D%29+%5Clog%281%2F%5Cdelta%29%7D%7B%5Cepsilon%5E2+n%5E2%7D.+%5C+%5C+%5C+%5C+%5C+%289%29&amp;bg=ffffff&amp;fg=000000&amp;s=0" alt="\displaystyle \Phi_{X}(j) + \mathcal{N}(0, \sigma^2) \quad \textrm{for} \quad \sigma^2 = \frac{ 2 \log^2(D) \log(1/\delta)}{\epsilon^2 n^2}. \ \ \ \ \ (9)" class="latex" title="\displaystyle \Phi_{X}(j) + \mathcal{N}(0, \sigma^2) \quad \textrm{for} \quad \sigma^2 = \frac{ 2 \log^2(D) \log(1/\delta)}{\epsilon^2 n^2}. \ \ \ \ \ (9)" /></p>
@@ -2337,11 +2474,11 @@ by plustcs <a href="https://tcsplus.wordpress.com/2020/04/19/tcs-talk-wednesday-
 <p>Every Boolean function <img src="https://s0.wp.com/latex.php?latex=f%3A%5C%7B0%2C1%5C%7D%5En%5Cto%5C%7B0%2C1%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="f:\{0,1\}^n\to\{0,1\}" class="latex" title="f:\{0,1\}^n\to\{0,1\}" /> can be represented in a unique way as a Real multilinear polynomial. This representation and related ones (e.g. using the {1,−1} basis rather than {0,1}– the “Fourier transform” over the hypercube, or approximation variants) have many applications for various complexity and algorithmic purposes. See, e.g., [O’D14] for a recent textbook. In this paper we derive the representation of the bipartite-perfect-matching decision problem as a Real polynomial.</p>
 <p><strong>Deﬁnition.</strong> The Boolean function <img src="https://s0.wp.com/latex.php?latex=BPM_n%28x_%7B1%2C1%7D%2C%5Cdots%2Cx_%7Bn%2Cn%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="BPM_n(x_{1,1},\dots,x_{n,n})" class="latex" title="BPM_n(x_{1,1},\dots,x_{n,n})" /> is deﬁned to be 1 if and only if the bipartite graph whose edges are<img src="https://s0.wp.com/latex.php?latex=%5C%7B%28i%2Cj%29%3Ax_%7Bi%2Cj%7D%3D1%5C%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" alt="\{(i,j):x_{i,j}=1\}" class="latex" title="\{(i,j):x_{i,j}=1\}" /> has a perfect matching, and 0 otherwise.</p>
 <p>And here are the two main theorems regarding this polynomial and the polynomial for the dual representation:</p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/04/bn2.png"><img src="https://gilkalai.files.wordpress.com/2020/04/bn2.png?w=640&amp;h=138" alt="" width="640" class="alignnone size-full wp-image-19769" height="138" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/04/bn2.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/04/bn2.png?w=640&amp;h=138" class="alignnone size-full wp-image-19769" height="138" /></a></p>
 <p>(For the second theorem you need the notion of totally ordered bipartite graphs.)</p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/04/bn3.png"><img src="https://gilkalai.files.wordpress.com/2020/04/bn3.png?w=640&amp;h=143" alt="" width="640" class="alignnone size-full wp-image-19770" height="143" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/04/bn3.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/04/bn3.png?w=640&amp;h=143" class="alignnone size-full wp-image-19770" height="143" /></a></p>
 <p>And here is a nice picture!</p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/04/bn4.png"><img src="https://gilkalai.files.wordpress.com/2020/04/bn4.png?w=640&amp;h=421" alt="" width="640" class="alignnone size-full wp-image-19771" height="421" /></a></p>
+<p><a href="https://gilkalai.files.wordpress.com/2020/04/bn4.png"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/04/bn4.png?w=640&amp;h=421" class="alignnone size-full wp-image-19771" height="421" /></a></p>
 <p>A very interesting open problem is:</p>
 <p><strong>Problem:</strong> Can the Beniamini-Nisan results be extended to general (non-bipartite) graphs</p>
 <p>This reminds me of an old great problem:</p>
@@ -2406,7 +2543,7 @@ by Gil Kalai <a href="https://gilkalai.wordpress.com/2020/04/19/to-cheer-you-up-
 <tbody>
 <tr>
 <td>
-<a href="https://rjlipton.wordpress.com/2020/04/18/proof-and-cake-envy/screen-shot-2020-04-18-at-12-47-07-pm/" rel="attachment wp-att-16968"><img src="https://rjlipton.files.wordpress.com/2020/04/screen-shot-2020-04-18-at-12.47.07-pm.png?w=300&amp;h=163" alt="" width="300" class="alignright size-medium wp-image-16968" height="163" /></a>
+<a href="https://rjlipton.wordpress.com/2020/04/18/proof-and-cake-envy/screen-shot-2020-04-18-at-12-47-07-pm/" rel="attachment wp-att-16968"><img width="300" alt="" src="https://rjlipton.files.wordpress.com/2020/04/screen-shot-2020-04-18-at-12.47.07-pm.png?w=300&amp;h=163" class="alignright size-medium wp-image-16968" height="163" /></a>
 </td>
 </tr>
 <tr>
@@ -2449,7 +2586,7 @@ If there are two agents the problem has long been solved. Let Bob divide the cak
 <table style="margin: auto;">
 <tbody><tr>
 <td>
-<a href="https://rjlipton.wordpress.com/2020/04/18/proof-and-cake-envy/two/" rel="attachment wp-att-16971"><img src="https://rjlipton.files.wordpress.com/2020/04/two.png?w=300&amp;h=144" alt="" width="300" class="aligncenter size-medium wp-image-16971" height="144" /></a>
+<a href="https://rjlipton.wordpress.com/2020/04/18/proof-and-cake-envy/two/" rel="attachment wp-att-16971"><img width="300" alt="" src="https://rjlipton.files.wordpress.com/2020/04/two.png?w=300&amp;h=144" class="aligncenter size-medium wp-image-16971" height="144" /></a>
 </td>
 </tr>
 <tr>
@@ -2848,122 +2985,6 @@ Our approach builds on previous explicit list decodable codes for space bounded 
 
 <p class="date">
 <a href="https://eccc.weizmann.ac.il/report/2020/047"><span class="datestr">at April 16, 2020 10:28 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://11011110.github.io/blog/2020/04/15/linkage">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eppstein.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="https://11011110.github.io/blog/2020/04/15/linkage.html">Linkage</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<ul>
-  <li>
-    <p><a href="https://www.quantamagazine.org/mathematics-as-a-team-sport-20200331/">Mathematics as a team sport</a> (<a href="https://mathstodon.xyz/@11011110/103927542292984705"></a>). What a week-long research workshop at Oberwolfach (or Dagstuhl, or many similar retreats) can be like. The workshop in the link is on low-dimensional topology, but the story would be the same for many other subjects. In late March, instead of attending a Bellairs workshop, we all collaborated remotely. I think we got a fair amount of research accomplished, but I didn’t have the same sense of all being brought together to do that one thing.</p>
-  </li>
-  <li>
-    <p><a href="https://arxiv.org/abs/2003.11832">Semidefinite programming bounds for the average kissing number</a> (<a href="https://mathstodon.xyz/@11011110/103932970304148800"></a>). Spheres kiss by touching with no overlap. The kissing number is how many unit spheres can touch a central one, and lattice kissing number is how many can touch in a lattice packing; both are 12 in 3d. Average kissing number is for finitely many non-unit spheres. It is ≥ lattice kissing number and ≤ 2x kissing number. One of my papers has a slightly better lower bound in 3d, and now we have better upper bounds in many dimensions.</p>
-  </li>
-  <li>
-    <p><a href="https://mathsedideas.blogspot.com/p/resources.html#RAMs">320 Random Acts of Maths</a> (<a href="https://mathstodon.xyz/@antoinechambertloir/103920121638187355"></a>). Pocket-sized problems, teasers, curios, provocations, inspirations, etc.</p>
-  </li>
-  <li>
-    <p><a href="https://www.nature.com/articles/d41586-020-00998-2">Mochizuki will publish his purported proof of the abc conjecture in the journal of which he is editor in chief</a> (<a href="https://mathstodon.xyz/@11011110/103941722283312831"></a>, <a href="https://retractionwatch.com/2020/04/04/weekend-reads-covid-19-and-peer-review-blaming-a-spell-checker-for-plagiarism-the-fastest-retracting-country/">via</a>). “The latest announcement seems unlikely to move many researchers over to Mochizuki’s camp.”</p>
-  </li>
-  <li>
-    <p><a href="https://en.wikipedia.org/wiki/Ring_lemma">The ring lemma</a> (<a href="https://mathstodon.xyz/@11011110/103950535538050348"></a>). New Wikipedia article on the ratio between sizes of adjacent circles in a circle packing.</p>
-  </li>
-  <li>
-    <p><a href="https://sites.google.com/site/calculatinghistory/home/computing-linkages">Computing linkages</a> (<a href="https://mathstodon.xyz/@esoterica/103950724802083262"></a>). Article by Andries de Man on computing devices built with hinged rods instead of electronics or gears.</p>
-  </li>
-  <li>
-    <p><a href="https://bl.ocks.org/robinhouston/6096950">Doyle spiral explorer</a> (<a href="https://mathstodon.xyz/@11011110/103961199355813355"></a>). If you slur “Doyle spiral” enough it kind of sounds like “Dora”. You can also <a href="https://observablehq.com/@mbostock/double-doyle-spiral">Möbius transform these things and get double spirals</a>.</p>
-  </li>
-  <li>
-    <p>This photo (<a href="https://mathstodon.xyz/@11011110/103965972080045328"></a>) is actually from a year ago but I neglected to upload it then and only rediscovered it recently while attempting to explain to an older relative, over the phone, how to attach images to text messages. It’s a shallow Showa bowl from Japan, bought when my wife and I visited Tokyo three years ago. We usually hold fruit in it; at the time I posted, it held three bananas and three lemons.</p>
-
-    <p style="text-align: center;"><a href="https://www.ics.uci.edu/~eppstein/pix/radialbowl/index.html"><img src="https://www.ics.uci.edu/~eppstein/pix/radialbowl/RadialBowl-m.jpg" alt="Showa bowl from above" style="border-style: solid; border-color: black;" /></a></p>
-  </li>
-  <li>
-    <p><a href="https://en.wikipedia.org/wiki/C._Doris_Hellman">C. Doris Hellman, historian of astronomy</a> (<a href="https://mathstodon.xyz/@11011110/103970811680488005"></a>), now a Good Article on Wikipedia. Through Hellman’s work on the Great Comet of 1577, historians came to see how Tycho Brahe’s observations of the comet moving unobstructed through translunar space <a href="https://en.wikipedia.org/wiki/Copernican_Revolution">became key evidence for heliocentrism and against the geocentric model of crystal spheres holding up the planets</a>. She also translated the definitive biography of Johannes Kepler from German into English.</p>
-  </li>
-  <li>
-    <p>Found in Friedman’s <em>A History of Folding in Mathematics</em>, p. 71, a quote from Francesco Maurolico from <span style="white-space: nowrap;">1537 (<a href="https://mathstodon.xyz/@11011110/103978188972978011"></a>):</span> “Item manifestum est in unoquoque regularium solidorum, numerum basium coniunctum cum numero cacuminum conflare numerum, qui binario excedit numerum laterum”. Except for the fact that he considers only Platonic solids, this is Euler’s formula  for convex polyhedra (in the equivalent form ), long before Euler (1752) and Descartes (1630).</p>
-  </li>
-  <li>
-    <p><a href="https://en.wikipedia.org/wiki/Convex_hull">Convex hull</a> (<a href="https://mathstodon.xyz/@11011110/103981026707788374"></a>), now a Good Article on Wikipedia.</p>
-  </li>
-  <li>
-    <p>Appreciations of John Conway, following his death from the coronavirus (<a href="https://mathstodon.xyz/@11011110/103987909082094935"></a>):</p>
-
-    <ul>
-      <li>
-        <p><a href="https://cameroncounts.wordpress.com/2020/04/12/john-conway/">Peter Cameron</a></p>
-      </li>
-      <li>
-        <p><a href="https://terrytao.wordpress.com/2020/04/12/john-conway/">Terry Tao</a></p>
-      </li>
-      <li>
-        <p><a href="https://www.scottaaronson.com/blog/?p=4732">Scott Aaronson</a></p>
-      </li>
-      <li>
-        <p><a href="https://www.solipsys.co.uk/new/RememberingConway.html?td12mn">Colin Wright</a></p>
-      </li>
-      <li>
-        <p><a href="https://rjlipton.wordpress.com/2020/04/14/john-horton-conway-1937-2020/">Richard Lipton and Ken Regan</a></p>
-      </li>
-      <li>
-        <p><a href="https://xkcd.com/2293/">xkcd</a></p>
-      </li>
-      <li>
-        <p><em><a href="http://www.theguardian.com/science/2015/jul/23/john-horton-conway-the-most-charismatic-mathematician-in-the-world">The Guardian</a></em></p>
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p><a href="http://www.dam.brown.edu/people/mumford/blog/2015/WakeUp.html">Wake up!</a> (<a href="https://mathstodon.xyz/@11011110/103998469608885562"></a>, <a href="https://en.wikipedia.org/wiki/Wikipedia:Articles_for_deletion/A_K_Peters">via</a>). A five-year-old blog post by David Mumford on the problems of corporate takeover of academic publishing, and the ensuing destruction of traditional author-editor relations.</p>
-  </li>
-  <li>
-    <p><a href="http://utf8everywhere.org/">utf8 everywhere</a> (<a href="https://mathstodon.xyz/@11011110/104001143871939014"></a>, <a href="https://news.ycombinator.com/item?id=22867503">via</a>). Mostly a manifesto about how we should be using utf8 instead of utf16 for unicode text files. But I think the sentiment that we should be treating utf8 as the default instead of ascii (which still is the actual default in many situations) is also valid.</p>
-  </li>
-  <li>
-    <p>In <a href="https://11011110.github.io/blog/2020/03/29/backyard-sunlight.html">the previous batch of photos</a> the stripy shadows were artificial (caused by the slats of a trellis shading our patio) but this time they’re natural: they come from the fronds of one of the palm trees in our garden, shading the trunk of the tree (<a href="https://mathstodon.xyz/@11011110/104005420231873385"></a>).</p>
-
-    <p style="text-align: center;"><a href="https://www.ics.uci.edu/~eppstein/pix/palmshadow/index.html"><img src="https://www.ics.uci.edu/~eppstein/pix/palmshadow/PalmShadow-m.jpg" alt="Palm tree casts shadows on itself" style="border-style: solid; border-color: black;" /></a></p>
-  </li>
-</ul></div>
-
-
-
-
-
-
-
-<p class="date">
-by David Eppstein <a href="https://11011110.github.io/blog/2020/04/15/linkage.html"><span class="datestr">at April 15, 2020 09:54 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
