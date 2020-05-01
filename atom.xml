@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-05-01T05:21:49Z</updated>
+  <updated>2020-05-01T06:21:51Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,238 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>https://francisbach.com/?p=3460</id>
+    <link href="https://francisbach.com/gradient-flows/" rel="alternate" type="text/html"/>
+    <title>Effortless optimization through gradient flows</title>
+    <summary>Optimization algorithms often rely on simple intuitive principles, but their analysis quickly leads to a lot of algebra, where the original idea is not transparent. In last month post, Adrien Taylor explained how convergence proofs could be automated. This month, I will show how proof sketches can be obtained easily for algorithms based on gradient...</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p class="justify-text">Optimization algorithms often rely on simple intuitive principles, but their analysis quickly leads to a lot of algebra, where the original idea is not transparent. In last month <a href="https://francisbach.com/computer-aided-analyses/">post</a>, <a href="https://www.di.ens.fr/~ataylor/">Adrien Taylor</a> explained how convergence proofs could be automated. This month, I will show how proof sketches can be obtained easily for algorithms based on gradient descent. This will be done using vanishing step-sizes that lead to <em>gradient flows</em>.</p>
+
+
+
+<h2>Gradient as local information</h2>
+
+
+
+<p class="justify-text">The intuitive principle behind gradient descent is the quest for <em>local</em> descent. We thus need to characterize the local behavior of the function we aim to optimize. This is what gradients are for.</p>
+
+
+
+<p class="justify-text">In this blog post, I will consider minimizing a function \(f\) over \(\mathbb{R}^d\). Assuming \(f\) is differentiable, a first order Taylor expansion of \(f\) around a point \(x\) leads to $$f(x+\delta) = f(x) + \nabla f(x) ^\top \delta + o(\| \delta\|),$$ for any norm \(\| \cdot \|\) on \(\mathbb{R}^d\), where \(\nabla f(x) \in \mathbb{R}^d\) is  the gradient of \(f\) at \(x\), composed of partial derivatives of \(f\). Therefore, around \(x\), \(f\) is approximately affine.</p>
+
+
+
+<p class="justify-text">Since we have a local affine approximation around \(x\), we can look for the direction of steepest descent, that is, the unit norm vector \(u \in \mathbb{R}^d\) such that \(f\) decays the most along \(u\), that is such that $$  u^\top \nabla f(x)$$ is minimized. This steepest descent direction depends on the choice of norm (assuming that the gradient is not zero at \(x\)).</p>
+
+
+
+<p class="justify-text">For the \(\ell_2\)-norm, then minimizing \(u^\top \nabla f(x)\) such that \(\|u\|_2 = 1\), leads to $$ \displaystyle u = \ – \frac{\nabla f(x)}{ \| \nabla f(x) \|_2},$$ that is the steepest descent is along the negative gradient (see an illustration below). In this blog post I will only focus on this steepest descent direction. </p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-3542" height="149" src="https://francisbach.com/wp-content/uploads/2020/04/gradient_contours-1024x358.png" width="428"/>Function \(f\) represented through its contour lines for values 1, 2, 3, 4 and 5. Negative gradient \(– \nabla f(x)\) as the steepest descent direction at point \(x\), which is orthogonal to the contour lines.</figure></div>
+
+
+
+<p class="justify-text">As as side note, for the \(\ell_1\)-norm, then minimizing \(u^\top \nabla f(x)\) such that \(\|u\|_1 = 1\), leads to $$u \in\  – \arg\max_{ v \in \{-e_1,\, e_1,\, -e_2,\, e_2,\dots,\, -e_d,\, e_d \}} v^\top \nabla f(x),$$ where \(e_i\) is the \(i\)-th canonical basis vector of \(\mathbb{R}^d\). Here the steepest descent is along a coordinate axis (along the positive or negative side), and this leads to various forms of <a href="https://en.wikipedia.org/wiki/Coordinate_descent">coordinate descent</a> (this will probably be a topic for another post). </p>
+
+
+
+<p class="justify-text">Given that the negative gradient leads to the steepest descent direction (for the Euclidean norm), it is natural to use this as a direction for an iterative algorithm, an idea that dates back to <a href="https://en.wikipedia.org/wiki/Augustin-Louis_Cauchy">Cauchy</a> in 1847 [<a href="http://gallica.bnf.fr/ark:/12148/bpt6k90190w/f406">1</a>] (see the nice summary by Claude Le Maréchal [<a href="https://www.math.uni-bielefeld.de/documenta/vol-ismp/40_lemarechal-claude.pdf">2</a>]).</p>
+
+
+
+<h2>From gradient descent to gradient flows</h2>
+
+
+
+<p class="justify-text"><a href="https://en.wikipedia.org/wiki/Gradient_descent">Gradient descent</a> is the most classical iterative algorithm to minimize differentiable functions. It takes the form $$x_{n+1} = x_{n} \, – \gamma \nabla f(x_{n})$$ at iteration \(n\), where \(\gamma &gt; 0 \) is a step-size.  </p>
+
+
+
+<p class="justify-text">Gradient descent comes in many flavors, steepest, stochastic, pre-conditioned, conjugate, proximal, projected, accelerated, etc. There are lots of papers and books [e.g., 3, 4, 5] analyzing it in various settings.</p>
+
+
+
+<p class="justify-text">In this post, to simplify its analysis and setting the stage for later posts, I will present the gradient flow, which is essentially the limit of gradient descent when the step-size \(\gamma\) tends to zero.</p>
+
+
+
+<p class="justify-text">More precisely, this is obtained by considering that our iterates \(x_n\) are sampled at each multiple of \(\gamma\), from a function \(X: \mathbb{R}_+ \to \mathbb{R}^d\), as $$x_n = X(n\gamma).$$ We can then use a piecewise affine interpolation to define a function defined on all points. We then have for \(t = n\gamma\), $$X(t + \gamma) = x_{n+1} =x_{n} \, – \gamma \nabla f(x_{n}) = X(t)\, – \gamma \nabla f(X(t)).$$ Dividing by \(\gamma\), we get $$ \frac{1}{\gamma} \big[ X(t + \gamma) \, – X(t) \big] = \, – \nabla f(X(t)).$$</p>
+
+
+
+<p class="justify-text">When \(\gamma\) tends to zero (and with simple additional regularity assumptions), the left hand side tends to the derivative of \(X\) at \(t\), and thus the function \(X\) tends to the solution of the following <a href="https://en.wikipedia.org/wiki/Ordinary_differential_equation">ordinary differential equation</a> $$ \dot{X}(t) = \ – \nabla f (X(t)).$$ See an illustration below.</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-full is-resized"><img alt="" class="wp-image-3479" height="271" src="https://francisbach.com/wp-content/uploads/2020/04/logistic_2d_flow.gif" width="348"/>Gradient descent (with piece-wise affine interpolation between iterates) vs. gradient flow on the same time scale for a logistic regression problem.</figure></div>
+
+
+
+<p class="justify-text">Studying the gradient flow in lieu of the gradient descent recursions comes with pros and cons.</p>
+
+
+
+<p class="justify-text"><strong>Simplified analyses</strong>. The gradient flow has no step-size, so all the traditional annoying issues regarding the choice of step-size, with line-search, constant, decreasing or with a weird schedule are unnecessary. Moreover, the use of differential calculus makes proving properties really simple (see examples below). We can thus focus on the essence of the algorithm rather than on technicalities.</p>
+
+
+
+<p class="justify-text"><strong>From (continuous) flow to actual (discrete) algorithms</strong>. A flow cannot be run on a computer at is is a continuous-time object. The traditional discretization is the <a href="https://en.wikipedia.org/wiki/Euler_method">Euler method</a>, that exactly replaces the flow by a piecewise-affine interpolation of the gradient descent iterates, where as shown above, we see \(x_n\) as \(X(n\gamma)\), where \(\gamma\) is the time increment between two samples. Four interesting observations:</p>
+
+
+
+<ul class="justify-text"><li><em>No direct proof transfer</em> : While Euler discretization always provides an algorithm, the generic convergence proofs do not allow to transfer immediately continuous-time proofs to convergence results for the discrete analysis. A key difficulty is to set-up the step-size \(\gamma\). However, the analysis can often be mimicked, i.e., similar <a href="https://en.wikipedia.org/wiki/Lyapunov_function">Lyapunov functions</a> can be used (see examples below).</li><li><em>Proximal algorithms</em> : Faced with non-continuous gradient functions, the <em>forward</em> version of Euler discretization \(x_{n+1} = x_{n} – \gamma \nabla f(x_{n})\) can be replaced by the <em>backward</em> version $$x_{n+1} = x_{n} \, –  \gamma \nabla f(x_{n+1}),$$ which is only implicit as it can be solved by minimizing $$ f(x) + \frac{1}{2\gamma}\|x-x_{n}\|_2^2,$$ thus leading to the <a href="https://fr.wikipedia.org/wiki/Algorithme_proximal_(optimisation)">proximal point algorithm</a>. Forward-backward schemes can also be recovered when \(f\) is the sum of a smooth and a non-smooth term.</li><li><em>Stochastic gradient descent</em> : There are two ways to deal with stochastic gradient descent, leading to two very different continuous limits. Adding independent and identically distributed (for simplicity) zero-mean noise \(\varepsilon_n\) to the gradient leads to the recursion $$x_{n+1} = x_{n} – \gamma \big[ \nabla f(x_{n}) + \varepsilon_n\big] = x_{n}\, – \gamma \nabla f(x_{n}) \,- \gamma \varepsilon_n,$$ where the noise is multiplied by the step-size \(\gamma\). Surprisingly, taking the limit when \(\gamma\) tends to zero leads to the deterministic gradient flow equation. A more detailed argument is presented at the end of post, but the main hand-waving reason is that the noise contribution vanishes because it is multiplied by the step-size. Note that this limiting behavior is consistent with a convergence to a minimizer of \(f\).</li><li><em>Convergence to a Langevin diffusion</em> : When instead the noise is added with magnitude proportional to the square root \(\sqrt{2 \gamma}\) of the step-size (which is asymptotically larger than \(\gamma\)), when \(\gamma\) tends to zero, and if the covariance of the noise is identity, we converge to a <a href="https://en.wikipedia.org/wiki/Diffusion_process">diffusion process</a> which is the solution of a <a href="https://en.wikipedia.org/wiki/Stochastic_differential_equation">stochastic differential equation</a>: $$ dX(t) = \ – \nabla f(X(t)) + \sqrt{2} dB(t),$$ where \(B\) is a standard <a href="https://en.wikipedia.org/wiki/Brownian_motion">Brownian motion</a>. Moreover, as \(t\) tends to infinity, \(X(t)\) happens to tend in distribution to a random variable with density proportional to \(\exp( – f(x) )\). See more details at the end of the post and in [6]. The difference in behavior is illustrated below.</li></ul>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-full is-resized"><img alt="" class="wp-image-3527" height="318" src="https://francisbach.com/wp-content/uploads/2020/04/logistic_2d_flow_SGD-3.gif" width="359"/> Comparison of flow and diffusion, for the same small \(\gamma\). The flow is deterministic and converges to a stationary point of \(f\) (here the global minimum), while the diffusion is stochastic and converges to a distribution (which is typically not a point mass)</figure></div>
+
+
+
+<h2>Properties of gradient flows</h2>
+
+
+
+<p class="justify-text">The gradient flow $$ \dot{X}(t) = \ – \nabla f (X(t)) $$ is well-defined for a wide variety of conditions on the function \(f\). The most classical ones are <a href="https://en.wikipedia.org/wiki/Picard%E2%80%93Lindel%C3%B6f_theorem">Lipschitz-continuity</a> or semi-convexity [<a href="https://link.springer.com/content/pdf/10.1007/s13373-017-0101-1.pdf">7</a>].</p>
+
+
+
+<p class="justify-text">The most obvious property is that the function decreases along the flow; in other words, \(f(X(t))\) is decreasing, which is a simple consequence of $$ \frac{d}{dt} f(X(t)) =\  – \nabla f(X(t))^\top \frac{dX(t)}{dt} =\  – \| \nabla f (X(t) )\|_2^2 \leqslant 0.$$</p>
+
+
+
+<p class="justify-text">If \(f\) is bounded from below, then \(f(X(t))\) will always converge (as a non-increasing function which is bounded from below, see <a href="https://en.wikipedia.org/wiki/Monotone_convergence_theorem">here</a>). However, in general, \(X(t)\) may not always converge without any further assumptions, e.g., it may oscillate forever. This is however rare and there are a variety of sufficient conditions for convergence of gradient flows, that date back to Lojasiewicz [8], and are based on “Lojasiewicz inequalities” that state that for \(y\) and \(x\) close enough, \(|f(x) – f(y)|^{1-\theta} \leqslant C \| \nabla f(x)\|\) for some \(C &gt; 0 \) and \(\theta \in (0,1)\). These are satisfied for “sub-analytical functions”, that include most functions one can imagine [<a href="https://www.sciencedirect.com/sdfe/reader/pii/S0022247X05006864/pdf">9</a>].</p>
+
+
+
+<p class="justify-text">Once \(X(t)\) converges to some \(X(\infty) \in \mathbb{R}^d\), assuming \(\nabla f\) is continuous, we must have \(\nabla f(X(\infty))=0\), that is, \(X(\infty)\) is a stationary point of \(f\). Among all stationary points (that can be local minima, local maxima, or saddle-points), the one to which \(X(t)\) converges to depends on \(X(0)\).</p>
+
+
+
+<p class="justify-text">Given any stationary point, one can look at the set of initializations that lead to it. Typically, only local minima are stable, that is, the attraction basins of other stationary points has typically zero Lebesgue measure (see, e.g., [<a href="http://www.jmlr.org/proceedings/papers/v49/lee16.pdf">10</a>]). See examples below. </p>
+
+
+
+<p class="justify-text">We start with a simple function defined on the two-dimensional plane, with several local minima and saddle-points.</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-3490" height="401" src="https://francisbach.com/wp-content/uploads/2020/04/plot_non_convex-1.png" width="511"/>Various gradient flows trajectories, starting from green points and ending in black points. Note the proximity of the three top starting points, all ending in different local minima. See the motion below.</figure></div>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-full is-resized"><img alt="" class="wp-image-3492" height="500" src="https://francisbach.com/wp-content/uploads/2020/04/logistic_2d_flow_noncvx-1.gif" width="519"/>Various gradient flows trajectories, in motion! All flows share the same time scale. Some seem “slower” than others (because the gradient norm is small).</figure></div>
+
+
+
+<p class="justify-text">Before moving on, I cannot resist presenting a “real” two-dimensional example that probably all skiers, hikers, and cyclists with some form of mathematical abilities have thought of, the topographic map. Here is an example below:</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-3751" height="458" src="https://francisbach.com/wp-content/uploads/2020/04/glandon_croix_de_fer-1-1024x1024.jpg" width="458"/>Extract from <a href="https://www.geoportail.gouv.fr/">IGN</a> topographic map, around <a href="https://en.wikipedia.org/wiki/Col_du_Glandon">Col du Glandon</a> and <a href="https://en.wikipedia.org/wiki/Col_de_la_Croix_de_Fer">Col de la Croix de Fer</a> (French Alps).</figure></div>
+
+
+
+<p class="justify-text">Given the topographic map, how would gradient descent or gradient flow perform? Clearly, this corresponds to a non convex function, but it is quite well-behaved, as following water flows will typically lead to sea level. I chose two starting points famous to cyclists, <a href="https://en.wikipedia.org/wiki/Col_du_Glandon">Col du Glandon</a> and <a href="https://en.wikipedia.org/wiki/Col_de_la_Croix_de_Fer">Col de la Croix de Fer</a>, and ran gradient descent with a small step-size (to approximate the gradient flow), without noise (left) and with noise (right), on the topographic map (thanks to <a href="http://recherche.ign.fr/labos/matis/cv.php?nom=Landrieu">Loïc Landrieu</a> for the data extraction).</p>
+
+
+
+<figure class="wp-block-image size-large"><img alt="" class="wp-image-3753" src="https://francisbach.com/wp-content/uploads/2020/04/flows_final_square_small-1024x394.png"/></figure>
+
+
+
+<p class="justify-text">Without noise, the descent from la Croix de Fer ends up getting stuck quickly in a local minimum, while the one from Glandon goes down to the valley, but then is not able to follow the almost flat slope. When noise is added, the two flows go a bit lower, highlighting the benefits of noise to escape local minima.</p>
+
+
+
+<h2>Gradient flows for optimization and machine learning</h2>
+
+
+
+<p class="justify-text">There are (at least) two key questions in optimization and machine learning related to gradient flows: </p>
+
+
+
+<ul class="justify-text"><li>When can we have global guarantees for convergence? That is, can we make sure that we choose an initialization point well enough to get the the global optimum <em>without knowing where the global optimum is</em>. A key difficulty is that the volume of the attraction basin of the global optimum can be made arbitrarily small, even for infinitely differentiable functions (imagine a function equal to zero everywhere except on a small ball where it is negative).</li><li>How fast can we get there? “there” can be a stationary point or a global optimum. This is an important question as mere convergence in the limit may be arbitrarily slow [<a href="https://papers.nips.cc/paper/6707-gradient-descent-can-take-exponential-time-to-escape-saddle-points.pdf">11</a>].</li></ul>
+
+
+
+<p class="justify-text">An important class of function is <a href="https://en.wikipedia.org/wiki/Convex_function">convex functions</a>, where everything works out very well. We will study them below. Other functions will be studied in future posts.</p>
+
+
+
+<h2>Convex functions</h2>
+
+
+
+<p class="justify-text">We now assume that the function \(f\) is <a href="https://en.wikipedia.org/wiki/Convex_function">convex</a> and differentiable. Within machine learning, this corresponds to objective functions encountered for supervised learning which are based on empirical risk minimization with a prediction function which is linearly parameterized, such as <a href="https://en.wikipedia.org/wiki/Logistic_regression">logistic regression</a>.</p>
+
+
+
+<p class="justify-text">There are various definitions of convexity, which are based on global properties (the function is always “below its chords”, or it is always “above its tangents”) or local properties (the Hessian is always positive semi-definite). The one which we need here is to be above its tangents, that is, for any \(x, y \in \mathbb{R}^d\), $$f(x) \geqslant f(y)  + \nabla f(y)^\top ( x \, – y).$$ Applying this to any stationary point \(y\) such that \(\nabla f(y)=0\) shows that for all \(x\), \(f(x) \geqslant f(y)\), that is, \(y\) is a global minimizer of \(f\). This is the classical benefit of convexity: no need to worry about local minima.</p>
+
+
+
+<p class="justify-text">Another property we will need is the Lojasiewicz inequality, which is in particular satisfied when \(f\) is \(\mu\)-<a href="https://en.wikipedia.org/wiki/Convex_function#Strongly_convex_functions">strongly convex</a> (that is, \(f – \frac{1}{2} \| \cdot \|_2^2\) is convex): $$ f(x) \ – f(x_\ast) \leqslant \frac{1}{2 \mu} \| \nabla f (x)\|^2$$ for any minimizer \(x_\ast\) of \(f\) and any \(x\). This property allows to go from a bound on the gradient norm to a bound on function values.</p>
+
+
+
+<p class="justify-text">We then obtain the convergence rate <em>in one line</em> as follows (see more details in [<a href="http://papers.nips.cc/paper/6711-integration-methods-and-optimization-algorithms.pdf">12</a>]): $$ \frac{d}{dt} \big[ f(X(t))\ – f(x_\ast) \big] =\  \nabla f(X(t))^\top \dot{X}(t) =  \ – \| \nabla f(X(t))\|_2^2 \leqslant \ – 2\mu  \big[ f(X(t)) \ – f(x_\ast) \big]$$ using the Lojasiewicz inequality above, leading to by simple integration of the derivative of \(\log \big[ f(X(t)) \ – f(x_\ast) \big]\): $$f(X(t)) \ – f(x_\ast) \leqslant \exp( – 2\mu t ) \big[ f(X(0))\  – f(x_\ast) \big], $$ that is, the convergence is exponential and the characteristic time is proportional to \(1/\mu\).</p>
+
+
+
+<p class="justify-text">The gradient flow gives the main insight (exponential convergence); and applying the result above to \(t = \gamma n\), we seem to recover the traditional rate proportional to \(\exp( – \gamma \mu n)\); HOWEVER, this is only true asymptotically for \(\gamma\) tending to zero, and proving a result for gradient descent requires extra steps to deal with having a constant step-size. This requires typically \(\gamma \leqslant 1/L\), where \(L\) is the smoothness constant of \(f\), and the simplest proof happens to use the same structure (see [<a href="https://arxiv.org/pdf/1608.04636">13</a>] and references therein, as well as [<a href="http://www.mathnet.ru/php/getFT.phtml?jrnid=zvmmf&amp;paperid=7813&amp;what=fullt&amp;option_lang=eng">14</a>]).</p>
+
+
+
+<p class="justify-text">Without strong convexity, we have, using the tangent property at \(X(t)\) and \(x_\ast\): $$ \frac{d}{dt}\big[   \| X(t)\ – x_\ast \|^2 \big] = \ –   2 ( X(t) \ – x_\ast )^\top \nabla f(X(t)) \leqslant \ – 2 \big[ f(X(t)) \ – f(x_\ast) \big],$$  leading to, by integrating from \(0\) to \(t\), and using the monotonicity of \(f(X(t))\): $$  f(X(t)) \ – f(x_\ast) \leqslant \frac{1}{t} \int_0^t \big[ f(X(u)) \ – f(x_\ast) \big] du \leqslant \frac{1}{2t} \| X(0) \ – x_\ast \|^2 \ – \frac{1}{2t} \| X(t) \ – x_\ast \|^2.$$ We recover the usual rates in \(O(1/n)\), with \(t = \gamma n\), with the same caveat as above (the step-size needs to be bounded).</p>
+
+
+
+<h2>Conclusion</h2>
+
+
+
+<p class="justify-text">In this blog post, I covered the basic aspects of gradient flows, in particular their relationships with various forms of gradient descent, and their use in obtaining simple convergence justifications. Next months, I will cover extensions of the analyses above, in particular in terms of (1) acceleration for convex functions, where several flows and discretizations are interesting beyond the gradient flow and Euler method [12, 15], and (2) another class of functions which includes non-convex functions as encountered when learning with neural networks [16].</p>
+
+
+
+<h2>References</h2>
+
+
+
+<p class="justify-text">[1] Augustin Louis Cauchy. <a href="http://gallica.bnf.fr/ark:/12148/bpt6k90190w/f406">Méthode générale pour la résolution des systèmes d’équations simultanées</a>. Compte Rendu à l’Académie des Sciences, 25:536–538, 1847.<br/>[2] Claude Lemaréchal. <a href="https://www.math.uni-bielefeld.de/documenta/vol-ismp/40_lemarechal-claude.pdf">Cauchy and the Gradient Method</a>. <em>Documenta Mathematica</em>, <a href="https://www.math.uni-bielefeld.de/documenta/vol-ismp/vol-ismp.html">Extra Volume: Optimization Stories</a>, 251–254, 2012.<br/>[3] Yurii Nesterov. <em>Introductory lectures on convex optimization: A basic course</em> (Vol. 87). Springer Science &amp; Business Media, 2013.<br/>[4] Dimitri P. Bertsekas, <em>Nonlinear programming</em>. Athena Scientific, 1999.<br/>[5] Jorge Nocedal and Stephen Wright. <em>Numerical optimization</em>. Springer Science &amp; Business Media, 2006.<br/>[6] Arnak S. Dalalyan. <a href="https://rss.onlinelibrary.wiley.com/doi/epdf/10.1111/rssb.12183">Theoretical guarantees for approximate sampling from smooth and log‐concave densities</a>. <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em>, 79(3), 651-676, 2017.<br/>[7] Filippo Santambrogio. <a href="https://link.springer.com/content/pdf/10.1007/s13373-017-0101-1.pdf">{Euclidean, metric, and Wasserstein} gradient flows: an overview</a>. <em>Bulletin of Mathematical Sciences</em>, <em>7</em>(1), 87-154, 2017.<br/>[8] Stanislaw Lojasiewicz. Sur les trajectoires du gradient d’une fonction analytique. <em>Seminari di Geometria</em>, 1983:115–117, 1982.<br/>[9] Jérôme Bolte, Aris Daniilidis, and Adrian Lewis. <a href="https://www.sciencedirect.com/sdfe/reader/pii/S0022247X05006864/pdf">A nonsmooth Morse–Sard theorem for subanalytic functions</a>. <em>Journal of Mathematical Analysis and Applications</em>, 321(2):729–740, 2006.<br/>[10] Jason D. Lee, Max Simchowitz, Michael I. Jordan, Benjamin Recht. <a href="http://www.jmlr.org/proceedings/papers/v49/lee16.pdf">Gradient descent only converges to minimizers</a>. <em>Conference on learning theory</em>, 1246-1257, 2016.<br/>[11] Simon S. Du, Chi Jin, Jason D. Lee, Michael I. Jordan, Barnabas Poczos, Aarti Singh. <a href="https://papers.nips.cc/paper/6707-gradient-descent-can-take-exponential-time-to-escape-saddle-points.pdf">Gradient descent can take exponential time to escape saddle points</a>. <em>Advances in neural information processing systems</em>, 1067-1077, 2017.<br/>[12] Damien Scieur, Vincent Roulet, Francis Bach, Alexandre d’Aspremont,. <a href="http://papers.nips.cc/paper/6711-integration-methods-and-optimization-algorithms.pdf">Integration methods and optimization algorithms</a>. <em>Advances in Neural Information Processing Systems</em>, 1109-1118, 2017.<br/>[13] Hamed Karimi, Julie Nutini, Mark Schmidt. <a href="https://arxiv.org/pdf/1608.04636">Linear convergence of gradient and proximal-gradient methods under the Polyak-Lojasiewicz condition</a>. <em>Joint European Conference on Machine Learning and Knowledge Discovery in Databases</em>, 795-811, 2016.<br/>[14] Boris T. Polyak. <a href="http://www.mathnet.ru/php/getFT.phtml?jrnid=zvmmf&amp;paperid=7813&amp;what=fullt&amp;option_lang=eng">Gradient methods for minimizing functionals</a>. <em>Zh. Vychisl. Mat. Mat. Fiz.</em>, 3(4):643–653, 1963. <br/>[15] Weijie Su, Stephen Boyd, Emmanuel J. Candès. <a href="http://www.jmlr.org/papers/volume17/15-084/15-084.pdf">A differential equation for modeling Nesterov’s accelerated gradient method: theory and insights</a>. <em>Journal of Machine Learning Research</em>, 17(1), 5312-5354, 2017.<br/>[16] Lénaïc Chizat, Francis Bach. <a href="http://papers.nips.cc/paper/7567-on-the-global-convergence-of-gradient-descent-for-over-parameterized-models-using-optimal-transport.pdf">On the global convergence of gradient descent for over-parameterized models using optimal transport</a>. <em>Advances in Neural Information Processing Systems</em>, 3036-3046, 2018.</p>
+
+
+
+<h2>Limits of stochastic gradient descent for vanishing step-sizes</h2>
+
+
+
+<p class="justify-text"><strong>Convergence to gradient flow. </strong>We consider fixed times \(t = n \gamma \) and \(s = m \gamma\), and we let \(\gamma\) tend to zero, with thus \(m\) and \(n\) tending to infinity. Starting from the recursion $$x_{n+1} = x_{n}\, – \gamma \nabla f(x_{n})\  – \gamma \varepsilon_n,$$ we get the following by applying it \(m\) times: $$X(t+s) \ – X(t) = x_{n+m}-x_n = \ – \gamma \sum_{k=0}^{m-1} \nabla f\Big(X\Big(t+\frac{sk}{m}\Big)\Big)\  – \gamma \sum_{k=0}^{m-1} \varepsilon_{k+n}.$$ The term \(\displaystyle \gamma \sum_{k=0}^{m-1} \nabla f\Big(X\Big(t+\frac{sk}{m}\Big)\Big)\) converges to \(\displaystyle \int_{t}^{t+s}\!\!\! \nabla f(X(u)) du\), while the term \(\gamma \sum_{k=0}^{m-1} \varepsilon_{k+n}\) has zero expectation and variance equal to \(\gamma^2 m = \gamma s \) times the variance of each \(\varepsilon_{k+n}\), and thus it tends to zero (since \(\gamma\) tends to zero). Thus, in the limit, $$X(t+s)\  – X(t) = \ – \int_{t}^{t+s} \!\!\! \nabla f(X(u)) du,$$ which is equivalent to the gradient flow equation.</p>
+
+
+
+<p class="justify-text"><strong>Convergence to diffusion.</strong> We consider the recursion $$x_{n+1} = x_{n}\,  – \gamma \nabla f(x_{n}) + \sqrt{2\gamma} \varepsilon_n.$$ With the same argument as above, we now get $$X(t+s) \ – X(t) = x_{n+m}-x_n =\ – \gamma \sum_{k=0}^{m-1} \nabla f\Big(X\Big(t+\frac{sk}{m}\Big)\Big)\ – \sqrt{2\gamma} \sum_{k=0}^{m-1} \varepsilon_{k+n}.$$ Now the second term has zero mean but a variance proportional to \(2s\) (<em>which does not go to zero when \(\gamma\) goes to zero</em>). We can then use when \(m\) tends to infinity the <a href="https://en.wikipedia.org/wiki/Wiener_process#Wiener_process_as_a_limit_of_random_walk">limit of the sum of independent variables as a Wiener process</a>, to get $$X(t+s)\ – X(t) =\  – \int_{t}^{t+s} \!\!\! \nabla f(X(u)) du + \sqrt{2} \big[ B(t+s)-B(t) \big].$$ The <a href="https://en.wikipedia.org/wiki/It%C3%B4_diffusion#Invariant_measures">limiting distribution</a> of \(X(t)\) happens to be the so-called <a href="https://en.wikipedia.org/wiki/Gibbs_measure">Gibbs</a> distribution, with density \(\exp(-f(x))\) (the factor of \(\sqrt{2}\) was added to avoid an extra constant factor in the Gibbs distribution). More on this in a future post.</p></div>
+    </content>
+    <updated>2020-05-01T05:15:04Z</updated>
+    <published>2020-05-01T05:15:04Z</published>
+    <category term="Machine learning"/>
+    <category term="Tools"/>
+    <author>
+      <name>Francis Bach</name>
+    </author>
+    <source>
+      <id>https://francisbach.com</id>
+      <link href="https://francisbach.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://francisbach.com" rel="alternate" type="text/html"/>
+      <subtitle>Francis Bach</subtitle>
+      <title>Machine Learning Research Blog</title>
+      <updated>2020-05-01T06:21:51Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://tcsplus.wordpress.com/?p=428</id>
@@ -36,7 +268,7 @@ website</a> on the day of the talk, so people who did not sign up will still be 
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2020-05-01T05:21:14Z</updated>
+      <updated>2020-05-01T06:21:15Z</updated>
     </source>
   </entry>
 
@@ -1186,7 +1418,7 @@ Our proofs are elementary and rely on the existence of (non-explicit) hitting se
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-05-01T05:20:24Z</updated>
+      <updated>2020-05-01T06:20:32Z</updated>
     </source>
   </entry>
 
@@ -1212,7 +1444,7 @@ In this paper, we introduce the related question of identity up to binning, wher
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-05-01T05:20:24Z</updated>
+      <updated>2020-05-01T06:20:32Z</updated>
     </source>
   </entry>
 
@@ -1299,7 +1531,7 @@ In this paper, we introduce the related question of identity up to binning, wher
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2020-05-01T05:20:10Z</updated>
+      <updated>2020-05-01T06:20:14Z</updated>
     </source>
   </entry>
 
@@ -1327,7 +1559,7 @@ The technical core of this result is an $n^{\Omega(k)}$ lower bound in the speci
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-05-01T05:20:25Z</updated>
+      <updated>2020-05-01T06:20:32Z</updated>
     </source>
   </entry>
 
@@ -1354,7 +1586,7 @@ Email: b.noheda@rug.nl, j.b.t.m.roerdink@rug.nl and/or j.h.m.van.der.velde@rug.n
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-05-01T05:20:37Z</updated>
+      <updated>2020-05-01T06:20:45Z</updated>
     </source>
   </entry>
 
@@ -1440,7 +1672,7 @@ Email: b.noheda@rug.nl, j.b.t.m.roerdink@rug.nl and/or j.h.m.van.der.velde@rug.n
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-05-01T05:20:57Z</updated>
+      <updated>2020-05-01T06:20:59Z</updated>
     </source>
   </entry>
 
@@ -1485,7 +1717,7 @@ Email: b.noheda@rug.nl, j.b.t.m.roerdink@rug.nl and/or j.h.m.van.der.velde@rug.n
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2020-05-01T05:21:23Z</updated>
+      <updated>2020-05-01T06:21:26Z</updated>
     </source>
   </entry>
 
@@ -1523,7 +1755,7 @@ Using our extractors against BCPs, we obtain improved $N$-out-of-$N$ leakage-res
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-05-01T05:20:25Z</updated>
+      <updated>2020-05-01T06:20:32Z</updated>
     </source>
   </entry>
 
@@ -1552,7 +1784,7 @@ We remark that the result relativizes. We could not prove a similar result for t
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-05-01T05:20:24Z</updated>
+      <updated>2020-05-01T06:20:32Z</updated>
     </source>
   </entry>
 
@@ -1582,143 +1814,7 @@ We show three main results. First, we prove that for a specific hypothesis class
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-05-01T05:20:25Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://rjlipton.wordpress.com/?p=16982</id>
-    <link href="https://rjlipton.wordpress.com/2020/04/26/time-for-some-jokes/" rel="alternate" type="text/html"/>
-    <title>Time For Some Jokes</title>
-    <summary>Can we still smile? [ Hardy and Littlewood] John Littlewood lived through the 1918–1919 flu pandemic, yet he appears not to have remarked on it in print. Nor can we find mention of it by Godfrey Hardy in A Mathematician’s Apology—though Hardy did write about the ravages of WW I. Today, Ken and I thought […]</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><font color="#0044cc"><br/>
-<em>Can we still smile?</em><br/>
-<font color="#000000"/></font></p><font color="#0044cc"><font color="#000000">
-<table class="image alignright">
-<tbody>
-<tr>
-<td>
-<a href="https://rjlipton.wordpress.com/2020/04/26/time-for-some-jokes/unknown-139/" rel="attachment wp-att-16991"><img alt="" class="alignright size-full wp-image-16991" src="https://rjlipton.files.wordpress.com/2020/04/unknown-2.jpeg?w=600"/></a>
-</td>
-</tr>
-<tr>
-<td class="caption alignright"><font size="-2">[ Hardy and Littlewood]</font></td>
-</tr>
-</tbody>
-</table>
-<p>
-John Littlewood lived through the 1918–1919 flu pandemic, yet he appears not to have remarked on it in print. Nor can we find mention of it by Godfrey Hardy in <em>A Mathematician’s Apology</em>—though Hardy did write about the ravages of WW I.</p>
-<p>
-Today, Ken and I thought you might like some fun comments that are not about the current pandemic. </p>
-<p>
-This is not to say we are ignoring it. We are all fighting the virus in one way or another. Our hearts go out to those of you fighting it directly. We are all worried about ourselves and others. We are stuck at home, at least most of us. We are all in this terrible time together. We hope you all are safe and well. </p>
-<p>
-We thought we would list a few jokes and stories that you might enjoy. We wrote recently about one kind of mathematical <a href="https://rjlipton.wordpress.com/2020/02/28/reductions-and-jokes/">joke</a> that can be given various proportions of pure levity and mathematical content. Our friends Lance Fortnow and Bill Gasarch, plus commenters in their <a href="https://blog.computationalcomplexity.org/2006/06/funniest-computer-science-joke-ever.html">item</a>, collected some jokes on the computer science side.</p>
-<p>
-Littlewood’s notion of “mathematical joke” leaned more on mathematical content, though his <a href="https://en.wikipedia.org/wiki/A_Mathematician's_Miscellany">memoir</a> <em>A Mathematician’s Miscellany</em> includes many funny stories as well. At the end of his introduction to the book, he wrote:</p>
-<blockquote><p><b> </b> <em> A good mathematical joke is better, and better mathematics, than a dozen mediocre papers. </em>
-</p></blockquote>
-<p/><p>
-We will start at the levity end. This is almost a math <a href="http://web.sonoma.edu/Math/faculty/falbo/jokes.html">joke</a>:</p>
-<blockquote><p><b> </b> <em> The Daily News published a story saying that one-half of the MP (Members of Parliament) were crooks.<br/>
-The Government took great exception to that and demanded a retraction and an apology.<br/>
-The newspaper responded the next day with an apology and reported that one-half of the MPs were not crooks. </em>
-</p></blockquote>
-<p/><p>
-We like this one, even if it is not really a hardcore math one. It does rely on the fact that <img alt="{\frac{1}{2} + \frac{1}{2} = 1.}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cfrac%7B1%7D%7B2%7D+%2B+%5Cfrac%7B1%7D%7B2%7D+%3D+1.%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\frac{1}{2} + \frac{1}{2} = 1.}"/></p>
-<p>
-</p><p/><h2> Jokes and More </h2><p/>
-<p/><p>
-The following are some examples that we hope you all like. They are from a variety of sources: </p>
-<ul>
-<li>
-Jokes that mathematicians think are <a href="https://www.businessinsider.com/13-math-jokes-that-every-mathematician-finds-absolutely-hilarious-2013-5">funny</a>. <p/>
-</li><li>
-Some are from <a href="https://cstheory.stackexchange.com/questions/3111/funny-tcs-related-papers-etc">StackExchange</a>. <p/>
-</li><li>
-Others are from Andrej Cherkaev’s <a href="https://www.math.utah.edu/~cherk/mathjokes.html">page</a>.
-</li></ul>
-<p>We have lightly edited a few.</p>
-<p>
-<img alt="{\bullet }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet }"/> “My age is two billion years old,” said Paul Erdös. The point is: </p>
-<blockquote><p><b> </b> <em> When I was seventeen years old it was said the earth was two billion years old. Now they say it is four billion years old. So my age is about two billion years old. </em>
-</p></blockquote>
-<p/><p>
-<img alt="{\bullet }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet }"/> There was a statistician that drowned crossing a river <img alt="{\dots}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cdots%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\dots}"/> It was 3 feet deep on average. </p>
-<p>
-<img alt="{\bullet }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet }"/> An infinite number of mathematicians walk into a bar. The first one orders a beer. The second orders half a beer. The third orders a third of a beer. The bartender bellows, “Get the heck out of here, are you trying to ruin me?”</p>
-<p>
-<img alt="{\bullet }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet }"/> An chemist, a physicist, and a mathematician are stranded on an island when a can of food rolls ashore. The chemist and the physicist comes up with many ingenious ways to open the can. Then suddenly the mathematician gets a bright idea: “Assume we have a can opener <img alt="{\dots}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cdots%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\dots}"/>” </p>
-<p>
-<img alt="{\bullet }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet }"/> A theorist decides she wants to learn more about practical problems. She sees a seminar with the title: “The Theory of Gears.” So she goes. The speaker stands up and begins, “The theory of gears with a finite number of teeth is well known <img alt="{\dots}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cdots%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\dots}"/></p>
-<p>
-<img alt="{\bullet }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet }"/> The reason that every major university maintains a department of mathematics is that it is cheaper to do this than to institutionalize all those people.</p>
-<p>
-Regarding the last one, Littlewood did after all write in his book:</p>
-<blockquote><p><b> </b> <em> Mathematics is a dangerous profession; an appreciable proportion of us go mad. </em>
-</p></blockquote>
-<p/><p>
-This appears to have been a playful swipe at Hardy’s decision to leave Cambridge for Oxford. It was couched in a discussion of events that would seem to have had tiny probabilities before they happened. </p>
-<p>
-The last two we’ve picked out from the above sites verge into philosophy:</p>
-<p>
-<img alt="{\bullet }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet }"/> The cherry theorem: Question: What is a small, red, round thing that has a cherry pit inside? <br/>
-Answer: A cherry.</p>
-<p>
-<img alt="{\bullet}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet}"/> René Descartes went into his favorite bar and the bartender asked, “would you like your usual drink tonight, Monsieur Descartes?” Descartes replied “I think not.” Then he promptly ceased to exist.</p>
-<p>
-</p><p/><h2> Wrong Derivations, Right Results </h2><p/>
-<p/><p>
-Littlewood’s standards for a “mathematical joke” were higher than ours, but we will start by adapting an example from this MathOverflow <a href="https://mathoverflow.net/questions/38856/jokes-in-the-sense-of-littlewood-examples">discussion</a> of Littlewood-style jokes. Sometimes we can play a joke on ourselves by deriving a result we know is right but with an incorrect proof. Here is the example:</p>
-<p>
-<img alt="{\bullet}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbullet%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\bullet}"/> <a href="https://www.reddit.com/r/math/comments/1bntfg/are_there_or_can_there_be_jokes_or_puns_in/">Casting out 6’s</a>. Suppose we want to simplify the fraction <img alt="{\frac{166}{664}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cfrac%7B166%7D%7B664%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\frac{166}{664}}"/>. We can use the rule of casting out 6’s to get </p>
-<p align="center"><img alt="\displaystyle  \frac{166}{664} = \frac{16}{64} = \frac{1}{4}. " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac%7B166%7D%7B664%7D+%3D+%5Cfrac%7B16%7D%7B64%7D+%3D+%5Cfrac%7B1%7D%7B4%7D.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \frac{166}{664} = \frac{16}{64} = \frac{1}{4}. "/></p>
-<p>
-The rule works quite generally:</p>
-<p align="center"><img alt="\displaystyle  \frac{1666}{6664} = \frac{16666}{66664} = \frac{166666}{666664} = \cdots " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac%7B1666%7D%7B6664%7D+%3D+%5Cfrac%7B16666%7D%7B66664%7D+%3D+%5Cfrac%7B166666%7D%7B666664%7D+%3D+%5Ccdots+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \frac{1666}{6664} = \frac{16666}{66664} = \frac{166666}{666664} = \cdots "/></p>
-<p/><p/>
-<p align="center"><img alt="\displaystyle  \frac{26}{65} = \frac{266}{665} = \frac{2666}{6665} = \frac{26666}{66665} = \cdots " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac%7B26%7D%7B65%7D+%3D+%5Cfrac%7B266%7D%7B665%7D+%3D+%5Cfrac%7B2666%7D%7B6665%7D+%3D+%5Cfrac%7B26666%7D%7B66665%7D+%3D+%5Ccdots+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \frac{26}{65} = \frac{266}{665} = \frac{2666}{6665} = \frac{26666}{66665} = \cdots "/></p>
-<p>You can even turn the paper upside down and cast out the <img alt="{6}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B6%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{6}"/>‘s that you see then:</p>
-<p/><p align="center"><img alt="\displaystyle  \frac{19}{95} = \frac{199}{995} = \frac{1999}{9995} = \frac{19999}{99995} = \cdots " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac%7B19%7D%7B95%7D+%3D+%5Cfrac%7B199%7D%7B995%7D+%3D+%5Cfrac%7B1999%7D%7B9995%7D+%3D+%5Cfrac%7B19999%7D%7B99995%7D+%3D+%5Ccdots+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \frac{19}{95} = \frac{199}{995} = \frac{1999}{9995} = \frac{19999}{99995} = \cdots "/></p>
-<p/><p/>
-<p align="center"><img alt="\displaystyle  \frac{49}{98} = \frac{499}{998} = \frac{4999}{9998} = \frac{49999}{99998} = \cdots " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac%7B49%7D%7B98%7D+%3D+%5Cfrac%7B499%7D%7B998%7D+%3D+%5Cfrac%7B4999%7D%7B9998%7D+%3D+%5Cfrac%7B49999%7D%7B99998%7D+%3D+%5Ccdots+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \frac{49}{98} = \frac{499}{998} = \frac{4999}{9998} = \frac{49999}{99998} = \cdots "/></p>
-<p>
-Note, this is a joke: The rule of course does not actually work all the time: 	</p>
-<p align="center"><img alt="\displaystyle  \frac{56}{65} = \frac{5}{5} = 1. " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac%7B56%7D%7B65%7D+%3D+%5Cfrac%7B5%7D%7B5%7D+%3D+1.+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \frac{56}{65} = \frac{5}{5} = 1. "/></p>
-<p/><p><br/>
-We thought to try to come up with our own examples, or at least blend in other sources. It once struck me (Ken), on reading a column by Martin Gardner on difference equations, that they give a “convincing proof” of <img alt="{0^0 = 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B0%5E0+%3D+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{0^0 = 1}"/>. Consider the powers of a natural number <img alt="{k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{k}"/>, say <img alt="{k = 5}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk+%3D+5%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{k = 5}"/>. Take differences like so: </p>
-<p align="center"><img alt="\displaystyle  \begin{array}{ccccccccccc} 1 &amp; &amp; 5 &amp; &amp; 25 &amp; &amp; 125 &amp; &amp; 625 &amp; &amp; \dots\\ &amp; 4 &amp; &amp; 20 &amp; &amp; 100 &amp; &amp; 500 &amp; &amp; \dots\\ &amp; &amp; 16 &amp; &amp; 80 &amp; &amp; 400 &amp; &amp; \dots &amp; &amp; \\ &amp; &amp; &amp; 64 &amp; &amp; 320 &amp; &amp; \dots &amp; &amp; &amp;\\ &amp; &amp; &amp; &amp; 256 &amp; &amp; &amp; &amp; \\ &amp; &amp; &amp; &amp; &amp; \ddots &amp; &amp; &amp; \end{array} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cbegin%7Barray%7D%7Bccccccccccc%7D+1+%26+%26+5+%26+%26+25+%26+%26+125+%26+%26+625+%26+%26+%5Cdots%5C%5C+%26+4+%26+%26+20+%26+%26+100+%26+%26+500+%26+%26+%5Cdots%5C%5C+%26+%26+16+%26+%26+80+%26+%26+400+%26+%26+%5Cdots+%26+%26+%5C%5C+%26+%26+%26+64+%26+%26+320+%26+%26+%5Cdots+%26+%26+%26%5C%5C+%26+%26+%26+%26+256+%26+%26+%26+%26+%5C%5C+%26+%26+%26+%26+%26+%5Cddots+%26+%26+%26+%5Cend%7Barray%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle  \begin{array}{ccccccccccc} 1 &amp; &amp; 5 &amp; &amp; 25 &amp; &amp; 125 &amp; &amp; 625 &amp; &amp; \dots\\ &amp; 4 &amp; &amp; 20 &amp; &amp; 100 &amp; &amp; 500 &amp; &amp; \dots\\ &amp; &amp; 16 &amp; &amp; 80 &amp; &amp; 400 &amp; &amp; \dots &amp; &amp; \\ &amp; &amp; &amp; 64 &amp; &amp; 320 &amp; &amp; \dots &amp; &amp; &amp;\\ &amp; &amp; &amp; &amp; 256 &amp; &amp; &amp; &amp; \\ &amp; &amp; &amp; &amp; &amp; \ddots &amp; &amp; &amp; \end{array} "/></p>
-<p>
-The powers of <img alt="{k-1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk-1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{k-1}"/> always appear on the bottom diagonal. Thus we have: <img alt="{(k-1)^0 = 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28k-1%29%5E0+%3D+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{(k-1)^0 = 1}"/>, <img alt="{(k-1)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28k-1%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{(k-1)}"/>, <img alt="{(k-1)^2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28k-1%29%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{(k-1)^2}"/>, and so on. Now do this for <img alt="{k = 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk+%3D+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{k = 1}"/>:</p>
-<p align="center"><img alt="\displaystyle \begin{array}{ccccccccccc} 1 &amp; &amp; 1 &amp; &amp; 1 &amp; &amp; 1 &amp; &amp; 1 &amp; &amp; \dots\\ &amp; 0 &amp; &amp; 0 &amp; &amp; 0 &amp; &amp; 0 &amp; &amp; \dots\\ &amp; &amp; 0 &amp; &amp; 0 &amp; &amp; 0 &amp; &amp; \dots &amp; &amp; \\ &amp; &amp; &amp; 0 &amp; &amp; 0 &amp; &amp; \dots &amp; &amp; &amp;\\ &amp; &amp; &amp; &amp; 0 &amp; &amp; &amp; &amp; \\ &amp; &amp; &amp; &amp; &amp; \ddots &amp; &amp; &amp; \end{array} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+%5Cbegin%7Barray%7D%7Bccccccccccc%7D+1+%26+%26+1+%26+%26+1+%26+%26+1+%26+%26+1+%26+%26+%5Cdots%5C%5C+%26+0+%26+%26+0+%26+%26+0+%26+%26+0+%26+%26+%5Cdots%5C%5C+%26+%26+0+%26+%26+0+%26+%26+0+%26+%26+%5Cdots+%26+%26+%5C%5C+%26+%26+%26+0+%26+%26+0+%26+%26+%5Cdots+%26+%26+%26%5C%5C+%26+%26+%26+%26+0+%26+%26+%26+%26+%5C%5C+%26+%26+%26+%26+%26+%5Cddots+%26+%26+%26+%5Cend%7Barray%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="\displaystyle \begin{array}{ccccccccccc} 1 &amp; &amp; 1 &amp; &amp; 1 &amp; &amp; 1 &amp; &amp; 1 &amp; &amp; \dots\\ &amp; 0 &amp; &amp; 0 &amp; &amp; 0 &amp; &amp; 0 &amp; &amp; \dots\\ &amp; &amp; 0 &amp; &amp; 0 &amp; &amp; 0 &amp; &amp; \dots &amp; &amp; \\ &amp; &amp; &amp; 0 &amp; &amp; 0 &amp; &amp; \dots &amp; &amp; &amp;\\ &amp; &amp; &amp; &amp; 0 &amp; &amp; &amp; &amp; \\ &amp; &amp; &amp; &amp; &amp; \ddots &amp; &amp; &amp; \end{array} "/></p>
-<p>The diagonal now holds the powers of <img alt="{0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{0}"/>. It thus follows that <img alt="{0^0 = 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B0%5E0+%3D+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{0^0 = 1}"/>.</p>
-<p/><h2> Open Problems </h2><p/>
-<p>What are your favorite mathematical jokes? Please send them to us. Be safe. Be well.</p>
-<p><a href="https://rjlipton.wordpress.com/2020/04/26/time-for-some-jokes/sign-2/" rel="attachment wp-att-16987"><img alt="" class="aligncenter size-medium wp-image-16987" height="111" src="https://rjlipton.files.wordpress.com/2020/04/sign-1.png?w=300&amp;h=111" width="300"/></a></p>
-<p>
-[fixed equations in last main section]</p></font></font></div>
-    </content>
-    <updated>2020-04-27T00:37:51Z</updated>
-    <published>2020-04-27T00:37:51Z</published>
-    <category term="Oldies"/>
-    <category term="People"/>
-    <category term="Proofs"/>
-    <category term="jokes"/>
-    <category term="math jokes"/>
-    <category term="stories"/>
-    <author>
-      <name>rjlipton</name>
-    </author>
-    <source>
-      <id>https://rjlipton.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://rjlipton.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://rjlipton.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://rjlipton.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>a personal view of the theory of computation</subtitle>
-      <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-05-01T05:20:35Z</updated>
+      <updated>2020-05-01T06:20:32Z</updated>
     </source>
   </entry>
 </feed>
