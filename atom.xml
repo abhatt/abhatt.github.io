@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-05-25T18:21:59Z</updated>
+  <updated>2020-05-25T19:22:12Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -241,7 +241,476 @@ Does this help? Does this unravel the mystery of the proof? Or is it still magic
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-05-25T18:20:48Z</updated>
+      <updated>2020-05-25T19:20:39Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>https://gradientscience.org/benchmarks/</id>
+    <link href="https://gradientscience.org/benchmarks/" rel="alternate" type="text/html"/>
+    <title>From ImageNet to Image Classification</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><a class="bbutton" href="https://arxiv.org/abs/2005.11295" style="float: left; width: 45%;">
+<i class="fas fa-file-pdf"/>
+    Paper
+</a>
+<a class="bbutton" href="https://github.com/MadryLab/ImageNetMultiLabel" style="float: left; width: 45%;">
+<i class="fab fa-github"/>
+   Data
+</a>
+<br/></p>
+
+<p><i>In our <a href="https://arxiv.org/abs/2005.11295">new paper</a>, we explore how closely
+the ImageNet benchmark aligns with the object recognition task it serves as a
+proxy for. We find pervasive and systematic deviations of ImageNet annotations
+from the ground truth, which can often be attributed to specific design choices
+in the data collection pipeline. These issues indicate that ImageNet accuracy
+alone might be insufficient to effectively gauge real model performance.  </i></p>
+
+<h2 id="contextualizing-progress-on-benchmarks">Contextualizing Progress on Benchmarks</h2>
+
+<p>Large-scale benchmarks are central to machine learning—they serve both
+as concrete targets for model development, and as proxies for assessing model
+performance on real-world tasks we actually care about. However, few benchmarks
+are perfect, and so as our models get increasingly better at them, we must also
+ask ourselves: <i>to what extent is performance on existing benchmarks
+indicative of progress on the real-world tasks that motivate them?</i></p>
+
+<p>In this post, we will explore this question of <i>benchmark-task alignment</i>
+in the context of the popular
+<a href="http://image-net.org/challenges/LSVRC/2012/">ImageNet object recognition dataset</a>.
+Specifically, our goal is to understand how well the underlying ground truth is
+captured by the dataset itself—this dataset is, after all, what we consider
+to be the gold standard during model training and evaluation.</p>
+
+<h3 id="a-sneak-peak-into-imagenet">A sneak peak into ImageNet</h3>
+<p>The ImageNet dataset contains over a million images of objects from a thousand,
+quite diverse classes. Like many other benchmarks of that scale, ImageNet was
+not carefully curated by experts, but instead created via crowd-sourcing,
+without perfect quality control. So what does ImageNet data look like? Here are
+a few image-label pairs from the dataset:</p>
+
+<div>
+    <div class="fake_img"> 
+      <img src="https://gradientscience.org/assets/multilabel/anec/0.jpg"/>
+      <div class="fake_label">missile</div>
+      <div class="true_label">projectile</div>
+    </div>
+    <div class="fake_img"> 
+      <img src="https://gradientscience.org/assets/multilabel/anec/1.jpg"/>
+      <div class="fake_label">stage</div>
+      <div class="true_label">acoustic guitar</div>
+    </div>
+    <div class="fake_img"> 
+      <img src="https://gradientscience.org/assets/multilabel/anec/2.jpg"/>
+      <div class="fake_label">monastery</div>
+      <div class="true_label">church</div>
+    </div>
+    <div class="fake_img"> 
+      <img src="https://gradientscience.org/assets/multilabel/anec/3.jpg"/>
+      <div class="fake_label">Norwich terrier</div>
+      <div class="true_label">Norfolk terrier</div>
+    </div>
+</div>
+<p><br/></p>
+
+<p>These samples appear pretty reasonable…but are they? Actually, while these
+are indeed <i>images</i> from the dataset, the labels shown above are
+<i>not</i> their actual ImageNet labels!
+<a href="https://gradientscience.org/" id="reveal">[Click to see the actual ImageNet labels]</a>
+Still, even though not “correct” from the point of view of the ImageNet
+dataset, these labels <i>do</i> correspond to actual ImageNet classes, and
+appear plausible when you see them in isolation. This shows that for ImageNet
+images, which capture objects in diverse real-world conditions, the ImageNet
+label may not properly reflect the ground truth.</p>
+
+<p>In our work, we dive into examining how this label misalignment actually
+impacts ImageNet: how often do ImageNet labels deviate from the ground truth?
+And how do shortcomings in these labels impact ImageNet-trained models?</p>
+
+<h3 id="revisiting-the-imagenet-collection-pipeline">Revisiting the ImageNet collection pipeline</h3>
+<p>Before going further, let’s take a look at how ImageNet was created. To build
+such a large dataset, the creators of ImageNet had to leverage scalable methods
+like automated data collection and crowd-sourcing. That is, they first selected
+a set of object classes (using the <a href="https://wordnet.princeton.edu">WordNet</a>
+hierarchy), and queried various search engines to obtain a pool of candidate
+images. These candidate images were then verified by annotators on <a href="https://www.mturk.com/">Mechanical
+Turk (MTurk)</a> using (what we will refer to as) the
+<span class="sc">Contains</span> task: annotators were shown images retrieved
+for a specific class
+label, and were subsequently asked to select the ones that actually contain an
+object of this class. Only images that multiple annotators validated ended up
+in the final dataset.</p>
+
+<div>
+  <div class="stages block">
+      <div class="stage rbutton block clicked" id="selection">Class Selection</div>
+      <div class="stage rbutton block" id="retrieval">Image Retrieval</div>
+      <div class="stage rbutton block" id="filtering">Label Validation</div>
+  </div>
+  <img id="stage_img" src="https://gradientscience.org/assets/multilabel/pipeline/selection.jpg"/>
+</div>
+<div class="footnote"> <strong>Imagenet collection pipeline:</strong> Click on a
+stage at the top for an illustration. </div>
+
+<p>While this is a natural approach to scalably annotate data (and, in fact, is
+commonly used to create large-scale benchmarks—e.g.,
+<a href="http://host.robots.ox.ac.uk/pascal/VOC/">PASCAL VOC</a>,
+<a href="http://cocodataset.org/#home">COCO</a>, <a href="http://places.csail.mit.edu/">places</a>),
+it has an important caveat. Namely, this process has an inherent bias: the
+annotation task itself is phrased as a leading question. ImageNet annotators
+were not asked to provide an image label, but instead only to verify if a
+<i>specific</i> label (predetermined by the image retrieval process) was
+<i>contained</i> in an image. Annotators had no knowledge of what the other
+classes in the dataset even were, or the granularity at which they were
+required to make distinctions. In fact, they were explicitly instructed to
+ignore clutter and obstructions.</p>
+
+<p>Looking back at the ImageNet samples shown above, one can see how this setup
+could lead to imperfect annotations. For instance, it is unclear if the average
+annotator knows the differences between a “Norwich terrier” and a “Norfolk
+terrier”, especially if they don’t even know that both of these (as well as 22
+other terrier breeds) are valid ImageNet classes. Also, the
+<span class="sc">Contains</span> task itself might be ill-suited for annotating
+multi-object images—the answer to the <span class="sc">Contains</span> question would be yes for any
+object in the image that corresponds to an ImageNet class. It is not unthinkable
+that the same images could have made it into ImageNet under the labels “stage”
+and “Norwich terrier” had they come up in the search results for those classes
+instead.</p>
+
+<p>Overall, this suggests that the labeling issues in ImageNet may go beyond just
+occasional annotator mistakes—the <i>design</i> of the data collection
+pipeline itself could have caused these labels to systematically deviate from
+the ground truth.</p>
+
+<h3 id="diagnosing-benchmark-task-misalignment">Diagnosing benchmark-task misalignment</h3>
+
+<p>To characterize how wide-spread these deviations are, we first need to get a
+better grasp of the ground truth for ImageNet data. In order to do this at
+scale, we still need to rely on crowd-sourcing. However, in contrast to the
+original label validation setup, we design a new annotation task based directly
+on <i>image classification</i>. Namely, we present annotators with a set of
+possible labels for a single image <i>simultaneously</i>. We then ask them to
+assign one label to every object in the image, and identify what they believe
+to be the main object. (Note that we intentionally ask for such fine-grained
+image annotations since, as we saw before, a single label might be inherently
+insufficient to capture the ground truth.)</p>
+
+<p>Of course, we need to ensure that annotators can meaningfully perform this
+task. To this end we  devise a way to narrow down the label choices they are
+presented with (all thousand ImageNet classes would be nearly impossible for a
+worker to choose between!). Specifically, for each image, we identify the most
+relevant labels by pooling together the top-5 predictions of a diverse set of
+ImageNet models and filtering them via the <span class="sc">Contains</span>
+task. Note that, by doing so, we are effectively bootstrapping the existing
+ImageNet labels by first using them to train models and then using model
+predictions to get better annotation candidates.</p>
+
+<p>This is what our resulting annotation task looks like:</p>
+
+<p><img src="https://gradientscience.org/assets/multilabel/main_task.jpg"/></p>
+
+<p>We aggregate the responses from multiple annotators to get per-image estimates
+of the number of objects in the image (along with their corresponding labels),
+as well as which object humans tend to view as the main one.</p>
+
+<p>We collect such <a href="https://github.com/MadryLab/ImageNetMultiLabel">annotations for 10k images from the ImageNet validation
+set</a>. With these more
+fine-grained and accurate annotations in hand, we now examine where the
+original ImageNet labels may fall short.</p>
+
+<h3 id="multi-object-images">Multi-object images</h3>
+<p>The simplest way in which ImageNet labels could deviate from the ground truth
+is if the image contains multiple objects. So, the first thing we want to
+understand is: how many ImageNet images contain objects from more than one
+valid class?</p>
+
+<p>It turns out: quite a few! Indeed, more than <b>20%</b> of the images contain
+more than one ImageNet object. Examples:</p>
+
+<div class="widget">
+  <div class="choices_one">
+    <span class="widgetheading">Inspect Image</span>
+  </div>
+  <div class="choices_img">
+    <span class="widgetheading">Image</span>
+  </div>
+  <div class="choices_info block">
+    <span class="widgetheading">Annotation</span>
+  </div>
+  <div class="choices_one" id="multi"> </div>
+  <div class="choices_img widgetheading"> <img id="multi1"/> </div>
+  <div class="choices_info block">
+    <div class="choices_info_text" id="multiclass"> </div>
+  </div>
+</div>
+<div style="clear: both;"/>
+<div class="footnote"> <strong>Multi-object images:</strong> Choose an image on
+the left to see the annotations we obtain for it.  </div>
+
+<p>Looking at some of these images, it is clear that the problem is not just
+natural image clutter but also the fact that certain objects are quite likely
+to co-occur in the real-world—e.g., “table lamp” and “lamp shade”. This means
+that choosing classes which in principle correspond to distinct objects (e.g.,
+using WordNet) is not enough to guarantee that the corresponding images have
+unambiguous labels. For example, see if you can guess the ImageNet label for
+the samples below:</p>
+
+<div class="widget">
+  <span class="widgetheading" id="coclass">Chosen class pair</span>
+  <div class="choices_one_full" id="co">
+  <div class="show_labels rbutton block" id="cooc">Show Labels</div>
+  </div>
+  <div id="coimages" style="border-right: 10px white solid;"> </div>
+</div>
+<div style="clear: both;"/>
+<div class="footnote">
+<strong>Co-occurring objects:</strong> Select a class pair on the top and see if
+you can identify which images correspond to each class (click on "Show Labels"
+to reveal the answers).
+</div>
+
+<h4 id="model-performance-on-multi-object-images">Model performance on multi-object images</h4>
+
+<p>So, how do models deal with images that contain multiple objects? To understand
+this, we evaluate a number of models (from AlexNet to EfficientNet-B7), and
+measure their accuracy (w.r.t. the ImageNet labels) on such images. We plot
+these accuracies below (as a function of their full test accuracy):</p>
+
+<canvas height="200" id="multi_drop" width="400"/>
+<div class="footnote">
+<strong>Performance on multi-object images:</strong>
+Model accuracy variation as a function of the number of objects in the image.
+Hover over each data point to see the corresponding model name.
+</div>
+
+<p>Across the board, in comparison to their performance on single-object images,
+models suffer around a 10% accuracy drop on multi-object ones. At the same
+time, this drop more-or-less disappears if we consider a model prediction to be
+correct if it matches the label of <i>any</i> valid object in the image (see
+the <a href="https://arxiv.org/abs/2005.11295">paper</a> for specifics).</p>
+
+<div class="footnote">
+    <strong>Aside:</strong> The original motivation of top-5 accuracy was
+    exactly to accommodate such multi-label images. However, we find that, while
+    it does largely account for these multi-object confusions, it also seems to
+    overestimate accuracy on single-object images.
+</div>
+
+<p>Still, even though models seem to struggle with multi-object images, they
+perform much better than chance (i.e., better than what one would get if they
+were picking the label of an object in the image at random). This makes sense
+when the image has a single prominent object that also matches the ImageNet
+label. However, for a third of all multi-object images the ImageNet label does
+not even match what annotators deem to be the main object in the image. Yet,
+even in these cases, models still successfully predict the ImageNet label
+(instead of what humans consider to be the right label for the image)!</p>
+
+<canvas height="200" id="overfitting" width="400"/>
+<div class="footnote">
+<strong>Performance on images with annotator-label disagreement:</strong>
+Model accuracy on images where annotators do not consider the ImageNet label to
+be the main object. Baseline: accuracy of picking the label of a random
+prominent object in the image.
+</div>
+
+<p>Here, models seem to base their predictions on biases in the dataset which
+humans do not find salient. For instance, models get high accuracy on the class
+“pickelhaube”, even though, pickelhaubes are usually present in images with
+other, more salient objects, such as “military uniforms”, suggesting that
+ImageNet models may be overly sensitive to the presence of distinctive objects
+in the image. While exploiting such biases would improve ImageNet accuracy,
+this strategy might not translate to improved performance on object recognition
+in the wild. Here are a few examples that seem to exhibit a similar mismatch:</p>
+
+<div class="widget">
+  <div class="choices_one">
+    <span class="widgetheading">Inspect Image</span>
+  </div>
+  <div class="choices_img">
+    <span class="widgetheading">Image</span>
+  </div>
+  <div class="choices_info block">
+    <span class="widgetheading">Annotation</span>
+  </div>
+  <div class="choices_one" id="main"> </div>
+  <div class="choices_img widgetheading"> <img id="main1"/> </div>
+  <div class="choices_info block">
+    <div class="choices_info_text" id="mainclass"> </div>
+  </div>
+</div>
+<div style="clear: both;"/>
+<div class="footnote">
+<strong>Annotator-label disagreement:</strong> Select an image on the left to
+see the annotations we obtain for it. Notice that the ImageNet label is
+different from the (annotator-selected) "main label".
+</div>
+
+<h3 id="biases-in-label-validation">Biases in label validation</h3>
+
+<p>Let us now turn our attention to the ImageNet data filtering process. Recall
+that each class in ImageNet was constructed by automatically retrieving many
+images and filtering them (via the <span class="sc">Contains</span> task described above). How likely
+were annotators to filter out mislabeled images under this setup?</p>
+
+<p>To understand this, we replicate the original filtering process on the existing
+ImageNet images. But this time, instead of only asking annotators to check if
+the image is valid with respect to its ImageNet label (i.e., the search query),
+we also try several other labels (each in isolation, with different sets of
+annotators).</p>
+
+<p>We find that annotators frequently deem an image to be valid for <i>many</i>
+different labels—even when only one object is present. Typically, this occurs
+when the image is ambiguous and lacks enough context (e.g. “seashore” or
+“lakeshore”), or annotators are likely confused between different semantically
+similar labels (e.g., “assault rifle” vs. “rifle”, dog breeds). It turns out
+that this confusion, at least partly, stems from the one-sidedness of the
+<span class="sc">Contains</span> task—i.e., asking annotators to ascertain the validity of a specific
+label without them knowing about any other options. If instead we present
+annotators with all the relevant labels simultaneously and ask them to choose
+one (as we did in our annotation setup), this kind of label confusion is
+alleviated: annotators select significantly fewer labels in total (see our
+<a href="https://arxiv.org/abs/2005.11295">paper</a> for details). So, even putting
+annotator’s expertise aside, the specific annotation task setup itself
+drastically affects the quality of the resulting dataset labels.</p>
+
+<div>
+  <div class="dropdown">
+    <div class="rates block" id="dropdownMenuButton">
+      Choose annotator threshold
+    </div>
+    <div class="rates">
+      <div class="block rbutton clicked">10%</div>
+      <div class="block rbutton">30%</div>
+      <div class="block rbutton">50%</div>
+    </div>
+  </div>
+  <img id="filtering_plot" src="https://gradientscience.org/assets/multilabel/filtering/filtering_0.1.jpg"/>
+</div>
+<div class="footnote">
+<strong>Number of valid labels:</strong> Distribution of labels annotators deem
+valid (based on an agreement threshold) for single-object images in the <span class="sc">Contains</span>
+task. Click the percentages on the top to change the annotator agreement
+threshold.
+</div>
+
+<p>Going back to ImageNet, our findings give us reason to believe that annotators
+may have had a rather limited ability to correct errors in labeling. Thus, in
+certain cases, ImageNet labels were largely determined by the automated image
+retrieval process—propagating any biases or mixups this process might
+introduce to the final dataset.</p>
+
+<p>In fact, we can actually see direct evidence of that in the ImageNet
+dataset—there are pairs of classes that appear to be <i>inherently
+ambiguous</i> (e.g., “laptop computer” and “notebook computer”) and neither
+human annotators, nor models, can tell the corresponding images apart (see
+below). If such class pairs actually overlap in terms of their ImageNet images,
+it is unclear how models can learn to separate them without memorizing specific
+validation examples.</p>
+
+<div class="widget">
+  <span class="widgetheading" id="ambclass">Chosen class pair</span>
+  <div class="choices_one_full" id="am">
+  <div class="show_labels rbutton block" id="amb">Show Labels</div>
+  </div>
+  <div id="ambimages" style="border-right: 10px white solid;"> </div>
+</div>
+<div style="clear: both;"/>
+<div class="footnote">
+<strong>Ambiguous class pairs:</strong> Select a class pair on the top and see if
+you can identify which images correspond to each class (click on "Show Labels"
+to reveal the answers).
+</div>
+
+<h3 id="beyond-test-accuracy-human-centric-model-evaluation">Beyond test accuracy: human-centric model evaluation</h3>
+
+<p>Performance of ImageNet-trained models is typically judged based on their
+ability to predict the dataset labels—yet, as we saw above, these labels may
+not fully capture the ground truth. Hence, ImageNet accuracy may not reflect
+properly model performance—for instance, measuring accuracy alone could
+unfairly penalize models for certain correct predictions on  multi-object
+images. So, how can we better assess model performance?</p>
+
+<p>One approach is to measure model-human alignment directly—we present model
+predictions to annotators and ask them to gauge their validity:</p>
+
+<canvas height="200" id="limit" width="400"/>
+<div class="footnote">
+<strong>Human-based model evaluation:</strong> Fraction of annotators that
+select a label as valid in the <span class="sc">Contains</span> task (i.e.,
+selection frequency) for ImageNet labels and model predictions. Baseline:
+(number of correct predictions) × (average selection frequency of the
+ImageNet label).
+</div>
+
+<p>Surprisingly, we find that for state-of-the-art models, annotators actually
+deem the prediction that models make to be valid about as often as the ImageNet
+label (even when the two <i> do not</i> match). Thus, recent models may be
+better at predicting the ground truth than their top-1 accuracy (w.r.t. the
+ImageNet label) would indicate.</p>
+
+<p>However, this does not imply that improving ImageNet accuracy is meaningless.
+For instance, non-expert annotators may not be able to tell apart certain
+fine-grained class differences (e.g., dog breeds) and for some of these images
+the ImageNet label may actually match the ground truth. What it does indicate,
+though, is that we are at a point where it may be hard to gauge if better
+performance on ImageNet corresponds to actual progress or merely to exploiting
+idiosyncrasies of the dataset.</p>
+
+<p>For further experimental details and additional results (e.g., human confusion
+matrices), take a look at <a href="https://arxiv.org/abs/2005.11295">our paper</a>!</p>
+
+<h3 id="conclusions">Conclusions</h3>
+
+<p>We took a closer look at how well ImageNet aligns with the real-world object
+recognition task—even though ImageNet is used extensively, we rarely question
+whether its labels actually reflect the ground truth. We saw that oftentimes
+ImageNet labels do not fully capture image content—e.g., many images have
+multiple (ImageNet) objects and there are classes that are inherently
+ambiguous. As a result, models trained using these labels as ground truth end
+up learning unintended biases and confusions.</p>
+
+<p>Our analysis indicates that when creating datasets we must be aware of (and try
+to mitigate) ways in which scalable data collection practices can skew the
+corresponding annotations (see our
+<a href="https://gradientscience.org/data_rep_bias">previous post</a> for another
+example of such a skew). Finally, given that such imperfections in our datasets
+could be inevitable, we also need to think about how to reliably assess model
+performance in their presence.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<b/><br/><hr/><b/><br/><br/><br/><b/><br/><br/><div class="cooc_img block"><div class="image_label label_cooc"><br/></div><img src="https://gradientscience.org/&quot; + base +                         pair + &quot;_&quot; + i + &quot;_dst.jpg"/></div><div class="amb_img block"><div class="image_label label_amb"><br/></div><img src="https://gradientscience.org/&quot; + base +                         pair + &quot;_&quot; + i + &quot;_dst.jpg"/></div><div class="bias_img block"><div class="image_label label_bias"><br/></div><img src="https://gradientscience.org/&quot; + base +                         pair + &quot;_&quot; + i + &quot;_dst.jpg"/></div></div>
+    </summary>
+    <updated>2020-05-25T00:00:00Z</updated>
+    <published>2020-05-25T00:00:00Z</published>
+    <source>
+      <id>https://gradientscience.org/</id>
+      <author>
+        <name>Gradient Science</name>
+      </author>
+      <link href="https://gradientscience.org/" rel="alternate" type="text/html"/>
+      <link href="https://gradientscience.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Research highlights and perspectives on machine learning and optimization from MadryLab.</subtitle>
+      <title>gradient science</title>
+      <updated>2020-05-25T19:20:59Z</updated>
     </source>
   </entry>
 
@@ -692,7 +1161,7 @@ Email: vgsco@univie.ac.at</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-05-25T18:20:52Z</updated>
+      <updated>2020-05-25T19:20:43Z</updated>
     </source>
   </entry>
 
@@ -1052,7 +1521,7 @@ performance of the proposed approach.
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-05-25T18:20:36Z</updated>
+      <updated>2020-05-25T19:20:31Z</updated>
     </source>
   </entry>
 
@@ -1084,7 +1553,7 @@ website</a> on the day of the talk, so people who did not sign up will still be 
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2020-05-25T18:21:19Z</updated>
+      <updated>2020-05-25T19:21:33Z</updated>
     </source>
   </entry>
 
@@ -1193,7 +1662,7 @@ What are your answers? Do you have some tells of your own?</p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-05-25T18:20:48Z</updated>
+      <updated>2020-05-25T19:20:39Z</updated>
     </source>
   </entry>
 
@@ -1219,7 +1688,7 @@ We also combine the Kabanets-Impagliazzo generator with recent ``bootstrapping''
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-05-25T18:20:36Z</updated>
+      <updated>2020-05-25T19:20:31Z</updated>
     </source>
   </entry>
 
@@ -1247,7 +1716,7 @@ We also combine the Kabanets-Impagliazzo generator with recent ``bootstrapping''
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-05-25T18:20:36Z</updated>
+      <updated>2020-05-25T19:20:31Z</updated>
     </source>
   </entry>
 
@@ -1273,7 +1742,7 @@ We also combine the Kabanets-Impagliazzo generator with recent ``bootstrapping''
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-05-25T18:20:36Z</updated>
+      <updated>2020-05-25T19:20:31Z</updated>
     </source>
   </entry>
 
@@ -1295,7 +1764,7 @@ We also combine the Kabanets-Impagliazzo generator with recent ``bootstrapping''
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-05-25T18:20:36Z</updated>
+      <updated>2020-05-25T19:20:31Z</updated>
     </source>
   </entry>
 
@@ -1445,7 +1914,7 @@ We also combine the Kabanets-Impagliazzo generator with recent ``bootstrapping''
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2020-05-25T18:21:29Z</updated>
+      <updated>2020-05-25T19:21:39Z</updated>
     </source>
   </entry>
 
@@ -1488,7 +1957,7 @@ We also combine the Kabanets-Impagliazzo generator with recent ``bootstrapping''
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2020-05-25T18:21:29Z</updated>
+      <updated>2020-05-25T19:21:39Z</updated>
     </source>
   </entry>
 
@@ -1684,7 +2153,7 @@ his theorem, he encouraged you to!)</div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-05-25T18:20:36Z</updated>
+      <updated>2020-05-25T19:20:31Z</updated>
     </source>
   </entry>
 
@@ -2252,7 +2721,7 @@ procedures, further experiments, and future directions.</p></div>
       <link href="https://gradientscience.org/feed.xml" rel="self" type="application/atom+xml"/>
       <subtitle>Research highlights and perspectives on machine learning and optimization from MadryLab.</subtitle>
       <title>gradient science</title>
-      <updated>2020-05-24T22:38:19Z</updated>
+      <updated>2020-05-25T19:20:58Z</updated>
     </source>
   </entry>
 
@@ -2277,7 +2746,7 @@ procedures, further experiments, and future directions.</p></div>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2020-05-25T18:21:27Z</updated>
+      <updated>2020-05-25T19:21:37Z</updated>
     </source>
   </entry>
 
@@ -2307,7 +2776,7 @@ Our lower-bound is based on a novel round-reduction technique that allows us to 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-05-25T18:20:36Z</updated>
+      <updated>2020-05-25T19:20:31Z</updated>
     </source>
   </entry>
 
@@ -2357,144 +2826,7 @@ Our lower-bound is based on a novel round-reduction technique that allows us to 
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-05-25T18:21:06Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://rjlipton.wordpress.com/?p=17042</id>
-    <link href="https://rjlipton.wordpress.com/2020/05/16/the-2020-y-prize/" rel="alternate" type="text/html"/>
-    <title>The 2020 Y Prize</title>
-    <summary>Can one maintain privacy while publicly congratulating? Cropped from X Facemask src X, who shall go nameless here, recently won a prize for research. Today we congratulate X and wish to talk a bit about their work while safeguarding X’s identity. X also won another prize Z—but we will not mention which one. In both […]</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>
-<font color="#0044cc"><br/>
-<em>Can one maintain privacy while publicly congratulating?</em><br/>
-<font color="#000000"/></font></p><font color="#0044cc"><font color="#000000">
-<table class="image alignright">
-<tbody>
-<tr>
-<td>
-<a href="https://rjlipton.files.wordpress.com/2020/05/x-facemaskman.jpg"><img alt="" class="alignright size-thumbnail wp-image-17044" height="129" src="https://rjlipton.files.wordpress.com/2020/05/x-facemaskman.jpg?w=150&amp;h=129" width="150"/></a>
-</td>
-</tr>
-<tr>
-<td class="caption alignright"><font size="-2">Cropped from X Facemask <a href="https://www.anime-remix.com/product/face-mask-cotton-cloth-designer-graphic-x/">src</a></font></td>
-</tr>
-</tbody>
-</table>
-<p>
-X, who shall go nameless here, recently won a prize for research. </p>
-<p>
-Today we congratulate X and wish to talk a bit about their work while safeguarding X’s identity.</p>
-<p>
-X also won another prize Z—but we will not mention which one. In both cases the honor is about the creation of a new field rather than the solution of a long-standing open problem. Her—OK, X is a she—brilliant work has allowed many others to write papers in these areas. And it has led to countless conferences, meetings, and talks. </p>
-<p>
-Oops, we used the word “brilliant.” That has already leaked her identity, given where you are reading this. Just type it into our search box.</p>
-<p>
-We assume you get the point. One can leak information about people without mentioning them directly. </p>
-<p/><p>
-<br/><br/>
-<br/><br/>
-</p><h2> The Real Start of the Post</h2><p/>
-<table class="image alignright">
-<tbody>
-<tr>
-<td>
-<a href="https://rjlipton.files.wordpress.com/2020/05/dworkaf.jpg"><img alt="" class="alignright wp-image-17045" height="138" src="https://rjlipton.files.wordpress.com/2020/05/dworkaf.jpg?w=180&amp;h=138" width="180"/></a>
-</td>
-</tr>
-<tr>
-<td class="caption alignright"><font size="-2">Her <a href="https://royalsociety.org/science-events-and-lectures/2018/06/you-and-ai-fairness/">work</a> in Algorithmic Fairness too</font><br/>
-</td></tr></tbody>
-</table>
-<p>
-Cynthia Dwork is the <a href="http://www.sigact.org/prizes/knuth/citation2020.pdf">winner</a> of the 2020 Donald E. Knuth Prize. The prize is awarded jointly by ACM SIGACT and the IEEE Computer Society Technical Committee. The ceremony will include a lecture by Cynthia at <a href="https://focs2020.cs.duke.edu/">FOCS 2020</a>, which is still projected to meet in-person at Duke next November 16–19.</p>
-<p>
-Today we congratulate Cynthia and talk a little about her work.</p>
-<p>
-I, Dick, have known her for many years. I am excited to see that she has won the Knuth prize. </p>
-<p>
-She has always been a top researcher and a terrific speaker. I fondly recall some of her earlier talks at Princeton and elsewhere. There is something about her ability to explain complex ideas in a lucid manner. I have often thought that this ability must be one of the reasons she has been so successful in her research. </p>
-<p>
-We will talk a little about <em>differential privacy</em> (DP) and then her other joint work which led to another prize. We should be quick to <a href="https://rjlipton.wordpress.com/2015/02/06/cynthia-dwork-and-a-brilliant-idea/">mention</a> that <a href="https://rjlipton.wordpress.com/2015/02/07/still-a-brilliant-idea/">others</a> have been instrumental in both developments.</p>
-<p>
-</p><p/><h2> Quantifying an Idea </h2><p/>
-<p/><p>
-DP might have been appreciated long before there were large databases and computer systems. The genius is not just the simplicity of the idea but the development of mathematical tools to govern its application.</p>
-<p>
-For a simple example, suppose a professor has a general policy of posting exam average scores in her class of 100. Suppose she posts that the average is 73.3 after 98 students have taken the exam but two need to make it up a week later. Then suppose she re-posts the average after they take it and it is 72.5. The difference may not seem like much. But the class learns two things: </p>
-<ul>
-<li>
-Both students had their makeup scores included in the average. (If the 73.3 is exact then it is not even possible to get a rounded 72.5 with just one score of zero, pending the other.) <p/>
-</li><li>
-The two students collectively bombed the exam. (Just possibly one got a zero while the other did OK, but even then the other’s score was below average.)
-</li></ul>
-<p>
-Your first thought might be that the fault is in the excessive precision in the grade reporting. If she had rounded to the nearest integer then both averages would have been reported as “73” and there would be no problem. But rounding is accidental. The new average could have been 72.49, which would be rounded down to “72,” when the set of possible interpretations is worse than before. </p>
-<p>
-In wide-scale situations where queries for multiple averages at different times are allowed, effects of rounding may cancel so that a large statistical analysis can subtract them out. Thus passively reducing precision is not enough. The key is to affect the precision actively by adding a random <img alt="{\pm \epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cpm+%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\pm \epsilon}"/> to the reported results, where <img alt="{\epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon}"/> is judiciously chosen. The point is:</p>
-<blockquote><p><b> </b> <em> Adding <img alt="{\pm \epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cpm+%5Cepsilon%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0" title="{\pm \epsilon}"/>, better than rounding, makes inference much harder. </em>
-</p></blockquote>
-<p>In the exam-score example, randomly adding or subtracting a number between 0 and 2 changes the calculus so that seeing “73.3” and then “72.5” does not allow a high-confidence inference about the makeup students’ scores. One could reason that the first number could easily have been 72.3 and the second 73.5, in line with interpretations where the makeup students upped the average. Actually, a jump from 72.3 to 73.5 in the <em>true</em> averages is impossible from just two new scores, so the class could deduce that the reported averages are fudged. But that is OK. Two basic purposes of reporting the averages are met despite the fudging: </p>
-<ul>
-<li>
-to show the exam was consistent with past years—especially good to know this year; <p/>
-</li><li>
-to give you some idea (knowing your own score exactly) where you stand relative to the class.
-</li></ul>
-<p>
-In related situations, one could argue that a mean of <img alt="{\pm 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cpm+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\pm 1}"/> for <img alt="{\epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\epsilon}"/> is not enough. If the exam has 100 one-point questions each with a 73.3% expectation of getting it right for everyone, then the standard deviation about the mean is almost <img alt="{2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{2}"/>. Using a mean change of <img alt="{\pm 2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cpm+2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\pm 2}"/> seems also fine in this case, whereas rounding to the nearest 05 (i.e., reporting “70” or “75” as the average) might be too coarse.</p>
-<p>
-We do not intend our example to be definitive, only that it conveys relevant issues. The example is enough to convey that DP leads into deep matters in statistics and <em>what can be inferred by statistical methods</em>. The latter melds the complexity-theoretic notion of knowledge gain from interactive protocols with statistical (machine) learning. And as with quantum computing, theorems and methods from the subfield have come back to inform fundamental questions about complexity (of course, this is true of crypto in general).</p>
-<p>
-</p><p/><h2> Privacy and Online Chess </h2><p/>
-<p/><p>
-I, Ken, am the lead on this post, and have had data-privacy affect me personally. The pandemic has forced the cancellation of all over-the-board (OTB) tournaments, some as far ahead as August. Chess has all moved online, as heralded by <a href="https://www.nytimes.com/2020/05/08/sports/coronavirus-chess-online-tournament.html">two</a> recent <a href="https://www.nytimes.com/2020/04/23/sports/chess-cheating-south-dakota-races.html">articles</a> in the New York Times and one in the Wall Street Journal <a href="https://www.wsj.com/articles/forget-sourdough-everyone-is-playing-chess-now-11588845643">proclaiming</a>, “Sports: Chess Is the New King of the Pandemic.” </p>
-<p>
-As these articles also note, cheating has long been a major concern for online chess. I have been a recourse for second-opinions in online cheating cases but have not tried to be <em>primary</em> in this domain. A great conversation in November 2006 with Daniel Sleator (who—besides being famous for splay trees and amortized analysis—<a href="https://en.wikipedia.org/wiki/Internet_Chess_Club#History">co-founded</a> the Internet Chess Club) told me how online cheating detection avails much information about the manner of play that is not applicable or reliably available in OTB chess. Also for academic reasons, I chose a minimal approach of using no information besides the moves of the games and the <a href="https://en.wikipedia.org/wiki/Elo_rating_system">Elo ratings</a> of the players. An unexpected advantage of that choice is exemplified by an e-mail I received—fifteen minutes before a conference call on Wednesday with representatives of the International Chess Federation (FIDE) and other online platforms—from a different chess organizer requesting a statement that:</p>
-<blockquote><p><b> </b> <em> …you will only use the data of the games, and not any personal data that might be obtained from the [tournaments] for your research, such as player name etc. … in writing as a standard precaution … to make sure that there isn’t third party usage of the data or usage outside of its intent. </em>
-</p></blockquote>
-<p/><p>
-Some recent legal decisions have confirmed that the moves of the games are public data and cannot be copyrighted. The e-mail did not mention the players’ ratings. As used by FIDE and the US and most online platforms (<a href="https://fivethirtyeight.com/features/how-we-calculate-nba-elo-ratings/">and</a> <a href="https://en.wikipedia.org/wiki/World_Football_Elo_Ratings">much</a> <a href="https://dotesports.com/general/news/elo-ratings-explained-20565">more</a> <a href="https://fivethirtyeight.com/methodology/how-our-nfl-predictions-work/">widely</a>), those are 4-digit numbers, and they are public. Knowing all four digits might be enough to pinpoint the identity of a player. </p>
-<p>
-Thus I suggested rounding the rating to the nearest 10 or even 20. This makes little difference to my statistical cheating tests, which already give 25 Elo points benefit-of-doubt for uncertainty about the rating. Tournament officials I’ve served have done this in a couple of individual cases but now the need is <em>en masse</em>. </p>
-<p>
-The question based on the previous section above is whether I should instead (or also) suggest that they implement full DP by adding <img alt="{\pm \epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cpm+%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\pm \epsilon}"/> with a mean of <img alt="{\pm 10}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cpm+10%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\pm 10}"/> or <img alt="{\pm 20}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cpm+20%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\pm 20}"/> or so, with-or-without rounding. A caveat is that it is easy for someone with a tournament spreadsheet to round a column of figures before exporting text to me, but applying a random function is less familiar and prone to major mess-ups.</p>
-<p>
-</p><p/><h2> The Other Prize </h2><p/>
-<p/><p>
-The Knuth Prize is not Cynthia’s only win for 2020. In December she was awarded the 2020 IEEE Richard W. Hamming Medal. A <a href="https://ieeetv.ieee.org/ieeetv-specials/honors-2020-cynthia-dwork-wins-the-ieee-richard-w-hamming-medal">video</a> gives a one-minute summary of differential privacy and her work on <em>non-malleable</em> cryptosystems via lattice bases. The latter stems from her 2000 <a href="https://www.cs.huji.ac.il/~dolev/pubs/nmc.pdf">paper</a> with Danny Dolev and Moni Naor (DDN).</p>
-<p>
-We have not covered this crypto topic before. It involves chosen-ciphertext attacks where Eve, the evesdropper, first gets hold of a transmitted ciphertext <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/>. The cryptosystem is <em>malleable</em> if Eve can know enough about the structure of <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> to make a legal ciphertext <img alt="{y'}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y'}"/>, one that may decode to a plaintext <img alt="{x'}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x'}"/> that advances her interests compared to the intended <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{x}"/>. Wikipedia’s <a href="https://en.wikipedia.org/wiki/Malleability_(cryptography)">article</a> gives an example where <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> embeds a numerical field <img alt="{r}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r}"/> that Eve can recognize and alter en-route. The paper gives a similar example where Eve cannot disrupt the transmission of <img alt="{r}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r}"/> but can separately send her own <img alt="{y'}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y'}"/> with a value <img alt="{r'}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r'}"/> that gives her advantage. This may be so even without being able to decode or gain any information about the plain value of <img alt="{r}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r}"/>, except that <img alt="{r'}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r'}"/> is different in a meaningful way. For instance, <img alt="{r'}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r'}"/> could be a lower bid on a contract or higher bid in a secure auction.</p>
-<p>
-One would think that <img alt="{r}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r}"/> should just be encoded via an error-correcting code whose range is secure so that an attacker would be overwhelmingly unlikely to find another value <img alt="{r'}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Br%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{r'}"/> in the legal range of the code. However, this clashes with the goal of <em>homomorphic encryption</em> which allows numerical operations on encoded values. Or the technology used may be too simple, as in the paper’s mention of submitting bids to a fax number. </p>
-<p>
-Note: both fax machines and the paper date to the previous millennium. But the paper next gives an example that is staying with us in this millennium, where <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> is a proof of <img alt="{\mathsf{P \neq NP}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BP+%5Cneq+NP%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{\mathsf{P \neq NP}}"/>. Suppose Alice arranges to transmit <img alt="{y}" class="latex" src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0" title="{y}"/> to a referee Ralph using a zero-knowledge protocol, but Eve is able to intercept their messages. Eve can impersonate Ralph to Alice and impersonate Alice to Ralph as Ralph asks questions in the protocol. It may seem impossible to forestall such a “man-in-the-middle” <a href="https://en.wikipedia.org/wiki/Man-in-the-middle_attack">attack</a> without extrinsic considerations of hardware and timing, but DDN design an ingenious scheme for <em>non-malleable zero-knowledge proofs</em>. </p>
-<p>
-</p><p/><h2> A Video </h2><p/>
-<p/><p>
-<em>En-passant</em> of this, we want to note a great <a href="https://www.youtube.com/watch?v=4Wl-3kadvgw">video</a> that was made for next month’s Women in Theory <a href="https://womenintheory.wordpress.com/">workshop</a>. It has an all-female cast and lyrics by Avi Wigderson parodying the song “I Will Survive.” Cynthia is not in the video, but she likewise has been a great spokesperson for the experiences of women in our professional life.</p>
-<p>
-</p><p/><h2> Open Problems </h2><p/>
-<p/><p>
-Our congratulations again to Cynthia—by name—on the Knuth and Hamming prizes.</p>
-<p/></font></font></div>
-    </content>
-    <updated>2020-05-16T20:58:14Z</updated>
-    <published>2020-05-16T20:58:14Z</published>
-    <author>
-      <name>RJLipton+KWRegan</name>
-    </author>
-    <source>
-      <id>https://rjlipton.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://rjlipton.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://rjlipton.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://rjlipton.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>a personal view of the theory of computation</subtitle>
-      <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-05-25T18:20:48Z</updated>
+      <updated>2020-05-25T19:21:12Z</updated>
     </source>
   </entry>
 </feed>
