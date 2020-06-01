@@ -237,7 +237,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at June 01, 2020 08:22 AM UTC</span>.
+Last updated <span class="datestr">at June 01, 2020 09:23 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -245,6 +245,261 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://francisbach.com/?p=2566">
+<div class="entryheader">
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-US"><a class="entryheader" href="https://francisbach.com/gradient-descent-neural-networks-global-convergence/">Gradient descent for wide two-layer neural networks – I : Global convergence</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://francisbach.com" title="Machine Learning Research Blog">Francis Bach</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en-US">
+<p class="justify-text">Supervised learning methods come in a variety of flavors. While local averaging techniques such as <a href="https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm">nearest-neighbors</a> or <a href="https://en.wikipedia.org/wiki/Decision_tree_learning">decision trees</a> are often used with low-dimensional inputs where they can adapt to any potentially non-linear relationship between inputs and outputs, methods based on empirical risk minimization are the most commonly used in high-dimensional settings. Their principle is simple: optimize the (potentially regularized) risk on training data over prediction functions in a pre-defined set of functions.</p>
+
+
+
+<p class="justify-text">When the set of a functions is a convex subset of a vector space with a finite-dimensional representation, with standard assumptions, the corresponding optimization problem is convex. This has the benefits of allowing a thorough theoretical understanding of the computational and statistical properties of learning methods, which often come with strong theoretical guarantees, in terms of running time [<a href="https://arxiv.org/pdf/1405.4980">1</a>, <a href="https://epubs.siam.org/doi/pdf/10.1137/16M1080173">2</a>, <a href="http://www.di.ens.fr/~fbach/bach_jenatton_mairal_obozinski_FOT.pdf">3</a>] or prediction performance on unseen data [<a href="https://www.cs.huji.ac.il/~shais/UnderstandingMachineLearning/understanding-machine-learning-theory-algorithms.pdf">4</a>, <a href="http://static.stevereads.com/papers_to_read/all_of_statistics.pdf">5</a>]. In particular, the linear parameterization can be done either explicitly by building a typically large finite set of features, or implicitly through the use of kernel methods and then a series of dedicated algorithms and theories can be leveraged for efficient non-linear predictions [6, <a href="http://papers.nips.cc/paper/3182-random-features-for-large-scale-kernel-machines.pdf">7</a>, <a href="http://papers.nips.cc/paper/6978-falkon-an-optimal-large-scale-kernel-method.pdf">8</a>].</p>
+
+
+
+<p class="justify-text">However, linearly-parameterized sets of functions do not include neural networks, which lead to state-of-the-art performance in most learning tasks in computer vision, natural language processing, speech processing, in particular through the use of deep and convolutional neural networks [<a href="https://www.deeplearningbook.org/">9</a>].</p>
+
+
+
+<h2>Two-layer neural networks with “relu” activations</h2>
+
+
+
+<p class="justify-text">The goal of this blog post is to provide some understanding of why supervised machine learning work for the simplest form of such models: $$ h(x) = \frac{1}{m} \sum_{i=1}^m a_i ( b_i^\top x)_+ = \frac{1}{m} \sum_{i=1}^m a_i \max\{ b_i^\top x,0\},$$ where the input \(x\) is a vector in \(\mathbb{R}^d\), and \(m\) is the number of hidden neurons. The weights \(a_i \in \mathbb{R}\), \(i=1,\dots,n\), are the <em>output weights</em>, while the weights \(b_i \in \mathbb{R}^d\), \(i=1,\dots,n\), are the <em>input weights</em>. The rectified linear unit (“relu”) [<a href="http://www.jmlr.org/proceedings/papers/v15/glorot11a/glorot11a.pdf">10</a>] activation is used, and our results will depend heavily on its positive homogeneity (that is, for \(\lambda &gt; 0\), \((\lambda u)_+ = \lambda u_+\)).</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img width="407" alt="" src="https://francisbach.com/wp-content/uploads/2020/05/nn_single_blog.png" class="wp-image-3829" height="292" />Two-layer neural network in dimension \(d = 6\) with \(m=4\) hidden neurons, and a single output.</figure></div>
+
+
+
+<p class="justify-text">Note that this is an idealized and much simplified set-up for deep learning, as there is a single hidden-layer, no convolutions, no pooling, etc. As I will show below, this simple set-up is already complex to understand, and I believe it captures some of the core difficulties associated with non-convexity.</p>
+
+
+
+<p class="justify-text">The first question that one may come to after decades of research in learning theory is: <em>why is it so hard to analyze?</em>  </p>
+
+
+
+<p class="justify-text">There are at least two major difficulties:</p>
+
+
+
+<ul class="justify-text"><li><strong>Non-linearity</strong>: the dependence on the input weights \(b_i\)’s is non-linear because of the activation function, typically leading to non-convex optimization problems.</li><li><strong>Overparameterization</strong>: The number \(m\) of hidden neurons is very large (often so large that the number of parameters \(m(d+1)\) exceeds the number of observations), which is hard in terms of optimization and potentially generalization to unseen data. </li></ul>
+
+
+
+<p class="justify-text">In this blog post, we will leverage the overparameterization and take \(m\) tending to infinity (without any dependence on the number of observations), which will allow us to derive theoretical results. We will leverage two key properties of the problem:</p>
+
+
+
+<ul class="justify-text"><li><strong>Separability</strong> of the model in \(w_i = (a_i,b_i)\), that is, the prediction function \(h(x)\) is the sum of terms which are independently parameterized, as \(h = \frac{1}{m} \sum_{i=1}^m \Phi(w_i)\), where \(\Phi: \mathbb{R}^p \to \mathcal{F}\), with \(\mathcal{F}\) a space of functions. In our situation, \(p = d+1\) and: $$ \Phi(w)(x) = a (b^\top x)_+. $$ In other words,  there is no parameter sharing among hidden neurons. Unfortunately, this does not generalize to more than a single hidden layer.</li><li><strong>Homogeneity</strong>: the relu activation is positively homogeneous so that as as function of \(w = (a,b) \in \mathbb{R} \times \mathbb{R}^d\), \(\Phi(w)(x) = a (b^\top x)_+\) is positively 2-homogeneous, that is, \(\Phi(\lambda w) = \lambda^2 \Phi(w)\) for \(\lambda &gt; 0\).</li></ul>
+
+
+
+<p class="justify-text">In this sequence of two blog posts, following a recent trend in optimization and machine learning theory [<a href="http://papers.nips.cc/paper/4900-non-strongly-convex-smooth-stochastic-approximation-with-convergence-rate-o1n.pdf">11</a>, <a href="https://www.pnas.org/content/pnas/116/32/15849.full.pdf">12</a>], optimization and statistics cannot be separated and need to be tackled together. I will focus on gradient flows on empirical or expected risks.</p>
+
+
+
+<p class="justify-text">In this blog post, I will cover optimization and how over-parameterization leads to global convergence for 2-homogeneous models, a recent result obtained two years ago with <a href="https://lchizat.github.io/">Lénaïc Chizat</a> [<a href="http://papers.nips.cc/paper/7567-on-the-global-convergence-of-gradient-descent-for-over-parameterized-models-using-optimal-transport.pdf">13</a>]. This requires tools from optimal transport which I will briefly describe (for more details, see, e.g., [<a href="https://arxiv.org/abs/1803.00567">14</a>]).</p>
+
+
+
+<p class="justify-text">Next month, I will focus on generalization capabilities and the several implicit biases associated with gradient descent in this context [<a href="https://papers.nips.cc/paper/8559-on-lazy-training-in-differentiable-programming.pdf">15</a>, <a href="https://arxiv.org/pdf/2002.04486">16</a>].</p>
+
+
+
+<h2>Infinitely wide limit and probability measures</h2>
+
+
+
+<p class="justify-text">Following the standard learning set-up, our goal will be to minimize with respect to the prediction function \(h\) the functional \(R\) defined as $$ R(h) = \mathbb{E}_{p(x,y)} \big[ \ell( y, h(x) ) \big],$$ where \(\ell(y,h(x))\) is the loss incurred by outputting \(h(x)\) when \(y\) is the true label. Even within deep learning, this loss is most often convex in its second argument, such as for least-squares or <a href="https://en.wikipedia.org/wiki/Loss_functions_for_classification">logistic</a> losses. Thus, I will assume that \(R\) is convex.</p>
+
+
+
+<p>The expectation can be considered in two scenarios:</p>
+
+
+
+<ul class="justify-text"><li><strong>Empirical risk</strong>: this corresponds to the situation where we have observations \((x_j,y_j)\), \(j=1,\dots,n\), coming from some joint distribution on \((x,y) \in \mathbb{R}^d \times \mathbb{R}\). Minimizing \(R\) then may not lead to any guarantee on unseen data unless some explicit or implicit regularization is used. In next blog post, I will consider the implicit regularization effect of gradient-based algorithms.</li><li><strong>Expected risk (or generalization performance)</strong>: The expectation is taken with respect to unseen data, and thus its value (or a gradient) cannot be computed. However, any training observation \((x_j,y_j)\) can lead to an unbiased estimate, and if single pass stochastic gradient is used, our guarantees will be on the expected risk.</li></ul>
+
+
+
+<p class="justify-text">The main and very classical idea is to consider the minimization of $$ G(W) = G(w_1,\dots,w_m) = R \Big( \frac{1}{m} \sum_{i=1}^m \Phi(w_i) \Big),$$ and see it as the minimization of $$ F(\mu) = R \Big( \int_{\mathbb{R}^p} \Phi(w) d\mu(w) \Big),$$ with respect to a probability measure \(\mu\), with the equivalence for $$ \mu = \frac{1}{m} \sum_{i=1}^m \delta(w_i),$$ where \(\delta(w_i)\) is the Dirac measure at \(w_i\). See an illustration below.</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img width="615" alt="" src="https://francisbach.com/wp-content/uploads/2020/05/diracs_measures-1-1024x156.png" class="wp-image-3852" height="93" />Left: discrete probability measure. Right: measure with density.</figure></div>
+
+
+
+<p class="justify-text">When \(m\) is large, we can represent any measure in the <a href="https://en.wikipedia.org/wiki/Convergence_of_measures#Weak_convergence_of_measures">weak sense</a> (that is, expectations of any continuous and bounded functions can be approximated). The benefits of considering the space of all measures instead of discrete measures have been used already in variety of contexts in machine learning, statistics and signal processing [<a href="http://www.stat.yale.edu/~arb4/publications_files/UniversalApproximationBoundsForSuperpositionsOfASigmoidalFunction.pdf">17</a>, <a href="http://papers.nips.cc/paper/2800-convex-neural-networks.pdf">18</a>, <a href="http://jmlr.org/papers/volume18/14-546/14-546.pdf">19</a>]. In this blog post, the key benefit is that the set of measures in convex and \(h = \int_{\mathbb{R}^p} \Phi(w) d\mu(w) \) is linear in the measure \(\mu\), so that our optimization problem has become convex.</p>
+
+
+
+<p class="justify-text">However, (1) It does not buy much in practice, as the set of probability measures is infinite-dimensional. <a href="http://Frank-Wolfe algorithms">Frank-Wolfe algorithms</a> can be used, but the choice of new neurons is a difficult optimization problem, NP-hard for the threshold activation function [<a href="https://epubs.siam.org/doi/pdf/10.1137/070685798">20</a>], with polynomial potentially high complexity for the relu activation [<a href="http://proceedings.mlr.press/v65/goel17a/goel17a.pdf">21</a>], and (2) this is not what is used in practice, which is (stochastic) gradient descent.</p>
+
+
+
+<h2>Finite-dimensional gradient flow</h2>
+
+
+
+<p class="justify-text">In this post, I will consider the gradient flow $$\dot{W} = \ – m \nabla G(W),$$ (where \(m\) is added as a normalization factor to allow a well-defined limit when \(m\) tends to infinity). This is still not exactly what is used in practice, but, as explained in <a href="https://francisbach.com/gradient-flows/">last month post</a>, this is a good approximation of gradient descent (if using the empirical risk, then leading to guarantees of global convergence on the empirical risk only), or stochastic gradient descent (if doing a single pass on the data, then leading to guarantees of global convergence on unseen data). This is a non-convex dynamics, with stationary points and local minima, even when \(m\) is large (see, e.g., [<a href="http://proceedings.mlr.press/v80/safran18a/safran18a.pdf">27</a>]).</p>
+
+
+
+<p class="justify-text">Two main questions arise: (1) what does the gradient flow dynamics converge to when the number of neurons \(m\) tends to infinity, and (2) can we get any global convergence guarantees for the limiting dynamics?</p>
+
+
+
+<h2>Mean-field limit and Wasserstein gradient flows</h2>
+
+
+
+<p class="justify-text">When \(m\) tends to infinity, since we want to use the measure representation, we need to understand the effect of performing the gradient flow jointly on \(w_1,\dots,w_m\) on the measure $$ \mu = \frac{1}{m} \sum_{i=1}^m \delta(w_i),$$ and see if we can take a limit when \(m\) tends to infinity. This process of taking limits is common in physics and often referred to as the “mean-field” limit, and has been considered in a series of recent works [<a href="https://arxiv.org/pdf/1712.05438">22</a>, <a href="http://papers.nips.cc/paper/7567-on-the-global-convergence-of-gradient-descent-for-over-parameterized-models-using-optimal-transport.pdf">13</a>, <a href="https://www.pnas.org/content/pnas/115/33/E7665.full.pdf">23</a>, <a href="https://arxiv.org/pdf/1805.00915">24</a>]. To avoid too much technicality, I will assume that the map \(\Phi\) is sufficiently differentiable, which unfortunately exclude the relu activation; for dedicated results, see [<a href="http://papers.nips.cc/paper/7567-on-the-global-convergence-of-gradient-descent-for-over-parameterized-models-using-optimal-transport.pdf">13</a>].</p>
+
+
+
+<p class="justify-text"><strong>Gradient flows on metric spaces.</strong> In order to understand the dynamics in the space of probability measures, we need to take a step backward and realize that gradient flows can be defined for many functions \(f\) on any metric space \(\mathcal{X}\). Indeed, it can be seen as the limit of taking infinitesimal steps of length \(\gamma\), where each new iterate \(x_{k+1}\) (corresponding to the value at time \(k\gamma\)) is defined recursively from \(x_k\) as $$x_{k+1} \in \arg\min_{x \in \mathcal{X}}\  f(x) + \frac{1}{2\gamma} d(x,x_k)^2.$$ As shown in [<a href="http://www2.stat.duke.edu/~sayan/ambrosio.pdf">25</a>, <a href="https://link.springer.com/content/pdf/10.1007/s13373-017-0101-1.pdf">26</a>], with some form of interpolation, this defines a curve with prescribed values \(x_k\) at each \(\gamma k\), and when the step-size \(\gamma\) goes to zero, this curves “converges” to the gradient flow.</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img width="419" alt="" src="https://francisbach.com/wp-content/uploads/2020/05/euler-1024x520.png" class="wp-image-3960" height="212" />Gradient flow in bold black, with interpolating curve in red from 14 points \(x_0,\dots,x_{13}\).</figure></div>
+
+
+
+<p class="justify-text">For the space \(\mathcal{X} = \mathbb{R}^d\) with the Euclidean distance and a continuously differentiable function \(f\), we obtain that $$x_{k+1} = x_k – \gamma f'(x_k) + o(\gamma),$$ and we get the usual gradient flow associated to \(f\), and the scheme above is nothing less than <a href="https://en.wikipedia.org/wiki/Euler_method">Euler discretization</a> that was described <a href="https://francisbach.com/gradient-flows/">last month</a>.</p>
+
+
+
+<p class="justify-text"><strong>Vector space gradient flows on probability measures.</strong> Probability measures are a convex subset of measures with finite <a href="https://en.wikipedia.org/wiki/Total_variation#Total_variation_of_probability_measures">total variation</a>, which is equal to the \(\ell_1\)-norm between densities when the two probability measures have densities with respect to the same base measure. It is a normed vector space for which we could derive our first type of gradient flow, which can be seen as a continuous version of Frank-Wolfe algorithm, where atoms are added one by one, until convergence.  </p>
+
+
+
+<p class="justify-text">As mentioned above, the fact that atoms are created sequentially seems attractive computationally. However, (1) deciding which one to add is a computationally hard problem, and (2) the flow on measures cannot be approximated by a finite evolving set of “particles” (here hidden neurons each defined by a vector \(w \in \mathbb{R}^{d+1}\)).</p>
+
+
+
+<p class="justify-text"><strong>Wasserstein gradient flows on probability measures.</strong> There is another natural distance here, namely the <a href="https://en.wikipedia.org/wiki/Wasserstein_metric">Wasserstein distance</a> (sometimes called the Kantorovich–Rubinstein distance). In order to remain short, I will only define it between empirical measures $$\mu = \frac{1}{m} \sum_{i=1}^m \delta(w_i) \mbox{ and } \nu = \frac{1}{m} \sum_{i=1}^m \delta(v_i)$$ with the same number of points. The squared 2-Wasserstein distance is obtained by minimizing $$\frac{1}{m} \sum_{i=1}^m \| w_j – v_{\sigma(j)} \|_2^2$$ over all permutations \(\sigma: \{1,\dots,m\} \to \{1,\dots,m\}\). See illustration below.</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img width="573" alt="" src="https://francisbach.com/wp-content/uploads/2020/05/Wasserstein-2-1024x307.png" class="wp-image-3886" height="171" />Wasserstein distance between two empirical measures: (left) original observations of two empirical measures with \(m = 11\) points, (right) assigning all black points to red points by minimizing the sum of squared distances between assigned points.</figure></div>
+
+
+
+<p class="justify-text">This can be extended to any pair of probability measures, and used within gradient flows, it has a very natural decoupling property: if \(\mu\) is fixed, and \(\nu\) is within a small distance of \(\mu\) in Wasserstein distance, then the optimal permutation above will always be the same, that is, locally, the Wasserstein distance is a sum of squared Euclidean distances. Then, the Wasserstein gradient flow will lead to \(m\) independent local regular Euclidean gradient flows, which interact through the gradient term as: $$ \dot{w}_i = \ –  \nabla \Phi(w_i)  \nabla R\Big(\int_{\mathbb{R}^p} \Phi d\mu \Big),$$ where the Jacobian \(\nabla \Phi(w_i)\) is a linear operator from \(\mathcal{F}\) to \(\mathbb{R}^p\), and \( \nabla R: \mathbb{R}^p \to \mathcal{F}\) the gradient operator of \(R\). Since \(\mu = \frac{1}{m} \sum_{i=1}^m \delta(w_i)\), the dynamics of each particle interacts through the gradient of \(R\). </p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img width="456" alt="" src="https://francisbach.com/wp-content/uploads/2020/05/Wasserstein_flows-1024x508.png" class="wp-image-3890" height="225" />Gradient flow for \(m=7\) interacting particles.</figure></div>
+
+
+
+<p class="justify-text">The intuitive reasoning above is behind the formal result for the function $$ F(\mu) = R \Big( \int_{\mathbb{R}^p} \Phi(w) d\mu(w) \Big),$$ that the limit of the Euclidean gradient flow on each particle when \(m\) tends to infinity, is exactly the Wasserstein gradient flow of \(F\). While I have proposed an intuitive explanation, this can be made more formal in particular through the use of partial differential equations on the density of the measure [<a href="http://papers.nips.cc/paper/7567-on-the-global-convergence-of-gradient-descent-for-over-parameterized-models-using-optimal-transport.pdf">13</a>] (see also nice <a href="http://web.math.ucsb.edu/~kcraig/math/curriculum_vitae_files/NIPS_120917.pdf">slides</a> from Katy Craig on Wasserstein gradient flows).</p>
+
+
+
+<p class="justify-text"><strong>Stationary points.</strong> Since \(R\) is assumed convex over the convex set of probability measures, all local minima of \(R\) are global, and we should expect the gradient flow to converge to global optimum from any initial measure. This is true for the gradient flow associated with the total variation metric. However this is not true for the Wasserstein gradient flow, for which stationary points which are not global minimizers exist (given that for discrete measures this corresponds to classical backpropagation, this is well known to anybody who has ever trained a neural network). Note that there exists a notion of convexity for Wasserstein gradient flows, namely <a href="https://en.wikipedia.org/wiki/Geodesic_convexity">geodesic convexity</a>, but the function \(F\) is not geodesically convex in general.</p>
+
+
+
+<h2>Global convergence</h2>
+
+
+
+<p class="justify-text">We can now describe the main result from our recent work with Lénaïc [<a href="http://papers.nips.cc/paper/7567-on-the-global-convergence-of-gradient-descent-for-over-parameterized-models-using-optimal-transport.pdf">13</a>]: under assumptions described below, for the function \(F\) defined above, if the Wasserstein gradient flow converges to a measure, this measure has to be a global minimum of \(F\) (note that we cannot prove it is always convergent).</p>
+
+
+
+<p class="justify-text">On top of technical regularity assumptions that I will not describe here, we need two crucial broad assumptions:</p>
+
+
+
+<ul class="justify-text"><li><strong>Homogeneity</strong> of the function \(\Phi: \mathbb{R}^{d+1} \to \mathcal{F}\). We need a condition of this form, since if \(R\) is a linear function, then \(F(\mu)\) is of the form \(F(\mu) = \int_{\mathbb{R}^p} \psi(w)d\mu(w)\) with \(\psi(w) = R(\Phi(w))\), and the Wasserstein gradient flow will converge to a weighted some of Diracs at all local minimizers of \(\psi\), which is typically not a global minimizer.</li><li><strong>Initialization with positive mass in all directions</strong>. That is, \(w_i\)’s are uniformly distributed on the sphere or Gaussian, which is the de facto choice in practice. </li></ul>
+
+
+
+<p class="justify-text"><strong>Illustration</strong>. We illustrate the result above by considering \(R\) as the square loss and \(y\) being generated from \(x\) through a neural network with \(m_0=5\) neurons. When running the gradient flow above, as soon as \(m \geqslant 5\), the model is sufficiently flexible to attain zero loss, which is thus the global optimum of the cost function. However, the gradient flow may not reach it, as it gets trapped in a local optimum. Our theoretical result suggests that when \(m\) is large, we should converge to the original neurons, which we see below. The surprising (and still unexplained) phenomenon is that \(m\) does not need to be much larger than \(m_0\) to see practical global convergence.</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img width="389" alt="" src="https://francisbach.com/wp-content/uploads/2020/05/ReLU_m5-1024x683.png" class="wp-image-3942" height="259" />Position of \(m = 5\) neurons, plotted as \(|a_i| b_i \in \mathbb{R}^2\) for a two-dimensional problem. The five dotted lines are the directions of the generating neurons. Although \(m\) is large enough to lead to the global optimum, the flow gets stuck in a local optimum.</figure></div>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img width="365" alt="" src="https://francisbach.com/wp-content/uploads/2020/05/ReLU_m10-1024x683.png" class="wp-image-3943" height="243" />Position of \(m = 10\) neurons; same setting as above. The flow converges to the global optimum, although \(m\) is not large.</figure></div>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img width="379" alt="" src="https://francisbach.com/wp-content/uploads/2020/05/ReLU_m100-1024x683.png" class="wp-image-3944" height="252" />Position of \(m = 100\) neurons; same setting as above. The flow converges to the global optimum, with \(m\) large. See video below.</figure></div>
+
+
+
+<figure class="wp-block-video aligncenter justify-text"><video src="https://francisbach.com/wp-content/uploads/2020/05/ReLU_m100.mp4"></video>Position of \(m = 100\) neurons; exact same setting as above.</figure>
+
+
+
+<h2>Discussion and open problems</h2>
+
+
+
+<p class="justify-text">In this blog post, I described theoretical results showing the benefits of overparameterization: when the number of hidden neurons \(m\) tends to infinity, then the corresponding gradient flow converges to the global optimum of the cost function. The proof relies notably on homogeneity properties of the relu activation. </p>
+
+
+
+<p class="justify-text">The main weakness of  this result is that is only <em>qualitative</em>: we cannot quantify how big \(m\) need to be to be close to the infinite width limit, or how fast the gradient flow converges to the global optimum. These are still open problems. Additional interesting areas of research are to extend these results to convolutional and/or deep networks.</p>
+
+
+
+<p class="justify-text">Now that we know that we can obtain global convergence, I will describe next month the generalization properties when interpolating the training data with an overparameterized relu network [<a href="https://arxiv.org/pdf/2002.04486">16</a>].</p>
+
+
+
+<p class="justify-text"><strong>Acknowledgements</strong>. I would like to thank Lénaïc Chizat for producing the nice figures and video of neural networks, proofreading this blog post, and making good clarifying suggestions.</p>
+
+
+
+<h2>References</h2>
+
+
+
+<p class="justify-text">[1] Sébastien Bubeck. <a href="https://arxiv.org/pdf/1405.4980">Convex Optimization: Algorithms and Complexity</a>. <em>Foundations and Trends in Machine Learning</em>, <em>8</em>(3-4), 231-357, 2015.<br />[2] Léon Bottou, Frank E. Curtis, Jorge Nocedal. <a href="https://epubs.siam.org/doi/pdf/10.1137/16M1080173">Optimization methods for large-scale machine learning</a>. SIAM Review, 60(2):223-311, 2018.<br />[3] Francis Bach, Rodolphe Jenatton, Julien Mairal, Guillaume Obozinski. <a href="http://www.di.ens.fr/~fbach/bach_jenatton_mairal_obozinski_FOT.pdf">Optimization with sparsity-inducing penalties</a>. <em>Foundations and Trends in Machine Learning, </em>4(1):1-106, 2012.<br />[4] Shai Shalev-Shwartz, Shai Ben-David. <a href="https://www.cs.huji.ac.il/~shais/UnderstandingMachineLearning/understanding-machine-learning-theory-algorithms.pdf">Understanding machine learning: From theory to algorithms</a>. Cambridge University Press, 2014.<br />[5] Larry Wasserman. <a href="http://static.stevereads.com/papers_to_read/all_of_statistics.pdf">All of statistics: a concise course in statistical inference</a>. Springer Science &amp; Business Media, 2013.<br />[6] Bernhard Schölkopf, Alexander J. Smola. Learning with kernels: support vector machines, regularization, optimization, and beyond. MIT press, 2002.<br />[7] Ali Rahimi and Benjamin Recht. <a href="http://papers.nips.cc/paper/3182-random-features-for-large-scale-kernel-machines.pdf">Random features for large-scale kernel machines</a>. <em>Advances in neural information processing systems</em>, 2008.<br />[8] Alessandro Rudi, Luigi Carratino, Lorenzo Rosasco. <a href="http://papers.nips.cc/paper/6978-falkon-an-optimal-large-scale-kernel-method.pdf">Falkon: An optimal large scale kernel method</a>. <em>Advances in Neural Information Processing Systems</em>, 2017.<br />[9] Ian Goodfellow, Yoshua Bengio, Aaron Courville. <a href="https://www.deeplearningbook.org/">Deep learning</a>. MIT Press, 2016.<br />[10] Xavier Glorot, Antoine Bordes, and Yoshua Bengio. <a href="http://www.jmlr.org/proceedings/papers/v15/glorot11a/glorot11a.pdf">Deep sparse rectifier neural networks</a>. <em>International Conference on Artificial Intelligence and Statistics</em>, 2011.<br />[11] Francis Bach and Eric Moulines. <a href="http://papers.nips.cc/paper/4900-non-strongly-convex-smooth-stochastic-approximation-with-convergence-rate-o1n.pdf">Non-strongly-convex smooth stochastic approximation with convergence rate O(1/n)</a>. <em>Advances in Neural Information Processing Systems</em>, 2013.<br />[12] MIkhail Belkin, Daniel Hsu, Siyuan Ma, Soumik Mandal. <a href="https://www.pnas.org/content/pnas/116/32/15849.full.pdf">Reconciling modern machine-learning practice and the classical bias–variance trade-off</a>. <em>Proceedings of the National Academy of Sciences</em>, 116(32), 15849-15854, 2019.<br />[13] Lénaïc Chizat, Francis Bach. <a href="http://papers.nips.cc/paper/7567-on-the-global-convergence-of-gradient-descent-for-over-parameterized-models-using-optimal-transport.pdf">On the Global Convergence of Gradient Descent for Over-parameterized Models using Optimal Transport</a>. <em>Advances in Neural Information Processing Systems</em>, 2018.<br />[14] Gabriel Peyré, Marco Cututi. <em><a href="https://arxiv.org/abs/1803.00567">Computational Optimal Transport</a></em>. Foundations and Trends in Machine Learning, 51(1):1–44, 2019.<br />[15] Lénaïc Chizat, Edouard Oyallon, Francis Bach. <a href="https://papers.nips.cc/paper/8559-on-lazy-training-in-differentiable-programming.pdf">On Lazy Training in Differentiable Programming</a>. <em>Advances in Neural Information Processing Systems</em>, 2019.<br />[16] Lénaïc Chizat, Francis Bach. <a href="https://arxiv.org/pdf/2002.04486">Implicit Bias of Gradient Descent for Wide Two-layer Neural Networks Trained with the Logistic Loss</a>. Technical report, arXiv:2002.04486, 2020.<br />[17] Andrew R. Barron. <a href="http://www.stat.yale.edu/~arb4/publications_files/UniversalApproximationBoundsForSuperpositionsOfASigmoidalFunction.pdf">Universal approximation bounds for superpositions of a sigmoidal function</a>. <em>IEEE Transactions on Information theory</em>, <em>39</em>(3), 930-945, 1993.<br />[18] Yoshua Bengio, Nicolas Le Roux, Pascal Vincent, Olivier Delalleau, Patrice Marcotte. <a href="http://papers.nips.cc/paper/2800-convex-neural-networks.pdf">Convex neural networks</a>. <em>Advances in neural information processing systems</em>, 2006.<br />[19] Francis Bach. <a href="http://jmlr.org/papers/volume18/14-546/14-546.pdf">Breaking the Curse of Dimensionality with Convex Neural Networks</a>.<strong> </strong><em>Journal of Machine Learning Research</em>, 18(19):1-53, 2017.<br />[20] Venkatesan Guruswami, Prasad Raghavendra. <a href="https://epubs.siam.org/doi/pdf/10.1137/070685798">Hardness of learning halfspaces with noise</a>. <em>SIAM Journal on Computing</em>, 39(2):742-765, 2009.<br />[21] Surbhi Goel, Varun Kanade, Adam Klivans, Justin Thaler. <a href="http://proceedings.mlr.press/v65/goel17a/goel17a.pdf">Reliably Learning the ReLU in Polynomial Time</a>. <em>Conference on Learning Theory</em>, 2017.<br />[22] Atsushi Nitanda, Taiji Suzuki. <a href="https://arxiv.org/pdf/1712.05438">Stochastic particle gradient descent for infinite ensembles</a>. Technical report, arXiv:1712.05438, 2017.<br />[23] Song Mei, Andrea Montanari, Phan-Minh Nguyen. <a href="https://www.pnas.org/content/pnas/115/33/E7665.full.pdf">A mean field view of the landscape of two-layer neural networks</a>. <em>Proceedings of the National Academy of Sciences</em> 115(33):E7665-E7671, 2018.<br />[24] Grant M. Rotskoff, Eric Vanden-Eijnden. <a href="https://arxiv.org/pdf/1805.00915">Neural networks as interacting particle systems: Asymptotic convexity of the loss landscape and universal scaling of the approximation error</a>. Technical report, arXiv:1805.00915, 2018.<br />[25] Luigi Ambrosio, Nicola Gigli, Giuseppe Savaré. <a href="http://www2.stat.duke.edu/~sayan/ambrosio.pdf">Gradient flows: in metric spaces and in the space of probability measures</a>. Springer Science &amp; Business Media, 2008<br />[26] Filippo Santambrogio. <a href="https://link.springer.com/content/pdf/10.1007/s13373-017-0101-1.pdf">{Euclidean, metric, and Wasserstein} gradient flows: an overview</a>. <em>Bulletin of Mathematical Sciences</em>, <em>7</em>(1), 87-154, 2017.<br />[27] Itay Safran, Ohad Shamir. <a href="http://proceedings.mlr.press/v80/safran18a/safran18a.pdf">Spurious Local Minima are Common in Two-Layer ReLU Neural Networks</a>. <em>International Conference on Machine Learning</em>, 2018.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Francis Bach <a href="https://francisbach.com/gradient-descent-neural-networks-global-convergence/"><span class="datestr">at June 01, 2020 07:32 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -3230,65 +3485,6 @@ by Scott <a href="https://www.scottaaronson.com/blog/?p=4805"><span class="dates
 
 <p class="date">
 by bplaut <a href="https://theorydish.blog/2020/05/19/incentive-compatible-sensitive-surveys/"><span class="datestr">at May 19, 2020 08:40 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://theorydish.blog/?p=1781">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/theorydish.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://theorydish.blog/2020/05/19/nominations-for-tcs-women-rising-star-talks-at-stoc/">Nominations for TCS Women Rising Star talks at STOC</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://theorydish.blog" title="Theory Dish">Theory Dish: Stanford blog</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<div>Directly from the organizers:</div>
-<div></div>
-<div>———–</div>
-<div></div>
-<div></div>
-<div>Dear colleagues,</div>
-<div></div>
-<div>We invite you to nominate speakers for TCS Women Rising Star talks at STOC 2019, which are planned as part of our virtual TCS Women Spotlight Workshop. To be eligible, your nominee has to be a female or a minority researcher working in theoretical computer science (all topics represented at STOC are welcome) and has to be a graduating PhD student or a postdoc. You can make your nomination by filling this form by May 28th:</div>
-<div></div>
-<div><a href="https://forms.gle/R9nmit62ESA6V9vv6" target="_blank" rel="noopener">https://forms.gle/R9nmit62ESA6V9vv6</a></div>
-<div></div>
-<div>STOC 2020 workshops will happen between June 23 and 25, with exact day/time TBD.</div>
-<div></div>
-<div>You can see the list of speakers from last year here:</div>
-<div><a href="https://sigact.org/tcswomen/2nd-tcs-women-meeting/tcs-women-2019/" target="_blank" rel="noopener">https://sigact.org/tcswomen/2nd-tcs-women-meeting/tcs-women-2019/</a></div>
-<div></div>
-<div>Looking forward to your nominations and to seeing you at the our TCS Women Spotlight Workshop,</div>
-<div>Barna Saha, Virginia Vassilevska Williams, and Sofya Raskhodnikova</div></div>
-
-
-
-
-
-
-
-<p class="date">
-by Omer Reingold <a href="https://theorydish.blog/2020/05/19/nominations-for-tcs-women-rising-star-talks-at-stoc/"><span class="datestr">at May 19, 2020 08:39 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
