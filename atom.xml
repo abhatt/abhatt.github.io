@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-07-08T13:21:47Z</updated>
+  <updated>2020-07-08T14:21:59Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,103 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>http://benjamin-recht.github.io/2020/07/08/gain-margin/</id>
+    <link href="http://benjamin-recht.github.io/2020/07/08/gain-margin/" rel="alternate" type="text/html"/>
+    <title>Margin Walker</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>I want to dive into some classic results in robust control and try to relate them to our current data-driven mindset. I’m going to try to do this in a modern way, avoiding any frequency domain analyses.</p>
+
+<p>Suppose you want to solve some optimal control problem: you spend time modeling the dynamics of your system, how it responds to stimuli, and which objectives you’d like to maximize and constraints you must adhere to. Each of these modeling decisions explicitly encodes both your beliefs about reality and your mental criteria of success and failure. <em>Robustness</em> aims to quantify the effects of oversight on your systems behavior. Perhaps your model wasn’t accurate enough, or perhaps you forgot to include some constraint in your objective. What are the downstream consequences?</p>
+
+<p>In the seventies, it was believed that optimization-based frameworks for control had “natural robustness.” The solutions of optimal control problems were often robust to phenomena not explicitly modeled by the engineer. As a simple example, suppose you have an incorrect model of the dynamical system you are trying to steer. How accurate do you need to be in order for this policy to be reasonably successful?</p>
+
+<p>To focus in on this, let’s study the continuous-time linear quadratic regulator (LQR). I know I’ve been arguing that we should  be moving away from LQR in order to understand the broader challenges in learning and control, but the LQR baseline has so many lessons to teach us. Please humor me again for a few additional reasons: First, most of the history I want to tell arises from studying continuous-time LQR in the 1970s. It’s worth understanding that history with a modern perspective. Second, LQR does admit elegant closed form formulae that are helpful for pedagogy, and they are particularly nice in continuous time.</p>
+
+<h2 id="lqr-in-continuous-time">LQR in Continuous Time</h2>
+
+<p>Suppose we have a dynamical system that we model as an ODE:</p>
+
+
+
+<p>Here, as always, $x_t$ is the state, $u_t$ is the control input signal, and $A$ and $B$ are matrices of appropriate dimensions. The goal of the continuous-time LQR problem is to minimize the cost functional</p>
+
+
+
+<p>over all possible control inputs $u_t$. Let’s assume for simplicity that $Q$ is a positive semidefinite matrix and $R$ is positive definite.</p>
+
+<p>The optimal LQR policy is <em>static state feedback</em>: there is some matrix $K$ such that</p>
+
+
+
+<p>for all time. $K$ has a closed form solution that can be found by solving a <em>continuous algebraic Riccatti equation</em> (CARE) for a matrix $P$:</p>
+
+
+
+<p>and then setting</p>
+
+
+
+<p>Importantly, we take the solution of the CARE where $P$ that is positive definite. If a positive definite solution of the CARE exists, then it is optimal for continuous time LQR. There are a variety of ways to prove this condition is sufficient, including an appeal to dynamic programming in continuous time. A simple argument I like uses the quadratic structure of LQR to derive the necessity of the CARE solution. (I found this argument in <a href="https://www.ece.ucsb.edu/~hespanha/linearsystems/">Joao Hespansha’s book</a>).</p>
+
+<p>Regardless, showing a positive definite CARE solution exists takes considerably more work. It suffices to assume that the pair $(A,B)$ is controllable and the pair $(Q,A)$ is detectable. But proving these conditions are sufficient requires a lot of manipulation of linear algebra, and I don’t think I could cleanly distill a proof into a blog post. I mention this just to reiterate that while LQR is definitely the simplest problem to study, its analysis in continuous time on an infinite time horizon is nontrivial. LQR is not really “easy.” It’s merely the easiest problem in a space of rather hard problems.</p>
+
+<h2 id="gain-margins">Gain margins</h2>
+
+<p>Let’s now turn to robustness. Suppose there is a mismatch between our modeled dynamics and reality. For example, what if the actual system is</p>
+
+
+
+<p>for some matrix $B_\star$. Such model mismatches occur all the time. For example, in robotics, we can send a signal “u” to the joint of some robot. This would be some voltage that would need to be linearly transformed into some torque by a motor. It requires a good deal of calibration to make sure that the output of the motor is precisely the force dictated by the voltage output from our controller. Is there a way to guarantee some leeway in the mapping from voltage to torque?</p>
+
+<p>An attractive feature of LQR is that we can quantify precisely how much slack we have directly from the CARE solution. We can use the solution of the CARE to build a <em>Lyapunov function</em> to guarantee stability of the system. Recall that a Lyapunov function is a function $V$ that maps states to real numbers, is nonnegative everywhere, is equal to $0$ only when $x=0$, and whose value is strictly decreasing along any trajectory of a dynamical system. In equations:</p>
+
+
+
+<p>If you have a Lyapunov function, then all trajectories must converge to $x=0$: if you are at any nonzero state, the value of $V$ will decrease. If you are at $0$, then you will be at a global minimum of $V$ and hence can’t move to any other state.</p>
+
+<p>Let $P$ be the solution of the CARE and let’s posit that $V(x) = x^\top  P x$ is a Lyapunov function. Since $P$ is positive definite, we have $V(x)\geq 0$ and $V(x)=0$ if and only if $x=0$. To prove that the derivative of the Lyapunov function is negative, we can first compute the derivative:</p>
+
+
+
+<p>Note that it is sufficient to show that  $(A-B_\star K)^\top P + P(A-B_\star K)$ is a negative definite matrix as this would prove that the derivative is negative for all nonzero $x_t$. To prove that this expression is negative definite, let’s apply a bit of algebra to generate some sufficient conditions. Using the definition of $K$ and the fact that $P$ solves the CARE gives the following chain of equalities:</p>
+
+
+
+<p>Here, the first equality is simply expanding the matrix product. The second equation uses the fact that $P$ is a solution to the CARE. The third equality uses the definition of $K$. The final equation is an algebraic rearrangement.</p>
+
+<p>With this final expression, we can cook up a huge number of conditions under which we get “robustness for free.” First, consider the base case where $B=B_\star$. Since $R$ is positive definite and $Q$ is positive semidefinite, the entire expression is negative definite, and hence we have proven the system is stable.</p>
+
+<p>Second, there is a famous result that LQR has “large gain margins.” The gain margin of a control system is an interval $(t_0,t_1)$ such that for all $t$ in this interval, our control system is stable with the controller $tK$. Another way of thinking about the gain margin is to assume that $B_\star = tB$, and to find the largest interval such that the system $(A,B_\star)$ is stabilized by a control policy $K$. For LQR, there are very large margins: if we plug in the identity $B_\star=tB$, we find that $x^\top  P x$ is a Lyapunov function provided that $t \in (\tfrac{1}{2},\infty)$. LQR control turns out to be robust to a wide range of perturbations to the matrix $B$. Intuitively, it makes sense that if we would like to drive a signal to zero and have more control authority than we anticipated then our policy will still drive the system to zero. This is the range of $t \in [1,\infty)$. The other part of the interval is perhaps more interesting: for the LQR problem, even if we only have half of the control authority we had planned for, we still will successfully stabilize our system from any initial condition.</p>
+
+<p>In discrete time, you can derive similar formulae with essentially the same argument. Unfortunately, the expressions are not as elegant. Also, note that you cannot expect infinite gain margins in discrete time. In continuous time a differential equation $\dot{x}_t = M x_t$ is stable if all of the eigenvalues of $M$ have negative real parts. In discrete time, you need all of the eigenvalues to have magnitude less than $1$. For almost any random set triple $(A,B,K)$, $A-t B K$ is going to have large eigenvalues for $t$ large enough. Nonetheless, you can certainly derive analogous conditions as to which errors are tolerable.</p>
+
+<p>There are a variety of other conditions that can be derived from our matrix expression. Most generally, the control system will be stable provided that</p>
+
+
+
+<p>The LQR gain margins fall out naturally from this expression when we assume $B_\star = t B$. However, we can guarantee much more general robustness using this inequality. For example, if we assume that $B_\star = BM$ for some square matrix $M$, then $K$ stabilizes the pair $(A,B_\star)$ if all of the eigenvalues of $M+M^\top $ are greater than $1$.</p>
+
+<p>Perhaps more in line with what we do in machine learning, suppose we are able to collect a lot of data, do some uncertainty quantification, and guarantee a bound $|B-B_\star|_2&lt;\epsilon$. Then as long as</p>
+
+
+
+<p>we will be guaranteed stable execution. This expression depends on the matrices $P$, $Q$, and $R$, so it has a different flavor of the infinite gain margin conditions which held irrespective of the dynamics or the cost. Moreover, if $P$ has large eigenvalues, then we are only able to guarantee safe execution for small perturbations to $B$. This foreshadows issues I’ll dive into in later posts. I want to flag here that these calculations reveal some fragilities of LQR: While the controller is always robust to perturbations along the direction of the matrix $B$, you can construct examples where the system is highly sensitive to tiny perturbations orthogonal to $B$. I’ll return in the next post to start to unpack how optimal control has some natural robustness, but it has natural fragility as well.</p></div>
+    </summary>
+    <updated>2020-07-08T00:00:00Z</updated>
+    <published>2020-07-08T00:00:00Z</published>
+    <source>
+      <id>http://benjamin-recht.github.io/</id>
+      <author>
+        <name>Ben Recht</name>
+      </author>
+      <link href="http://benjamin-recht.github.io/" rel="alternate" type="text/html"/>
+      <link href="http://benjamin-recht.github.io/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Musings on systems, information, learning, and optimization.</subtitle>
+      <title>arg min blog</title>
+      <updated>2020-07-08T14:21:22Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>http://arxiv.org/abs/2007.03633</id>
@@ -662,7 +759,7 @@ Email: shachar.lovett@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-07-08T13:20:40Z</updated>
+      <updated>2020-07-08T14:20:41Z</updated>
     </source>
   </entry>
 
@@ -694,7 +791,7 @@ Quantum Query Complexity versus Bounded Depth Circuits: We give the first exampl
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-07-08T13:20:28Z</updated>
+      <updated>2020-07-08T14:20:30Z</updated>
     </source>
   </entry>
 
@@ -1217,7 +1314,7 @@ b-articulation points and b-bridges.
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-07-08T13:20:28Z</updated>
+      <updated>2020-07-08T14:20:30Z</updated>
     </source>
   </entry>
 
@@ -1253,7 +1350,7 @@ In order to carry this progress back to the $\textit{non-monotone}$ setting, we 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-07-08T13:20:28Z</updated>
+      <updated>2020-07-08T14:20:30Z</updated>
     </source>
   </entry>
 
@@ -1551,7 +1648,7 @@ undefined term.  But the problem on the final used the well defined concept `do
       <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2020-07-07T06:18:17Z</updated>
+      <updated>2020-07-08T13:39:06Z</updated>
     </source>
   </entry>
 
@@ -1640,7 +1737,7 @@ The first proof is from Chari, Rohatgi and Srinivasan and uses the potential met
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-07-08T13:20:28Z</updated>
+      <updated>2020-07-08T14:20:30Z</updated>
     </source>
   </entry>
 
@@ -1779,7 +1876,7 @@ Have a safe and happy fourth of July.</p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-07-08T13:20:38Z</updated>
+      <updated>2020-07-08T14:20:39Z</updated>
     </source>
   </entry>
 
@@ -1811,7 +1908,7 @@ Email: legall@math.nagoya-u.ac.jp</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-07-08T13:20:40Z</updated>
+      <updated>2020-07-08T14:20:41Z</updated>
     </source>
   </entry>
 
@@ -1891,34 +1988,7 @@ Email: legall@math.nagoya-u.ac.jp</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-07-08T13:20:56Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-jobs.org/2020/06/30/postdoc-at-university-of-oxford-apply-by-september-11-2020/</id>
-    <link href="https://cstheory-jobs.org/2020/06/30/postdoc-at-university-of-oxford-apply-by-september-11-2020/" rel="alternate" type="text/html"/>
-    <title>postdoc at University of Oxford (apply by September 11, 2020)</title>
-    <summary>All Souls College Oxford are advertising a 5 year postdoctoral research fellowship in theoretical computer science, with a tentative start date 1 Oct 2021. This is an exceptional opportunity for a first-rate early career researcher in theoretical computer science. Website: https://www.asc.ox.ac.uk/post-doctoral-research-fellowships-2020-further-particulars Email: pdrf.admin@all-souls.ox.ac.uk</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>All Souls College Oxford are advertising a 5 year postdoctoral research fellowship in theoretical computer science, with a tentative start date 1 Oct 2021. This is an exceptional opportunity for a first-rate early career researcher in theoretical computer science.</p>
-<p>Website: <a href="https://www.asc.ox.ac.uk/post-doctoral-research-fellowships-2020-further-particulars">https://www.asc.ox.ac.uk/post-doctoral-research-fellowships-2020-further-particulars</a><br/>
-Email: pdrf.admin@all-souls.ox.ac.uk</p></div>
-    </content>
-    <updated>2020-06-30T16:27:02Z</updated>
-    <published>2020-06-30T16:27:02Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-jobs.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-jobs.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-jobs.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-07-08T13:20:40Z</updated>
+      <updated>2020-07-08T14:21:00Z</updated>
     </source>
   </entry>
 </feed>
