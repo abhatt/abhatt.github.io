@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-07-15T12:21:48Z</updated>
+  <updated>2020-07-15T13:22:50Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -646,7 +646,110 @@ and the unit disk in time $C(\epsilon)n$. One can take $ C(\epsilon) = C + C
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-07-15T12:20:25Z</updated>
+      <updated>2020-07-15T13:20:33Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>http://benjamin-recht.github.io/2020/07/14/there-are-none/</id>
+    <link href="http://benjamin-recht.github.io/2020/07/14/there-are-none/" rel="alternate" type="text/html"/>
+    <title>There are none</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>In the <a href="http://www.argmin.net/2020/07/08/gain-margin/">last post</a>, we showed that continuous-time LQR has “natural robustness” insofar as the optimal solution is robust to a variety of model-mismatch conditions. LQR makes the assumption that the state of the system is fully, perfectly observed. In many situations, we don’t have access to such perfect state information. What changes?</p>
+
+<p>The generalization of LQR to the case with imperfect state observation is called “Linear Quadratic Gaussian” control (LQG). This is the simplest, special case of a Partially Observed Markov Decision Process (POMDP). We again assume linear dynamics:</p>
+
+
+
+<p>where the state is now corrupted by zero-mean Gaussian noise, $w_t$. Instead of measuring the state $x_t$ directly, we instead  measure a signal $y_t$ of the form</p>
+
+
+
+<p>Here, $v_t$ is also zero-mean Gaussian noise. Suppose we’d still like to minimize a quadratic cost function</p>
+
+
+
+<p>This problem is very similar to our LQR problem except for the fact that we get an indirect measurement of the state and need to apply some sort of <em>filtering</em> of the $y_t$ signal to estimate $x_t$.</p>
+
+<p>The optimal solution for LQG is strikingly elegant. Since the observation of $x_t$ is through a Gaussian process, the maximum likelihood estimation algorithm has a clean, closed form solution, even in continuous time. Our best estimate for $x_t$, denoted $\hat{x}_t$, given all of the data observed up to time $t$ obeys a differential equation</p>
+
+
+
+<p>The matrix $L$ that can be found by solving an algebraic Riccati equation that depends on the variance of $v_t$ and $w_t$ and on the matrices $A$ and $C$. In particular, it’s the CARE with data $(A^\top,C^\top,\Sigma_w,\Sigma_v)$. This solution is called a <em>Kalman Filter</em> and is a continuous limit of the discrete time Kalman Filter one might see in a course on graphical models.</p>
+
+<p>The optimal LQG solution takes the estimate of the Kalman Filter, $\hat{x}_t$, and sets the control signal to be</p>
+
+
+
+<p>Here, $K$ is gain matrix that would be used to solve the LQR problem with data $(A,B,Q,R)$. That is, LQG performs optimal filtering to compute the best state estimate, and then computes a feedback policy as if this estimate was a noiseless measurement of the state. That this turns out to be optimal is one of the more amazing results in control theory. It decouples the process of designing an optimal filter from designing an optimal controller, enabling simplicity and modularity in control design. This decoupling where we treat the output of our state estimator as the true state is an example of <em>certainty equivalence</em>, the umbrella term for using point estimates of stochastic quantities as if they were the correct value. Though certainty equivalent control may be suboptimal in general, it remains ubiquitous for all of the benefits it brings as a design paradigm. Unfortunately, not only is this decoupled design of filters and controllers often suboptimal, it has many hidden fragilities. LQG highlights a particular scenario where certainty equivalent control leads to misplaced optimism about robustness.</p>
+
+<p>We saw in the previous post that LQR had this amazing robustness property: even if you optimize with the wrong model, you’ll still probably be OK. Is the same true about LQG? What are the guaranteed stability margins for LQG regulators? The answer was succinctly summed up in the <a href="https://ieeexplore.ieee.org/document/1101812">abstract of a 1978 paper by John Doyle</a>: “There are none.”</p>
+
+<p class="center"><img alt="There Are None" src="http://www.argmin.net/assets/there_are_none.png" width="400px"/></p>
+
+<p>What goes wrong? Doyle came up with a simple counterexample, that I’m going to simplify even further for the purpose of contextualizing in our modern discussion. Before presenting the example, let’s first dive into <em>why</em> LQG is likely less robust than LQR. Let’s assume that the true dynamics obeys the ODE:</p>
+
+
+
+<p>though we computed the optimal controller with the matrix $B$. Define an error signal, $e_t = x_t - \hat{x}_t$, that measures the current deviation between the actual state and the estimate. Then, using the fact that $u_t = -K \hat{x}_t$, we get the closed loop dynamics</p>
+
+
+
+<p>When $B=B_\star$, the bottom left block is equal to zero. The system is then stable provided $A-BK$ and $A-LC$ are both stable matrices (i.e., have eigenvalues in the left half plane). However, small perturbations in the off-diagonal block can make the matrix unstable. For intuition, consider the matrix</p>
+
+
+
+<p>The eigenvalues of this matrix are $-1$ and $-2$, so the matrix is clearly stable. But the matrix</p>
+
+
+
+<p>has an eigenvalue greater than zero if $t&gt;0.01$. So a tiny perturbation significantly shifts the eigenvalues and makes the matrix unstable.</p>
+
+<p>Similar things happen in LQG. In Doyle’s example he uses the problem instance:</p>
+
+
+
+
+
+
+
+<p>The open loop system here is unstable, having two eigenvalues at $1$. We can stabilize the system only by modifying the second state. The state disturbance is aligned along the $[1;1]$ direction, and the state cost only penalizes states aligned with this disturbance. So the goal is simply to remove as much signal as possible in the $[1;1]$ direction without using too much control authority. We only are able to measure the first component of the state, and this measurement is corrupted by Gaussian noise.</p>
+
+<p>What does the optimal policy look like? Perhaps unsurprisingly, it focuses all of its energy on ensuring that there is little state signal along the disturbance direction. The optimal $K$ and $L$ matrices are</p>
+
+
+
+<p>Now what happens when we have model mismatch? If we set $B_\star=tB$ and use the formula for the closed loop above, we see that closed loop state transition matrix is</p>
+
+
+
+<p>It’s straight forward to check that when $t=1$ (i.e., no model mismatch), the eigenvalues of  $A-BK$ and $A-LC$ all have negative real parts. For the full closed loop matrix, analytically computing the eigenvalues themselves is a pain, but we can prove instability by looking at the characteristic polynomial. For a matrix to have all of its eigenvalues in the left half plane, its characteristic polynomial necessarily must have all positive coefficients. If we look at the linear term in the polynomial, we see that we must have</p>
+
+
+
+<p>if we’d like any hope of having a stable system. Hence, we can guarantee that this closed loop system is unstable if $t\geq 1+\sigma$. This is a very conservative condition, and we could get a tighter bound if we’d like, but it’s good enough to reveal some paradoxical properties of LQG. The most striking is that if we build a sensor that gives us a better and better measurement, our system becomes more and more fragile to perturbation and model mismatch. For machine learning scientists, this seems to go against all of our training. How can a system become <em>less</em> robust if we improve our sensing and estimation?</p>
+
+<p>Let’s look at the example in more detail to get some intuition for what’s happening. When the sensor noise gets small, the optimal Kalman Filter is more aggressive. If the model is true, then the disturbance has equal value in both states, so, when $\sigma$ is small, the filter can effectively just set the value of the second state to be equal to whatever is in the first state. The filter is effectively deciding that the first state should equal the observation $y_t$, and the second state should be equal to the first state. In other words, it rapidly damps any errors in the disturbance direction $[1;1]$ and, as $d$ increases, it damps the $[0;1]$ direction less. When $t \neq 1$, we are effectively introducing a disturbance that makes the two states unequal. That is, $B-B_\star$ is aligned in the $[0;1]$ and can be treated as a disturbance signal. This undamped component of the error is fed errors from the state estimate $\hat{x}$, and these errors compound each other. Since we spend so much time focusing on our control along the direction of the injected state noise, we become highly susceptible to errors in a different direction and these are the exact errors that occur when there is a gain mismatch between the model and reality.</p>
+
+<p>The lack of fragility in LQG has many takeaways. It highlights that noiseless state measurement can be a dangerous modeling assumption, because it is then optimal to trust our model too much. Though we apparently got a freebie with LQR, for LQG, model mismatch must be explicitly accounted for when designing the controller.</p>
+
+<p>This should be a cautionary tale for modern AI systems. Most of the papers I read in reinforcement learning consider MDPs where we get perfect state measurement. Building an entire field around optimal actions with perfect state observation builds too much optimism. Any realistic scenario is going to have partial state observation, and such problems are much thornier.</p>
+
+<p>A second lesson is that it is not enough to just improve the prediction components in feedback systems that are powered by machine learning. I have spoken with many applied machine learning engineers who have told me that they have seen performance degrade in production systems when they improve their prediction model. They might spend months building some state of the art LSTM mumbo jumbo that is orders of magnitude more accurate in prediction, but in production yields worse performance than the legacy system with a boring ARMA model. It is quite possible that these performance drops are due to the Doyle effect: the improved prediction system is increasing sensitivity to a modeling flaw in some other part of the engineering pipeline.</p>
+
+<p>The story turns out to be even worse than what I have described thus far. The supposed robustness guarantees we derived for LQR assume not just full noiseless state measurement, but that the sensors and actuators have infinite bandwidth. That is, they assume you can build controllers $K$ with arbitrarily large entries and that react instantaneously, without delay, to changes in the state. In the next post, I’ll show how realistic sampled data controllers for LQR, even with noiseless state measurement, also have no guarantees.</p></div>
+    </summary>
+    <updated>2020-07-14T00:00:00Z</updated>
+    <published>2020-07-14T00:00:00Z</published>
+    <source>
+      <id>http://benjamin-recht.github.io/</id>
+      <author>
+        <name>Ben Recht</name>
+      </author>
+      <link href="http://benjamin-recht.github.io/" rel="alternate" type="text/html"/>
+      <link href="http://benjamin-recht.github.io/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Musings on systems, information, learning, and optimization.</subtitle>
+      <title>arg min blog</title>
+      <updated>2020-07-15T13:22:11Z</updated>
     </source>
   </entry>
 
@@ -1508,7 +1611,7 @@ $m$.
       <link href="https://francisbach.com" rel="alternate" type="text/html"/>
       <subtitle>Francis Bach</subtitle>
       <title>Machine Learning Research Blog</title>
-      <updated>2020-07-15T12:21:48Z</updated>
+      <updated>2020-07-15T13:22:50Z</updated>
     </source>
   </entry>
 
@@ -1582,7 +1685,7 @@ $m$.
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-07-15T12:20:49Z</updated>
+      <updated>2020-07-15T13:21:00Z</updated>
     </source>
   </entry>
 
@@ -1629,7 +1732,7 @@ The homepage of ADFOCS, including forms for registration, can be found at <a hr
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2020-07-15T12:20:31Z</updated>
+      <updated>2020-07-15T13:20:40Z</updated>
     </source>
   </entry>
 
@@ -1755,7 +1858,7 @@ What is the probability that two mathematicians have names that are anagrams. I 
       <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2020-07-15T09:00:26Z</updated>
+      <updated>2020-07-15T12:57:55Z</updated>
     </source>
   </entry>
 
@@ -1820,7 +1923,7 @@ We show that this problem is not easier than determining whether a given graph c
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-07-15T12:20:25Z</updated>
+      <updated>2020-07-15T13:20:33Z</updated>
     </source>
   </entry>
 
@@ -1861,32 +1964,7 @@ We show that this problem is not easier than determining whether a given graph c
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-07-15T12:20:25Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-events.org/2020/07/11/2020-virtual-telluride-neuromorphic-cognition-engineering-workshop/</id>
-    <link href="https://cstheory-events.org/2020/07/11/2020-virtual-telluride-neuromorphic-cognition-engineering-workshop/" rel="alternate" type="text/html"/>
-    <title>2020 Virtual Telluride Neuromorphic Cognition Engineering Workshop</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">July 27-31, 2020 Telluride CO (virtual) https://sites.google.com/view/telluride2020/home We are happy to announce a Virtual Telluride Neuromorphic Cognition Engineering Workshop 2020 (https://tellurideneuromorphic.org/) this year in replacement of our usual Workshop in Telluride. The workshop will take place from July 27 to July 31 (8am to 10am PDT, or 17:00 to 19:00 CET). The format will be … <a class="more-link" href="https://cstheory-events.org/2020/07/11/2020-virtual-telluride-neuromorphic-cognition-engineering-workshop/">Continue reading <span class="screen-reader-text">2020 Virtual Telluride Neuromorphic Cognition Engineering Workshop</span></a></div>
-    </summary>
-    <updated>2020-07-11T05:05:01Z</updated>
-    <published>2020-07-11T05:05:01Z</published>
-    <category term="workshop"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-events.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-events.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-events.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-events.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
-      <title>CS Theory Events</title>
-      <updated>2020-07-15T12:21:16Z</updated>
+      <updated>2020-07-15T13:20:33Z</updated>
     </source>
   </entry>
 </feed>
