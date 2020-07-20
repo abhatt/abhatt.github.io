@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-07-20T18:23:51Z</updated>
+  <updated>2020-07-20T19:23:09Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -51,6 +51,281 @@ Please let us know if we missed any papers on differential privacy, either in th
       <subtitle>Website for the differential privacy research community</subtitle>
       <title>Differential Privacy</title>
       <updated>2020-07-20T14:23:53Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>https://gradientscience.org/transfer-learning/</id>
+    <link href="https://gradientscience.org/transfer-learning/" rel="alternate" type="text/html"/>
+    <title>Transfer Learning with Adversarially Robust Models</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><a class="bbutton" href="https://arxiv.org/abs/2007.08489" style="float: left; width: 45%;">
+<i class="fas fa-file-pdf"/>
+    Paper
+</a>
+<a class="bbutton" href="https://github.com/Microsoft/robust-models-transfer" style="float: left; width: 45%;">
+<i class="fab fa-github"/>
+   Models and Code
+</a>
+<br/></p>
+
+<p><i>In our <a href="https://arxiv.org/abs/2007.08489">latest paper</a>, in collaboration with <a href="https://www.microsoft.com/en-us/research/">Microsoft Research</a>, we explore adversarial
+robustness as an avenue for training computer vision models with more transferrable
+features. We find that robust models outperform their standard counterparts on
+a variety of transfer learning tasks.</i></p>
+
+<h2 id="what-is-transfer-learning">What is transfer learning?</h2>
+
+<p>Transfer learning is a paradigm where one leverages information
+from a “source” task to better solve another “target” task. Particularly when there is little training data or compute available for solving the target
+task, transfer learning provides a simple and efficient way to obtain performant
+machine learning models.</p>
+
+<p>Transfer learning has already proven its utility in many ML contexts. In natural language processing, for example, one can leverage language models pre-trained on large
+text corpora to beat state-of-the-art performance on
+tasks like query answering, entity recognition or part-of-speech classification.</p>
+
+<p>In our work we focus on computer vision; in this context, a standard—and
+remarkably successful—transfer learning pipeline is “ImageNet pre-training.”
+This pipeline starts with a deep neural network trained on the <a href="http://image-net.org">ImageNet-1K</a>
+dataset, and then refines this pre-trained model for a target task. The target task can range
+from classification of smaller datasets (e.g., <a href="https://www.cs.toronto.edu/~kriz/cifar.html">CIFAR</a>) to more complex
+tasks like object detection (e.g., <a href="http://host.robots.ox.ac.uk/pascal/VOC/">VOC</a>).</p>
+
+<p>Although there are many ways in which one can refine a pre-trained model, we
+will restrict our attention to the two most popular methods:</p>
+
+<ul>
+  <li><strong>Fixed-feature</strong>: In fixed-feature transfer learning, we replace the final
+(linear) layer of the neural network with a new layer that has the correct
+number of outputs for the target task. Then, keeping the rest of the layers
+<em>fixed</em>, we train the newly replaced layer on the target task.</li>
+  <li><strong>Full-network</strong>: In full-network transfer learning, we also replace the last
+layer but do not freeze any layers afterwards. Instead, we use the pre-trained
+network
+as a sort of “initialization,” and continue training <em>all</em> the layers on the
+target task.</li>
+</ul>
+
+<p>When at least a moderate amount of data is available, full-network transfer
+learning typically outperforms the fixed-feature strategy.</p>
+
+<h2 id="how-can-we-improve-transfer-learning">How can we improve transfer learning?</h2>
+
+<p>Although we don’t have a comprehensive understanding of what makes transfer
+learning algorithms tick, there has been a long line of work focused on identifying 
+factors that improve (or worsen) performance (examples include
+<a href="https://arxiv.org/abs/1406.5774">[1]</a>,
+<a href="https://arxiv.org/abs/1608.08614">[2]</a>,
+<a href="https://arxiv.org/abs/1805.08974">[3]</a>,
+<a href="https://arxiv.org/abs/1804.08328">[4]</a>,
+<a href="https://arxiv.org/abs/1411.1792">[5]</a>).</p>
+
+<p>By design, the pre-trained ImageNet model itself plays a major role here:
+indeed, a recent study by <a href="https://arxiv.org/abs/1805.08974">Kornblith, Shlens, and Le</a> finds that
+pre-trained models which achieve a higher ImageNet accuracy also perform better when
+transferred to downstream classification tasks, with a tight linear
+correspondence between ImageNet accuracy and the accuracy on the target task:</p>
+
+<p><img alt="A scatter plot of ImageNet accuracy versus downstream     transfer accuracy showing the linear relation." class="bigimg" src="https://gradientscience.org/assets/robust-transfer-learning/ksl.png"/></p>
+<div class="footnote">
+Reproduced from <a href="https://arxiv.org/abs/1805.08974">[KSL19]</a>. 
+Each dot is a pre-trained model whose $x$ coordinate is given by its 
+ImageNet accuracy and $y$ coordinate is given by its downstream 
+accuracy on the target task (after the corresponding refinement on that task).
+</div>
+
+<p>But is improving ImageNet accuracy of the pre-trained model the <em>only</em> way to improve transfer learning performance?</p>
+
+<p>After all, we want to obtain models that have learned broadly applicable features from the
+source dataset. ImageNet accuracy likely correlates with the quality of
+features that a model has learned, but may not fully describe the downstream
+utility of these features.
+Ultimately, the nature of learned features stems from the <em>priors</em> placed on
+them during training. For example, there have been studies of the (sometimes
+implicit) priors imposed by architectural components (e.g., <a href="https://dmitryulyanov.github.io/deep_image_prior">convolutional layers</a>),
+<a href="https://www.tandfonline.com/doi/abs/10.1198/10618600152418584">data</a>
+<a href="https://arxiv.org/abs/1911.09071">augmentation</a>, 
+<a href="https://arxiv.org/abs/1811.00401">loss functions</a> and even
+<a href="https://stats385.github.io/assets/lectures/Stanford_Donoho_class_Nov_19.pdf">gradient descent</a> on neural network training.</p>
+
+<p>In <a href="https://arxiv.org/abs/2007.08489">our paper</a>, we study another prior: <em>adversarial robustness</em>.
+Adversarial robustness—a rather frequent subject on this blog—refers to
+model’s invariance to small (often imperceptible) perturbations of natural
+inputs, called <a href="https://gradientscience.org/intro_adversarial">adversarial examples</a>.</p>
+
+<p>Standard neural networks (i.e., trained with the goal of maximizing
+accuracy) are extremely vulnerable to such adversarial examples. For example,
+with just a tiny perturbation to the pig image below, a pre-trained ImageNet
+classifier will predict it as an “airliner” with 99% confidence:</p>
+
+<p><img alt="An adversarial example: a pig on the left which is imperceptibly perturbed to be classified as an airliner on the right." src="https://gradientscience.org/images/piggie.png"/></p>
+<div class="footnote">
+A "pigs-can-fly" adversarial example: The "pig" image on the left is correctly classified by a standard ML model, but its imperceptibly perturbed counterpart on the right is classified as an "airliner" with 99% confidence.
+</div>
+
+<p>Adversarial robustness is thus typically induced at training time by replacing
+the standard loss minimization objective with a <em>robust optimization</em> objective
+(see our <a href="https://gradientscience.org/robust_opt_pt1">post on robust optimization</a> for more background):</p>
+
+
+
+<p>The above objective trains models to be robust to image perturbations that are
+small in (pixel-wise) $\ell_2$ (Euclidean) normIn reality, an $\ell_2$ ball doesn't perfectly capture the
+set of imperceptible perturbations we want models to be robust to—but robustness with respect to this fairly rudimentary notion of perturbations turns out to be already non-trivial and very helpful.. 
+The parameter $\varepsilon$ is a hyperparameter
+governing the intended degree of invariance of the resulting models to the
+corresponding perturbations. Setting 
+$\varepsilon = 0$ corresponds to standard training, and increasing $\varepsilon$
+asks the model to be robust to increasingly large perturbations.
+In short, the objective asks the model to minimize risk on not only the 
+training datapoints but also the entire radius-$\varepsilon$
+neighbourhood around them.</p>
+
+<p><em>[A quick plug: Our <a href="https://github.com/MadryLab/robustness"><code class="language-plaintext highlighter-rouge">robustness</code> Python library</a>, used for the code release of this paper, enables one to easily train and manipulate both standard and adversarially robust models.]</em></p>
+
+<p>Although adversarial robustness has been initially studied solely through the lens of machine learning security, a line
+of recent work (including some that’s been <a href="https://gradientscience.org/adv">previously</a> 
+<a href="https://gradientscience.org/robust_apps">covered</a> on this blog) has begun to study
+adversarially robust models in their own right, framing adversarial robustness
+as a prior that forces models to learn features that are locally stable.
+These works have found that on the one hand, adversarially robust models tend
+to attain lower accuracy than their standardly-trained
+counterparts.</p>
+
+<p>On the other hand, recent work suggests that the feature
+representations of robust models carry several advantages over those of
+standard models, such as <a href="https://arxiv.org/abs/1805.12152">better-behaved</a>
+<a href="https://arxiv.org/abs/1905.09797">gradients</a>, <a href="https://arxiv.org/abs/1910.08640">representation
+invertibility</a>, and more <a href="https://arxiv.org/abs/2005.10190">specialized
+features</a>.
+We’ve actually discussed some of these observations in earlier posts on this
+blog—see, e.g., our posts about 
+<a href="https://gradientscience.org/robust_reps">representation learning</a> and 
+<a href="https://gradientscience.org/robust_apps">image synthesis</a>.</p>
+
+<p>These desirable properties
+might suggest that robust neural networks are learning better feature
+representations than standard networks, which could improve transfer
+performance.</p>
+
+<h3 id="adversarial-robustness-and-transfer-learning">Adversarial robustness and transfer learning</h3>
+
+<p>So in summary, we have standard models with high accuracy on the source task but
+little (or no) robustness; and we have adversarially robust models, which are
+worse in terms of ImageNet accuracy, but have the “nice”
+representational properties identified and discussed by prior works. Which
+models are better for transfer learning?</p>
+
+<p>To answer this question, we trained and examined a large collection
+of standard and robust ImageNet models, while grid searching over a wide range of
+hyperparameters and architectures to find the best model of each type. (All
+models are available for download via our <a href="https://github.com/microsoft/robust-models-transfer">code/model
+release</a> and more
+details on our training procedure can be found there and in <a href="https://arxiv.org/abs/2007.08489">our
+paper</a>). We then performed transfer
+learning (using both fixed-feature and full-network refinement) from each
+trained model to 12 downstream classification tasks.</p>
+
+<p>It turns out that 
+adversarially robust source models fairly consistently outperform their standard counterparts in
+terms of downstream accuracy. In the table below, we compare the accuracies of
+the best standard model (searching over hyperparameters and
+architecture) and the best robust model (searching over the
+previous factors as well as robustness level $\varepsilon$):</p>
+
+<p><img alt="Table showing that robust models     perform better than their standard counterparts." class="bigimg" src="https://gradientscience.org/assets/robust-transfer-learning/results-table.svg" style="width: 100%;"/></p>
+<div class="footnote">
+    The main result: Adversarially robust models outperform their standard counterparts when transferred to downstream classification tasks.
+</div>
+
+<p>This difference in performance tends to be particularly striking in the context of fixed-feature transfer learning. The following graph shows, for each architecture and
+downstream classification task, the best standard model compared to the best
+robust model in that setting. As we can see, adversarially robust models
+improve on the performance of their standard counterparts, and the gap tends to
+<em>increase</em> as networks increase in width:</p>
+
+<p><img alt="A bar chart showing that robust models improve on     standard ones even without taking the maximum over architectures." class="bigimg" src="https://gradientscience.org/assets/robust-transfer-learning/LogisticRegression.svg"/></p>
+<div class="footnote">
+    Adversarially robust models tend to improve over standard networks for
+    individual architectures too. (An analogous graph for full-network
+    transfer learning is given in Figure 3 of <a href="https://arxiv.org/abs/2007.08489">our paper</a>.)
+</div>
+
+<p>Adversarial robustness improved downstream transfer
+performance even when the target task was not a classification one. For example, the
+following table compares standard and robust pre-training for use in downstream
+object detection and instance segmentation:</p>
+
+<p><img class="bigimg" src="https://gradientscience.org/../assets/robust-transfer-learning/obj-det-results.svg" style="width: 80%;"/></p>
+<div class="footnote">
+</div>
+
+<h3 id="robustness-versus-accuracy">Robustness versus accuracy</h3>
+
+<p>So it seems like robust models, despite being less accurate on the source task, are actually
+better for transfer learning purposes. Indeed, the linear relation between
+ ImageNet accuracy and transfer performance observed in prior work (see our discussion above) doesn’t seem
+ to hold when the robustness parameter is varied. Compare the graphs below to the ones at the very start of this post:</p>
+
+<p><img class="bigimg" src="https://gradientscience.org/assets/robust-transfer-learning/wide_resnet50_4_LogisticRegression.svg"/></p>
+<div class="footnote">
+    Source-task (ImageNet) versus target (fixed-feature) accuracy for models with the same
+    architecture while varying the robustness levels. Each dot is a
+    WideResNet-50x4 model with $x$ coordinate given by source-task accuracy and
+    $y$ coordinate given by fixed-feature transfer learning accuracy.
+    Contrast the trends here with the "fixed-feature" trend in the first
+    figure of this post—the linear trend depicted there largely disappears as less
+    accurate but more robust models perform better in terms of transfer.
+</div>
+
+<p>How do we reconcile our observations with these trends observed by prior work?</p>
+
+<p>We hypothesize that robustness and accuracy have <em>disentangled</em> effects on
+transfer performance. That is, for a fixed level of robustness, higher
+accuracy on the source task helps transfer, and for a fixed level of
+accuracy, increased robustness helps transfer. Indeed, as shown below, for a
+fixed level of robustness, the accuracy-transfer relation tends to hold
+strongly:</p>
+
+<p><img class="bigimg" src="https://gradientscience.org/assets/robust-transfer-learning/fixed-robustness.svg"/></p>
+<div class="footnote">
+Even though robust models appear to break the linear
+accuracy-transfer trend, this trend is actually preserved for a fixed value of
+robustness. Each dot in the graph is a different architecture, trained for the same level of robustness ($\varepsilon = 3.0$). The $x$ coordinate is source task (ImageNet) accuracy, and the $y$ coordinate is the downstream accuracy on each target dataset.
+</div>
+
+<p>In addition to reconciling our results with those of prior work, these findings suggest that ongoing work on developing more accurate robust models
+may have the added benefit of further improving transfer learning performance.</p>
+
+<h3 id="other-empirical-mysteries-and-future-work">Other empirical mysteries and future work</h3>
+
+<p>This post discussed how adversarially robust models might constitute a promising
+avenue for improving transfer learning, and already often outperform standard
+models in terms of downstream accuracy. In <a href="https://arxiv.org/abs/2007.08489">our paper</a>, 
+we study this phenomenon more closely: for example, we examine the effects of
+model width, and we compare adversarial robustness to other notions of
+robustness. We also uncover a few somewhat mysterious properties: for example,
+resizing images seems to have a non-trivial effect on the relationship between
+robustness and downstream accuracy.</p>
+
+<p>Finally, while our work provides evidence that adversarially
+robust computer vision models transfer better, understanding precisely <em>why</em> this is the case remains open. More broadly, the results we
+observe indicate that we still do not yet fully understand (even empirically)
+the ingredients that make transfer learning successful. We hope that our work
+prompts an inquiry into the underpinnings of modern transfer learning.</p></div>
+    </summary>
+    <updated>2020-07-20T00:00:00Z</updated>
+    <published>2020-07-20T00:00:00Z</published>
+    <source>
+      <id>https://gradientscience.org/</id>
+      <author>
+        <name>Gradient Science</name>
+      </author>
+      <link href="https://gradientscience.org/" rel="alternate" type="text/html"/>
+      <link href="https://gradientscience.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Research highlights and perspectives on machine learning and optimization from MadryLab.</subtitle>
+      <title>gradient science</title>
+      <updated>2020-07-20T19:21:26Z</updated>
     </source>
   </entry>
 
@@ -1393,7 +1668,7 @@ In addition, we present an alternative proof for the known fact that testing Ind
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-07-20T18:20:29Z</updated>
+      <updated>2020-07-20T19:20:29Z</updated>
     </source>
   </entry>
 
@@ -1425,7 +1700,7 @@ Building on the lower bound of Eden and Rosenbaum, we show that, for all $t \in 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-07-20T18:20:29Z</updated>
+      <updated>2020-07-20T19:20:29Z</updated>
     </source>
   </entry>
 
@@ -1456,7 +1731,7 @@ The proof deviates significantly from prior non-testability results in this area
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-07-20T18:20:29Z</updated>
+      <updated>2020-07-20T19:20:29Z</updated>
     </source>
   </entry>
 
@@ -1530,49 +1805,6 @@ compute $\delta$, for any $b\in[n^{2/3},n]$.
 </p></div>
     </summary>
     <updated>2020-07-19T00:00:00Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2020-07-17T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2007.08285</id>
-    <link href="http://arxiv.org/abs/2007.08285" rel="alternate" type="text/html"/>
-    <title>Quantum algorithms for graph problems with cut queries</title>
-    <feedworld_mtime>1595116800</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Lee:Troy.html">Troy Lee</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Santha:Miklos.html">Miklos Santha</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/z/Zhang:Shengyu.html">Shengyu Zhang</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2007.08285">PDF</a><br/><b>Abstract: </b>Let $G$ be an $n$-vertex graph with $m$ edges. When asked a subset $S$ of
-vertices, a cut query on $G$ returns the number of edges of $G$ that have
-exactly one endpoint in $S$. We show that there is a bounded-error quantum
-algorithm that determines all connected components of $G$ after making
-$O(\log(n)^5)$ many cut queries. In contrast, it follows from results in
-communication complexity that any randomized algorithm even just to decide
-whether the graph is connected or not must make at least $\Omega(n/\log(n))$
-many cut queries. We further show that with $O(\log(n)^7)$ many cut queries a
-quantum algorithm can with high probability output a spanning forest for $G$.
-</p>
-<p>En route to proving these results, we design quantum algorithms for learning
-a graph using cut queries. We show that a quantum algorithm can learn a graph
-with maximum degree $d$ after $O(d \log(n)^2)$ many cut queries, and can learn
-a general graph with $O(\sqrt{m} \log(n)^{3/2})$ many cut queries. These two
-upper bounds are tight up to the poly-logarithmic factors, and compare to
-$\Omega(dn)$ and $\Omega(m/\log(n))$ lower bounds on the number of cut queries
-needed by a randomized algorithm for the same problems, respectively.
-</p>
-<p>The key ingredients in our results are the Bernstein-Vazirani algorithm,
-approximate counting with "OR queries", and learning sparse vectors from inner
-products as in compressed sensing.
-</p></div>
-    </summary>
-    <updated>2020-07-19T23:23:39Z</updated>
     <author>
       <name/>
     </author>
