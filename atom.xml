@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-08-04T18:21:50Z</updated>
+  <updated>2020-08-04T19:21:50Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,169 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>https://francisbach.com/?p=2561</id>
+    <link href="https://francisbach.com/integration-by-parts-abel-transformation/" rel="alternate" type="text/html"/>
+    <title>The many faces of integration by parts – I : Abel transformation</title>
+    <summary>Integration by parts is a highlight of any calculus class. It leads to multiple classical applications for integration of logarithms, exponentials, etc., and it is the source of an infinite number of exercises and applications to special functions. In this post, I will look at a classical discrete extension that is useful in machine learning...</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p class="justify-text">Integration by parts is a highlight of any calculus class. It leads to multiple classical applications for integration of logarithms, exponentials, etc., and it is the source of an infinite number of exercises and applications to <a href="https://en.wikipedia.org/wiki/Special_functions">special functions</a>. In this post, I will look at a classical discrete extension that is useful in machine learning and optimization, namely <a href="https://en.wikipedia.org/wiki/Summation_by_parts">Abel transformation</a>, with applications to convergence proofs for the (stochastic) <a href="https://en.wikipedia.org/wiki/Subgradient_method">subgradient method</a>. Next month, extensions to higher dimensions will be considered, with applications to score functions [<a href="http://www.jmlr.org/papers/volume6/hyvarinen05a/hyvarinen05a.pdf">2</a>, <a href="https://www.jstor.org/stable/1914309">3</a>] and randomized smoothing [4, <a href="https://arxiv.org/pdf/2002.08676">5</a>].</p>
+
+
+
+<h2>Abel transformation: from continuous to discrete</h2>
+
+
+
+<p class="justify-text">The most classical version of integration by parts goes as follows. Given two continuously differentiable functions from \(\mathbb{R}\) to \(\mathbb{R}\), we have: $$ \int_a^b \!\!\!\!f(x)g'(x) dx = \Big[ f(x) g(x) \Big]_a^b \!-\! \int_a^b\!\!\! \!f'(x) g(x) dx =  f(b) g(b)\, – f(a)g(a)-\! \int_a^b\! \!\!\! f'(x) g(x) dx.$$ This is valid for less regular functions, but this is not the main concern here. The proof follows naturally from the derivative of a product, but there is a nice “proof without words” (see, e.g., [1, p. 42] or <a href="https://en.wikipedia.org/wiki/Integration_by_parts#Visualization">here</a>).</p>
+
+
+
+<p class="justify-text">There is a discrete analogue referred to as <a href="https://en.wikipedia.org/wiki/Summation_by_parts">Abel transformation</a> or summation by parts, where derivatives are replaced by increments: given two real-valued sequences \((a_n)_{n \geq 0}\) and \((b_n)_{n \geq 0}\) (the second sequence could also be taken vector-valued), we can expand $$ \sum_{k=1}^n a_k ( b_k\, – b_{k-1}) =\sum_{k=1}^n a_k  b_k \ – \sum_{k=1}^n a_k  b_{k-1} = \sum_{k=1}^n a_k b_k \ – \sum_{k=0}^{n-1} a_{k+1} b_{k},$$ using a simple index increment in the second sum.  Rearranging terms, this leads to $$ \sum_{k=1}^n a_k ( b_k\, – b_{k-1}) = a_n b_n \ – a_0 b_0\  – \sum_{k=0}^{n-1} ( a_{k+1} – a_{k } ) b_k.$$ In other words, we can transfer the first-order difference from the sequence \((b_k)_{k \geq 0}\) to the sequence \((a_k)_{k \geq 0}\).  A few remarks:</p>
+
+
+
+<ul class="justify-text"><li><strong>Warning</strong>! It is very easy/common to make mistakes with indices and signs.</li><li>I gave the direct proof but a proof through explicit integration by part is also possible, by introducing the piecewise-constant function \(f\) equal to \(a_k\) on \([k,k+1)\), and \(g\) continuous  piecewise affine equal to \(b_{k} + (t-k) ( b_{k+1}-b_{k})\) for \(t \in [k,k+1]\), and integrating between \(0+\) and \(n+\). </li></ul>
+
+
+
+<p class="justify-text">There are classical applications for the convergence of series (see <a href="https://en.wikipedia.org/wiki/Summation_by_parts">here</a>), but in this post, I will show how it can lead to an elegant result for stochastic gradient descent for non-smooth functions and <em>decaying</em> step-sizes.</p>
+
+
+
+<h2>Decaying step-sizes in stochastic gradient descent</h2>
+
+
+
+<p class="justify-text">The Abel summation formula is quite useful when analyzing optimization algorithms, and we give a simple example below. We consider a sequence of random potentially <em>non-smooth</em> convex functions \((f_k)_{k \geq 0}\) which are independent and identically distributed functions from \(\mathbb{R}^d \) to \(\mathbb{R}\), with expectation \(F\). The goal is to find a minimizer \(x_\ast\) of \(F\) over a some convex bounded set \(\mathcal{C}\), only being given access to some stochastic gradients of \(f_k\) at well-chosen points. The most classical example is supervised machine learning, where \(f_k(\theta)\) is the loss of a random observation for the predictor parameterized by \(\theta\).  The difficulty here is the potential non-smoothness of the function \(f_k\) (e.g., for the <a href="https://en.wikipedia.org/wiki/Hinge_loss">hinge loss</a> and the <a href="https://en.wikipedia.org/wiki/Support_vector_machine">support vector machine</a>).</p>
+
+
+
+<p class="justify-text">We consider the projected stochastic subgradient descent method. The deterministic version of this method dates back to Naum Shor [6] in 1962 (see nice history <a href="https://www.math.uni-bielefeld.de/documenta/vol-ismp/43_goffin-jean-louis.pdf">here</a>). The method goes as follows: starting from some \(\theta_0 \in \mathbb{R}^d\), we perform the iteration $$ \theta_{k} = \Pi_{ \mathcal{C} } \big( \theta_{k-1} – \gamma_k  \nabla f_k(\theta_{k-1}) \big),$$ where \(\Pi_{ \mathcal{C}}: \mathbb{R}^d \to \mathbb{R}^d\) is the orthogonal projection onto the set \(\mathcal{C}\), and \(\nabla f_k(\theta_{k-1})\) is any subgradient of \(f_k\) at \(\theta_{k-1}\). </p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-4324" height="211" src="https://francisbach.com/wp-content/uploads/2020/07/gradient_contours_projection-1024x410.png" width="528"/>One step of projected (sub)gradient descent: from a vector \(\theta\), we go down the direction of a negative subgradient \(\nabla f(\theta)\) of the function \(f\) (here typically a random function) and an orthogonal projection is performed to obtain the new vector \(\theta_+\).</figure></div>
+
+
+
+<p class="justify-text">We make the following standard assumptions: (a) the set \(\mathcal{C}\) is convex and compact with diameter \(\Delta\) (with respect to the \(\ell_2\)-norm), (b) the functions \(f_k\) are almost surely convex and \(B\)-Lipschitz-continuous (or equivalently with gradients bounded in \(\ell_2\)-norm by \(B\)). We denote by \(\theta_\ast\) a minimizer of \(f\) on \(\mathcal{C}\) (there can be multiple ones). </p>
+
+
+
+<p class="justify-text">For non-smooth problems, choosing a constant step-size does not lead to an algorithm converging to a global minimizer: decaying step-sizes are then needed.</p>
+
+
+
+<h2>Convergence proof through Lyapunov functions</h2>
+
+
+
+<p class="justify-text">Since the functions \(f_k\) are non-smooth, we cannot use Taylor expansions, and we rely on a now classical proof technique dating back from the 1960’s (see, e.g., a <a href="http://www.mathnet.ru/links/5d71a255cae8f1a313ac599b8f20a123/dan33049.pdf">paper</a> by Boris Polyak [7] in Russian), that has led to several extensions in particular for online learning [<a href="http://www.cs.cmu.edu/~maz/publications/techconvex.pdf">8</a>]. The proof relies on the concept of “<a href="https://en.wikipedia.org/wiki/Lyapunov_function">Lyapunov functions</a>“, often also referred to as “potential functions”. This is a non-negative function \(V(\theta_k)\) of the iterates \(\theta_k\), that is supposed to go down along iterations (at least in expectation). In optimization, standard Lyapunov functions are \(V(\theta)  = F(\theta)\, – F(\theta_\ast)\) or \(V(\theta) = \| \theta \ – \theta_\ast\|_2^2\). </p>
+
+
+
+<p class="justify-text">For the subgradient method, we will not be able to show that the Lyapunov function is decreasing, but this will lead through a manipulation which is standard in linear dynamical system analysis to a convergence proof for the averaged iterate: that is, if \(V(\theta_k) \leqslant V(\theta_{k-1})\ – W(\theta_{k-1}) + \varepsilon_k\),  for a certain function \(W\) and extra positive terms \(\varepsilon_k\), then, using telescoping sums, $$ \frac{1}{n} \sum_{k=1}^n W(\theta_{k-1}) \leqslant \frac{1}{n} \big( V(\theta_0)\ – V(\theta_n) \big) + \frac{1}{n} \sum_{k=1}^n \varepsilon_k.$$ We can then either use <a href="https://en.wikipedia.org/wiki/Jensen%27s_inequality">Jensen’s inequality</a> to get a bound on \(W \big( \frac{1}{n} \sum_{k=1}^n \theta_{k-1} \big)\), or directly get a bound on \(\min_{k \in \{1,\dots,n\}} W(\theta_{k-1})\). The first solution gives a performance guarantee for a well-defined iterate, while the second solution only shows that among the first \(n-1\) iterates, one of them has a performance guarantee; in the stochastic set-up where latex \(W\) is an expectation, it is not easily possible to know which one, so we will consider only averaging below.</p>
+
+
+
+<p class="justify-text"><strong>Standard inequality. </strong>We have, by contractivity of orthogonal projections: $$ \|\theta_k \ – \theta_\ast\|_2^2 =  \big\|  \Pi_{ \mathcal{C} } \big( \theta_{k-1} – \gamma_k   \nabla f_k(\theta_{k-1}) \big) – \Pi_{ \mathcal{C} } (\theta_\ast)  \big\|_2^2 \leqslant  \big\|   \theta_{k-1} – \gamma_k  \nabla f_k(\theta_{k-1}) -\   \theta_\ast  \big\|_2^2.$$ We can then expand the squared Euclidean norm to get: $$ \|\theta_k – \theta_\ast\|_2^2 \leqslant  \|\theta_{k-1} – \theta_\ast\|_2^2 \ – 2\gamma_k (\theta_{k-1} – \theta_\ast)^\top \nabla f_k (\theta_{k-1}) + \gamma_k^2 \|  \nabla f_k(\theta_{k-1})\|_2^2.$$ The last term is upper-bounded by \(\gamma_k^2 B^2\) because of the regularity assumption on \(f_k\). For the middle term, we use the convexity of \(f_k\), that is,  the function \(f_k\) is greater than its tangent at \(\theta_{k-1}\). See figure below.</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-4331" height="220" src="https://francisbach.com/wp-content/uploads/2020/07/tangent_convex-1-1024x440.png" width="513"/>Convex function above its tangent at \(\theta_{k-1}\), leading to the desired inequality.</figure></div>
+
+
+
+<p class="justify-text">We then obtain $$ f_k(\theta_\ast) \geqslant f_k(\theta_{k-1}) + \nabla f_k(\theta_{k-1})^\top ( \theta_{\ast} – \theta_{k-1}).$$</p>
+
+
+
+<p class="justify-text">Putting everything together, this leads to $$ \|\theta_k \ – \theta_\ast\|_2^2 \leqslant  \|\theta_{k-1}\  – \theta_\ast\|_2^2 \ – 2\gamma_k  \big[ f_k(\theta_{k-1}) \ – f_k(\theta_\ast) \big] + \gamma_k^2 B^2.$$ At this point, except the last term, all terms are random. We can now take expectations, with a particular focus on the term \(\mathbb{E} \big[ f_k(\theta_{k-1}) \big]\), for which we can use the fact that the random function \(f_k\) is independent from the past, so that $$ \mathbb{E} \big[ f_k(\theta_{k-1}) \big] =  \mathbb{E} \Big[  \mathbb{E} \big[ f_k(\theta_{k-1}) \big| f_{1},\dots,f_{k-1}  \big] \Big] =\mathbb{E} \big[   F(\theta_{k-1})   \big] . $$ We thus get $$ \mathbb{E} \big[ \|\theta_k – \theta_\ast\|_2^2\big] \leqslant  \mathbb{E} \big[ \|\theta_{k-1} – \theta_\ast\|_2^2\big]  – 2\gamma_k \big( \mathbb{E} \big[ F(\theta_{k-1}) \big] – F(\theta_\ast) \big) + \gamma_k^2 B^2.$$ As above, we can now isolate the excess in function values as: $$ \mathbb{E} \big[ F(\theta_{k-1}) \big] – F(\theta_\ast)  \leqslant \frac{1}{2 \gamma_k} \Big( \mathbb{E} \big[ \|\theta_{k-1} – \theta_\ast\|_2^2\big] – \mathbb{E} \big[ \|\theta_{k} – \theta_\ast\|_2^2\big] \Big) + \frac{\gamma_k}{2} B^2.$$ At this point, the “optimization part” of the proof is done. Only algebraic manipulations are needed to obtain a convergence rate. This is where Abel transformation will come in.</p>
+
+
+
+<h2>From fixed horizon to anytime algorithms</h2>
+
+
+
+<p class="justify-text"><strong>The lazy way.</strong> At this point, many authors (including me sometimes) will take a constant step-size \(\gamma_k = \gamma\) so as to obtain a telescopic sum, leading to $$ \frac{1}{n} \sum_{k=1}^n \mathbb{E} \big[ F(\theta_{k-1}) \big] – F(\theta_\ast) \leqslant \frac{1}{2n\gamma}     \Big( \mathbb{E} \big[ \|\theta_{0} \ – \theta_\ast\|_2^2\big] – \mathbb{E} \big[ \|\theta_{n}\  – \theta_\ast\|_2^2\big] \Big) + \frac{\gamma}{2} B^2,$$ which is less than \(\displaystyle \frac{\Delta^2}{2n \gamma} + \frac{\gamma}{2} B^2\), and minimized for \(\displaystyle \gamma = \frac{ \Delta}{B \sqrt{n}}\), leading to a convergence rate less than \(\displaystyle \frac{ B \Delta}{\sqrt{n}}\). Using Jensen’s inequality, we then get for \(\bar{\theta}_n = \frac{1}{n} \sum_{k=1}^n \theta_{k-1}\): $$\mathbb{E} \big[ F(\bar{\theta}_{n}) \big] – F(\theta_\ast) \leqslant \frac{ B \Delta}{\sqrt{n}} .$$ This result leads to the desired rate but can be improved in at least one way: the step-size currently has to depend on the “horizon” \(n\) (which has to be known in advance), and the algorithm is not “anytime”, which is not desirable in practice (where one often launches an algorithm and stops it when it the performance gains have plateaued or when the user gets bored waiting).</p>
+
+
+
+<p class="justify-text"><strong>Non-uniform averaging.</strong> Another way [<a href="https://www2.isye.gatech.edu/~nemirovs/SIOPT_RSA_2009.pdf">9</a>] is to consider the non-uniform average $$ \eta_{k} =   \frac{\sum_{k=1}^n \gamma_{k} \theta_{k-1}}{\sum_{k=1}^n \gamma_{k}}, $$ for which telescoping sums apply as before, to get $$ \mathbb{E} \big[ F(\eta_k) \big] – F(\theta_\ast) \leqslant \frac{1}{2} \frac{\Delta^2 + B^2 \sum_{k=1}^n \gamma_k^2}{\sum_{k=1}^n \gamma_{k}}.$$  Then, by selecting a decaying step-size \(\displaystyle \gamma_k = \frac{ \Delta}{B \sqrt{k}}\), that depends on the iteration number, we get a rate proportional to \(\displaystyle \frac{ B \Delta}{\sqrt{n}} ( 1 + \log n)\). We now have an anytime algorithm, but we have lost a logarithmic term, which is not the end of the world, but still disappointing. In [<a href="https://www2.isye.gatech.edu/~nemirovs/SIOPT_RSA_2009.pdf">9</a>], “tail-averaging” (only averaging iterates between a constant times \(n\) and \(n\)) is proposed, that removes the logarithmic term but requires to store iterates (moreover, the non-uniform averaging puts too much weight on the first iterates, slowing down convergence).</p>
+
+
+
+<p class="justify-text"><strong>Using Abel transformation.</strong> If we start to sum inequalities from \(k=1\) to \(k=n\), we get, with \(\delta_k = \mathbb{E} \big[ \|\theta_{k} – \theta_\ast\|_2^2\big]\) (which is always between \(0\) and \(\Delta^2\)): $$ \frac{1}{n} \sum_{k=1}^n \mathbb{E} \big[ F(\theta_{k-1}) \big] – F(\theta_\ast)  \leqslant  \frac{1}{n} \sum_{k=1}^n \bigg( \frac{1}{2 \gamma_k} \Big( \delta_{k-1} –  \delta_k \Big)\bigg) +  \frac{1}{n} \sum_{k=1}^n \frac{\gamma_k}{2} B^2,$$ which can be transformed through Abel transformation into $$ \frac{1}{n} \sum_{k=1}^n \mathbb{E} \big[ F(\theta_{k-1}) \big] – F(\theta_\ast) \leqslant \frac{1}{n} \sum_{k=1}^{n-1}  {\delta_k} \bigg(\frac{1}{ 2\gamma_{k+1}}- \frac{1}{ 2\gamma_{k}} \bigg) + \frac{\delta_0}{2 \gamma_1}- \frac{\delta_t}{2 \gamma_t}+ \frac{1}{n} \sum_{k=1}^n \frac{\gamma_k}{2} B^2.$$ For decreasing step-size sequences, this leads to $$ \frac{1}{n} \sum_{k=1}^n \mathbb{E} \big[ F(\theta_{k-1}) \big] – F(\theta_\ast) \leqslant \frac{1}{n} \sum_{k=1}^{n-1} {\Delta^2} \bigg(\frac{1}{ 2\gamma_{k+1}}- \frac{1}{ 2\gamma_{k}} \bigg) + \frac{\Delta^2}{2 \gamma_1}+ \frac{1}{n} \sum_{k=1}^n \frac{\gamma_k}{2} B^2,$$ and thus $$ \frac{1}{n} \sum_{k=1}^n \mathbb{E} \big[ F(\theta_{k-1}) \big] – F(\theta_\ast) \leqslant \frac{\Delta^2 }{2 n \gamma_n} + \frac{1}{n} \sum_{k=1}^n \frac{\gamma_k}{2} B^2.$$ For \(\gamma_k = \frac{  \Delta}{B \sqrt{k}}\), this leads to an upper bound $$\frac{\Delta B }{2 \sqrt{n}} \big( 1+ \frac{1}{\sqrt{n}} \sum_{k=1}^n \frac{1}{\sqrt{k}}\big) \leqslant \frac{3 \Delta B }{2 \sqrt{n}},$$ which is up to a factor \(\frac{3}{2}\) exactly the same bound as with a constant step-size, but now with an anytime algorithm.</p>
+
+
+
+<h2>Experiments</h2>
+
+
+
+<p class="justify-text">To illustrate the behaviors above, let’s consider minimizing \(\mathbb{E}_x \| x – \theta \|_1\), with respect to \(\theta\), with \(f_k(\theta) = \| x_k- \theta\|_1\), where \(x_k\) is sampled independently from a given distribution (here independent log-normal distributions for each coordinate). The global optimum \(\theta_\ast\) is the per-coordinate median of the distribution of \(x\)’s.</p>
+
+
+
+<p class="justify-text">When applying SGD, the chosen subgradient of \(f_k\) has components in \(\{-1,1\}\). Hence in the plots below in two dimensions, the iterates are always on a grid. With a constant step-size: if the \(\gamma\) is too large (right), there are large oscillations, while if \(\gamma\) is too small (left), optimization is too slow. Note that while the SGD iterate with a constant step-size is always oscillating, the averaged iterate converges to some point (which is not the global optimum, and is typically at distance \(O(\gamma)\) away from it [<a href="https://arxiv.org/pdf/1707.06386">11</a>]).</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-full is-resized"><img alt="" class="wp-image-4339" height="230" src="https://francisbach.com/wp-content/uploads/2020/07/sgd-1.gif" width="545"/>Stochastic gradient descent (averaged or not), with constant step-size. Left: small step-size. Right: large step-size (8 times larger).</figure></div>
+
+
+
+<p class="justify-text">With a decaying step-size (figure below), the initial conditions are forgotten reasonably fast and the iterates converge to the global optimum (and of course, we get an anytime algorithm!).</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-full is-resized"><img alt="" class="wp-image-4340" height="295" src="https://francisbach.com/wp-content/uploads/2020/07/sgd_decaying.gif" width="310"/>Stochastic gradient descent (averaged or not), with decreasing step-size.</figure></div>
+
+
+
+<p>We can now compare in terms of function values, showing that a constant step-size only works well for a specific range of iteration numbers.</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-4335" height="276" src="https://francisbach.com/wp-content/uploads/2020/07/convergence_proofs.png" width="371"/>Comparison of expected performance for decaying and constant-step sizes. Several constant step-sizes are tested, with uniform spacings in log-scale (hence the the uniform spacings in performance for large \(n\)).</figure></div>
+
+
+
+<h2>Conclusion</h2>
+
+
+
+<p class="justify-text">Being able to deal with decaying step-sizes and anytime algorithms is arguably not a major improvement, but quite a satisfactory one, at least to me! Discrete integration by parts is the key enabler here.</p>
+
+
+
+<p class="justify-text">There is another rewarding aspect which is totally unrelated to integration by parts: when applied to supervised machine learning, we just obtained from elementary principles (convexity) and few calculations a generalization bound <em>on unseen data</em>, which is as good as regular bounds from statistics [<a href="https://www.esaim-ps.org/articles/ps/pdf/2005/01/ps0420.pdf">10</a>] that use much more complex tools such as <a href="https://en.wikipedia.org/wiki/Rademacher_complexity">Rademacher complexities</a> (but typically no convexity assumptions): here, statistics considered independently from optimization is not only slower (considering the empirical risk and minimizing it using the plain non-stochastic subgradient method would lead to an \(n\) times slower algorithm) but also more difficult to analyze! </p>
+
+
+
+<h2>References</h2>
+
+
+
+<p class="justify-text">[1] Roger B. Nelsen, <em>Proofs without Words: Exercises in Visual Thinking</em>, Mathematical Association of America, 1997.<br/>[2] Aapo Hyvärinen, <a href="http://www.jmlr.org/papers/volume6/hyvarinen05a/hyvarinen05a.pdf">Estimation of non-normalized statistical models by score matching</a>. <em>Journal of Machine Learning Research</em>, <em>6</em>(Apr), 695-709, 2005.<br/>[3] Thomas M. Stoker, <a href="https://www.jstor.org/stable/1914309">Consistent estimation of scaled coefficients</a>.  <em>Econometrica: Journal of the Econometric Society</em>, 54(6):1461-1481, 1986.<br/>[4] Tamir Hazan, George Papandreou, and Daniel Tarlow. <a href="https://mitpress.mit.edu/books/perturbations-optimization-and-statistics">Perturbation, Optimization, and Statistics</a>. MIT Press, 2016.<br/>[5] Quentin Berthet, Matthieu Blondel, Olivier Teboul, Marco Cuturi, Jean-Philippe Vert, Francis Bach, <a href="https://arxiv.org/pdf/2002.08676">Learning with differentiable perturbed optimizers</a>. Technical report arXiv 2002.08676, 2020.<br/>[6] Naum Z. Shor. An application of the method of gradient descent to the solution of the network transportation problem. <em>Notes of Scientific Seminar on Theory and Applications of Cybernetics and Operations Research</em>, <em>Ukrainian Academy of Sciences</em>, Kiev, 9–17, 1962.<br/>[7] Boris T. Polyak, <a href="http://www.mathnet.ru/links/5d71a255cae8f1a313ac599b8f20a123/dan33049.pdf">A general method for solving extremal problems</a>. <em>Doklady Akademii Nauk SSSR</em>, 174(1):33–36, 1967.<br/>[8] Martin Zinkevich. <a href="http://www.cs.cmu.edu/~maz/publications/techconvex.pdf">Online convex programming and generalized infinitesimal gradient ascent</a>. <em>Proceedings of the international conference on machine learning )(ICML)</em>, 2003.<br/>[9] Arkadi Nemirovski, Anatoli Juditsky, Guanghui Lan, Alexander Shapiro<em>.</em> <a href="https://www2.isye.gatech.edu/~nemirovs/SIOPT_RSA_2009.pdf">Robust stochastic approximation approach to stochastic programming</a>. <em>SIAM Journal on optimization</em>, 19(4):1574-1609, 2009.<br/>[10] Stéphane Boucheron, Olivier Bousquet, Gabor Lugosi. <a href="https://www.esaim-ps.org/articles/ps/pdf/2005/01/ps0420.pdf">Theory of classification: A survey of some recent advances</a>. <em>ESAIM: probability and statistics</em>, <em>9</em>, 323-375, 2005.<br/>[11] Aymeric Dieuleveut, Alain Durmus, and Francis Bach. <a href="https://arxiv.org/pdf/1707.06386">Bridging the gap between constant step size stochastic gradient descent and Markov chains</a>. Annals of Statistics, 48(3):1348-1382, 2020.</p></div>
+    </content>
+    <updated>2020-08-04T15:55:26Z</updated>
+    <published>2020-08-04T15:55:26Z</published>
+    <category term="Tools"/>
+    <author>
+      <name>Francis Bach</name>
+    </author>
+    <source>
+      <id>https://francisbach.com</id>
+      <link href="https://francisbach.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://francisbach.com" rel="alternate" type="text/html"/>
+      <subtitle>Francis Bach</subtitle>
+      <title>Machine Learning Research Blog</title>
+      <updated>2020-08-04T19:21:49Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>https://eccc.weizmann.ac.il/report/2020/117</id>
@@ -37,7 +200,7 @@
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-08-04T18:20:41Z</updated>
+      <updated>2020-08-04T19:20:27Z</updated>
     </source>
   </entry>
 
@@ -920,7 +1083,7 @@ We feel there could also be interesting applications for his theorem as it stand
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-08-04T18:20:51Z</updated>
+      <updated>2020-08-04T19:20:44Z</updated>
     </source>
   </entry>
 
@@ -977,7 +1140,7 @@ We feel there could also be interesting applications for his theorem as it stand
       <link href="https://tcsmath.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>some mathematics &amp; computation</subtitle>
       <title>tcs math</title>
-      <updated>2020-08-04T18:20:16Z</updated>
+      <updated>2020-08-04T19:20:17Z</updated>
     </source>
   </entry>
 
@@ -1397,7 +1560,7 @@ The paper's main technical contribution is a method of converting lower bounds f
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-08-04T18:20:41Z</updated>
+      <updated>2020-08-04T19:20:27Z</updated>
     </source>
   </entry>
 
@@ -1482,7 +1645,7 @@ from a method of Prawitz, presented in the 1972 paper. H. Prawitz, <a href="http
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-08-04T18:20:45Z</updated>
+      <updated>2020-08-04T19:20:38Z</updated>
     </source>
   </entry>
 
@@ -1504,7 +1667,7 @@ from a method of Prawitz, presented in the 1972 paper. H. Prawitz, <a href="http
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-08-04T18:20:41Z</updated>
+      <updated>2020-08-04T19:20:27Z</updated>
     </source>
   </entry>
 
@@ -1650,7 +1813,7 @@ Email: nominations@eth-its.ethz.ch</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-08-04T18:20:54Z</updated>
+      <updated>2020-08-04T19:20:47Z</updated>
     </source>
   </entry>
 
@@ -1682,7 +1845,7 @@ In this paper, we construct two natural set systems of VC dimension $d$, motivat
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-08-04T18:20:41Z</updated>
+      <updated>2020-08-04T19:20:27Z</updated>
     </source>
   </entry>
 
@@ -1712,31 +1875,7 @@ We construct an O(1)-query relaxed LCC with nearly-linear block length n = k^{1+
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-08-04T18:20:41Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2020/112</id>
-    <link href="https://eccc.weizmann.ac.il/report/2020/112" rel="alternate" type="text/html"/>
-    <title>TR20-112 |  Simulating DQBF Preprocessing Techniques with Resolution Asymmetric Tautologies | 
-
-	Joshua Blinkhorn</title>
-    <summary>Dependency quantified Boolean formulas (DQBF) describe an NEXPTIME-complete generalisation of QBF, which in turn generalises SAT. QRAT is a recently proposed proof system for quantified Boolean formulas (QBF), which simulates the full suite of QBF preprocessing techniques and thus forms a uniform proof checking format for solver verification.
-
-In this work, we study QRAT in the more general DQBF context, obtaining a sound and complete refutational DQBF proof system that we call DQRAT. We show that DQRAT can simulate the full suite of dedicated DQBF preprocessing techniques, except those relying on defined variables, which we cover with the introduction of a new form of prefix modification. Our work enables generalisations of further QBF preprocessing techniques (e.g. blocked literal elimination) that were not previously considered for DQBF.</summary>
-    <updated>2020-07-27T19:18:09Z</updated>
-    <published>2020-07-27T19:18:09Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2020-08-04T18:20:41Z</updated>
+      <updated>2020-08-04T19:20:27Z</updated>
     </source>
   </entry>
 </feed>
