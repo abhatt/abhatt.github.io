@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-08-16T13:21:55Z</updated>
+  <updated>2020-08-16T14:22:00Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,104 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://differentialprivacy.org/privacy-composition/</id>
+    <link href="https://differentialprivacy.org/privacy-composition/" rel="alternate" type="text/html"/>
+    <title>Why Privacy Needs Composition</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>We’re back!  In our last <a href="https://differentialprivacy.org/\average-case-dp">post</a> we discussed some of the subtle pitfalls of formulating the assumptions underlying average-case relaxations of differential privacy.  This time we’re going to look at the composition property of differential privacy—that is, the fact that running two independent differentially private algorithms on your data and combining their outputs is still differentially private. This is a key property of differential privacy and is actually closely related to the worst-case nature of differential privacy.</p>
+
+<p>Composition is really the crucial property that has made differential privacy successful. Data analysis doesn’t happen in a vacuum, and the greatest threat to privacy comes from combining multiple pieces of information. These pieces of information can come from a single source that releases detailed statistics, or they could come from separate sources. So it’s critical to understand how the composition of multiple pieces of information can affect privacy.</p>
+
+<p>In this post we’ll give some examples to illustrate why we need composition, and why composition is challenging for average-case relaxations of differential privacy.  Composition is what allows you to design sophisticated differentially private algorithms out of simple building blocks, and it’s what allows one organization to release differentially private statistics without having to understand the entire ecosystem of related information that has been or will be released.  As we’ll see, the challenges of composing average-case privacy guarantees are also very closely related to the subtleties that arise in thinking about the adversary’s beliefs.</p>
+
+<h3 id="differencing-attacks">Differencing Attacks</h3>
+
+<p>Let’s start with a simple example of composition that was alluded to in our last post.</p>
+
+<p>You’ve just started a new job and signed up for the health insurance provided by your employer. Thus, your employer is able to obtain aggregated data from the insurance provider. In particular, your employer can ask “How many of our employees have submitted claims for condition X?”  However, your employer should not be able to find out whether or not <em>you</em> have condition X. 
+For concreteness, condition X could be a mental health condition, drug addiction, being pregnant, terminal cancer, or an expensive chronic illness. Each of these could result in some kind of employment discrimination.</p>
+
+<p>The employer may find out that 417 employees have condition X.  That’s OK; on its own, this number reveals very little about whether or not <em>you</em> have condition X, as long as your employer is uncertain about how many employees <em>other than you</em> have condition X.  We can formalize this as some kind of average-case or Bayesian privacy guarantee. Thus the health-insurance company is comfortable releasing this number exactly.  But, yesterday, before you started your job, it also seemed reasonable to allow your employer to ask the exact same question, and yesterday the answer was 416. Thus your employer concludes that you have condition X.</p>
+
+<p>In this example, we see how two pieces of information—the count before you started and the count after you started—each of which seems innocuous on its own can be combined to reveal private information. This is a simple example of a <em>differencing attack</em> and composition is important in part because it prevents these attacks.</p>
+
+<p>This example involves only two pieces of information. However, an attack could combine many pieces of information. For example, the counts could be broken down by sex, race/ethnicity, age, location, and tobacco use.<sup id="fnref:1"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:1">1</a></sup> Additional data may also be obtained from other sources, such as public records, social media, voluntary disclosures, healthcare providers, financial records, employment records, or even illicit sources. The possibilities for attacks grow rapidly as more information is made available. And an employer is only one example of a potential privacy adversary.</p>
+
+<p>The point of this example is that it’s easy to argue that one piece of information is harmless to privacy by making plausible-looking assumptions about the adversary. But this intuition rapidly breaks down once you consider the bigger picture where there are many pieces of information that can complete the puzzle. That’s why we need rigorous methods for understanding privacy and its composition.</p>
+
+<h3 id="quantifying-composition">Quantifying Composition</h3>
+
+<p>How does differential privacy prevent a differencing attack like the one we just discussed? The simplest way is to add a little bit of random noise to each answer. On the first day, instead of releasing the exact count 416, we could release a noisy count, say, 420. Then on the second day, instead of releasing the true count 417, we release another noisy count, say, 415. More precisely, it is common to add noise to counts drawn from a Laplace or Gaussian distribution.  These figures are still close enough to the true values to be useful, but the difference of 1 is now obscured by the noise, so your privacy is protected.</p>
+
+<p>Since the noise is unknown to <em>any</em> potential adversary, it introduces uncertainty that protects the contribution that an individual makes to the count. Taking the difference of two independent noisy counts results in something that is still noisy. However, we must be careful to quantify this privacy guarantee, particularly when it comes to composition.</p>
+
+<p>So, how much noise do we need to add? Let’s go back to the example and suppose the insurance company provides noisy answers where the noise has mean zero and some fixed variance. Your employer could simply ask the same question again and again and each time receive a different noisy answer. Averaging these noisy answers will effectively reduce the variance of the added noise and allow the true answer to be discerned. That leaves us back where we started.</p>
+
+<p>The moral of this revised example is that the scale of the noise must increase if we allow more access to the data, so more questions means more noise in each answer.<sup id="fnref:2"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:2">2</a></sup> 
+Asking the same question again and again may seem silly. There are easy ways to defend against this and some similar attacks. (E.g., by returning the same answer each time instead of generating fresh noise.) But, unfortunately, the underlying phenomenon cannot be circumvented. One of the seminal works that led to differential privacy <a href="https://dl.acm.org/doi/10.1145/773153.773173" title="Irit Dinur, Kobbi Nissim. Revealing Information While Preserving Privacy. PODS 2003"><strong>[DN03]</strong></a> showed that there is an inherent tradeoff between the number of questions to be answered and the amount of noise that needs to be added to protect privacy. The general attack is simple: Instead of asking the same query again and again, the attacker asks “random” queries.<sup id="fnref:3"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:3">3</a></sup> This attack only requires basic linear algebra and, importantly, has been demonstrated on real systems <a href="https://arxiv.org/abs/1810.05692" title="Aloni Cohen, Kobbi Nissim. Linear Program Reconstruction in Practice. 2018."><strong>[CN18]</strong></a>.</p>
+
+<h3 id="adaptive-composition">Adaptive Composition</h3>
+
+<p>There are actually two kinds of composition to consider. There is <strong>non-adaptive composition</strong>, where the questions to be asked are pre-specified and thus independent of the data, and there is <strong>adaptive composition</strong>, where the questions may themselves depend on the results of prior access to the data. Adaptive composition arises in an interactive system where queries are submitted one-by-one and each answer is returned before the next query is submitted. So far, we have really only considered non-adaptive composition.</p>
+
+<p>Any interactive system must take adaptive composition into account.  A natural algorithm which asks adaptive questions is gradient descent for minimizing a function that is determined by private data (e.g., for logistic regression on medical records). At each step, the algorithm asks for a gradient of the function, which depends on the private data, at the current point. Then the point is updated according to the reported gradient and the process repeats. Since the updated point depends on the previous answer, the next gradient computation is adaptive.</p>
+
+<p>The good news is that differential privacy can handle adaptive composition just fine.  However, to handle adaptive composition, it’s really important that you have a worst-case privacy definition like differential privacy. As we will see below, average-case variants of differential privacy cannot handle adaptive composition. Intuitively, the problem is that whatever distributional assumption you might make about the data or query a priori is unlikely to hold when you condition on past interactions with the same data or related data.</p>
+
+<p>Here’s a technical example that shows the difficulty of adaptive composition. Our data \(x \in \{-1,+1\}^n\) is a vector of \(n\) bits, one bit per person.<sup id="fnref:4"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:4">4</a></sup>  Because we’re considering average-case differential privacy, we’ll model this vector as uniformly random.  Consider the following slightly odd algorithm \(M_2(x,v)\)—it takes a vector \(v \in \{-1,+1\}^n\) from the user, and, if the correlation \(\langle x, v \rangle / n\) between \(v\) and \(x\) is smaller than \(\varepsilon/2\), the query returns \(\emptyset\), but, if the correlation between \(v\) and \(x\) is larger than \(\varepsilon/2\), the query returns the dataset \(x\).  In isolation this algorithm satisfies an average-case version of differential privacy, because if \(n\) is large enough and \(x\) is uniformly random, then it’s very unlikely that the user can guess a vector \(v\) that causes this algorithm to output anything other than \(\emptyset\).  This algorithm may seem contrived; it is a simple stand-in for any algorithm that behaves very well most of the time, but fails completely on some rare inputs.</p>
+
+<p>Now, consider another, more familiar differentially private algorithm called randomized response <a href="https://www.jstor.org/stable/2283137?seq=1" title="Stanley Warner. Randomized Response: A Survey Technique for Eliminating Evasive Answer Bias. Journal of the American Statistical Association 1965."><strong>[W65]</strong></a>.  For those not familiar, this algorithm \(M_1(x)\) outputs a vector \(y \in \{0,1\}^n\), where \(y_i\) is slightly more likely to be \(x_i\) than \(-x_i\).  Specifically, we set \(y_i = x_i\) with probability \((1+\varepsilon)/2\) and \(y_i = - x_i\) otherwise. This satisfies \(\log(\frac{1+\varepsilon}{1-\varepsilon})\)-differential privacy or, roughly, \(2\varepsilon\)-differential privacy. The upshot is that we obtain a vector \(y\) where the correlation between \(x\) and \(y\) is about \(\varepsilon\), i.e. \(\langle x , y \rangle / n \approx \varepsilon\)</p>
+
+<p>OK, so \(M_1\) and \(M_2\) both satisfy strong average-case versions of differential privacy when the data is uniform, but what about their composition?  Well, the bad news is that running \(y = M_1(x)\) followed by \(M_2(x,y)\) is going to return the dataset \(x\) with probability approaching 100%!  That’s because \(y\) was designed precisely to be a vector with correlation about \(\varepsilon\) with \(x\), and this is exactly the key that gets \(M_2\) to unlock the dataset.</p>
+
+<p>What went wrong here is that, even if \(x\) really is uniformly random, it’s very far from it when conditioned on the output \(y=M_1(x)\). To analyze \(M_2(x,y)\) we must look at the distribution of \(x\) conditioned on \(y\). This distribution is going to be messy and may as well be a worst-case distribution, which means we must leave the realm of average-case privacy.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+<p>Composition guarantees that, as long as each part of your system is differentially private, then the overall system is too. It would be difficult to build sophisticated systems without this property. And it’s what allows one organization to release differentially private statistics without having to worry about what other information might be out there. In short, composition is what allows differential privacy to deal with the complexities of the real world.</p>
+
+<p>It is unlikely that differential privacy would have taken off as a field of research without this composition property. Any proposal for an alternative approach to privacy-preserving data analysis should first be evaluated in terms of how it handles composition.</p>
+
+<p>This post only scratches the surface. In particular, we haven’t talked about the quantitative aspects of composition; that’s where the fun really begins. We will leave you with some pointers to further reading on the topic:</p>
+
+<ul>
+  <li><a href="https://privacytools.seas.harvard.edu/publications/exposed-survey-attacks-private-data" title="Cynthia Dwork, Adam Smith, Thomas Steinke, Jonathan Ullman. Exposed! A Survey of Attacks on Private Data. Annual Review of Statistics and its Applications 2017."><strong>[DSSU17]</strong></a> This is a survey of attacks which explains quantitatively the relationship between noise, number of questions, and privacy risks.</li>
+  <li><a href="https://arxiv.org/abs/1311.0776" title="Peter Kairouz, Sewoong Oh, Pramod Viswanath. The Composition Theorem for Differential Privacy. ICML 2015."><strong>[KOV15]</strong></a> <a href="https://arxiv.org/abs/1507.03113" title="Jack Murtagh, Salil Vadhan. The Complexity of Computing the Optimal Composition of Differential Privacy. TCC 2016"><strong>[MV15]</strong></a> <a href="https://arxiv.org/abs/1603.01887" title="Cynthia Dwork, Guy Rothbum. Concentrated Differential Privacy."><strong>[DR16]</strong></a> <a href="https://arxiv.org/abs/1605.02065" title="Mark Bun, Thomas Steinke. Concentrated Differential Privacy: Simplifications, Extensions, and Lower Bounds. TCC 2016."><strong>[BS16]</strong></a> <a href="https://arxiv.org/abs/1702.07476" title="Ilya Mironov. Renyi Differential Privacy. CSF 2017."><strong>[M17]</strong></a> <a href="https://arxiv.org/abs/1905.02383" title="Jinshuo Dong, Aaron Roth, Weijie Su. Gaussian Differential Privacy. Journal of the Royal Statistical Society: Series B."><strong>[DRS19]</strong></a> On the positive side, these papers analyze how differential privacy composes, yielding sharp quantitative bounds.</li>
+</ul>
+
+<hr/>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p>A good rule of thumb is that, if the number of released values is much larger than the number of people, then a privacy attack is probably possible. This is analogous to the rule from algebra that, if the number of constraints (released values) is greater than the number of unknown variables (people’s data), then the unknowns can be worked out. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:1">↩</a></p>
+    </li>
+    <li id="fn:2">
+      <p>Exactly quantifying how much noise is needed as the number of questions grows leads to the concept of a “privacy budget.” That is, we must precisely quantify how differential privacy degrades under composition. This is a very deep topic and is something we hope to discuss in future posts. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:2">↩</a></p>
+    </li>
+    <li id="fn:3">
+      <p>The queries do not need to be random <strong><a href="https://iacr.org/archive/crypto2008/51570469/51570469.pdf" title="Cynthia Dwork, Sergey Yekhanin. New Efficient Attacks on Statistical Disclosure Control Mechanisms. CRYPTO 2008">[DY08]</a></strong>. The queries simply need to be “sufficiently distinct”, which can be formulated precisely as being nearly orthogonal vectors. Random, or even pseudorandom queries (e.g., hash functions), will almost certainly satisfy this property. In general, it is fairly likely that a set of queries will have this property and allow a reconstruction attack; that is, it is hard to <em>avoid</em> this phenomenon. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:3">↩</a></p>
+    </li>
+    <li id="fn:4">
+      <p>This representation of the dataset as a vector of bits \(x \in \{-1,+1\}^n \) is an abstraction. The entries in the dataset would actually be something like a set of pairs \( ( u_i, x_i ) \) for \(i = 1, \cdots, n \), where \(u_i\) is various information that identifies the individual concerned (name, address, race, date of birth, etc.). <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:4">↩</a></p>
+    </li>
+  </ol>
+</div></div>
+    </summary>
+    <updated>2020-08-16T14:00:00Z</updated>
+    <published>2020-08-16T14:00:00Z</published>
+    <author>
+      <name>Jonathan Ullman</name>
+    </author>
+    <source>
+      <id>https://differentialprivacy.org</id>
+      <link href="https://differentialprivacy.org" rel="alternate" type="text/html"/>
+      <link href="https://differentialprivacy.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Website for the differential privacy research community</subtitle>
+      <title>Differential Privacy</title>
+      <updated>2020-08-16T14:21:59Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>https://11011110.github.io/blog/2020/08/15/linkage</id>
@@ -564,7 +662,7 @@ hole, pyramid)-free graphs of degree at most 4.
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-08-16T13:20:34Z</updated>
+      <updated>2020-08-16T14:20:37Z</updated>
     </source>
   </entry>
 
@@ -659,7 +757,7 @@ Check him out.</p></font></font></div>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-08-16T13:20:40Z</updated>
+      <updated>2020-08-16T14:20:43Z</updated>
     </source>
   </entry>
 
@@ -1220,7 +1318,7 @@ Another motivation for studying the parallel repetition of the GHZ game comes fr
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-08-16T13:20:29Z</updated>
+      <updated>2020-08-16T14:20:33Z</updated>
     </source>
   </entry>
 
@@ -1287,7 +1385,7 @@ Another motivation for studying the parallel repetition of the GHZ game comes fr
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-08-16T13:20:29Z</updated>
+      <updated>2020-08-16T14:20:33Z</updated>
     </source>
   </entry>
 
@@ -1477,7 +1575,7 @@ Thanks Fran. Much of that change is due to pioneers like you. Thanks for everyth
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-08-16T13:20:41Z</updated>
+      <updated>2020-08-16T14:20:45Z</updated>
     </source>
   </entry>
 
@@ -1635,7 +1733,7 @@ Thanks Fran. Much of that change is due to pioneers like you. Thanks for everyth
       <link href="https://adamsheffer.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Discrete geometry and other typos</subtitle>
       <title>Some Plane Truths</title>
-      <updated>2020-08-16T13:21:13Z</updated>
+      <updated>2020-08-16T14:21:11Z</updated>
     </source>
   </entry>
 
@@ -1692,7 +1790,7 @@ Thanks Fran. Much of that change is due to pioneers like you. Thanks for everyth
       <link href="https://differentialprivacy.org/feed.xml" rel="self" type="application/atom+xml"/>
       <subtitle>Website for the differential privacy research community</subtitle>
       <title>Differential Privacy</title>
-      <updated>2020-08-15T23:29:08Z</updated>
+      <updated>2020-08-16T14:21:59Z</updated>
     </source>
   </entry>
 
@@ -1731,7 +1829,7 @@ Thanks Fran. Much of that change is due to pioneers like you. Thanks for everyth
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2020-08-16T13:21:09Z</updated>
+      <updated>2020-08-16T14:21:07Z</updated>
     </source>
   </entry>
 
@@ -1755,7 +1853,7 @@ In addition, we show that testing asymmetry in the dense graph model is almost t
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-08-16T13:20:29Z</updated>
+      <updated>2020-08-16T14:20:33Z</updated>
     </source>
   </entry>
 
@@ -1918,7 +2016,7 @@ In addition, we show that testing asymmetry in the dense graph model is almost t
       <link href="https://francisbach.com" rel="alternate" type="text/html"/>
       <subtitle>Francis Bach</subtitle>
       <title>Machine Learning Research Blog</title>
-      <updated>2020-08-16T13:21:55Z</updated>
+      <updated>2020-08-16T14:21:58Z</updated>
     </source>
   </entry>
 
@@ -1948,7 +2046,7 @@ In addition, we show that testing asymmetry in the dense graph model is almost t
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-08-16T13:20:29Z</updated>
+      <updated>2020-08-16T14:20:33Z</updated>
     </source>
   </entry>
 
@@ -2146,7 +2244,7 @@ We feel there could also be interesting applications for his theorem as it stand
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-08-16T13:20:41Z</updated>
+      <updated>2020-08-16T14:20:45Z</updated>
     </source>
   </entry>
 
@@ -2203,7 +2301,7 @@ We feel there could also be interesting applications for his theorem as it stand
       <link href="https://tcsmath.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>some mathematics &amp; computation</subtitle>
       <title>tcs math</title>
-      <updated>2020-08-16T13:20:17Z</updated>
+      <updated>2020-08-16T14:20:18Z</updated>
     </source>
   </entry>
 
@@ -2319,92 +2417,7 @@ The paper's main technical contribution is a method of converting lower bounds f
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-08-16T13:20:29Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://gilkalai.wordpress.com/?p=19988</id>
-    <link href="https://gilkalai.wordpress.com/2020/08/01/to-cheer-you-up-in-difficult-times-8-nathan-keller-and-ohad-klein-proved-tomaszewskis-conjecture-on-randomly-signed-sums/" rel="alternate" type="text/html"/>
-    <title>To Cheer you up in Difficult Times 8: Nathan Keller and Ohad Klein Proved Tomaszewski’s Conjecture on Randomly Signed Sums</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Today we talk about the paper, Proof of Tomaszewski’s Conjecture on Randomly Signed Sums, by Nathan Keller and Ohad Klein. Consider a unit vector That is latex \sum_{i=1}^n a_i^2=1$. Consider all () signed sums where each is either 1 or … <a href="https://gilkalai.wordpress.com/2020/08/01/to-cheer-you-up-in-difficult-times-8-nathan-keller-and-ohad-klein-proved-tomaszewskis-conjecture-on-randomly-signed-sums/">Continue reading <span class="meta-nav">→</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Today we talk about the paper, <a href="https://arxiv.org/abs/2006.16834">Proof of Tomaszewski’s Conjecture on Randomly Signed Sums</a>, by Nathan Keller and Ohad Klein.</p>
-<p>Consider a unit vector <img alt="a=(a_1,a_2,\dots, a_n)." class="latex" src="https://s0.wp.com/latex.php?latex=a%3D%28a_1%2Ca_2%2C%5Cdots%2C+a_n%29.&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="a=(a_1,a_2,\dots, a_n)."/> That is latex \sum_{i=1}^n a_i^2=1$. Consider all (<img alt="2^n" class="latex" src="https://s0.wp.com/latex.php?latex=2%5En&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^n"/>) signed sums <img alt="\displaystyle \epsilon_1a_1+\epsilon_2a_2+\cdots +\epsilon_n a_n, " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+%5Cepsilon_1a_1%2B%5Cepsilon_2a_2%2B%5Ccdots+%2B%5Cepsilon_n+a_n%2C+&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\displaystyle \epsilon_1a_1+\epsilon_2a_2+\cdots +\epsilon_n a_n, "/> where each <img alt="\epsilon_k" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon_k&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\epsilon_k"/> is either 1 or -1.</p>
-<p><strong>Theorem (Keller and Klein (2020) asked by Boguslav Tomaszewski (1986)): </strong>For at least <img alt="2^{n-1}" class="latex" src="https://s0.wp.com/latex.php?latex=2%5E%7Bn-1%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="2^{n-1}"/> signed sums <img alt="\displaystyle |\epsilon_1a_1+\epsilon_2a_2+\cdots +\epsilon_n a_n| \le 1 ." class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+%7C%5Cepsilon_1a_1%2B%5Cepsilon_2a_2%2B%5Ccdots+%2B%5Cepsilon_n+a_n%7C+%5Cle+1+.&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\displaystyle |\epsilon_1a_1+\epsilon_2a_2+\cdots +\epsilon_n a_n| \le 1 ."/></p>
-<p>Another way to state the theorem is that the probability of a signed sum to be in the interval [-1, 1] is at least 1/2.</p>
-<p>To see that this is best possible consider the case that <img alt="n=2" class="latex" src="https://s0.wp.com/latex.php?latex=n%3D2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n=2"/> and let <img alt="a_1,a_2" class="latex" src="https://s0.wp.com/latex.php?latex=a_1%2Ca_2&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="a_1,a_2"/> be non zero. For the sum in question to exceed one we need both summands to have the same sign which happens half of the times. There is another example of importance, the vector <img alt="(\frac{1}{2}, \frac{1}{2}, \frac {1}{2}, \frac{1}{2})" class="latex" src="https://s0.wp.com/latex.php?latex=%28%5Cfrac%7B1%7D%7B2%7D%2C+%5Cfrac%7B1%7D%7B2%7D%2C+%5Cfrac+%7B1%7D%7B2%7D%2C+%5Cfrac%7B1%7D%7B2%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="(\frac{1}{2}, \frac{1}{2}, \frac {1}{2}, \frac{1}{2})"/>. Here 3/8 of the absolute values of signed sums (6 out of 16) are below 1 (in fact, equal to zero), 1/2 equal to 1 and 1/8 exceed 1. Holzman and Kleitman proved in 1992 that the fraction of absolute values of signed sums below 1 is always at least 3/8.</p>
-<p>Congratulations to Nathan and Ohad. I will say a little more about the problem below but before that, a few more things.</p>
-<h3>A few more things</h3>
-<p>Luca Trevisan posted on his blog In Theory a post “Silver linings” about two cheerful pieces of news. The first one is “Karlin, Klein, and Oveis Gharan have just <a href="https://arxiv.org/abs/2007.01409">posted a paper</a> in which, at long last, they improve over the 1.5 approximation ratio for metric TSP which was achieved, in 1974, by Christofides.”</p>
-<p>The second  one is about breaking the logarithmic barrier for Roth’s theorem that we wrote about here. This was also discussed by Bill <a>Gasarch </a>on Computational Complexity. In the comment section of my post there is an interesting discussion regarding timetable for future achievements and how surprising they would be.</p>
-<p>The third is about Ron Graham, a friend and a mathematical giant who passed away a few days ago. Here is a <a href="https://www.facebook.com/fan.chung.9/posts/10220086655131549">moving post</a> by Fan Chung, <a href="http://www.math.ucsd.edu/~fan/ron/">a web page for Ron</a> set by Fan, and a <a href="https://rjlipton.wordpress.com/2020/07/10/ron-graham-1935-2020/">blog post by Dick and Ken on GLL</a>.</p>
-<p>The fourth is that there is a nice collection of open problems on Boolean functions that is cited in the paper of Nathan and Ohad:  Y. Filmus, H. Hatami, S. Heilman, E. Mossel, R. O’Donnell, S. Sachdeva, A. Wan, and K. Wimmer, <a href="https://simons.berkeley.edu/sites/default/files/openprobsmerged.pdf">Real analysis in computer science: A collection of open problems</a>.</p>
-<p>The fifth is that both our (HUJI) combinatorics seminar and basic notions seminar are running and are recorded. Here are the links. (Hmm, the links are not yet available, I will update.)</p>
-<h2>Back to the result of Keller and Klein</h2>
-<h3><a href="https://gilkalai.files.wordpress.com/2020/08/dkrh2.png"><img alt="" class="alignnone size-full wp-image-20034" height="365" src="https://gilkalai.files.wordpress.com/2020/08/dkrh2.png?w=640&amp;h=365" width="640"/></a></h3>
-<p><span style="color: #ff0000;">Daniel Kleitman and Ron Holzman</span></p>
-<h3>A quick orientation</h3>
-<p>If the <img alt="a_i" class="latex" src="https://s0.wp.com/latex.php?latex=a_i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="a_i"/>s are all the same, or small, or random, then to compute the probability that the weighted sum is between -1 and 1, we can use some Gaussian approximation and then we will find ourselves in a clash of constants that goes our way. The probability will be close to a constant well above 1/2. So what we need to understand is the case where some <img alt="a_i" class="latex" src="https://s0.wp.com/latex.php?latex=a_i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="a_i"/>s are large.</p>
-<h3>Early papers on the problem</h3>
-<p>The problem first appeared in the American Math Monthly.  Richard Guy <a href="https://www.math.wisc.edu/~miller/res/fun-problem.pdf">collected several problems  and challenged the readers Any Answers Anent These Analytical Enigmas?</a> (I don’t know what the fate of the other questions is.)  Holzman and Kleitman <a href="https://holzman.technion.ac.il/files/2012/09/combsigns.pdf">proved in 1992</a> that the fraction of absolute values of signed sums below 1 is always at least 3/8, and this is tight. For many years, 3/8 was the record for the original problem, until  the 2017 paper by Ravi Boppana and Ron Holzman: <a href="https://arxiv.org/abs/1704.00350">Tomaszewski’s problem on randomly signed sums: Breaking the 3/8 barrier</a>, where a lower bound of 0.406, was proved. The current record 0f 0.46 was proved in the paper <a href="https://arxiv.org/abs/2005.05031">Improved Bound for Tomaszewski’s Problem</a> by Vojtěch Dvořák, Peter van Hintum, and Marius Tiba. The new definite result by Nathan and Ohad used some ideas of these early papers.</p>
-<h3>What is the crux of matters</h3>
-<p>Let me quote what the authors kindly wrote me:</p>
-<blockquote><p><em>“The crux of the matter is how to deal with the case of very large coefficients (<img alt="a_1+a_2&gt;1" class="latex" src="https://s0.wp.com/latex.php?latex=a_1%2Ba_2%3E1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="a_1+a_2&gt;1"/>). We gave a short semi-inductive argument covering this case (this is Section 5 of the paper). The argument is only semi-inductive, as it requires the full assertion of Tomaszewski for any n'&lt;n, and gives only the case (<img alt="a_1+a_2&gt;1" class="latex" src="https://s0.wp.com/latex.php?latex=a_1%2Ba_2%3E1&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="a_1+a_2&gt;1"/>) for <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="n"/>. But this means that if we can handle all other cases by other methods then we will be done.</em></p>
-<p><em>The semi-inductive argument takes only 3 pages. Handling the other cases takes 72 more pages and requires several new tools, but is closer to things that were done in previous works. (Actually, after we found the 3-page argument, we were quite sure we will be able to finalize the proof; this indeed happened, but took a year).”</em></p></blockquote>
-<p>Most of the paper deals with the case of small coefficients. This requires several ideas and new tools.</p>
-<h3>Rademacher sums: Improved Berry-Esseen and local tail inequalities</h3>
-<p>If all coefficients are “sufficiently small”, then we can<br/>
-approximate X by a Gaussian and the inequality should follow. However, using the standard <a href="https://en.wikipedia.org/wiki/Berry%E2%80%93Esseen_theorem">Berry-Esseen bound</a>, this holds only if all coefficients are less than 0.16.<br/>
-Nathan and Ohad showed that for Rademacher sums, namely random variables of the form <img alt="X=\sum a_i x_i" class="latex" src="https://s0.wp.com/latex.php?latex=X%3D%5Csum+a_i+x_i&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="X=\sum a_i x_i"/>, as discussed in the conjecture, a stronger Berry-Esseen<br/>
-bound can be obtained, and this bound shows immediately that Tomaszewski’s assertion holds whenever all coefficients are less than 0.31. The stronger bound stems<br/>
-from a method of Prawitz, presented in the 1972 paper. H. Prawitz, <a href="https://www.tandfonline.com/doi/abs/10.1080/03461238.1972.10404645">Limits for a distribution, if the characteristic function is given in a finite domain</a>, which appeared in the Scandinavian <span style="color: #ff0000;">Actuarial</span> journal.</p>
-<p>The second tool is local tail inequalities for Rademacher sums, of the form <img alt="\Pr[a&lt;X&lt;b] \leq \Pr[c&lt;X&lt;d]," class="latex" src="https://s0.wp.com/latex.php?latex=%5CPr%5Ba%3CX%3Cb%5D+%5Cleq+%5CPr%5Bc%3CX%3Cd%5D%2C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\Pr[a&lt;X&lt;b] \leq \Pr[c&lt;X&lt;d],"/> where <em>a,b,c,d</em> satisfy certain conditions. Inequalities of this kind were obtained before by Devroye and Lugosi in the 2008 paper:  <a href="https://arxiv.org/abs/0712.1686">Local tail bounds for functions of independent random variables</a>.</p>
-<p>These local tail inequalities already have some other applications, e.g., to analysis of Boolean functions. They were developed and applied in an earlier paper paper of Keller and Klein: <a href="https://arxiv.org/abs/1710.07429">Biased halfspaces, noise sensitivity, and relative Chernoff inequalities</a>. Let me mention my related MO question <a href="https://mathoverflow.net/questions/85835/a-variance-tail-description-for-continuous-probability-distributions">A variance tail description for continuous probability distributions.</a></p>
-<h3>A couple more ingredients</h3>
-<p><strong>A  stopping time argument.</strong> Variants of Tomaszewski’s problem appeared in various fields. The problem was stated independently in a 2002 paper by Ben-Tal, Nemirovski, Roos, <a href="https://www2.isye.gatech.edu/~nemirovs/SIOPT_RQP_2002.pdf">Robust solutions of uncertain quadratic and conic-quadratic problems.</a>  A stopping time argument introduced there (for proving a lower bound of 1/3) played a crucial role in subsequent works and the critical semi-inductive argument by Nathan and Ohad.</p>
-<p><strong>Refinements of the famous <a href="https://en.wikipedia.org/wiki/Chebyshev%27s_inequality">Chebyshev’s inequality</a>.</strong>  (Did you know Chebyshev’s full name? Ans: Pafnuty Lvovich Chebyshev.)</p>
-<dl>
-<dd/>
-</dl>
-<h3>Questions and connections that come to mind</h3>
-<p><strong>Q1:</strong> What can be said about families <img alt="\cal F" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ccal+F&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="\cal F"/> of signs that can serve as those signs for which  <img alt="|\epsilon_1a_1+\epsilon_2a_2+\cdots +\epsilon_n a_n| \le 1 ," class="latex" src="https://s0.wp.com/latex.php?latex=%7C%5Cepsilon_1a_1%2B%5Cepsilon_2a_2%2B%5Ccdots+%2B%5Cepsilon_n+a_n%7C+%5Cle+1+%2C&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="|\epsilon_1a_1+\epsilon_2a_2+\cdots +\epsilon_n a_n| \le 1 ,"/> for some vector <img alt="a" class="latex" src="https://s0.wp.com/latex.php?latex=a&amp;bg=ffffff&amp;fg=333333&amp;s=0" title="a"/>.</p>
-<p><strong>Q2:</strong> What can be said about the complex version or even more generally about high dimensions?</p>
-<p><strong>Q3:</strong> Are there any relations to <a href="https://www.jstor.org/stable/1971442?seq=1">Littlewood-Offord type problems</a>?</p>
-<p><strong>Q4:</strong> Is there any relation to the <a href="https://ocw.mit.edu/courses/mathematics/18-s096-topics-in-mathematics-of-data-science-fall-2015/projects/MIT18_S096F15_Open0.1.pdf">Komlos Conjecture</a>?</p>
-<p>See also <a href="https://mathoverflow.net/questions/53669/anti-concentration-of-bernoulli-sums/53683#53683">this MO question</a> by Luca Trevisan and <a href="https://mathoverflow.net/questions/366894/a-rademacher-root-7-anti-concentration-inequality">this one</a> by George Lowther.</p>
-<h3><span style="color: #ff0000;"><strong>Is there a simpler proof?</strong></span></h3>
-<p>We can ask about simpler or just different proofs for almost every result we discuss here. But here the statement is so simple…</p>
-<div class="thumb tright">
-<div class="thumbinner"/>
-</div>
-<div class="thumb tright">
-<div class="thumbinner">
-<div class="thumbcaption"/>
-</div>
-</div></div>
-    </content>
-    <updated>2020-08-01T18:32:23Z</updated>
-    <published>2020-08-01T18:32:23Z</published>
-    <category term="Analysis"/>
-    <category term="Combinatorics"/>
-    <category term="Probability"/>
-    <category term="Boguslav Tomaszewski"/>
-    <category term="Nathan Keller"/>
-    <category term="Ohad Klein"/>
-    <author>
-      <name>Gil Kalai</name>
-    </author>
-    <source>
-      <id>https://gilkalai.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://gilkalai.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://gilkalai.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://gilkalai.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Gil Kalai's blog</subtitle>
-      <title>Combinatorics and more</title>
-      <updated>2020-08-16T13:20:35Z</updated>
+      <updated>2020-08-16T14:20:33Z</updated>
     </source>
   </entry>
 </feed>
