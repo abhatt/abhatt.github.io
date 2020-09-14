@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-09-14T00:22:08Z</updated>
+  <updated>2020-09-14T01:26:08Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,235 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://minimizingregret.wordpress.com/2016/10/30/unsupervised-learning-ii-the-power-of-improper-convex-relaxations/</id>
+    <link href="https://minimizingregret.wordpress.com/2016/10/30/unsupervised-learning-ii-the-power-of-improper-convex-relaxations/" rel="alternate" type="text/html"/>
+    <title>Unsupervised Learning II: the power of improper convex relaxations</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">http://cdn.mathjax.org/mathjax/latest/MathJax.js In this continuation post I’d like to bring out a critical component of learning theory that is essentially missing in today’s approaches for unsupervised learning: improper learning by convex relaxations. Consider the task of learning a sparse linear separator. The sparsity, or $\ell_0$, constraint is non-convex and computationally hard. Here comes the Lasso – … <a class="more-link" href="https://minimizingregret.wordpress.com/2016/10/30/unsupervised-learning-ii-the-power-of-improper-convex-relaxations/">Continue reading <span class="screen-reader-text">Unsupervised Learning II: the power of improper convex relaxations</span> <span class="meta-nav">→</span></a></div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><a href="http://cdn.mathjax.org/mathjax/latest/MathJax.js">http://cdn.mathjax.org/mathjax/latest/MathJax.js</a>   </p>
+<div dir="ltr" style="text-align: left;">In this continuation post I’d like to bring out a critical component of learning theory that is essentially missing in today’s approaches for unsupervised learning: improper learning by convex relaxations.<p/>
+<p>Consider the task of learning a sparse linear separator. The sparsity, or $\ell_0$, constraint is non-convex and computationally hard. Here comes the <a href="http://statweb.stanford.edu/~tibs/lasso.html">Lasso</a> – replace the $\ell_0$ constraint with $\ell_1$ convex relaxation — et voila — you’ve enabled polynomial-time solvable convex optimization.</p>
+<p><a name="more"/></p>
+<p>Another more timely example: latent variable models for recommender systems, a.k.a. the matrix completion problem. Think of a huge matrix, with one dimension corresponding to users and the other corresponding to media items (e.g. movies as in the Netflix problem). Given a set of entries in the matrix, corresponding to ranking of movies that the users already gave feedback on, the problem is to complete the entire matrix and figure out the preferences of people on movies they haven’t seen.<br/>This is of course ill posed without further assumptions. The low-rank assumption intuitively states that people’s preferences are governed by few factors (say genre, director, etc.).  This corresponds to the user-movie matrix having low algebraic rank.</p>
+<p>Completing a low-rank matrix is NP-hard in general. However, stemming from the compressed-sensing literature, the statistical-reconstruction approach is to assume additional statistical and structural properties over the user-movie matrix. For example, if this matrix is “incoherent”, and the observations of the entires are obtained via a uniform distribution, then <a href="http://pages.cs.wisc.edu/~brecht/papers/08.Candes.Recht.MatrixCompletion.pdf">this paper by Emmanuel Candes and Ben Recht</a> shows efficient reconstruction is still possible.</p>
+<p>But is there an alternative to incoherent assumptions such as incoherence and i.i.d. uniform observations?</p>
+<p>A long line of research has taken the “improper learning by convex relaxation approach” and applied it to matrix completion in works such as <a href="http://ttic.uchicago.edu/~nati/Publications/SrebroShraibmanCOLT05.pdf">Srebro and Shraibman</a>, considering convex relaxations to rank such as the trace norm and the max norm. Finally, in  joint work with <a href="https://arxiv.org/abs/1204.0136">Satyen Kale and Shai Shalev-Shwartz</a>, we take this approach to the extreme by not requiring any distribution at all, giving regret bounds in the online convex optimization model (see <a href="http://www.minimizingregret.com/2016/07/more-than-decade-of-online-convex.html">previous post</a>).</p>
+<p>By the exposition above one may think that this technique of improper convex relaxations applies only to problems whose hardness comes from “sparsity”.  This is far from the truth, and in the very same <a href="https://arxiv.org/abs/1204.0136">paper</a> referenced above, we show how the technique can be applied to combinatorial problems such as predicting cuts in graphs, and outcomes of matches in tournaments.</p>
+<p>In fact, improper learning is such a powerful concept, that problems such that the complexity of problems such as learning DNF formulas has remained open for quite a long time, despite the fact that showing proper learnability was long known to be NP-hard.</p>
+<p>On the other hand, improper convex relaxation is not an all powerful magic pill. When designing convex relaxations to learning problems, special care is required so not to increase sample complexity. Consider for example the question of predicting tournaments, as given in this <a href="http://web.eecs.umich.edu/~jabernet/OpenProblemAbernethy.pdf">COLT open problem formulation by Jake Abernethy</a>. The problem, loosely stated, is to iteratively predict the outcome of a match between two competing teams from a league of N teams. The goal is to compete, or make as few mistakes, as the best ranking of teams in hindsight. Since the number of rankings scales as $N!$, the <a href="http://theoryofcomputing.org/articles/v008a006/">multiplicative weights update method</a> can be used to guarantee regret that scales as $\sqrt{T \log N!} = O(\sqrt{T N \log N})$. However, the latter, naively implemented, runs in time proportional to $N!$. Is there an efficient algorithm for the problem attaining similar regret bounds?</p>
+<p>A naive improper learning relaxation would treat each pair of competing teams as an instance of binary prediction, for which we have efficient algorithms. The resulting regret bound, however, would scale as the number of pairs of teams over $N$ candidate teams, or as $\sqrt{T N^2}$, essentially removing any meaningful prediction property. What has gone wrong?</p>
+<p>By removing the restriction of focus from rankings to pairs of teams, we have enlarged the decision set significantly, and increased the number of examples needed to learn. This is a general and important concern for improper convex relaxations: one needs to relax the problem in such a way that sample complexity (usually measured in terms of Rademacher complexity) doesn’t explode. For the aforementioned problem of predicting tournaments, a convex relaxation that preserves sample complexity up to logarithmic factors is indeed possible, and described in the same <a href="https://arxiv.org/abs/1204.0136">paper</a>.</p>
+<p>In the coming posts we’ll describe a framework for unsupervised learning that allows us to use the power of improper convex relaxations.</p>
+</div></div>
+    </content>
+    <updated>2016-10-30T01:34:00Z</updated>
+    <published>2016-10-30T01:34:00Z</published>
+    <category term="Uncategorized"/>
+    <author>
+      <name>Elad Hazan</name>
+    </author>
+    <source>
+      <id>https://minimizingregret.wordpress.com</id>
+      <logo>https://minimizingregret.files.wordpress.com/2017/08/cropped-pu1.png?w=32</logo>
+      <link href="https://minimizingregret.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://minimizingregret.wordpress.com" rel="alternate" type="text/html"/>
+      <link href="https://minimizingregret.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://minimizingregret.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>Google Princeton AI and Hazan Lab @ Princeton University</subtitle>
+      <title>Minimizing Regret</title>
+      <updated>2020-09-14T01:25:17Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2009.05541</id>
+    <link href="http://arxiv.org/abs/2009.05541" rel="alternate" type="text/html"/>
+    <title>2D Fractional Cascading on Axis-aligned Planar Subdivisions</title>
+    <feedworld_mtime>1600041600</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Afshani:Peyman.html">Peyman Afshani</a>, Pingan Cheng <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2009.05541">PDF</a><br/><b>Abstract: </b>Fractional cascading is one of the influential techniques in data structures,
+as it provides a general framework for solving the important iterative search
+problem. In the problem, the input is a graph $G$ with constant degree and a
+set of values for every vertex of $G$. The goal is to preprocess $G$ such that
+when given a query value $q$, and a connected subgraph $\pi$ of $G$, we can
+find the predecessor of $q$ in all the sets associated with the vertices of
+$\pi$. The fundamental result of fractional cascading is that there exists a
+data structure that uses linear space and it can answer queries in $O(\log n +
+|\pi|)$ time [Chazelle and Guibas, 1986]. While this technique has received
+plenty of attention in the past decades, an almost quadratic space lower bound
+for "2D fractional cascading" [Chazelle and Liu, 2001] has convinced the
+researchers that fractional cascading is fundamentally a 1D technique.
+</p>
+<p>In 2D fractional cascading, the input includes a planar subdivision for every
+vertex of $G$ and the query is a point $q$ and a subgraph $\pi$ and the goal is
+to locate the cell containing $q$ in all the subdivisions associated with the
+vertices of $\pi$. In this paper, we show that it is possible to circumvent the
+lower bound of Chazelle and Liu for axis-aligned planar subdivisions. We
+present a number of upper and lower bounds which reveal that in 2D, the problem
+has a much richer structure. When $G$ is a tree and $\pi$ is a path, then
+queries can be answered in
+$O(\log{n}+|\pi|+\min\{|\pi|\sqrt{\log{n}},\alpha(n)\sqrt{|\pi|}\log{n}\})$
+time using linear space where $\alpha$ is an inverse Ackermann function;
+surprisingly, we show both branches of this bound are tight, up to the inverse
+Ackermann factor. When $G$ is a general graph or when $\pi$ is a general
+subgraph, then the query bound becomes $O(\log n + |\pi|\sqrt{\log n})$ and
+this bound is once again tight in both cases.
+</p></div>
+    </summary>
+    <updated>2020-09-14T00:00:00Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Computational Geometry"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.CG" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Computational Geometry (cs.CG) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.CG updates on arXiv.org</title>
+      <updated>2020-09-14T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2009.05382</id>
+    <link href="http://arxiv.org/abs/2009.05382" rel="alternate" type="text/html"/>
+    <title>Fault-Tolerant Edge-Disjoint Paths -- Beyond Uniform Faults</title>
+    <feedworld_mtime>1600041600</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Adjiashvili:David.html">David Adjiashvili</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Hommelsheim:Felix.html">Felix Hommelsheim</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/M=uuml=hlenthaler:Moritz.html">Moritz Mühlenthaler</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Schaudt:Oliver.html">Oliver Schaudt</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2009.05382">PDF</a><br/><b>Abstract: </b>The overwhelming majority of survivable (fault-tolerant) network design
+models assume a uniform fault model. Such a model assumes that every subset of
+the network resources (edges or vertices) of a given cardinality $k$ may fail.
+While this approach yields problems with clean combinatorial structure and good
+algorithms, it often fails to capture the true nature of the scenario set
+coming from applications. One natural refinement of the uniform model is
+obtained by partitioning the set of resources into vulnerable and safe
+resources. The scenario set contains every subset of at most $k$ faulty
+resources. This work studies the Fault-Tolerant Path (FTP) problem, the
+counterpart of the Shortest Path problem in this fault model and the
+Fault-Tolerant Flow problem (FTF), the counterpart of the $\ell$-disjoint
+Shortest $s$-$t$ Path problem. We present complexity results alongside exact
+and approximation algorithms for both models. We emphasize the vast increase in
+the complexity of the problem with respect to the uniform analogue, the
+Edge-Disjoint Paths problem.
+</p></div>
+    </summary>
+    <updated>2020-09-14T01:22:56Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2020-09-14T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2009.05314</id>
+    <link href="http://arxiv.org/abs/2009.05314" rel="alternate" type="text/html"/>
+    <title>Repeated Recursion Unfolding for Super-Linear Speedup within Bounds</title>
+    <feedworld_mtime>1600041600</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Thom Fruehwirth <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2009.05314">PDF</a><br/><b>Abstract: </b>Repeated recursion unfolding is a new approach that repeatedly unfolds a
+recursion with itself and simplifies it while keeping all unfolded rules. Each
+unfolding doubles the number of recursive steps covered. This reduces the
+number of recursive rule applications to its logarithm at the expense of
+introducing a logarithmic number of unfolded rules to the program. Efficiency
+crucially depends on the amount of simplification inside the unfolded rules. We
+prove a super-linear speedup theorem in the best case, i.e. speedup by more
+than a constant factor. Our optimization can lower the time complexity class of
+a program. In this paper, the super-linear speedup is within bounds: it holds
+up to an arbitrary but chosen upper bound on the number of recursive steps. We
+also report on the first results with a prototype implementation of repeated
+recursion unfolding. A simple program transformation completely removes
+recursion up to the chosen bound. The actual runtime improvement quickly
+reaches several orders of magnitude.
+</p></div>
+    </summary>
+    <updated>2020-09-14T00:00:00Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Computational Complexity"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.CC" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Computational Complexity (cs.CC) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.CC updates on arXiv.org</title>
+      <updated>2020-09-14T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2009.05218</id>
+    <link href="http://arxiv.org/abs/2009.05218" rel="alternate" type="text/html"/>
+    <title>Explicit SoS lower bounds from high-dimensional expanders</title>
+    <feedworld_mtime>1600041600</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Dinur:Irit.html">Irit Dinur</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/f/Filmus:Yuval.html">Yuval Filmus</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Harsha:Prahladh.html">Prahladh Harsha</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/t/Tulsiani:Madhur.html">Madhur Tulsiani</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2009.05218">PDF</a><br/><b>Abstract: </b>We construct an explicit family of 3XOR instances which is hard for
+$O(\sqrt{\log n})$ levels of the Sum-of-Squares hierarchy. In contrast to
+earlier constructions, which involve a random component, our systems can be
+constructed explicitly in deterministic polynomial time.
+</p>
+<p>Our construction is based on the high-dimensional expanders devised by
+Lubotzky, Samuels and Vishne, known as LSV complexes or Ramanujan complexes,
+and our analysis is based on two notions of expansion for these complexes:
+cosystolic expansion, and a local isoperimetric inequality due to Gromov.
+</p>
+<p>Our construction offers an interesting contrast to the recent work of Alev,
+Jeronimo and the last author~(FOCS 2019). They showed that 3XOR instances in
+which the variables correspond to vertices in a high-dimensional expander are
+easy to solve. In contrast, in our instances the variables correspond to the
+edges of the complex.
+</p></div>
+    </summary>
+    <updated>2020-09-14T01:20:46Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Computational Complexity"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.CC" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Computational Complexity (cs.CC) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.CC updates on arXiv.org</title>
+      <updated>2020-09-14T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2009.05208</id>
+    <link href="http://arxiv.org/abs/2009.05208" rel="alternate" type="text/html"/>
+    <title>Consensus under Network Interruption and Effective Resistance Interdiction</title>
+    <feedworld_mtime>1600041600</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/e/Etesami:S=_Rasoul.html">S. Rasoul Etesami</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2009.05208">PDF</a><br/><b>Abstract: </b>We study the problem of network robustness under consensus dynamics. We first
+show that maximizing the consensus time subject to removing limited network
+edges can be cast as an effective resistance interdiction problem. We then show
+that the effective resistance interdiction problem is strongly NP-hard, even
+for three types of resistors in the network, hence correcting some claims in
+the existing literature. Finally, we provide a quadratic program formulation to
+find a local optimum solution to the consensus interdiction problem.
+</p></div>
+    </summary>
+    <updated>2020-09-14T00:00:00Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Computational Complexity"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.CC" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Computational Complexity (cs.CC) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.CC updates on arXiv.org</title>
+      <updated>2020-09-14T01:30:00Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>https://decentralizedthoughts.github.io/2020-09-13-synchronous-consensus-omission-faults/</id>
@@ -203,7 +432,7 @@ I wish I were better informed about continuous methods in general. They are powe
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-09-14T00:20:40Z</updated>
+      <updated>2020-09-14T01:24:28Z</updated>
     </source>
   </entry>
 
@@ -231,7 +460,7 @@ Except when the program's width $w$ is very small, this is an improvement over p
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-09-14T00:20:29Z</updated>
+      <updated>2020-09-14T01:24:16Z</updated>
     </source>
   </entry>
 
@@ -737,7 +966,7 @@ In this work, we show that tree codes that are efficiently encodable, {\em but n
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-09-14T00:20:29Z</updated>
+      <updated>2020-09-14T01:24:16Z</updated>
     </source>
   </entry>
 
@@ -767,7 +996,7 @@ Our construction offers an interesting contrast to the recent work of Alev, Jero
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-09-14T00:20:29Z</updated>
+      <updated>2020-09-14T01:24:16Z</updated>
     </source>
   </entry>
 
@@ -889,7 +1118,7 @@ We would like to throw the floor open for comment on Moshe’s matters that we�
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-09-14T00:20:40Z</updated>
+      <updated>2020-09-14T01:24:27Z</updated>
     </source>
   </entry>
 
@@ -951,7 +1180,7 @@ We would like to throw the floor open for comment on Moshe’s matters that we�
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-09-14T00:21:14Z</updated>
+      <updated>2020-09-14T01:24:47Z</updated>
     </source>
   </entry>
 
@@ -1022,7 +1251,7 @@ We would like to throw the floor open for comment on Moshe’s matters that we�
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2020-09-14T00:21:28Z</updated>
+      <updated>2020-09-14T01:25:00Z</updated>
     </source>
   </entry>
 
@@ -1057,7 +1286,7 @@ tolerant graph isomorphism. We believe that the introduction of the problem of t
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-09-14T00:20:29Z</updated>
+      <updated>2020-09-14T01:24:16Z</updated>
     </source>
   </entry>
 
@@ -1224,7 +1453,7 @@ on the block sensitivity of the classes we consider.</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-09-14T00:20:29Z</updated>
+      <updated>2020-09-14T01:24:16Z</updated>
     </source>
   </entry>
 
@@ -1260,7 +1489,7 @@ We show that black-box proofs cannot improve the Goldreich-Levin theorem and pro
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-09-14T00:20:29Z</updated>
+      <updated>2020-09-14T01:24:16Z</updated>
     </source>
   </entry>
 
@@ -1582,7 +1811,7 @@ We show that black-box proofs cannot improve the Goldreich-Levin theorem and pro
       <link href="https://francisbach.com" rel="alternate" type="text/html"/>
       <subtitle>Francis Bach</subtitle>
       <title>Machine Learning Research Blog</title>
-      <updated>2020-09-14T00:22:06Z</updated>
+      <updated>2020-09-14T01:26:07Z</updated>
     </source>
   </entry>
 
@@ -1608,7 +1837,7 @@ We show that black-box proofs cannot improve the Goldreich-Levin theorem and pro
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-09-14T00:20:29Z</updated>
+      <updated>2020-09-14T01:24:16Z</updated>
     </source>
   </entry>
 
@@ -1677,7 +1906,7 @@ where $\omega^*(G)$ represents the entangled value of the game $G$. This is a ge
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-09-14T00:20:29Z</updated>
+      <updated>2020-09-14T01:24:16Z</updated>
     </source>
   </entry>
 
@@ -1707,7 +1936,7 @@ As a corollary, we also get $3$-query probabilistically checkable proofs with pe
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-09-14T00:20:29Z</updated>
+      <updated>2020-09-14T01:24:16Z</updated>
     </source>
   </entry>
 
@@ -1825,7 +2054,7 @@ What about our advice: what would you do if you solved a major open problem? Not
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-09-14T00:20:40Z</updated>
+      <updated>2020-09-14T01:24:27Z</updated>
     </source>
   </entry>
 
@@ -1851,234 +2080,7 @@ For every $n$-variate polynomial of degree $d$, the determinantal complexity is 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-09-14T00:20:29Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://adamsheffer.wordpress.com/?p=5519</id>
-    <link href="https://adamsheffer.wordpress.com/2020/09/04/mathematics-for-human-flourishing/" rel="alternate" type="text/html"/>
-    <title>Mathematics for Human Flourishing</title>
-    <summary>I read a lot of “popular math” books. I also wrote about some in past posts. But I’ve never read a book similar to Mathematics for Human Flourishing by Francis Su. I already knew the math presented in this book and almost all other topics covered. I even knew some of Su’s personal stories from […]</summary>
-    <updated>2020-09-04T21:21:41Z</updated>
-    <published>2020-09-04T21:21:41Z</published>
-    <category term="Math events"/>
-    <author>
-      <name>Adam Sheffer</name>
-    </author>
-    <source>
-      <id>https://adamsheffer.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://adamsheffer.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://adamsheffer.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://adamsheffer.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://adamsheffer.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Discrete geometry and other typos</subtitle>
-      <title>Some Plane Truths</title>
-      <updated>2020-09-14T00:21:26Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://gilkalai.wordpress.com/?p=20205</id>
-    <link href="https://gilkalai.wordpress.com/2020/09/04/alef-corner-math-collaboration/" rel="alternate" type="text/html"/>
-    <title>Alef Corner: Math Collaboration</title>
-    <summary>Another artistic view by Alef on mathematical collaboration.   Other Alef’s corner posts</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Another artistic view by Alef on mathematical collaboration.</p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/09/mathcoll.jpg"><img alt="" class="alignnone size-full wp-image-20207" height="640" src="https://gilkalai.files.wordpress.com/2020/09/mathcoll.jpg?w=640&amp;h=640" width="640"/></a></p>
-<p> </p>
-<p>Other <a href="https://gilkalai.wordpress.com/tag/alefs-corner/">Alef’s corner</a> posts</p></div>
-    </content>
-    <updated>2020-09-04T07:17:13Z</updated>
-    <published>2020-09-04T07:17:13Z</published>
-    <category term="Art"/>
-    <category term="Combinatorics"/>
-    <category term="What is Mathematics"/>
-    <category term="Alef's corner"/>
-    <author>
-      <name>Gil Kalai</name>
-    </author>
-    <source>
-      <id>https://gilkalai.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://gilkalai.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://gilkalai.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://gilkalai.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Gil Kalai's blog</subtitle>
-      <title>Combinatorics and more</title>
-      <updated>2020-09-14T00:20:35Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://dstheory.wordpress.com/?p=52</id>
-    <link href="https://dstheory.wordpress.com/2020/09/04/friday-sept-11-bin-yu-from-uc-berkeley/" rel="alternate" type="text/html"/>
-    <title>Friday, Sept 11 — Bin Yu from UC Berkeley</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">The next Foundations of Data Science virtual talk will take place on Friday, Sept 11th at 10:00 AM Pacific Time (1:00 pm Eastern Time, 18:00 Central European Time, 17:00 UTC).  Bin Yu from UC Berkeley will speak about “Veridical Data Science”. Abstract: Building and expanding on principles of statistics, machine learning, and the sciences, we propose<a class="more-link" href="https://dstheory.wordpress.com/2020/09/04/friday-sept-11-bin-yu-from-uc-berkeley/">Continue reading <span class="screen-reader-text">"Friday, Sept 11 — Bin Yu from UC Berkeley"</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The next Foundations of Data Science virtual talk will take place on Friday, Sept 11th at 10:00 AM Pacific Time (1:00 pm Eastern Time, 18:00 Central European Time, 17:00 UTC).  <strong>Bin Yu </strong>from UC Berkeley will speak about “<em>Veridical Data Science</em>”.</p>
-
-
-
-<p><strong>Abstract</strong>: Building and expanding on principles of statistics, machine learning, and the sciences, we propose the predictability, computability, and stability (PCS) framework for veridical data science. Our framework is comprised of both a workflow and documentation and aims to provide responsible, reliable, reproducible, and transparent results across the entire data science life cycle. The PCS workflow uses predictability as a reality check and considers the importance of computation in data collection/storage and algorithm design. It augments predictability and computability with an overarching stability principle for the data science life cycle. Stability expands on statistical uncertainty considerations to assess how human judgment calls impact data results through data and model/algorithm perturbations. We develop inference procedures that build on PCS, namely PCS perturbation intervals and PCS hypothesis testing, to investigate the stability of data results relative to problem formulation, data cleaning, modeling decisions, and interpretations.</p>
-
-
-
-<p>Moreover, we propose PCS documentation based on R Markdown or Jupyter Notebook, with publicly available, reproducible codes and narratives to back up human choices made throughout an analysis.</p>
-
-
-
-<p>The PCS framework will be illustrated through our DeepTune approach to model and characterize neurons in the difficult visual cortex area V4.</p>
-
-
-
-<p><a href="https://sites.google.com/view/dstheory" rel="noreferrer noopener" target="_blank">Please register here to join the virtual talk.</a></p>
-
-
-
-<p>The series is supported by the <a href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1934846&amp;HistoricalAwards=false">NSF HDR TRIPODS Grant 1934846</a>.</p></div>
-    </content>
-    <updated>2020-09-04T00:47:54Z</updated>
-    <published>2020-09-04T00:47:54Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>dstheory</name>
-    </author>
-    <source>
-      <id>https://dstheory.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://dstheory.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://dstheory.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://dstheory.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://dstheory.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <title>Foundation of Data Science – Virtual Talk Series</title>
-      <updated>2020-09-14T00:22:02Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://tcsmath.wordpress.com/?p=2298</id>
-    <link href="https://tcsmath.wordpress.com/2020/09/03/itcs-2021-call-for-papers-deadline-extension/" rel="alternate" type="text/html"/>
-    <title>ITCS 2021 Call For Papers (deadline extension)</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">NOTE: The deadline has been extended to Tuesday, September 8th to account for the Labor Day Holiday in the US. The 12th Innovations in Theoretical Computer Science (ITCS) conference will be held online from January 6-8, 2021. The submission deadline is now September 8, 2020. The program committee encourages you to send your papers our way! See the call for papers for information about submitting to the … <a class="more-link" href="https://tcsmath.wordpress.com/2020/09/03/itcs-2021-call-for-papers-deadline-extension/">Continue reading <span class="screen-reader-text">ITCS 2021 Call For Papers (deadline extension)</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><strong>NOTE</strong>:  The deadline has been extended to Tuesday, September 8th to account for the Labor Day Holiday in the US.</p>
-
-
-
-<p>The <strong>12th Innovations in Theoretical Computer Science (ITCS)</strong> conference will be held <strong>online</strong> from <strong>January 6-8, 2021</strong>. The <strong>submission deadline</strong> is now <strong>September 8, 2020</strong>.</p>
-
-
-
-<p>The <a href="http://itcs-conf.org/">program committee</a> encourages you to send your papers our way! See the <a href="http://itcs-conf.org/">call for papers</a> for information about submitting to the conference.</p>
-
-
-
-<p>ITCS seeks to promote research that carries a strong conceptual message (e.g., introducing a new concept, model or understanding, opening a new line of inquiry within traditional or interdisciplinary areas, introducing new mathematical techniques and methodologies, or new applications of known techniques). ITCS welcomes both conceptual and technical contributions whose contents will advance and inspire the greater theory community.</p>
-
-
-
-<h3>Important dates</h3>
-
-
-
-<ul><li><strong>Submission deadline: </strong>September 8, 2020 (05:59PM PDT)</li><li><strong>Notification to authors:</strong> November 1, 2020</li><li><strong>Conference dates: </strong>January 6-8, 2021</li></ul></div>
-    </content>
-    <updated>2020-09-03T21:53:56Z</updated>
-    <published>2020-09-03T21:53:56Z</published>
-    <category term="Math"/>
-    <author>
-      <name>James</name>
-    </author>
-    <source>
-      <id>https://tcsmath.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://tcsmath.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://tcsmath.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://tcsmath.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://tcsmath.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>some mathematics &amp; computation</subtitle>
-      <title>tcs math</title>
-      <updated>2020-09-14T00:20:17Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-US">
-    <id>https://www.scottaaronson.com/blog/?p=4949</id>
-    <link href="https://www.scottaaronson.com/blog/?p=4949" rel="alternate" type="text/html"/>
-    <link href="https://www.scottaaronson.com/blog/?p=4949#comments" rel="replies" type="text/html"/>
-    <link href="https://www.scottaaronson.com/blog/?feed=atom&amp;p=4949" rel="replies" type="application/atom+xml"/>
-    <title xml:lang="en-US">My Utility+ podcast with Matthew Putman</title>
-    <summary xml:lang="en-US">Another Update (Sep. 8): A reader wrote to let me know about a fundraiser for Denys Smirnov, a 2015 IMO gold medalist from Ukraine who needs an expensive bone marrow transplant to survive Hodgkin’s lymphoma. I just donated and I hope you’ll consider it too! Update (Sep. 5): Here’s another quantum computing podcast I did, […]</summary>
-    <content type="xhtml" xml:lang="en-US"><div xmlns="http://www.w3.org/1999/xhtml"><p><strong><span class="has-inline-color has-vivid-red-color">Another Update (Sep. 8):</span></strong> A reader wrote to let me know about a <a href="https://www.gofundme.com/f/help-denis-smirnov">fundraiser for Denys Smirnov</a>, a 2015 IMO gold medalist from Ukraine who needs an expensive bone marrow transplant to survive Hodgkin’s lymphoma.  I just donated and I hope you’ll consider it too!</p>
-
-
-
-<p><strong><span class="has-inline-color has-vivid-red-color">Update (Sep. 5):</span></strong> <a href="https://dunctank.podbean.com/e/scott-aaronson-infinite-universes/">Here’s another quantum computing podcast I did</a>, “Dunc Tank” with Duncan Gammie.  Enjoy!</p>
-
-
-
-<p/><hr/>
-<p><br/>Thanks so much to <em>Shtetl-Optimized</em> readers, so far we’ve raised $1,371 for the <a href="https://secure.actblue.com/donate/duforjoe">Biden-Harris campaign</a> and $225 for the <a href="https://lincolnproject.us/donate/">Lincoln Project</a>, which I intend to match for $3,192 total.  If you’d like to donate by tonight (Thursday night), there’s still $404 to go!</p><p/>
-
-
-
-<p>Meanwhile, a mere three days after declaring my <a href="https://www.scottaaronson.com/blog/?p=4942">“new motto,”</a> I’ve come up with a <em>new</em> new motto for this blog, hopefully a more cheerful one:</p>
-
-
-
-<blockquote class="wp-block-quote"><p>When civilization seems on the brink of collapse, sometimes there’s nothing left to talk about but maximal separations between randomized and quantum query complexity.</p></blockquote>
-
-
-
-<p>On that note, please enjoy my new <a href="https://nanotronics.co/thinkspace/24-scott-aaronson-before-and-after-the-machine/">one-hour podcast on Spotify</a> (if that link doesn’t work, <a href="https://overcast.fm/+UZFvS_CT8">try this one</a>) with <a href="https://en.wikipedia.org/wiki/Matthew_Putman_(scientist)">Matthew Putman</a> of Utility+.  Alas, my umming and ahhing were more frequent than I now aim for, but that’s partly compensated for by Matthew’s excellent decision to speed up the audio.  This was an unusually wide-ranging interview, covering everything from SlateStarCodex to quantum gravity to interdisciplinary conferences to the challenges of teaching quantum computing to 7-year-olds.  I hope you like it!</p></div>
-    </content>
-    <updated>2020-09-03T16:43:36Z</updated>
-    <published>2020-09-03T16:43:36Z</published>
-    <category scheme="https://www.scottaaronson.com/blog" term="Announcements"/>
-    <category scheme="https://www.scottaaronson.com/blog" term="Complexity"/>
-    <category scheme="https://www.scottaaronson.com/blog" term="Nerd Interest"/>
-    <category scheme="https://www.scottaaronson.com/blog" term="Quantum"/>
-    <author>
-      <name>Scott</name>
-      <uri>http://www.scottaaronson.com</uri>
-    </author>
-    <source>
-      <id>https://www.scottaaronson.com/blog</id>
-      <link href="https://www.scottaaronson.com/blog" rel="alternate" type="text/html"/>
-      <link href="https://www.scottaaronson.com/blog/?feed=atom" rel="self" type="application/atom+xml"/>
-      <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
-      <title xml:lang="en-US">Shtetl-Optimized</title>
-      <updated>2020-09-08T18:48:29Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-jobs.org/2020/09/03/post-doc-at-basic-algorithms-research-copenhagen-at-it-university-of-copenhagen-apply-by-october-26-2020/</id>
-    <link href="https://cstheory-jobs.org/2020/09/03/post-doc-at-basic-algorithms-research-copenhagen-at-it-university-of-copenhagen-apply-by-october-26-2020/" rel="alternate" type="text/html"/>
-    <title>Post-doc at Basic Algorithms Research Copenhagen at IT University of Copenhagen (apply by October 26, 2020)</title>
-    <summary>The BARC Center for Basic Algorithms Research Copenhagen (barc.ku.dk) is seeking a postdoc employed at IT University of Copenhagen (ITU). The ideal candidate will have proven their research ability through an outstanding PhD thesis, and by publishing in leading international venues for algorithms theory. Website: https://candidate.hr-manager.net/ApplicationInit.aspx?cid=119&amp;ProjectId=181207&amp;DepartmentId=3439&amp;MediaId=5 Email: pagh@itu.dk</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The BARC Center for Basic Algorithms Research Copenhagen (barc.ku.dk) is seeking a postdoc employed at IT University of Copenhagen (ITU).</p>
-<p>The ideal candidate will have proven their research ability through an outstanding PhD thesis, and by publishing in leading international venues for algorithms theory.</p>
-<p>Website: <a href="https://candidate.hr-manager.net/ApplicationInit.aspx?cid=119&amp;ProjectId=181207&amp;DepartmentId=3439&amp;MediaId=5">https://candidate.hr-manager.net/ApplicationInit.aspx?cid=119&amp;ProjectId=181207&amp;DepartmentId=3439&amp;MediaId=5</a><br/>
-Email: pagh@itu.dk</p></div>
-    </content>
-    <updated>2020-09-03T08:36:42Z</updated>
-    <published>2020-09-03T08:36:42Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-jobs.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-jobs.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-jobs.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-09-14T00:20:43Z</updated>
+      <updated>2020-09-14T01:24:16Z</updated>
     </source>
   </entry>
 </feed>
