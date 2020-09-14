@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-09-14T01:26:08Z</updated>
+  <updated>2020-09-14T01:25:35Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,47 +10,6 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
-
-  <entry xml:lang="en">
-    <id>http://minimizingregret.wordpress.com/2016/10/30/unsupervised-learning-ii-the-power-of-improper-convex-relaxations/</id>
-    <link href="https://minimizingregret.wordpress.com/2016/10/30/unsupervised-learning-ii-the-power-of-improper-convex-relaxations/" rel="alternate" type="text/html"/>
-    <title>Unsupervised Learning II: the power of improper convex relaxations</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">http://cdn.mathjax.org/mathjax/latest/MathJax.js In this continuation post I’d like to bring out a critical component of learning theory that is essentially missing in today’s approaches for unsupervised learning: improper learning by convex relaxations. Consider the task of learning a sparse linear separator. The sparsity, or $\ell_0$, constraint is non-convex and computationally hard. Here comes the Lasso – … <a class="more-link" href="https://minimizingregret.wordpress.com/2016/10/30/unsupervised-learning-ii-the-power-of-improper-convex-relaxations/">Continue reading <span class="screen-reader-text">Unsupervised Learning II: the power of improper convex relaxations</span> <span class="meta-nav">→</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><a href="http://cdn.mathjax.org/mathjax/latest/MathJax.js">http://cdn.mathjax.org/mathjax/latest/MathJax.js</a>   </p>
-<div dir="ltr" style="text-align: left;">In this continuation post I’d like to bring out a critical component of learning theory that is essentially missing in today’s approaches for unsupervised learning: improper learning by convex relaxations.<p/>
-<p>Consider the task of learning a sparse linear separator. The sparsity, or $\ell_0$, constraint is non-convex and computationally hard. Here comes the <a href="http://statweb.stanford.edu/~tibs/lasso.html">Lasso</a> – replace the $\ell_0$ constraint with $\ell_1$ convex relaxation — et voila — you’ve enabled polynomial-time solvable convex optimization.</p>
-<p><a name="more"/></p>
-<p>Another more timely example: latent variable models for recommender systems, a.k.a. the matrix completion problem. Think of a huge matrix, with one dimension corresponding to users and the other corresponding to media items (e.g. movies as in the Netflix problem). Given a set of entries in the matrix, corresponding to ranking of movies that the users already gave feedback on, the problem is to complete the entire matrix and figure out the preferences of people on movies they haven’t seen.<br/>This is of course ill posed without further assumptions. The low-rank assumption intuitively states that people’s preferences are governed by few factors (say genre, director, etc.).  This corresponds to the user-movie matrix having low algebraic rank.</p>
-<p>Completing a low-rank matrix is NP-hard in general. However, stemming from the compressed-sensing literature, the statistical-reconstruction approach is to assume additional statistical and structural properties over the user-movie matrix. For example, if this matrix is “incoherent”, and the observations of the entires are obtained via a uniform distribution, then <a href="http://pages.cs.wisc.edu/~brecht/papers/08.Candes.Recht.MatrixCompletion.pdf">this paper by Emmanuel Candes and Ben Recht</a> shows efficient reconstruction is still possible.</p>
-<p>But is there an alternative to incoherent assumptions such as incoherence and i.i.d. uniform observations?</p>
-<p>A long line of research has taken the “improper learning by convex relaxation approach” and applied it to matrix completion in works such as <a href="http://ttic.uchicago.edu/~nati/Publications/SrebroShraibmanCOLT05.pdf">Srebro and Shraibman</a>, considering convex relaxations to rank such as the trace norm and the max norm. Finally, in  joint work with <a href="https://arxiv.org/abs/1204.0136">Satyen Kale and Shai Shalev-Shwartz</a>, we take this approach to the extreme by not requiring any distribution at all, giving regret bounds in the online convex optimization model (see <a href="http://www.minimizingregret.com/2016/07/more-than-decade-of-online-convex.html">previous post</a>).</p>
-<p>By the exposition above one may think that this technique of improper convex relaxations applies only to problems whose hardness comes from “sparsity”.  This is far from the truth, and in the very same <a href="https://arxiv.org/abs/1204.0136">paper</a> referenced above, we show how the technique can be applied to combinatorial problems such as predicting cuts in graphs, and outcomes of matches in tournaments.</p>
-<p>In fact, improper learning is such a powerful concept, that problems such that the complexity of problems such as learning DNF formulas has remained open for quite a long time, despite the fact that showing proper learnability was long known to be NP-hard.</p>
-<p>On the other hand, improper convex relaxation is not an all powerful magic pill. When designing convex relaxations to learning problems, special care is required so not to increase sample complexity. Consider for example the question of predicting tournaments, as given in this <a href="http://web.eecs.umich.edu/~jabernet/OpenProblemAbernethy.pdf">COLT open problem formulation by Jake Abernethy</a>. The problem, loosely stated, is to iteratively predict the outcome of a match between two competing teams from a league of N teams. The goal is to compete, or make as few mistakes, as the best ranking of teams in hindsight. Since the number of rankings scales as $N!$, the <a href="http://theoryofcomputing.org/articles/v008a006/">multiplicative weights update method</a> can be used to guarantee regret that scales as $\sqrt{T \log N!} = O(\sqrt{T N \log N})$. However, the latter, naively implemented, runs in time proportional to $N!$. Is there an efficient algorithm for the problem attaining similar regret bounds?</p>
-<p>A naive improper learning relaxation would treat each pair of competing teams as an instance of binary prediction, for which we have efficient algorithms. The resulting regret bound, however, would scale as the number of pairs of teams over $N$ candidate teams, or as $\sqrt{T N^2}$, essentially removing any meaningful prediction property. What has gone wrong?</p>
-<p>By removing the restriction of focus from rankings to pairs of teams, we have enlarged the decision set significantly, and increased the number of examples needed to learn. This is a general and important concern for improper convex relaxations: one needs to relax the problem in such a way that sample complexity (usually measured in terms of Rademacher complexity) doesn’t explode. For the aforementioned problem of predicting tournaments, a convex relaxation that preserves sample complexity up to logarithmic factors is indeed possible, and described in the same <a href="https://arxiv.org/abs/1204.0136">paper</a>.</p>
-<p>In the coming posts we’ll describe a framework for unsupervised learning that allows us to use the power of improper convex relaxations.</p>
-</div></div>
-    </content>
-    <updated>2016-10-30T01:34:00Z</updated>
-    <published>2016-10-30T01:34:00Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>Elad Hazan</name>
-    </author>
-    <source>
-      <id>https://minimizingregret.wordpress.com</id>
-      <logo>https://minimizingregret.files.wordpress.com/2017/08/cropped-pu1.png?w=32</logo>
-      <link href="https://minimizingregret.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://minimizingregret.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://minimizingregret.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://minimizingregret.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Google Princeton AI and Hazan Lab @ Princeton University</subtitle>
-      <title>Minimizing Regret</title>
-      <updated>2020-09-14T01:25:17Z</updated>
-    </source>
-  </entry>
 
   <entry xml:lang="en-us">
     <id>http://arxiv.org/abs/2009.05541</id>
@@ -1811,7 +1770,7 @@ We show that black-box proofs cannot improve the Goldreich-Levin theorem and pro
       <link href="https://francisbach.com" rel="alternate" type="text/html"/>
       <subtitle>Francis Bach</subtitle>
       <title>Machine Learning Research Blog</title>
-      <updated>2020-09-14T01:26:07Z</updated>
+      <updated>2020-09-14T01:25:34Z</updated>
     </source>
   </entry>
 
@@ -2081,6 +2040,30 @@ For every $n$-variate polynomial of degree $d$, the determinantal complexity is 
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
       <updated>2020-09-14T01:24:16Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://adamsheffer.wordpress.com/?p=5519</id>
+    <link href="https://adamsheffer.wordpress.com/2020/09/04/mathematics-for-human-flourishing/" rel="alternate" type="text/html"/>
+    <title>Mathematics for Human Flourishing</title>
+    <summary>I read a lot of “popular math” books. I also wrote about some in past posts. But I’ve never read a book similar to Mathematics for Human Flourishing by Francis Su. I already knew the math presented in this book and almost all other topics covered. I even knew some of Su’s personal stories from […]</summary>
+    <updated>2020-09-04T21:21:41Z</updated>
+    <published>2020-09-04T21:21:41Z</published>
+    <category term="Math events"/>
+    <author>
+      <name>Adam Sheffer</name>
+    </author>
+    <source>
+      <id>https://adamsheffer.wordpress.com</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://adamsheffer.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://adamsheffer.wordpress.com" rel="alternate" type="text/html"/>
+      <link href="https://adamsheffer.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://adamsheffer.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>Discrete geometry and other typos</subtitle>
+      <title>Some Plane Truths</title>
+      <updated>2020-09-14T01:24:58Z</updated>
     </source>
   </entry>
 </feed>
