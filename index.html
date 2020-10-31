@@ -149,7 +149,7 @@ Stay up to date
 <a class="feedlink" href="" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a class="message" title="403: forbidden">Learning with Errors: Student Theory Blog</a>
 <br>
-<a class="feedlink" href="http://processalgebra.blogspot.com/feeds/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
+<a class="feedlink" href="http://www.blogger.com/feeds/27705661/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://processalgebra.blogspot.com/" title="Process Algebra Diary">Luca Aceto</a>
 <br>
 <a class="feedlink" href="https://lucatrevisan.wordpress.com/feed/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
@@ -240,7 +240,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at October 29, 2020 04:21 AM UTC</span>.
+Last updated <span class="datestr">at October 31, 2020 08:41 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -258,47 +258,99 @@ Powered by<br>
 
 <div class="channelgroup">
 <div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14916">
+	id="http://windowsontheory.org/?p=7857">
 <div class="entryheader">
 <span class="face">
-	<img class="face" src="images/corr.jpeg">
+	<img class="face" src="images/wot.png">
 </span>
 <div class="entryheadertextcontainer">
 <div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14916">Almost-Optimal Deterministic Treasure Hunt in Arbitrary Graphs</a></h3>
+<h3 lang="en"><a class="entryheader" href="https://windowsontheory.org/2020/10/30/digging-into-election-models/">Digging into election models</a></h3>
 <p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<a class="entryheader" href="https://windowsontheory.org" title="Windows On Theory">Windows on Theory</a>
 <p>
 </div>
 </div>
 </div>
 <div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Bouchard:S=eacute=bastien.html">Sébastien Bouchard</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Dieudonn=eacute=:Yoann.html">Yoann Dieudonné</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Labourel:Arnaud.html">Arnaud Labourel</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Pelc:Andrzej.html">Andrzej Pelc</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14916">PDF</a><br /><b>Abstract: </b>A mobile agent navigating along edges of a simple connected graph, either
-finite or countably infinite, has to find an inert target (treasure) hidden in
-one of the nodes. This task is known as treasure hunt. The agent has no a
-priori knowledge of the graph, of the location of the treasure or of the
-initial distance to it. The cost of a treasure hunt algorithm is the worst-case
-number of edge traversals performed by the agent until finding the treasure.
-Awerbuch, Betke, Rivest and Singh [ABRS 1999] considered graph exploration and
-treasure hunt for finite graphs in a restricted model where the agent has a
-fuel tank that can be replenished only at the starting node $s$. The size of
-the tank is $B=2(1+\alpha)r$, for some positive real constant $\alpha$, where
-$r$, called the radius of the graph, is the maximum distance from $s$ to any
-other node. The tank of size $B$ allows the agent to make at most $\lfloor
-B\rfloor$ edge traversals between two consecutive visits at node $s$.
-</p>
-<p>Let $e(d)$ be the number of edges whose at least one extremity is at distance
-less than $d$ from $s$. Awerbuch, Betke, Rivest and Singh [ABRS 1999]
-conjectured that it is impossible to find a treasure hidden in a node at
-distance at most $d$ at cost nearly linear in $e(d)$. We first design a
-deterministic treasure hunt algorithm working in the model without any
-restrictions on the moves of the agent at cost $\mathcal{O}(e(d) \log d)$, and
-then show how to modify this algorithm to work in the model from [ABRS 1999]
-with the same complexity. Thus we refute the above twenty-year-old conjecture.
-We observe that no treasure hunt algorithm can beat cost $\Theta(e(d))$ for all
-graphs and thus our algorithms are also almost optimal.
-</p></div>
+<div class="content" lang="en">
+<p>With election on my mind, and constantly looking at polls and predictions, I thought I would look a little more into how election models are made. (<strong>Disclaimer:</strong> I am not an expert statistician / pollster and this is based on me trying to read their methodological description as well as looking into results of simulations in Python. However, there is a <a href="https://colab.research.google.com/drive/1GaoBn71PwIk_uAisNWzp2Naqev9JHW0I?usp=sharing">colab notebook</a> so you can try this on your own!)</p>
+
+
+
+<p>If polls were 100% accurate, then we would not need election models – we will know that the person polling at more than 50% in a given state will win, and we can just sum up the electoral votes. However, polls have various sources of errors:</p>
+
+
+
+<ol><li><strong>Statistical sample error</strong> –  this is simply the deviation between the fraction of people that would say “I will vote for X” at time T in the population, and the empirical fraction reported by the poll based on their sample. As battleground states get polled frequently with large samples, this error is likely to be negligible.</li><li><strong>Sampling bias</strong> – this is the bias incurred by the fact that we cannot actually sample a random subset of the population and get them to answer our questions – the probability that people will pick up their phone may be correlated with their vote. Pollsters hope that these correlations all disappear once you condition on certain demographic variables (race, education, etc..) and so try to ensure the sample is balanced according to these metrics. I believe this was part of the reason that polls were off in 2016, since they didn’t explicitly adjust for levels of education (which were not strongly correlated with party before) and ended up under-representing white voters without college degrees.</li><li><strong>Lying responses or “shy” voters</strong> – Some people suggest that voters lie to pollsters because their choice is considered “socially undesirable”. There is <a href="https://fivethirtyeight.com/features/trump-supporters-arent-shy-but-polls-could-still-be-missing-some-of-them/">not much support</a> that this is a statistically significant effect. In particular <a href="https://morningconsult.com/form/shy-trump-2020/">one study</a> showed there was no statistically significant difference between responders’ responses in online and live calling. Also in  2016 polls equally under-estimated the votes for Trump and Republican senators (which presumably didn’t have the same “social stigma” to them).</li><li><strong>Turnout estimates</strong> – Estimating the probability that a person supporting candidate X will actually show up to vote (or mail it in) is a bit of a dark art, and account for the gap in polls representing registered voters (which make no such estimates) and polls representing likely voters (which do). Since traditionally the Republican electorate is older and more well off, they tend to vote more reliably and hence likely voter estimates are typically better for republicans. The effect seems not to be very strong this year. Turnout might be particularly hard to predict this year, though it seems likely to be historically high.</li><li><strong>Voters changing their mind</strong> –  The poll is done at a given point in time and does not necessarily reflect voters views in election day. For example in 2016 it seems that many undecided voters broke for Trump. In this cycle the effect might be less pronounced since there are few undecided voters and “election day” is smoothed over a 2-4 week period due to early and mail-in voting.</li></ol>
+
+
+
+<p>To a first approximation, a poll-based election model does the following:<br /><br />1. Aggregates polls into national and state-wise predictions </p>
+
+
+
+<p>2. Computes a probability distribution over the correlated error vectors (i.e. the vector <img src="https://s0.wp.com/latex.php?latex=%5Cvec%7Be%7D&amp;bg=eeeeee&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\vec{e}" class="latex" title="\vec{e}" />  with coordinate for each jurisdiction containing the deviation from the prediction)</p>
+
+
+
+<p>3. Samples from the probability distribution over vectors to obtain probabilities over outcomes.</p>
+
+
+
+<p>From a skim of <a href="https://fivethirtyeight.com/features/how-fivethirtyeights-2020-presidential-forecast-works-and-whats-different-because-of-covid-19/">538’s methodology</a> it seems that they do the following:</p>
+
+
+
+<ol><li>Aggregate polls (weighing by quality, timeliness, adjusting for house effects, etc..). Earlier in the election cycle they also mix in “fundamentals” such as state of the economy etc.. though their weight decreases with time.</li><li>Estimate magnitude of national error (i.e., sample a value <img src="https://s0.wp.com/latex.php?latex=E+%5Cin+%5Cmathbb%7BR%7D_%2B&amp;bg=eeeeee&amp;fg=666666&amp;s=0&amp;c=20201002" alt="E \in \mathbb{R}_+" class="latex" title="E \in \mathbb{R}_+" /> according to some distribution that reflects the amount of national uncertainty.</li><li>(This is where I may be understanding wrong.) Sample a vector <img src="https://s0.wp.com/latex.php?latex=%5Cvec%7Be%7D&amp;bg=eeeeee&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\vec{e}" class="latex" title="\vec{e}" /> whose entries sum up to <img src="https://s0.wp.com/latex.php?latex=E&amp;bg=eeeeee&amp;fg=666666&amp;s=0&amp;c=20201002" alt="E" class="latex" title="E" /> according to a correlated distribution, where the correlations between states depends on demographic, location, and other  factors. For each particular choice of $E$, because the sum is fixed, if a state has $E+X$ bias then on average the other states will need to compensate for this $-X$ bias, and hence this can create <a href="https://statmodeling.stat.columbia.edu/2020/10/24/reverse-engineering-the-problematic-tail-behavior-of-the-fivethirtyeight-presidential-election-forecast/">negative correlations</a> between states. (It is not clear that negative correlations are unreasonable – one could imagine policies that are deeply popular with population A and deeply unpopular with population B)</li></ol>
+
+
+
+<p>From a skim of the <a href="https://projects.economist.com/us-2020-forecast/president/how-this-works">Economist’s methodology</a> it seems that they do the following:</p>
+
+
+
+<ol><li>They start again with some estimate on the national popular vote, based on polls and fundamentals, and then assume it is distributed according to some probability distribution to account for errors.</li><li>They then compute some prior on “partisan lean” (difference between state and national popular vote) for each state. If we knew the popular vote and partisan lean perfectly then we would know the result. Again like good Bayesians they assume that the lean is distributed according to some probability distribution.</li><li>They update the prior based on state polls and other information</li><li>They sample from an error distribution <img src="https://s0.wp.com/latex.php?latex=%5Cvec%7Be%7D&amp;bg=eeeeee&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\vec{e}" class="latex" title="\vec{e}" /> according to some explicit pairwise correlation matrix that has only non-negative entries (and hence you don’t get negative correlations in their model).</li></ol>
+
+
+
+<p>So, given all of the above, how much do these models differ? Perhaps surprisingy, the answer is “not by much”.  To understand how they differ, I plotted for both models the following: </p>
+
+
+
+<ol><li>The histogram of Biden’s popular vote margin</li><li>The probability of Biden to win conditioned on a particular margin</li></ol>
+
+
+
+<p>Much of the methodological difference, including the issue of pairwise correlations, should manifest in 2, but eyeballing it, they don’t seem to differ that much. It seems that conditioned on a particular margin, both models give Biden similar probability to win. (In particular both models think that 3% margin is about 50/50, while 4% margin gives Biden about 80/20 chance). The main difference is actually in the first part of estimating the popular vote margin – 538 is more “conservative” and has fatter tails.</p>
+
+
+
+<figure class="wp-block-image size-large"><a href="https://windowsontheory.files.wordpress.com/2020/10/election_models.png"><img src="https://windowsontheory.files.wordpress.com/2020/10/election_models.png?w=993" alt="" class="wp-image-7867" /></a></figure>
+
+
+
+<p>If you want to check my data, see if I have a bug, or try your own analysis, you can use this <a href="https://colab.research.google.com/drive/1GaoBn71PwIk_uAisNWzp2Naqev9JHW0I?usp=sharing">colab notebook</a>.</p>
+
+
+
+<h2>“Make your own needle”</h2>
+
+
+
+<p>Another applications for such models is to help us adjust the priors as new information comes in. For example, it’s possible that Florida, North Carolina and Texas will report results early. If Biden loses one of these states, should we adjust our estimate of win probability significantly? It turns out that the answer depends on by how much he loses.</p>
+
+
+
+<p>The following graphs show the updated win probability conditioned on a particular margin in a state. We see that winning or losing Florida, North Carolina, and Texas on their own doesn’t make much difference to the probability – it’s all about the margin. In contrast, losing Pennsylvania’s 20 electoral votes will make a significant difference to Biden’s chances.</p>
+
+
+
+<figure class="wp-block-image size-large"><a href="https://windowsontheory.files.wordpress.com/2020/10/predict_states.png"><img src="https://windowsontheory.files.wordpress.com/2020/10/predict_states.png?w=1024" alt="" class="wp-image-7869" /></a></figure>
+
+
+
+<p>(The non monotonicity is simply a side effect of having a finite number of simulation runs and would disappear in the limit.)</p></div>
 
 
 
@@ -307,7 +359,7 @@ graphs and thus our algorithms are also almost optimal.
 
 
 <p class="date">
-<a href="http://arxiv.org/abs/2010.14916"><span class="datestr">at October 29, 2020 12:00 AM UTC</span></a>
+by Boaz Barak <a href="https://windowsontheory.org/2020/10/30/digging-into-election-models/"><span class="datestr">at October 30, 2020 04:16 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -324,50 +376,43 @@ graphs and thus our algorithms are also almost optimal.
 
 <div class="channelgroup">
 <div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14864">
+	id="http://windowsontheory.org/?p=7851">
 <div class="entryheader">
 <span class="face">
-	<img class="face" src="images/corr.jpeg">
+	<img class="face" src="images/wot.png">
 </span>
 <div class="entryheadertextcontainer">
 <div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14864">Tree-structured Ising models can be learned efficiently</a></h3>
+<h3 lang="en"><a class="entryheader" href="https://windowsontheory.org/2020/10/30/im-with-her-but-4-years-too-late/">I’m with her (but 4 years too late)</a></h3>
 <p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<a class="entryheader" href="https://windowsontheory.org" title="Windows On Theory">Windows on Theory</a>
 <p>
 </div>
 </div>
 </div>
 <div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Daskalakis:Constantinos.html">Constantinos Daskalakis</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Pan:Qinxuan.html">Qinxuan Pan</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14864">PDF</a><br /><b>Abstract: </b>We provide the first polynomial-sample and polynomial-time algorithm for
-learning tree-structured Ising models. In particular, we show that $n$-variable
-tree-structured Ising models can be learned computationally-efficiently to
-within total variation distance~$\epsilon$ from an optimal $O(n \log
-n/\epsilon^2)$ samples, where $O(.)$ hides an absolute constant which does not
-depend on the model being learned -- neither its tree nor the magnitude of its
-edge strengths, on which we place no assumptions. Our guarantees hold, in fact,
-for the celebrated Chow-Liu [1968] algorithm, using the plug-in estimator for
-mutual information. While this (or any other) algorithm may fail to identify
-the structure of the underlying model correctly from a finite sample, we show
-that it will still learn a tree-structured model that is close to the true one
-in TV distance, a guarantee called "proper learning."
-</p>
-<p>Prior to our work there were no known sample- and time-efficient algorithms
-for learning (properly or non-properly) arbitrary tree-structured graphical
-models. In particular, our guarantees cannot be derived from known results for
-the Chow-Liu algorithm and the ensuing literature on learning graphical models,
-including a recent renaissance of algorithms on this learning challenge, which
-only yield asymptotic consistency results, or sample-inefficient and/or
-time-inefficient algorithms, unless further assumptions are placed on the
-graphical model, such as bounds on the "strengths" of the model's edges. While
-we establish guarantees for a widely known and simple algorithm, the analysis
-that this algorithm succeeds is quite complex, requiring a hierarchical
-classification of the edges into layers with different reconstruction
-guarantees, depending on their strength, combined with delicate uses of the
-subadditivity of the squared Hellinger distance over graphical models to
-control the error accumulation.
-</p></div>
+<div class="content" lang="en">
+<p>In May 2016, after Donald Trump was elected as the republican nominee for president, I wrote the following blog post. I ended up not publishing it – this has always been a technical blog (and also more of a group blog, at the time).  While the damage of a Donald Trump presidency was hypothetical at the time, it is now very real and in a second term the stakes are only higher. I once again hope American readers of this blog would do what they can to support Joe Biden.<br /></p>
+
+
+
+<p>Note: this is not an invitation for a debate on who to vote for in the comments. At this point, if you are educated and following the news (as I imagine all readers of this blog are) then if you are not already convinced that Donald Trump is a danger to this country and the world, nothing I will say will change your mind. Similarly, nothing you will say will change mine. Hence this is just a call for those readers who already support Joe Biden to make sure they vote and think of how they can help with their money or time in other ways.</p>
+
+
+
+<h2>I’m with Her</h2>
+
+
+
+<p><strong>Boaz Barak / May 3, 2016</strong><br /><br />The republican electorate, in their infinite wisdom, have just (essentially) finalized the election of Donald Trump as their nominee for the position of the president of the United States.</p>
+
+
+
+<p>While I have my political views, I don’t consider myself a very political person, and have not (as far as I remember) ever written about politics in this blog. However, extreme times call for extreme measures. It is tempting to be fatalist or cynical about this process, and believe that whether Donald Trump or Hillary Clinton is elected doesn’t make much of a difference. Some people believe that the presidency shapes the person more than the other way around, and others feel that all politicians are anyway corrupt or that Hillary is not much better than trump since she voted for the Iraq war and gave paid speeches for Wall Street firms. I think the last two presidencies of George W. Bush and Barack Obama demonstrated that the identity of the president makes a huge difference. All evidence points out that with Trump this difference will be entirely in the negative direction.</p>
+
+
+
+<p>While his chances might not be great, this is not a bet I’m comfortable taking. I plan to support Hillary Clinton as much as I can, and hope that other American readers of this blog will do the same</p></div>
 
 
 
@@ -376,7 +421,7 @@ control the error accumulation.
 
 
 <p class="date">
-<a href="http://arxiv.org/abs/2010.14864"><span class="datestr">at October 29, 2020 12:00 AM UTC</span></a>
+by Boaz Barak <a href="https://windowsontheory.org/2020/10/30/im-with-her-but-4-years-too-late/"><span class="datestr">at October 30, 2020 02:20 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -393,14 +438,720 @@ control the error accumulation.
 
 <div class="channelgroup">
 <div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14824">
+	id="http://arxiv.org/abs/2010.15814">
 <div class="entryheader">
 <span class="face">
 	<img class="face" src="images/corr.jpeg">
 </span>
 <div class="entryheadertextcontainer">
 <div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14824">Explainable Artificial Intelligence for Manufacturing Cost Estimation and Machining Feature Visualization</a></h3>
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15814">Around the diameter of AT-free graphs</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Ducoffe:Guillaume.html">Guillaume Ducoffe</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15814">PDF</a><br /><b>Abstract: </b>A graph algorithm is truly subquadratic if it runs in ${\cal O}(m^b)$ time on
+connected $m$-edge graphs, for some positive $b &lt; 2$. Roditty and Vassilevska
+Williams (STOC'13) proved that under plausible complexity assumptions, there is
+no truly subquadratic algorithm for computing the diameter of general graphs.
+In this work, we present positive and negative results on the existence of such
+algorithms for computing the diameter on some special graph classes.
+Specifically, three vertices in a graph form an asteroidal triple (AT) if
+between any two of them there exists a path that avoids the closed
+neighbourhood of the third one. We call a graph AT-free if it does not contain
+an AT. We first prove that for all $m$-edge AT-free graphs, one can compute all
+the eccentricities in truly subquadratic ${\cal O}(m^{3/2})$ time. Then, we
+extend our study to several subclasses of chordal graphs -- all of them
+generalizing interval graphs in various ways --, as an attempt to understand
+which of the properties of AT-free graphs, or natural generalizations of the
+latter, can help in the design of fast algorithms for the diameter problem on
+broader graph classes. For instance, for all chordal graphs with a dominating
+shortest path, there is a linear-time algorithm for computing a diametral pair
+if the diameter is at least four. However, already for split graphs with a
+dominating edge, under plausible complexity assumptions, there is no truly
+subquadratic algorithm for deciding whether the diameter is either $2$ or $3$.
+</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://arxiv.org/abs/2010.15814"><span class="datestr">at October 30, 2020 12:00 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://arxiv.org/abs/2010.15811">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/corr.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15811">Algorithmic pure states for the negative spherical perceptron</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Alaoui:Ahmed_El.html">Ahmed El Alaoui</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Sellke:Mark.html">Mark Sellke</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15811">PDF</a><br /><b>Abstract: </b>We consider the spherical perceptron with Gaussian disorder. This is the set
+$S$ of points $\sigma \in \mathbb{R}^N$ on the sphere of radius $\sqrt{N}$
+satisfying $\langle g_a , \sigma \rangle \ge \kappa\sqrt{N}\,$ for all $1 \le a
+\le M$, where $(g_a)_{a=1}^M$ are independent standard gaussian vectors and
+$\kappa \in \mathbb{R}$ is fixed. Various characteristics of $S$ such as its
+surface measure and the largest $M$ for which it is non-empty, were computed
+heuristically in statistical physics in the asymptotic regime $N \to \infty$,
+$M/N \to \alpha$. The case $\kappa&lt;0$ is of special interest as $S$ is
+conjectured to exhibit a hierarchical tree-like geometry known as "full
+replica-symmetry breaking" (FRSB) close to the satisfiability threshold
+$\alpha_{\text{SAT}}(\kappa)$, and whose characteristics are captured by a
+Parisi variational principle akin to the one appearing in the
+Sherrington-Kirkpatrick model. In this paper we design an efficient algorithm
+which, given oracle access to the solution of the Parisi variational principle,
+exploits this conjectured FRSB structure for $\kappa&lt;0$ and outputs a vector
+$\hat{\sigma}$ satisfying $\langle g_a , \hat{\sigma}\rangle \ge \kappa
+\sqrt{N}$ for all $1\le a \le M$ and lying on a sphere of non-trivial radius
+$\sqrt{\bar{q} N}$, where $\bar{q} \in (0,1)$ is the right-end of the support
+of the associated Parisi measure. We expect $\hat{\sigma}$ to be approximately
+the barycenter of a pure state of the spherical perceptron. Moreover we expect
+that $\bar{q} \to 1$ as $\alpha \to \alpha_{\text{SAT}}(\kappa)$, so that
+$\big\langle g_a,\hat{\sigma}/|\hat{\sigma}|\big\rangle \geq
+(\kappa-o(1))\sqrt{N}$ near criticality.
+</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://arxiv.org/abs/2010.15811"><span class="datestr">at October 30, 2020 12:00 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://arxiv.org/abs/2010.15805">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/corr.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15805">A Local Search Framework for Experimental Design</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Lau:Lap_Chi.html">Lap Chi Lau</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/z/Zhou:Hong.html">Hong Zhou</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15805">PDF</a><br /><b>Abstract: </b>We present a local search framework to design and analyze both combinatorial
+algorithms and rounding algorithms for experimental design problems. This
+framework provides a unifying approach to match and improve all known results
+in D/A/E-design and to obtain new results in previously unknown settings.
+</p>
+<p>For combinatorial algorithms, we provide a new analysis of the classical
+Fedorov's exchange method. We prove that this simple local search algorithm
+works well as long as there exists an almost optimal solution with good
+condition number. Moreover, we design a new combinatorial local search
+algorithm for E-design using the regret minimization framework.
+</p>
+<p>For rounding algorithms, we provide a unified randomized exchange algorithm
+to match and improve previous results for D/A/E-design. Furthermore, the
+algorithm works in the more general setting to approximately satisfy multiple
+knapsack constraints, which can be used for weighted experimental design and
+for incorporating fairness constraints into experimental design.
+</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://arxiv.org/abs/2010.15805"><span class="datestr">at October 30, 2020 11:24 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://arxiv.org/abs/2010.15803">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/corr.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15803">Isometric embeddings in trees and their use in the diameter problem</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Ducoffe:Guillaume.html">Guillaume Ducoffe</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15803">PDF</a><br /><b>Abstract: </b>We prove that given a discrete space with $n$ points which is either embedded
+in a system of $k$ trees, or the Cartesian product of $k$ trees, we can compute
+all eccentricities in ${\cal O}(2^{{\cal O}(k\log{k})}(N+n)^{1+o(1)})$ time,
+where $N$ is the cumulative total order over all these $k$ trees. This is near
+optimal under the Strong Exponential-Time Hypothesis, even in the very special
+case of an $n$-vertex graph embedded in a system of $\omega(\log{n})$ spanning
+trees. However, given such an embedding in the strong product of $k$ trees,
+there is a much faster ${\cal O}(N + kn)$-time algorithm for this problem. All
+our positive results can be turned into approximation algorithms for the graphs
+and finite spaces with a quasi isometric embedding in trees, if such embedding
+is given as input, where the approximation factor (resp., the approximation
+constant) depends on the distortion of the embedding (resp., of its stretch).
+The existence of embeddings in the Cartesian product of finitely many trees has
+been thoroughly investigated for cube-free median graphs. We give the
+first-known quasi linear-time algorithm for computing the diameter within this
+graph class. It does not require an embedding in a product of trees to be given
+as part of the input. On our way, being given an $n$-node tree $T$, we propose
+a data structure with ${\cal O}(n\log{n})$ pre-processing time in order to
+compute in ${\cal O}(k\log^2{n})$ time the eccentricity of any subset of $k$
+nodes. We combine the latter technical contribution, of independent interest,
+with a recent distance-labeling scheme that was designed for cube-free median
+graphs.
+</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://arxiv.org/abs/2010.15803"><span class="datestr">at October 30, 2020 12:00 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://arxiv.org/abs/2010.15794">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/corr.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15794">Eccentricity queries and beyond using Hub Labels</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Ducoffe:Guillaume.html">Guillaume Ducoffe</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15794">PDF</a><br /><b>Abstract: </b>Hub labeling schemes are popular methods for computing distances on road
+networks and other large complex networks, often answering to a query within a
+few microseconds for graphs with millions of edges. In this work, we study
+their algorithmic applications beyond distance queries. We focus on
+eccentricity queries and distance-sum queries, for several versions of these
+problems on directed weighted graphs, that is in part motivated by their
+importance in facility location problems. On the negative side, we show
+conditional lower bounds for these above problems on unweighted undirected
+sparse graphs, via standard constructions from "Fine-grained" complexity.
+However, things take a different turn when the hub labels have a sublogarithmic
+size. Indeed, given a hub labeling of maximum label size $\leq k$, after
+pre-processing the labels in total $2^{{O}(k)} \cdot |V|^{1+o(1)}$ time, we can
+compute both the eccentricity and the distance-sum of any vertex in $2^{{O}(k)}
+\cdot |V|^{o(1)}$ time. It can also be applied to the fast global computation
+of some topological indices. Finally, as a by-product of our approach, on any
+fixed class of unweighted graphs with bounded expansion, we can decide whether
+the diameter of an $n$-vertex graph in the class is at most $k$ in $f(k) \cdot
+n^{1+o(1)}$ time, for some "explicit" function $f$.
+</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://arxiv.org/abs/2010.15794"><span class="datestr">at October 30, 2020 12:00 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://arxiv.org/abs/2010.15776">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/corr.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15776">Quantum advantage for differential equation analysis</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><b>Authors: </b>Bobak T. Kiani, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Palma:Giacomo_De.html">Giacomo De Palma</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/e/Englund:Dirk.html">Dirk Englund</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Kaminsky:William.html">William Kaminsky</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Marvian:Milad.html">Milad Marvian</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Lloyd:Seth.html">Seth Lloyd</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15776">PDF</a><br /><b>Abstract: </b>Quantum algorithms for both differential equation solving and for machine
+learning potentially offer an exponential speedup over all known classical
+algorithms. However, there also exist obstacles to obtaining this potential
+speedup in useful problem instances. The essential obstacle for quantum
+differential equation solving is that outputting useful information may require
+difficult post-processing, and the essential obstacle for quantum machine
+learning is that inputting the training set is a difficult task just by itself.
+In this paper, we demonstrate, when combined, these difficulties solve one
+another. We show how the output of quantum differential equation solving can
+serve as the input for quantum machine learning, allowing dynamical analysis in
+terms of principal components, power spectra, and wavelet decompositions. To
+illustrate this, we consider continuous time Markov processes on
+epidemiological and social networks. These quantum algorithms provide an
+exponential advantage over existing classical Monte Carlo methods.
+</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://arxiv.org/abs/2010.15776"><span class="datestr">at October 30, 2020 11:33 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://arxiv.org/abs/2010.15770">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/corr.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15770">Recursive Random Contraction Revisited</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Karger:David_R=.html">David R. Karger</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/w/Williamson:David_P=.html">David P. Williamson</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15770">PDF</a><br /><b>Abstract: </b>In this note, we revisit the recursive random contraction algorithm of Karger
+and Stein for finding a minimum cut in a graph. Our revisit is occasioned by a
+paper of Fox, Panigrahi, and Zhang which gives an extension of the Karger-Stein
+algorithm to minimum cuts and minimum $k$-cuts in hypergraphs. When specialized
+to the case of graphs, the algorithm is somewhat different than the original
+Karger-Stein algorithm. We show that the analysis becomes particularly clean in
+this case: we can prove that the probability that a fixed minimum cut in an $n$
+node graph is returned by the algorithm is bounded below by $1/(2H_n-2)$, where
+$H_n$ is the $n$th harmonic number. We also consider other similar variants of
+the algorithm, and show that no such algorithm can achieve an asymptotically
+better probability of finding a fixed minimum cut.
+</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://arxiv.org/abs/2010.15770"><span class="datestr">at October 30, 2020 11:29 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://arxiv.org/abs/2010.15755">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/corr.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15755">A more Pragmatic Implementation of the Lock-free, Ordered, Linked List</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/t/Tr=auml=ff:Jesper_Larsson.html">Jesper Larsson Träff</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/P=ouml=ter:Manuel.html">Manuel Pöter</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15755">PDF</a><br /><b>Abstract: </b>The lock-free, ordered, linked list is an important, standard example of a
+concurrent data structure. An obvious, practical drawback of textbook
+implementations is that failed compare-and-swap (CAS) operations lead to
+retraversal of the entire list (retries), which is particularly harmful for
+such a linear-time data structure. We alleviate this drawback by first
+observing that failed CAS operations under some conditions do not require a
+full retry, and second by maintaining approximate backwards pointers that are
+used to find a closer starting position in the list for operation retry.
+Experiments with both a worst-case deterministic benchmark, and a standard,
+randomized, mixed-operation throughput benchmark on three shared-memory systems
+(Intel Xeon, AMD EPYC, SPARC-T5) show practical improvements ranging from
+significant, to dramatic, several orders of magnitude.
+</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://arxiv.org/abs/2010.15755"><span class="datestr">at October 30, 2020 11:34 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://arxiv.org/abs/2010.15671">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/corr.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15671">Computing Crisp Bisimulations for Fuzzy Structures</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Nguyen:Linh_Anh.html">Linh Anh Nguyen</a>, Dat Xuan Tran <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15671">PDF</a><br /><b>Abstract: </b>Fuzzy structures such as fuzzy automata, fuzzy transition systems, weighted
+social networks and fuzzy interpretations in fuzzy description logics have been
+widely studied. For such structures, bisimulation is a natural notion for
+characterizing indiscernibility between states or individuals. There are two
+kinds of bisimulations for fuzzy structures: crisp bisimulations and fuzzy
+bisimulations. While the latter fits to the fuzzy paradigm, the former has also
+attracted attention due to the application of crisp equivalence relations, for
+example, in minimizing structures. Bisimulations can be formulated for fuzzy
+labeled graphs and then adapted to other fuzzy structures. In this article, we
+present an efficient algorithm for computing the partition corresponding to the
+largest crisp bisimulation of a given finite fuzzy labeled graph. Its
+complexity is of order $O((m\log{l} + n)\log{n})$, where $n$, $m$ and $l$ are
+the number of vertices, the number of nonzero edges and the number of different
+fuzzy degrees of edges of the input graph, respectively. We also study a
+similar problem for the setting with counting successors, which corresponds to
+the case with qualified number restrictions in description logics and graded
+modalities in modal logics. In particular, we provide an efficient algorithm
+with the complexity $O((m\log{m} + n)\log{n})$ for the considered problem in
+that setting.
+</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://arxiv.org/abs/2010.15671"><span class="datestr">at October 30, 2020 11:20 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://arxiv.org/abs/2010.15600">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/corr.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15600">Three computational models and its equivalence</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://arxiv.org/" title="cs.CC updates on arXiv.org">arXiv.org: Computational complexity</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><b>Authors: </b>Ciro Ivan Garcia Lopez <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15600">PDF</a><br /><b>Abstract: </b>The study of computability has its origin in Hilbert's conference of 1900,
+where an adjacent question, to the ones he asked, is to give a precise
+description of the notion of algorithm. In the search for a good definition
+arose three independent theories: Turing and the Turing machines, G\"odel and
+the recursive functions, Church and the Lambda Calculus.
+</p>
+<p>Later there were established by Kleene that the classic models of computation
+are equivalent. This fact is widely accepted by many textbooks and the proof is
+omitted since the proof is tedious and unreadable. We intend to fill this gap
+presenting the proof in a modern way, without forgetting the mathematical
+details.
+</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://arxiv.org/abs/2010.15600"><span class="datestr">at October 30, 2020 11:20 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://arxiv.org/abs/2010.15476">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/corr.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15476">Iteratively reweighted greedy set cover</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Alexa:Marc.html">Marc Alexa</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15476">PDF</a><br /><b>Abstract: </b>We empirically analyze a simple heuristic for large sparse set cover
+problems. It uses the weighted greedy algorithm as a basic building block. By
+multiplicative updates of the weights attached to the elements, the greedy
+solution is iteratively improved. The implementation of this algorithm is
+trivial and the algorithm is essentially free of parameters that would require
+tuning. More iterations can only improve the solution. This set of features
+makes the approach attractive for practical problems.
+</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://arxiv.org/abs/2010.15476"><span class="datestr">at October 30, 2020 11:21 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://arxiv.org/abs/2010.15435">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/corr.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15435">Group-Harmonic and Group-Closeness Maximization -- Approximation and Engineering</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Angriman:Eugenio.html">Eugenio Angriman</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Becker:Ruben.html">Ruben Becker</a>, Gianlorenzo D'Angelo, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Gilbert:Hugo.html">Hugo Gilbert</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Grinten:Alexander_van_der.html">Alexander van der Grinten</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Meyerhenke:Henning.html">Henning Meyerhenke</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15435">PDF</a><br /><b>Abstract: </b>Centrality measures characterize important nodes in networks. Efficiently
+computing such nodes has received a lot of attention. When considering the
+generalization of computing central groups of nodes, challenging optimization
+problems occur. In this work, we study two such problems, group-harmonic
+maximization and group-closeness maximization both from a theoretical and from
+an algorithm engineering perspective.
+</p>
+<p>On the theoretical side, we obtain the following results. For group-harmonic
+maximization, unless $P=NP$, there is no polynomial-time algorithm that
+achieves an approximation factor better than $1-1/e$ (directed) and $1-1/(4e)$
+(undirected), even for unweighted graphs. On the positive side, we show that a
+greedy algorithm achieves an approximation factor of $\lambda(1-2/e)$
+(directed) and $\lambda(1-1/e)/2$ (undirected), where $\lambda$ is the ratio of
+minimal and maximal edge weights. For group-closeness maximization, the
+undirected case is $NP$-hard to be approximated to within a factor better than
+$1-1/(e+1)$ and a constant approximation factor is achieved by a local-search
+algorithm. For the directed case, however, we show that, for any
+$\epsilon&lt;1/2$, the problem is $NP$-hard to be approximated within a factor of
+$4|V|^{-\epsilon}$.
+</p>
+<p>From the algorithm engineering perspective, we provide efficient
+implementations of the above greedy and local search algorithms. In our
+experimental study we show that, on small instances where an optimum solution
+can be computed in reasonable time, the quality of both the greedy and the
+local search algorithms come very close to the optimum. On larger instances,
+our local search algorithms yield results with superior quality compared to
+existing greedy and local search solutions, at the cost of additional running
+time. We thus advocate local search for scenarios where solution quality is of
+highest concern.
+</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://arxiv.org/abs/2010.15435"><span class="datestr">at October 30, 2020 11:27 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://arxiv.org/abs/2010.15399">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/corr.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15399">Free-boundary conformal parameterization of point clouds</a></h3>
 <p style="text-indent: 1.0em;">from 
 <a class="entryheader" href="http://arxiv.org/" title="cs.CG updates on arXiv.org">arXiv.org: Computational geometry</a>
 <p>
@@ -409,23 +1160,23 @@ control the error accumulation.
 </div>
 <div class="entry">
 <div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/y/Yoo:Soyoung.html">Soyoung Yoo</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Kang:Namwoo.html">Namwoo Kang</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14824">PDF</a><br /><b>Abstract: </b>Studies on manufacturing cost prediction based on deep learning have begun in
-recent years, but the cost prediction rationale cannot be explained because the
-models are still used as a black box. This study aims to propose a
-manufacturing cost prediction process for 3D computer-aided design (CAD) models
-using explainable artificial intelligence. The proposed process can visualize
-the machining features of the 3D CAD model that are influencing the increase in
-manufacturing costs. The proposed process consists of (1) data collection and
-pre-processing, (2) 3D deep learning architecture exploration, and (3)
-visualization to explain the prediction results. The proposed deep learning
-model shows high predictability of manufacturing cost for the computer
-numerical control (CNC) machined parts. In particular, using 3D
-gradient-weighted class activation mapping proves that the proposed model not
-only can detect the CNC machining features but also can differentiate the
-machining difficulty for the same feature. Using the proposed process, we can
-provide a design guidance to engineering designers in reducing manufacturing
-costs during the conceptual design phase. We can also provide real-time
-quotations and redesign proposals to online manufacturing platform customers.
+<p><b>Authors: </b>Yechen Liu, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Choi:Gary_P=_T=.html">Gary P. T. Choi</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Lui:Lok_Ming.html">Lok Ming Lui</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15399">PDF</a><br /><b>Abstract: </b>With the advancement in 3D scanning technology, there has been a surge of
+interest in the use of point clouds in science and engineering. To facilitate
+the computations and analyses of point clouds, prior works have considered
+parameterizing them onto some simple planar domains with a fixed boundary shape
+such as a unit circle or a rectangle. However, the geometry of the fixed shape
+may lead to some undesirable distortion in the parameterization. It is
+therefore more natural to consider free-boundary conformal parameterizations of
+point clouds, which minimize the local geometric distortion of the mapping
+without constraining the overall shape. In this work, we propose a novel
+approximation scheme of the Laplace--Beltrami operator on point clouds and
+utilize it for developing a free-boundary conformal parameterization method for
+disk-type point clouds. With the aid of the free-boundary conformal
+parameterization, high-quality point cloud meshing can be easily achieved.
+Furthermore, we show that using the idea of conformal welding in complex
+analysis, the point cloud conformal parameterization can be computed in a
+divide-and-conquer manner. Experimental results are presented to demonstrate
+the effectiveness of the proposed method.
 </p></div>
 
 
@@ -435,7 +1186,7 @@ quotations and redesign proposals to online manufacturing platform customers.
 
 
 <p class="date">
-<a href="http://arxiv.org/abs/2010.14824"><span class="datestr">at October 29, 2020 12:00 AM UTC</span></a>
+<a href="http://arxiv.org/abs/2010.15399"><span class="datestr">at October 30, 2020 12:00 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -452,48 +1203,34 @@ quotations and redesign proposals to online manufacturing platform customers.
 
 <div class="channelgroup">
 <div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14815">
+	id="http://arxiv.org/abs/2010.15221">
 <div class="entryheader">
 <span class="face">
 	<img class="face" src="images/corr.jpeg">
 </span>
 <div class="entryheadertextcontainer">
 <div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14815">Analytic formulae for random walks on stochastic uniform growth trees</a></h3>
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15221">Geometric Sampling of Networks</a></h3>
 <p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.CC updates on arXiv.org">arXiv.org: Computational complexity</a>
+<a class="entryheader" href="http://arxiv.org/" title="cs.CG updates on arXiv.org">arXiv.org: Computational geometry</a>
 <p>
 </div>
 </div>
 </div>
 <div class="entry">
 <div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Ma:Fei.html">Fei Ma</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/w/Wang:Ping.html">Ping Wang</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14815">PDF</a><br /><b>Abstract: </b>Random walk, as a representation depicting discrete-time unbiased Markov
-process, has attracted increasing attention in the past. The most important in
-studying random walk on networks is to measure a structural parameter called
-mean first-passage time, denote by $\overline{\mathcal{F}}$. As known, the
-commonly-utilized methods for determining $\overline{\mathcal{F}}$ are mainly
-based on Laplacian spectra on networks under consideration. On the other hand,
-methods of this type can become prohibitively complicated and even fail to work
-in the worst case where the corresponding Laplacian matrix is difficult to
-describe in the first place.
-</p>
-<p>In this paper, we will propose an effective approach to addressing this kind
-of issues on some tree networks, such as, Vicsek fractal, with intriguing
-structural properties, for instance, fractal feature. As opposed to most of
-previous work focusing on estimating $\overline{\mathcal{F}}$ on growth trees
-that share deterministic structure, our goal is to consider stochastic cases
-where probability is introduced into the process of growing trees. To this end,
-we first build up a general formula between Wiener index, denoted by
-$\mathcal{W}$, and $\overline{\mathcal{F}}$ on a tree. This enables us to
-convert issues to answer into calculation of $\mathcal{W}$ on networks in
-question, which helps us gain what we are seeking for. Additionally, it is
-straightforward to obtain Kirchhoff index on our tree networks using the
-approach proposed instead of spectral technique. As an immediate consequence,
-the previously published results in deterministic cases are easily covered by
-formulae established in this paper. Most importantly, our approach is more
-manageable than many other methods including spectral technique in situations
-considered herein.
+<p><b>Authors: </b>Vladislav Barkanass, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/j/Jost:J=uuml=rgen.html">Jürgen Jost</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Saucan:Emil.html">Emil Saucan</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15221">PDF</a><br /><b>Abstract: </b>Motivated by the methods and results of manifold sampling based on Ricci
+curvature, we propose a similar approach for networks. To this end we make
+appeal to three types of discrete curvature, namely the graph Forman-, full
+Forman- and Haantjes-Ricci curvatures for edge-based and node-based sampling.
+We present the results of experiments on real life networks, as well as for
+square grids arising in Image Processing. Moreover, we consider fitting Ricci
+flows and we employ them for the detection of networks' backbone. We also
+develop embedding kernels related to the Forman-Ricci curvatures and employ
+them for the detection of the coarse structure of networks, as well as for
+network visualization with applications to SVM. The relation between the Ricci
+curvature of the original manifold and that of a Ricci curvature driven
+discretization is also studied.
 </p></div>
 
 
@@ -503,7 +1240,7 @@ considered herein.
 
 
 <p class="date">
-<a href="http://arxiv.org/abs/2010.14815"><span class="datestr">at October 29, 2020 01:26 AM UTC</span></a>
+<a href="http://arxiv.org/abs/2010.15221"><span class="datestr">at October 30, 2020 11:36 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -520,75 +1257,14 @@ considered herein.
 
 <div class="channelgroup">
 <div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14801">
+	id="http://arxiv.org/abs/2010.15210">
 <div class="entryheader">
 <span class="face">
 	<img class="face" src="images/corr.jpeg">
 </span>
 <div class="entryheadertextcontainer">
 <div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14801">Matrix and tensor rigidity and $L_p$-approximation</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.CC updates on arXiv.org">arXiv.org: Computational complexity</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b>Yuri Malykhin <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14801">PDF</a><br /><b>Abstract: </b>In this note we make two observations. First: the low-rank approximation of
-Walsh-Hadamard matrices (that disproves ridigity) via Alman and Williams
-provides good $\ell_p$-approximation for $p&lt;2$. It follows that the first $N$
-functions of Walsh-Paley system can be approximated with an error $N^{-\delta}$
-by a linear space of dimension $N^{1-\delta}$: $$
-d_{N^{1-\delta}}(\{w_1,\ldots,w_N\}, L_p[0,1]) \le N^{-\delta},\quad
-p\in[1,2),\;\delta=\delta(p)&gt;0. $$ We do not know if this is possible for the
-trigonometric system.
-</p>
-<p>Second, we notice that the algebraic method of Alon-Frankl-R\"odl for
-bounding the number of low-signum-rank matrices, works for tensors: almost all
-signum-tensors have large signum-rank and can't be $\ell_1$-approximated by
-low-rank tensors. That implies lower bounds for $\Theta_m$ -- the error of
-$m$-term approximation of multivariate functions by sums of tensor products
-$u^1(x_1)\cdots u^d(x_d)$. In particular, for the set of trigonometric
-polynomials with spectrum in $\prod_{j=1}^d[-n_j,n_j]$ and of norm
-$\|t\|_\infty\le 1$ we have $$ \Theta_m(\mathcal
-T(n_1,\ldots,n_d)_\infty,L_1[-\pi,\pi]^d) \ge c_1(d)&gt;0,\quad m\le
-c_2(d)\frac{\prod n_j}{\max\{n_j\}}. $$
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/2010.14801"><span class="datestr">at October 29, 2020 12:00 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14752">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14752">Competitive Analysis of Move-to-Front-or-Middle (MFM) Online List Update Algorithm</a></h3>
+<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.15210">On Linearizability and the Termination of Randomized Algorithms</a></h3>
 <p style="text-indent: 1.0em;">from 
 <a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
 <p>
@@ -597,31 +1273,18 @@ c_2(d)\frac{\prod n_j}{\max\{n_j\}}. $$
 </div>
 <div class="entry">
 <div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Baisakh:.html">Baisakh</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Mohanty:Rakesh.html">Rakesh Mohanty</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14752">PDF</a><br /><b>Abstract: </b>The design and analysis of efficient algorithms with the knowledge of current
-and past inputs is a non-trivial and challenging research area in computer
-science. In many practical applications the future inputs are not available to
-the algorithm at any instance of time. So the algorithm has to make decisions
-based on a sequence of inputs that are in order and on the fly. Such algorithms
-are known as online algorithms. For measuring the performance of online
-algorithms, a standard measure, known as competitive analysis, has been
-extensively used in the literature. List update problem is a well studied
-research problem in the area of online algorithms since last few decades. One
-of the widely used deterministic online list update algorithm is the
-Move-To-Front (MTF) algorithm, which has been shown to be 2-competitive with
-best performance in practical real life inputs. In this paper we analyse the
-Move-to-Front-or-Middle (MFM) algorithm using competitive analysis by
-addressing one of an open question raised by Albers that whether dynamic
-offline algorithm can be used in finding the competitiveness of an online
-algorithm? Move-To-Front-or-Middle (MFM) was experimentally studied and
-observed to be performing better than MTF algorithm by using the Calgary Corpus
-and Canterbury Corpus data set. However, it is interesting and challenging to
-find the lower bound and upper bound on the competitive ratio of MFM algorithm.
-We make a first attempt to find the competitiveness of MFM algorithm. Our new
-results show that MFM is not 2-competitive with respect to static optimum
-offline algorithm, whereas it is 2-competitive with respect to dynamic optimum
-offline algorithm. Our new theoretical results may open up a new direction of
-research in the online list update problem by characterising the structure of
-competitive and non competitive deterministic online algorithms.
+<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Hadzilacos:Vassos.html">Vassos Hadzilacos</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Hu:Xing.html">Xing Hu</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/t/Toueg:Sam.html">Sam Toueg</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.15210">PDF</a><br /><b>Abstract: </b>We study the question of whether the "termination with probability 1"
+property of a randomized algorithm is preserved when one replaces the atomic
+registers that the algorithm uses with linearizable (implementations of)
+registers. We show that in general this is not so: roughly speaking, every
+randomized algorithm A has a corresponding algorithm A' that solves the same
+problem if the registers that it uses are atomic or strongly-linearizable, but
+does not terminate if these registers are replaced with "merely" linearizable
+ones. Together with a previous result shown in [15], this implies that one
+cannot use the well-known ABD implementation of registers in message-passing
+systems to automatically transform any randomized algorithm that works in
+shared-memory systems into a randomized algorithm that works in message-passing
+systems: with a strong adversary the resulting algorithm may not terminate.
 </p></div>
 
 
@@ -631,7 +1294,7 @@ competitive and non competitive deterministic online algorithms.
 
 
 <p class="date">
-<a href="http://arxiv.org/abs/2010.14752"><span class="datestr">at October 29, 2020 12:00 AM UTC</span></a>
+<a href="http://arxiv.org/abs/2010.15210"><span class="datestr">at October 30, 2020 11:22 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -648,40 +1311,22 @@ competitive and non competitive deterministic online algorithms.
 
 <div class="channelgroup">
 <div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14684">
+	id="http://cstheory-jobs.org/2020/10/29/postdoc-in-causal-inference-ml-theory-at-university-of-chicago-and-carnegie-mellon-university-apply-by-january-30-2021/">
 <div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
 <div class="entryheadertextcontainer">
 <div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14684">Substream-Centric Maximum Matchings on FPGA</a></h3>
+<h3 lang="en"><a class="entryheader" href="https://cstheory-jobs.org/2020/10/29/postdoc-in-causal-inference-ml-theory-at-university-of-chicago-and-carnegie-mellon-university-apply-by-january-30-2021/">Postdoc in Causal Inference / ML Theory at University of Chicago and Carnegie Mellon University (apply by January 30, 2021)</a></h3>
 <p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<a class="entryheader" href="https://cstheory-jobs.org" title="Theoretical Computer Science Jobs">CCI: jobs</a>
 <p>
 </div>
 </div>
 </div>
 <div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Besta:Maciej.html">Maciej Besta</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/f/Fischer:Marc.html">Marc Fischer</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Ben=Nun:Tal.html">Tal Ben-Nun</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Stanojevic:Dimitri.html">Dimitri Stanojevic</a>, Johannes De Fine Licht, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Hoefler:Torsten.html">Torsten Hoefler</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14684">PDF</a><br /><b>Abstract: </b>Developing high-performance and energy-efficient algorithms for maximum
-matchings is becoming increasingly important in social network analysis,
-computational sciences, scheduling, and others. In this work, we propose the
-first maximum matching algorithm designed for FPGAs; it is energy-efficient and
-has provable guarantees on accuracy, performance, and storage utilization. To
-achieve this, we forego popular graph processing paradigms, such as
-vertex-centric programming, that often entail large communication costs.
-Instead, we propose a substream-centric approach, in which the input stream of
-data is divided into substreams processed independently to enable more
-parallelism while lowering communication costs. We base our work on the theory
-of streaming graph algorithms and analyze 14 models and 28 algorithms. We use
-this analysis to provide theoretical underpinning that matches the physical
-constraints of FPGA platforms. Our algorithm delivers high performance (more
-than 4x speedup over tuned parallel CPU variants), low memory, high accuracy,
-and effective usage of FPGA resources. The substream-centric approach could
-easily be extended to other algorithms to offer low-power and high-performance
-graph processing on FPGAs.
-</p></div>
+<div class="content" lang="en">
+<p>Applications are invited for a postdoctoral researcher working on problems in causal inference and graphical models. The candidate will be given the opportunity to pursue a broad research agenda at the intersection of theoretical statistics, machine learning, and causal inference. This is part of a collaborative project between Bryon Aragam (UChicago), Pradeep Ravikumar (CMU), and Eric Xing (CMU).</p>
+<p>Website: <a href="http://bryonaragam.com/uchicago_cmu_postdoc_announcement.pdf">http://bryonaragam.com/uchicago_cmu_postdoc_announcement.pdf</a><br />
+Email: bryon@chicagobooth.edu</p></div>
 
 
 
@@ -690,7 +1335,7 @@ graph processing on FPGAs.
 
 
 <p class="date">
-<a href="http://arxiv.org/abs/2010.14684"><span class="datestr">at October 29, 2020 12:00 AM UTC</span></a>
+by shacharlovett <a href="https://cstheory-jobs.org/2020/10/29/postdoc-in-causal-inference-ml-theory-at-university-of-chicago-and-carnegie-mellon-university-apply-by-january-30-2021/"><span class="datestr">at October 29, 2020 10:03 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -707,37 +1352,31 @@ graph processing on FPGAs.
 
 <div class="channelgroup">
 <div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14658">
+	id="http://tcsplus.wordpress.com/?p=505">
 <div class="entryheader">
 <span class="face">
-	<img class="face" src="images/corr.jpeg">
+	<img class="face" src="images/seminarseries.png">
 </span>
 <div class="entryheadertextcontainer">
 <div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14658">Faster Differentially Private Samplers via R\'enyi Divergence Analysis of Discretized Langevin MCMC</a></h3>
+<h3 lang="en"><a class="entryheader" href="https://tcsplus.wordpress.com/2020/10/29/tcs-talk-wednesday-november-4-shalev-ben-david-university-of-waterloo/">TCS+ talk: Wednesday, November 4 — Shalev Ben-David, University of Waterloo</a></h3>
 <p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<a class="entryheader" href="https://tcsplus.wordpress.com" title="TCS+">TCS+ seminar series</a>
 <p>
 </div>
 </div>
 </div>
 <div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Ganesh:Arun.html">Arun Ganesh</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/t/Talwar:Kunal.html">Kunal Talwar</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14658">PDF</a><br /><b>Abstract: </b>Various differentially private algorithms instantiate the exponential
-mechanism, and require sampling from the distribution $\exp(-f)$ for a suitable
-function $f$. When the domain of the distribution is high-dimensional, this
-sampling can be computationally challenging. Using heuristic sampling schemes
-such as Gibbs sampling does not necessarily lead to provable privacy. When $f$
-is convex, techniques from log-concave sampling lead to polynomial-time
-algorithms, albeit with large polynomials. Langevin dynamics-based algorithms
-offer much faster alternatives under some distance measures such as statistical
-distance. In this work, we establish rapid convergence for these algorithms
-under distance measures more suitable for differential privacy. For smooth,
-strongly-convex $f$, we give the first results proving convergence in R\'enyi
-divergence. This gives us fast differentially private algorithms for such $f$.
-Our techniques and simple and generic and apply also to underdamped Langevin
-dynamics.
-</p></div>
+<div class="content" lang="en">
+<p>The next TCS+ talk will take place this coming Wednesday, November 4th at 1:00 PM Eastern Time (10:00 AM Pacific Time, 19:00 Central European Time, 18:00 UTC). <strong>Shalev Ben-David</strong> from University of Waterloo will speak about “<em>Forecasting Algorithms, Minimax Theorems, and Randomized Lower Bounds</em>” (abstract below).</p>
+
+
+
+<p>You can reserve a spot as an individual or a group to join us live by signing up on <a href="https://sites.google.com/site/plustcs/livetalk/live-seat-reservation">the online form</a>. Due to security concerns, <em>registration is required</em> to attend the interactive talk. (The link to the YouTube livestream will also be posted <a href="https://sites.google.com/site/plustcs/livetalk">on our  website</a> on the day of the talk, so people who did not sign up will still be able to  watch the talk live.) As usual, for more information about the TCS+ online seminar series and the upcoming talks, or to <a href="https://sites.google.com/site/plustcs/suggest">suggest</a> a possible topic or speaker, please see <a href="https://sites.google.com/site/plustcs/">the website</a>.</p>
+
+
+
+<p class="wp-block-quote">Abstract: I will present a new approach to randomized lower bounds, particularly in the setting where we wish to give a fine-grained analysis of randomized algorithms that achieve small bias. The approach is as follows: instead of considering ordinary randomized algorithms which give an output in <img src="https://s0.wp.com/latex.php?latex=%5C%7B0%2C1%5C%7D&amp;bg=fff&amp;fg=444444&amp;s=0&amp;c=20201002" alt="\{0,1\}" class="latex" title="\{0,1\}" /> and may err, we switch models to look at “forecasting” randomized algorithms which output a confidence in <img src="https://s0.wp.com/latex.php?latex=%5B0%2C1%5D&amp;bg=fff&amp;fg=444444&amp;s=0&amp;c=20201002" alt="[0,1]" class="latex" title="[0,1]" /> for whether they think the answer is 1. When scored by a proper scoring rule, the performance of the best forecasting algorithm is closely related to the bias of the best (ordinary) randomized algorithm, but is more amenable to analysis. <br />As an application, I’ll present a new minimax theorem for randomized algorithms, which can be viewed as a strengthening of Yao’s minimax theorem. Yao’s minimax theorem guarantees the existence of a hard distribution for a function <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=fff&amp;fg=444444&amp;s=0&amp;c=20201002" alt="f" class="latex" title="f" /> such that solving <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=fff&amp;fg=444444&amp;s=0&amp;c=20201002" alt="f" class="latex" title="f" /> against this distribution (to a desired error level) is as hard as solving <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=fff&amp;fg=444444&amp;s=0&amp;c=20201002" alt="f" class="latex" title="f" /> in the worst case (to that same error level). However, the hard distribution provided by Yao’s theorem depends on the chosen error level. Our minimax theorem removes this dependence, giving a distribution which certifies the hardness of <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=fff&amp;fg=444444&amp;s=0&amp;c=20201002" alt="f" class="latex" title="f" /> against all bias levels at once. In recent work, we used this minimax theorem to give a tight composition theorem for randomized query complexity. <br /><br />Based on joint work with Eric Blais.</p></div>
 
 
 
@@ -746,177 +1385,7 @@ dynamics.
 
 
 <p class="date">
-<a href="http://arxiv.org/abs/2010.14658"><span class="datestr">at October 29, 2020 12:00 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14620">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14620">Correlation Robust Influence Maximization</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b>Louis Chen, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Padmanabhan:Divya.html">Divya Padmanabhan</a>, Chee Chin Lim, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Natarajan:Karthik.html">Karthik Natarajan</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14620">PDF</a><br /><b>Abstract: </b>We propose a distributionally robust model for the influence maximization
-problem. Unlike the classic independent cascade model
-\citep{kempe2003maximizing}, this model's diffusion process is adversarially
-adapted to the choice of seed set. Hence, instead of optimizing under the
-assumption that all influence relationships in the network are independent, we
-seek a seed set whose expected influence under the worst correlation, i.e. the
-"worst-case, expected influence", is maximized. We show that this worst-case
-influence can be efficiently computed, and though the optimization is NP-hard,
-a ($1 - 1/e$) approximation guarantee holds. We also analyze the structure to
-the adversary's choice of diffusion process, and contrast with established
-models. Beyond the key computational advantages, we also highlight the extent
-to which the independence assumption may cost optimality, and provide insights
-from numerical experiments comparing the adversarial and independent cascade
-model.
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/2010.14620"><span class="datestr">at October 29, 2020 12:00 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14560">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14560">Improved Algorithms for Edge Colouring in the W-Streaming Model</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Charikar:Moses.html">Moses Charikar</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Liu:Paul.html">Paul Liu</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14560">PDF</a><br /><b>Abstract: </b>In the W-streaming model, an algorithm is given $O(n \mathrm{polylog} n)$
-space and must process a large graph of up to $O(n^2)$ edges. In this short
-note we give two algorithms for edge colouring under the W-streaming model. For
-edge colouring in W-streaming, a colour for every edge must be determined by
-the time all the edges are streamed. Our first algorithm uses $\Delta +
-o(\Delta)$ colours in $O(n \log^2 n)$ space when the edges arrive according to
-a uniformly random permutation. The second algorithm uses $(1 + o(1))\Delta^2 /
-s$ colours in $\tilde{O}(n s)$ space when edges arrival adversarially.
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/2010.14560"><span class="datestr">at October 29, 2020 12:00 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/1902.04495">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/1902.04495">The Cost of Privacy: Optimal Rates of Convergence for Parameter Estimation with Differential Privacy</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Cai:T=_Tony.html">T. Tony Cai</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/w/Wang:Yichen.html">Yichen Wang</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/z/Zhang:Linjun.html">Linjun Zhang</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/1902.04495">PDF</a><br /><b>Abstract: </b>Privacy-preserving data analysis is a rising challenge in contemporary
-statistics, as the privacy guarantees of statistical methods are often achieved
-at the expense of accuracy. In this paper, we investigate the tradeoff between
-statistical accuracy and privacy in mean estimation and linear regression,
-under both the classical low-dimensional and modern high-dimensional settings.
-A primary focus is to establish minimax optimality for statistical estimation
-with the $(\varepsilon,\delta)$-differential privacy constraint. To this end,
-we find that classical lower bound arguments fail to yield sharp results, and
-new technical tools are called for.
-</p>
-<p>By refining the "tracing adversary" technique for lower bounds in the
-theoretical computer science literature, we formulate a general lower bound
-argument for minimax risks with differential privacy constraints, and apply
-this argument to high-dimensional mean estimation and linear regression
-problems. We also design computationally efficient algorithms that attain the
-minimax lower bounds up to a logarithmic factor. In particular, for the
-high-dimensional linear regression, a novel private iterative hard thresholding
-pursuit algorithm is proposed, based on a privately truncated version of
-stochastic gradient descent. The numerical performance of these algorithms is
-demonstrated by simulation studies and applications to real data containing
-sensitive information, for which privacy-preserving statistical methods are
-necessary.
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/1902.04495"><span class="datestr">at October 29, 2020 12:00 AM UTC</span></a>
+by plustcs <a href="https://tcsplus.wordpress.com/2020/10/29/tcs-talk-wednesday-november-4-shalev-ben-david-university-of-waterloo/"><span class="datestr">at October 29, 2020 07:35 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -1338,596 +1807,6 @@ Xiyang Liu, Sewoong Oh</p>
 
 <p class="date">
 by Thomas Steinke <a href="https://differentialprivacy.org/tpdp2020/"><span class="datestr">at October 28, 2020 12:01 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14487">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14487">Improved Guarantees for k-means++ and k-means++ Parallel</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Makarychev:Konstantin.html">Konstantin Makarychev</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/r/Reddy:Aravind.html">Aravind Reddy</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Shan:Liren.html">Liren Shan</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14487">PDF</a><br /><b>Abstract: </b>In this paper, we study k-means++ and k-means++ parallel, the two most
-popular algorithms for the classic k-means clustering problem. We provide novel
-analyses and show improved approximation and bi-criteria approximation
-guarantees for k-means++ and k-means++ parallel. Our results give a better
-theoretical justification for why these algorithms perform extremely well in
-practice. We also propose a new variant of k-means++ parallel algorithm
-(Exponential Race k-means++) that has the same approximation guarantees as
-k-means++.
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/2010.14487"><span class="datestr">at October 28, 2020 11:25 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14464">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14464">Dynamic Boundary Time Warping for Sub-sequence Matching with Few Examples</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b>Łukasz Borchmann, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/j/Jurkiewicz:Dawid.html">Dawid Jurkiewicz</a>, Filip Graliński, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/G=oacute=recki:Tomasz.html">Tomasz Górecki</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14464">PDF</a><br /><b>Abstract: </b>The paper presents a novel method of finding a fragment in a long temporal
-sequence similar to the set of shorter sequences. We are the first to propose
-an algorithm for such a search that does not rely on computing the average
-sequence from query examples. Instead, we use query examples as is, utilizing
-all of them simultaneously. The introduced method based on the Dynamic Time
-Warping (DTW) technique is suited explicitly for few-shot query-by-example
-retrieval tasks. We evaluate it on two different few-shot problems from the
-field of Natural Language Processing. The results show it either outperforms
-baselines and previous approaches or achieves comparable results when a low
-number of examples is available.
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/2010.14464"><span class="datestr">at October 28, 2020 12:00 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14367">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14367">Simultaenous Sieves: A Deterministic Streaming Algorithm for Non-Monotone Submodular Maximization</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Kuhnle:Alan.html">Alan Kuhnle</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14367">PDF</a><br /><b>Abstract: </b>In this work, we present a combinatorial, deterministic single-pass streaming
-algorithm for the problem of maximizing a submodular function, not necessarily
-monotone, with respect to a cardinality constraint (SMCC). In the case the
-function is monotone, our algorithm reduces to the optimal streaming algorithm
-of Badanidiyuru et al. (2014). In general, our algorithm achieves ratio $\alpha
-/ (1 + \alpha) - \varepsilon$, for any $\varepsilon &gt; 0$, where $\alpha$ is the
-ratio of an offline (deterministic) algorithm for SMCC used for
-post-processing. Thus, if exponential computation time is allowed, our
-algorithm deterministically achieves nearly the optimal $1/2$ ratio. These
-results nearly match those of a recently proposed, randomized streaming
-algorithm that achieves the same ratios in expectation. For a deterministic,
-single-pass streaming algorithm, our algorithm achieves in polynomial time an
-improvement of the best approximation factor from $1/9$ of previous literature
-to $\approx 0.2689$.
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/2010.14367"><span class="datestr">at October 28, 2020 12:00 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14338">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14338">On Minimum Generalized Manhattan Connections</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.CG updates on arXiv.org">arXiv.org: Computational geometry</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Antoniadis:Antonios.html">Antonios Antoniadis</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Capretto:Margarita.html">Margarita Capretto</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Chalermsook:Parinya.html">Parinya Chalermsook</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Damerius:Christoph.html">Christoph Damerius</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Kling:Peter.html">Peter Kling</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/N=ouml=lke:Lukas.html">Lukas Nölke</a>, Nidia Obscura, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Spoerhase:Joachim.html">Joachim Spoerhase</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14338">PDF</a><br /><b>Abstract: </b>We consider minimum-cardinality Manhattan connected sets with arbitrary
-demands: Given a collection of points $P$ in the plane, together with a subset
-of pairs of points in $P$ (which we call demands), find a minimum-cardinality
-superset of $P$ such that every demand pair is connected by a path whose length
-is the $\ell_1$-distance of the pair. This problem is a variant of three
-well-studied problems that have arisen in computational geometry, data
-structures, and network design: (i) It is a node-cost variant of the classical
-Manhattan network problem, (ii) it is an extension of the binary search tree
-problem to arbitrary demands, and (iii) it is a special case of the directed
-Steiner forest problem. Since the problem inherits basic structural properties
-from the context of binary search trees, an $O(\log n)$-approximation is
-trivial. We show that the problem is NP-hard and present an $O(\sqrt{\log
-n})$-approximation algorithm. Moreover, we provide an $O(\log\log
-n)$-approximation algorithm for complete bipartite demands as well as improved
-results for unit-disk demands and several generalizations. Our results
-crucially rely on a new lower bound on the optimal cost that could potentially
-be useful in the context of BSTs.
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/2010.14338"><span class="datestr">at October 28, 2020 12:00 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14316">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14316">Computation of Large Asymptotics of 3-Manifold Quantum Invariants</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.CG updates on arXiv.org">arXiv.org: Computational geometry</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Maria:Cl=eacute=ment.html">Clément Maria</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/r/Rouill=eacute=:Owen.html">Owen Rouillé</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14316">PDF</a><br /><b>Abstract: </b>Quantum topological invariants have played an important role in computational
-topology, and they are at the heart of major modern mathematical conjectures.
-In this article, we study the experimental problem of computing large $r$
-values of Turaev-Viro invariants $\mathrm{TV}_r$. We base our approach on an
-optimized backtracking algorithm, consisting of enumerating combinatorial data
-on a triangulation of a 3-manifold. We design an easily computable parameter to
-estimate the complexity of the enumeration space, based on lattice point
-counting in polytopes, and show experimentally its accuracy. We apply this
-parameter to a preprocessing strategy on the triangulation, and combine it with
-multi-precision arithmetics in order to compute the Turaev-Viro invariants. We
-finally study the improvements brought by these optimizations compared to
-state-of-the-art implementations, and verify experimentally Chen and Yang's
-volume conjecture on a census of closed 3-manifolds.
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/2010.14316"><span class="datestr">at October 28, 2020 12:00 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14189">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14189">Jiffy: A Fast, Memory Efficient, Wait-Free Multi-Producers Single-Consumer Queue</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Adas:Dolev.html">Dolev Adas</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/f/Friedman:Roy.html">Roy Friedman</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14189">PDF</a><br /><b>Abstract: </b>In applications such as sharded data processing systems, data flow
-programming and load sharing applications, multiple concurrent data producers
-are feeding requests into the same data consumer. This can be naturally
-realized through concurrent queues, where each consumer pulls its tasks from
-its dedicated queue. For scalability, wait-free queues are often preferred over
-lock based structures.
-</p>
-<p>The vast majority of wait-free queue implementations, and even lock-free
-ones, support the multi-producer multi-consumer model. Yet, this comes at a
-premium, since implementing wait-free multi-producer multi-consumer queues
-requires utilizing complex helper data structures. The latter increases the
-memory consumption of such queues and limits their performance and scalability.
-Additionally, many such designs employ (hardware) cache unfriendly memory
-access patterns.
-</p>
-<p>In this work we study the implementation of wait-free multi-producer
-single-consumer queues. Specifically, we propose Jiffy, an efficient memory
-frugal novel wait-free multi-producer single-consumer queue and formally prove
-its correctness. We then compare the performance and memory requirements of
-Jiffy with other state of the art lock-free and wait-free queues. We show that
-indeed Jiffy can maintain good performance with up to 128 threads, delivers up
-to 50% better throughput than the next best construction we compared against,
-and consumes ~90% less memory.
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/2010.14189"><span class="datestr">at October 28, 2020 11:26 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14181">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14181">Impossibility Results for Grammar-Compressed Linear Algebra</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.CC updates on arXiv.org">arXiv.org: Computational complexity</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Abboud:Amir.html">Amir Abboud</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Backurs:Arturs.html">Arturs Backurs</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Bringmann:Karl.html">Karl Bringmann</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/K=uuml=nnemann:Marvin.html">Marvin Künnemann</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14181">PDF</a><br /><b>Abstract: </b>To handle vast amounts of data, it is natural and popular to compress vectors
-and matrices. When we compress a vector from size $N$ down to size $n \ll N$,
-it certainly makes it easier to store and transmit efficiently, but does it
-also make it easier to process?
-</p>
-<p>In this paper we consider lossless compression schemes, and ask if we can run
-our computations on the compressed data as efficiently as if the original data
-was that small. That is, if an operation has time complexity
-$T(\rm{inputsize})$, can we perform it on the compressed representation in time
-$T(n)$ rather than $T(N)$? We consider the most basic linear algebra
-operations: inner product, matrix-vector multiplication, and matrix
-multiplication. In particular, given two compressed vectors, can we compute
-their inner product in time $O(n)$? Or perhaps we must decompress first and
-then multiply, spending $\Omega(N)$ time?
-</p>
-<p>The answer depends on the compression scheme. While for simple ones such as
-Run-Length-Encoding (RLE) the inner product can be done in $O(n)$ time, we
-prove that this is impossible for compressions from a richer class: essentially
-$n^2$ or even larger runtimes are needed in the worst case (under complexity
-assumptions). This is the class of grammar-compressions containing most popular
-methods such as the Lempel-Ziv family. These schemes are more compressing than
-the simple RLE, but alas, we prove that performing computations on them is much
-harder.
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/2010.14181"><span class="datestr">at October 28, 2020 11:20 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.14058">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.14058">Heterogeneous Graphlets</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/r/Rossi:Ryan_A=.html">Ryan A. Rossi</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Ahmed:Nesreen_K=.html">Nesreen K. Ahmed</a>, Aldo Carranza, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Arbour:David.html">David Arbour</a>, Anup Rao, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Kim:Sungchul.html">Sungchul Kim</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Koh:Eunyee.html">Eunyee Koh</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.14058">PDF</a><br /><b>Abstract: </b>In this paper, we introduce a generalization of graphlets to heterogeneous
-networks called typed graphlets. Informally, typed graphlets are small typed
-induced subgraphs. Typed graphlets generalize graphlets to rich heterogeneous
-networks as they explicitly capture the higher-order typed connectivity
-patterns in such networks. To address this problem, we describe a general
-framework for counting the occurrences of such typed graphlets. The proposed
-algorithms leverage a number of combinatorial relationships for different typed
-graphlets. For each edge, we count a few typed graphlets, and with these counts
-along with the combinatorial relationships, we obtain the exact counts of the
-other typed graphlets in o(1) constant time. Notably, the worst-case time
-complexity of the proposed approach matches the time complexity of the best
-known untyped algorithm. In addition, the approach lends itself to an efficient
-lock-free and asynchronous parallel implementation. While there are no existing
-methods for typed graphlets, there has been some work that focused on computing
-a different and much simpler notion called colored graphlet. The experiments
-confirm that our proposed approach is orders of magnitude faster and more
-space-efficient than methods for computing the simpler notion of colored
-graphlet. Unlike these methods that take hours on small networks, the proposed
-approach takes only seconds on large networks with millions of edges. Notably,
-since typed graphlet is more general than colored graphlet (and untyped
-graphlets), the counts of various typed graphlets can be combined to obtain the
-counts of the much simpler notion of colored graphlets. The proposed methods
-give rise to new opportunities and applications for typed graphlets.
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/2010.14058"><span class="datestr">at October 28, 2020 11:28 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.13949">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.13949">KFC: A Scalable Approximation Algorithm for $k$-center Fair Clustering</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Harb:Elfarouk.html">Elfarouk Harb</a>, Ho Shan Lam <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.13949">PDF</a><br /><b>Abstract: </b>In this paper, we study the problem of fair clustering on the $k-$center
-objective. In fair clustering, the input is $N$ points, each belonging to at
-least one of $l$ protected groups, e.g. male, female, Asian, Hispanic. The
-objective is to cluster the $N$ points into $k$ clusters to minimize a
-classical clustering objective function. However, there is an additional
-constraint that each cluster needs to be fair, under some notion of fairness.
-This ensures that no group is either "over-represented" or "under-represented"
-in any cluster. Our work builds on the work of Chierichetti et al. (NIPS 2017),
-Bera et al. (NeurIPS 2019), Ahmadian et al. (KDD 2019), and Bercea et al.
-(APPROX 2019). We obtain a randomized $3-$approximation algorithm for the
-$k-$center objective function, beating the previous state of the art
-($4-$approximation). We test our algorithm on real datasets, and show that our
-algorithm is effective in finding good clusters without over-representation or
-under-representation, surpassing the current state of the art in runtime speed,
-clustering cost, while achieving similar fairness violations.
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/2010.13949"><span class="datestr">at October 28, 2020 12:00 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://arxiv.org/abs/2010.13888">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/corr.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="http://arxiv.org/abs/2010.13888">Unifying Matrix Data Structures: Simplifying and Speeding up Iterative Algorithms</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Brand:Jan_van_den.html">Jan van den Brand</a> <br /><b>Download:</b> <a href="http://arxiv.org/pdf/2010.13888">PDF</a><br /><b>Abstract: </b>Many algorithms use data structures that maintain properties of matrices
-undergoing some changes. The applications are wide-ranging and include for
-example matchings, shortest paths, linear programming, semi-definite
-programming, convex hull and volume computation. Given the wide range of
-applications, the exact property these data structures must maintain varies
-from one application to another, forcing algorithm designers to invent them
-from scratch or modify existing ones. Thus it is not surprising that these data
-structures and their proofs are usually tailor-made for their specific
-application and that maintaining more complicated properties results in more
-complicated proofs.
-</p>
-<p>In this paper we present a unifying framework that captures a wide range of
-these data structures. The simplicity of this framework allows us to give short
-proofs for many existing data structures regardless of how complicated the to
-be maintained property is. We also show how the framework can be used to speed
-up existing iterative algorithms, such as the simplex algorithm.
-</p>
-<p>More formally, consider any rational function $f(A_1,...,A_d)$ with input
-matrices $A_1,...,A_d$. We show that the task of maintaining $f(A_1,...,A_d)$
-under updates to $A_1,...,A_d$ can be reduced to the much simpler problem of
-maintaining some matrix inverse $M^{-1}$ under updates to $M$. The latter is a
-well studied problem called dynamic matrix inverse. By applying our reduction
-and using known algorithms for dynamic matrix inverse we can obtain fast data
-structures and iterative algorithms for much more general problems.
-</p></div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="http://arxiv.org/abs/2010.13888"><span class="datestr">at October 28, 2020 12:00 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -3250,6 +3129,97 @@ In 1798 he used the weak cox-pox to fool our immune system to create a protectio
 
 <p class="date">
 by rjlipton <a href="https://rjlipton.wordpress.com/2020/10/22/vaccines-are-not-developing/"><span class="datestr">at October 22, 2020 03:50 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://tcsplus.wordpress.com/?p=499">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/seminarseries.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://tcsplus.wordpress.com/2020/10/22/tcs-talk-wednesday-october-28-omar-montasser-ttic/">TCS+ talk: Wednesday, October 28 — Omar Montasser, TTIC</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://tcsplus.wordpress.com" title="TCS+">TCS+ seminar series</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p>The next TCS+ talk will take place this coming Wednesday, October 28th at 1:00 PM Eastern Time (10:00 AM Pacific Time, 18:00 Central European Time, 17:00 UTC). <strong>Omar Montasser</strong> from TTIC will speak about “<em>Adversarially Robust Learnability: Characterization and Reductions</em>” (abstract below).</p>
+
+
+
+<p>You can reserve a spot as an individual or a group to join us live by signing up on <a href="https://sites.google.com/site/plustcs/livetalk/live-seat-reservation">the online form</a>. Due to security concerns, <em>registration is required</em> to attend the interactive talk. As usual, for more information about the TCS+ online seminar series and the upcoming talks, or to <a href="https://sites.google.com/site/plustcs/suggest">suggest</a> a possible topic or speaker, please see <a href="https://sites.google.com/site/plustcs/">the website</a>.</p>
+
+
+
+<p class="wp-block-quote">Abstract: We study the question of learning an adversarially robust predictor from uncorrupted samples. We show that any VC class <img src="https://s0.wp.com/latex.php?latex=H&amp;bg=fff&amp;fg=444444&amp;s=0&amp;c=20201002" alt="H" class="latex" title="H" /> is robustly PAC learnable, but we also show that such learning must sometimes be improper (i.e. use predictors from outside the class), as some VC classes are not robustly properly learnable.  In particular, the popular robust empirical risk minimization approach (also known as adversarial training), which is proper, cannot robustly learn all VC classes.  After establishing learnability, we turn to ask whether having a tractable non-robust learning algorithm is sufficient for tractable robust learnability and give a reduction algorithm for robustly learning any hypothesis class <img src="https://s0.wp.com/latex.php?latex=H&amp;bg=fff&amp;fg=444444&amp;s=0&amp;c=20201002" alt="H" class="latex" title="H" /> using a non-robust PAC learner for <img src="https://s0.wp.com/latex.php?latex=H&amp;bg=fff&amp;fg=444444&amp;s=0&amp;c=20201002" alt="H" class="latex" title="H" />, with nearly-optimal oracle complexity.<br />This is based on joint work with Steve Hanneke and Nati Srebro, available at <a href="https://arxiv.org/abs/1902.04217">https://arxiv.org/abs/1902.04217</a>.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by plustcs <a href="https://tcsplus.wordpress.com/2020/10/22/tcs-talk-wednesday-october-28-omar-montasser-ttic/"><span class="datestr">at October 22, 2020 02:48 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://cstheory-jobs.org/2020/10/22/computer-science-tenured-tenure-track-at-nyu-shanghai-apply-by-february-1-2021/">
+<div class="entryheader">
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://cstheory-jobs.org/2020/10/22/computer-science-tenured-tenure-track-at-nyu-shanghai-apply-by-february-1-2021/">Computer Science, Tenured/Tenure-track at NYU Shanghai (apply by February 1, 2021)</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://cstheory-jobs.org" title="Theoretical Computer Science Jobs">CCI: jobs</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p>NYU Shanghai is currently inviting applications for a Tenured or Tenure-track position in Computer Science Theory. The search is not restricted to any rank. We invite candidates with a strong research record in CS theory to apply, including research in algorithms, data structures, computational complexity, cryptography, learning theory, and so on.</p>
+<p>Website: <a href="https://apply.interfolio.com/80168">https://apply.interfolio.com/80168</a><br />
+Email: shanghai.faculty.recruitment@nyu.edu</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by shacharlovett <a href="https://cstheory-jobs.org/2020/10/22/computer-science-tenured-tenure-track-at-nyu-shanghai-apply-by-february-1-2021/"><span class="datestr">at October 22, 2020 01:41 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
