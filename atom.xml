@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-11-04T13:38:58Z</updated>
+  <updated>2020-11-04T14:21:44Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -762,11 +762,7 @@ and cuboid.
 
 
 
-<p>Each such container <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> will contain the following attributes:</p>
-
-
-
-<ol><li>The actual scalar (i.e., floating point) value that <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> holds. We call this <code>data</code>.</li><li>The gradient of <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> with respect to some future unknown value <img alt="f" class="latex" src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="f"/> that will use it. We call this <code>grad</code> and it is initialized to zero.</li><li>Pointers to all the values that were used in the computation of <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/>. We call this <code>_prev</code></li><li>The method that adds (using the current value of <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> and other values) the contribution of <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> to the gradient of all its previous values <img alt="v" class="latex" src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="v"/> to their gradients. We call this function <code>_backward</code>. Specifically, at the time we call <code>_backward</code> we assume that <code>u.grad</code> already contains <img alt="\tfrac{\partial z}{\partial u}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctfrac%7B%5Cpartial+z%7D%7B%5Cpartial+u%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="\tfrac{\partial z}{\partial u}"/> where <img alt="z" class="latex" src="https://s0.wp.com/latex.php?latex=z&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="z"/> is the final value we are interested in. For every value <img alt="v" class="latex" src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="v"/> that was used to compute <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/>, we add to <code>v.grad</code> the quantity <img alt="\tfrac{\partial z}{\partial u} \cdot \tfrac{\partial u}{\partial v}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctfrac%7B%5Cpartial+z%7D%7B%5Cpartial+u%7D+%5Ccdot+%5Ctfrac%7B%5Cpartial+u%7D%7B%5Cpartial+v%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="\tfrac{\partial z}{\partial u} \cdot \tfrac{\partial u}{\partial v}"/>. For the latter quantity we need to keep track of <em>how</em> <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> was computed from <img alt="b" class="latex" src="https://s0.wp.com/latex.php?latex=b&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="b"/>.</li><li>If we call the method <code>backwards</code> (without an underscore) on a variable <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> then this will compute the derivative of <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> with respect to <img alt="v" class="latex" src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="v"/> for all values <img alt="v" class="latex" src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="v"/> that were used in the computation of <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/>. We do this by first recursively building a list <img alt="v_1,v_2,\ldots,v_k" class="latex" src="https://s0.wp.com/latex.php?latex=v_1%2Cv_2%2C%5Cldots%2Cv_k&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="v_1,v_2,\ldots,v_k"/> of these values in reverse topoligical order (i.e., if <img alt="v_i" class="latex" src="https://s0.wp.com/latex.php?latex=v_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="v_i"/> used <img alt="v_j" class="latex" src="https://s0.wp.com/latex.php?latex=v_j&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="v_j"/> in the computation then <img alt="i&lt;j" class="latex" src="https://s0.wp.com/latex.php?latex=i%3Cj&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="i&lt;j"/>) and then call <code>_backwards</code> on each one of them.</li></ol>
+<ol><li>The actual scalar (i.e., floating point) value that <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> holds. We call this <code>data</code>.</li><li>The gradient of <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> with respect to some future unknown value <img alt="f" class="latex" src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="f"/> that will use it. We call this <code>grad</code> and it is initialized to zero.</li><li>Pointers to all the values that were used in the computation of <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/>. We call this <code>_prev</code></li><li>The method that adds (using the current value of <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> and other values) the contribution of <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> to the gradient of all its previous values <img alt="v" class="latex" src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="v"/> to their gradients. We call this function <code>_backward</code>. Specifically, at the time we call <code>_backward</code> we assume that <code>u.grad</code> already contains <img alt="\tfrac{\partial z}{\partial u}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctfrac%7B%5Cpartial+z%7D%7B%5Cpartial+u%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="\tfrac{\partial z}{\partial u}"/> where <img alt="z" class="latex" src="https://s0.wp.com/latex.php?latex=z&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="z"/> is the final value we are interested in. For every value <img alt="v" class="latex" src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="v"/> that was used to compute <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/>, we add to <code>v.grad</code> the quantity <img alt="\tfrac{\partial z}{\partial u} \cdot \tfrac{\partial u}{\partial v}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctfrac%7B%5Cpartial+z%7D%7B%5Cpartial+u%7D+%5Ccdot+%5Ctfrac%7B%5Cpartial+u%7D%7B%5Cpartial+v%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="\tfrac{\partial z}{\partial u} \cdot \tfrac{\partial u}{\partial v}"/>. For the latter quantity we need to keep track of <em>how</em> <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> was computed from <img alt="b" class="latex" src="https://s0.wp.com/latex.php?latex=b&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="b"/>.</li><li>If we call the method <code>backwards</code> (without an underscore) on a variable <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> then this will compute the derivative of <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> with respect to <img alt="v" class="latex" src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="v"/> for all values <img alt="v" class="latex" src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="v"/> that were used in the computation of <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/>. We do this by applying <code>_backward</code> to <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/> and then recursively (just like in DFS) going over the “children” (values used to compute <img alt="u" class="latex" src="https://s0.wp.com/latex.php?latex=u&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="u"/>), calling <code>_backward</code> on each one and keeping track the ones we visited just like the Depth First Search (DFS) algorithm.</li></ol>
 
 
 
@@ -818,14 +814,15 @@ and cuboid.
 <p>The <code>backward</code> function is obtained by setting the gradient of the current value to <img alt="1" class="latex" src="https://s0.wp.com/latex.php?latex=1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="1"/> and then running <code>_backwards</code> on all other values in reverse topological order:</p>
 
 
-<pre class="brush: python; gutter: false; title: ; notranslate">    def backward(self):
-        visited= set()
-        def topo(v):# return children in topological order
-            visited.add(v)
-            return [x for L in [topo(child) for child in v._prev if not child in visited] for x in L]
+<pre class="brush: python; gutter: false; title: ; notranslate">def backward(self, visited= None): # slightly shorter code to fit in the blog 
+    if visited is None:
+        visited= set([self])
         self.grad = 1
-        for v in reversed(topo(self)):
-          v.__backward()
+    self._backward()
+    for child in self._prev:
+        if not child in visited:
+            visited.add(child)
+            child.backward(visited)
 </pre>
 
 
@@ -840,7 +837,7 @@ print(a.grad)
 </pre>
 
 
-<p>then the values printed will be <code>0</code> and <code>89</code> since the derivative of <img alt="(x+2)^2 + x^3 = x^3 + x^2 + 4x + 4" class="latex" src="https://s0.wp.com/latex.php?latex=%28x%2B2%29%5E2+%2B+x%5E3+%3D+x%5E3+%2B+x%5E2+%2B+4x+%2B+4&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="(x+2)^2 + x^3 = x^3 + x^2 + 4x + 4"/> equals <img alt="3x^2 + 4x + 2" class="latex" src="https://s0.wp.com/latex.php?latex=3x%5E2+%2B+4x+%2B+2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="3x^2 + 4x + 2"/>.</p>
+<p>then the values printed will be <code>0</code> and <code>89</code> since the derivative of <img alt="(x+2)^2 + x^3 = x^3 + x^2 + 4x + 4" class="latex" src="https://s0.wp.com/latex.php?latex=%28x%2B2%29%5E2+%2B+x%5E3+%3D+x%5E3+%2B+x%5E2+%2B+4x+%2B+4&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="(x+2)^2 + x^3 = x^3 + x^2 + 4x + 4"/> equals <img alt="3x^2 + 2x +42" class="latex" src="https://s0.wp.com/latex.php?latex=3x%5E2+%2B+2x+%2B42&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="3x^2 + 2x +42"/>.</p>
 
 
 
@@ -926,7 +923,7 @@ for t in range(epochs):
 
 
 
-<p>The code for this Neural Network is as follows: (when <code>Value() </code>is called without a parameter the value is random number in <img alt="[-1,1]" class="latex" src="https://s0.wp.com/latex.php?latex=%5B-1%2C1%5D&amp;bg=eeeeee&amp;fg=ffffff&amp;s=0&amp;c=20201002" title="[-1,1]"/>)</p>
+<p>The code for this Neural Network is as follows: (when <code>Value() </code>is called without a parameter the value is random number in <img alt="[-1,1]" class="latex" src="https://s0.wp.com/latex.php?latex=%5B-1%2C1%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="[-1,1]"/>)</p>
 
 
 <pre class="brush: python; gutter: false; title: ; notranslate">def Neuron(weights,inputs, relu =True):
@@ -1005,7 +1002,7 @@ class Net:
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-11-04T13:37:54Z</updated>
+      <updated>2020-11-04T14:20:58Z</updated>
     </source>
   </entry>
 
@@ -1032,7 +1029,7 @@ Email: moemke@informatik.uni-augsburg.de</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-11-04T13:37:39Z</updated>
+      <updated>2020-11-04T14:20:42Z</updated>
     </source>
   </entry>
 
@@ -1185,7 +1182,7 @@ How do you think Election Night results will unfold, apart from your estimate of
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-11-04T13:37:36Z</updated>
+      <updated>2020-11-04T14:20:39Z</updated>
     </source>
   </entry>
 
@@ -1679,7 +1676,7 @@ Email: ttsearch@cs.tufts.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-11-04T13:37:39Z</updated>
+      <updated>2020-11-04T14:20:42Z</updated>
     </source>
   </entry>
 
@@ -1810,7 +1807,7 @@ This method was initiated in our prior work ({\em ECCC}, TR20-149), and we signi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-11-04T13:37:27Z</updated>
+      <updated>2020-11-04T14:20:31Z</updated>
     </source>
   </entry>
 
@@ -1833,7 +1830,7 @@ This method was initiated in our prior work ({\em ECCC}, TR20-149), and we signi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-11-04T13:37:27Z</updated>
+      <updated>2020-11-04T14:20:31Z</updated>
     </source>
   </entry>
 
@@ -1921,7 +1918,7 @@ The word “election” does <i>not</i> appear in Kearns and Roth’s book.  Wha
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-11-04T13:37:36Z</updated>
+      <updated>2020-11-04T14:20:40Z</updated>
     </source>
   </entry>
 
