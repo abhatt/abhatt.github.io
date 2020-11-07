@@ -240,7 +240,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at November 07, 2020 12:38 PM UTC</span>.
+Last updated <span class="datestr">at November 07, 2020 01:21 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -248,6 +248,297 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://francisbach.com/?p=64">
+<div class="entryheader">
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-US"><a class="entryheader" href="https://francisbach.com/cauchy-residue-formula/">The Cauchy residue trick: spectral analysis made “easy”</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://francisbach.com" title="Machine Learning Research Blog">Francis Bach</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en-US">
+<p class="justify-text">In many areas of machine learning, statistics and signal processing, eigenvalue decompositions are commonly used, e.g., in principal component analysis, spectral clustering, convergence analysis of Markov chains, convergence analysis of optimization algorithms, low-rank inducing regularizers, community detection, seriation, etc.</p>
+
+
+
+<p class="justify-text">Understanding how the spectral decomposition of a matrix changes as a function of a matrix is thus of primary importance, both algorithmically and theoretically. We thus need a perturbation analysis or more generally some differentiability properties for eigenvalues or eigenvectors [1], or any spectral function [2]. These properties can be obtained from many angles, but a generic tool can be used for all of these: it is a surprising and elegant application of Cauchy’s residue formula, which is due to Kato [3].</p>
+
+
+
+<p class="justify-text">Before diving into spectral analysis, I will first present the Cauchy residue theorem and some nice applications in computing integrals that are needed in machine learning and kernel methods.</p>
+
+
+
+<h2>Cauchy residue formula </h2>
+
+
+
+<p class="justify-text">A function \(f : \mathbb{C} \to \mathbb{C}\) is said <em>holomorphic</em> in \(\lambda \in \mathbb{C}\) with derivative \(f'(\lambda) \in \mathbb{C}\), if is differentiable in \(\lambda\), that is if \(\displaystyle \frac{f(z)-f(\lambda)}{z-\lambda}\) tends to \(f'(\lambda)\) when \(z\) tends to \(\lambda\). Many classical functions are holomorphic on \(\mathbb{C}\) or portions thereof, such as the exponential, sines, cosines and their hyperbolic counterparts, rational functions, portions of the logarithm.</p>
+
+
+
+<p class="justify-text">We consider a function which is holomorphic in a region of \(\mathbb{C}\) except in \(m\) values \(\lambda_1,\dots,\lambda_m \in \mathbb{C}\), which are usually referred to as <em>poles</em>. We also consider a simple closed directed contour \(\gamma\) in \(\mathbb{C}\) that goes strictly around the \(m\) values above. </p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img width="549" alt="" src="https://francisbach.com/wp-content/uploads/2020/10/contour_generic-1-1024x440.png" class="wp-image-5002" height="236" /></figure></div>
+
+
+
+<p class="justify-text">The Cauchy residue formula gives an explicit formula for the contour integral along \(\gamma\):<br /> $$ \oint_\gamma f(z) dz = 2 i \pi \sum_{j=1}^m {\rm Res}(f,\lambda_j), \tag{1}$$<br /> where \({\rm Res}(f,\lambda)\) is called the <em>residue</em> of \(f\) at \(\lambda\) . If around \(\lambda\),  \(f(z)\) has a series expansions in powers of \((z − \lambda)\), that is, \(\displaystyle f(z) =  \sum_{k=-\infty}^{+\infty}a_k (z −\lambda)^k\), then \({\rm Res}(f,\lambda)=a_{-1}\).</p>
+
+
+
+<p class="justify-text">For example, if \(\displaystyle f(z) =   \frac{g(z)}{z-\lambda}\) with \(g\) holomorphic around \(\lambda\), then \({\rm Res}(f,\lambda) = g(\lambda)\), and more generally, if \(\displaystyle f(z) = \frac{g(z)}{(z-\lambda)^k}\) for \(k \geqslant  1\), then \(\displaystyle {\rm Res}(f,\lambda) = \frac{g^{(k-1)}(\lambda) }{(k-1)!}\). For more details on complex analysis, see [4].</p>
+
+
+
+<p class="justify-text">The result above can be naturally extended to vector-valued functions (and thus to any matrix-valued function), by applying the identity to all components of the vector.</p>
+
+
+
+<p class="justify-text">This result is due to <a href="https://en.wikipedia.org/wiki/Augustin-Louis_Cauchy">Cauchy</a> [<a href="https://archive.org/details/mmoiresurlesin00cauc">10</a>] in 1825. The <a href="https://archive.org/details/mmoiresurlesin00cauc">original paper</a> where this is presented is a nice read in French where you can find some pepits like “la fonction s’évanouit pour \(x = \infty\)”.</p>
+
+
+
+<p>If you are already familiar with complex residues, you can skip the next section.</p>
+
+
+
+<h2>Where does it come from?</h2>
+
+
+
+<p class="justify-text">At first, the formula in Eq. (1) seems unsettling. Why doesn’t the result depend more explicitly on the contour \(\gamma\)? Where does the multiplicative term \( {2i\pi}\) come from? Here is a very partial and non rigorous account (go to the <a href="https://terrytao.wordpress.com/tag/residue-theorem/">experts</a> for more rigor!).</p>
+
+
+
+<p class="justify-text">Complex-valued functions on \(\mathbb{C}\) can be seen as functions from \(\mathbb{R}^2\) to itself, by writing $$ f(x+iy) = u(x,y) + i v(x,y),$$ where \(u\) and \(v\) are real-valued functions. We have thus a function \((x,y) \mapsto (u(x,y),v(x,y))\) from \(\mathbb{R}^2\) to \(\mathbb{R}^2\). Expanding \(f(z+dz) = f(z) + f'(z) dz\), which is the definition of complex differentiability, into real and imaginary parts, we get (using \(i^2 = -1\)): $$\left\{ \begin{array}{l} u(x+dx,y+dy) = u(x,y) + {\rm Re}(f'(z)) dx\ – {\rm Im}(f'(z)) dy \\ v(x+dx,y+dy) = v(x,y) + {\rm Re}(f'(z)) dy + {\rm Im}(f'(z)) dx. \end{array}\right.$$ This leads to $$\left\{ \begin{array}{l} \displaystyle \frac{\partial u}{\partial x}(x,y) = {\rm Re}(f'(z)) \\ \displaystyle \frac{\partial u}{\partial y}(x,y) = \ – {\rm Im}(f'(z)) \\ \displaystyle \frac{\partial v}{\partial x}(x,y) = {\rm Im}(f'(z)) \\ \displaystyle \frac{\partial v}{\partial y}(x,y) = {\rm Re}(f'(z)). \end{array}\right.$$</p>
+
+
+
+<p class="justify-text">This in turn leads to the <a href="https://en.wikipedia.org/wiki/Cauchy%E2%80%93Riemann_equations">Cauchy-Riemann equations</a> \(\displaystyle \frac{\partial u}{\partial x} = \frac{\partial v}{\partial y}\) and \(\displaystyle \frac{\partial u}{\partial y} = -\frac{\partial v}{\partial x}\), which are essentially necessary and sufficient conditions to be holomorphic. Thus holomorphic functions correspond to differentiable functions on \(\mathbb{R}^2\) with some equal partial derivatives. These equations are key to obtaining the Cauchy residue formula.</p>
+
+
+
+<p class="justify-text"><strong>Contour integral with no poles. </strong>We first consider a contour integral over a contour \(\gamma\) enclosing a region \(\mathcal{D}\) where the function \(f\) is holomorphic everywhere. The contour \(\gamma\) is defined as a differentiable function \(\gamma: [0,1] \to \mathbb{C}\), and the integral is equal to $$\oint_\gamma f(z) dz = \int_0^1 \!\!f(\gamma(t)) \gamma'(t) dt = \int_0^1 \!\![u(x(t),y(t)) +i v(x(t),y(t))] [ x'(t) + i y'(t)] dt,$$ where \(x(t) = {\rm Re}(\gamma(t))\) and \(y(t) = {\rm Im}(\gamma(t))\). By expanding the product of complex numbers, it is thus equal to $$\int_0^1 [ u(x(t),y(t)) x'(t) \ – v(x(t),y(t))y'(t)] dt +i  \int_0^1 [ v(x(t),y(t)) x'(t) +u (x(t),y(t))y'(t)] dt,$$ which we can rewrite in compact form as (with \(dx = x'(t) dt\) and \(dy = y'(t)dt\)): $$\oint_\gamma ( u \, dx\  – v \, dy ) + i \oint_\gamma ( v \, dx + u \, dy ).$$ We can then use <a href="https://en.wikipedia.org/wiki/Green%27s_theorem">Green’s theorem</a> because our functions are differentiable on the entire region \(\mathcal{D}\) (the set “inside” the contour), to get $$\oint_\gamma ( u \, dx\ – v \, dy ) + i \oint_\gamma ( v \, dx + u \, dy ) =\  – \int\!\!\!\!\int_\mathcal{D} \! \Big( \frac{\partial v}{\partial x} + \frac{\partial u}{\partial y} \Big) dx dy \ – i \!\! \int\!\!\!\!\int_\mathcal{D} \!\Big( \frac{\partial u}{\partial x} – \frac{\partial v}{\partial y} \Big) dx dy.$$ Thus, because of the Cauchy-Riemann equations, the contour integral is always zero within the domain of differentiability of \(f\). Note that this extends to piecewise smooth contours \(\gamma\).</p>
+
+
+
+<p class="justify-text"><strong>Circle and rational functions.</strong> For a circle contour of center \(\lambda \in \mathbb{C}\) and radius \(r\), we have, with \(\gamma(t) = \lambda + re^{ 2i \pi t}\): $$\oint_{\gamma} \frac{dz}{(z-\lambda)^k} =\int_0^{1} \frac{ 2r i \pi e^{2i\pi t}}{ r^k e^{2i\pi kt}}dt= \int_0^{1} r^{1-k} i e^{2i\pi (1-k)t} dt,$$ which is equal to zero if \(k \neq 1\), and to \(\int_0^{1} 2i\pi dt = 2 i \pi\) for \(k =1\). Thus, for a function with a series expansion, the Cauchy residue formula is true for the circle around a single pole, because only the term in \(\frac{1}{z-\lambda}\) contributes.</p>
+
+
+
+<p class="justify-text"><strong>No dependence on the contour.</strong> Now that the Cauchy formula is true for the circle around a single pole, we can “deform” the contour below to a circle.</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img width="398" alt="" src="https://francisbach.com/wp-content/uploads/2020/10/contour_generic_circle-1024x532.png" class="wp-image-5021" height="207" /></figure></div>
+
+
+
+<p>This can be done considering two contours \(\gamma_1\) and \(\gamma_2\) below with no poles inside, and thus with zero contour integrals, and for which the integrals along the added lines cancel.</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img width="391" alt="" src="https://francisbach.com/wp-content/uploads/2020/10/contour_generic_circle_cut-1-1024x537.png" class="wp-image-5022" height="205" /></figure></div>
+
+
+
+<p class="justify-text">This “shows” that the integral does not depend on the contour, and so in applications we can be quite liberal in the choice of contour. Note that similar constructions can be used to take into account several poles.</p>
+
+
+
+<p class="justify-text">Before going to the spectral analysis of matrices, let us explore some cool choices of contours and integrands, and (again!) some positive definite kernels.</p>
+
+
+
+<h2>Classical examples</h2>
+
+
+
+<p class="justify-text">The Cauchy residue theorem can be used to compute integrals, by choosing the appropriate contour, looking for poles and computing the associated residues. Here are classical examples, before I show applications to kernel methods. See more examples in <a href="http://residuetheorem.com/">http://residuetheorem.com/</a>, and many in [11].</p>
+
+
+
+<p class="justify-text"><strong>Fourier transforms. </strong> For \(\omega&gt;0\), we can compute \( \displaystyle \int_{-\infty}^\infty \!\! f(x) e^{ i \omega x} dx\) for holomorphic functions \(f\) by integrating on the real line and a big upper circle as shown below, with \(R\) tending to infinity (so that the contribution of the half-circle goes to zero because of the exponential term). This leads to \(2i \pi\) times the sum of all residues of the function \(z \mapsto f(z) e^{ i \omega z}\) in the upper half plane. See an example below related to kernel methods.</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img width="385" alt="" src="https://francisbach.com/wp-content/uploads/2020/10/contour_upper-circle-2-1024x570.png" class="wp-image-5026" height="214" /></figure></div>
+
+
+
+<p class="justify-text"><strong>Trigonometric integrals</strong>. For holomorphic functions \(Q\), we can compute the integral \(\displaystyle \int_0^{2\pi} \!\!\! Q(\cos \theta, \sin \theta) d\theta\). Indeed, letting \(f(z) = \frac{1}{iz} Q\big( \frac{z+z^{-1}}{2}, \frac{z-z^{-1}}{2i} \big)\), it is exactly equal to the integral on the unit circle. The desired integral is then equal to \(2i\pi\) times the sum of all residues of \(f\) within the unit disk.</p>
+
+
+
+<p class="justify-text">For example, when \(Q(\cos \theta, \sin \theta) = \frac{1}{2 + \sin \theta}\), we have \(f(z) = \frac{2}{z^2+4iz-1}\), with a single pole inside the unit circle, namely \(\lambda = i ( \sqrt{3}-2)\), and residue equal to \(-i / \sqrt{3}\), leading to \(\int_0^{2\pi} \frac{d\theta}{2+\sin \theta} = \frac{2\pi}{\sqrt{3}}\).</p>
+
+
+
+<p class="justify-text"><strong>Series.</strong> If the function \(f\) is holomorphic and has no poles at integer real values, and satisfies some basic boundedness conditions, then $$\sum_{n \in \mathbb{Z}} f(n) = \ – \!\!\! \sum_{ \lambda \in {\rm poles}(f)} {\rm Res}\big( f(z) \pi \frac{\cos \pi z}{\sin \pi z} ,\lambda\big).$$ This is a simple consequence of the fact that the function \(z \mapsto \pi \frac{\cos \pi z}{\sin \pi z}\) has all integers \(n \in \mathbb{Z}\) as poles, with corresponding residue equal to \(1\). This is obtained from the contour below with \(m\) tending to infinity.</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img width="284" alt="" src="https://francisbach.com/wp-content/uploads/2020/10/contour_square-1-1024x903.png" class="wp-image-5028" height="250" /></figure></div>
+
+
+
+<p class="justify-text">The same trick can be applied to  \(\displaystyle \sum_{n \in \mathbb{Z}} (-1)^n f(n) =\  –  \!\!\! \sum_{ \lambda \in {\rm poles}(f)} {\rm Res}\big( f(z) \pi \frac{1}{\sin \pi z} ,\lambda\big).\) See [7, Section 11.2] for more details. Experts will see an interesting link with the <a href="https://en.wikipedia.org/wiki/Euler%E2%80%93Maclaurin_formula">Euler-MacLaurin formula</a> and <a href="https://en.wikipedia.org/wiki/Bernoulli_polynomials">Bernoulli polynomials</a>.</p>
+
+
+
+<p class="justify-text"><strong>Applications to kernel methods.</strong> In non-parametric estimation, regularization penalties are used to constrain real-values functions to be smooth. One such examples are combinations of squared \(L_2\) norms of derivatives. For functions \(f\) defined on an interval \(I\) of the real line, penalties are typically of the form \(\int_I \sum_{k=0}^s \alpha_k | f^{(k)}(x)|^2 dx\), for non-negative weights \(\alpha_0,\dots,\alpha_k\). For these Sobolev space norms, a positive definite kernel \(K\) can be used for estimation (see, e.g., <a href="https://francisbach.com/hermite-polynomials/">last month blog post</a>). </p>
+
+
+
+<p class="justify-text">A classical question is: given the norm defined above, how to compute \(K\)? For \(I = \mathbb{R}\), then this can be done using Fourier transforms as: $$K(x,y) =  \frac{1}{2\pi} \int_\mathbb{R} \frac{e^{i\omega(x-y)}}{\sum_{k=0}^s \alpha_k \omega^{2k}} d\omega.$$ This is exactly an integral of the form above, for which we can use the contour integration technique. For example, for \(\alpha_0=1\) and \(\alpha_1=a^2\), we get for \(x-y&gt;0\), one pole \(i/a\) in the upper half plane for the function \(\frac{1}{1+a^2 z^2} = \frac{1}{(1+iaz)(1-iaz)}\), with residue \(-\frac{i}{2a} e^{-(x-y)/a}\), leading to the familiar exponential kernel \(K(x,y) = \frac{1}{2a} e^{-|x-y|/a}\). More complex kernels can be considered (see, e.g., [8, page 277], for \(\sum_{k=0}^s \alpha_k \omega^{2k} = 1 + \omega^{2s}\)).</p>
+
+
+
+<p class="justify-text">We can also consider the same penalty on the unit interval \([0,1]\) with periodic functions, leading to the kernel (see [9] for more details): $$ K(x,y) = \sum_{n \in \mathbb{Z}} \frac{ e^{2in\pi(x-y)}}{\sum_{k=0}^s \alpha_k( 2n\pi)^s}.$$ For the same example as above, that is, \(\alpha_0=1\) and \(\alpha_1=a^2\), this leads to an infinite series on which we can apply the Cauchy residue formula as explained above. This leads to, for \(x-y \in [0,1]\), \(K(x,y) =  \frac{1}{2a}  \frac{ \cosh (\frac{1-2(x-y)}{2a})}{\sinh (\frac{1}{2a})}\). We can then extend by \(1\)-periodicity to all \(x-y\). See the detailed computation at the end of the post.</p>
+
+
+
+<p>Now that you are all experts in residue calculus, we can move on to spectral analysis.</p>
+
+
+
+<h2>Spectral analysis of symmetric matrices</h2>
+
+
+
+<p class="justify-text">We consider a symmetric matrix \(A \in \mathbb{R}^{n \times n}\), with its \(n\) ordered real eigenvalues \(\lambda_1 \geqslant  \cdots \geqslant \lambda_n\), counted with their orders of multiplicity, and an orthonormal basis of their eigenvectors \(u_j \in \mathbb{R}^n\), \(j=1,\dots,n\). We have \(A = \sum_{j=1}^n \lambda_j u_j u_j^\top\).  When we consider eigenvalues as functions of \(A\), we use the notation \(\lambda_j(A)\), \(j=1,\dots,n\). These functions are always well-defined even when eigenvalues are multiple (this is not the case for eigenvectors because of the invariance by orthogonal transformations).</p>
+
+
+
+<p class="justify-text">The key property that we will use below is that we can express the so-called resolvent matrix \((z I – A)^{-1} \in \mathbb{C}^{n \times n}\), for \(z \in \mathbb{C}\), as: $$  (z I- A)^{-1}  = \sum_{j=1}^n \frac{1}{z-\lambda_j} u_j u_j^\top. $$ The dependence on \(z\) of the form \( \displaystyle \frac{1}{z- \lambda_j}\)  leads to a nice application of Cauchy residue formula.</p>
+
+
+
+<p class="justify-text">Assuming the \(k\)-th eigenvalue \(\lambda_k\) is simple, we consider the contour \(\gamma\) going strictly around \(\lambda_k\) like below (for \(k=5\)).</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img width="431" alt="" src="https://francisbach.com/wp-content/uploads/2020/10/contour_single_eigenvalue-1024x433.png" class="wp-image-5039" height="182" /></figure></div>
+
+
+
+<p class="justify-text">We consider integrating the matrix above, which leads to: $$ \oint_\gamma<br />  (z I- A)^{-1} dz = \sum_{j=1}^m \Big( \oint_\gamma \frac{1}{z – \lambda_j} dz \Big) u_j u_j^\top<br />  = 2 i \pi \  u_k u_k^\top $$  using the identity \(\displaystyle \oint_\gamma \frac{1}{z – \lambda_j} dz = 1\) if \(j=k\) and \(0\) otherwise (because the pole is outside of \(\gamma\)). We thus obtain an expression for projectors on the one-dimensional eigen-subspace associated with the eigenvalue \(\lambda_k\).</p>
+
+
+
+<p class="justify-text">With simple manipulations, we can also access the eigenvalues. Indeed, we have: $$ \oint_\gamma<br />   (z I- A)^{-1} z dz = \sum_{j=1}^m \Big( \oint_\gamma \frac{z}{z – \lambda_j} dz \Big) u_j u_j^\top<br />  = 2 i \pi \lambda_k  u_k u_k^\top, $$ and by taking the trace, we obtain $$ \oint_\gamma<br />  {\rm tr} \big[ z (z I- A)^{-1} \big]  dz    = \lambda_k. $$ The key benefit of these representations is that when the matrix \(A\) is slightly perturbed, then the same contour \(\gamma\) can be used to enclose the corresponding eigenvalues of the perturbed matrix, and perturbation results are simply obtained by taking gradients within the contour integral. Note that several eigenvalues may be summed up by selecting a contour englobing more than one eigenvalues.</p>
+
+
+
+<h2>Gradients of eigenvalues</h2>
+
+
+
+<p class="justify-text">The expression with contour integrals allows to derive simple formulas for gradients of eigenvalues. These can be obtained by other means [5], but using contour integrals shows that this is simply done by looking at the differential of \((z I – A)^{-1}\) and integrating it. The central component is the following expansion, which is a classical result in matrix differentiable calculus, with \(\|\Delta\|_2\) the operator norm of \(\Delta\) (i.e., its largest singular value):  $$<br /> (z I- A – \Delta)^{-1} = (z I – A)^{-1} + (z I- A)^{-1} \Delta (z I- A)^{-1} + o(\| \Delta\|_2).  $$ Note here that the asymptotic remainder \(o(\| \Delta\|_2)\) can be made explicit. </p>
+
+
+
+<p class="justify-text">By expanding the expression on the basis of eigenvectors of \(A\), we get  $$<br /> z (z I- A – \Delta)^{-1}  – z (z I- A)^{-1}  =  \sum_{j=1}^n \sum_{\ell=1}^n u_j u_\ell^\top  \frac{ z \cdot u_j^\top \Delta u_\ell}{(z-\lambda_j)(z-\lambda_\ell)} + o(\| \Delta \|_2).<br /> $$ Taking the trace, the cross-product terms \({\rm tr}(u_j u_\ell^\top) =  u_\ell^\top u_j\) disappear for \(j \neq \ell\), and we get: $$<br /> {\rm tr} \big[ z (z I – A – \Delta)^{-1}  \big] – {\rm tr} \big[ z (z I – A)^{-1}  \big]=  \sum_{j=1}^n   \frac{ z \cdot u_j^\top \Delta u_j}{(z-\lambda_j)^2} + o(\| \Delta \|_2).<br /> $$ This leads to, by contour integration:<br />$$<br /> \lambda_{k}(A+\Delta) -\lambda_k(A)<br /> =<br /> \frac{1}{2i \pi} \oint_\gamma \Big[ <br />   \sum_{j=1}^n   \frac{ z \cdot u_j^\top \Delta u_j}{(z-\lambda_j)^2} \Big] dz +  o(\| \Delta \|_2).<br /> $$ By keeping only the pole \(\lambda_k\) which is inside the contour \(\gamma\), we get  $$ \lambda_{k}(A+\Delta) -\lambda_k(A)<br />  =<br /> \frac{1}{2i \pi} \oint_\gamma \Big[ <br />    \frac{ z \cdot u_k^\top \Delta u_k}{(z-\lambda_k)^2} \Big] dz +  o(| \Delta |_2) \<br />    =  u_k^\top \Delta u_k + o(\| \Delta \|_2),<br /> $$ using the identity \(\displaystyle <br />  \oint_\gamma \frac{z dz}{(z – \lambda_k)^2} dz = <br />   \oint_\gamma \Big( \frac{\lambda_k}{(z – \lambda_k)^2}  + \frac{1}{z – \lambda_k} \Big) dz = 1\).  </p>
+
+
+
+<p class="justify-text">Thus the gradient of \(\lambda_k\) at a matrix \(A\) where the \(k\)-th eigenvalue is simple is simply \( u_k u_k^\top\), where \(u_k\) is a corresponding eigenvector. Note that this result can be simply obtained by the simple (rough) calculation: if \(x\) is a unit eigenvector of \(A\), then \(Ax =\lambda x\), and \(x^\top x = 1\), leading to \(x^\top dx = 0\) and \(dA\ x + A dx = d\lambda \ x + \lambda dx\), and by taking the dot product with \(x\), \(d\lambda = x^\top dA\ x + x^\top A dx = x^\top dA \ x + \lambda x^\top  dx = x^\top dA \ x\), which is the same result. However, this reasoning is more cumbersome, and does not lead to neat approximation guarantees, in particular in the extensions below.</p>
+
+
+
+<h2>Other perturbation results</h2>
+
+
+
+<p class="justify-text">Given the gradient, other more classical perturbation results could de derived, such as Hessians of eigenvalues, or gradient of the projectors \(u_k u_k^\top\).  Here I derive a perturbation result for the projector \(\Pi_k(A)=u_k u_k^\top\), when \(\lambda_k\) is a simple eigenvalue. Using the same technique as above, we get: $$ \Pi_k(A+\Delta )\  – \Pi_k(A) = \frac{1}{2i \pi} \oint_\gamma (z I- A)^{-1} \Delta (z I – A)^{-1}dz  + o(\| \Delta\|_2),$$ which we can expand to the basis of eigenvectors as $$ \frac{1}{2i \pi} \oint_\gamma \sum_{j=1}^n \sum_{\ell=1}^n u_j u_j^\top \Delta u_\ell u_\ell^\top \frac{  dz}{(z-\lambda_\ell) (z-\lambda_j)  } + o(\| \Delta\|_2).$$ We can then split in two, with the two terms (all others are equal to zero by lack of poles within \(\gamma\)): $$ \frac{1}{2i \pi} \oint_\gamma \sum_{j \neq k}  u_j^\top \Delta u_k  ( u_j u_k^\top + u_k u_j^\top)   \frac{  dz}{(z-\lambda_k) (z-\lambda_j)  }= \sum_{j \neq k}  u_j^\top \Delta u_k  ( u_j u_k^\top + u_k u_j^\top) \frac{1}{\lambda_k – \lambda_j}  $$ and $$\frac{1}{2i \pi} \oint_\gamma   u_k^\top \Delta u_k   u_k u_k^\top  \frac{  dz}{(z-\lambda_k)^2  } = 0 ,$$ finally leading to $$\Pi_k(A+\Delta ) \ – \Pi_k(A) =  \sum_{j \neq k}  \frac{u_j^\top \Delta u_k}{\lambda_k – \lambda_j}    ( u_j u_k^\top + u_k u_j^\top)    + o(\| \Delta\|_2),$$ from which we can compute the Jacobian of \(\Pi_k\).</p>
+
+
+
+<h2>Spectral functions</h2>
+
+
+
+<p class="justify-text">Spectral functions are functions on symmetric matrices defined as \(F(A) = \sum_{k=1}^n f(\lambda_k(A))\), for any real-valued function \(f\). For \(f(x) = x\), we get back the trace, for \(f(x) = \log x\) we get back the log determinant, and so on. The function \(F\) can be represented as $$F(A) = \sum_{k=1}^n f(\lambda_k(A)) = \frac{1}{2i \pi} \oint_\gamma f(z) {\rm tr} \big[ (z I  – A)^{-1} \big] dz,$$ where the contour \(\gamma\) encloses all eigenvalues (as shown below).</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img width="438" alt="" src="https://francisbach.com/wp-content/uploads/2020/11/contour_all_eigenvalues-1024x433.png" class="wp-image-5087" height="185" /></figure></div>
+
+
+
+<p class="justify-text">This representation can be used to compute derivatives of \(F\), by simple derivations, to obtain the same result as [<a href="https://epubs.siam.org/doi/pdf/10.1137/S089547980036838X">12</a>].</p>
+
+
+
+<h2>Singular values of rectangular matrices</h2>
+
+
+
+<p class="justify-text">Singular value decompositions are also often used, for a rectangular matrix \(W \in \mathbb{R}^{n \times d}\). It consists in finding \(r\) pairs \((u_j,v_j) \in \mathbb{R}^{n} \times \mathbb{R}^d\), \(j=1,\dots,r\), of singular vectors and \(r\) positive singular values \(\sigma_1 \geqslant \cdots \geqslant \sigma_r &gt; 0\) such that \(W = \sum_{j=1}^r \sigma_j u_j v_j^\top\) and  \((u_1,\dots,u_r)\) and \((v_1,\dots,v_r)\) are orthonormal families.</p>
+
+
+
+<p class="justify-text">There are two natural ways to relate the singular value decomposition to the classical eigenvalue decomposition of a symmetric matrix, �first through \(WW^\top\) (or similarly \(W^\top W\)). Here it is more direct to consider the so-called Jordan-Wielandt matrix, defined by blocks as $$<br /> \bar{W} = \left( \begin{array}{cc}<br />0 &amp; W \\<br />W^\top &amp; 0 \end{array} \right). $$ The matrix \(\bar{W}\) is symmetric, and its non zero eigenvalues are \(+\sigma_i\) and \(-\sigma_i\), \(i=1,\dots,r\), associated with the eigenvectors \(\frac{1}{\sqrt{2}}  \left( \begin{array}{cc}<br />u_i \\ v_i \end{array} \right)\) and \(\frac{1}{\sqrt{2}}  \left( \begin{array}{cc}<br />u_i \\ -v_i \end{array} \right)\).</p>
+
+
+
+<p class="justify-text">All necessary results (derivatives of singular values \(\sigma_j\), or projectors \(u_j v_j^\top\) can be obtained from there); see more details, in, e.g., the appendix of [6].</p>
+
+
+
+<h2>Going beyond</h2>
+
+
+
+<p class="justify-text">In this post, I have shown various applications of the Cauchy residue formula, for computing integrals and for the spectral analysis of matrices. I have just scratched the surface of spectral analysis, and what I presented extends to many interesting situations, for example, to more general linear operators in infinite-dimensional spaces [3], or to the analysis fo the eigenvalue distribution of random matrices (see a nice and reasonably simple derivation of the semi-circular law from <a href="https://terrytao.wordpress.com/2010/02/02/254a-notes-4-the-semi-circular-law/">Terry Tao’s blog</a>).</p>
+
+
+
+<h2>References</h2>
+
+
+
+<p class="justify-text">[1] Gilbert W. Stewart and Sun Ji-Huang. <em>Matrix Perturbation Theory</em>. Academic Press, 1990.<br />[2] Adrian Stephen Lewis. Derivatives of spectral functions. <em>Mathematics of Operations Research</em>, 21(3):576–588, 1996. <br />[3] Tosio Kato. <em>Perturbation Theory for Linear Operators</em>, volume 132. Springer, 2013. <br />[4] Serge Lang. <em>Complex Analysis</em>, volume 103. Springer, 2013. <br />[5] Jan R. Magnus. On differentiating eigenvalues and eigenvectors. <em>Econometric Theory</em>, 1(2):179–191, 1985. <br />[6] Francis Bach. Consistency of trace norm minimization. <em>Journal of Machine Learning Research</em>, 9:1019-1048, 2008.<br />[7] Joseph Bak, Donald J. Newman. <em>Complex analysis</em>. New York: Springer, 2010.<br />[8] Alain Berlinet, and Christine Thomas-Agnan. <em>Reproducing kernel Hilbert spaces in probability and statistics</em>. Springer Science &amp; Business Media, 2011.<br />[9] Grace Wahba. <a href="https://epubs.siam.org/doi/book/10.1137/1.9781611970128">Spline models for observational data</a>. Society for Industrial and Applied Mathematics, 1990.<br />[10] Augustin Louis Cauchy, <a href="https://archive.org/details/mmoiresurlesin00cauc">Mémoire</a><a href="http://www.numdam.org/article/BSMA_1874__7__265_0.pdf"> sur les intégrales définies, prises entre des limites imaginaires</a>, 1825, <a href="http://www.numdam.org/article/BSMA_1874__7__265_0.pdf">re-published</a> in Bulletin des Sciences Mathématiques et Astronomiques, Tome 7, 265-304, 1874.<br />[11] Dragoslav S. Mitrinovic, and Jovan D. Keckic. <em>The Cauchy method of residues: theory and applications</em>. Vol. 9. Springer Science &amp; Business Media, 1984.<br />[12] Adrian S. Lewis, and Hristo S. Sendov. <a href="https://epubs.siam.org/doi/pdf/10.1137/S089547980036838X">Twice differentiable spectral functions</a>. <em>SIAM Journal on Matrix Analysis and Applications</em> 23.2: 368-386, 2001.</p>
+
+
+
+<h2>Computing the Sobolev kernel</h2>
+
+
+
+<p class="justify-text">The goal is to compute the infinite sum $$\sum_{n \in \mathbb{Z}} \frac{e^{2i\pi q \cdot n}}{1+(2a \pi n)^2}$$ for \(q \in (0,1)\). We consider the function $$f(z) = \frac{e^{i\pi (2q-1) z}}{1+(2a \pi z)^2} \frac{\pi}{\sin (\pi z)}.$$ It is holomorphic on \(\mathbb{C}\) except at all integers \(n \in \mathbb{Z}\), where it has a simple pole with residue \(\displaystyle \frac{e^{i\pi (2q-1) n}}{1+(2a \pi n)^2} (-1)^n = \frac{e^{i\pi 2q n}}{1+(2a \pi n)^2}\), at \(z = i/(2a\pi)\) where it has a residue equal to \(\displaystyle \frac{e^{ – (2q-1)/(2a)}}{4ia\pi} \frac{\pi}{\sin (i/(2a))} = \ – \frac{e^{ – (2q-1)/(2a)}}{4a} \frac{1}{\sinh (1/(2a))}\), and at \(z = -i/(2a\pi)\) where it has a residue equal to \(\displaystyle \frac{e^{  (2q-1)/(2a)}}{4ia\pi} \frac{\pi}{\sin (i/(2a))} =\ – \frac{e^{ (2q-1)/(2a)}}{4a} \frac{1}{\sinh (1/(2a))}\). With all residues summing to zero (note that this fact requires a precise analysis of limits when \(m\) tends to infinity for the contour defined in the main text), we get: $$\sum_{n \in \mathbb{Z}} \frac{e^{2i\pi q \cdot n}}{1+(2a \pi n)^2} =\frac{e^{ – (2q-1)/(2a)}}{4a} \frac{1}{\sinh (1/(2a))}+ \frac{e^{ (2q-1)/(2a)}}{4a} \frac{1}{\sinh (1/(2a))} = \frac{1}{2a} \frac{ \cosh (\frac{2q-1}{2a})}{\sinh (\frac{1}{2a})}.$$</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Francis Bach <a href="https://francisbach.com/cauchy-residue-formula/"><span class="datestr">at November 07, 2020 12:10 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -3563,62 +3854,6 @@ This paper focuses on a variant of the circuit minimization problem (MCSP), deno
 
 <p class="date">
 <a href="https://eccc.weizmann.ac.il/report/2020/158"><span class="datestr">at October 26, 2020 09:00 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://11011110.github.io/blog/2020/10/26/graphs-whose-cycles">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eppstein.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="https://11011110.github.io/blog/2020/10/26/graphs-whose-cycles.html">Graphs whose cycles all touch</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p>An interesting recent question on MathOverflow asks about <a href="https://mathoverflow.net/q/374793/440">graphs in which all cycles touch</a>. Here, touching is meant in the same sense as a <a href="https://en.wikipedia.org/wiki/Bramble_(graph_theory)">bramble</a> in graph structure theory: every two cycles either share a vertex or contain the two endpoints of an edge from one cycle to the other. The graphs with this property include all the complete graphs (girth 3), complete bipartite graphs (girth 4), and theta graphs (arbitrarily high girth but very simple structure). As originally phrased, it asked whether there exists \(g\) such that graphs of girth \(\ge g\) with all cycles touching have bounded treewidth. Partial results given there by Tony Huynh and me show that the condition of bounded treewidth can be replaced by bounded vertex cover number or a bounded number of vertex-disjoint cycles without changing the answer.</p>
-
-<p>This led me to look for graphs that have high girth, all cycles touching, and as many vertex-disjoint cycles as I could construct. So far, the best I have found is four vertex-disjoint cycles, as shown in graphs of the following form:</p>
-
-<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2020/4-disjoint-touching-cycles.svg" alt="A graph with four vertex-disjoint long cycles, and all cycles touching" /></p>
-
-<p>It consists of four theta graphs (the pairs of blue vertices connected by multiple long paths of yellow vertices, with the eight blue pole vertices of the theta graphs connected into two four-vertex paths. I’ve drawn it with yellow paths of length 16, and three paths per theta, but these numbers are arbitrary. One can easily find four vertex-disjoint cycles, within each of the four thetas, ignoring the edges between the pole vertices.</p>
-
-<p>There is no cycle using only the blue pole vertices, so every cycle in the overall graph must include at least one complete yellow path connecting its two poles. Therefore, every cycle is at least as long as this yellow path length. These paths can be made arbitrarily long, so the graphs constructed in this way can have arbitrarily large girth.</p>
-
-<p>The six edges of the two four-vertex paths between the pole vertices include an edge between each of the six pairs of pole vertices. But each cycle uses at least one pair of pole vertices, so this implies that every two cycles touch, either by sharing a pole vertex or by each containing one endpoint of one of these path edges.</p>
-
-<p>Therefore the graphs constructed in this way have arbitrarily large girth, have all cycles touching, and contain four vertex-disjoint cycles. It also has feedback vertex number four. The MathOverflow question asks whether the four vertex-disjoint cycles can be replaced by an arbitrarily large number of cycles, or equivalently whether the feedback vertex number can be increased, but at this point I don’t even know whether either number can be replaced by five.</p>
-
-<p>(<a href="https://mathstodon.xyz/@11011110/105103937279022043">Discuss on Mastodon</a>)</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by David Eppstein <a href="https://11011110.github.io/blog/2020/10/26/graphs-whose-cycles.html"><span class="datestr">at October 26, 2020 04:16 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
