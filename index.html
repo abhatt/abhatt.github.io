@@ -240,7 +240,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at November 15, 2020 01:39 AM UTC</span>.
+Last updated <span class="datestr">at November 15, 2020 02:22 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -284,6 +284,77 @@ Powered by<br>
 
 <p class="date">
 by gasarch (noreply@blogger.com) <a href="https://blog.computationalcomplexity.org/2020/11/alex-trebekwhat-is-todays-post-about.html"><span class="datestr">at November 14, 2020 08:26 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://11011110.github.io/blog/2020/11/14/pathbreaking-for-intervals">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/eppstein.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://11011110.github.io/blog/2020/11/14/pathbreaking-for-intervals.html">Pathbreaking for intervals</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>The use of Nash’s Hex lemma in <a href="https://11011110.github.io/blog/2020/11/10/hex-books-queues.html">my previous post</a>, according to which any 2-coloring of a triangular grid has a long monochromatic path, naturally raises the question: for which graphs other than the triangular grid is this true? In that post I mentioned that it is also true for certain outerplanar graphs, but false for bipartite graphs and for subcubic graphs. Here’s another class of graphs for which it is false: the graphs of bounded <a href="https://en.wikipedia.org/wiki/Pathwidth">pathwidth</a>. These graphs can always be 2-colored in a way that breaks up all long paths, leaving the remaining monochromatic paths of bounded size.</p>
+
+<p>Rather than dealing with pathwidth directly, I want to formulate it geometrically in terms of interval graphs. Every graph can be completed (by adding extra edges) to form an <a href="https://en.wikipedia.org/wiki/Interval_graph">interval graph</a> of the same pathwidth; an interval graph has one-dimensional closed intervals as its vertices, connected by an edge whenever they intersect. The pathwidth of an interval graph is always one less than the maximum number of intervals that overlap at the same point (their ply). So rather than looking at graphs of bounded pathwidth I’ll be considering sets of intervals of bounded ply. For example in the illustration below which I drew a few years ago for Wikipedia, the intervals shown have ply 3, and their interval graph has pathwidth 2.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2020/interval-graph.svg" alt="A set of intervals and their associated interval graph" /></p>
+
+<p>Intervals with low ply that are all either nested or disjoint can have no long paths in their intersection graph regardless of coloring. In any set of intervals forming a path, the path can pass through the outermost level of nesting at most once, subdividing it into two smaller paths with lower ply. It follows by induction the number of intervals in the path can be at most \(2^{\operatorname{ply}}-1\). (This is the standard argument behind an equivalence in graphs between longest path length and <a href="https://en.wikipedia.org/wiki/Tree-depth">tree-depth</a>.) So if we could partition an arbitrary set of intervals into two subsets within which all intervals are nested or disjoint, we’d be done. For instance, in the example above, the partition into \(\{A,B,F\}\) and \(\{C,D,E,G\}\) works. Not every set of intervals can be partitioned in this way, but I’ll show below that it’s always possible to lengthen some intervals, keeping the ply small, so that the lengthened intervals can be partitioned (colored) into two nested subsets.</p>
+
+<p>As a subroutine in the construction, let’s find a set of points with the following properties:</p>
+
+<ul>
+  <li>
+    <p>Each interval lies strictly between the leftmost and rightmost selected points.</p>
+  </li>
+  <li>
+    <p>No interval covers more than one selected point.</p>
+  </li>
+  <li>
+    <p>The union of the intervals that cover selected points equals the union of all the intervals.</p>
+  </li>
+</ul>
+
+<p>This can be done by a greedy algorithm that repeatedly selects an uncovered interval endpoint until the intervals that cover selected points also cover all other interval endpoints. Finish by selecting any two points to the left and right of all the intervals, and then number the selected points as \(x_0,x_1,\dots\) in left-to-right order. For example, one possible choice for our example would have \(x_0\) to the left of the intervals, \(x_1\) at the left endpoint of \(D\), \(x_2\) at the left endpoint of \(F\), and \(x_3\) to the right of the intervals. For this choice, \(B\) and \(E\) do not cover any selected points, but that’s not a problem. It’s not necessary to optimize how many points are selected.</p>
+
+<p>Call an interval “odd” if it covers an odd-numbered point \(x_i\) and “even” if it covers an even-numbered point. In our example, \(A\), \(C\), and \(D\) are odd, and \(F\), and \(G\) are even, but \(B\) and \(E\) are neither odd nor even. We will color the odd intervals blue and the even intervals red. Because they are different colors, we don’t have to worry about nesting between odd and even intervals. However, the intervals that contain any single point \(x_i\) will have the same color and need to be lengthened to nesting intervals. To do so, we extend all these intervals to a single longer interval, from just after \(x_{i-1}\) to just before \(x_{i+1}\). Because of the way the points \(x_i\) were chosen, this does not create new intersections between intervals of the same color, and it makes all colored intervals nest with all uncolored ones (not just with each other). However, it can also increase the ply. If the ply was \(p\) previously, it can increase by as much as \(2p-1\), when a point that was previously covered by only one odd or even interval becomes covered by \(2p-1\) more of them.</p>
+
+<p>Finally, we apply the same coloring and lengthening process recursively, to the remaining subsets of uncolored intervals between each pair of selected points.
+To make sure the intervals stay nested after lengthening, we take care in each recursive subproblem to select its first and last points to be inside all intervals of the outer problem that contain the subproblem. Because every point in an interval of a recursive subproblem is also in at least one of the outer colored intervals, the recursive subproblem has smaller ply than the initial ply of the outer problem. The recursion stops at ply 2; for this ply the intersection graph is a tree (more precisely a caterpillar) and it is possible to 2-color the intervals without any lengthening so that no two intervals of the same color intersect, by 2-coloring the tree.</p>
+
+<p>So if we start with intervals of ply 2, we produce a lengthened, 2-colored, and monochromatically nested set of intervals of ply 2 again (no change to the ply). If we start with intervals of ply 3, we produce a lengthened, 2-colored, and monochromatically nested set of intervals of ply at most 8, because the ply-3 interval-lengthening process added at most 5 to the existing ply. More generally for any starting ply \(p\) the new ply will be at most \(p^2+p-4\). And since the interval graph for the lengthened intervals has no monochromatic path with more than \(2^{p^2+p-4}-1\) intervals in it, neither does the interval graph for the original intervals, with the same 2-coloring.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by David Eppstein <a href="https://11011110.github.io/blog/2020/11/14/pathbreaking-for-intervals.html"><span class="datestr">at November 14, 2020 05:59 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -2777,57 +2848,6 @@ Elchanan Mossel, Microsoft Research</p></div>
 
 <p class="date">
 by Gil Kalai <a href="https://gilkalai.wordpress.com/2020/11/10/benjamini-and-mossel-2000-account-sensitivity-of-voting-schemes-to-mistakes-and-manipulations/"><span class="datestr">at November 10, 2020 03:57 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://eccc.weizmann.ac.il/report/2020/167">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eccc.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="https://eccc.weizmann.ac.il/report/2020/167">TR20-167 |  Approximate Hypergraph Vertex Cover and generalized Tuza&amp;#39;s conjecture | 
-
-	Venkatesan Guruswami, 
-
-	Sai Sandeep</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://eccc.weizmann.ac.il/" title="ECCC - Reports">ECCC papers</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-A famous conjecture of Tuza states that the minimum number of edges needed to cover all the triangles in a graph is at most twice the maximum number of edge-disjoint triangles.  This conjecture was couched in a broader setting by Aharoni and Zerbib who proposed a hypergraph version of this conjecture, and also studied its implied fractional versions. We establish the fractional version of the Aharoni-Zerbib conjecture up to lower order terms. Specifically, we give a factor $t/2+ O(\sqrt{t \log t})$ approximation based on LP rounding for an algorithmic version of the hypergraph Tur\'{a}n problem (AHTP). The objective in AHTP is to pick the smallest collection of $(t-1)$-sized subsets of vertices of an input $t$-uniform hypergraph such that every hyperedge contains one of these subsets.
-
-Aharoni and Zerbib also posed whether Tuza's conjecture and its hypergraph versions could follow from non-trivial duality gaps between vertex covers and matchings on hypergraphs that exclude certain sub-hypergraphs, for instance, a ``tent" structure that cannot occur in the incidence of triangles and edges. We give a strong negative answer to this question, by exhibiting tent-free hypergraphs, and indeed $\mathcal{F}$-free hypergraphs for any finite family $\mathcal{F}$ of excluded sub-hypergraphs, whose vertex covers must include almost all the vertices.
-
-
-The algorithmic questions arising in the above study can be phrased as instances of vertex cover on \emph{simple} hypergraphs, whose hyperedges can pairwise share at most one vertex. We prove that the trivial factor $t$ approximation for vertex cover is hard to improve for simple $t$-uniform hypergraphs. However, for set cover on simple $n$-vertex hypergraphs, the greedy algorithm achieves a factor $(\ln n)/2$, better than the optimal $\ln n$ factor for general hypergraphs.</div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="https://eccc.weizmann.ac.il/report/2020/167"><span class="datestr">at November 09, 2020 06:20 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
