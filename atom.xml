@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-11-27T13:38:57Z</updated>
+  <updated>2020-11-27T14:22:10Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -72,7 +72,7 @@
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-11-27T13:37:38Z</updated>
+      <updated>2020-11-27T14:20:33Z</updated>
     </source>
   </entry>
 
@@ -106,7 +106,185 @@
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2020-11-27T13:38:24Z</updated>
+      <updated>2020-11-27T14:21:19Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>http://offconvex.github.io/2020/11/27/reg_dl_not_norm/</id>
+    <link href="http://offconvex.github.io/2020/11/27/reg_dl_not_norm/" rel="alternate" type="text/html"/>
+    <title>Can implicit regularization in deep learning be explained by norms?</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>This post is based on my <a href="https://arxiv.org/pdf/2005.06398.pdf">recent paper</a> with <a href="https://noamrazin.github.io/">Noam Razin</a> (to appear at NeurIPS 2020), studying the question of whether norms can explain implicit regularization in deep learning.
+TL;DR: we argue they cannot.</p>
+
+<h2 id="implicit-regularization--norm-minimization">Implicit regularization = norm minimization?</h2>
+
+<p>Understanding the implicit regularization induced by gradient-based optimization is possibly the biggest challenge facing theoretical deep learning these days.
+In classical machine learning we typically regularize via norms, so it seems only natural to hope that in deep learning something similar is happening under the hood, i.e. the implicit regularization strives to find minimal norm solutions.
+This is actually the case in the simple setting of overparameterized linear regression $-$ there, by a folklore analysis (cf. <a href="https://openreview.net/pdf?id=Sy8gdB9xx">Zhang et al. 2017</a>), gradient descent (and any other reasonable gradient-based optimizer) initialized at zero is known to converge to the minimal Euclidean norm solution.
+A spur of recent works (see <a href="https://arxiv.org/pdf/2005.06398.pdf">our paper</a> for a thorough review) has shown that for various other models an analogous result holds, i.e. gradient descent (when initialized appropriately) converges to solutions that minimize a certain (model-dependent) norm.
+On the other hand, as discussed last year in posts by <a href="http://www.offconvex.org/2019/06/03/trajectories/">Sanjeev</a> as well as <a href="http://www.offconvex.org/2019/07/10/trajectories-linear-nets/">Wei and myself</a>, mounting theoretical and empirical evidence suggest that it may not be possible to generally describe implicit regularization in deep learning as minimization of norms.
+Which is it then?</p>
+
+<h2 id="a-standard-test-bed-matrix-factorization">A standard test-bed: matrix factorization</h2>
+
+<p>A standard test-bed for theoretically studying implicit regularization in deep learning is <em>matrix factorization</em> $-$ matrix completion via linear neural networks.
+Wei and I already presented this model in our <a href="http://www.offconvex.org/2019/07/10/trajectories-linear-nets/">previous post</a>, but for self-containedness I will do so again here.</p>
+
+<p>In <em>matrix completion</em>, we are given entries $\{ M_{i, j} : (i, j) \in \Omega \}$ of an unknown matrix $M$, and our job is to recover the remaining entries.
+This can be seen as a supervised learning (regression) problem, where the training examples are the observed entries of $M$, the model is a matrix $W$ trained with the loss:
+[
+\qquad \ell(W) = \sum\nolimits_{(i, j) \in \Omega} (W_{i, j} - M_{i, j})^2 ~, \qquad\qquad \color{purple}{\text{(1)}}
+]
+and generalization corresponds to how similar $W$ is to $M$ in the unobserved locations.
+In order for the problem to be well-posed, we have to assume something about $M$ (otherwise the unobserved locations can hold any values, and guaranteeing generalization is impossible).
+The standard assumption (which has many <a href="https://en.wikipedia.org/wiki/Matrix_completion#Applications">practical applications</a>) is that $M$ has low rank, meaning the goal is to find, among all global minima of the loss $\ell(W)$, one with minimal rank.
+The classic algorithm for achieving this is <a href="https://en.wikipedia.org/wiki/Matrix_norm#Schatten_norms"><em>nuclear norm</em></a> minimization $-$ a convex program which, given enough observed entries and under certain technical assumptions (“incoherence”), recovers $M$ exactly (cf. <a href="https://statweb.stanford.edu/~candes/papers/MatrixCompletion.pdf">Candes and Recht</a>).</p>
+
+<p>Matrix factorization represents an alternative, deep learning approach to matrix completion.
+The idea is to use a <em>linear neural network</em> (fully-connected neural network with linear activation), and optimize the resulting objective via gradient descent (GD).
+More specifically, rather than working with the loss $\ell(W)$ directly, we choose a depth $L \in \mathbb{N}$, and run GD on the <em>overparameterized objective</em>:
+[
+\phi ( W_1 , W_2 , \ldots , W_L ) := \ell ( W_L W_{L - 1} \cdots W_1) ~. ~~\qquad~ \color{purple}{\text{(2)}}
+]
+Our solution to the matrix completion problem is then:
+[
+\qquad\qquad W_{L : 1} := W_L W_{L - 1} \cdots W_1 ~, \qquad\qquad\qquad \color{purple}{\text{(3)}}
+] 
+which we refer to as the <em>product matrix</em>.
+While (for $L \geq 2$) it is possible to constrain the rank of $W_{L : 1}$ by limiting dimensions of the parameter matrices ${ W_j }<em>j$, from an implicit regularization standpoint, the case of interest is where rank is unconstrained (i.e. dimensions of ${ W_j }_j$ are large enough for $W</em>{L : 1}$ to take on any value).
+In this case there is <em>no explicit regularization</em>, and the kind of solution GD will converge to is determined implicitly by the parameterization.
+The degenerate case $L = 1$ is obviously uninteresting (nothing is learned in the unobserved locations), but what happens when depth is added ($L \geq 2$)?</p>
+
+<p>In their <a href="https://papers.nips.cc/paper/2017/file/58191d2a914c6dae66371c9dcdc91b41-Paper.pdf">NeurIPS 2017 paper</a>, Gunasekar et al. showed empirically that with depth $L = 2$, if GD is run with small learning rate starting from near-zero initialization, then the implicit regularization in matrix factorization tends to produce low-rank solutions (yielding good generalization under the standard assumption of $M$ having low rank).
+They conjectured that behind the scenes, what takes place is the classic nuclear norm minimization algorithm:</p>
+
+<blockquote>
+  <p><strong>Conjecture 1 (<a href="https://papers.nips.cc/paper/7195-implicit-regularization-in-matrix-factorization.pdf">Gunasekar et al. 2017</a>; informally stated):</strong>
+GD (with small learning rate and near-zero initialization) over a depth $L = 2$ matrix factorization finds solution with minimum nuclear norm.</p>
+</blockquote>
+
+<p>Moreover, they were able to prove the conjecture in a certain restricted setting, and others (e.g. <a href="http://proceedings.mlr.press/v75/li18a/li18a.pdf">Li et al. 2018</a>) later derived proofs for additional specific cases.</p>
+
+<p>Two years after Conjecture 1 was made, in a <a href="https://papers.nips.cc/paper/2019/file/c0c783b5fc0d7d808f1d14a6e9c8280d-Paper.pdf">NeurIPS 2019 paper</a> with Sanjeev, Wei and Yuping Luo, we presented empirical and theoretical evidence (see <a href="http://www.offconvex.org/2019/07/10/trajectories-linear-nets/">previous blog post</a> for details) which led us to hypothesize the opposite, namely, that for any depth $L \geq 2$, the implicit regularization in matrix factorization can <em>not</em> be described as minimization of a norm:</p>
+
+<blockquote>
+  <p><strong>Conjecture 2 (<a href="https://papers.nips.cc/paper/2019/file/c0c783b5fc0d7d808f1d14a6e9c8280d-Paper.pdf">Arora et al. 2019</a>; informally stated):</strong>
+Given a depth $L \geq 2$ matrix factorization, for any norm $| \cdot |$, there exist matrix completion tasks on which GD (with small learning rate and near-zero initialization) finds solution that does not minimize $| \cdot |$.</p>
+</blockquote>
+
+<p>Due to technical subtleties in their formal statements, Conjectures 1 and 2 do not necessarily contradict.
+However, they represent opposite views on the question of whether or not norms can explain implicit regularization in matrix factorization.
+The goal of my recent work with <a href="https://noamrazin.github.io/">Noam</a> was to resolve this open question.</p>
+
+<h2 id="implicit-regularization-can-drive-all-norms-to-infinity">Implicit regularization can drive all norms to infinity</h2>
+
+<p>The main result in our <a href="https://arxiv.org/pdf/2005.06398.pdf">paper</a> is a proof that there exist simple matrix completion settings where the implicit regularization in matrix factorization drives <strong><em>all norms towards infinity</em></strong>.
+By this we affirm Conjecture 2, and in fact go beyond it in the following sense:
+<em>(i)</em> not only is each norm disqualified by some setting, but there are actually settings that jointly disqualify all norms;
+and
+<em>(ii)</em> not only are norms not necessarily minimized, but they can grow towards infinity.</p>
+
+<p>The idea behind our analysis is remarkably simple.
+We prove the following:</p>
+
+<blockquote>
+  <p><strong>Theorem (informally stated):</strong>
+During GD over matrix factorization (i.e. over $\phi ( W_1 , W_2 , \ldots , W_L)$ defined by Equations $\color{purple}{\text(1)}$ and $\color{purple}{\text(2)}$), if learning rate is sufficiently small and initialization sufficiently close to the origin, then the determinant of the product matrix $W_{1: L}$ (Equation $\color{purple}{\text(3)}$) doesn’t change sign.</p>
+</blockquote>
+
+<p>A corollary is that if $\det ( W_{L : 1} )$ is positive at initialization (an event whose probability is $0.5$ under any reasonable initialization scheme), then it stays that way throughout.
+This seemingly benign observation has far-reaching implications.
+As a simple example, consider the following matrix completion problem ($*$ here stands for unobserved entry):
+[
+\qquad\qquad
+\begin{pmatrix}
+* &amp; 1 \<br/>
+1 &amp; 0 
+\end{pmatrix}
+~. \qquad\qquad \color{purple}{\text{(4)}}
+]
+Every solution to this problem, i.e. every matrix that agrees with its observations, must have determinant $-1$.
+It is therefore only logical to expect that when solving the problem using matrix factorization, the determinant of the product matrix $W_{L : 1}$ will converge to $-1$.
+On the other hand, we know that (with probability $0.5$ over initialization) $\det ( W_{L : 1} )$ is always positive, so what is going on?
+This conundrum can only mean one thing $-$ as $W_{L : 1}$ fits the observations, its value in the unobserved location (i.e. $(W_{L : 1})_{11}$) diverges to infinity, which implies that <em>all norms grow to infinity!</em></p>
+
+<p>The above idea goes way beyond the simple example given in Equation $\color{purple}{\text(4)}$.
+We use it to prove that in a wide array of matrix completion settings, the implicit regularization in matrix factorization leads norms to <em>increase</em>.
+We also demonstrate it empirically, showing that in such settings unobserved entries grow during optimization.
+Here’s the result of an experiment with the setting of Equation $\color{purple}{\text(4)}$:</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/reg_dl_not_norm_mf_exp.png" style="width: 300px;"/>
+<br/>
+<i><b>Figure 1:</b> 
+Solving matrix completion problem defined by Equation $\color{purple}{\text(4)}$ <br/> 
+using matrix factorization leads absolute value of unobserved entry <br/>
+to increase (which in turn means norms increase) as loss decreases.
+</i>
+</div>
+
+<h2 id="what-is-happening-then">What is happening then?</h2>
+
+<p>If the implicit regularization in matrix factorization is not minimizing a norm, what is it doing?
+While a complete theoretical characterization is still lacking, there are signs that a potentially useful interpretation is <strong><em>minimization of rank</em></strong>.
+In our aforementioned <a href="https://papers.nips.cc/paper/2019/file/c0c783b5fc0d7d808f1d14a6e9c8280d-Paper.pdf">NeurIPS 2019 paper</a>, we derived a dynamical characterization (and showed supporting experiments) suggesting that matrix factorization is implicitly conducting some kind of greedy low-rank search (see <a href="http://www.offconvex.org/2019/07/10/trajectories-linear-nets/">previous blog post</a> for details).
+This phenomenon actually facilitated a new autoencoding architecture suggested in a recent <a href="https://arxiv.org/pdf/2010.00679.pdf">empirical paper</a> (to appear at NeurIPS 2020) by Yann LeCun and his team at Facebook AI.
+Going back to the example in Equation $\color{purple}{\text(4)}$, notice that in this matrix completion problem all solutions have rank $2$, but it is possible to essentially minimize rank to $1$ by taking (absolute value of) unobserved entry to infinity.
+As we’ve seen, this is exactly what the implicit regularization in matrix factorization does!</p>
+
+<p>Intrigued by the rank minimization viewpoint, <a href="https://noamrazin.github.io/">Noam</a> and I empirically explored an extension of matrix factorization to <em>tensor factorization</em>.
+Tensors can be thought of as high dimensional arrays, and they admit natural factorizations similarly to matrices (two dimensional arrays).
+We found that on the task of <em>tensor completion</em> (defined analogously to matrix completion $-$ see Equation $\color{purple}{\text(1)}$ and surrounding text), GD on a tensor factorization tends to produce solutions with low rank, where rank is defined in the context of tensors (for a formal definition, and a general intro to tensors and their factorizations, see this <a href="http://www.kolda.net/publication/TensorReview.pdf">excellent survey</a> by Kolda and Bader).
+That is, just like in matrix factorization, the implicit regularization in tensor factorization also strives to minimize rank!
+Here’s a representative result from one of our experiments:</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/reg_dl_not_norm_tf_exp.png" style="width: 700px;"/>
+<br/>
+<i><b>Figure 2:</b> 
+In analogy with matrix factorization, the implicit regularization of tensor factorization (high dimensional extension) strives to find a low (tensor) rank solution.
+Plots show reconstruction error and (tensor) rank of final solution on multiple tensor completion problems differing in the number of observations.
+GD over tensor factorization is compared against "linear" method $-$ GD over direct parameterization of tensor initialized at zero (this is equivalent to fitting observations while placing zeros in unobserved locations).
+</i>
+<br/>
+<br/>
+</div>
+
+<p>So what can tensor factorizations tell us about deep learning?
+It turns out that, similarly to how matrix factorizations correspond to prediction of matrix entries via linear neural networks, tensor factorizations can be seen as prediction of tensor entries with a certain type of <em>non-linear</em> neural networks, named <em>convolutional arithmetic circuits</em> (in my PhD I worked a lot on analyzing the expressive power of these models, as well as showing that they work well in practice $-$ see this <a href="https://arxiv.org/pdf/1705.02302.pdf">survey</a> for a soft overview).</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/reg_dl_not_norm_mf_lnn_tf_cac.png" style="width: 900px;"/>
+<br/>
+<i><b>Figure 3:</b> 
+The equivalence between matrix factorizations and linear neural <br/>
+networks extends to an equivalence between tensor factorizations and a certain <br/>
+type of non-linear neural networks named convolutional arithmetic circuits.
+</i>
+<br/>
+<br/>
+</div>
+
+<p>Analogously to how the input-output mapping of a linear neural network can be thought of as a matrix, that of a convolutional
+arithmetic circuit is naturally represented by a tensor.
+The experiment reported in Figure 2 (and similar ones presented in <a href="https://arxiv.org/pdf/2005.06398.pdf">our paper</a>) thus provides a second example of a neural network architecture whose implicit regularization strives to lower a notion of rank for its input-output mapping.
+This leads us to believe that implicit rank minimization may be a general phenomenon, and developing notions of rank for input-output mappings of contemporary models may be key to explaining generalization in deep learning.</p>
+
+<p><a href="http://www.cohennadav.com/">Nadav Cohen</a></p></div>
+    </summary>
+    <updated>2020-11-27T09:00:00Z</updated>
+    <published>2020-11-27T09:00:00Z</published>
+    <source>
+      <id>http://offconvex.github.io/</id>
+      <author>
+        <name>Off the Convex Path</name>
+      </author>
+      <link href="http://offconvex.github.io/" rel="alternate" type="text/html"/>
+      <link href="http://offconvex.github.io/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Algorithms off the convex path.</subtitle>
+      <title>Off the convex path</title>
+      <updated>2020-11-27T14:21:22Z</updated>
     </source>
   </entry>
 
@@ -208,7 +386,7 @@ We investigate a hierarchy of Outcome Indistinguishability definitions, whose st
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-11-27T13:37:34Z</updated>
+      <updated>2020-11-27T14:20:29Z</updated>
     </source>
   </entry>
 
@@ -644,7 +822,7 @@ lower bound.
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-11-27T13:38:06Z</updated>
+      <updated>2020-11-27T14:21:02Z</updated>
     </source>
   </entry>
 
@@ -672,7 +850,7 @@ Email: daniel.spielman@yale.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-11-27T13:37:46Z</updated>
+      <updated>2020-11-27T14:20:41Z</updated>
     </source>
   </entry>
 
@@ -743,7 +921,7 @@ Email: daniel.spielman@yale.edu</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-11-27T13:37:38Z</updated>
+      <updated>2020-11-27T14:20:33Z</updated>
     </source>
   </entry>
 
@@ -824,7 +1002,7 @@ Email: daniel.spielman@yale.edu</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-11-27T13:38:07Z</updated>
+      <updated>2020-11-27T14:21:03Z</updated>
     </source>
   </entry>
 
@@ -931,7 +1109,7 @@ Email: daniel.spielman@yale.edu</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-11-27T13:38:06Z</updated>
+      <updated>2020-11-27T14:21:02Z</updated>
     </source>
   </entry>
 
@@ -977,7 +1155,7 @@ Email: daniel.spielman@yale.edu</p></div>
       <link href="https://dstheory.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://dstheory.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Foundation of Data Science – Virtual Talk Series</title>
-      <updated>2020-11-27T13:38:53Z</updated>
+      <updated>2020-11-27T14:22:00Z</updated>
     </source>
   </entry>
 
@@ -999,7 +1177,7 @@ Email: daniel.spielman@yale.edu</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-11-27T13:37:34Z</updated>
+      <updated>2020-11-27T14:20:29Z</updated>
     </source>
   </entry>
 
@@ -1113,7 +1291,7 @@ Email: tom.gur@warwick.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-11-27T13:37:46Z</updated>
+      <updated>2020-11-27T14:20:41Z</updated>
     </source>
   </entry>
 
@@ -1256,7 +1434,7 @@ Email: tom.gur@warwick.ac.uk</p></div>
       <link href="https://mycqstate.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>In superposition</subtitle>
       <title>MyCQstate</title>
-      <updated>2020-11-27T13:38:41Z</updated>
+      <updated>2020-11-27T14:21:44Z</updated>
     </source>
   </entry>
 
@@ -1306,7 +1484,7 @@ Email: tom.gur@warwick.ac.uk</p></div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2020-11-27T13:37:15Z</updated>
+      <updated>2020-11-27T14:20:13Z</updated>
     </source>
   </entry>
 
@@ -1340,7 +1518,7 @@ Email: tom.gur@warwick.ac.uk</p></div>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2020-11-27T13:38:23Z</updated>
+      <updated>2020-11-27T14:21:18Z</updated>
     </source>
   </entry>
 
@@ -1400,7 +1578,7 @@ Email: tom.gur@warwick.ac.uk</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-11-27T13:37:37Z</updated>
+      <updated>2020-11-27T14:20:33Z</updated>
     </source>
   </entry>
 
@@ -1488,7 +1666,7 @@ Email: tom.gur@warwick.ac.uk</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-11-27T13:38:07Z</updated>
+      <updated>2020-11-27T14:21:03Z</updated>
     </source>
   </entry>
 
@@ -1515,7 +1693,7 @@ Email: j.van-den-heuvel@lse.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-11-27T13:37:46Z</updated>
+      <updated>2020-11-27T14:20:41Z</updated>
     </source>
   </entry>
 
@@ -1653,7 +1831,7 @@ We have not found something like this when searching on TSP and communication co
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-11-27T13:37:42Z</updated>
+      <updated>2020-11-27T14:20:38Z</updated>
     </source>
   </entry>
 
@@ -1720,7 +1898,7 @@ Email: smweinberg@princeton.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-11-27T13:37:46Z</updated>
+      <updated>2020-11-27T14:20:41Z</updated>
     </source>
   </entry>
 
@@ -1748,7 +1926,7 @@ We apply our generalized isoperimetric inequality to improve algorithms for test
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-11-27T13:37:34Z</updated>
+      <updated>2020-11-27T14:20:29Z</updated>
     </source>
   </entry>
 
@@ -1775,7 +1953,7 @@ Email: burkstep@isu.edul</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-11-27T13:37:46Z</updated>
+      <updated>2020-11-27T14:20:41Z</updated>
     </source>
   </entry>
 
@@ -1805,7 +1983,7 @@ As another application of block rigidity, we show conditional size-depth tradeof
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-11-27T13:37:34Z</updated>
+      <updated>2020-11-27T14:20:29Z</updated>
     </source>
   </entry>
 
@@ -1832,7 +2010,7 @@ Email: skiena@cs.stonybrook.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-11-27T13:37:46Z</updated>
+      <updated>2020-11-27T14:20:41Z</updated>
     </source>
   </entry>
 
@@ -1925,34 +2103,7 @@ Email: skiena@cs.stonybrook.edu</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2020-11-27T13:38:06Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-jobs.org/2020/11/17/tenure-track-assistant-professor-position-at-university-of-british-columbia-apply-by-december-20-2020/</id>
-    <link href="https://cstheory-jobs.org/2020/11/17/tenure-track-assistant-professor-position-at-university-of-british-columbia-apply-by-december-20-2020/" rel="alternate" type="text/html"/>
-    <title>Tenure-track assistant professor position at University of British Columbia (apply by December 20, 2020)</title>
-    <summary>The Department of Computer Science at the University of British Columbia (Vancouver campus) is inviting applications for one position at the rank of Assistant Professor. We invite applications from candidates of outstanding scientific talent in all areas of computer science. Website: https://www.cs.ubc.ca/our-department/employment/tenure-track-assistant-professor-department-computer-science-ubc-research Email: research-recruiting-chair@cs.ubc.ca</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The Department of Computer Science at the University of British Columbia (Vancouver campus) is inviting applications for one position at the rank of Assistant Professor. We invite applications from candidates of outstanding scientific talent in all areas of computer science.</p>
-<p>Website: <a href="https://www.cs.ubc.ca/our-department/employment/tenure-track-assistant-professor-department-computer-science-ubc-research">https://www.cs.ubc.ca/our-department/employment/tenure-track-assistant-professor-department-computer-science-ubc-research</a><br/>
-Email: research-recruiting-chair@cs.ubc.ca</p></div>
-    </content>
-    <updated>2020-11-17T19:33:56Z</updated>
-    <published>2020-11-17T19:33:56Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-jobs.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-jobs.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-jobs.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-11-27T13:37:46Z</updated>
+      <updated>2020-11-27T14:21:02Z</updated>
     </source>
   </entry>
 </feed>
