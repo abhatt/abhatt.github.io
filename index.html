@@ -240,7 +240,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at December 07, 2020 05:39 AM UTC</span>.
+Last updated <span class="datestr">at December 07, 2020 06:21 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -248,6 +248,128 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://www.scottaaronson.com/blog/?p=5151">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/aaronson.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-US"><a class="entryheader" href="https://www.scottaaronson.com/blog/?p=5151">Shor’s algorithm in higher dimensions: Guest post by Greg Kuperberg</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://www.scottaaronson.com/blog" title="Shtetl-Optimized">Scott Aaronson</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en-US">
+<p><strong>Upbeat advertisement:</strong> If research in QC theory or CS theory otherwise is your thing, then wouldn’t you like to live in peaceful, quiet, <a href="https://vimeo.com/75059452" target="_blank" rel="noreferrer noopener">bicycle-based</a><a href="https://en.wikipedia.org/wiki/Davis,_California" target="_blank" rel="noreferrer noopener"> Davis, California</a>, and be a faculty member at the large, prestigious, friendly university known as <a href="https://www.ucdavis.edu/" target="_blank" rel="noreferrer noopener">UC Davis</a>? In the QCQI sphere, you’d have <a href="https://sites.google.com/site/marinaradulaski/" target="_blank" rel="noreferrer noopener">Marina Radulaski</a>, <a href="https://www.math.ucdavis.edu/~bxn/" target="_blank" rel="noreferrer noopener">Bruno Nachtergaele</a>, <a href="https://www.math.ucdavis.edu/~fraas/" target="_blank" rel="noreferrer noopener">Martin Fraas</a>, <a href="https://mukund.physics.ucdavis.edu/" target="_blank" rel="noreferrer noopener">Mukund Rangamani</a>, <a href="https://hubeny.physics.ucdavis.edu/" target="_blank" rel="noreferrer noopener">Veronika Hubeny</a>, and <a>Nick Curro</a> as faculty colleagues, among others; and <a href="https://www.math.ucdavis.edu/~greg/" target="_blank" rel="noreferrer noopener">yours truly</a>, and hopefully more people in the future. This year the UC Davis <a href="https://cs.ucdavis.edu/" target="_blank" rel="noreferrer noopener">CS department</a> has a <a href="https://recruit.ucdavis.edu/JPF03853" target="_blank" rel="noreferrer noopener">faculty opening in quantum computing</a>, and another <a href="https://recruit.ucdavis.edu/JPF03838" target="_blank" rel="noreferrer noopener">faculty opening in CS theory</a> including quantum computing. If you are interested, then time is of the essence, since the full-consideration deadline is December 15.</p>
+
+
+
+<hr class="wp-block-separator" />
+
+
+
+<p>In this guest post, I will toot my own horn about a paper in progress (hopefully nearly finished) that goes back to the revolutionary early days of quantum computing, namely Shor’s algorithm. <strong>The takeway: I think that the strongest multidimensional generalization of Shor’s algorithm has been missed for decades. It appears to be a new algorithm that does more than the standard generalization described by Kitaev.</strong> (Scott wanted me to channel Captain Kirk and boldly go with a takeaway, so I did.)</p>
+
+
+
+<p>Unlike Shor’s algorithm proper, I don’t know of any dramatic applications of this new algorithm. However, more than one quantum algorithm was discovered just because it looked interesting, and then found applications later. The input to Shor’s algorithm is a function \(f:\mathbb{Z} \to S\), in other words a symbol-valued function \(f\) on the integers, which is periodic with an unknown period \(p\) and otherwise injective. In equations, \(f(x) = f(y)\) if only if \(p\) divides \(x-y\). In saying that the input is a function \(f\), I mean that Shor’s algorithm is provided with an algorithm to compute \(f\) efficiently. Shor’s algorithm itself can then find the period \(p\) in (quantum) polynomial time in the number of digits of \(p\). (Not polynomial time in \(p\), polynomial time in its logarithm.) If you’ve heard that Shor’s algorithm can factor integers, that is just one special case where \(f(x) = a^x\) mod \(N\), the integer to factor. In its generalized form, Shor’s algorithm is miraculous. In particular, if \(f\) is a black-box function, then it is routine to prove that any classical algorithm to do the same thing needs exponentially many values of \(f\), or values \(f(x)\) where \(x\) has exponentially many digits.</p>
+
+
+
+<p>Shor’s algorithm begat the Shor-Kitaev algorithm, which does the same thing for a higher dimensional periodic function \(f:\mathbb{Z}^d \to S\), where \(f\) is now periodic with respect to a lattice \(L\). The Shor-Kitaev algorithm in turn begat the hidden subgroup problem (called HSP among friends), where \(\mathbb{Z}\) or \(\mathbb{Z}^d\) is replaced by a group \(G\), and now \(f\) is \(L\)-periodic for some subgroup \(L\). HSP varies substantially in both its computationally difficulty and its complexity status, depending on the structure of \(G\) as well as optional restrictions on \(L\).</p>
+
+
+
+<p>A funny thing happened <s>on the way to the forum</s> in later work on HSP. Most of the later work has been in the special case that the ambient group \(G\) is finite, even though \(G\) is infinite in the famous case of Shor’s algorithm. My paper-to-be explores the hidden subgroup problem in various cases when \(G\) is infinite. In particular, I noticed that even the case \(G = \mathbb{Z}^d\) isn’t fully solved, because the Shor-Kitaev algorithm makes the extra assumption that \(L\) is a maximum-rank lattice, or equivalently that \(L\) a finite-index subgroup of \(\mathbb{Z}^d\). As far as I know, the more general case where \(L\) might have lower rank wasn’t treated previously. I found an extension of Shor-Kitaev to handle this case, which is I will sketch after discussing some points about HSP in general.</p>
+
+
+
+<h2>Quantum algorithms for HSP</h2>
+
+
+
+<p>Every known quantum algorithm for HSP has the same two opening steps. First prepare an equal superposition \(|\psi_G\rangle\) of “all” elements of the ambient group \(G\), then apply a unitary form of the hiding function \(f\) to get the following: \[ U_f|\psi_G\rangle \propto \sum_{x \in G} |x,f(x)\rangle. \] Actually, you can only do exactly this when \(G\) is a finite group. You cannot make an equal quantum superposition on an infinite set, for the same reason that you cannot choose an integer uniformly at random from among all of the integers: It would defy the laws of probability. Since computers are finite, a realistic quantum algorithm cannot make an unequal quantum superposition on an infinite set either. However, if \(G\) is a well-behaved infinite group, then you can approximate the same idea by making an equal superposition on a large but finite box \(B \subseteq G\) instead: \[ U_f|\psi_G\rangle \propto \sum_{x \in B \subseteq G} |x,f(x)\rangle. \] Quantum algorithms for HSP now follow a third counterintuitive “step”, namely, that you should discard the output qubits that contain the value \(f(x)\). You should take the values of \(f\) to be incomprehensible data, encrypted for all you know. A good quantum algorithm evaluates \(f\) too few times to interpret its output, so you might as well let it go. (By contrast, a classical algorithm is forced to dig for the only meaningful information that the output of \(f\) to have. Namely, it has to keep searching until it finds equal values.) What remains, want what turns out to be highly valuable, is the input state in a partially measured form. I remember joking with <a href="http://tuvalu.santafe.edu/~moore/" target="_blank" rel="noreferrer noopener">Cris Moore</a> about the different ways of looking at this step:</p>
+
+
+
+<ol><li>You can measure the output qubits.</li><li>The janitor can fish the output qubits out of the trash and measure them for you.</li><li>You can secretly not measure the output qubits and say you did.</li><li>You can keep the output qubits and say you threw them away.</li></ol>
+
+
+
+<p>Measuring the output qubits wins you the purely mathematical convenience that the posterior state on the input qubits is pure (a vector state) rather than mixed (a density matrix). However, since no use is made of the measured value, it truly makes no difference for the algorithm.</p>
+
+
+
+<p>The final universal step for all HSP quantum algorithms is to apply a quantum Fourier transform (or QFT) to the input register and measure the resulting Fourier mode. This might seem like a creative step that may or may not be a good idea. However, if you have an efficient algorithm for the QFT for your particular group \(G\), then you might as well do this, because (taking the interpretation that you threw away the output register) the environment already knows the Fourier mode. You can assume that this Fourier mode has been published in the New York Times, and you won’t lose anything by reading the papers.</p>
+
+
+
+<h2>Fourier modes and Fourier stripes</h2>
+
+
+
+<p>I’ll now let \(G = \mathbb{Z}^d\) and make things more explicit, for starters by putting arrows on elements \(\vec{x} \in \mathbb{Z}^d\) to indicate that they are lattice vectors. The standard begining produces a superposition \(|\psi_{L+\vec{v}}\rangle\) on a translate \(L+\vec{v}\) of the hidden lattice \(L\). (Again, \(L\) is the periodicity of \(f\).) If this state could be an equal superposition on the infinite set \(L+\vec{v}\), and if you could do a perfect QFT on the infinite group \(\mathbb{Z}^d\), then the resulting Fourier mode would be a randomly chosen element of a certain dual group \(L^\# \subseteq (\mathbb{R}/\mathbb{Z})^d\) inside the torus of Fourier modes of \(\mathbb{Z}^d\). Namely, \(L^\#\) consists of those vectors \(\vec{y} \in (\mathbb{R}/\mathbb{Z})^d\) whose such that the dot product \(\vec{x} \cdot \vec{y}\) is an integer for every \(\vec{x} \in L\). (If you expected the Fourier dual of the integers \(\mathbb{Z}\) to be a circle \(\mathbb{R}/2\pi\mathbb{Z}\) of length \(2\pi\), I found it convenient here to rescale it to a circle \(\mathbb{R}/\mathbb{Z}\) of length 1. This is often considered gauche these days, like using \(h\) instead of \(\hbar\) in quantum mechanics, but in context it’s okay.) In principle, you can learn \(L^\#\) from sampling it, and then learn \(L\) from \(L^\#\). Happily, the unknown and irrelevant translation vector \(\vec{v}\) is erased in this method.</p>
+
+
+
+<p>In practice, it’s not so simple. As before, you cannot actually make an equal superposition on all of \(L+\vec{v}\), but only trimmed to a box \(B \subseteq \mathbb{Z}^d\). If you have \(q\) qubits available for each coordinate of \(\mathbb{Z}^d\), then \(B\) might be a \(d\)-dimensional cube with \(Q = 2^q\) lattice points in each direction. Following Peter Shor’s famous paper, the standard thing to do here is to identify \(B\) with the finite group \((\mathbb{Z}/Q)^d\) and do the QFT there instead. This is gauche as pure mathematics, but it’s reasonable as computer science. In any case, it works, but it comes at a price. You should rescale the resulting Fourier mode \(\vec{y} \in (\mathbb{Z}/Q)^d\) as \(\vec{y}_1 = \vec{y}/Q\) to match it to the torus \((\mathbb{R}/\mathbb{Z})^d\). Even if you do that, \(\vec{y}_1\) is not actually a uniformly random element of \(L^\#\), but rather a noisy, discretized approximation of one.</p>
+
+
+
+<p>In Shor’s algorithm, the remaining work is often interpreted as the post-climax. In this case \(L = p\mathbb{Z}\), where \(p\) is the hidden period of \(f\), and \(L^\#\) consists of the multiples of \(1/p\) in \(\mathbb{R}/\mathbb{Z}\). The Fourier mode \(y_1\) (skipping the arrow since we are in one dimension) is an approximation to some fraction \(r/p\) with roughly \(q\) binary digits of precision. (\(y_1\) is often but not always the very best binary approximation to \(r/p\) with the available precision.) If you have enough precision, you can learn a fraction from its digits, either in base 2 or in any base. For instance, if I’m thinking of a fraction that is approximately 0.2857, then 2/7 is much closer than any other fraction with a one-digit denominator. As many people know, and as Shor explained in his paper, continued fractions are an efficient and optimal algorithm for this in larger cases.</p>
+
+
+
+<p>The Shor-Kitaev algorithm works the same way. You can denoise each coordinate of each Fourier example \(\vec{y}_1\) with the continued fraction algorithm to obtain an exact element \(\vec{y}_0 \in L^\#\). You can learn \(L^\#\) with a polynomial number of samples, and then learn \(L\) from that with integer linear algebra. However, this approach can only work if \(L^\#\) is a finite group, or equivalently when \(L\) has maximum rank \(d\). This condition is explicitly stated in Kitaev’s paper, and in most but not all of the papers and books that cite this algorithm. if \(L\) has maximum rank, then the picture in Fourier space looks like this: </p>
+
+
+
+<figure class="wp-block-image"><a href="https://www.scottaaronson.com/f1-torus.png"><img src="https://www.scottaaronson.com/f1-torus.png" alt="" /></a></figure>
+
+
+
+<p>However, if \(L\) has rank \(\ell &lt; d\), then \(L^\#\) is a pattern of \((k-\ell)\)-dimensional stripes, like this instead: </p>
+
+
+
+<figure class="wp-block-image"><a href="https://www.scottaaronson.com/f1-torus.png"><img src="https://www.scottaaronson.com/f1-torus.png" alt="" /></a></figure>
+
+
+
+<p>In this case, as the picture indicates, each coordinate of \(\vec{y}_1\) is flat random and individually irreparable. If you knew the direction of the stripes, then you use could define a slanted coordinate system where some of the coordinates of \(\vec{y}_1\) could be repaired. But the tangent directions of \(L^\#\) essentially beg the question. They are the orthogonal space of \(L_\mathbb{R}\), the vector space subtended by the hidden subgroup \(L\). If you know \(L_\mathbb{R}\), then you can find \(L\) by running Shor-Kitaev in the lattice \(L_\mathbb{R} \cap \mathbb{Z}^d\).</p>
+
+
+
+<p>My solution to this conundrum is to observe that the multiples of a randomly chosen point \(\vec{y}_0\) in \(L^\#\) have a good chance of filling out \(L^\#\) adequately well, in particular to land near \(\vec{0}\) often enough to reveal the tangent directions of \(L^\#\). You have to make do with a noisy sample \(\vec{y}_1\) instead, but by making the QFT radix \(Q\) large enough, you can reduce the noise well enough for this to work. Still, even if you know that these small, high-quality multiples of \(\vec{y}_1\) exist, they are needles in an exponential haystack of bad multiples, so how do you find them? It turns out that the versatile LLL algorithm, which finds a basis of short vectors in a lattice, can be used here. The multiples of \(\vec{y}_0\) (say, for simplicity) aren’t a lattice, they are a dense orbit in \(L^\#\) or part of it. However, they are a shadow of a lattice one dimension higher, that you can supply to the LLL algorithm. This step produces lets you compute the linear span \(L_\mathbb{R}\) of \(L\) from its perpendicular space, and then as mentioned you can use Shor-Kitaev to learn the exact geometry of \(L\).</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Scott <a href="https://www.scottaaronson.com/blog/?p=5151"><span class="datestr">at December 07, 2020 06:14 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2511,47 +2633,6 @@ Email: hguo@inf.ed.ac.uk</p></div>
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-jobs.org/2020/11/30/research-associate-postdoc-at-university-of-edinburgh-apply-by-january-6-2021/"><span class="datestr">at November 30, 2020 10:30 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://cstheory-jobs.org/2020/11/30/postdoc-at-technion-israel-institute-of-technology-apply-by-march-1-2021/">
-<div class="entryheader">
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://cstheory-jobs.org/2020/11/30/postdoc-at-technion-israel-institute-of-technology-apply-by-march-1-2021/">postdoc at Technion Israel Institute of Technology (apply by March 1, 2021)</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://cstheory-jobs.org" title="Theoretical Computer Science Jobs">CCI: jobs</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p>Looking for excellent post graduate researchers for a yearlong postdoc position at the Computer Science Department at Technion. Main research theme is intersection of theoretical computer science with learning, information and data.</p>
-<p>Website: <a href="https://nailon.net.technion.ac.il/openings/">https://nailon.net.technion.ac.il/openings/</a><br />
-Email: mayasidis@cs.technion.ac.il</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by shacharlovett <a href="https://cstheory-jobs.org/2020/11/30/postdoc-at-technion-israel-institute-of-technology-apply-by-march-1-2021/"><span class="datestr">at November 30, 2020 07:43 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
