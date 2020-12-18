@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2020-12-18T17:21:58Z</updated>
+  <updated>2020-12-18T17:38:50Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,265 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>https://francisbach.com/?p=5129</id>
+    <link href="https://francisbach.com/optimization-is-as-hard-as-approximation/" rel="alternate" type="text/html"/>
+    <title>Optimization is as hard as approximation</title>
+    <summary>Optimization is a key tool in machine learning, where the goal is to achieve the best possible objective function value in a minimum amount of time. Obtaining any form of global guarantees can usually be done with convex objective functions, or with special cases such as risk minimization with one-hidden over-parameterized layer neural networks (see...</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p class="justify-text">Optimization is a key tool in machine learning, where the goal is to achieve the best possible objective function value in a minimum amount of time. Obtaining any form of global guarantees can usually be done with <a href="https://en.wikipedia.org/wiki/Convex_optimization">convex</a> objective functions, or with special cases such as risk minimization with one-hidden over-parameterized layer neural networks (see the <a href="https://francisbach.com/gradient-descent-neural-networks-global-convergence/">June post</a>). In this post, I will consider low-dimensional problems (imagine 10 or 20), with no constraint on running time (thus get ready for some running-times that are exponential in dimension!).</p>
+
+
+
+<p class="justify-text">We consider minimizing a function \(f\) on a bounded subset  \(\mathcal{X}\) of \(\mathbb{R}^d\), based only on function evaluations, a problem often referred to as zero-th order optimization or <a href="https://en.wikipedia.org/wiki/Derivative-free_optimization">derivative-free optimization</a>. No convexity is assumed, so we should not expect fast rates, and, again, no efficient algorithms that can provably find a global minimizer. Good references on what I am going to cover in this post are [1, 2, 5].</p>
+
+
+
+<p class="justify-text">One may wonder why this is interesting at all. Clearly, such algorithms are not made to be used to find millions of parameters for logistic regression or neural networks, but they are often used for hyperparameter tuning (regularization parameters, size of neural network layer, etc.). See, e.g., [<a href="https://papers.nips.cc/paper/2012/file/05311655a15b75fab86956663e1819cd-Paper.pdf">6</a>] for applications.</p>
+
+
+
+<p class="justify-text">We are going to assume some regularity for the functions we want to minimize, typically bounded derivatives. We will thus assume that \(f \in \mathcal{F}\), for a space \(\mathcal{F}\) of functions from \(\mathcal{X}\) to \(\mathbb{R}\). We are going to take a worst-case approach, where we characterize convergence over all members of \(\mathcal{F}\).  That is, we want our guarantees to hold for <em>all</em> functions in \(\mathcal{F}\). Note that this worst-case analysis may not predict well what’s happening for a particular function; in particular, it is (by design) pessimistic.</p>
+
+
+
+<p class="justify-text">An algorithm \(\mathcal{O}\) will be characterized by (a) the choice of points \(x_1,\dots,x_n \in \mathcal{X}\) to query the function, and (b) the algorithm to output a candidate \(\hat{x} \in \mathcal{X}\) such that \(f(\hat{x}) \ – \inf_{x \in \mathcal{X}} f(x)  \) is small. The estimate \(\hat{x}\) can only depend on \((x_i,f(x_i))\), for \(i \in \{1,\dots,n\}\). In most of this post, the choice of points \(x_1,\dots,x_n\) is made once (without seeing any function values). We show later in this blog post that going <em>adaptive</em>, where the point \(x_{i+1}\) is selected after seeing \((x_j,f(x_j))\) for all \(j \leqslant i\), does not bring much (at least in the worst-case sense).</p>
+
+
+
+<p class="justify-text">Given a selection of points and the algorithm \(\mathcal{O}\), the rate of convergence is the supremum over all functions \(f \in \mathcal{F}\) of the error \(f(\hat{x}) \ – \inf_{x \in \mathcal{X}} f(x)\). This is a function \(\varepsilon_n(\mathcal{O})\) of the number \(n\) of sampled points (and of the the class of functions \(\mathcal{F}\)). The optimal algorithm (minimizing \(\varepsilon_n(\mathcal{O})\)) will lead to a rate we denote \(\varepsilon_n^{\rm opt}\), and which we aim to characterize.</p>
+
+
+
+<h2>Direct lower/upper bounds for Lipschitz-continuous functions</h2>
+
+
+
+<p class="justify-text">The argument is particularly simple for a bounded metric space \(\mathcal{X}\) with distance \(d\), and \(\mathcal{F}\) the class of \(L\)-Lipschitz-continuous functions, that is, such that for all \(x,x’ \in \mathcal{X}\), \(|f(x) -f(x’)| \leqslant L d(x,x’)\). This is a very large set of functions, so expect weak convergence rates.</p>
+
+
+
+<p class="justify-text"><strong>Set covers. </strong>We will need to cover the set \(\mathcal{X}\) with balls of a given radius. The minimal radius \(r\) of a cover of \(\mathcal{X}\) by \(n\) balls of radius \(r\) is denoted \(r_n(\mathcal{X},d)\). This corresponds to \(n\) ball centers \(x_1,\dots,x_n\). See example below for the unit cube \(\mathcal{X} = [0,1]^2\) and the metric obtained from the \(\ell_\infty\)-norm, with \(n = 16\), and \(r_n([0,1]^2,\ell_\infty) = 1/8\). See more details on covering numbers <a href="https://en.wikipedia.org/wiki/Covering_number">here</a>.</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-5187" height="269" src="https://francisbach.com/wp-content/uploads/2020/12/cover-1024x1024.png" width="269"/></figure></div>
+
+
+
+<p class="justify-text">More generally, for the unit cube \(\mathcal{X} = [0,1]^d\), we have \(r_n([0,1]^d,\ell_\infty) \approx \frac{1}{2} n^{-1/d}\) (which is not an approximation where \(n\) is the \(d\)-th power of an integer). For other normed metrics, (since all norms are equivalent) the scaling as \(r_n \sim {\rm diam} (\mathcal{X}) n^{-1/d}\) is the same on any bounded set in \(\mathbb{R}^d\) (with an extra constant that depends on \(d\)).</p>
+
+
+
+<p class="justify-text"><strong>Algorithm. </strong>Given the ball centers \(x_1,\dots,x_n\), outputting the minimum of function values \(f(x_i)\) for \(i=1,\dots,n\), leads to an error which is less than \(L r_n(\mathcal{X},d)\), as the optimal \(x_\ast \in \mathcal{X}\) is at most at distance \(r_n(\mathcal{X},d)\) from one of the cluster centers, let’s say \(x_k\), and thus \(f(x_k)\  – f(x_\ast) \leqslant L d(x_k,x_\ast) \leqslant L r_n(\mathcal{X},d)\). This provides an upper-bound on \(\varepsilon_n^{\rm opt}\). The algorithm we just described seems naive, but it turns out to be optimal for this class of problems.</p>
+
+
+
+<p class="justify-text"><strong>Lower-bound.</strong> Consider any optimization algorithm, with its first \(n\) point queries and its estimate \(\hat{x}\). By considering the functions which are zero in these \(n+1\) points, the algorithm outputs zero. We now simply need to construct a function \(f \in \mathcal{F}\) such that \(f\) is zero at these points, but maximally smaller than zero at a different point. </p>
+
+
+
+<p class="justify-text">Consider a cover of \(\mathcal{X}\) with \(n+2\) balls of minimal radius  (equal to \(r_{n+2}(\mathcal{X},d)\)), there has to exist at least one of the \(n+2\) corresponding ball centers such that the corresponding ball contains no points from the algorithm (denote by \(y\) its center). We can then construct the function $$ f(x)  = \ – L \big( r_{n+2}(\mathcal{X},d) \ – d(x,y) \big)_+ = \ – L \max \big\{  r_{n+2}(\mathcal{X},d) \ – d(x,y) ,0 \big\}, $$ which is zero on all points of the algorithm and the output point \(\hat{x}\), and with minimum value \(– L r_{n+2}(\mathcal{X},d)\) attained at \(y\). Thus, we must have \(\varepsilon_n^{\rm opt} \geqslant 0 \ – (\ – L r_{n+2}(\mathcal{X},d) ) = L r_{n+2}(\mathcal{X},d)\). This difficult function is plotted below in one dimension.</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-5260" height="73" src="https://francisbach.com/wp-content/uploads/2020/12/lowerbound-1-1024x178.png" width="423"/></figure></div>
+
+
+
+<p class="justify-text">Thus, the performance of any algorithm from \(n\) function values has to be larger than \(L r_{n+2}(\mathcal{X},d)\).  Thus, so far, we have shown that $$L r_{n+2}(\mathcal{X},d) \leqslant \varepsilon_n^{\rm opt} \leqslant L r_{n}(\mathcal{X},d).$$  For \(\mathcal{X} \subset \mathbb{R}^d\), \(r_n(\mathcal{X},d)\) is typically of order \({\rm diam}(\mathcal{X}) n^{-1/d}\), and thus the difference between \(n\) and \(n+2\) above is negligible. Note that the rate in \(n^{-1/d}\) is <strong>very</strong> slow, and symptomatic of the classical curse of dimensionality. The appearance of a covering number is not totally random here, as we will see below.</p>
+
+
+
+<p class="justify-text"><strong>Random search.</strong> We can have a similar bound up to logarithmic terms for random search, that is, after selecting independently \(n\) points \(x_1,\dots,x_n\), uniformly at random in \(\mathcal{X}\), and selecting the points with smallest function value \(f(x_i)\). The performance can be shown to be proportional to \(L {\rm diam}(\mathcal{X}) ( \log n )^{1/d} n^{-1/d}\) in high probability, leading to an extra logarithmic term (the proof can be obtained with a simple covering argument, as shown at the end of the post). Therefore, random search is optimal up to logarithmic terms for this very large class of functions to optimize.</p>
+
+
+
+<p class="justify-text">We would like to go beyond Lipschitz-continuous functions, and study if we can leverage smoothness, and hopefully avoid the dependence in \(n^{-1/d}\). This can be done by a somewhat surprising equivalence between worst case guarantees from optimization and worst case guarantees for uniform approximation.</p>
+
+
+
+<h2>Optimization is as hard as uniform function approximation</h2>
+
+
+
+<p class="justify-text">We now also consider the problem of outputting a whole function \(\hat{f} \in \mathcal{F}\), such that \(\|f – \hat{f}\|_\infty = \max_{x \in \mathcal{X}} | \hat{f}(x)\ – f(x)|\) is as small as possible. For any approximation algorithm \(\mathcal{A}\) that builds an estimate \(\hat{f} \in \mathcal{F}\) from \(n\) function values, we can define its convergence rate in the same way as for optimization algorithm \(\varepsilon_n(\mathcal{A})\), as a function of \(n\). The optimal approximation algorithm has a convergence rate denoted by \(\varepsilon_n^{\rm app}\).</p>
+
+
+
+<p class="justify-text"><strong>From approximation to optimization. </strong>Clearly, an approximation algorithm \(\mathcal{A}\) leads to an optimization algorithm \(\mathcal{O}\) with at most twice the same rate, that is, $$  \varepsilon_n(\mathcal{O}) \leqslant 2\varepsilon_n(\mathcal{A}),$$ by simply approximating \(f\) by \(\hat{f}\) and outputting any \(\hat{x} \in \arg \min_{x \in \mathcal{X}} \hat{f}(x)\), for which $$f(\hat{x})  \leqslant \hat{f}(\hat{x}) + \| \hat{f}\ – f\|_\infty =  \min_{x \in \mathcal{X}} \hat{f}(x) + \| \hat{f}\  – f\|_\infty \leqslant \min_{x \in \mathcal{X}} {f}(x) +2  \| \hat{f} \ – f\|_\infty. $$ See an illustration below (with a function estimated from the values at green points), with the candidate minimizer in orange.</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-5268" height="254" src="https://francisbach.com/wp-content/uploads/2020/12/optim_approx-1024x553.png" width="470"/></figure></div>
+
+
+
+<p class="justify-text">Thus in terms of worst-case performance, we get $$ \varepsilon_n^{\rm opt} \leqslant 2\varepsilon_n^{\rm app}.$$ Intuitively, it seems that this upper-bound should be very loose, as approximating uniformly a function, in particular far from its minimum, seems useless for minimization. For worst-case performance, this intuition is incorrect… Indeed, the optimal rate for optimization with \(n\) function evaluations happens to be greater than the optimal rate for approximation with \(n+1\) function evaluations, which we will now show.</p>
+
+
+
+<p class="justify-text"><strong>Lower-bound on optimization performance. </strong>We will need an extra assumption, namely that the function space \(\mathcal{F}\) is convex and symmetric (and bounded in uniform norm).</p>
+
+
+
+<p class="justify-text">We consider an optimization algorithm over the class of function \(\mathcal{F}\), that is considering \(n\) observation points \(x_1,\dots,x_n\), and an estimate \(\hat{x}\). The worst-case performance over all functions in \(\mathcal{F}\) is greater than over the (smaller) class of functions for which \(f(x_1) = \cdots = f(x_n) = f(\hat{x}) = 0\). Given that the performance measure is \(f(\hat{x})\  – \inf_{x \in \mathcal{X}} f(x)\), the performance is greater than the supremum of  \(– \inf_{x \in \mathcal{X}} f(x)\) over functions in \(\mathcal{F}\) such that \(f(x_1) = \cdots = f(x_n) = f(\hat{x}) = 0\). For Lipschitz-continuous functions above, we built explicitly a hard function. In the general case, an explicit construction is not that easy, but we will relate the construction of such a function to the general approximation problem.</p>
+
+
+
+<p class="justify-text">As we just saw, the optimal rate of the optimization algorithm is greater than $$\inf_{x_1,\dots,\, x_{n+1} \in \, \mathcal{X}} \sup_{f \in \mathcal{F}, \ f(x_1)\ =\ \cdots \ = \ f(x_{n+1}) \ =\ 0} – \inf_{x \in \mathcal{X}} f(x) . $$ The quantity above characterizes how small a function can be when equal to zero on \(n+1\) points. When the set of function \(\mathcal{F}\) is centrally symmetric, that is \(f \in \mathcal{F} \Rightarrow \ – f \in \mathcal{F}\), we can replace \(– \inf_{x \in \mathcal{X}} f(x)\) in the expression above by \(\| f\|_\infty\).</p>
+
+
+
+<p class="justify-text">It turns out that for convex and centrally symmetric spaces \(\mathcal{F}\) of functions, this happens to be the optimal rate of approximation with \(n+1\) function evaluations. This is sometimes referred to as Smolyak’s lemma [3], which we state here (see a very nice and short proof in [4]).</p>
+
+
+
+<p class="justify-text"><strong>Smolyak’s lemma. </strong>We consider a space of functions \(\mathcal{F}\) which is convex and centrally symmetric. Then:</p>
+
+
+
+<ul class="justify-text"><li>For any \(x_1,\dots,x_n \in \mathcal{X}\), the optimal approximation method, that is the optimal map \(\mathcal{S}: \mathbb{R}^n \to \mathcal{F}\), i.e., an algorithm that computes \(\hat{f} = \mathcal{S}(f(x_1),\dots,f(x_n)) \in \mathcal{F}\), is <em>linear</em>, that is, there exist functions \(g_1,\dots,g_n: \mathcal{X} \to \mathbb{R}\) such that $$\mathcal{S}(f(x_1),\dots,f(x_n)) = \sum_{i=1}^n f(x_i) g_i.$$</li><li>The optimal rate of uniform approximation in \(\mathcal{F}\) is equal to $$ \displaystyle \varepsilon_n^{\rm app} = \inf_{x_1,\dots,\, x_{n} \in \, \mathcal{X}} \sup_{f \in \mathcal{F}, \ f(x_1)\ =\ \cdots \ = \ f(x_{n}) \ =\ 0} \| f \|_\infty.$$</li></ul>
+
+
+
+<p class="justify-text">Thus, we have “shown” that: $$ \varepsilon_{n+1}^{\rm app} \leqslant \varepsilon_n^{\rm opt} \leqslant 2\varepsilon_n^{\rm app}, $$ that is, optimization is at most twice as hard as uniform approximation (still in the worst-case sense). We can now consider examples of uniform approximation algorithms to get optimization algorithms.</p>
+
+
+
+<h2>Examples and optimal algorithms</h2>
+
+
+
+<p class="justify-text">As seen above, we simply need algorithms that approximate the function in uniform norm, and then we minimize the approximation. This is computationally optimal in terms of access to function evaluations (but clearly not in terms of computational complexity).</p>
+
+
+
+<p class="justify-text"><strong>Lipschitz-continuous functions.</strong> One can check that with \(x_1,\dots,x_n\) the centers of the cover above, and a piecewise constant function on each of the ball (with arbitrary values at intersections), then we have $$ \| \hat{f} \, – f \|_\infty \leqslant L   r_n(\mathcal{X},d),$$ which is a standard approximation result using covering numbers. We recover the result above directly from the cover argument (and here the sharper result that the rates of uniform approximation and optimization are asymptotically the same for this class of functions).</p>
+
+
+
+<p class="justify-text"><strong>Smooth functions in one dimension.</strong> For simplicity, I will focus on the one-dimensional problem, where all concepts are simpler, some of them directly extend to higher dimensions, some of them don’t.</p>
+
+
+
+<p class="justify-text">We consider \(\mathcal{X} = [0,1]\). The simplest interpolation techniques are piecewise constant and piecewise affine interpolations. That is, if we observe \(0 = x_1 \leqslant \cdots \leqslant x_n = 1\), we consider \(\hat{f}\) defined on \([x_i,x_{i+1}]\) as $$\hat{f}(x) = \frac{1}{2}f(x_i) + \frac{1}{2}f(x_{i+1}) $$ </p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-5286" height="152" src="https://francisbach.com/wp-content/uploads/2020/12/interpolation_constant-2-1024x451.png" width="339"/></figure></div>
+
+
+
+<p class="justify-text">or $$ \hat{f}(x) = f(x_i) + \frac{ x\  – x_i}{x_{i+1}-x_i}\big[ f(x_{i+1})\ – f(x_i) \big].$$</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-5287" height="144" src="https://francisbach.com/wp-content/uploads/2020/12/interpolation_affine-1024x449.png" width="324"/></figure></div>
+
+
+
+<p class="justify-text">If we assume that \(f\) is twice differentiable with second-derivative bounded by \(M_2\), then, we can show that on \([x_i,x_{i+1}]\), we have for piecewise affine interpolation: $$ | f(x) \ – \hat{f}(x) | \leqslant \frac{M_2}{8} | x_{i+1} – x_i |^2.$$</p>
+
+
+
+<p class="justify-text">If we assume that \(f\) is differentiable with first-derivative bounded by \(M_1\), then, we can show that on \([x_i,x_{i+1}]\), we have for piecewise affine or constant interpolation: $$ | f(x) \ – \hat{f}(x) | \leqslant \frac{M_1}{2} | x_{i+1} – x_i |.$$</p>
+
+
+
+<p class="justify-text">This leads to, when \(x_i = (i-1)/(n-1)\), to uniform error in \(O(1/n)\) for functions with a bound on a single derivative and or \(O(1/n^2)\) for two derivatives. Thus, we see two effects, that are common in approximations problems: (a) the more regular the function to approximate, the better the approximation rate, (b) If we consider a method tailored to smoother functions, it often works well for less smooth functions.</p>
+
+
+
+<p class="justify-text">Explicit piecewise affine interpolation is harder to perform in higher dimensions, where other techniques can be used as presented below, such as <a href="https://en.wikipedia.org/wiki/Kernel_method">kernel methods</a> (again!).</p>
+
+
+
+<p class="justify-text"><strong>Going high-dimensional with kernel methods.</strong> We assume that we have a positive definite kernel \(k: \mathcal{X} \times \mathcal{X} \to \mathbb{R}\) on \(\mathcal{X}\), and, given the \(n\) elements \(x_1,\dots,x_n\) of \(\mathcal{X}\) and function values \(f(x_1),\dots,f(x_n)\), we look for the interpolating function \(f\) in the corresponding reproducing kernel Hilbert space with minimum norm. By the <a href="https://en.wikipedia.org/wiki/Representer_theorem">representer theorem</a>, it has to be of the form \(\sum_{i=1}^n  \alpha_i k(x,x_i)\). Since it has to interpolate, we must have \(K\alpha = y\) and thus \(\alpha = K^{-1} y\), where \(y_i = f(x_i)\) for \(i \in \{1,\dots,n\}\), and \(K\) the \(n \times n\) kernel matrix. Thus, interpolation can then be easily done in higher dimensions.</p>
+
+
+
+<p class="justify-text"><a href="https://en.wikipedia.org/wiki/Sobolev_space">Sobolev spaces</a> are commonly used in the interpolation context, and for \(s\) square-integrable derivatives, for \(s &gt; d/2\), they are reproducing kernel Hilbert spaces. See below for examples of interpolations with various Sobolev spaces and increasing number of interpolating points, where the approximation errors (in uniform norm) are computed. With \(s=1\), we recover piecewise affine interpolation, but smoother functions are obtained for \(s=2\).</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-full is-resized"><img alt="" class="wp-image-5238" height="250" src="https://francisbach.com/wp-content/uploads/2020/12/interpolation-2.gif" width="468"/></figure></div>
+
+
+
+<p class="justify-text"><strong>Optimal rates of approximation.</strong> With the method defined above, we can obtain the optimal rates of approximation (and hence of optimization) of \(\varepsilon_n^{\rm app} \approx \displaystyle \frac{1}{n^{m/d}}\), for the set of functions with \(m\) bounded derivatives. Thus, for very smooth functions, we can escape the curse of dimensionality (that is, obtain a power of \(n\) that does not decay too slowly). See [1] for more details.</p>
+
+
+
+<h2>The powerlessness of adaptivity</h2>
+
+
+
+<p class="justify-text">The critical reader may argue that the algorithm set-up described in this post is too simple: the points at which we take function values are decided once and for all, independently of the observed function values. Clearly, some form of adaptivity should beat random search. The sad truth is that the bound for worst-case performance is the same… up to a factor of 2 at most (still in the worst-case sense).</p>
+
+
+
+<p class="justify-text">The argument is essentially the same as for non-adaptive algorithms: for the Lipschitz-continuous example, our hard function can also be built for adaptive algorithms, while for the general case, it simply turns out that the rate for adaptive approximation is exactly the same than for adaptive approximation [4].</p>
+
+
+
+<p class="justify-text">Thus, adaptive and non-adaptive approximations are just a factor of two of each other. Note that given the practical success of <a href="https://en.wikipedia.org/wiki/Bayesian_optimization">Bayesian optimization</a> (which is one instance of adaptive optimization) on some problems, there could be at least two explanations (choose the one you prefer, or find a new one): (1) the worst-case analysis can be too pessimistic, or (2) what is crucial in Bayesian optimization is not the adaptive choice of points to evaluate the function, but the adaptivity to smoothness of the function to optimize (that is, if the function has \(m\) derivatives, then the rate is \(n^{-m/d}\), which can be much better than \(n^{-1/d}\)).</p>
+
+
+
+<h2>Conclusion</h2>
+
+
+
+<p class="justify-text">In this post, I highlighted the strong links between approximation problems and optimization problems. It turns out that the parallel between worst-case performances goes beyond: computing integrals from function evaluations, a problem typically referred to as <a href="https://en.wikipedia.org/wiki/Numerical_integration">quadrature</a>, is also as hard. More on this in a future post.</p>
+
+
+
+<p class="justify-text">As warned early in the post, the algorithms presented here all have running time that are exponential in dimension, as they either perform random sampling or need to minimize a model of the function to optimize. </p>
+
+
+
+<p class="justify-text">The only good news in this post: optimization is hard as approximation, but the scenario is more varied than expected. Indeed approximation can be fast and avoid the curse of dimensionality, at least in the exponent of the rate, when the function is very smooth (indeed, for \(m\)-times differentiable functions, the constant in front of \(n^{-m/d}\) still depends exponentially in \(d\)). It would be nice to catch this property also in an optimization algorithm, with a running time complexity depending polynomially on \(n\) only, and not exponentially in \(d\). Next month, I will present recent work with Alessandro Rudi and Ulysse Marteau-Ferey [7] that does exactly this, by combining the tasks of interpolation and optimization in a single convex optimization problem.</p>
+
+
+
+<p class="justify-text"><strong>Acknowledgements</strong>. I would like to thank Alessandro Rudi and Ulysse Marteau-Ferey for proofreading this blog post and making good clarifying suggestions.</p>
+
+
+
+<h2>References</h2>
+
+
+
+<p class="justify-text">[1] Erich Novak. <em>Deterministic and stochastic error bounds in numerical analysis</em>. Springer, 2006.<br/>[2] Erich Novak, Henryk Woźniakowski. Tractability of Multivariate Problems: Standard information for functionals, European Mathematical Society, 2008.<br/>[3] S. A. Smolyak. On optimal restoration of functions and functionals of them, Candidate Dissertation, Moscow State University, 1965.<br/>[4] Nikolai Sergeevich Bakhvalov. <a href="https://www.sciencedirect.com/science/article/abs/pii/0041555371900176">On the optimality of linear methods for operator approximation in convex classes of functions</a>. USSR Computational Mathematics and Mathematical Physics. 11(4): 244-249, 1971.<br/>[5] Yurii Nesterov. <em>Lectures on Convex Optimization</em>. Springer, 2018.<br/>[<a href="https://papers.nips.cc/paper/2012/file/05311655a15b75fab86956663e1819cd-Paper.pdf">6</a>] Jasper Snoek, Hugo Larochelle, and Ryan P. Adams. <a href="https://papers.nips.cc/paper/2012/file/05311655a15b75fab86956663e1819cd-Paper.pdf">Practical Bayesian optimization of machine learning algorithms</a>. <em>Advances in Neural Information Processing Systems</em>, 2015.<br/>[7] Alessandro Rudi, Ulysse Marteau-Ferey, Francis Bach. Finding Global Minima via Kernel Approximations. Technical report HAL-03081675, 2020.</p>
+
+
+
+<h2>Performance of random search</h2>
+
+
+
+<p class="justify-text">We consider sampling independently and uniformly in \(\mathcal{X}\) \(n\) points \(x_1,\dots,x_n\). For a given \(L\)-Lipschitz-continuous function \(f\), with global minimizer \(x\) on \(\mathcal{X}\), we have $$\min_{i \in \{1,\dots,n\}} f(x_i)\  – f(x) \leqslant L \min_{i \in \{1,\dots,n\}} d(x,x_i).$$ Thus, to obtain an upper-bound on performance over all functions \(f\) (and potentially all locations of the global minimizer \(x\)), we need to bound $$\max_{x \in \mathcal{X}} \min_{i \in \{1,\dots,n\}} d(x,x_i).$$ If we have a cover with \(m\) points \(y_1,\dots,y_m\), and radius \(r = r_m(\mathcal{X},d)\), we have $$\max_{x \in \mathcal{X}} \min_{i \in \{1,\dots,n\}} d(x,x_i) \leqslant r + \max_{j  \in \{1,\dots,m\}} \min_{i \in \{1,\dots,n\}} d(y_j,x_i) .$$ We can then bound the probability that $$ \max_{j \in \{1,\dots,m\}} \min_{i \in \{1,\dots,n\}} d(y_j,x_i) \geqslant r$$ by the union bound (and using the independence of the \(x_i\)’s) as \(m\) times the \(n\)-th power of the probability that one of the \(x_i\) is not in a given ball of radius \(r\). By a simple volume argument (and assuming that all balls of a given radius have the same volume), this probability is less than \(( 1 – 1/m)\). Thus with probability greater than \(1 – m(1 – 1/m)^n \geqslant 1 – m e^{ – n /m}\) the worst-case performance is less than \(2Lr\).</p>
+
+
+
+<p class="justify-text">Since for normed metrics in \(\mathbb{R}^d\), \(r  \sim m^{-1/d} {\rm diam}(\mathcal{X})\), by selecting \(m = 2n \log n\), we get an overall performance proportional to \( L \big( \frac{ \log n}{n} \big)^{1/d}\) with probability greater than \(1 – \frac{ \log n}{n}\) (which tends to one when \(n\) grows).</p></div>
+    </content>
+    <updated>2020-12-18T16:07:10Z</updated>
+    <published>2020-12-18T16:07:10Z</published>
+    <category term="Machine learning"/>
+    <author>
+      <name>Francis Bach</name>
+    </author>
+    <source>
+      <id>https://francisbach.com</id>
+      <link href="https://francisbach.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://francisbach.com" rel="alternate" type="text/html"/>
+      <subtitle>Francis Bach</subtitle>
+      <title>Machine Learning Research Blog</title>
+      <updated>2020-12-18T17:38:49Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://rjlipton.wordpress.com/?p=17896</id>
@@ -90,7 +349,7 @@
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-12-18T17:20:34Z</updated>
+      <updated>2020-12-18T17:37:37Z</updated>
     </source>
   </entry>
 
@@ -897,7 +1156,7 @@ Email: yekhanin@microsoft.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-12-18T17:20:37Z</updated>
+      <updated>2020-12-18T17:37:40Z</updated>
     </source>
   </entry>
 
@@ -924,7 +1183,7 @@ Email: yekhanin@microsoft.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-12-18T17:20:37Z</updated>
+      <updated>2020-12-18T17:37:40Z</updated>
     </source>
   </entry>
 
@@ -953,7 +1212,7 @@ Email: pettie@umich.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-12-18T17:20:37Z</updated>
+      <updated>2020-12-18T17:37:40Z</updated>
     </source>
   </entry>
 
@@ -993,7 +1252,7 @@ Email: pettie@umich.edu</p></div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2020-12-18T17:20:11Z</updated>
+      <updated>2020-12-18T17:37:13Z</updated>
     </source>
   </entry>
 
@@ -1021,7 +1280,7 @@ Email: izack.cohen@biu.ac.il</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-12-18T17:20:37Z</updated>
+      <updated>2020-12-18T17:37:40Z</updated>
     </source>
   </entry>
 
@@ -1048,7 +1307,7 @@ Email: algo@tuhh.de</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-12-18T17:20:37Z</updated>
+      <updated>2020-12-18T17:37:40Z</updated>
     </source>
   </entry>
 
@@ -1182,7 +1441,7 @@ In a recent work of Chatterjee and the authors (FOCS 2020), it was shown that th
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-12-18T17:20:26Z</updated>
+      <updated>2020-12-18T17:37:29Z</updated>
     </source>
   </entry>
 
@@ -1209,7 +1468,7 @@ For example, this bound is $\sqrt{\mathrm{DL}(f)}$ when $p = \sqrt{5}-2 \approx 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-12-18T17:20:26Z</updated>
+      <updated>2020-12-18T17:37:29Z</updated>
     </source>
   </entry>
 
@@ -1241,7 +1500,7 @@ Our proof builds on several works in learning theory, pseudorandomness, and comp
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-12-18T17:20:26Z</updated>
+      <updated>2020-12-18T17:37:29Z</updated>
     </source>
   </entry>
 
@@ -1371,7 +1630,7 @@ Thanks again Ken. </p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-12-18T17:20:34Z</updated>
+      <updated>2020-12-18T17:37:37Z</updated>
     </source>
   </entry>
 
@@ -1425,7 +1684,7 @@ Thanks again Ken. </p>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2020-12-18T17:20:30Z</updated>
+      <updated>2020-12-18T17:37:33Z</updated>
     </source>
   </entry>
 
@@ -1517,7 +1776,7 @@ Thanks again Ken. </p>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2020-12-18T17:20:13Z</updated>
+      <updated>2020-12-18T17:37:15Z</updated>
     </source>
   </entry>
 
@@ -1548,7 +1807,7 @@ Thanks again Ken. </p>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2020-12-18T17:20:26Z</updated>
+      <updated>2020-12-18T17:37:29Z</updated>
     </source>
   </entry>
 
@@ -1575,7 +1834,7 @@ Email: jn@di.ku.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-12-18T17:20:37Z</updated>
+      <updated>2020-12-18T17:37:40Z</updated>
     </source>
   </entry>
 
@@ -1602,7 +1861,7 @@ Email: jn@di.ku.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-12-18T17:20:37Z</updated>
+      <updated>2020-12-18T17:37:40Z</updated>
     </source>
   </entry>
 
@@ -1630,7 +1889,7 @@ Email: jn@di.ku.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2020-12-18T17:20:37Z</updated>
+      <updated>2020-12-18T17:37:40Z</updated>
     </source>
   </entry>
 
@@ -1655,7 +1914,7 @@ Email: jn@di.ku.dk</p></div>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2020-12-18T17:21:25Z</updated>
+      <updated>2020-12-18T17:38:24Z</updated>
     </source>
   </entry>
 
@@ -1743,60 +2002,7 @@ Taylor told me it was OK, because he knew another argument which avoided Gross�
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2020-12-18T17:20:34Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://gilkalai.wordpress.com/?p=20503</id>
-    <link href="https://gilkalai.wordpress.com/2020/12/10/open-problem-session-of-huji-combsem-problem-2-chaya-keller-the-krasnoselskii-number/" rel="alternate" type="text/html"/>
-    <title>Open problem session of HUJI-COMBSEM: Problem #2 Chaya Keller: The Krasnoselskii number</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">  Marilyn Breen This is our second post on the open problem session of the HUJI combinatorics seminar. The video of the session is here. Today’s problem was presented by Chaya Keller. The Krasnoselskii number One of the best-known applications … <a href="https://gilkalai.wordpress.com/2020/12/10/open-problem-session-of-huji-combsem-problem-2-chaya-keller-the-krasnoselskii-number/">Continue reading <span class="meta-nav">→</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><div class="wp-caption alignnone" id="attachment_20545" style="width: 650px;"><a href="https://gilkalai.files.wordpress.com/2020/11/chaya-keller.jpg"><img alt="" class="size-full wp-image-20545" height="479" src="https://gilkalai.files.wordpress.com/2020/11/chaya-keller.jpg?w=640&amp;h=479" width="640"/></a><p class="wp-caption-text" id="caption-attachment-20545"><span style="color: #ff0000;">Chaya Keller</span></p></div>
-<p> </p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/11/mbreen.jpg"><img alt="" class="alignnone size-full wp-image-20544" src="https://gilkalai.files.wordpress.com/2020/11/mbreen.jpg?w=640"/></a></p>
-<p><span style="color: #ff0000;">Marilyn Breen</span></p>
-<p>This is our second post on the open problem session of the HUJI combinatorics seminar. <a href="https://huji.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=1ac330a2-d6b7-4b86-9bac-ac7500d14205">The video of the session is here</a>. Today’s problem was presented by <a href="http://www.ma.huji.ac.il/~ckeller/">Chaya Keller</a>.</p>
-<h2>The Krasnoselskii number</h2>
-<p>One of the best-known applications of Helly’s theorem (that is, actually, equivalent to Helly’s theorem, see [Bo]) is the following theorem, due to Krasnoselskii [K]:</p>
-<p><strong>Theorem 1 (Krasnoselskii):</strong> Let <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" title="{S}"/> be an infinite compact set in <img alt="{\mathbb{R}^d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BR%7D%5Ed%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" title="{\mathbb{R}^d}"/>. If every <img alt="{d+1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bd%2B1%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" title="{d+1}"/> points of <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" title="{S}"/> are visible from a common point, then <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" title="{S}"/> is starshaped, that is there exists some <img alt="{x_0 \in S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_0+%5Cin+S%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" title="{x_0 \in S}"/> that sees all points in <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" title="{S}"/>.</p>
-<p>Krasnoselskii’s theorem does not hold for non-compact sets. However, all known counter-examples satisfy the weaker requirement of being finitely starlike, namely that any finite subset of <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{S}"/> is visible from a common point. This led Peterson [P] to ask the following:</p>
-<p>Does there exist a Krasnoselskii number <img alt="{K(d)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%28d%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{K(d)}"/> such that for any infinite set <img alt="{S \subset \mathbb{R}^d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS+%5Csubset+%5Cmathbb%7BR%7D%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{S \subset \mathbb{R}^d}"/>, if every <img alt="{K(d)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%28d%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{K(d)}"/> points of <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{S}"/> are visible from a single point, then <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{S}"/> is finitely starlike?</p>
-<p>Marilyn Breen obtained positive results for special cases of sets that satisfy additional topological conditions [Br1,Br2,Br3], e.g., Krasnoselskii number 3 for closed sets in the plane. On the other hand, she proved that if <img alt="{K(2)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%282%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{K(2)}"/> exists, then it must be larger than <img alt="{8}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B8%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{8}"/>.</p>
-<p>Recently, Micha Perles and me (Chaya Keller) proved that under no restriction on the set, the Krasnoselskii number does not exist. More precisely, we proved that for any <img alt="{k \geq 2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk+%5Cgeq+2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{k \geq 2}"/>, there exists a set <img alt="{S \subset \mathbb{R}^2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS+%5Csubset+%5Cmathbb%7BR%7D%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{S \subset \mathbb{R}^2}"/> such that any <img alt="{2k+3}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2k%2B3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{2k+3}"/> points in <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{S}"/> are visible from a common point, but there exist <img alt="{2k+4}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2k%2B4%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{2k+4}"/> points in <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{S}"/> that are not visible from a common point. But this counter example is absolutely not constructive (since it is based on a transfinite induction), and the resulting set <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{S}"/> admits no resonable topological structure.</p>
-<p>This leads to the following two problems:</p>
-<h3><span style="color: #0000ff;">Problem 1: Can you show constructively that the Krasnoselskii number does not exist?</span></h3>
-<h3><span style="color: #0000ff;">Problem 2: Can you find more natural topological conditions under which the Krasnoselskii number exists?</span></h3>
-<h3><span style="color: #ff0000;">References</span></h3>
-<p>[Bo] Borwein, J., A proof of the equivalence of Helly’s and Krasnosselsky’s theorems,Canad. Math. Bull., 20 (1977), 35-37.</p>
-<p>[Br1] M. Breen, Clear visibility, starshaped sets, and finitely starlike sets, J. of Geometry, 19 (1982), 183-196.</p>
-<p>[Br2] M. Breen, Some Krasnoseleskii numbers for finitely starlike sets in the plane, J. of Geometry, 32 (1988), 1-12.</p>
-<p>[Br3] M. Breen, Finitely starlike sets whose F-stars have positive measure, J. of Geometry, 35 (1989), pp.~19–25.</p>
-<p>[K] M. A. Krasnoselskii, Sur un Critére pour Qu’un Domain Soit Étoilé, Math. Sb., 19 (1946), pp.309-310.</p>
-<p>[P] B. Peterson, Is there a Krasnonselskii theorem for finitely starlike sets?, Convexity and Related Combinatorial Geometry, Marcel Dekker, New York, 1982, pp.81-84.</p></div>
-    </content>
-    <updated>2020-12-10T11:17:30Z</updated>
-    <published>2020-12-10T11:17:30Z</published>
-    <category term="Combinatorics"/>
-    <category term="Convexity"/>
-    <category term="Chaya Keller"/>
-    <category term="Marilyn Breen"/>
-    <category term="Mark Krasnoselskii"/>
-    <category term="Micha A. Perles"/>
-    <author>
-      <name>Gil Kalai</name>
-    </author>
-    <source>
-      <id>https://gilkalai.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://gilkalai.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://gilkalai.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://gilkalai.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Gil Kalai's blog</subtitle>
-      <title>Combinatorics and more</title>
-      <updated>2020-12-18T17:20:30Z</updated>
+      <updated>2020-12-18T17:37:37Z</updated>
     </source>
   </entry>
 </feed>
