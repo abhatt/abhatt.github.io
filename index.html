@@ -240,7 +240,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at December 22, 2020 05:21 PM UTC</span>.
+Last updated <span class="datestr">at December 22, 2020 05:38 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -330,6 +330,265 @@ by shacharlovett <a href="https://cstheory-jobs.org/2020/12/22/postdoc-at-univer
 
 <p class="date">
 by Scott <a href="https://www.scottaaronson.com/blog/?p=5209"><span class="datestr">at December 22, 2020 08:05 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://gradientscience.org/unadversarial/">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/madry.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://gradientscience.org/unadversarial/">Unadversarial Examples: Designing Objects for Robust Vision</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://gradientscience.org/" title="gradient science">Gradient Science</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><a style="float: left; width: 45%;" href="https://www.microsoft.com/en-us/research/uploads/prod/2020/12/main_unadv.pdf" class="bbutton">
+<i class="fas fa-file-pdf"></i>
+    Paper
+</a>
+<a style="float: left; width: 45%;" href="https://git.io/unadversarial" class="bbutton">
+<i class="fab fa-github"></i>
+   Code
+</a>
+
+<br /></p>
+
+<p>Modern computer vision systems are sensitive to transformations and corruptions
+of their inputs, making reliability and safety real concerns at deployment time.
+For example, fog or snow can severely impact self-driving cars’ perception
+systems; in an <a href="https://gradientscience.org/background">earlier post</a>, we found that even changes in image
+background are often enough to cause model misbehavior. Techniques like data
+augmentation, domain randomization, and robust training can all improve
+robustness, but often perform poorly in the face of the unfamiliar distribution
+shifts that computer vision systems face in the wild.</p>
+
+<h2 id="how-can-we-make-classifiers-more-robust">How can we make classifiers more robust?</h2>
+
+<p>So far, most approaches to robust machine learning have focussed on better model
+training methods. However, there is more than one way to peel a banana. Instead
+of tackling the general problem of designing universally robust vision
+algorithms, we leverage an additional degree of freedom present in many
+real-world scenarios. In particular, we observe that in many situations, the
+system designer not only trains the model used to make predictions, but can also
+modify objects of interest. Critically, such a system designer could
+specifically modify objects to aid in task performance! For example, a drone
+operator training a landing pad detection model can modify the landing pad
+surface for easier detection, and a roboticist manipulating custom objects could
+alter objects’ texture or geometry to assist with perception. Indeed, a similar
+insight motivates QR codes, which are patterns explicitly designed to encode
+easily recoverable bits in photographs. In our work, we ask: can we reliably
+create objects that <em>augment</em>Note that QR codes don't
+really fit the bill here, since they require their own decoder. (For
+completeness, we still tested QR codes in our paper and
+found them not robust to distribution shift.) the
+performance of existing machine learning models on vision tasks like
+classification or regression?</p>
+
+<h2 id="designing-objects-for-robust-vision">Designing objects for robust vision</h2>
+<p>Research on <a href="https://gradientscience.org/intro_adversarial">adversarial examples</a> has demonstrated that modern vision
+models can be extraordinarily sensitive to small changes in input: carefully
+chosen yet imperceptible perturbations of natural images can cause models to
+make wildly inaccurate predictions. In particular, previous work has shown that
+we can perturb objects’ textures so that they induce misclassification when
+photographed <a href="https://arxiv.org/abs/1607.02533">Kurakin et al</a>. For example, 
+<a href="https://arxiv.org/abs/1707.07397">Athalye et al</a> 3D print a textured 
+turtle that looks like a turtle, but classifies as a rifle when shown to a
+classifier!</p>
+
+<p>So, given that we can make objects <em>fool</em> ML models, can we also make them <em>help</em>?</p>
+
+<p>The answer is yes! In our work, we turn the same oversensitivity behind
+adversarial examples into a tool for robustly solving vision tasks.
+Specifically, instead of optimizing inputs to mislead models (as in adversarial
+attacks), we optimize inputs to reinforce correct behavior, yielding what we
+refer to as <em>unadversarial examples</em> or <em>robust objects</em>.</p>
+
+<p>We demonstrate that even a simple gradient-based algorithm can successfully
+construct unadversarial examples for a variety of vision settings. In fact, by
+optimizing objects for vision systems (rather than only vice-versa) we can
+greatly improve performance on both in-distribution data and previously unseen
+out-of-distribution data. For example, as illustrated below, optimizing the
+texture of a 3D-modelled jet enables the image classifier to classify that jet
+more robustly under various weather conditions, despite never being exposed to
+such conditions in training:</p>
+
+<p><img src="https://gradientscience.org/assets/unadversarial/headline_fig.png" alt="Example of unadversarial example (jet)" /></p>
+<div class="footnote">
+    In our work, we demonstrate that optimizing objects (e.g., the
+    pictured jet) for pre-trained neural networks can significantly boost
+    performance and robustness on computer vision tasks.
+</div>
+
+<p>The model correctly classifies both the original jet and its unadversarial
+counterpart in standard conditions, but recognizes only the unadversarial jet in
+foggy and dusty conditions.</p>
+
+<h2 id="constructing-unadversarial-examples">Constructing unadversarial examples</h2>
+<p>Our paper proposes two ways of designing robust objects: unadversarial
+stickers (patches), and unadversarial textures:</p>
+
+<p><img src="https://gradientscience.org/assets/unadversarial/patch_vs_texture.png" alt="Example of unadversarial patch and unadversarial texture" /></p>
+<div class="footnote">
+    Examples of the two considered methods for constructing unadversarial objects.
+</div>
+
+<p>As with adversarial examples, we construct both unadversarial patches and
+textures via gradient descent. In both cases, we need a pre-trained vision model
+to optimize objects for:</p>
+
+<ul>
+  <li><strong>Unadversarial patches</strong>: To construct/train unadversarial patches, we repeatedly
+sample natural images from a given dataset, and place a patch onto the sampled
+image (with random orientation and position) corresponding to the label of the
+image. We then feed the augmented image into the pre-trained vision model, and
+use gradient descent to minimize the standard classification loss of the model
+with respect to the patch pixels. The procedure is almost identical to that of
+<a href="https://arxiv.org/abs/1712.09665">Brown et al</a> for constructing <em>adversarial</em>
+patches; the main difference is that here we minimize, rather than maximize,
+the loss of the pre-trained model.</li>
+  <li><strong>Unadversarial textures</strong>: To construct adversarial textures, we start with a 3D
+mesh of the object we would like to optimize, as well as a dataset of
+background images. At each iteration, we render the current unadversarial
+texture onto the 3D mesh, and overlay the rendering onto a random background
+image. The result is fed to the pre-trained classifier, and we (again) use
+gradient descent to minimize the classification loss with respect to the
+texture. In previous work, <a href="https://arxiv.org/abs/1707.07397">Athalye et al</a>
+use an extremely similar approach to optimize <em>adversarial</em> textures (the most
+famous example of which being the 
+<a href="https://www.labsix.org/physical-objects-that-fool-neural-nets/">rifle turtle</a>).</li>
+</ul>
+
+<h2 id="evaluating-unadversarial-examples">Evaluating unadversarial examples</h2>
+<p>After designing our unadversarial examples, we evaluate them in two ways. First,
+we want to ensure that classifiers still maintain (or improve on) high accuracy
+levels on standard benchmarks augmented with unadversarial examples. Second, we
+want to understand the extent to which patches confer robustness to
+<em>out-of-distribution</em> samples—how well do models perform on patches under
+distribution shifts, despite such shifts never being considered in training?</p>
+
+<p>To answer these questions, we first test our methods on standard datasets
+(ImageNet and CIFAR) and robustness benchmarks (CIFAR10-C, ImageNet-C). It turns
+out that adding unadversarial patches to ImageNet dataset boosts the ImageNet
+accuracy as well as the robustness of a pretrained ResNet-18 model under various
+corruptions!</p>
+
+<p><img src="https://gradientscience.org/assets/unadversarial/benchmark_performance.png" alt="Performance on ImageNet and ImageNet-C" /></p>
+<div class="footnote">
+Accuracy on (a) clean ImageNet images and (b) synthetically corrupted
+ImageNet-C images as a function of patch size (given as a percentage of image
+area). In (b), each bar denotes the average accuracy over the five severities
+in ImageNet-C, and the horizontal dashed lines report the accuracy on the
+original (non-patched) datasets.
+</div>
+
+<p>In our 
+<a href="https://www.microsoft.com/en-us/research/uploads/prod/2020/12/main_unadv.pdf">paper</a>,
+we also compare to some non-optimization based baselines,
+like QR code-based augmentation and predetermined patches; unadversarial patches
+comfortably outperform all of the baselines we tested.</p>
+
+<h2 id="how-do-robust-objects-fare-in-more-realistic-settings">How do robust objects fare in more realistic settings?</h2>
+<p>The promising results we observe on standard classification and synthetic
+corruption benchmarks motivate us to consider more realistic tasks. To this end,
+we extend our evaluation to consider unadversarial examples in three additional
+settings: (a) classifying objects in a high-fidelity renderer, (b) localizing
+objects in a drone-landing simulator, and (c) recognizing objects in the real
+world. In the first two (simulated) settings, we optimize over objects’ textures
+directly and simulate weather conditions in the renderings themselves. In the
+final setting, we print out patches designed for ImageNet and study how well
+they aid classification when photographed on real world objects.</p>
+
+<h3 id="a-recognizing-objects-in-a-high-fidelity-simulator">A) Recognizing Objects in a High-Fidelity Simulator</h3>
+<p>We first test how well unadversarial examples aid recognition of
+three-dimensional objects in a high-fidelity simulator. Generating unadversarial
+textures for objects corresponding to ImageNet classes, such as “warplane” and
+“automobile,” we then use Microsoft AirSim to evaluate how well the
+unadversarial textures help classification in both standard and severe weather
+conditions—like fog and snow (note that in AirSim these weather conditions are
+explicitly simulated in the 3D scene, and not applied through image
+post-processing). We observe that our unadversarial models are much more
+recognizable than their original counterparts by the pre-trained ImageNet model,
+especially under distribution shift. For example, our unadversarial jet beats
+the baselines “Bright Jet” and “Dark Jet,” textures manually designed with the
+goal of visibility in severe weather) in a variety of weather conditions and
+severities:</p>
+
+<p><img src="https://gradientscience.org/assets/unadversarial/jetplots.png" alt="Classification of a standard and unadversarial jet in simulation" /></p>
+<div class="footnote">
+The jet unadversarial example task. We show example conditions under which we
+evaluate the objects, along with aggregate statistics for how well an
+ImageNet classifier classifies the objects in different conditions.
+</div>
+
+<h3 id="b-localization-for-simulated-drone-landing">B) Localization for (Simulated) Drone Landing</h3>
+<p>We then take the realism of our simulations a step further by training
+unadversarial patches for a simulated drone landing task. The drone is equipped
+with a pre-trained regression model that localizes the landing pad. To improve
+localization, we place an unadversarial patch on the pad and optimize it by
+minimizing a squared error loss (instead of a classification loss as in the
+previous experiments) corresponding to the drone’s error in predicting landing
+pad location. We then evaluate the effectiveness of the patch by examining  the
+landing success rate in clear, moderate, and severe (simulated) weather
+conditions. As shown below, we find that the unadversarial landing pad improves
+landing success rate across all conditions:</p>
+
+<p><img src="https://gradientscience.org/assets/unadversarial/landing.png" alt="Simulated drone landing with unadversarial landing pad" /></p>
+<div class="footnote">
+Drone landing task. On the left we show the unadversarial versus standard landing pads. On the right we show the results for the task when both the standard and unadversarial landing pads are used.
+</div>
+
+<h3 id="c-physical-world-unadversarial-examples">C) Physical World Unadversarial Examples</h3>
+<p>Finally, we study unadversarial examples’ generalization to the physical world.
+Printing out unadversarial patches, we place them on top of real-world objects
+and classify these object-patch pairs along a diverse set of viewpoints and
+object orientations. Our results are detailed below; we find that the
+unadversarial patches consistently improve performance despite printing
+artifacts, lighting conditions, partial visibility, and other naturally-arising
+distribution shifts.</p>
+
+<p><img src="https://gradientscience.org/assets/unadversarial/physical_world_results.png" alt="Physical-world unadversarial examples" /></p>
+<div class="footnote">
+Physical-world experiments. We take pictures of objects at diverse orientations while varying the presence of a patch on the object. Note that we don't do any additional data augmentation on the patches, which are the same used in our previous ImageNet benchmark experiment.
+</div>
+
+<h2 id="conclusions">Conclusions</h2>
+<p>We have shown that it is possible to design objects that improve the performance
+of computer vision models, even under strong and unforeseen corruptions and
+distribution shifts. By minimizing the standard loss of a pre-trained model,
+without training for robustness to anything specific, we significantly boosted
+both model performance and model robustness across a variety of tasks and
+settings. Our results suggest that designing unadversarial inputs could be a
+promising route towards increasing reliability and out-of-distribution
+robustness of computer vision models.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="https://gradientscience.org/unadversarial/"><span class="datestr">at December 22, 2020 12:00 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -2783,69 +3042,6 @@ Taylor told me it was OK, because he knew another argument which avoided Gross�
 
 <p class="date">
 by rjlipton <a href="https://rjlipton.wordpress.com/2020/12/10/the-future-of-mathematics/"><span class="datestr">at December 10, 2020 03:07 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://gilkalai.wordpress.com/?p=20503">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/kalai.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://gilkalai.wordpress.com/2020/12/10/open-problem-session-of-huji-combsem-problem-2-chaya-keller-the-krasnoselskii-number/">Open problem session of HUJI-COMBSEM: Problem #2 Chaya Keller: The Krasnoselskii number</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://gilkalai.wordpress.com" title="Combinatorics and more">Gil Kalai</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<div style="width: 650px;" class="wp-caption alignnone" id="attachment_20545"><a href="https://gilkalai.files.wordpress.com/2020/11/chaya-keller.jpg"><img width="640" alt="" src="https://gilkalai.files.wordpress.com/2020/11/chaya-keller.jpg?w=640&amp;h=479" class="size-full wp-image-20545" height="479" /></a><p class="wp-caption-text" id="caption-attachment-20545"><span style="color: #ff0000;">Chaya Keller</span></p></div>
-<p> </p>
-<p><a href="https://gilkalai.files.wordpress.com/2020/11/mbreen.jpg"><img src="https://gilkalai.files.wordpress.com/2020/11/mbreen.jpg?w=640" alt="" class="alignnone size-full wp-image-20544" /></a></p>
-<p><span style="color: #ff0000;">Marilyn Breen</span></p>
-<p>This is our second post on the open problem session of the HUJI combinatorics seminar. <a href="https://huji.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=1ac330a2-d6b7-4b86-9bac-ac7500d14205">The video of the session is here</a>. Today’s problem was presented by <a href="http://www.ma.huji.ac.il/~ckeller/">Chaya Keller</a>.</p>
-<h2>The Krasnoselskii number</h2>
-<p>One of the best-known applications of Helly’s theorem (that is, actually, equivalent to Helly’s theorem, see [Bo]) is the following theorem, due to Krasnoselskii [K]:</p>
-<p><strong>Theorem 1 (Krasnoselskii):</strong> Let <img src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S}" class="latex" title="{S}" /> be an infinite compact set in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BR%7D%5Ed%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathbb{R}^d}" class="latex" title="{\mathbb{R}^d}" />. If every <img src="https://s0.wp.com/latex.php?latex=%7Bd%2B1%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{d+1}" class="latex" title="{d+1}" /> points of <img src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S}" class="latex" title="{S}" /> are visible from a common point, then <img src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S}" class="latex" title="{S}" /> is starshaped, that is there exists some <img src="https://s0.wp.com/latex.php?latex=%7Bx_0+%5Cin+S%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x_0 \in S}" class="latex" title="{x_0 \in S}" /> that sees all points in <img src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S}" class="latex" title="{S}" />.</p>
-<p>Krasnoselskii’s theorem does not hold for non-compact sets. However, all known counter-examples satisfy the weaker requirement of being finitely starlike, namely that any finite subset of <img src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S}" class="latex" title="{S}" /> is visible from a common point. This led Peterson [P] to ask the following:</p>
-<p>Does there exist a Krasnoselskii number <img src="https://s0.wp.com/latex.php?latex=%7BK%28d%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{K(d)}" class="latex" title="{K(d)}" /> such that for any infinite set <img src="https://s0.wp.com/latex.php?latex=%7BS+%5Csubset+%5Cmathbb%7BR%7D%5Ed%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S \subset \mathbb{R}^d}" class="latex" title="{S \subset \mathbb{R}^d}" />, if every <img src="https://s0.wp.com/latex.php?latex=%7BK%28d%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{K(d)}" class="latex" title="{K(d)}" /> points of <img src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S}" class="latex" title="{S}" /> are visible from a single point, then <img src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S}" class="latex" title="{S}" /> is finitely starlike?</p>
-<p>Marilyn Breen obtained positive results for special cases of sets that satisfy additional topological conditions [Br1,Br2,Br3], e.g., Krasnoselskii number 3 for closed sets in the plane. On the other hand, she proved that if <img src="https://s0.wp.com/latex.php?latex=%7BK%282%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{K(2)}" class="latex" title="{K(2)}" /> exists, then it must be larger than <img src="https://s0.wp.com/latex.php?latex=%7B8%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{8}" class="latex" title="{8}" />.</p>
-<p>Recently, Micha Perles and me (Chaya Keller) proved that under no restriction on the set, the Krasnoselskii number does not exist. More precisely, we proved that for any <img src="https://s0.wp.com/latex.php?latex=%7Bk+%5Cgeq+2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{k \geq 2}" class="latex" title="{k \geq 2}" />, there exists a set <img src="https://s0.wp.com/latex.php?latex=%7BS+%5Csubset+%5Cmathbb%7BR%7D%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S \subset \mathbb{R}^2}" class="latex" title="{S \subset \mathbb{R}^2}" /> such that any <img src="https://s0.wp.com/latex.php?latex=%7B2k%2B3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{2k+3}" class="latex" title="{2k+3}" /> points in <img src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S}" class="latex" title="{S}" /> are visible from a common point, but there exist <img src="https://s0.wp.com/latex.php?latex=%7B2k%2B4%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{2k+4}" class="latex" title="{2k+4}" /> points in <img src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S}" class="latex" title="{S}" /> that are not visible from a common point. But this counter example is absolutely not constructive (since it is based on a transfinite induction), and the resulting set <img src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S}" class="latex" title="{S}" /> admits no resonable topological structure.</p>
-<p>This leads to the following two problems:</p>
-<h3><span style="color: #0000ff;">Problem 1: Can you show constructively that the Krasnoselskii number does not exist?</span></h3>
-<h3><span style="color: #0000ff;">Problem 2: Can you find more natural topological conditions under which the Krasnoselskii number exists?</span></h3>
-<h3><span style="color: #ff0000;">References</span></h3>
-<p>[Bo] Borwein, J., A proof of the equivalence of Helly’s and Krasnosselsky’s theorems,Canad. Math. Bull., 20 (1977), 35-37.</p>
-<p>[Br1] M. Breen, Clear visibility, starshaped sets, and finitely starlike sets, J. of Geometry, 19 (1982), 183-196.</p>
-<p>[Br2] M. Breen, Some Krasnoseleskii numbers for finitely starlike sets in the plane, J. of Geometry, 32 (1988), 1-12.</p>
-<p>[Br3] M. Breen, Finitely starlike sets whose F-stars have positive measure, J. of Geometry, 35 (1989), pp.~19–25.</p>
-<p>[K] M. A. Krasnoselskii, Sur un Critére pour Qu’un Domain Soit Étoilé, Math. Sb., 19 (1946), pp.309-310.</p>
-<p>[P] B. Peterson, Is there a Krasnonselskii theorem for finitely starlike sets?, Convexity and Related Combinatorial Geometry, Marcel Dekker, New York, 1982, pp.81-84.</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by Gil Kalai <a href="https://gilkalai.wordpress.com/2020/12/10/open-problem-session-of-huji-combsem-problem-2-chaya-keller-the-krasnoselskii-number/"><span class="datestr">at December 10, 2020 11:17 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
