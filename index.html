@@ -240,7 +240,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at December 23, 2020 03:38 PM UTC</span>.
+Last updated <span class="datestr">at December 23, 2020 04:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -428,7 +428,7 @@ by Scott <a href="https://www.scottaaronson.com/blog/?p=5209"><span class="dates
 </div>
 <div class="entry">
 <div class="content">
-<p><a style="float: left; width: 45%;" href="https://www.microsoft.com/en-us/research/uploads/prod/2020/12/main_unadv.pdf" class="bbutton">
+<p><a style="float: left; width: 45%;" href="https://arxiv.org/abs/2012.12235" class="bbutton">
 <i class="fas fa-file-pdf"></i>
     Paper
 </a>
@@ -439,14 +439,21 @@ by Scott <a href="https://www.scottaaronson.com/blog/?p=5209"><span class="dates
 
 <br /></p>
 
+
+<div class="footnote">
+    A video demo of an <em>unadversarial patch</em> for garbage trucks.
+    Placing the patch on misclassified garbage trucks significantly
+    improves performance and robustness.
+</div>
+
 <p>Modern computer vision systems are sensitive to transformations and corruptions
 of their inputs, making reliability and safety real concerns at deployment time.
 For example, fog or snow can severely impact self-driving cars’ perception
 systems; in an <a href="https://gradientscience.org/background">earlier post</a>, we found that even changes in image
 background are often enough to cause model misbehavior. Techniques like data
 augmentation, domain randomization, and robust training can all improve
-robustness, but often perform poorly in the face of the unfamiliar distribution
-shifts that computer vision systems face in the wild.</p>
+robustness, but tend to perform poorly in the face of the unfamiliar
+distribution shifts that computer vision systems encounter in the wild.</p>
 
 <h2 id="how-can-we-make-classifiers-more-robust">How can we make classifiers more robust?</h2>
 
@@ -454,10 +461,10 @@ shifts that computer vision systems face in the wild.</p>
 training methods. However, there is more than one way to peel a banana. Instead
 of tackling the general problem of designing universally robust vision
 algorithms, we leverage an additional degree of freedom present in many
-real-world scenarios. In particular, we observe that in many situations, the
-system designer not only trains the model used to make predictions, but can also
-modify objects of interest. Critically, such a system designer could
-specifically modify objects to aid in task performance! For example, a drone
+real-world scenarios. Specifically, we observe that in many situations, the
+system designer not only trains the model used to make predictions, but also has
+the ability to modify objects of interest. Critically, such a system designer could
+modify objects to improve the model’s performance! For example, a drone
 operator training a landing pad detection model can modify the landing pad
 surface for easier detection, and a roboticist manipulating custom objects could
 alter objects’ texture or geometry to assist with perception. Indeed, a similar
@@ -476,8 +483,8 @@ models can be extraordinarily sensitive to small changes in input: carefully
 chosen yet imperceptible perturbations of natural images can cause models to
 make wildly inaccurate predictions. In particular, previous work has shown that
 we can perturb objects’ textures so that they induce misclassification when
-photographed <a href="https://arxiv.org/abs/1607.02533">Kurakin et al</a>. For example, 
-<a href="https://arxiv.org/abs/1707.07397">Athalye et al</a> 3D print a textured 
+photographed <a href="https://arxiv.org/abs/1607.02533">[Kurakin et al.]</a>. Indeed, 
+<a href="https://arxiv.org/abs/1707.07397">Athalye et al.</a> 3D print a textured 
 turtle that looks like a turtle, but classifies as a rifle when shown to a
 classifier!</p>
 
@@ -529,7 +536,7 @@ image (with random orientation and position) corresponding to the label of the
 image. We then feed the augmented image into the pre-trained vision model, and
 use gradient descent to minimize the standard classification loss of the model
 with respect to the patch pixels. The procedure is almost identical to that of
-<a href="https://arxiv.org/abs/1712.09665">Brown et al</a> for constructing <em>adversarial</em>
+<a href="https://arxiv.org/abs/1712.09665">Brown et al.</a> for constructing <em>adversarial</em>
 patches; the main difference is that here we minimize, rather than maximize,
 the loss of the pre-trained model.</li>
   <li><strong>Unadversarial textures</strong>: To construct adversarial textures, we start with a 3D
@@ -538,7 +545,7 @@ background images. At each iteration, we render the current unadversarial
 texture onto the 3D mesh, and overlay the rendering onto a random background
 image. The result is fed to the pre-trained classifier, and we (again) use
 gradient descent to minimize the classification loss with respect to the
-texture. In previous work, <a href="https://arxiv.org/abs/1707.07397">Athalye et al</a>
+texture. In previous work, <a href="https://arxiv.org/abs/1707.07397">Athalye et al.</a>
 use an extremely similar approach to optimize <em>adversarial</em> textures (the most
 famous example of which being the 
 <a href="https://www.labsix.org/physical-objects-that-fool-neural-nets/">rifle turtle</a>).</li>
@@ -567,8 +574,7 @@ in ImageNet-C, and the horizontal dashed lines report the accuracy on the
 original (non-patched) datasets.
 </div>
 
-<p>In our 
-<a href="https://www.microsoft.com/en-us/research/uploads/prod/2020/12/main_unadv.pdf">paper</a>,
+<p>In our <a href="https://arxiv.org/abs/2012.12235">paper</a>,
 we also compare to some non-optimization based baselines,
 like QR code-based augmentation and predetermined patches; unadversarial patches
 comfortably outperform all of the baselines we tested.</p>
