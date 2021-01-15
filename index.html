@@ -56,7 +56,7 @@ Stay up to date
 
 <h3>Blogs/feeds</h3>
 <div class="subscriptionlist">
-<a class="feedlink" href="http://aaronsadventures.blogspot.com/feeds/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
+<a class="feedlink" href="http://www.blogger.com/feeds/25562705/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://aaronsadventures.blogspot.com/" title="Adventures in Computation">Aaron Roth</a>
 <br>
 <a class="feedlink" href="https://adamsheffer.wordpress.com/feed/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
@@ -243,7 +243,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at January 15, 2021 01:39 PM UTC</span>.
+Last updated <span class="datestr">at January 15, 2021 02:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -251,6 +251,150 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="tag:blogger.com,1999:blog-25562705.post-8763851996229403535">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/roth.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="http://aaronsadventures.blogspot.com/2021/01/how-to-estimate-uncertainty-of.html">How to Estimate the Uncertainty of Predictions</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://aaronsadventures.blogspot.com/" title="Adventures in Computation">Aaron Roth</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p style="text-align: center;" class="has-text-align-center"><i>This is a post about a new paper <a href="https://arxiv.org/abs/2101.01739">Online Multivalid Learning: Means, Moments, and Prediction Intervals</a>, that is joint work with Varun Gupta, Christopher Jung, Georgy Noarov, and Mallesh Pai. It is <a href="https://toc4fairness.org/how-to-estimate-the-uncertainty-of-predictions">cross-posted to the new TOC4Fairness blog</a>. </i></p> <p>Suppose you go and train the latest, greatest machine learning architecture to predict something important. Say (to pick an example entirely out of thin air) you are in the midst of a pandemic, and want to predict the severity of patients' symptoms in 2 days time, so as to triage scarce medical resources. Since you will be using these predictions to make decisions, you would like them to be accurate in various ways: for example, at the very least, you will want your predictions to be calibrated, and you may also want to be able to accurately quantify the uncertainty of your predictions (say with 95% prediction intervals). It is a fast moving situation, and data is coming in dynamically --- and you need to make decisions as you go. What can you do? </p> <p>The first thing you might do is <a href="https://twitter.com/Aaroth/status/1272545845603434497">ask on twitter</a>! What you will find is that the standard tool for quantifying uncertainty in settings like this is <a href="https://jmlr.csail.mit.edu/papers/volume9/shafer08a/shafer08a.pdf">conformal prediction</a>. The conformal prediction literature has a number of elegant techniques for endowing arbitrary point prediction methods with <em>marginal prediction intervals</em>: i.e intervals $(\ell(x), u(x))$ such that over the randomness of some data distribution over labelled examples $(x,y)$: $\Pr_{(x,y)}\left[y \in [\ell(x), u(x)]\right] \approx 0.95$ These would be 95% marginal prediction intervals --- but in general you could pick your favorite coverage probability $1-\delta$.  </p> <p>Conformal prediction has a lot going for it --- its tools are very general and flexible, and lead to practical algorithms. But it also has two well known shortcomings:</p> <ol><li><strong>Strong Assumptions</strong>. Like many tools from statistics and machine learning, conformal prediction methods require that the future look like the past. In particular, they require that the data be drawn i.i.d. from some distribution --- or at least be <em>exchangable</em> (i.e. their distribution should be invariant to permutation). This is sometimes the case --- but it often is not. In our pandemic scenario, the distribution on patient features might quickly change in unexpected ways as the disease moves between different populations, as might the relationship between features and outcomes, as treatments advance. In other settings in which consequential decisions are being made about people --- like lending and hiring decisions --- people might intentionally manipulate their features in response to the predictive algorithms you deploy, in an attempt to get the outcome they want. Or you might be trying to predict outcomes in time series data, in which there are explicit dependencies across time. In all of these scenarios, exchangeability is violated.</li><li><strong>Weak Guarantees</strong>. Marginal coverage guarantees are <em>averages over people</em>. 95% marginal coverage means that the true label falls within the predicted interval for 95% of people. It need not mean anything for <em>people like you</em>. For example, if you are part of a demographic group that makes up less than 5% of the population, it is entirely consistent with the guarantees of a 95% marginal prediction interval that labels for people from your demographic group fall outside of their intervals 100% of the time. This can be both an accuracy and a <strong><em>fairness</em> </strong>concern --- marginal prediction works well for "typical" members of a population, but not necessarily for everyone else. </li></ol> <p>What kinds of improvements might we hope for? Lets start with how to strengthen the guarantee:</p> <p><strong>Multivalidity</strong> Ideally, we would want <em>conditional</em> guarantees --- i.e. the promise that for every $x$, that we would have $\Pr_{y}\left[y \in [\ell(x), u(x)] | x \right] \approx 0.95$. In other words, that somehow for each individual, the prediction interval was valid for them specifically, over the "unrealized" (or unmeasured) randomness of the world. Of course this is too much to hope for. In a rich feature space, we have likely never seen anyone exactly like you before (i.e. with your feature vector $x$). So strictly speaking, we have no information at all about your conditional label distribution. We still have to average over people. But we don't have to average over everybody. An important idea that has been investigated in <a href="https://arxiv.org/abs/1711.08513">several </a><a href="https://arxiv.org/abs/1711.05144">different </a><a href="https://arxiv.org/abs/1805.12317">contexts </a>in recent years in the theory literature on fairness is that we might articulate a very rich collection of (generally intersecting) demographic groups $G$ corresponding to relevant subsets of the data domain, and ask for things that we care about to hold true as averaged over any group $S \in G$ in the collection. In the case of prediction intervals, this would correspond to asking for something like that simultaneously for every demographic group $S \in G$, $\Pr_{(x,y)}\left[y \in [\ell(x), u(x)] | x \in S \right] \approx 0.95$. Note here that an individual might be a member of many different demographic groups, and can interpret the guarantees of their prediction interval as averages over any of those demographic groups, at their option. This is what we can achieve --- at least for any such group that isn't too small.  </p> <p>And what kinds of assumptions do we need?</p> <p><strong>Adversarial Data </strong>Actually, its not clear that we need any! Many learning problems which initially appear to require distributional assumptions turn out to be solvable even in the worst case over data sequences --- i.e. even if a clever adversary, with full knowledge of your algorithm, and with the intent only to sabotage your learning guarantees, is allowed to adaptively choose data to present to your algorithm. This is the case for <a href="https://academic.oup.com/biomet/article-abstract/85/2/379/298827">calibrated weather prediction</a>, as well as <a href="http://proceedings.mlr.press/v48/syrgkanis16.pdf">general contextual prediction</a>. It turns out to be the case for us as well. Instead of promising coverage probabilities of $1-\delta + O(1/T)$ after $T$ rounds <em>on the underlying distribution</em>, as<a href="https://www.stat.cmu.edu/~ryantibs/papers/conformal.pdf"> conformal prediction is able to</a>, (for us there is no underlying distribution) we offer <em>empirical</em> coverage rates of $1-\delta \pm O(1/\sqrt{T})$. This kind of guarantee is quite similar to what<a href="https://www.stat.cmu.edu/~ryantibs/papers/conformal.pdf"> conformal prediction guarantees about empirical coverage</a>. </p> <p><strong>More Generally </strong>Our techniques are not specific to prediction intervals. We can do the same thing for predicting label means, and predicting variances of the residuals of arbitrary prediction methods. For mean prediction, this corresponds to an algorithm for providing <a href="https://arxiv.org/abs/1711.08513">multi-calibrated predictions in the sense of Hebert-Johnson et al</a>, in an online adversarial environment. For variances and other higher moments, it corresponds to an online algorithm for making <a href="https://arxiv.org/abs/2008.08037">mean-conditioned moment multicalibrated predictions in the sense of Jung et al</a>.</p> <p><strong>Techniques</strong> At the risk of boring my one stubbornly remaining reader, let me say a few words about how we do it. We generalize an idea that dates back to an argument that<a href="https://dash.harvard.edu/bitstream/handle/1/3203773/fudenberg_calibrate.pdf"> Fudenberg and Levine first made in 1995</a> --- and is closely related to <a href="http://www.ma.huji.ac.il/hart/papers/calib-minmax.pdf">an earlier, beautiful argument by Sergiu Hart</a> --- but that I just learned about this summer, and thought was just amazing. It applies broadly to solving any prediction task that would be easy, if only you were facing a known data distribution. This is the case for us. If, for each arriving patient at our hospital, a wizard <em>told us</em> their "true" distribution over outcome severity, we could easily make calibrated predictions by always predicting the mean of this distribution --- and we could similarly read off correct 95% coverage intervals from the CDF of the distribution. So what? That's not the situation we are in, of course. Absent a wizard, we first need to commit to some learning algorithm, and only then will the adversary decide what data to show us. </p> <p>But lets put our game theory hats on. Suppose we've been making predictions for awhile. We can write down some measure of our error so far --- say the maximum, over all demographic groups in $G$, of the deviation of our empirical coverage so far from our 95% coverage target.  For the next round, define a zero sum game, in which we (the learner) want to minimize the <em>increase</em> in this measure of error, and the adversary wants to maximize it. The defining feature of zero-sum games is that how well you can do in them is independent of which player has to announce their distribution on play first --- this is the celebrated <a href="https://en.wikipedia.org/wiki/Minimax_theorem">Minimax Theorem</a>. So to evaluate how well the learner could do in this game, we can think about the situation involving a Wizard above, in which for each arriving person, before we have to make a prediction for them, we get to observe their true label distribution. Of course in this scenario we can do well, because for all of our goals, our measure of success is based on how well our predictions match observed properties of these distributions. The Minimax theorem tells us that (at least in principle --- it doesn't give us the algorithm), there must therefore also be a learning algorithm that can do just as well, but against an adversary. </p> <p>The minimax argument is slick, but non-constructive. To actually pin down a concrete algorithm, we need to solve for the equilibrium in the corresponding game. That's what we spend much of the paper doing, for each of the prediction tasks that we study. For multicalibration, we get a simple, elementary algorithm --- but for the prediction interval problem, although we get a polynomial time algorithm, it involves solving a linear program with a separation oracle at each round. Finding more efficient and practical ways to do this strikes me as an important problem. </p> <p>Finally, I had more fun writing this paper --- learning about old techniques from the game theoretic calibration literature --- than I've had in awhile. I hope a few people enjoy reading it!</p><p> </p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Aaron (noreply@blogger.com) <a href="http://aaronsadventures.blogspot.com/2021/01/how-to-estimate-uncertainty-of.html"><span class="datestr">at January 15, 2021 02:01 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://toc4fairness.org/?p=1242">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/fair.jpg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-US"><a class="entryheader" href="https://toc4fairness.org/how-to-estimate-the-uncertainty-of-predictions/">How to Estimate the Uncertainty of Predictions</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://toc4fairness.org" title="TOC for Fairness">TOC for Fairness</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en-US">
+<p class="has-text-align-center">This is a post about a new paper <em><a href="https://arxiv.org/abs/2101.01739">Online Multivalid Learning: Means, Moments, and Prediction Intervals</a></em>, that is joint work with Varun Gupta, Christopher Jung, Georgy Noarov, and Mallesh Pai.  </p>
+
+
+
+<p>Suppose you go and train the latest, greatest machine learning architecture to predict something important. Say (to pick an example entirely out of thin air) you are in the midst of a pandemic, and want to predict the severity of patients’ symptoms in 2 days time, so as to triage scarce medical resources. Since you will be using these predictions to make decisions, you would like them to be accurate in various ways: for example, at the very least, you will want your predictions to be calibrated, and you may also want to be able to accurately quantify the uncertainty of your predictions (say with 95% prediction intervals). It is a fast moving situation, and data is coming in dynamically — and you need to make decisions as you go. What can you do? </p>
+
+
+
+<p>The first thing you might do is <a href="https://twitter.com/Aaroth/status/1272545845603434497">ask on twitter</a>! What you will find is that the standard tool for quantifying uncertainty in settings like this is <a href="https://jmlr.csail.mit.edu/papers/volume9/shafer08a/shafer08a.pdf">conformal prediction</a>. The conformal prediction literature has a number of elegant techniques for endowing arbitrary point prediction methods with <em>marginal prediction intervals</em>: i.e intervals <img src="https://s0.wp.com/latex.php?latex=%28%5Cell%28x%29%2C+u%28x%29%29&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="(\ell(x), u(x))" class="latex" title="(\ell(x), u(x))" /> such that over the randomness of some data distribution over labelled examples <img src="https://s0.wp.com/latex.php?latex=%28x%2Cy%29&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="(x,y)" class="latex" title="(x,y)" />: <img src="https://s0.wp.com/latex.php?latex=%5CPr_%7B%28x%2Cy%29%7D%5Cleft%5By+%5Cin+%5B%5Cell%28x%29%2C+u%28x%29%5D%5Cright%5D+%5Capprox+0.95&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="\Pr_{(x,y)}\left[y \in [\ell(x), u(x)]\right] \approx 0.95" class="latex" title="\Pr_{(x,y)}\left[y \in [\ell(x), u(x)]\right] \approx 0.95" /> These would be 95% marginal prediction intervals — but in general you could pick your favorite coverage probability <img src="https://s0.wp.com/latex.php?latex=1-%5Cdelta&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="1-\delta" class="latex" title="1-\delta" />.  </p>
+
+
+
+<p>Conformal prediction has a lot going for it — its tools are very general and flexible, and lead to practical algorithms. But it also has two well known shortcomings:</p>
+
+
+
+<ol><li><strong>Strong Assumptions</strong>. Like many tools from statistics and machine learning, conformal prediction methods require that the future look like the past. In particular, they require that the data be drawn i.i.d. from some distribution — or at least be <em>exchangable</em> (i.e. their distribution should be invariant to permutation). This is sometimes the case — but it often is not. In our pandemic scenario, the distribution on patient features might quickly change in unexpected ways as the disease moves between different populations, as might the relationship between features and outcomes, as treatments advance. In other settings in which consequential decisions are being made about people — like lending and hiring decisions — people might intentionally manipulate their features in response to the predictive algorithms you deploy, in an attempt to get the outcome they want. Or you might be trying to predict outcomes in time series data, in which there are explicit dependencies across time. In all of these scenarios, exchangeability is violated.</li><li><strong>Weak Guarantees</strong>. Marginal coverage guarantees are <em>averages over people</em>. 95% marginal coverage means that the true label falls within the predicted interval for 95% of people. It need not mean anything for <em>people like you</em>. For example, if you are part of a demographic group that makes up less than 5% of the population, it is entirely consistent with the guarantees of a 95% marginal prediction interval that labels for people from your demographic group fall outside of their intervals 100% of the time. This can be both an accuracy and a <strong><em>fairness</em> </strong>concern — marginal prediction works well for “typical” members of a population, but not necessarily for everyone else. </li></ol>
+
+
+
+<p>What kinds of improvements might we hope for? Lets start with how to strengthen the guarantee:</p>
+
+
+
+<p><strong>Multivalidity</strong> Ideally, we would want <em>conditional</em> guarantees — i.e. the promise that for every <img src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="x" class="latex" title="x" />, that we would have <img src="https://s0.wp.com/latex.php?latex=%5CPr_%7By%7D%5Cleft%5By+%5Cin+%5B%5Cell%28x%29%2C+u%28x%29%5D+%7C+x+%5Cright%5D+%5Capprox+0.95&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="\Pr_{y}\left[y \in [\ell(x), u(x)] | x \right] \approx 0.95" class="latex" title="\Pr_{y}\left[y \in [\ell(x), u(x)] | x \right] \approx 0.95" />. In other words, that somehow for each individual, the prediction interval was valid for them specifically, over the “unrealized” (or unmeasured) randomness of the world. Of course this is too much to hope for. In a rich feature space, we have likely never seen anyone exactly like you before (i.e. with your feature vector <img src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="x" class="latex" title="x" />). So strictly speaking, we have no information at all about your conditional label distribution. We still have to average over people. But we don’t have to average over everybody. An important idea that has been investigated in <a href="https://arxiv.org/abs/1711.08513">several </a><a href="https://arxiv.org/abs/1711.05144">different </a><a href="https://arxiv.org/abs/1805.12317">contexts </a>in recent years in the theory literature on fairness is that we might articulate a very rich collection of (generally intersecting) demographic groups <img src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="G" class="latex" title="G" /> corresponding to relevant subsets of the data domain, and ask for things that we care about to hold true as averaged over any group <img src="https://s0.wp.com/latex.php?latex=S+%5Cin+G&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="S \in G" class="latex" title="S \in G" /> in the collection. In the case of prediction intervals, this would correspond to asking for something like that simultaneously for every demographic group <img src="https://s0.wp.com/latex.php?latex=S+%5Cin+G&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="S \in G" class="latex" title="S \in G" />, <img src="https://s0.wp.com/latex.php?latex=%5CPr_%7B%28x%2Cy%29%7D%5Cleft%5By+%5Cin+%5B%5Cell%28x%29%2C+u%28x%29%5D+%7C+x+%5Cin+S+%5Cright%5D+%5Capprox+0.95&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="\Pr_{(x,y)}\left[y \in [\ell(x), u(x)] | x \in S \right] \approx 0.95" class="latex" title="\Pr_{(x,y)}\left[y \in [\ell(x), u(x)] | x \in S \right] \approx 0.95" />. Note here that an individual might be a member of many different demographic groups, and can interpret the guarantees of their prediction interval as averages over any of those demographic groups, at their option. This is what we can achieve — at least for any such group that isn’t too small. </p>
+
+
+
+<p>And what kinds of assumptions do we need?</p>
+
+
+
+<p><strong>Adversarial Data </strong>Actually, its not clear that we need any! Many learning problems which initially appear to require distributional assumptions turn out to be solvable even in the worst case over data sequences — i.e. even if a clever adversary, with full knowledge of your algorithm, and with the intent only to sabotage your learning guarantees, is allowed to adaptively choose data to present to your algorithm. This is the case for <a href="https://academic.oup.com/biomet/article-abstract/85/2/379/298827">calibrated weather prediction</a>, as well as <a href="http://proceedings.mlr.press/v48/syrgkanis16.pdf">general contextual prediction</a>. It turns out to be the case for us as well. Instead of promising coverage probabilities of <img src="https://s0.wp.com/latex.php?latex=1-%5Cdelta+%2B+O%281%2FT%29&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="1-\delta + O(1/T)" class="latex" title="1-\delta + O(1/T)" /> after <img src="https://s0.wp.com/latex.php?latex=T&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="T" class="latex" title="T" /> rounds <em>on the underlying distribution</em>, as<a href="https://www.stat.cmu.edu/~ryantibs/papers/conformal.pdf"> conformal prediction is able to</a>, we offer <em>empirical</em> coverage rates of <img src="https://s0.wp.com/latex.php?latex=1-%5Cdelta+%5Cpm+O%281%2F%5Csqrt%7BT%7D%29&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="1-\delta \pm O(1/\sqrt{T})" class="latex" title="1-\delta \pm O(1/\sqrt{T})" /> (since for us there is no underlying distribution). This kind of guarantee is quite similar to what<a href="https://www.stat.cmu.edu/~ryantibs/papers/conformal.pdf"> conformal prediction guarantees about empirical coverage</a>. </p>
+
+
+
+<p><strong>More Generally </strong>Our techniques are not specific to prediction intervals. We can do the same thing for many other distributional quantities. We work this out in the case of predicting label means, and predicting variances of the residuals of arbitrary prediction methods. For mean prediction, this corresponds to an algorithm for providing <a href="https://arxiv.org/abs/1711.08513">multi-calibrated predictions in the sense of Hebert-Johnson et al</a>, in an online adversarial environment. For variances and other higher moments, it corresponds to an online algorithm for making <a href="https://arxiv.org/abs/2008.08037">mean-conditioned moment multicalibrated predictions in the sense of Jung et al</a>.</p>
+
+
+
+<p><strong>Techniques</strong> At the risk of boring my one stubbornly remaining reader, let me say a few words about how we do it. We generalize an idea that dates back to an argument that<a href="https://dash.harvard.edu/bitstream/handle/1/3203773/fudenberg_calibrate.pdf"> Fudenberg and Levine first made in 1995</a> — and is closely related to <a href="http://www.ma.huji.ac.il/hart/papers/calib-minmax.pdf">an earlier, beautiful argument by Sergiu Hart</a> — but that I just learned about this summer, and thought was just amazing. It applies broadly to solving any prediction task that would be easy, if only you were facing a known data distribution. This is the case for us. If, for each arriving patient at our hospital, a wizard <em>told us</em> their “true” distribution over outcome severity, we could easily make calibrated predictions by always predicting the mean of this distribution — and we could similarly read off correct 95% coverage intervals from the CDF of the distribution. So what? That’s not the situation we are in, of course. Absent a wizard, we first need to commit to some learning algorithm, and only then will the adversary decide what data to show us. </p>
+
+
+
+<p>But lets put our game theory hats on. Suppose we’ve been making predictions for awhile. We can write down some measure of our error so far — say the maximum, over all demographic groups in <img src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="G" class="latex" title="G" />, of the deviation of our empirical coverage so far from our 95% coverage target.  For the next round, define a zero sum game, in which we (the learner) want to minimize the <em>increase</em> in this measure of error, and the adversary wants to maximize it. The defining feature of zero-sum games is that how well you can do in them is independent of which player has to announce their distribution on play first — this is the celebrated <a href="https://en.wikipedia.org/wiki/Minimax_theorem">Minimax Theorem</a>. So to evaluate how well the learner could do in this game, we can think about the situation involving a Wizard above, in which for each arriving person, before we have to make a prediction for them, we get to observe their true label distribution. Of course in this scenario we can do well, because for all of our goals, our measure of success is based on how well our predictions match observed properties of these distributions. The Minimax theorem tells us that (at least in principle — it doesn’t give us the algorithm), there must therefore also be a learning algorithm that can do just as well, but against an adversary. </p>
+
+
+
+<p>The minimax argument is slick, but non-constructive. To actually pin down a concrete algorithm, we need to solve for the equilibrium in the corresponding game. That’s what we spend much of the paper doing, for each of the prediction tasks that we study. For multicalibration, we get a simple, elementary algorithm — but for the prediction interval problem, although we get a polynomial time algorithm, it involves solving a linear program with a separation oracle at each round. Finding more efficient and practical ways to do this strikes me as an important problem. </p>
+
+
+
+<p>Finally, I had more fun writing this paper — learning about old techniques from the game theoretic calibration literature — than I’ve had in awhile. I hope a few people enjoy reading it!</p>
+
+
+
+<p></p>
+
+
+
+<p></p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Aaron Roth <a href="https://toc4fairness.org/how-to-estimate-the-uncertainty-of-predictions/"><span class="datestr">at January 15, 2021 02:00 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2722,271 +2866,6 @@ by shacharlovett <a href="https://cstheory-jobs.org/2021/01/03/postdoc-in-parall
 
 <p class="date">
 by Scott <a href="https://www.scottaaronson.com/blog/?p=5240"><span class="datestr">at January 02, 2021 09:36 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://rjlipton.wordpress.com/?p=17937">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/lipton.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://rjlipton.wordpress.com/2021/01/01/peter-m-neumann-1940-2020/">Peter M. Neumann, 1940–2020</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://rjlipton.wordpress.com" title="Gödel’s Lost Letter and P=NP">Richard Lipton</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p>
-<font color="#0044cc"><br />
-<em>Memories from Oxford days</em><br />
-<font color="#000000"></font></font></p><font color="#0044cc"><font color="#000000">
-<table class="image alignright">
-<tbody>
-<tr>
-<td>
-<a href="https://rjlipton.wordpress.com/2021/01/01/peter-m-neumann-1940-2020/neumann2/" rel="attachment wp-att-17939"><img width="200" alt="" src="https://rjlipton.files.wordpress.com/2021/01/neumann2.jpg?w=200&amp;h=200" class="alignright wp-image-17939" height="200" /></a>
-</td>
-</tr>
-<tr>
-<td class="caption alignright"><font size="-2">Mathematical Institute <a href="https://www.maths.ox.ac.uk/people/peter.neumann">src</a></font></td>
-</tr>
-</tbody>
-</table>
-<p>
-Peter Neumann, Professor of Mathematics at Queen’s College, Oxford University, passed away two weeks ago. Last Monday would have been his 80th birthday. </p>
-<p>
-Today we join others mourning in private and remembering in public, including the authors of these <a href="https://luit-pariya.blogspot.com/2020/12/eter-neumann-is-no-more.html">stories</a> and <a href="https://cameroncounts.wordpress.com/2020/12/24/memories-of-peter-neumann/">memories</a>, who are among Peter’s <a href="https://www.genealogy.math.ndsu.nodak.edu/id.php?id=28732">39</a> graduated doctoral students.<br />
-<span id="more-17937"></span></p>
-<p>
-Peter died from Covid-19 while in a care home for long treatment of a stroke that had paralyzed his left side two years ago—something he <a href="https://www.queens.ox.ac.uk/academics/neumann">wrote</a> he could recover from “no earlier than late 2020.” From the number of people we know who have been touched closely by this kind of happening, my family included, we have a small statistical window on a great tragedy. The one resolution we can most make for the New Year is that it bring a resolution, so that the progression Covid 19-20-21 stops there.</p>
-<p>
-The two words that most define Peter for me are <em>genial</em> and <em>acute</em>. I knew him from the beginning of my time as a graduate student at Oxford under a Marshall Scholarship in 1981. Every “don” at Oxford is associated to one of the thirty-nine residential colleges or six private halls. I joined Merton College to associate with my advisor, Dominic Welsh, but also there was Peter Cameron, whose memories are linked above and who joined Merton’s faculty after earning his doctorate under Peter in 1971. Perhaps that contributed to why Peter—that is, Neumann—kept up spelling his name Πeter. </p>
-<p>
-</p><p></p><h2> The Kinderseminar </h2><p></p>
-<p></p><p>
-Early in my first term, Peter invited me to join a special weekly seminar hosted by Πeter in his expansive room in Queen’s College. It was already called the <em>Kinderseminar</em>, for it was directed to the graduate students for experience reading current research papers and, importantly, presenting them. It always began at 11am and had flexible time after noon because college lunches at Oxford typically began at 12:20 or 12:30 for students and 1pm for fellows.</p>
-<p>
-It is hard to replicate the atmosphere anywhere I have seen in the US. There was at least one big comfy chair, in which I remember Peter’s student Sarah Rees almost disappearing, and other chairs brought in around a coffee table for tea and—much more often—coffee. And a roll of <a href="https://en.wikipedia.org/wiki/McVitie's">McVitie’s</a> that was passed around. High windows let in enough light to work lamps-off except on the darkest days. Lugged to the head of the table when the time for chitchat was over was a portable chalkboard. Then began a masterclass in how to give a masterclass.</p>
-<p></p><p></p>
-<table style="margin: auto;">
-<tbody><tr>
-<td>
-<p>
-<a href="https://rjlipton.wordpress.com/2021/01/01/peter-m-neumann-1940-2020/the_queens_college_front_quad/" rel="attachment wp-att-17941"><img width="300" alt="" src="https://rjlipton.files.wordpress.com/2021/01/the_queens_college_front_quad.jpg?w=300&amp;h=225" class="aligncenter wp-image-17941" height="225" /></a>
-</p></td>
-</tr>
-<tr>
-<td class="caption alignright"><font size="-2">Queen’s College toward his rooms at right. (Photo by Odicalmuse, <a href="https://commons.wikimedia.org/w/index.php?curid=94248927">own work</a>.)</font>
-</td>
-</tr>
-</tbody></table>
-<p>
-We have already mentioned the <a href="https://rjlipton.wordpress.com/2013/09/27/a-dictionary-for-reading-proofs/">seminar</a> a <a href="https://rjlipton.wordpress.com/2019/02/28/phrases-that-drive-me-crazy/">number</a> of <a href="https://rjlipton.wordpress.com/2019/07/16/summer-reading-in-theory/">times</a> on this blog. Two of those mentions recall a lecture by Πeter himself on Évariste Galois, whose ulterior point was to warn the dangers of carelessly using phrases like “it is easy to see that…” in proofs. Well Galois, explained Πeter, was writing in haste the night before the duel that killed him, but most of us don’t have that excuse. Here is a preserved later <a href="https://www.youtube.com/watch?app=desktop&amp;v=xfJ4vwQ3vpo">lecture</a> by Πeter on Galois.</p>
-<p>
-The most recent of those posts featured Norman Biggs, who visited Oxford and took part in the seminar for some of my first year. My own first presentation in the seminar was on alternate proofs I’d found in my Princeton undergraduate thesis of theorems covered in a textbook by Biggs. He gave me the nice compliment of saying that if his text went to a second edition he could use my proofs. But Πeter—ah, Πeter took me aside afterward and pointed out my kinks in delivering them, including body positioning and organizing diagrams and algebra on the board. Encouragingly, of course.</p>
-<p>
-Also a regular was my fellow Mertonian and chess master Dugald Macpherson. Neither of us was the most illustrious chess player to enter that room, for grandmaster Colin McNab obtained his doctorate under Πeter shortly after I finished. I was more impressed by stories of playing first-class cricket in Jamaica by the visiting Ken Johnson. Thirty years later, when I emerged from my car in Princeton’s south campus parking lot and boarded a jitney going to the 2012 Alan Turing Centennial event covered <a href="https://rjlipton.wordpress.com/2012/05/17/turings-tiger-birthday-party/">here</a>, there was Johnson—who is now a professor at Penn State. Other students I have particular memories of there are Muhammad Audu, Jacinta Covington, and Tim Penttila.</p>
-<p>
-One quirky memory was coming in on Tuesday, Oct. 25, 1983, to find everyone around a radio bringing bulletins of the US invasion of Grenada which had begun at local dawn. After some pointed anti-imperialist disapproval they did get into math, but my mind stayed on Grenada as I composed in my head a steel-drum melody and the first verse of a still-unfinished <a href="https://cse.buffalo.edu/~regan/Writing/GrenadaAfter.txt">song</a> about the event. </p>
-<p>
-</p><p></p><h2> Another Memory </h2><p></p>
-<p></p><p>
-Because his OBE from Queen Elizabeth in 2008 says Peter not Πeter, I will revert to the former. This was cited for services to mathematics education. He not only won other prizes, he has a prize named after him: the <a href="https://en.wikipedia.org/wiki/British_Society_for_the_History_of_Mathematics#Neumann_Prize">Neumann Prize</a> by the British Society for the History of Mathematics. Peter served once as its president and also led the British Mathematical Association—whose logo spells its name with a lowercase <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\alpha}" class="latex" title="{\alpha}" />.</p>
-<p></p><p></p>
-<table style="margin: auto;">
-<tbody><tr>
-<td>
-<a href="https://rjlipton.wordpress.com/2021/01/01/peter-m-neumann-1940-2020/ma-logo/" rel="attachment wp-att-17942"><img src="https://rjlipton.files.wordpress.com/2021/01/ma-logo.jpeg?w=600" alt="" class="aligncenter size-full wp-image-17942" /></a>
-</td>
-</tr>
-<tr>
-<td class="caption alignright"><font size="-2">Mathematical Association <a href="https://www.m-a.org.uk/">home</a></font>
-</td>
-</tr>
-</tbody></table>
-<p>
-From various experiences I can aver that Peter took a <em>whole-person</em> approach to education. He followed the lives of his former students and I heard stories of social occasions in both Britain and France. He also wrote the Oxford Mathematical Institute’s <a href="https://courses.maths.ox.ac.uk/node/view_material/1160">guide</a> to TeX and LaTeX for students. </p>
-<p>
-In May, 1984, the Institute organized an outing to a Mathematics Day at the University of Warwick near Coventry, about 55 miles north of Oxford. Peter organized about a dozen for the trip—whether this was everyone coming from Oxford, and whether we had one shuttle or separate cars, I do not recall. </p>
-<p>
-What I do recall is that he did not simply take us to and from the workshop. He planned a picnic en-route at the <a href="https://en.wikipedia.org/wiki/Rollright_Stones">Rollright Stones</a>, which are along a road at the Oxon-Warks border. I had not previously seen a Celtic stone circle. He told stories of its history. I also believe that after the meeting we took a drive into Coventry with a brief stop to walk around the cathedral to see the damage from World War II, but it is possible I am conflating that with a time the Oxford chess team played a match in Coventry.</p>
-<p></p><p></p>
-<table style="margin: auto;">
-<tbody><tr>
-<td>
-<a href="https://rjlipton.wordpress.com/2021/01/01/peter-m-neumann-1940-2020/kings-men-stone-circle-at-great-rollright/" rel="attachment wp-att-17943"><img width="300" alt="" src="https://rjlipton.files.wordpress.com/2021/01/kings-men-stone-circle-at-great-rollright.jpg?w=300&amp;h=200" class="aligncenter size-medium wp-image-17943" height="200" /></a>
-</td>
-</tr>
-<tr>
-<td class="caption alignright"><font size="-2">“Visit baby Stonehenge” <font size="-2"><a href="https://www.farmcottages.com/visit-stonehenge-great-rollright-stones-north-cotswolds/">src</a></font>
-</font></td>
-</tr>
-</tbody></table>
-<p>
-</p><p></p><h2> Instances and Problems in Ancient Complexity </h2><p></p>
-<p></p><p>
-Peter carried the Neumann pedigree in group theory, for it was the specialty of both his <a href="https://en.wikipedia.org/wiki/Hanna_Neumann">mother</a> and his <a href="https://en.wikipedia.org/wiki/Bernhard_Neumann">father</a>. He supervised another friend from Merton, Julia Tompson, in a thesis on the history of the Jordan-Hölder theorem. But I will discuss a contribution in which group theory is in the background—where I can put ideas from computational complexity in the foreground.</p>
-<p>
-Our May 2014 <a href="https://rjlipton.wordpress.com/2014/05/23/stoc-1500/">post</a> “STOC 1500” had a semi-serious intent of aligning famous classical problems of geometric (non-)constructibility with modern complexity theory. It has a fantasized keynote by the chess master and mathematician Luca Pacioli introducing the “<img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BNC%3DC%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathcal{NC=C}}" class="latex" title="{\mathcal{NC=C}}" />?” problem: using Euclid’s ruler and compass alone, can one trisect an angle, double a cube, or (going beyond <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BNC%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathcal{NC}}" class="latex" title="{\mathcal{NC}}" />) square a circle? Much as we’re at pains to say that “<img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BNP%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf{NP}}" class="latex" title="{\mathsf{NP}}" />” does <em>not</em> stand for “non-polynomial,” the name “<img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BNC%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathcal{NC}}" class="latex" title="{\mathcal{NC}}" />” does not stand for “non-constructible” but rather constructible by <a href="https://en.wikipedia.org/wiki/Neusis_construction">neusis</a>, meaning using fixed marks on a rotatable ruler. Of course, now we know that <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BNC+%5Cneq+C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathcal{NC \neq C}}" class="latex" title="{\mathcal{NC \neq C}}" />, a fact often attributed to Galois theory but, as Peter noted in his <a href="https://www.ime.usp.br/~pleite/pub/artigos/neumann/reflections_on_reflection_on_spherical_mirror.pdf">paper</a>, provable from simpler considerations about field extensions.</p>
-<p>
-Both “Ancient Complexity” and computational complexity have a key distinction between <em>instances</em> and <em>problems</em>. Trisecting a <img src="https://s0.wp.com/latex.php?latex=%7B90%5E%5Ccirc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{90^\circ}" class="latex" title="{90^\circ}" /> angle is an easy instance. If <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\alpha}" class="latex" title="{\alpha}" /> is a <em>constructible angle</em>, then the angle <img src="https://s0.wp.com/latex.php?latex=%7B%5Cbeta+%3D+3%5Calpha%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\beta = 3\alpha}" class="latex" title="{\beta = 3\alpha}" /> can be trisected—but the method is <em>ad hoc</em> to that instance, not a single algorithm that given only <img src="https://s0.wp.com/latex.php?latex=%7B%5Cbeta%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\beta}" class="latex" title="{\beta}" /> would efficiently discover how to trisect it. There are algorithms that work correctly on multiple angles but not on all of them.</p>
-<p>
-What is most different from computational complexity is that there are single instances that cannot be solved, such as <img src="https://s0.wp.com/latex.php?latex=%7B%5Calpha+%3D+60%5E%5Ccirc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\alpha = 60^\circ}" class="latex" title="{\alpha = 60^\circ}" />. It is not a case of a Euclid-based algorithm taking too long: no <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BC%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathcal{C}}" class="latex" title="{\mathcal{C}}" /> algorithm can construct a <img src="https://s0.wp.com/latex.php?latex=%7B20%5E%5Ccirc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{20^\circ}" class="latex" title="{20^\circ}" /> angle, period. This is akin to how a single string can be <em>incompressible</em> in Kolmogorov complexity, but without the latter’s dependence on a reference universal compression scheme.</p>
-<p>
-Another difference is problems, such as doubling the cube and squaring the circle, that essentially have only one instance. One can impose algebraic coordinates to represent different instances of them, but that is different from defining the coordinates from features of a given instance, as allowed when marking a ruler for <em>neusis</em>.  Peter’s paper speaks these problem/instance distinctions well.</p>
-<p>
-</p><p></p><h2> The Reflection Problem </h2><p></p>
-<p></p><p>
-The <a href="https://en.wikipedia.org/wiki/Alhazen's_problem">problem</a> addressed in Peter’s paper was formulated by Ptolemy in the year 150. Given a circle <img src="https://s0.wp.com/latex.php?latex=%7BC%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{C}" class="latex" title="{C}" /> and points <img src="https://s0.wp.com/latex.php?latex=%7Ba%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a}" class="latex" title="{a}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{b}" class="latex" title="{b}" />, both inside <img src="https://s0.wp.com/latex.php?latex=%7BC%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{C}" class="latex" title="{C}" /> or both outside <img src="https://s0.wp.com/latex.php?latex=%7BC%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{C}" class="latex" title="{C}" />, construct a point <img src="https://s0.wp.com/latex.php?latex=%7Bp%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{p}" class="latex" title="{p}" /> on <img src="https://s0.wp.com/latex.php?latex=%7BC%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{C}" class="latex" title="{C}" /> so that light starting from <img src="https://s0.wp.com/latex.php?latex=%7Ba%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a}" class="latex" title="{a}" /> will reflect at <img src="https://s0.wp.com/latex.php?latex=%7Bp%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{p}" class="latex" title="{p}" /> and go to <img src="https://s0.wp.com/latex.php?latex=%7Bb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{b}" class="latex" title="{b}" />. When the points are inside, this is imagined as shooting a perfect billiard ball from <img src="https://s0.wp.com/latex.php?latex=%7Ba%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a}" class="latex" title="{a}" /> off a circular rim to hit <img src="https://s0.wp.com/latex.php?latex=%7Bb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{b}" class="latex" title="{b}" />.</p>
-<p></p><p><br />
-<a href="https://rjlipton.wordpress.com/2021/01/01/peter-m-neumann-1940-2020/alhazen/" rel="attachment wp-att-17945"><img width="300" alt="" src="https://rjlipton.files.wordpress.com/2021/01/alhazen.png?w=300&amp;h=234" class="aligncenter size-medium wp-image-17945" height="234" /></a></p>
-<p></p><p><br />
-There are two algorithms in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BC%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathcal{C}}" class="latex" title="{\mathcal{C}}" /> that correctly solve an infinite set of instances, namely points <img src="https://s0.wp.com/latex.php?latex=%7Ba%27%2Cb%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a',b'}" class="latex" title="{a',b'}" /> equidistant from the center <img src="https://s0.wp.com/latex.php?latex=%7B0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{0}" class="latex" title="{0}" /> of the circle. One constructs the midpoint <img src="https://s0.wp.com/latex.php?latex=%7Bm%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{m}" class="latex" title="{m}" /> of the line segment between <img src="https://s0.wp.com/latex.php?latex=%7Ba%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a'}" class="latex" title="{a'}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bb%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{b'}" class="latex" title="{b'}" />, projects the ray <img src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{R}" class="latex" title="{R}" /> from <img src="https://s0.wp.com/latex.php?latex=%7B0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{0}" class="latex" title="{0}" /> to <img src="https://s0.wp.com/latex.php?latex=%7Bm%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{m}" class="latex" title="{m}" />, and finds <img src="https://s0.wp.com/latex.php?latex=%7Bp%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{p'}" class="latex" title="{p'}" /> where the ray intersects <img src="https://s0.wp.com/latex.php?latex=%7BC%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{C}" class="latex" title="{C}" />. The other (shown in the above figure) first finds the intersections of the rays from <img src="https://s0.wp.com/latex.php?latex=%7B0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{0}" class="latex" title="{0}" /> to <img src="https://s0.wp.com/latex.php?latex=%7Ba%27%2Cb%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a',b'}" class="latex" title="{a',b'}" /> with <img src="https://s0.wp.com/latex.php?latex=%7BC%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{C}" class="latex" title="{C}" />, bisects the line segment connecting them, and uses that to project outward to <img src="https://s0.wp.com/latex.php?latex=%7Bp%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{p'}" class="latex" title="{p'}" />. The latter algorithm also works on points <img src="https://s0.wp.com/latex.php?latex=%7Ba%27%27%2Cb%27%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a'',b''}" class="latex" title="{a'',b''}" /> that are collinear with the rays to <img src="https://s0.wp.com/latex.php?latex=%7Ba%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a'}" class="latex" title="{a'}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bb%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{b'}" class="latex" title="{b'}" />, respectively, while the former is correct for pairs taken from the lines through <img src="https://s0.wp.com/latex.php?latex=%7Ba%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a'}" class="latex" title="{a'}" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bb%27%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{b'}" class="latex" title="{b'}" /> that are parallel to <img src="https://s0.wp.com/latex.php?latex=%7BR%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{R}" class="latex" title="{R}" />. If <img src="https://s0.wp.com/latex.php?latex=%7B0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{0}" class="latex" title="{0}" /> is not available, the methods can be combined—to work on the original equidistant cases.</p>
-<p>
-Around the year 1020, Hasan Ibn al-Haytham presented a geometric algorithm that works in all cases, <a href="https://www2.kenyon.edu/Depts/Math/Aydin/Teach/128/AlHazenProblem.pdf">using</a> conic sections in ways equivalent to <em>neusis</em> and further <a href="http://nyjm.albany.edu/j/2000/6-8.pdf">characterized</a> this millennium by Roger Alperin of San José State. The problem was apparently not shown to be outside <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BC%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathcal{C}}" class="latex" title="{\mathcal{C}}" /> until a 1965 <a href="https://www.jstor.org/stable/27968003?refreqid=excelsior_b4edd5f21fda45f74dd56724556a7a87&amp;seq=1">paper</a> by Jack Elkin. </p>
-<p>
-After considering solvable cases like the above in his paper, Elkin ended by giving a single non-<img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BC%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathcal{C}}" class="latex" title="{\mathcal{C}}" /> case, analogous to <img src="https://s0.wp.com/latex.php?latex=%7B60%5E%5Ccirc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{60^\circ}" class="latex" title="{60^\circ}" /> for the trisection problem. His example did show the general algebraic ingredients. What Peter did in his 1998 <a href="https://www.ime.usp.br/~pleite/pub/artigos/neumann/reflections_on_reflection_on_spherical_mirror.pdf">paper</a>, <a href="https://mathshistory.st-andrews.ac.uk/Obituaries/Al-Haytham_Telegraph/">evidently</a> <a href="https://www-jstor-org.gate.lib.buffalo.edu/stable/3620392">unaware</a> of Elkin’s, was to characterize all the <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BC%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathcal{C}}" class="latex" title="{\mathcal{C}}" />-solvable cases and show that they form a set of measure zero. Thus, he gave a rigorous sense in which <em>almost all</em> instances of the reflection problem are not <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BC%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathcal{C}}" class="latex" title="{\mathcal{C}}" />-solvable. The algebra and lemmas about field extensions and irreducibility are especially pretty in Peter’s paper.</p>
-<p>
-</p><p></p><h2> Open Problems </h2><p></p>
-<p></p><p>
-Our condolences go to Peter’s wife Sylvia, his family, and all who knew him.  This <a href="https://www.lms.ac.uk/news-entry/21122020-0842/dr-peter-neumann-1940-2020">notice</a> by the London Mathematical Society includes at the end an invitation to send reminiscences for a collection being made by Queen’s College.   <b>Update 1/6:</b> Queen’s College <a href="https://www.queens.ox.ac.uk/news/peter-m-neumann-obe-1940-2020">obituary</a> and <a href="https://www.queens.ox.ac.uk/tributes-peter-m-neumann-obe-1940-2020">tributes</a>, including also a link to <a href="https://tonysmaths.blogspot.com/2020/12/memories-of-peter-neumann.html?m=1">memories</a> by Tony Mann.</p>
-<p>
-Discovering Alperin’s equivalences while writing this post leads me to re-pose this question from the “STOC 1500” <a href="https://rjlipton.wordpress.com/2014/05/23/stoc-1500/">post</a>: is there a single problem that is <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BNC%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathcal{NC}}" class="latex" title="{\mathcal{NC}}" />-complete under <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal%7BC%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathcal{C}}" class="latex" title="{\mathcal{C}}" />-reductions?</p>
-<p></p><p><br />
-[added link to LMS notice, then Queen’s College tributes and further posts of memories.]</p></font></font></div>
-
-
-
-
-
-
-
-<p class="date">
-by KWRegan <a href="https://rjlipton.wordpress.com/2021/01/01/peter-m-neumann-1940-2020/"><span class="datestr">at January 02, 2021 02:51 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://11011110.github.io/blog/2020/12/31/year-end-linkage">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eppstein.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="https://11011110.github.io/blog/2020/12/31/year-end-linkage.html">Year-end linkage</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<ul>
-  <li>
-    <p><a href="https://www.quantamagazine.org/a-mathematicians-adventure-through-the-physical-world-20201216/">A mathematician’s unanticipated journey through the physical world</a> (<a href="https://mathstodon.xyz/@11011110/105394664282719115">\(\mathbb{M}\)</a>). <em>Quanta</em> profiles <a href="https://en.wikipedia.org/wiki/Lauren_Williams">Lauren Williams</a> and discusses her work on enumerating cells of Grassmannians and its unexpected connections with intersection patterns of solitons.</p>
-  </li>
-  <li>
-    <p><a href="https://www.insidehighered.com/news/2020/12/15/draconian-contract-proposals-connecticut">Connecticut state university system faculty contract negotiations go sour</a> (<a href="https://mathstodon.xyz/@11011110/105402517620055997">\(\mathbb{M}\)</a>). Proposals include increasing units taught per term, adding a term, halving units counted per hour of teaching, doubling required office hours, killing a cap on part-timers, adding required weekend teaching, eliminating faculty ownership of course content, eliminating funds for faculty travel and research, eliminating committee review of personnel actions, and monitoring emails for union activity.</p>
-  </li>
-  <li>
-    <p><a href="https://github.com/patmorin/lhp">Pat Morin implements the product structure for planar graphs in Python</a> (<a href="https://mathstodon.xyz/@patmorin/105396573803578266">\(\mathbb{M}\)</a>). This is part of a recent line of research in which planar graphs can be decomposed as subgraphs of strong products of paths with bounded-treewidth graphs. Pat writes: “Not exactly industrial-strength, and leans towards simplicity over performance.  Still, it can  decompose 100k-vertex triangulations in a few seconds.”</p>
-  </li>
-  <li>
-    <p><a href="http://make-origami.com/RonaGurkewitz/home.php">Modular origami polyhedra systems</a> (<a href="https://mathstodon.xyz/@11011110/105408938256987767">\(\mathbb{M}\)</a>). An old link by <a href="https://en.wikipedia.org/wiki/Rona_Gurkewitz">Rona Gurkewitz</a> from my Geometry Junkyard, moved to a new address.</p>
-  </li>
-  <li>
-    <p><a href="https://diagonalargument.com/2020/12/08/socrates-bad-guy/">Socrates as anti-democratic enabler of tyrannical coups</a> (<a href="https://mathstodon.xyz/@11011110/105419425427517260">\(\mathbb{M}\)</a>). None of this analysis is particularly new, but it’s not the version of Socrates you’ll see when you look at <a href="https://en.wikipedia.org/wiki/Socrates">the Wikipedia article</a>.</p>
-  </li>
-  <li>
-    <p><a href="https://en.wikipedia.org/wiki/Blichfeldt%27s_theorem">Blichfeldt’s theorem</a> (<a href="https://mathstodon.xyz/@11011110/105422739565106313">\(\mathbb{M}\)</a>): Any set in the plane of area greater than one can be translated to contain two integer points. New article on Wikipedia, connected to an expansion of the <a href="https://en.wikipedia.org/wiki/Hans_Frederick_Blichfeldt">biography  of Hans Blichfeldt</a>, who came to the US from Denmark as a teenager in 1888 and worked for several years as a lumberman, railway worker, and surveyor before his mathematical talent was recognized and he became one of the first students at Stanford.</p>
-  </li>
-  <li>
-    <p>I’ve been experimenting with <a href="https://git-scm.com/docs/git-svn">git-svn</a> (<a href="https://mathstodon.xyz/@11011110/105426263611221446">\(\mathbb{M}\)</a>), for a new project whose coauthors chose svn. It somehow manages to be clunkier than either svn or git by themselves. I understand why svn’s linear history forces compromise, but mostly I tend to keep a linear history anyway. I just want git pull and push to work, but instead I have to learn new un-mnemonic commands (for which <a href="https://git.wiki.kernel.org/images-git/7/78/Git-svn-cheatsheet.pdf">the cheatsheet of equivalences from svn to git-svn</a> was helpful). The only advantage over svn that I found was you have a local copy of the history, although in the comments David Bremner suggests more.</p>
-  </li>
-  <li>
-    <p><a href="https://www.latimes.com/business/story/2020-12-22/agree-to-disagree">“Why I never ‘agree to disagree’ — I just tell you when you’re wrong”</a> (<a href="https://mathstodon.xyz/@11011110/105431453312440767">\(\mathbb{M}\)</a>). <em>Los Angeles Times</em> columnist Michael Hiltzik on truth versus neutrality, and why it is incorrect and intellectually lazy for public media to treat certain firmly-established facts — such as the existence of the COVID pandemic, the outcome of the recent US election, or human-driven climate change — as topics on which debate is still reasonable.</p>
-  </li>
-  <li>
-    <p><a href="https://www.atlasobscura.com/articles/best-christmas-cookie-cutter">The perfect Christmas cookie cutter: one that tessellates your cookie dough sheet with Christmas trees</a> (<a href="https://mathstodon.xyz/@11011110/105436497912189975">\(\mathbb{M}\)</a>).</p>
-  </li>
-  <li>
-    <p><a href="https://hardmath123.github.io/chaos-game-fractal-foliage.html">Using gradient descent to find Christmas-tree-shaped fractals</a> (<a href="https://mathstodon.xyz/@11011110/105439870724073086">\(\mathbb{M}\)</a>).</p>
-  </li>
-  <li>
-    <p><a href="https://en.wikipedia.org/wiki/Lars_Arge">Lars Arge</a> died of cancer on December 23 (<a href="https://mathstodon.xyz/@11011110/105447919719671152">\(\mathbb{M}\)</a>). You can read an <a href="https://cs.au.dk/news-events/news/show-news/artikel/in-memoriam-professor-lars-arge/">obituary by his department chair</a> and <a href="http://blog.geomblog.org/2020/12/lars-arge.html">another by Suresh Venkatasubramanian</a>. Lars was a leading researcher in algorithms for massive data, and an anchor for algorithms and computational geometry in Denmark. As Suresh writes, he was a larger-than-life figure; we’ll miss him.</p>
-  </li>
-  <li>
-    <p><a href="https://en.wikipedia.org/wiki/Reinhardt_polygon">Reinhardt polygons</a> (<a href="https://mathstodon.xyz/@11011110/105454229077474608">\(\mathbb{M}\)</a>). These polygons have equal side lengths and are inscribed in Reuleaux polygons. Among all convex polygons with the same number of sides (any number that is not a power of two), they have the largest possible perimeter for their diameter, the largest possible width for their diameter, and the largest possible width for their perimeter. New Wikipedia article.</p>
-
-    <p style="text-align: center;"><img width="50%" alt="Reinhardt 15-gons" src="https://11011110.github.io/blog/assets/2020/Reinhardt_15-gons.svg" /></p>
-  </li>
-  <li>
-    <p><a href="https://cacm.acm.org/magazines/2021/1/249441-reboot-the-computing-research-publication-systems/fulltext">Moshe Vardi suggests taking advantage of this year’s disruption to the dysfunctional computer science conference publication system by setting up a replacement that is more scalable and doesn’t involve large amounts of carbon-expensive travel</a> (<a href="https://mathstodon.xyz/@11011110/105460878037520050">\(\mathbb{M}\)</a>). He doesn’t really say what this new system (or old journal system?) should be, though, only that we should design it.</p>
-
-    <p>Relatedly, <a href="https://statmodeling.stat.columbia.edu/2020/12/23/update-on-ieees-refusal-to-issue-corrections/">IEEE relents on corrections to conference papers</a>.</p>
-  </li>
-  <li>
-    <p><a href="https://mathstodon.xyz/@christianp/105465163493715434">What winter looks like in different parts of the world</a>. Long photo-thread responding to a request by Christian Lawson-Perfect’s 3-year-old. Here’s <a href="https://mathstodon.xyz/@11011110/105466532506211765">my contribution</a>, with prickly pears and the distant snow-topped San Gabriel mountains in Southern California:</p>
-
-    <p style="text-align: center;"><img width="80%" style="border-style: solid; border-color: black;" alt="Coastal prickly pear (opuntia littoralis) with visible fruit in the University of California, Irvine Ecological Preserve, looking north towards the San Gabriel Mountains, covered in snow from a recent storm" src="https://www.ics.uci.edu/~eppstein/pix/pricklypearmountains/PricklyPearMountains-m.jpg" /></p>
-  </li>
-  <li>
-    <p><a href="https://boingboing.net/2020/12/29/game-of-life-running-on-penrose-tiles.html">Game of Life running on Penrose tiles</a> (<a href="https://mathstodon.xyz/@11011110/105473798576179397">\(\mathbb{M}\)</a>). With links to a <em>New York Times</em> feature of “<a href="https://www.nytimes.com/2020/12/28/science/math-conway-game-of-life.html">short reflections from big thinkers on why Conway’s famous cellular-automata gewgaw remains so fascinating</a>”. From which I found Kjetil Golid’s generative-art <a href="https://generated.space/sketch/crosshatch-automata/">crosshatch automata</a>.</p>
-  </li>
-  <li>
-    <p>Two analyses of citation vs other impact in mathematics (<a href="https://mathstodon.xyz/@11011110/105477934629467245">\(\mathbb{M}\)</a>):</p>
-
-    <ul>
-      <li>
-        <p>In “<a href="https://www.ams.org/journals/notices/202101/rnoti-p114.pdf">Don’t count on it</a>” in the <em>Notices</em>, Edward Dunne compares highly cited mathematicians to winners of multiple prizes; high citations clustered in few topics, while prize winners were widely distributed across research areas.</p>
-      </li>
-      <li>
-        <p>In “<a href="https://arxiv.org/abs/2005.05389">Citations versus expert opinions</a>” (arXiv:2005.05389, <a href="https://retractionwatch.com/2020/12/19/weekend-reads-prof-sues-journal-school-after-demotion-following-retraction-researcher-fired-after-questioning-why-school-rejected-grant-the-authors-who-like-publish-or-perish/">via retractionwatch</a>), Smolinsky et al compare highly cited papers to MathSciNet featured reviews, again finding little overlap.</p>
-      </li>
-    </ul>
-  </li>
-</ul></div>
-
-
-
-
-
-
-
-<p class="date">
-by David Eppstein <a href="https://11011110.github.io/blog/2020/12/31/year-end-linkage.html"><span class="datestr">at December 31, 2020 09:32 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
