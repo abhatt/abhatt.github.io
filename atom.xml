@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-01-23T07:38:56Z</updated>
+  <updated>2021-01-23T08:22:21Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,76 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2021/01/22/bracing-squaregraphs</id>
+    <link href="https://11011110.github.io/blog/2021/01/22/bracing-squaregraphs.html" rel="alternate" type="text/html"/>
+    <title>Bracing squaregraphs (and other rhombus tilings)</title>
+    <summary>A bookshelf or other structure made only of vertical and horizontal beams will easily fall over unless its joints are very strong, because axis-parallel structures are not inherently rigid. The vertical beams can tilt away from being perpendicular to the horizontals, without changing the relative spacing of the joints, and that can lead to books all over the floor. Here’s an example from a 2011 earthquake at the Smithsonian that didn’t get quite that far, but did damage some shelves beyond repair:</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>A bookshelf or other structure made only of vertical and horizontal beams will easily fall over unless its joints are very strong, because axis-parallel structures are not inherently <a href="https://en.wikipedia.org/wiki/Structural_rigidity">rigid</a>. The vertical beams can tilt away from being perpendicular to the horizontals, without changing the relative spacing of the joints, and that can lead to books all over the floor. Here’s an example <a href="https://www.si.edu/newsdesk/photos/earthquake-damage-botany-library">from a 2011 earthquake at the Smithsonian</a> that didn’t get quite that far, but did damage some shelves beyond repair:</p>
+
+<p style="text-align: center;"><img alt="Damaged bookshelves in the Botany and Horticulture Library at the Smithsonian's National Museum of Natural History after the August 2011 Virginia earthquake, photographed by James DiLoreto, from https://www.si.edu/newsdesk/photos/earthquake-damage-botany-library" src="https://11011110.github.io/blog/assets/2021/nhb2011-01160-botany_library.jpg" style="border-style: solid; border-color: black;" width="65%"/></p>
+
+<p>Triangular bookshelves would be annoying for different reasons, but they wouldn’t collapse like this, because triangular structures are more rigid: there is only one triangle that three sides of fixed lengths can form, unlike squares and rectangles which can flex into rhombi and parallelograms without changing their side lengths. So the standard solution to the bookshelf rigidity problem is to add <a href="https://en.wikipedia.org/wiki/Cross_bracing">cross bracing</a>, diagonal beams built into shelves or other rectangular structures that make them similarly rigid. But which parts to brace? Even if every vertical and horizontal segment of a square bookshelf is allowed to flex independently of the other ones on its same line, bracing all the squares of the bookshelf would be too many. The vertical segments in each row of squares must stay parallel (in any flex small enough to avoid self-crossings), and similarly the horizontal segments in each column of squares must stay parallel. So a square grid with \(r\) rows and \(c\) columns has only \(r+c-1\) degrees of freedom in its shape (the relative angles among the verticals of each of the \(r\) rows and the horizontals of each of the \(c\) columns), far fewer than the \(rc\) braces that would be obtained by bracing all the squares.</p>
+
+<p style="text-align: center;"><img alt="Degrees of freedom of a flexible square grid" src="https://11011110.github.io/blog/assets/2021/grid-flex.svg"/></p>
+
+<p>A beautiful theory showing how to minimally brace any square (or rectangular) grid, connecting this <a href="https://en.wikipedia.org/wiki/Grid_bracing">grid bracing problem</a> to the connectivity of bipartite graphs, was developed in the late 1970s and early 1980s by Ethan Bolker, <a href="https://en.wikipedia.org/wiki/Henry_Crapo_(mathematician)">Henry Crapo</a>, <a href="https://en.wikipedia.org/wiki/Jenny_Baglivo">Jenny Baglivo</a>, and Jack Graver.<sup id="fnref:bc"><a class="footnote" href="https://11011110.github.io/blog/2021/01/22/bracing-squaregraphs.html#fn:bc">1</a></sup> <sup id="fnref:bg"><a class="footnote" href="https://11011110.github.io/blog/2021/01/22/bracing-squaregraphs.html#fn:bg">2</a></sup> Their idea was to represent the grid and its bracing more abstractly, as a graph, whose vertices represent the rows and columns of grid squares. A braced square can be represented as an edge in this graph:</p>
+
+<p style="text-align: center;"><img alt="Representing a braced square grid as a graph" src="https://11011110.github.io/blog/assets/2021/grid-bracing.svg"/></p>
+
+<p>An edge in this graph, or more generally any chain of edges, fixes the relative angles between the vertical edges in the rows that it connects, and the horizontal edges of the columns. So if the whole graph is connected, as it is in the figure, all of these angles are fixed, and the grid is made rigid. In particular, any spanning tree of the complete bipartite graph on the rows and columns (such as the spanning tree shown in the figure) provides a bracing pattern that will suffice to make the grid rigid. It is also necessary for rigidity that the bracing pattern contain a spanning tree: any set of braces including a cycle is redundant, with one of the braces removable without changing the possible motions of the braced grid, and any forest that is not a tree has too few braces to eliminate all of the degrees of freedom. So a grid is braced rigidly if and only if its graph is connected, and the minimal rigid bracings are exactly the spanning trees.</p>
+
+<p>The same theory can be (and has been) generalized in multiple ways. A grid is “double braced” if every brace is redundant: you can remove any one brace and the whole structure will stay rigid. This is true if and only if the corresponding graph has the property that you can remove any one edge and the whole graph will remain connected, which is true exactly for the connected <a href="https://en.wikipedia.org/wiki/Bridge_(graph_theory)">bridgeless graphs</a>. A version with directed graphs applies to bracing by strings or wires, strong under tension but useless under compression. These constrain the sides of the squares from turning only in one direction: if one side turns clockwise, the other side is forced to turn clockwise, or vice versa, but not both ways. So we can represent a tension brace in a square by a directed edge. The edge is directed from the square’s row to its column when a clockwise turn of the vertical sides in the row would force a clockwise turn of the horizontal sides in the column, and in the other direction otherwise. Then, the whole structure is rigid under this sort of tension bracing if and only if the resulting directed graph is strongly connected.</p>
+
+<p>For this theory to work, it is necessary that the braced structure consist of quadrilaterals with parallel sides, but they don’t have to be squares: the same thing works for grids of rectangles, rhombi, or parallelograms. It would work for the deformed square grid in the right of the second figure, for instance. It’s also not necessary for the quadrilaterals to be connected in the pattern of a square grid. In 2006, Ture Wester observed that the same method should work for the rhombic version of the Penrose tiling, for instance, but was very vague about boundary conditions (not distinguishing carefully between infinite tilings and finite patches of them).<sup id="fnref:w"><a class="footnote" href="https://11011110.github.io/blog/2021/01/22/bracing-squaregraphs.html#fn:w">3</a></sup> The correct boundary conditions are that this works for any tiling of a disk in the plane by finitely many parallel-sided quadrilaterals. For such tilings, one can group the quadrilaterals into zones, sequences of quadrilaterals connected edge-to-edge on opposite sides, so that each quadrilateral belongs to two zones (giving it a zone by itself if two opposite sides are both on the boundary of the disk). Without bracing, the shared parallel sides in each zone can turn independently of any other motion of the tiling; this is the part that requires that the tiled area be a disk rather than an annulus or more complicated shape, so that the two parts of the graph separated by each zone are disconnected from each other and can move independently. And the overall shape of the tiling is completely determined by the angles of the shared sides of all of its zones. Therefore, the number of degrees of freedom (factoring out motions in which the tiling translates without rotation, or rotates rigidly) is exactly one less than the number of zones. Any set of braced quadrilaterals can be represented as a subgraph of the intersection graph of the zones, and after the calculation of degrees of freedom, the same argument as for grids shows that the tiling is rigid if this subgraph connects all the zones, that it is double braced if this subgraph is connected and bridgeless, or that it is tension braced if the directed version of this subgraph is strongly connected.</p>
+
+<p>So as Wester stated, this does work for rhombic Penrose tilings, as long as one considers disk-shaped patches of the tilings. Similar, it works for (simply-connected) polyominoes, or disk-shaped patches of the <a href="https://en.wikipedia.org/wiki/Rhombille_tiling">rhombille tiling</a>. It also works for <a href="https://en.wikipedia.org/wiki/Squaregraph">squaregraphs</a>, planar graphs in which all interior vertices have degree at least four and all interior faces are quadrilaterals, as long as those quadrilaterals are drawn with parallel sides. One of my old papers shows that these drawings always exist,<sup id="fnref:e"><a class="footnote" href="https://11011110.github.io/blog/2021/01/22/bracing-squaregraphs.html#fn:e">4</a></sup> and another shows how to optimize them to avoid sharp angles.<sup id="fnref:ew"><a class="footnote" href="https://11011110.github.io/blog/2021/01/22/bracing-squaregraphs.html#fn:ew">5</a></sup>. In all of these cases, the tiling can be made rigid by bracing tiles forming a spanning tree of its zones, doubly rigid by bracing tiles forming a bridgeless spanning subgraph, or rigid for tension bracing by adding braces that form a strongly connected graph.</p>
+
+<p>However, some algorithmic aspects of this theory may depend more strongly on the fact that for square grids, the intersection graphs of their zones have a very simple structure. Square grids have complete bipartite zone intersection graphs, but more general tilings of disks by parallel-sided quadrilaterals have arbitrary <a href="https://en.wikipedia.org/wiki/Circle_graph">circle graphs</a> and squaregraphs have triangle-free circle graphs. Extending a partial bracing to a minimal rigid bracing is just a matter of extending a forest to a spanning tree, easy in all graphs, but the corresponding problem for tension bracing is more complicated. Gabow and Jordán solve it for square grids (equivalently, adding as few edges as possible to a bipartite directed graph to make it strongly connected, while respecting its given bipartition) in linear time.<sup id="fnref:gj"><a class="footnote" href="https://11011110.github.io/blog/2021/01/22/bracing-squaregraphs.html#fn:gj">6</a></sup> But it is not at all obvious that it’s as easy to extend a directed subgraph of a circle graph to a minimal strongly connected subgraph of the same circle graph.</p>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:bc">
+      <p>Bolker, Ethan D., and Crapo, Henry (1977), “How to brace a one-story building”, <em>Environment and Planning B: Planning and Design</em> 4 (2): 125–152, <a href="https://doi.org/10.1068/b040125">doi:10.1068/b040125</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2021/01/22/bracing-squaregraphs.html#fnref:bc">↩</a></p>
+    </li>
+    <li id="fn:bg">
+      <p>Baglivo, Jenny A., and Graver, Jack E. (1983), “3.10 Bracing structures”, <em>Incidence and Symmetry in Design and Architecture</em>, Cambridge University Press, pp. 76–87. <a class="reversefootnote" href="https://11011110.github.io/blog/2021/01/22/bracing-squaregraphs.html#fnref:bg">↩</a></p>
+    </li>
+    <li id="fn:w">
+      <p>Wester, Ture (2006), “<a href="http://new.math.uiuc.edu/oldnew/quasicrystals/papers/TureWester.pdf">The structural morphology of Penrose and quasicrystal patterns, part I</a>”, <em>Adaptables2006, TU/e, International Conference On Adaptable Building Structures, Eindhoven, The Netherlands, 3–5 July 2006</em>, 10-290. <a class="reversefootnote" href="https://11011110.github.io/blog/2021/01/22/bracing-squaregraphs.html#fnref:w">↩</a></p>
+    </li>
+    <li id="fn:e">
+      <p>Eppstein, David (2004), “Algorithms for drawing media”, <em>Proc. 12th Int. Symp. Graph Drawing</em>, Springer, LNCS 3383, pp. 173–183, <a href="https://arxiv.org/abs/cs.DS/0406020">arXiv:cs.DS/0406020</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2021/01/22/bracing-squaregraphs.html#fnref:e">↩</a></p>
+    </li>
+    <li id="fn:ew">
+      <p>Eppstein, David, and Wortman, Kevin (2011), “Optimal angular resolution for face-symmetric drawings”, <em>J. Graph Algorithms and Applications</em> 15 (4): 551–564, <a href="https://doi.org/10.7155/jgaa.00238">doi:10.7155/jgaa.00238</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2021/01/22/bracing-squaregraphs.html#fnref:ew">↩</a></p>
+    </li>
+    <li id="fn:gj">
+      <p>Gabow, Harold N., and Jordán, Tibor (2000), “How to make a square grid framework with cables rigid”, <em>SIAM Journal on Computing</em> 30 (2): 649–680, <a href="https://doi.org/10.1137/S0097539798347189">doi:10.1137/S0097539798347189</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2021/01/22/bracing-squaregraphs.html#fnref:gj">↩</a></p>
+    </li>
+  </ol>
+</div>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/105603974591107625">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2021-01-22T23:32:00Z</updated>
+    <published>2021-01-22T23:32:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2021-01-23T08:03:40Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://cstheory-jobs.org/2021/01/22/oxford-warwick-postdoc-in-complexity-theory-at-university-of-oxford-university-of-warwick-apply-by-february-28-2021/</id>
@@ -36,7 +106,7 @@ Email: igorcarb@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-01-23T07:37:49Z</updated>
+      <updated>2021-01-23T08:20:43Z</updated>
     </source>
   </entry>
 
@@ -614,7 +684,7 @@ We would be grateful for suggestions of additional mathematics and computing blo
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2021-01-23T07:37:45Z</updated>
+      <updated>2021-01-23T08:20:40Z</updated>
     </source>
   </entry>
 
@@ -672,7 +742,7 @@ We would be grateful for suggestions of additional mathematics and computing blo
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-01-23T07:37:39Z</updated>
+      <updated>2021-01-23T08:20:35Z</updated>
     </source>
   </entry>
 
@@ -801,7 +871,7 @@ We would be grateful for suggestions of additional mathematics and computing blo
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-01-23T07:37:39Z</updated>
+      <updated>2021-01-23T08:20:34Z</updated>
     </source>
   </entry>
 
@@ -889,7 +959,7 @@ Our thoughts and condolences go out to Ed’s family and friends.</p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2021-01-23T07:37:45Z</updated>
+      <updated>2021-01-23T08:20:40Z</updated>
     </source>
   </entry>
 
@@ -916,7 +986,7 @@ Our thoughts and condolences go out to Ed’s family and friends.</p>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-01-23T07:37:35Z</updated>
+      <updated>2021-01-23T08:20:26Z</updated>
     </source>
   </entry>
 
@@ -946,7 +1016,7 @@ As a by-product of the techniques developed to show these proof complexity trade
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-01-23T07:37:35Z</updated>
+      <updated>2021-01-23T08:20:25Z</updated>
     </source>
   </entry>
 
@@ -1201,7 +1271,7 @@ As a by-product of the techniques developed to show these proof complexity trade
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-01-23T07:38:04Z</updated>
+      <updated>2021-01-23T08:21:04Z</updated>
     </source>
   </entry>
 
@@ -1276,7 +1346,7 @@ As a by-product of the techniques developed to show these proof complexity trade
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2021-01-16T04:33:21Z</updated>
+      <updated>2021-01-23T08:03:40Z</updated>
     </source>
   </entry>
 
@@ -1400,7 +1470,7 @@ As a by-product of the techniques developed to show these proof complexity trade
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-01-23T07:38:56Z</updated>
+      <updated>2021-01-23T08:22:21Z</updated>
     </source>
   </entry>
 
@@ -1427,7 +1497,7 @@ Email: recruit@cs.toronto.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-01-23T07:37:49Z</updated>
+      <updated>2021-01-23T08:20:43Z</updated>
     </source>
   </entry>
 
@@ -1455,7 +1525,7 @@ Email: kousha@inf.ed.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-01-23T07:37:49Z</updated>
+      <updated>2021-01-23T08:20:43Z</updated>
     </source>
   </entry>
 
@@ -1600,7 +1670,7 @@ There must be other lower bounds on the primes. We cannot seem to find them. Any
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2021-01-23T07:37:45Z</updated>
+      <updated>2021-01-23T08:20:40Z</updated>
     </source>
   </entry>
 
@@ -1660,7 +1730,7 @@ There must be other lower bounds on the primes. We cannot seem to find them. Any
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-01-23T07:37:39Z</updated>
+      <updated>2021-01-23T08:20:35Z</updated>
     </source>
   </entry>
 
@@ -1688,7 +1758,7 @@ Email: abasov@hse.ru</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-01-23T07:37:49Z</updated>
+      <updated>2021-01-23T08:20:43Z</updated>
     </source>
   </entry>
 
@@ -1716,7 +1786,7 @@ Email: abasov@hse.ru</p></div>
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-01-23T07:38:56Z</updated>
+      <updated>2021-01-23T08:22:21Z</updated>
     </source>
   </entry>
 
@@ -1749,7 +1819,7 @@ Email: abasov@hse.ru</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-01-23T07:37:35Z</updated>
+      <updated>2021-01-23T08:20:25Z</updated>
     </source>
   </entry>
 
@@ -1786,7 +1856,7 @@ Email: abasov@hse.ru</p></div>
       <link href="https://sarielhp.org/blog" rel="alternate" type="text/html"/>
       <subtitle>Sariel's blog</subtitle>
       <title>Vanity of Vanities, all is Vanity</title>
-      <updated>2021-01-23T07:37:29Z</updated>
+      <updated>2021-01-23T08:20:20Z</updated>
     </source>
   </entry>
 
@@ -1912,7 +1982,7 @@ Email: abasov@hse.ru</p></div>
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2021-01-23T07:37:42Z</updated>
+      <updated>2021-01-23T08:20:37Z</updated>
     </source>
   </entry>
 
@@ -1975,7 +2045,7 @@ Email: abasov@hse.ru</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-01-23T07:37:35Z</updated>
+      <updated>2021-01-23T08:20:25Z</updated>
     </source>
   </entry>
 
@@ -2043,7 +2113,7 @@ Email: abasov@hse.ru</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-01-23T07:37:39Z</updated>
+      <updated>2021-01-23T08:20:35Z</updated>
     </source>
   </entry>
 
@@ -2073,7 +2143,7 @@ Email: abasov@hse.ru</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-01-23T07:37:35Z</updated>
+      <updated>2021-01-23T08:20:25Z</updated>
     </source>
   </entry>
 
@@ -2105,35 +2175,7 @@ In both settings, a key ingredient in our constructions is a pseudorandom restri
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-01-23T07:37:35Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-jobs.org/2021/01/08/samuel-eilenberg-assistant-professor-at-university-of-warsaw-apply-by-february-12-2020/</id>
-    <link href="https://cstheory-jobs.org/2021/01/08/samuel-eilenberg-assistant-professor-at-university-of-warsaw-apply-by-february-12-2020/" rel="alternate" type="text/html"/>
-    <title>Samuel Eilenberg Assistant Professor at University of Warsaw (apply by February 12, 2020)</title>
-    <summary>The Faculty of Mathematics, Informatics and Mechanics at University of Warsaw (MIM UW) invites applications for positions of an assistant professor (“adiunkt” in Polish) in Computer Science, starting on 1st October 2021 (or 1st Feb 2022). Note: compared to a standard assistant professor position, Samuel Eilenberg Assistant Professor comes with reduced teaching load and increased […]</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The Faculty of Mathematics, Informatics and Mechanics at University of Warsaw (MIM UW) invites applications for positions of an assistant professor (“adiunkt” in Polish) in Computer Science, starting on 1st October 2021 (or 1st Feb 2022).</p>
-<p>Note: compared to a standard assistant professor position, Samuel Eilenberg Assistant Professor comes with reduced teaching load and increased salary.</p>
-<p>Website: <a href="https://www.mimuw.edu.pl/sites/default/files/konkursy/wmim_1210_ek_01_2021_en.pdf">https://www.mimuw.edu.pl/sites/default/files/konkursy/wmim_1210_ek_01_2021_en.pdf</a><br/>
-Email: kowalik@mimuw.edu.pl</p></div>
-    </content>
-    <updated>2021-01-08T17:14:00Z</updated>
-    <published>2021-01-08T17:14:00Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-jobs.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-jobs.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-jobs.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-01-23T07:37:49Z</updated>
+      <updated>2021-01-23T08:20:25Z</updated>
     </source>
   </entry>
 </feed>
