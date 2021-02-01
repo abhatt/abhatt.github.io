@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-02-01T18:22:29Z</updated>
+  <updated>2021-02-01T18:39:24Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,225 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>https://francisbach.com/?p=5433</id>
+    <link href="https://francisbach.com/self-concordant-analysis-newton/" rel="alternate" type="text/html"/>
+    <title>Going beyond least-squares – I : self-concordant analysis of Newton method</title>
+    <summary>Least-squares is a workhorse of optimization, machine learning, statistics, signal processing, and many other scientific fields. I find it particularly appealing (too much, according to some of my students and colleagues…), because all algorithms, such as stochastic gradient [1], and analyses, such as for kernel ridge regression [2], are much simpler and rely on reasonably...</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p class="justify-text">Least-squares is a workhorse of optimization, machine learning, statistics, signal processing, and many other scientific fields. I find it particularly appealing (too much, according to some of my students and colleagues…), because all algorithms, such as stochastic gradient [<a href="https://proceedings.neurips.cc/paper/2013/file/7fe1f8abaad094e0b5cb1b01d712f708-Paper.pdf">1</a>], and analyses, such as for kernel ridge regression [<a href="https://link.springer.com/article/10.1007/s10208-006-0196-8">2</a>], are much simpler and rely on reasonably simple linear algebra.</p>
+
+
+
+<p class="justify-text">Despite the unique appeal of least-squares, most interesting optimization or machine problems go beyond quadratic functions. While there are many algorithms and analyses dedicated to more general situations, it is tempting to use least-squares for analysis or algorithms by considering the functions at hand to be approximately quadratic.</p>
+
+
+
+<p class="justify-text">Using bounds on the third-order derivatives and <a href="https://en.wikipedia.org/wiki/Taylor_series">Taylor expansions</a> are the usual ways to go, but they are not ideal for sharp non-asymptotic results where the deviation from quadratic functions has to be precisely quantified. In many situations, more finer structures can be used. In a series of posts, I will describe <em>self-concordance</em> properties, that relate the third order derivatives to second order ones.</p>
+
+
+
+<p class="justify-text">There are many great books that cover this topic where the material below is taken from [<a href="https://epubs.siam.org/doi/book/10.1137/1.9781611970791">3</a>, <a href="https://www2.isye.gatech.edu/~nemirovs/LecIPM.pdf">4</a>, <a href="https://link.springer.com/content/pdf/10.1007%2F978-3-319-91578-4.pdf">5</a>, <a href="https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf">6</a>].</p>
+
+
+
+<h2>Self-concordance</h2>
+
+
+
+<p class="justify-text">A function \(f: C \subset \mathbb{R} \to \mathbb{R}\) is said self-concordant on the open interval \(C\) if and only if it is convex, three-times differentiable on \(C\), and $$\tag{1}\forall x \in C, \  |f^{\prime\prime\prime}(x)| \leqslant 2 f^{\prime\prime}(x)^{3/2}.$$ You may wonder why the power \(3/2\) or why the constant \(2\). The constant is just a convention (multiplying the function \(f\) by \(c\) would replace \(2\) by \(2/\sqrt{c}\)), while the power \(3/2\) is fundamental, as it makes the definition “affine-invariant”, that is, if \(f\) is self-concordant, so is \(y \mapsto f(ay)\) for any \(a \in \mathbb{R}\).</p>
+
+
+
+<p class="justify-text">For a convex function defined on a convex subset \(C\) of \(\mathbb{R}\), this has to be true along all rays, or equivalently, if \(f^{\prime\prime\prime}(x)[h,h,h]= \sum_{i,j,k=1}^d h_i h_j h_k \frac{\partial^3 f}{\partial x_i \partial x_j \partial x_k}(x)\) is the symmetric third-order tensor and \(f^{\prime\prime}(x)[h,h] = \sum_{i,j=1}^d h_i h_j  \frac{\partial^2 f}{\partial x_i \partial x_j}(x)\) the second-order one, then $$\tag{2} \forall x \in C, \ \forall h \in \mathbb{R}^d , \ |f^{\prime\prime\prime}(x)[h,h,h]| \leqslant 2 f^{\prime\prime}(x)^{3/2}[h,h].$$</p>
+
+
+
+<p class="justify-text"><strong>Examples. </strong>One can check that if \(f\) and \(g\) are self-concordant, then so is \(f+g\) (but not their average). Moreover, if \(f\) is self-concordant, so is \(y\mapsto f(Ay)\) for any matrix \(A\). The property is also preserved by Fenchel conjugation. Classical examples are all linear and quadratic functions, the negative logarithm, the negative log-determinant, or the negative logarithm of quadratic functions. The three previous examples are particularly important because they are “barrier functions”, with non-full domains, and are instrumental to interior-point methods (see below).</p>
+
+
+
+<p class="justify-text"><strong>Properties in one dimension.</strong>  A nice reformulation of Eq. (1) (which is one-dimensional) is $$ \big| \frac{d}{dx} \big( f^{\prime\prime}(x)^{-1/2} \big) \big| = \big| \frac{1}{2} f^{\prime\prime\prime}(x)  f^{\prime \prime}(x)^{-3/2} \big| \leqslant 1,$$ which allows to define upper and lower bounds on \(f^{\prime \prime}(x)\) by integration, as, for \(x &gt; 0\), $$ – x \leqslant f^{\prime\prime}(x)^{-1/2} \, – f^{\prime\prime}(0)^{-1/2} \leqslant x,$$ which can be transformed into (by isolating \(f^{\prime\prime}(x)\)): $$ \tag{3} \frac{f^{\prime\prime}(0)}{\big(1 + x f^{\prime\prime}(0)^{1/2}\big)^2} \leqslant f^{\prime\prime}(x) \leqslant \frac{f^{\prime\prime}(0)}{\big(1 – x f^{\prime\prime}(0)^{1/2}\big)^2}.$$ We thus obtain global upper and lower bounds on \(f^{\prime\prime}(x)\).</p>
+
+
+
+<p class="justify-text">We can then integrate Eq. (3) twice between \(0\) and \(x\) to obtain lower and upper bounds on \(f^\prime\) and then \(f\): $$-f^{\prime\prime}(0)^{1/2} + \frac{f^{\prime\prime}(0)^{1/2}}{1+x f^{\prime\prime}(0)^{1/2}} \leqslant f^\prime(x)-f^\prime(0) \leqslant -f^{\prime\prime}(0)^{1/2} + \frac{f^{\prime\prime}(0)^{1/2}}{1-x f^{\prime\prime}(0)^{1/2}},$$ and  $$ \tag{4} \rho \big( – f^{\prime\prime}(0)^{1/2} x \big) \leqslant f(x) \ – f(0) \ – f^\prime(0) x \leqslant   \rho \big( f^{\prime\prime}(0)^{1/2} x \big),$$ with \(\displaystyle \rho(u) =\  – \log(1-u) \ – u \sim \frac{u^2}{2} \) when \(u\to 0\), that is, the second-order expansion is tight at \(x =0\), but leads to global lower and upper bounds. This upper-bound is valid as long as \(\delta = f^{\prime\prime}(0)^{1/2} x \in [0,1]\), while the lower-bound on \(f\) is always true. The function \(\rho\) is plotted below.</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-5631" height="233" src="https://francisbach.com/wp-content/uploads/2021/01/rho.png" width="303"/></figure></div>
+
+
+
+<p class="justify-text"><strong>Properties in multiple dimensions.</strong> The properties above in Eq. (3) and (4) directly extend to multiple dimensions. For any \(x \in C\), then for any \(h \in \mathbb{R}^d\) such that \(\delta^2 = \Delta^\top f^{\prime\prime}(x) \Delta &lt; 1\), we have upper and lower bounds for the Hessian, the gradient and the functions value at \(x + \Delta\), that is, denoting by \(\| \cdot \|\) the standard Euclidean norm (see detailed proofs at the end of the post) $$\tag{5}(1-\delta)^2 f^{\prime \prime}(x) \preccurlyeq  f^{\prime \prime}(x+\Delta) \preccurlyeq  \frac{1}{(1-\delta)^2}  f^{\prime \prime}(x),$$ $$ \tag{6}\big\| f^{\prime\prime}(x)^{-1/2} \big(f^\prime(x+\Delta)-f^\prime(x) -f^{\prime \prime}(x)\Delta \big) \big\|  \leqslant \frac{\delta^2}{1-\delta},$$ and $$\tag{7} \rho(-\delta) \leqslant f(x+\Delta)\ -f(x) \ – f^\prime(x)^\top \Delta \leqslant \rho(\delta).$$ A nice consequence is that if \(\delta &lt; 1\), then \(x+\Delta \in C\), that is, we get “for free” a feasible point. Moreover, these approximations are “second-order tight” at \(\Delta=0\), that is, the term in \(f^{\prime\prime}(x)\) in Taylor expansion around \(x\) is exact.</p>
+
+
+
+<p class="justify-text"><strong>Dikin ellipsoid.</strong> The condition that \(\delta^2 = \Delta^\top f^{\prime\prime}(x) \Delta &lt; 1\) defines an ellipsoid around \(x\) which is always strictly inside the domain of \(f\) (see example in the plot below). The results above essentially state that when inside the Dikin ellipsoid, the locally quadratic approximation can be used. </p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-full is-resized"><img alt="" class="wp-image-5642" height="307" src="https://francisbach.com/wp-content/uploads/2021/01/dykin.gif" width="388"/>Dikin ellipsoids for the function \(f(x) = \sum_{i=1}^k \log (b_i – a_i^\top x)\), which is self-concordant with a domain which is a polytope.</figure></div>
+
+
+
+<p class="justify-text">In this post, I will focus primarily on the use self-concordant functions in optimization through the analysis of Newton method.</p>
+
+
+
+<h2>Why should you care about Newton method?</h2>
+
+
+
+<ol class="justify-text"><li>For fun: Newton method is one of the classics of optimization!</li><li>For high precisions: as we will see, it is quadratically convergent and attains machine precision after solving a few linear systems.</li><li>Even in high dimensions where the linear system can be expensive, Newton method may still be the method of choice for severely ill-conditioned problems where even accelerated first-order methods are too slow to obtain low precision solutions.</li><li>It sometimes comes for free in situations where gradients are expensive to evaluate compared to \(d\).</li></ol>
+
+
+
+<h2>Classical analysis of Newton method</h2>
+
+
+
+<p class="justify-text">Given a function \(f: \mathbb{R}^d \to \mathbb{R}\), Newton method is an iterative optimization algorithm consisting in locally approximating the function \(f\) around the iterate \(x_{t}\) by a second-order Taylor expansion $$f(x_t) + f^\prime(x_t)^\top(x-x_t) + \frac{1}{2} (x-x_t)^\top f^{\prime \prime}(x_t) ( x – x_t),$$ whose minimum can be found in closed form as $$\tag{8} x_{t+1} = x_t \ – f^{\prime \prime}(x_t)^{-1} f^{\prime}(x_t).$$</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-full is-resized"><img alt="" class="wp-image-5705" height="275" src="https://francisbach.com/wp-content/uploads/2021/02/approx_taylor.gif" width="323"/>Quadratic approximation and Newton step (in green) for varying starting points (in red). When the starting point is far from the global minimizer (in 0), the Newton step totally overshoots the global minimizer.</figure></div>
+
+
+
+<p class="justify-text">Newton method is classically analyzed for three times differentiable convex functions with bounded Hessians and third-order derivatives. The method is only locally convergent, that is, far away from the global minimizer \(x_\ast\) (even for very regular convex function), the method may diverge. In the non-convex setting, this leads to nice <a href="https://en.wikipedia.org/wiki/Newton_fractal">fractal plots</a>, but even for convex functions, the method can be unstable (see plot above).</p>
+
+
+
+<p class="justify-text">Locally, it is quadratically convergent, that is, there exists \(c&gt;0\), such that if \(\| x_t \ – x_\ast\| \leqslant c\), then \(\| x_{t+1} \ – x_\ast \| /c  \leqslant \big( \|x_t\  – x_\ast\| / c \big)^2\). Roughly, the number of significant digits doubles at every iteration.</p>
+
+
+
+<p class="justify-text">This leads to $$ \| x_{t} \ – x_\ast \| \leqslant c \big( \|x_{t_0} \ – x_\ast\| / c \big)^{2^{t-t_0}} ,$$ for \(t \geqslant t_0\) and \(t_0\) an index for which \(\| x_{t_0} \ – x_\ast\| \leqslant c\). It is less than \(\varepsilon\), as soon as \(2^{t-t_0} \log ( c / \| x_{t_0} – x_\ast \| ) \geqslant \log ( c / \varepsilon)\), that is, $$ t \geqslant t_0 + \frac{ \log \log ( c / \varepsilon)}{ \log 2} \  –  \frac{\log \log ( c / \| x_{t_0} – x_\ast \| )}{\log 2}.$$</p>
+
+
+
+<p class="justify-text">That is, once we enter the quadratic phase, we obtain a number of iterations in \( \log \log ( 1/ \varepsilon)\), that is, only very few iterations. For example, for \(\varepsilon = 10^{-16}\), \(\log \log ( 1/ \varepsilon) \leqslant 4\).</p>
+
+
+
+<p class="justify-text">Two major issues may be solved elegantly using self-concordant analysis: </p>
+
+
+
+<ol class="justify-text"><li>Dealing with the two phases of Newton method, the quadratically convergent final phase, as well as the initial phase.</li><li>Obtaining convergence rates which are affine-invariant, that is, minimizing \(f(x)\) of \(f(Ax+b)\) for \(A\) an invertible matrix should lead to exactly the same convergence rate (this is not the case for the classical analysis, where for example the constant \(c\) depends on non affine-invariant quantities).</li></ol>
+
+
+
+<h2>Self-concordant analysis of Newton method</h2>
+
+
+
+<p class="justify-text">Consider \(f: \mathcal{C} \to \mathbb{R}\) which is self-concordant. Since Newton method in Eq. (8) is not globally convergent, we need to study a version where the Newton step is performed partially. There are several possible strategies. Here I present the so-called “damped Newton” iteration and thus study the iteration $$ x^+ = x\  – \frac{1}{1+\lambda(x)} f^{\prime \prime}(x)^{-1} f^\prime(x),$$ where we define the “Newton decrement” \(\lambda(x)\) at \(x \in C\), as $$ \lambda^2 = \lambda(x)^2 =f^\prime(x)^\top f^{\prime \prime}(x)^{-1} f^\prime(x) = \|f^{\prime \prime}(x)^{-1/2} f^\prime(x) \|^2.$$</p>
+
+
+
+<p class="justify-text">The Newton decrement is a key quantity in the analysis of Newton method, as \(\frac{1}{2} \lambda(x)^2\) is exactly the decrease in the quadratic approximation obtained by a full Newton step. Moreover, </p>
+
+
+
+<ol class="justify-text"><li>If \(\lambda(x) &lt; 1\), then \(x^+\) is in the Dikin ellipsoid where we can expect the local quadratic approximation to be relevant.</li><li>If \(\lambda(x) &lt; 1\), then one can show that \(f(x) \ – f(x_\ast) \leqslant \rho( \lambda(x)) \sim \frac{1}{2} \lambda(x)^2\) when \(\lambda(x)\) is close to zero, that is, the Newton decrement provides an upper bound on the distance to optimum.</li></ol>
+
+
+
+<p class="justify-text">The update corresponds to \(\Delta = \ – \frac{1}{1+\lambda(x)} f^{\prime \prime}(x)^{-1} f^\prime(x)\), and \(\delta  = \frac{\lambda(x)}{1+\lambda(x)}  \in [0,1]\), thus \(x^+\) is automatically feasible (which is important for constrained case, see below).</p>
+
+
+
+<p class="justify-text">Moreover, using Eq. (7), we get $$f(x^+)-f(x) \leqslant \ – \frac{f^\prime(x)^\top f^{\prime \prime}(x)^{-1} f^\prime(x)}{1+\lambda(x)} + \rho \Big( \frac{\lambda(x)}{1+\lambda(x)} \Big) = \log (1+ \lambda(x)) \ – \lambda(x).$$ This immediately leads to a fixed decrease of \(\frac{1}{4} \, – \log \frac{5}{4} \geqslant 0.0268\) if \(\lambda(x) \geqslant \frac{1}{4}\). </p>
+
+
+
+<p class="justify-text">We can now compute the Newton decrement at \(x^+\), to see how it decreases, by first bounding $$\lambda(x^+) =\|f^{\prime \prime}(x^+)^{-1/2} f^\prime(x^+) \| \leqslant \frac{1}{1-\delta} \|f^{\prime \prime}(x)^{-1/2} f^\prime(x^+) \|,$$ using Eq. (5). We then have, using Eq. (6): $$ \|f^{\prime \prime}(x)^{-1/2} f^\prime(x^+) \| \leqslant \big\| f^{\prime \prime}(x)^{-1/2} \big( f^\prime(x) + f^{\prime\prime}(x) \Delta  \big) \big\| + \frac{\delta^2}{ 1-\delta } \leqslant \frac{\lambda(x)^2}{1+\lambda(x)} + \frac{\delta^2}{ 1-\delta  }.$$ This exactly leads to $$\lambda(x^+) \leqslant 2  \lambda(x)^2, $$ which leads to quadratic convergence if \(\lambda(x)\) is small enough.</p>
+
+
+
+<p class="justify-text">We can then divide the analysis in two phases: before \(\lambda(x) \leqslant 1/4\) and after. The first integer \(t_0\) such that \(\lambda(x) \leqslant 1/4\) is less than \(\frac{ f(x_0) – f(x_\ast)}{0.0268} \leqslant 38 [ f(x_0) – f(x_\ast) ]\). Then, for the second phase, \(2\lambda(x_t) \leqslant (1/2)^{2^{t-t_0}}\). Given that for \(\lambda \leqslant 1/4\), \(\rho(\lambda) \leqslant 2\lambda\), we reach precision \(\varepsilon\) as soon as \(2^{t-t_0} \log 2 \geqslant \log \frac{1}{\varepsilon}\), that is, \(t \geqslant t_0 + \frac{1}{\log 2} \log \log \frac{1}{\varepsilon} -1\). This leads to number of iterations to reach a precision \(\varepsilon\)  which is less than $$38[ f(x_0) \ – f(x_\ast)]  +2 \log \log \frac{1}{\varepsilon}.$$</p>
+
+
+
+<h2>Interior point methods</h2>
+
+
+
+<p class="justify-text">Self-concordant functions are also key in the analysis of interior point methods. Consider a function \(f\) defined on \(\mathbb{R}^d\) and the constrained optimization problem $$\min_{ x \in C} f(x),$$ where \(C\) is a convex set. Barrier methods are appending a so-called “barrier function” \(g(x)\) to the objective function. A function \(g\) is a barrier function if \(g\) is convex and with domain containing the relative interior of \(C\), with gradients that explode when reaching the boundary of \(C\). We then solve instead $$\tag{9} \min_{x \in \mathbb{R}^d}  \varepsilon^{-1} f(x) +  g(x), $$ where \(\varepsilon &gt; 0\). Typically, the minimizer \(x_\varepsilon\) is in the relative interior of \(C\) (hence the name interior point method), and, when \(\varepsilon\) tends to zero, \(x_\varepsilon\) tends to the minimizer of \(f\) on \(C\).</p>
+
+
+
+<p class="justify-text">When both the original function \(f\) and the barrier function \(g\) are self-concordant, the (damped) Newton method is particularly useful as it ensures feasibility of the iterates. Moreover, the interplay between the progressive reduction of \(\varepsilon\) towards zero and the approximate resolution of Eq. (9) can be completely characterized (see [<a href="https://epubs.siam.org/doi/book/10.1137/1.9781611970791">3</a>, <a href="https://www2.isye.gatech.edu/~nemirovs/LecIPM.pdf">4</a>, <a href="https://link.springer.com/content/pdf/10.1007%2F978-3-319-91578-4.pdf">5</a>]). This applies directly to linear programming, second-order cone programming and semidefinite programming.</p>
+
+
+
+<h2>Applications in machine learning</h2>
+
+
+
+<p class="justify-text">If you have reached this point, you are probably a big fan of self-concordance. While this property is crucial in optimization, is it really relevant for machine learning or statistics? The sad truth is that most of the non-quadratic functions within machine learning are <em>not</em> self-concordant in the sense of Eq. (1) or Eq. (2). In particular, log-sum-exp functions, such that the logistic loss \(f(t) = \log( 1 + \exp(-t) )\),  do satisfy a relationship between third and second-order derivatives, but of the form $$| f^{\prime \prime \prime}(t)| \leqslant f^{\prime \prime }(t),$$ without the power \(3/2\). This seemingly small difference leads to several variations [7] which will the topic of next month blog post. Meanwhile, it is worth mentioning two applications in machine learning of classical self-concordance.</p>
+
+
+
+<p class="justify-text"><strong>Maximum likelihood estimation for covariance matrices.</strong> Beyond its use in interior point methods, self-concordant functions arise naturally when estimating the covariance matrix using maximum likelihood estimation with a Gaussian model. Indeed, the negative log-likelihood can be written as $$ – \log p (x| \mu ,\Sigma) =\frac{d}{2} \log(2\pi) +  \frac{1}{2} \log \det \Sigma + \frac{1}{2} ( x -\mu)^\top \Sigma^{-1} ( x – \mu),$$  which leads to a negative log-determinant of the inverse \(\Sigma^{-1}\) of the covariance matrix \(\Sigma\), which is a self-concordant function, on which the guarantees discussed above apply.</p>
+
+
+
+<p class="justify-text"><strong>Self-concordant losses.</strong> One can also design losses which are self-concordant. For example, a self-concordant version of the <a href="https://en.wikipedia.org/wiki/Huber_loss">Huber loss</a> is $$f(t) = \sqrt{1+t^2} \ – 1 \ –  \log \frac{ \sqrt{1+t^2} +1 }{2} .$$ It can be seen as the Fenchel-conjugate of \(– \log(1-t^2)\), and the proximity with a quadratic problem can be leveraged to obtain generalization performances using this loss function which are essentially the same as for the square loss. It can also be used for binary classification (see [<a href="https://projecteuclid.org/download/pdfview_1/euclid.ejs/1609902192">8</a>] for details, and the two nice <a href="https://ostrodmit.github.io/blog/2018/11/12/self-concordance-part-1/">blog posts</a> of Dmitrii Ostrovskii).</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-5654" height="251" src="https://francisbach.com/wp-content/uploads/2021/01/loss_selfc.png" width="359"/></figure></div>
+
+
+
+<p class="justify-text"><strong>One-step-estimation.</strong> Given the focus of this post on Newton method, I cannot resist mentioning a great technique coming from statistics that relies on a single Newton step. We consider a classical empirical risk minimization problem (statisticians would call it an M-estimation problem), with empirical risk \(\displaystyle \widehat{R}(\theta) = \frac{1}{n} \sum_{i=1}^n \ell(y_i, f_\theta(x_i) )\). Given an estimator \(\hat{\theta}\), obtained by any means, then if \(\hat{\theta}\) is \(\frac{1}{\sqrt{n}}\) away from the optimal parameter (with optimal performance on unseen data), then one Newton step on the function \(\widehat{R}\) started from \(\hat{\theta}\) will lead to an estimator achieving asymptotically the usual <a href="https://en.wikipedia.org/wiki/Cram%C3%A9r%E2%80%93Rao_bound">Cramer-Rao</a> lower bound. In a nutshell, a single Newton step on the empirical risk transforms a good estimator into a very good estimator. See [9, Section 5.7] for more details.</p>
+
+
+
+<p class="justify-text"><strong>Acknowledgements</strong>. I would like to thank Adrien Taylor and Dmitrii Ostrovskii for proofreading this blog post and making good clarifying suggestions.</p>
+
+
+
+<h2>References</h2>
+
+
+
+<p class="justify-text">[1] F. Bach and E. Moulines. <a href="https://proceedings.neurips.cc/paper/2013/file/7fe1f8abaad094e0b5cb1b01d712f708-Paper.pdf">Non-strongly-convex smooth stochastic approximation with convergence rate</a> \(O(1/n)\). Advances in Neural Information Processing Systems (NIPS), 2013.<br/>[2] Andrea Caponnetto, Ernesto De Vito. <a href="https://link.springer.com/article/10.1007/s10208-006-0196-8">Optimal rates for the regularized least-squares algorithm</a>. Foundations of Computational Mathematics 7(3):331-368, 2007.<br/>[3] Yurii Nesterov, and Arkadii Nemirovskii. <em><a href="https://epubs.siam.org/doi/book/10.1137/1.9781611970791">Interior</a><a href="https://epubs.siam.org/doi/pdf/10.1137/1.9781611970791.bm">-Point Polynomial Algorithms in Convex Programming</a></em>, SIAM, 1994.<br/>[4] Arkadii Nemirovski. <em><a href="https://www2.isye.gatech.edu/~nemirovs/LecIPM.pdf">Interior Point Polynomial Time Methods in Convex Programming</a></em>. Lecture notes, 1996.<br/>[5] Yurii Nesterov. <em><a href="https://link.springer.com/content/pdf/10.1007%2F978-3-319-91578-4.pdf">Lectures on Convex Optimization</a></em> (Vol. 137). Springer, 2018.<br/>[6] Stephen P. Boyd, and Lieven Vandenberghe. <em><a href="https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf">Convex Optimization</a></em>. Cambridge University Press, 2004.<br/>[7] Francis Bach. <a href="https://projecteuclid.org/download/pdfview_1/euclid.ejs/1271941980">Self-Concordant Analysis for Logistic Regression</a>. Electronic Journal of Statistics, 4, 384-414, 2010<br/>[8] Dmitrii Ostrovskii, and Francis Bach. <a href="https://projecteuclid.org/download/pdfview_1/euclid.ejs/1609902192">Finite-sample Analysis of M-estimators using Self-concordance</a>. Electronic Journal of Statistics, 15(1):326-391, 2021.<br/>[9] Aad W. Van der Vaart. <em><a href="http://Aad W. Van der Vaart. Asymptotic Statistics">Asymptotic Statistics</a></em>, volume 3. Cambridge University Press, 2000.</p>
+
+
+
+<h2>Detailed proofs for self-concordance properties</h2>
+
+
+
+<p class="justify-text">We first show Eq. (7), by considering the function \(a(t) = f(x+t\Delta)\), which is a one-dimensional self-concordant function, for which \(a^\prime(t) = \Delta^\top f^\prime(x+t\Delta)\), and \(a^{\prime\prime}(t) = \Delta^\top f^{\prime\prime}(x+t\Delta) \Delta\). Then \(a^{\prime\prime}(0) = \delta^2\), and Eq. (4) for \(x=1\) and \(a\) exactly leads to Eq. (7).</p>
+
+
+
+<p class="justify-text">In order to show Eq. (5), we consider \(h \in \mathbb{R}^d\), and the function \(b(t) = h^\top f^{\prime\prime}(x+t\Delta) h\). We have, \(b'(t) = f^{\prime\prime\prime}(x+t\Delta)[h,h,\Delta]\), which can be bounded using Eq. (2) as $$ |b'(t) | \leqslant 2 f^{\prime\prime}(x+t\Delta)[h,h] f^{\prime\prime}(x+t\Delta)[\Delta,\Delta]^{1/2} = 2 b(t) a^{\prime \prime}(t)^{1/2} \leqslant 2 b(t) \frac{\delta}{1-t\delta}, $$ using Eq. (3). This implies that for \(\delta t \in [0,1)\): $$\frac{d}{dt} \big[ (1-\delta t)^2 b(t) \big] = -2\delta (1-\delta t) b(t) + (1-\delta t)^2 b'(t) \leqslant 0, $$  which implies \(b(t) \leqslant \frac{b(0)}{(1-\delta t)^2} = \frac{h^\top f^{\prime\prime}(x) h}{(1-\delta t)^2}\), which leads to the right-hand side of Eq. (5) since this is true for all \(h \in \mathbb{R}^d\). The left-hand side is proved similarly.</p>
+
+
+
+<p class="justify-text">In order to show Eq. (6), we consider the function \(g(t) = h^\top f^\prime(x+t\Delta)\), for which, \(g^\prime(t) = h^\top f^{\prime\prime}(x+t\Delta) \Delta\), and \(g^{\prime\prime}(t) =   f^{\prime\prime\prime}(x+t\Delta) [h,\Delta,\Delta]\), which satisfies: $$|g^{\prime\prime}(t)| \leqslant 2 f^{\prime\prime}(x+t\Delta)[\Delta,\Delta] f^{\prime\prime}(x+t\Delta)[h,h]^{1/2} \leqslant 2 b(t)^{1/2} a^{\prime \prime}(t). $$ This leads to $$ |g^{\prime\prime}(t)| \leqslant 2 \big( h^\top f^{\prime\prime}(x) h\big)^{1/2} \frac{\delta^2}{(1-\delta t)^3}.$$ We can then integrate twice, using \(g(0) = h^\top f^\prime(x)\) and \(g^\prime(0) = h^\top f^{\prime\prime}(x) \Delta\), to get: $$h^\top \big(f^\prime(x+t\Delta)-f^\prime(x) \ – f^{\prime \prime}(x)\Delta \big) \leqslant    \big( h^\top f^{\prime\prime}(x) h\big)^{1/2} \frac{\delta^2}{1-\delta},$$ which leads to Eq. (5) after maximizing with respect to \(h\).</p></div>
+    </content>
+    <updated>2021-02-01T16:16:32Z</updated>
+    <published>2021-02-01T16:16:32Z</published>
+    <category term="Optimization"/>
+    <author>
+      <name>Francis Bach</name>
+    </author>
+    <source>
+      <id>https://francisbach.com</id>
+      <link href="https://francisbach.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://francisbach.com" rel="alternate" type="text/html"/>
+      <subtitle>Francis Bach</subtitle>
+      <title>Machine Learning Research Blog</title>
+      <updated>2021-02-01T18:39:21Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>tag:blogger.com,1999:blog-27705661.post-6639458808942063282</id>
@@ -69,7 +288,7 @@ Email: lisa.cox@isye.gatech.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-02-01T18:21:04Z</updated>
+      <updated>2021-02-01T18:38:03Z</updated>
     </source>
   </entry>
 
@@ -553,7 +772,7 @@ Email: lisa.cox@isye.gatech.edu</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-02-01T18:21:20Z</updated>
+      <updated>2021-02-01T18:38:19Z</updated>
     </source>
   </entry>
 
@@ -1009,7 +1228,7 @@ these graph families.</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-02-01T18:20:52Z</updated>
+      <updated>2021-02-01T18:37:51Z</updated>
     </source>
   </entry>
 
@@ -1307,7 +1526,7 @@ Our embraces go to Sharon, to Jeffrey, to their daughter Heather—who also work
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2021-02-01T18:21:01Z</updated>
+      <updated>2021-02-01T18:37:59Z</updated>
     </source>
   </entry>
 
@@ -1430,7 +1649,7 @@ See <a href="https://rjlipton.wordpress.com/2009/02/18/insider-baseball-and-pnp/
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2021-02-01T18:21:01Z</updated>
+      <updated>2021-02-01T18:38:00Z</updated>
     </source>
   </entry>
 
@@ -1536,7 +1755,7 @@ See <a href="https://rjlipton.wordpress.com/2009/02/18/insider-baseball-and-pnp/
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-02-01T18:20:56Z</updated>
+      <updated>2021-02-01T18:37:55Z</updated>
     </source>
   </entry>
 
@@ -1683,7 +1902,7 @@ Email: search@csc.uvic.ca</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-02-01T18:21:04Z</updated>
+      <updated>2021-02-01T18:38:03Z</updated>
     </source>
   </entry>
 
@@ -1746,7 +1965,7 @@ Email: search@csc.uvic.ca</p></div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2021-02-01T18:21:27Z</updated>
+      <updated>2021-02-01T18:38:25Z</updated>
     </source>
   </entry>
 
@@ -1882,7 +2101,7 @@ Email: igorcarb@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-02-01T18:21:04Z</updated>
+      <updated>2021-02-01T18:38:03Z</updated>
     </source>
   </entry>
 
@@ -2154,7 +2373,7 @@ We would be grateful for suggestions of additional mathematics and computing blo
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2021-02-01T18:21:01Z</updated>
+      <updated>2021-02-01T18:37:59Z</updated>
     </source>
   </entry>
 
@@ -2212,7 +2431,7 @@ We would be grateful for suggestions of additional mathematics and computing blo
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-02-01T18:20:56Z</updated>
+      <updated>2021-02-01T18:37:55Z</updated>
     </source>
   </entry>
 
@@ -2341,7 +2560,7 @@ We would be grateful for suggestions of additional mathematics and computing blo
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-02-01T18:20:55Z</updated>
+      <updated>2021-02-01T18:37:54Z</updated>
     </source>
   </entry>
 
@@ -2429,7 +2648,7 @@ Our thoughts and condolences go out to Ed’s family and friends.</p>
       <link href="https://rjlipton.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
-      <updated>2021-02-01T18:21:01Z</updated>
+      <updated>2021-02-01T18:37:59Z</updated>
     </source>
   </entry>
 
@@ -2456,7 +2675,7 @@ Our thoughts and condolences go out to Ed’s family and friends.</p>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-02-01T18:20:52Z</updated>
+      <updated>2021-02-01T18:37:51Z</updated>
     </source>
   </entry>
 
@@ -2486,262 +2705,7 @@ As a by-product of the techniques developed to show these proof complexity trade
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-02-01T18:20:52Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://windowsontheory.org/?p=7963</id>
-    <link href="https://windowsontheory.org/2021/01/15/ml-theory-with-bad-drawings/" rel="alternate" type="text/html"/>
-    <title>ML Theory with bad drawings</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">This semester I am teaching a seminar on the theory of machine learning. For the first lecture, I would like to talk about what is the theory of machine learning. I decided to write this (very rough!) blog post mainly to organize my own thoughts. In any science, ML included, the goals of theory and … <a class="more-link" href="https://windowsontheory.org/2021/01/15/ml-theory-with-bad-drawings/">Continue reading <span class="screen-reader-text">ML Theory with bad drawings</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>This semester I am teaching a <a href="https://boazbk.github.io/mltheoryseminar/">seminar on the theory of machine learning</a>. For the first lecture, I would like to talk about what is the theory of machine learning. I decided to write this (very rough!) blog post mainly to organize my own thoughts.</p>
-
-
-
-<p>In any science, ML included, the goals of theory and practice are not disjoint. We study the same general phenomena from different perspectives. We can think of questions in computation at a high level as trying to map the unknown terrain of the computational cost of achieving certain quality of output, given some conditions on the input.</p>
-
-
-
-<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/h8ZOrcE.png"/></figure>
-
-
-
-<p>Practitioners aim to find points on this terrain’s practically relevant regions, while theoreticians are more interested in its broad landscape, including at points far out into infinity. Both theoreticians and practitioners care about <em>discontinuities</em>, when small changes in one aspect correspond to large changes in another. As theoreticians, we care about <em>computational/statistical tradeoffs</em>, particularly about points where a small difference in quality yields an exponential difference in time or sample complexity. In practice, models such as GPT-3 demonstrate that a quantitative increase in computational resources can correspond to a qualitative increase in abilities.</p>
-
-
-
-<p>Since theory and practice study the same phenomenon in different ways, their relation can vary. Sometimes theory is forward-looking or <em>prescriptive</em> – giving “proof of concepts” results that can inspire future application or impossibility results that can rule out certain directions. Sometimes it is backward-looking or <em>descriptive</em> – explaining phenomena uncovered by experiments and putting them in a larger context.</p>
-
-
-
-<h2>What is machine learning?</h2>
-
-
-
-<p>Before we talk about what is machine-learning theory, we should talk about what is machine learning. It’s common to see claims of the form “machine learning is X”:</p>
-
-
-
-<ul><li>Machine learning is just statistics</li><li>Machine learning is just optimization</li><li>Machine learning is just approximation or “curve fitting”</li></ul>
-
-
-
-<p>and probably many more.</p>
-
-
-
-<p>I view machine learning as addressing the following setup:</p>
-
-
-
-<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/KPvtSl6.png"/></figure>
-
-
-
-<p>There is a system <img alt="f" class="latex" src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="f"/> that interacts with the world around it in some manner, and we have some sense of whether this interaction is successful or unsuccessful.</p>
-
-
-
-<p>For example, a self-driving car is “successful” if it gets passengers from point A to point B safely, quickly, and comfortably. It is “unsuccessful” if it gets into accidents, takes a long time, or drives in a halting or otherwise uncomfortable manner.</p>
-
-
-
-<h3>Three levels of indirection</h3>
-
-
-
-<p>The system <img alt="f" class="latex" src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="f"/> is the “machine.” It is “learning” since we <em>adapt</em> <img alt="f" class="latex" src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="f"/> so that it becomes more successful. Ideally, we would set <img alt="f" class="latex" src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="f"/> to be the most successful system. However, what we actually do is at least <em>thrice-removed</em> from this ideal:</p>
-
-
-
-<ol><li><strong>The model gap:</strong> We do not optimize overall possible systems, but rather a small subset of such systems (e.g., ones that belong to a certain family of models).</li><li><strong>The metric gap:</strong> In almost all cases, we do not optimize the actual measure of success we care about, but rather another metric that is at best correlated with it.</li><li><strong>The algorithm gap:</strong> We don’t even optimize the latter metric since it will almost always be non-convex, and hence the system we end up with depends on our starting point and the particular algorithms we use.</li></ol>
-
-
-
-<p>The magic of machine learning is that sometimes (though not always!) we can still get good results despite these gaps. Much of the theory of machine learning is about understanding under what conditions can we bridge some of these gaps.</p>
-
-
-
-<p>The above discussion explains the “machine Learning is just X” takes. The expressivity of our models falls under <em>approximation theory</em>. The gap between the success we want to achieve and the metric we can measure often corresponds to the difference between <em>population</em> and <em>sample</em> performance, which becomes a question of <em>statistics</em>. The study of our algorithms’ performance falls under <em>optimization</em>.</p>
-
-
-
-<p>The <strong>metric gap</strong> is perhaps the widest of them all. While in some settings (e.g., designing systems to play video games) we can directly measure a system’s success, this is typically the exception rather than rule. Often:</p>
-
-
-
-<ul><li>The data we have access to is not the data the system will run on and might not even come from the same distribution.</li><li>The measure of success that we care about is not necessarily well defined or accessible to us. Even if it was, it is not necessarily in a form that we can directly optimize.</li></ul>
-
-
-
-<p>Nevertheless, the hope is that if we optimize the hell out of the metrics we can measure, the system will perform well in the way we care about. In other words:</p>
-
-
-
-<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/tDKqZZC.jpg"/></figure>
-
-
-
-<p>A priori, it is not clear that this should be the case, and indeed it’s not always is. Part of the magic of auto-differentiation is that it allows optimization of more complex metrics that match more closely with the success metric we have in mind. But, except for very special circumstances, the two metrics can never be the same. The mismatch between the goal we have and the metric we optimize can manifest in one of the following general ways:</p>
-
-
-
-<ul><li><strong>“No free lunch”</strong> or <a href="https://en.wikipedia.org/wiki/Goodhart%27s_law">Goodhart’s law</a>: If we optimize a metric <img alt="\mathcal{M}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BM%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="\mathcal{M}"/> then we will get a system that does very well at <img alt="\mathcal{M}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BM%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="\mathcal{M}"/> and not at all well in any other measure. For example, if we optimize accuracy in predicting images, then we may <a href="https://arxiv.org/abs/1805.12152">not do well</a> on slightly perturbed versions of these images.</li><li><strong>“It’s not the destination, it’s the journey”</strong> or <a href="https://en.wikipedia.org/wiki/Anna_Karenina_principle">Anna Karenina principle</a>: All successful systems are similar to one another, and hence if we make our system successful with respect to a metric <img alt="\mathcal{M}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BM%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="\mathcal{M}"/> then it is likely to also be successful with respect to related measures. For example, image classifiers trained on ImageNet have been successfully used for very different images, and there is also evidence that success in ImageNet translates into success on a related distribution (i.e., <a href="https://arxiv.org/abs/1902.10811">ImageNet v2</a>).</li></ul>
-
-
-
-<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/mzSqGVe.png"/></figure>
-
-
-
-<p>At the moment, we have no good way to predict when a system will behave according to Goodhart’s law versus the Anna Karenina principle. It seems that when it comes to learning <em>representations</em>, machine learning systems follow the Anna Karenina principle: all successful models tend to learn very similar representations of their data. In contrast, when it comes to making <em>decisions</em>, we get manifestations of Goodhart’s law, and optimizing for one metric can give very different results than the other.</p>
-
-
-
-<p>The <strong>model gap</strong> is the gap between the set of all possible systems and the set that we actually optimize over. Even if a system can be captured as a finite function (say a function mapping <img alt="32 \times 32" class="latex" src="https://s0.wp.com/latex.php?latex=32+%5Ctimes+32&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="32 \times 32"/> pixel images to <img alt="10" class="latex" src="https://s0.wp.com/latex.php?latex=10&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="10"/> classes), a simple counting argument shows that the vast majority of these functions require far too many gates to be efficiently computable by any reasonable computational model. (In case you are curious, the counting argument also works for <em>quantum</em> circuits.) Hence we necessarily have to deal with a subclass of all possible functions.</p>
-
-
-
-<p>This raises the question of whether we should expect a realizable system to <em>exist</em>, let alone for us to find it. Often machine learning is used in <em>artifical intelligence</em> applications, where we are trying to mimic human performance. In such cases, human performance is an “existence proof” that some reasonably-sized circuit is successful in the goal. But whether this circuit can be embedded in our model family is still an open question.</p>
-
-
-
-<p>Remember when I said that sometimes it’s not about the journey but about the destination? I lied. The <strong>algorithm gap</strong> implies that in modern machine learning, there is a certain sense in which it is always about the journey. In modern machine learning, the system <img alt="f" class="latex" src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="f"/> is typically parameterized by a vector <img alt="w \in \mathbb{R}^N" class="latex" src="https://s0.wp.com/latex.php?latex=w+%5Cin+%5Cmathbb%7BR%7D%5EN&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="w \in \mathbb{R}^N"/> of real numbers. Hence the <em>metric</em> we optimize over is to minimize some loss function <img alt="\mathcal{L}(w)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BL%7D%28w%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="\mathcal{L}(w)"/>. We use <em>local search algorithms</em>, which start off at some vector <img alt="w_0" class="latex" src="https://s0.wp.com/latex.php?latex=w_0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="w_0"/> chosen via some distribution, and then iteratively takes small steps <img alt="w_1,w_2,w_3,\ldots" class="latex" src="https://s0.wp.com/latex.php?latex=w_1%2Cw_2%2Cw_3%2C%5Cldots&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="w_1,w_2,w_3,\ldots"/>. For each <img alt="w_i" class="latex" src="https://s0.wp.com/latex.php?latex=w_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="w_i"/>, the next step <img alt="w_{i+1}" class="latex" src="https://s0.wp.com/latex.php?latex=w_%7Bi%2B1%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="w_{i+1}"/> is chosen from some distribution of vectors close to <img alt="w_i" class="latex" src="https://s0.wp.com/latex.php?latex=w_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="w_i"/> such that (hopefully) in expectation <img alt="\mathcal{L}(w_{i+1}) &lt; \mathcal{L}(w_i)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BL%7D%28w_%7Bi%2B1%7D%29+%3C+%5Cmathcal%7BL%7D%28w_i%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="\mathcal{L}(w_{i+1}) &lt; \mathcal{L}(w_i)"/>.</p>
-
-
-
-<p>Modern machine learning systems are <em>non convex</em>, which means that the final point <img alt="w_t" class="latex" src="https://s0.wp.com/latex.php?latex=w_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" title="w_t"/> we end up in depends on the starting point, the algorithms, and the randomness. Hence, we can’t have a neat “separation of concerns” and decouple the <strong>architecture</strong>, <strong>metric</strong>, and <strong>algorithm</strong>. When we say that a system obeys the “Anna Karenina principle,” we really mean that for <em>natural algorithms</em> to optimize <em>natural metrics</em> on <em>natural architectures</em>, successful outputs (ones that do well on the metric) are likely to be similar to one another. The use of the “natural” qualifier is a warning sign that we don’t fully understand the conditions under which this happens, but it is clear that some conditions are necessary. Due to non-convexity, it is typically possible to find a “bad minima” that would be very good in some specific metric but terrible in other ones.</p>
-
-
-
-<h2>Types of theory for machine learning (and for CS in general)</h2>
-
-
-
-<p>Given the above discussion, what kind of theoretical results should we expect in machine learning? Let’s try to classify the type of results we see in general theoretical computer science. In the discussion below, I will focus on the <em>limitations</em> of these theoretical results and use humorous names, but make no mistake: all of these categories correspond to valuable theoretical insights.</p>
-
-
-
-<h3>End to end analysis</h3>
-
-
-
-<p>The <em>quicksort</em> algorithm provides a canonical example of algorithm analysis. At this point, we have a reasonably complete understanding of quicksort. We can analyze the distribution of its running time down to the constant.</p>
-
-
-
-<p>Hence we have an efficient algorithm, used in practice, with rigoroulsy proven theorems that precisely characterize its performance. This is the “gold standard” of analysis, but also an unrealistic and unachievable goal in almost any other setting.</p>
-
-
-
-<h3>Proof of concept</h3>
-
-
-
-<p>A more common situation is that we have algorithms that work in practice and algorithms with rigorous analysis, but they are not the same algorithms. A canonical example is linear programming. The simplex algorithm often works well in practice but was known to take exponential time on certain instances. For a long time, it was an open question whether or not there is an algorithm for linear programming that take polynomial time in the worst case.</p>
-
-
-
-<p>In 1979, Khachiyan gave the <em>Ellipsoid</em> algorithm that runs in polynomial time, but with a polynomial so large that it is impractical. Still, the Ellipsoid algorithm was a great breakthrough, giving hope for better algorithms and a new approach for defining progress measures for linear programming instances. Indeed in 1984, Karmarkar came up with the <em>interior points</em> algorithm, with much better time dependence.</p>
-
-
-
-<p>The interior-point algorithm is practical and often outperforms the simplex method on large enough instances. However, the algorithm as implemented is not identical to the one analyzed- implementations use different step sizes and other heuristics for which we do not have a precise analysis.</p>
-
-
-
-<p>Nevertheless, even if (unlike quicksort) the rigorously analyzed algorithm is not identical to the practical implementations, the story of linear programming shows how crucial “proofs of concept” can be to introducing new ideas and techniques.</p>
-
-
-
-<p>The flip side of “proof of concept” results are <em>impossiblity results</em> that rule out even “proof of concept ” algorithms. Impossibility results always come with fine print and caveats (for example, NP-hardness results always refer to <em>worst case</em> complexity). However, they still teach us about the structure of the problem and help define the contours of what we can expect to achieve.</p>
-
-
-
-<h2>Character witness</h2>
-
-
-
-<p>“End to end analysis” is when we can prove the guarantees we need on algorithms we actually want to use. “Proof of concept” is when we prove the guarantees we need on impractical algorithms. A “character witness” result is when we prove something positive about an algorithm people use in practice, even if that positive property falls short of the guarantees we actually want.</p>
-
-
-
-<p>While the term “character witness” sounds derogatory, such results can sometimes yield truly profound insights. A canonical example again comes from linear programming. While the simplex algorithm can be exponential in the worst case, in a seminal work, Spielman and Teng showed that it does run in polynomial-time if the input is slightly perturbed- this is so-called <em>smoothed analysis</em>. While the actual polynomial and the level of perturbation do not yield practical bounds, this is still an important result. It gives formal meaning to the intuition that the simplex only fails on “pathological” instances and initiated a new mode of analyzing algorithms between worst-case and average-case complexity.</p>
-
-
-
-<p>In machine learning, a “character witness” result can take many forms. For example, some “character witness” results are analyses of algorithms under certain assumptions on the data, that even if not literally true, seem like they could be “morally true”. Another type of “character witness” result shows that an algorithm would yield the right results if it is allowed to run for an infinite or exponentially long time. Evaluating the significance of such results can be challenging. The main question is whether the analysis teaches us something we didn’t know before.</p>
-
-
-
-<p>A third type of “character witness” results are quantitative bounds that are too weak for practical use but are still non-vacuous. For example, approximation algorithms with too big of an approximation factor, or generalization bounds with too big of a guaranteed gap. In such cases, one would hope that these bounds will be at least correlated with performance: algorithms with better bounds will also have higher quality output.</p>
-
-
-
-<h2>Toy problems</h2>
-
-
-
-<p>The name “toy problem” also sounds derogatory, but toy problems or toy models can be extremely important in science, and machine learning is no different. A toy model is a way to abstract the salient issues of a model to enable analysis. Results on “toy models” can teach us about general principles that hold in more complex models.</p>
-
-
-
-<p>When choosing a toy model, it is important not to mistake models that share superficial similarity with models that keep the salient issues we want to study. For example, consider the following two variants of deep neural networks:</p>
-
-
-
-<ul><li>Networks that have standard architecture except that we make them extremely wide, with the width tending to infinity independently of all other parameters.</li><li>Networks where all activation functions are linear.</li></ul>
-
-
-
-<p>Since the practical intuition is that bigger models are better, it may seem that such “ultra-wide” models are not toy models at all and should capture state of the art deep networks. However, the neural tangent kernel results show that these models become kernel models that do not learn their representation at all.</p>
-
-
-
-<p>Intuitively, making activation functions linear seems pointless since the composition of linear functions is linear, and hence such linear networks are no more expressive than a layer one linear net. Thus such linear networks seem too much of a “toy model” (maybe a “happy meal model”?). Yet, it turns out that despite their limited expressivity, deep linear networks capture an essential feature of deep networks- the bias induced by the gradient descent algorithm. For example, running gradient descent on a depth two linear network translate to regularizing by a proxy of <em>rank</em>. In general, gradient descent on a deep linear network induces a very different geometry on the manifold of linear functions.</p>
-
-
-
-<p>Hence, although the first model seems much more “real” than the second one, there are some deep learning questions where the second model is more relevant.</p>
-
-
-
-<h3>Theory without theorems</h3>
-
-
-
-<p>One might think that the whole point of theory is to provide rigorous results: if we are not going to prove theorems, we might as well use benchmarks. Yet, there are important theoretical insights we can get from experiments. A favorite example of mine is the Zhang et al result that deep neural networks can fit random labels. This simple experiment ruled out in one fell swoop a whole direction for proving generalization bounds on deep nets. A theory work does not have to involve theorems: well-chosen experiments can provide important theoretical insights.</p>
-
-
-
-<h2>Conclusion</h2>
-
-
-
-<p>The above was a stream-of-consciousness and very rough personal overview of questions and results in ML theory. In the <a href="https://boazbk.github.io/mltheoryseminar/">coming seminar</a> we will see results of all the types above, as well as many open questions.</p>
-
-
-
-<p><strong>Acknowledgements:</strong> Thanks to Yamini Bansal and Preetum Nakkiran for helpful comments (though they are not to blame for any mistakes!)</p></div>
-    </content>
-    <updated>2021-01-15T21:41:55Z</updated>
-    <published>2021-01-15T21:41:55Z</published>
-    <category term="ML Theory seminar"/>
-    <author>
-      <name>Boaz Barak</name>
-    </author>
-    <source>
-      <id>https://windowsontheory.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://windowsontheory.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://windowsontheory.org" rel="alternate" type="text/html"/>
-      <link href="https://windowsontheory.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>A Research Blog</subtitle>
-      <title>Windows On Theory</title>
-      <updated>2021-02-01T18:21:19Z</updated>
+      <updated>2021-02-01T18:37:51Z</updated>
     </source>
   </entry>
 </feed>
