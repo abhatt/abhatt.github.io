@@ -243,7 +243,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at February 17, 2021 09:22 PM UTC</span>.
+Last updated <span class="datestr">at February 17, 2021 09:39 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -251,6 +251,356 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://windowsontheory.org/?p=7992">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/wot.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://windowsontheory.org/2021/02/17/what-do-deep-networks-learn-and-when-do-they-learn-it/">What do deep networks learn and when do they learn it</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://windowsontheory.org" title="Windows On Theory">Windows on Theory</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p><em>Scribe notes by <a href="https://manosth.github.io/">Manos Theodosis</a></em></p>
+
+
+
+<p><strong>Previous post:</strong> <a href="https://windowsontheory.org/2021/01/31/a-blitz-through-classical-statistical-learning-theory/">A blitz through statistical learning theory</a> <strong>Next post:</strong> TBD. See also <a href="https://windowsontheory.org/category/ml-theory-seminar/">all seminar posts</a> and <a href="https://boazbk.github.io/mltheoryseminar/cs229br.html#plan">course webpage</a>.</p>
+
+
+
+<p><a href="https://harvard.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=c518b9e4-5f63-4278-871d-acc2017b8984">Lecture video</a> – <a href="https://boazbk.github.io/mltheoryseminar/lectures/seminar_lecture2.pdf">Slides (pdf)</a> – <a href="http://files.boazbarak.org/misc/mltheory/ML_seminar_lecture_2.pptx">Slides (powerpoint with ink and animation)</a></p>
+
+
+
+<p>In this lecture, we talk about <em>what</em> neural networks end up learning (in terms of their weights) and <em>when</em>, during training, they learn it.</p>
+
+
+
+<p>In particular, we’re going to discuss</p>
+
+
+
+<ul><li><strong>Simplicity bias</strong>: how networks favor “simple” features first.</li><li><strong>Learning dynamics</strong>: what is learned early in training.</li><li><strong>Different layers</strong>: do the different layers learn the same features?</li></ul>
+
+
+
+<p>The type of results we will discuss are:</p>
+
+
+
+<ul><li>Gradient-based deep learning algorithms have a bias toward learning simple classifiers. In particular this often holds when the optimization problem they are trying to solve is “underconstrained/overparameterized”, in the sense that there are exponentially many different models that fit the data.</li><li>Simplicity also affects the <em>timing</em> of learning. Deep learning algorithms tend to learn simple (but still predictive!) features first.</li><li>Such “simple predictive features” tend to be in lower (closer to input) levels of the network. Hence deep learning also tends to learn lower levels earlier.</li><li>On the other side, the above means that distributions that do not have “simple predictive features” pose significant challenges for deep learning. Even if there is a small neural network that works very well for the distribution, gradient-based algorithms will not “get off the ground” in such cases. We will see a lower bound for <em>learning parities</em> that makes this intuition formal.</li></ul>
+
+
+
+<h2>What do neural networks learn, and when do they learn it?</h2>
+
+
+
+<p>As a first example to showcase what is learned by neural networks, we’ll consider the following data distribution where we sample points <img src="https://s0.wp.com/latex.php?latex=%28X%2C+Y%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(X, Y)" class="latex" title="(X, Y)" />, with <img src="https://s0.wp.com/latex.php?latex=Y+%5Cin+%7B1%2C+-1%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Y \in {1, -1}" class="latex" title="Y \in {1, -1}" /> (<img src="https://s0.wp.com/latex.php?latex=Y+%3D+1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Y = 1" class="latex" title="Y = 1" /> corresponding to orange points and <img src="https://s0.wp.com/latex.php?latex=Y%3D-1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Y=-1" class="latex" title="Y=-1" /> corresponding to blue points).<br /><img src="https://i.imgur.com/xiXoqDj.png" alt="" /></p>
+
+
+
+<p>If we <a href="http://tfmeter.icsi.berkeley.edu/#activation=tanh&amp;batchSize=10&amp;dataset=byod&amp;regDataset=reg-plane&amp;learningRate=0.03&amp;trueLearningRate=0&amp;regularizationRate=0&amp;noise=35&amp;networkShape=10,6,4,2&amp;seed=0.36834921&amp;showTestData=false&amp;discretize=false&amp;percTrainData=74&amp;x=true&amp;y=true&amp;xTimesY=false&amp;xSquared=false&amp;ySquared=false&amp;cosX=false&amp;sinX=false&amp;cosY=false&amp;sinY=false&amp;collectStats=false&amp;problem=classification&amp;initZero=false&amp;hideText=false">train</a> a neural network to fit this distribution, we can see below that the neurons that are closest to the input data end up learning features that are highly correlated with the input (mostly linear subspaces at 45-degree angle, which correspond to one of the stripes). In the subsequent layers, the features learned are more sophisticated and have increased complexity.<br /><img src="https://i.imgur.com/p2FQdUd.png" alt="" /><br />)</p>
+
+
+
+<h3>Neural networks have simpler but useful features in lower layers</h3>
+
+
+
+<p>Some people have spent a lot of time trying to understand what is learned by different layers. In a <a href="https://distill.pub/2020/circuits/early-vision/">recent</a> work, Olah et al. dig deep into a particular architecture for computer vision, trying to interpret the features learned by neurons at different layers.</p>
+
+
+
+<p>They found that earlier layers learn features that resemble edge detectors.<br /><img src="https://i.imgur.com/I8veBVf.png" alt="" /><br />However, as we go deeper, the neurons at those layers start learning more convoluted (for example, these features from layer <img src="https://s0.wp.com/latex.php?latex=3b&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="3b" class="latex" title="3b" /> resemble heads).<br /><img src="https://i.imgur.com/rJsmKHR.png" alt="" /></p>
+
+
+
+<h3>SGD learns simple (but still predictive) features earlier.</h3>
+
+
+
+<p>There is evidence that <a href="https://arxiv.org/abs/1905.11604">SGD learns simpler classifiers first</a>. The following figure tracks how much of a learned classifier’s performance can be accounted for by a linear classifier. We see that up to a certain point in training <em>all</em> of the performance of the neural network learned by SGD (measured as mutual information with the label or as accuracy) can be ascribed to the linear classifier. They diverge only very near the point where the linear classifier “saturates,” in the sense that the classifier reachers the best possible accuracy for linear models. (We use the quantity <img src="https://s0.wp.com/latex.php?latex=I%28f%28x%29%3By+%7CL%28x%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I(f(x);y |L(x))" class="latex" title="I(f(x);y |L(x))" /> – the mutual information of <img src="https://s0.wp.com/latex.php?latex=f%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f(x)" class="latex" title="f(x)" /> and <img src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="y" class="latex" title="y" /> conditioned on the prediction of the linear classifier <img src="https://s0.wp.com/latex.php?latex=L%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="L(x)" class="latex" title="L(x)" /> – to measure how much of <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" title="f" />‘s performance <em>cannot</em> be accounted for by <img src="https://s0.wp.com/latex.php?latex=L&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="L" class="latex" title="L" />.)</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/pGxap3e.png" alt="" /></figure>
+
+
+
+<h3>The benefits and pitfalls of simplicity bias</h3>
+
+
+
+<p>In general, simplicity bias is a very good thing. For example, the most “complex” function is a random function. However, if given some observed data <img src="https://s0.wp.com/latex.php?latex=%7B+%28x_i%2Cy_i%29%7D_%7Bi%5Cin+%5Bn%5D%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="{ (x_i,y_i)}_{i\in [n]}" class="latex" title="{ (x_i,y_i)}_{i\in [n]}" />, SFD were to find a random function <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" title="f" /> that perfectly fits it, then it would never generalize (since for every fresh <img src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x" class="latex" title="x" />, the value of <img src="https://s0.wp.com/latex.php?latex=f%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f(x)" class="latex" title="f(x)" /> would be random).</p>
+
+
+
+<p>At the same time, simplicity bias means that our algorithms might focus too much on simple solutions and miss more complex ones. Sometimes the complex solutions actually do perform better. In the following cartoon a person could go to the low-hanging fruit tree on the right-hand side and miss the bigger rewards on the left-hand side.</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/eijQfpl.png" alt="" /></figure>
+
+
+
+<p>This <a href="https://arxiv.org/abs/2006.07710">can actually happen</a> in neural networks. We also saw a simple example in class:</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/LvONKsw.png" alt="" /></figure>
+
+
+
+<p>The two datasets are equally easy to represent, but on the righthand side, there is a very strong “simple classifier” (the 45-degree halfspace) that SGD will “latch onto.” Once it gets stuck with that classifier, it is hard for SGD to get “unstuck.” As a result, SGD has a much harder time learning the righthand dataset than the lefthand dataset.</p>
+
+
+
+<h2>Analysing SGD for over-parameterized linear regression</h2>
+
+
+
+<p>So, what can we prove about the dynamics of gradient descent? Often we can gain insights by studying <em>linear regression</em>.</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/T9VGkXj.png" alt="" /></figure>
+
+
+
+<p>Formally, given <img src="https://s0.wp.com/latex.php?latex=%28x_i%2C+y_i%29_%7Bi%3D1%7D%5En+%5Cin+%5Cmathbb%7BR%7D%5E%7Bd%2B1%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(x_i, y_i)_{i=1}^n \in \mathbb{R}^{d+1}" class="latex" title="(x_i, y_i)_{i=1}^n \in \mathbb{R}^{d+1}" /> with <img src="https://s0.wp.com/latex.php?latex=d%5Cgg+n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="d\gg n" class="latex" title="d\gg n" /> we would like to find a vector <img src="https://s0.wp.com/latex.php?latex=w%5Cin%5Cmathbb%7BR%7D%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w\in\mathbb{R}^d" class="latex" title="w\in\mathbb{R}^d" /> such that <img src="https://s0.wp.com/latex.php?latex=%5Clangle+w%2C+x_i%5Crangle%5Capprox+y_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\langle w, x_i\rangle\approx y_i" class="latex" title="\langle w, x_i\rangle\approx y_i" />.</p>
+
+
+
+<p>In this setting, we can prove that running SGD (from zero or tiny initialization) on the loss <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BL%7D%28w%29+%3D%5ClVert+Xw+-y+%5CrVert%5E2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{L}(w) =\lVert Xw -y \rVert^2" class="latex" title="\mathcal{L}(w) =\lVert Xw -y \rVert^2" /> will converge to solution <img src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w" class="latex" title="w" /> of minimum norm. To see whym note that SGD performs updates of the form<br /><img src="https://s0.wp.com/latex.php?latex=w_%7Bt%2B1%7D+%3D+w_t+-+%5Ceta+x_i%5ET%28%5Clangle+x_i%2C+w%5Crangle+-+y_i%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w_{t+1} = w_t - \eta x_i^T(\langle x_i, w\rangle - y_i)" class="latex" title="w_{t+1} = w_t - \eta x_i^T(\langle x_i, w\rangle - y_i)" />.<br />However note that <img src="https://s0.wp.com/latex.php?latex=%5Ceta%28%5Clangle+x_i%2C+w%5Crangle+-+y_i%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\eta(\langle x_i, w\rangle - y_i)" class="latex" title="\eta(\langle x_i, w\rangle - y_i)" /> is a scalar. Therefore all of the updates keep the updated vector <img src="https://s0.wp.com/latex.php?latex=w_%7Bt%2B1%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w_{t+1}" class="latex" title="w_{t+1}" /> within <img src="https://s0.wp.com/latex.php?latex=%5Cmathrm%7Bspan%7D%28x_1%5ET%2C+%5Cldots%2C+x_n%5ET%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathrm{span}(x_1^T, \ldots, x_n^T)" class="latex" title="\mathrm{span}(x_1^T, \ldots, x_n^T)" />. This implies that the converging solution <img src="https://s0.wp.com/latex.php?latex=w_%7B%5Cinfty%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w_{\infty}" class="latex" title="w_{\infty}" /> will also lie in <img src="https://s0.wp.com/latex.php?latex=%5Cmathrm%7Bspan%7D%28x_1%5ET%2C+%5Cldots%2C+x_n%5ET%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathrm{span}(x_1^T, \ldots, x_n^T)" class="latex" title="\mathrm{span}(x_1^T, \ldots, x_n^T)" />.<br /><img src="https://i.imgur.com/G8tFMrF.png" alt="" /><br />Geometrically this translates into <img src="https://s0.wp.com/latex.php?latex=w_%7B%5Cinfty%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w_{\infty}" class="latex" title="w_{\infty}" /> being the projection of <img src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="y" class="latex" title="y" /> onto the the subspace <img src="https://s0.wp.com/latex.php?latex=%5Cmathrm%7Bspan%7D%28x_1%5ET%2C+%5Cldots%2C+x_n%5ET%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathrm{span}(x_1^T, \ldots, x_n^T)" class="latex" title="\mathrm{span}(x_1^T, \ldots, x_n^T)" /> which results in the least norm solution.</p>
+
+
+
+<p>Analyzing the dynamics of descent, we can write the distance between consecutive weight updates and the converging solution as<br /><img src="https://s0.wp.com/latex.php?latex=w_%7Bt%2B1%7D+-+w_%7B%5Cinfty%7D+%3D+%28I+-+%5Ceta+X%5ETX%29%28w_t+-+w_%7B%5Cinfty%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w_{t+1} - w_{\infty} = (I - \eta X^TX)(w_t - w_{\infty})" class="latex" title="w_{t+1} - w_{\infty} = (I - \eta X^TX)(w_t - w_{\infty})" />.<br />We see that we are applying the linear operator <img src="https://s0.wp.com/latex.php?latex=%28I+-+%5Ceta+X%5ETX%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(I - \eta X^TX)" class="latex" title="(I - \eta X^TX)" /> at every step we take. As long as this operator is contractive, we will continue to progress and converge to <img src="https://s0.wp.com/latex.php?latex=w_%7B%5Cinfty%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w_{\infty}" class="latex" title="w_{\infty}" />. Formally, to make progress, we require<br /><img src="https://s0.wp.com/latex.php?latex=0+%5Cprec+I+-%5Ceta+X%5ETX%5Cprec+1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="0 \prec I -\eta X^TX\prec 1" class="latex" title="0 \prec I -\eta X^TX\prec 1" />.<br />This directly translates into <img src="https://s0.wp.com/latex.php?latex=%5Ceta+%3C+%5Cfrac%7B1%7D%7B%5Clambda_1%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\eta &lt; \frac{1}{\lambda_1}" class="latex" title="\eta &lt; \frac{1}{\lambda_1}" /> and then the progress we make is approximately <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B%5Clambda_d%7D%7B%5Clambda_1%7D%3D%5Cfrac%7B1%7D%7B%5Ckappa%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\frac{\lambda_d}{\lambda_1}=\frac{1}{\kappa}" class="latex" title="\frac{\lambda_d}{\lambda_1}=\frac{1}{\kappa}" />, where <img src="https://s0.wp.com/latex.php?latex=%5Ckappa&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\kappa" class="latex" title="\kappa" /> is the <em>condition number</em> of <img src="https://s0.wp.com/latex.php?latex=X&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="X" class="latex" title="X" />.</p>
+
+
+
+<p>What happens now if the matrix <img src="https://s0.wp.com/latex.php?latex=X&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="X" class="latex" title="X" /> is random? Then, results from random matrix theory (specifically the <a href="https://en.wikipedia.org/wiki/Marchenko%E2%80%93Pastur_distribution">Marchenko-Pastur distribution</a>) state that</p>
+
+
+
+<ul><li>if <img src="https://s0.wp.com/latex.php?latex=d+%3C+n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="d &lt; n" class="latex" title="d &lt; n" />, then the matrix <img src="https://s0.wp.com/latex.php?latex=X%5E%5Ctop+X&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="X^\top X" class="latex" title="X^\top X" /> has <img src="https://s0.wp.com/latex.php?latex=%5Cmathrm%7Brank%7D%28X%5E%5Ctop+X%29%3Dd&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathrm{rank}(X^\top X)=d" class="latex" title="\mathrm{rank}(X^\top X)=d" /> and the eigenvalues are bounded away from <img src="https://s0.wp.com/latex.php?latex=0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="0" class="latex" title="0" />. This means that the matrix is well conditioned.</li><li>if <img src="https://s0.wp.com/latex.php?latex=d+%5Capprox+n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="d \approx n" class="latex" title="d \approx n" />, then the spectrum of <img src="https://s0.wp.com/latex.php?latex=X%5E%5Ctop+X&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="X^\top X" class="latex" title="X^\top X" /> starts shifting towards <img src="https://s0.wp.com/latex.php?latex=0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="0" class="latex" title="0" />, with some eigenvalues being equal to zero, resulting in an ill-conditioned matrix.</li><li>if <img src="https://s0.wp.com/latex.php?latex=d+%3E+n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="d &gt; n" class="latex" title="d &gt; n" />, then the spectrum has some zero eigenvalues, but is otherwise bounded away from zero. If we restrict to the subspace of positive eigenvalues, we achieve again a good condition number.</li></ul>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/hLZtfz5.png" alt="" /></figure>
+
+
+
+<p></p>
+
+
+
+<h2>Deep linear networks</h2>
+
+
+
+<p>We now want to go beyond linear regression and talk about deep networks. As deep networks are very hard to understand, we will first start analyzing a depth <img src="https://s0.wp.com/latex.php?latex=2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="2" class="latex" title="2" /> network. We will also consider a <em>linear</em> network and omit the nonlinearity. This might seem strange, as we could consider the corresponding linear model, which has exactly the same expressiveness. However, note that these two models have a different parameter space. This means that gradient-based algorithms will travel on different paths when optimizing these two models.</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/ekh9k8M.png" alt="" /></figure>
+
+
+
+<p>Specifically, we can see that the minimum loss attained by the two models will coincide, i.e., <img src="https://s0.wp.com/latex.php?latex=%5Cmin+%5Cmathcal%7BL%7D%28A_1%2C+A_2%29+%3D+%5Cmin+%5Cmathcal%7BL%7D%28B%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\min \mathcal{L}(A_1, A_2) = \min \mathcal{L}(B)" class="latex" title="\min \mathcal{L}(A_1, A_2) = \min \mathcal{L}(B)" />, but the SGD path and the solution will be different.</p>
+
+
+
+<p>We will analyze the gradient flow on these two networks (which is gradient descent with the learning rate <img src="https://s0.wp.com/latex.php?latex=%5Ceta+%5Crightarrow+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\eta \rightarrow 0" class="latex" title="\eta \rightarrow 0" />). We will make the simplifying assumption that <img src="https://s0.wp.com/latex.php?latex=A_1+%3D+A_2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="A_1 = A_2" class="latex" title="A_1 = A_2" /> and symmetric. Then, we can see that <img src="https://s0.wp.com/latex.php?latex=B+%3D+A%5E2+%5CRightarrow+A+%3D+%5Csqrt%7BB%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="B = A^2 \Rightarrow A = \sqrt{B}" class="latex" title="B = A^2 \Rightarrow A = \sqrt{B}" />. We will try and compare the gradient flow of two different loss functions: <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BL%7D%28B%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{L}(B)" class="latex" title="\mathcal{L}(B)" /> (doing gradient flow on a linear model) and <img src="https://s0.wp.com/latex.php?latex=%5Ctilde%7B%5Cmathcal%7BL%7D%7D%28A%29+%3D+%5Cmathcal%7BL%7D%28A%5E2%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\tilde{\mathcal{L}}(A) = \mathcal{L}(A^2)" class="latex" title="\tilde{\mathcal{L}}(A) = \mathcal{L}(A^2)" /> (doing gradient flow on a depth linear model).</p>
+
+
+
+<p>Gradient flow on the linear model simply gives <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7BdB%28t%29%7D%7Bdt%7D%3D-%5Cnabla%5Cmathcal%7BL%7D%28B%28t%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\frac{dB(t)}{dt}=-\nabla\mathcal{L}(B(t))" class="latex" title="\frac{dB(t)}{dt}=-\nabla\mathcal{L}(B(t))" />, whereas for the deep linear network we have (using the chain rule)<br /><img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7BdA%28t%29%7D%7Bdt%7D%3D-%5Cnabla%5Ctilde%7B%5Cmathcal%7BL%7D%7D%28A%28t%29%29+%3D+%5Cnabla%5Cmathcal%7BL%7D%28A%5E2%29A+%3D+A%5Cnabla%5Cmathcal%7BL%7D%28A%5E2%29%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\frac{dA(t)}{dt}=-\nabla\tilde{\mathcal{L}}(A(t)) = \nabla\mathcal{L}(A^2)A = A\nabla\mathcal{L}(A^2)," class="latex" title="\frac{dA(t)}{dt}=-\nabla\tilde{\mathcal{L}}(A(t)) = \nabla\mathcal{L}(A^2)A = A\nabla\mathcal{L}(A^2)," /><br />since <img src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="A" class="latex" title="A" /> is symmetric.</p>
+
+
+
+<p>For simplicity, let’s denote <img src="https://s0.wp.com/latex.php?latex=%5Cnabla%5Cmathcal%7BL%7D%28B%29+%3D+%5Cnabla%5Cmathcal%7BL%7D%28A%5E2%29+%3D+%5Cnabla&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\nabla\mathcal{L}(B) = \nabla\mathcal{L}(A^2) = \nabla" class="latex" title="\nabla\mathcal{L}(B) = \nabla\mathcal{L}(A^2) = \nabla" /> and <img src="https://s0.wp.com/latex.php?latex=%5Cnabla%5Ctilde%7B%5Cmathcal%7BL%7D%7D%28A%29+%3D+%5Ctilde%7B%5Cnabla%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\nabla\tilde{\mathcal{L}}(A) = \tilde{\nabla}" class="latex" title="\nabla\tilde{\mathcal{L}}(A) = \tilde{\nabla}" />. We then have<br /><img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7BdA%5E2%28t%29%7D%7Bdt%7D%3D%5Cfrac%7BdA%28t%29%7D%7Bdt%7DA%3D-%5Ctilde%7B%5Cnabla%7DA+%3D+-A+%5Cnabla+A&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\frac{dA^2(t)}{dt}=\frac{dA(t)}{dt}A=-\tilde{\nabla}A = -A \nabla A" class="latex" title="\frac{dA^2(t)}{dt}=\frac{dA(t)}{dt}A=-\tilde{\nabla}A = -A \nabla A" />.</p>
+
+
+
+<p>Another way to view the comparison between the models of interest, <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7BdA%5E2%28t%29%7D%7Bdt%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\frac{dA^2(t)}{dt}" class="latex" title="\frac{dA^2(t)}{dt}" /> and <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7BdB%28t%29%7D%7Bdt%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\frac{dB(t)}{dt}" class="latex" title="\frac{dB(t)}{dt}" /> is as follows: let <img src="https://s0.wp.com/latex.php?latex=B+%3D+A%5E2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="B = A^2" class="latex" title="B = A^2" />, then <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7BdB%28t%29%7D%7Bdt%7D+%3D+-A%5Cnabla+A+%3D+-%5Csqrt%7BB%7D%5Cnabla%5Cmathcal%7BL%7D%28B%28t%29%29%5Csqrt%7BB%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\frac{dB(t)}{dt} = -A\nabla A = -\sqrt{B}\nabla\mathcal{L}(B(t))\sqrt{B}" class="latex" title="\frac{dB(t)}{dt} = -A\nabla A = -\sqrt{B}\nabla\mathcal{L}(B(t))\sqrt{B}" />.<br />We can view this as follows: when we multiply the gradient with <img src="https://s0.wp.com/latex.php?latex=%5Csqrt%7BB%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\sqrt{B}" class="latex" title="\sqrt{B}" /> we end up making the “big bigger and the small smaller”. Basically, this accenuates the differences between the eigenvalues and is biasing <img src="https://s0.wp.com/latex.php?latex=B&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="B" class="latex" title="B" /> to become a low-rank matrix. </p>
+
+
+
+<p>To see why, you can think of a low rank matrix has one that has few large eigenvalues and the others small. If <img src="https://s0.wp.com/latex.php?latex=B&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="B" class="latex" title="B" /> is already close low rank, then replacing a gradient by <img src="https://s0.wp.com/latex.php?latex=%5Csqrt%7BB%7D%5Cnabla%5Cmathcal%7BL%7D%28B%28t%29%29%5Csqrt%7BB%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\sqrt{B}\nabla\mathcal{L}(B(t))\sqrt{B}" class="latex" title="\sqrt{B}\nabla\mathcal{L}(B(t))\sqrt{B}" /> encourages the gradient steps to mostly happen in the top eigenspace of <img src="https://s0.wp.com/latex.php?latex=B&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="B" class="latex" title="B" />. This result <a href="https://arxiv.org/abs/1910.05505">generalizes</a> to networks of greater depth, and the gradient evolves as <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7BdB%28t%29%7D%7Bdt%7D+%3D+-%5Cpsi_%7BB%28t%29%7D%28%5Cnabla%5Cmathcal%7BL%7D%28B%28t%29%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\frac{dB(t)}{dt} = -\psi_{B(t)}(\nabla\mathcal{L}(B(t)))" class="latex" title="\frac{dB(t)}{dt} = -\psi_{B(t)}(\nabla\mathcal{L}(B(t)))" />, with <img src="https://s0.wp.com/latex.php?latex=%5Cpsi_%7BB%7D%28%5Cnabla%29+%3D+%5Csum+B%5E%7B%5Calpha%7D%5Cnabla+B%5E%7B1-%5Calpha%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\psi_{B}(\nabla) = \sum B^{\alpha}\nabla B^{1-\alpha}" class="latex" title="\psi_{B}(\nabla) = \sum B^{\alpha}\nabla B^{1-\alpha}" />.</p>
+
+
+
+<p>This means that we end up doing gradient flow on a <em>Riemannian manifold</em>. An interesting result is that the flow induced by the operator <img src="https://s0.wp.com/latex.php?latex=%5Cpsi_%7BB%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\psi_{B}" class="latex" title="\psi_{B}" /> is provably not equivalent to a regularized minimization problem <img src="https://s0.wp.com/latex.php?latex=%5Cmin%5Cmathcal%7BL%7D+%2B+%5Clambda+R%28B%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\min\mathcal{L} + \lambda R(B)" class="latex" title="\min\mathcal{L} + \lambda R(B)" /> for any <img src="https://s0.wp.com/latex.php?latex=R%28%5Ccdot%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="R(\cdot)" class="latex" title="R(\cdot)" />.</p>
+
+
+
+<h2>What is learned at different layers?</h2>
+
+
+
+<p>Finally, let’s discuss what is learned by the different layers in a neural network. Some intuition people have is that learning proceeds roughly like the following cartoon:</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/rteesY5.png" alt="" /></figure>
+
+
+
+<p>We can think of our data as being “built up” as a sequence of choices from higher level to lower level features. For example, the data is generated by first deciding that it would be a photo of a dog, then that it would be on the beach, and finally low-level details such as the type of fur and light. This is also how a human would describe this photo. In contrast, a neural network builds up the features in the opposite direction. It starts from the simplest (lowest-level) features in the image (edges, textures, etc.) and gradually builds up complexity until it finally classifies the image.</p>
+
+
+
+<h2>How neural networks learn features?</h2>
+
+
+
+<p>To build a bit of intuition, consider an example of combining different simple features. We can see that if we try to combine two good edge detectors with different orientations, the end result will hardly be an edge detector.<br /><img src="https://i.imgur.com/CsTB2LV.png" alt="" /></p>
+
+
+
+<p>So the intuition is that there is competitive/evolutionary pressure on neurons to “specialize” and recognize useful features. Initially, all the neurons are random features, which can be thought of as random linear combination of the various detectors. However, after training, the symmetry will break between the neurons, and they will specialize (in this simple example, they will either become vertical or horizontal edge detectors).</p>
+
+
+
+<p><a href="https://arxiv.org/abs/1706.05806">Raghu, Gilmer, Yosinski, and Sohl-Dickstein</a> tracked the speed at which features learned by different layers reach their final learned state. In the figure below the diagonal elements denote the similarity of the current state of a layer to its final one, where lighter color means that the state is more similar. We can see that earlier layer (more to the left) reach their final state earlier (with th exception of the 2 layers closest to the output that also converge very early).</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/qHTIAzz.png" alt="" /></figure>
+
+
+
+<p>The “symmetry breaking” intuition is explored by a recent work of <a href="https://arxiv.org/abs/1912.05671">Frankle, Dziugaite, Roy, and Carbin</a>. Intuitively, because the average of two good features is generally <em>not</em> a good feature, averaging the weights of two neural networks with small loss will likely result in a network with large loss. That is, if we start from two random initializations <img src="https://s0.wp.com/latex.php?latex=w_0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w_0" class="latex" title="w_0" />, $latex w’<em>0&amp;bg=ffffff$ and train two networks until we reach weights $latex w</em>\infty&amp;bg=ffffff$ and $latex w’<em>\infty&amp;bg=ffffff$ with small loss, then we expect the average of $latex w</em>\infty&amp;bg=ffffff$ and <img src="https://s0.wp.com/latex.php?latex=w%27_%5Cinfty&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w'_\infty" class="latex" title="w'_\infty" /> to result in a network with poor loss:</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/uLPBPpN.png" alt="" /></figure>
+
+
+
+<p>In contrast, Frankle et al showed that sometimes, when we start from the same initialization (especially after pruning) and use random SGD noise (obtained by randomly shuffling the training set) then we reach a “linear plateu” of the loss function in which averaging two networks yields a network with similar loss:</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/owtRGUL.png" alt="" /></figure>
+
+
+
+<h2>The contrapositive of simplicity: lower bounds for learning parities</h2>
+
+
+
+<p>If we believe that networks learn simple features first, and learn them in the early layers, then this has an interesting consequence. If the data has the form that simple features (e.g. linear or low degree) are completely uninformative (have no correlation with the label) then we may expect that learning cannot “get off the ground”. That is, even if there exists a small neural network that can learn the class, gradient based algorithms such as SGD will never find it. (In fact, it is possible that <em>no</em> efficient algorithm could find it.) There are some settings where we can prove such conjectures. (For gradient-based algorithms that is; proving this for all efficient algorithms would require settling the P vs NP question.)</p>
+
+
+
+<p>We discuss one of the canonical “hard” examples for neural networks: parities. Formally, for <img src="https://s0.wp.com/latex.php?latex=I%5Csubset+%5Bd%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I\subset [d]" class="latex" title="I\subset [d]" />, the distribution <img src="https://s0.wp.com/latex.php?latex=D_I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="D_I" class="latex" title="D_I" /> is the distribution over <img src="https://s0.wp.com/latex.php?latex=%28x%2Cy%29+%5Cin+%7B+%5Cpm+1+%7D%5E%7Bd%2B1%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(x,y) \in { \pm 1 }^{d+1}" class="latex" title="(x,y) \in { \pm 1 }^{d+1}" /> defined as follows: <img src="https://s0.wp.com/latex.php?latex=x%5Csim+%7B%5Cpm+1%7D%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x\sim {\pm 1}^d" class="latex" title="x\sim {\pm 1}^d" /> and <img src="https://s0.wp.com/latex.php?latex=y+%3D+%5Cprod_%7Bi%5Cin+I%7Dx_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="y = \prod_{i\in I}x_i" class="latex" title="y = \prod_{i\in I}x_i" />. The “learning parity” problem is as follows: given <img src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="n" class="latex" title="n" /> samples <img src="https://s0.wp.com/latex.php?latex=%7B+%28x_i%2Cy_i%29+%7D_%7Bi%3D1..n%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="{ (x_i,y_i) }_{i=1..n}" class="latex" title="{ (x_i,y_i) }_{i=1..n}" /> drawn from <img src="https://s0.wp.com/latex.php?latex=D_I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="D_I" class="latex" title="D_I" />, either recover <img src="https://s0.wp.com/latex.php?latex=I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I" class="latex" title="I" /> or do the weaker task of finding a predictor <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" title="f" /> such that <img src="https://s0.wp.com/latex.php?latex=f%28x%29%3Dy&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f(x)=y" class="latex" title="f(x)=y" /> with high probability over future samples <img src="https://s0.wp.com/latex.php?latex=%28x%2Cy%29+%5Csim+D_I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(x,y) \sim D_I" class="latex" title="(x,y) \sim D_I" />.</p>
+
+
+
+<p>It turns out that if we don’t restrict ourselves to deep learning, given <img src="https://s0.wp.com/latex.php?latex=2d&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="2d" class="latex" title="2d" /> samples we can recover <img src="https://s0.wp.com/latex.php?latex=I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I" class="latex" title="I" />. Consider the transformations <img src="https://s0.wp.com/latex.php?latex=Z_%7Bi%2Cj%7D+%3D+%281+-+x_%7Bi%2Cj%7D%29%2F2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Z_{i,j} = (1 - x_{i,j})/2" class="latex" title="Z_{i,j} = (1 - x_{i,j})/2" /> and <img src="https://s0.wp.com/latex.php?latex=b_i+%3D+%281+-+y_i%29%2F2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="b_i = (1 - y_i)/2" class="latex" title="b_i = (1 - y_i)/2" />. If we let <img src="https://s0.wp.com/latex.php?latex=s_i%3D1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s_i=1" class="latex" title="s_i=1" /> if <img src="https://s0.wp.com/latex.php?latex=i%5Cin+I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="i\in I" class="latex" title="i\in I" /> and <img src="https://s0.wp.com/latex.php?latex=0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="0" class="latex" title="0" /> otherwise, we can write <img src="https://s0.wp.com/latex.php?latex=%5Csum_j+Z_%7Bi%2C+j%7Ds_j+%3D+b_i+%28%5Ctext%7Bmod+%7D+2%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\sum_j Z_{i, j}s_j = b_i (\text{mod } 2)" class="latex" title="\sum_j Z_{i, j}s_j = b_i (\text{mod } 2)" />. Basically, we transformed the problem of parity to a problem of counting if we have an odd or an even number of <img src="https://s0.wp.com/latex.php?latex=-1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="-1" class="latex" title="-1" />. In this setting, we can think of every sample <img src="https://s0.wp.com/latex.php?latex=%28x%2Cy%29+%5Cin+D_I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(x,y) \in D_I" class="latex" title="(x,y) \in D_I" /> as providing a <em>linear equation</em> moudlo 2 over the <img src="https://s0.wp.com/latex.php?latex=d&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="d" class="latex" title="d" /> unknown variables <img src="https://s0.wp.com/latex.php?latex=s_1%2C%5Cldots%2Cs_d&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s_1,\ldots,s_d" class="latex" title="s_1,\ldots,s_d" />. When <img src="https://s0.wp.com/latex.php?latex=n%3Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="n&gt;d" class="latex" title="n&gt;d" />, these linear equations will be very likely to be of full rank, and hence we can use Gaussian elimination to find <img src="https://s0.wp.com/latex.php?latex=s_1%2C%5Cldots%2Cs_d&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s_1,\ldots,s_d" class="latex" title="s_1,\ldots,s_d" /> and hence <img src="https://s0.wp.com/latex.php?latex=I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I" class="latex" title="I" />.</p>
+
+
+
+<p>Switching to the learning setting, we can express parities by using few ReLUs. In particular, we’ve shown that we can create a step function using <img src="https://s0.wp.com/latex.php?latex=4&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="4" class="latex" title="4" /> ReLUs. Therefore for every <img src="https://s0.wp.com/latex.php?latex=k+%5Cin+%7B0%2C1%2C%5Cldots%2C+d+%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="k \in {0,1,\ldots, d }" class="latex" title="k \in {0,1,\ldots, d }" />, there is a combination of four ReLUs that computes the function <img src="https://s0.wp.com/latex.php?latex=f_k%3A%5Cmathbb%7BR%7D+%3A%5Crightarrow+%5Cmathbb%7BR%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f_k:\mathbb{R} :\rightarrow \mathbb{R}" class="latex" title="f_k:\mathbb{R} :\rightarrow \mathbb{R}" /> such that <img src="https://s0.wp.com/latex.php?latex=f_k%28s%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f_k(s)" class="latex" title="f_k(s)" /> outputs <img src="https://s0.wp.com/latex.php?latex=1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="1" class="latex" title="1" /> for <img src="https://s0.wp.com/latex.php?latex=s%3Dk&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s=k" class="latex" title="s=k" />, and <img src="https://s0.wp.com/latex.php?latex=f_k%28s%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f_k(s)" class="latex" title="f_k(s)" /> outputs <img src="https://s0.wp.com/latex.php?latex=0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="0" class="latex" title="0" /> if <img src="https://s0.wp.com/latex.php?latex=%7Cx-k%7C%3E0.5&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="|x-k|&gt;0.5" class="latex" title="|x-k|&gt;0.5" />. We can then write the parity function (for example for <img src="https://s0.wp.com/latex.php?latex=I%3D%5Bd%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I=[d]" class="latex" title="I=[d]" />) as <img src="https://s0.wp.com/latex.php?latex=%5Csum_%7Bk+%5Ctext%7B+odd+%7D+%5Cin+%5Bd%5D%7D+f_k%28%5Csum_%7Bi%3D1%7D%5Ed+%281-x_i%29%2F2+%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\sum_{k \text{ odd } \in [d]} f_k(\sum_{i=1}^d (1-x_i)/2 )" class="latex" title="\sum_{k \text{ odd } \in [d]} f_k(\sum_{i=1}^d (1-x_i)/2 )" />. This will be a linear combination of at most <img src="https://s0.wp.com/latex.php?latex=4d&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="4d" class="latex" title="4d" /> ReLUs.</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/NwQ31Jy.png" alt="" /></figure>
+
+
+
+<p>Parities are an example of a case where simple feature are uninformative. For example, if <img src="https://s0.wp.com/latex.php?latex=%7CI%7C%3E1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="|I|&gt;1" class="latex" title="|I|&gt;1" /> then for every linear function <img src="https://s0.wp.com/latex.php?latex=L%3A%5Cmathbb%7BR%7D%5Ed+%5Crightarrow+%5Cmathbb%7BR%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="L:\mathbb{R}^d \rightarrow \mathbb{R}" class="latex" title="L:\mathbb{R}^d \rightarrow \mathbb{R}" />,</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D_%7B%28x%2Cy%29+%5Csim+D_I%7D%5B+L%28x%29y%5D+%3D+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{E}_{(x,y) \sim D_I}[ L(x)y] = 0" class="latex" title="\mathbb{E}_{(x,y) \sim D_I}[ L(x)y] = 0" /></p>
+
+
+
+<p>in other words, there is no correlation between the linear function and the label.<br />To see why this is true, write <img src="https://s0.wp.com/latex.php?latex=L%28x%29+%3D+%5Csum+L_i+x_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="L(x) = \sum L_i x_i" class="latex" title="L(x) = \sum L_i x_i" />. By linearity of expectation, it suffices to show that $latex \mathbb{E}<em>{(x,y) \sim D_I}[ L_ix_i y] = L_i \mathbb{E}</em>{(x,y) \sim D_I}[ x_i y] = 0&amp;bg=ffffff$. Both <img src="https://s0.wp.com/latex.php?latex=x_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x_i" class="latex" title="x_i" /> and <img src="https://s0.wp.com/latex.php?latex=y_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="y_i" class="latex" title="y_i" /> are just values in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cpm+1+%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="{\pm 1 }" class="latex" title="{\pm 1 }" />. To evaluate the expectation <img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D%5Bx_i+y%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{E}[x_i y]" class="latex" title="\mathbb{E}[x_i y]" /> we simply need to know the marginal distribution that <img src="https://s0.wp.com/latex.php?latex=D_I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="D_I" class="latex" title="D_I" /> induces on <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cpm+1+%7D%5E2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="{ \pm 1 }^2" class="latex" title="{ \pm 1 }^2" /> when we restrict it to these two coordinates. This distribution is just the uniform distribution. To see why this is the case, consider a coordinate <img src="https://s0.wp.com/latex.php?latex=j%5Cin+I+%5Csetminus+%7B+i+%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="j\in I \setminus { i }" class="latex" title="j\in I \setminus { i }" /> and let’s condition on the values of all coordinates other than <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="i" class="latex" title="i" /> and <img src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="j" class="latex" title="j" />. After conditioning on these values, <img src="https://s0.wp.com/latex.php?latex=y+%3D+%5Csigma+x_i+x_j&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="y = \sigma x_i x_j" class="latex" title="y = \sigma x_i x_j" /> for some <img src="https://s0.wp.com/latex.php?latex=%5Csigma+%5Cin+%7B+%5Cpm+1+%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\sigma \in { \pm 1 }" class="latex" title="\sigma \in { \pm 1 }" /> and <img src="https://s0.wp.com/latex.php?latex=x_i%2Cx_j&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x_i,x_j" class="latex" title="x_i,x_j" /> are chosen uniformly and independently from <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cpm+1+%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="{ \pm 1 }" class="latex" title="{ \pm 1 }" />. For every choice of <img src="https://s0.wp.com/latex.php?latex=x_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x_i" class="latex" title="x_i" />, if we flip <img src="https://s0.wp.com/latex.php?latex=x_j&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x_j" class="latex" title="x_j" /> then that would flip the value of <img src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="y" class="latex" title="y" />, and hence the marginal distribution on <img src="https://s0.wp.com/latex.php?latex=x_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x_i" class="latex" title="x_i" /> and <img src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="y" class="latex" title="y" /> will be uniform.</p>
+
+
+
+<p>This lack of correlation turns out to be a real obstacle for gradient-based algorithms. While small neural networks for parities exist, and Gaussian elimination can find them, it turns out that gradient-based algorithms such as SGD will <em>fail</em> to do so. Parities are hard to learn, and even if the capacity of the network is such that it can memorize the input, it will still perform poorly in a test set. Indeed, we can prove that for <em>every</em> neural network architecture <img src="https://s0.wp.com/latex.php?latex=f_w%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f_w(x)" class="latex" title="f_w(x)" />, running SGD on <img src="https://s0.wp.com/latex.php?latex=%5Cmin%5ClVert+f_w%28x%29+-%5Cprod_%7Bi%5Cin+I%7D+x_i%5CrVert%5E2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\min\lVert f_w(x) -\prod_{i\in I} x_i\rVert^2" class="latex" title="\min\lVert f_w(x) -\prod_{i\in I} x_i\rVert^2" /> will require <img src="https://s0.wp.com/latex.php?latex=e%5E%7B%5COmega%28d%29%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="e^{\Omega(d)}" class="latex" title="e^{\Omega(d)}" /> steps. (Note that if we add <em>noise</em> to parities, then Gaussian elimination will fail and it is believed that <em>no efficient algorithm</em> can learn the distribution in this case. This is known as the <a href="https://wiki.epfl.ch/edicpublic/documents/Candidacy%20exam/Cryptography_from_learning_parity_with_noise.pdf">learning parity with noise</a> problem, which is also related to the <a href="https://en.wikipedia.org/wiki/Learning_with_errors">learning with errors</a> problem that is the foundation of modern lattice-based cryptography.)</p>
+
+
+
+<p>We now sketch the proof that gradient-based algorithms require exponentially many steps to learn parities, following Theorem 1 of <a href="https://arxiv.org/abs/1703.07950">Shalev-Shwartz,Shamir and Shammah</a>. We think of an idealized setting where we have an unlimited number of samples and only use a sample <img src="https://s0.wp.com/latex.php?latex=%28x%2Cy%29+%5Csim+D_I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(x,y) \sim D_I" class="latex" title="(x,y) \sim D_I" /> only once (this should only make learning easier). We will show that we make very little progress in learning <img src="https://s0.wp.com/latex.php?latex=D_I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="D_I" class="latex" title="D_I" />, by showing that for any given <img src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w" class="latex" title="w" />, the expected gradient over <img src="https://s0.wp.com/latex.php?latex=%28x%2Cy%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(x,y)" class="latex" title="(x,y)" /> will be exponentially small, and hence we make very little progress toward learning <img src="https://s0.wp.com/latex.php?latex=I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I" class="latex" title="I" />. Specifically, using the notation <img src="https://s0.wp.com/latex.php?latex=%5Cchi_I%28x%29%3D%5Cprod_%7Bi%5Cin+I%7Dx_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\chi_I(x)=\prod_{i\in I}x_i" class="latex" title="\chi_I(x)=\prod_{i\in I}x_i" />, for any <img src="https://s0.wp.com/latex.php?latex=w%2Cx%2CI&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w,x,I" class="latex" title="w,x,I" />,</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cnabla_w+%5Cparallel+f_w%28x%29+-+%5Cchi_I%28x%29+%5Cparallel%5E2+%3D+2%5Csum_%7Bi%3D1%7D%5Ed+%5Cleft+%5B+f_w%28x%29+%5Ctfrac%7Bd%7D%7Bd+x_i%7Df_%7Bw%7D%28x%29-+%5Cchi_I%28x%29%5Ctfrac%7Bd%7D%7Bd+x_i%7Df_%7Bw%7D%28x%29+%5Cright%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\nabla_w \parallel f_w(x) - \chi_I(x) \parallel^2 = 2\sum_{i=1}^d \left [ f_w(x) \tfrac{d}{d x_i}f_{w}(x)- \chi_I(x)\tfrac{d}{d x_i}f_{w}(x) \right]" class="latex" title="\nabla_w \parallel f_w(x) - \chi_I(x) \parallel^2 = 2\sum_{i=1}^d \left [ f_w(x) \tfrac{d}{d x_i}f_{w}(x)- \chi_I(x)\tfrac{d}{d x_i}f_{w}(x) \right]" /></p>
+
+
+
+<p>The term <img src="https://s0.wp.com/latex.php?latex=f_w%28x%29+%5Ctfrac%7Bd%7D%7Bd+x_i%7Df_%7Bw%7D%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f_w(x) \tfrac{d}{d x_i}f_{w}(x)" class="latex" title="f_w(x) \tfrac{d}{d x_i}f_{w}(x)" /> is independent of <img src="https://s0.wp.com/latex.php?latex=I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I" class="latex" title="I" /> and so does not contribute toward learning <img src="https://s0.wp.com/latex.php?latex=D_I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="D_I" class="latex" title="D_I" />. Hence intuitively to show we make exponentially small progress, it suffices to show that typically for every <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="i" class="latex" title="i" />, $latex \left(\mathbb{E}<em>x[ \chi_I(x)\tfrac{d}{d x_i}f</em>{w}(x) ] \right)^2&amp;bg=ffffff$ will be exponentially small. (That is, even if for a fixed <img src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x" class="latex" title="x" /> we make a large step, these all cancel out and give us exponentially small progress toward actually learning <img src="https://s0.wp.com/latex.php?latex=I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I" class="latex" title="I" />.)</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/lWCuan2.png" alt="" /></figure>
+
+
+
+<p>Formally, we will prove the following lemma:</p>
+
+
+
+<p><strong>Lemma:</strong> For every <img src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w" class="latex" title="w" />,</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D_I+%5Cleft%28%5Cmathbb%7BE%7D_x%5B+%5Cchi_I%28x%29%5Ctfrac%7Bd%7D%7Bd+x_i%7Df%7Bw%7D%28x%29+%5D+%5Cright%29%5E2+%5Cleq+%5Ctfrac%7Bpoly%28d%2Cn%29%5Cmathbb%7BE%7D_x+%5Cfrac%7Bd%7D%7Bd+x_i%7Df%7Bw%7D%28x%29%5E2%7D%7B2%5Ed%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{E}_I \left(\mathbb{E}_x[ \chi_I(x)\tfrac{d}{d x_i}f{w}(x) ] \right)^2 \leq \tfrac{poly(d,n)\mathbb{E}_x \frac{d}{d x_i}f{w}(x)^2}{2^d}" class="latex" title="\mathbb{E}_I \left(\mathbb{E}_x[ \chi_I(x)\tfrac{d}{d x_i}f{w}(x) ] \right)^2 \leq \tfrac{poly(d,n)\mathbb{E}_x \frac{d}{d x_i}f{w}(x)^2}{2^d}" /></p>
+
+
+
+<p><strong>Proof:</strong> Let us fix <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="i" class="latex" title="i" /> and define <img src="https://s0.wp.com/latex.php?latex=g%28x%29+%3D+%5Ctfrac%7Bd%7D%7Bd+x_i%7Df_%7Bw%7D%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="g(x) = \tfrac{d}{d x_i}f_{w}(x)" class="latex" title="g(x) = \tfrac{d}{d x_i}f_{w}(x)" />. The quantity <img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D_x%5B+%5Cchi_I%28x%29%5Ctfrac%7Bd%7D%7Bd+x_i%7Df%7Bw%7D%28x%29%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{E}_x[ \chi_I(x)\tfrac{d}{d x_i}f{w}(x)]" class="latex" title="\mathbb{E}_x[ \chi_I(x)\tfrac{d}{d x_i}f{w}(x)]" /> can be written as <img src="https://s0.wp.com/latex.php?latex=%5Clangle+%5Cchi_I%2Cg+%5Crangle&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\langle \chi_I,g \rangle" class="latex" title="\langle \chi_I,g \rangle" /> with respect to the inner product <img src="https://s0.wp.com/latex.php?latex=%5Clangle+f%2Cg+%5Crangle+%3D+%5Cmathbb%7BE%7D_x+f%28x%29g%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\langle f,g \rangle = \mathbb{E}_x f(x)g(x)" class="latex" title="\langle f,g \rangle = \mathbb{E}_x f(x)g(x)" />. However, <img src="https://s0.wp.com/latex.php?latex=%7B+%5Cchi_I+%7D%7BI%5Csubseteq+%5Bd%5D%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="{ \chi_I }{I\subseteq [d]}" class="latex" title="{ \chi_I }{I\subseteq [d]}" /> is an orhtonormal basis with respect to this inner product. To see this note that since <img src="https://s0.wp.com/latex.php?latex=%5Cchi_I%28x%29+%5Cin+%7B+%5Cpm+1+%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\chi_I(x) \in { \pm 1 }" class="latex" title="\chi_I(x) \in { \pm 1 }" />, <img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D_x+%5Cchi_I%28x%29%5E2+%3D+1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{E}_x \chi_I(x)^2 = 1" class="latex" title="\mathbb{E}_x \chi_I(x)^2 = 1" /> for every <img src="https://s0.wp.com/latex.php?latex=I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I" class="latex" title="I" />, and for <img src="https://s0.wp.com/latex.php?latex=I+%5Cneq+J&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I \neq J" class="latex" title="I \neq J" />, <img src="https://s0.wp.com/latex.php?latex=%5Cchi_I%28x%29%5Cchi_J%28x%29+%3D+%28%5Cprod%7Bi+%5Cin+I%7D+x_i%29%28%5Cprod_%7Bj+%5Cin+J%7D+x_j%29+%3D+%5Cprod_%7Bk+%5Cin+I+%5Coplus+H%7D+x_k&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\chi_I(x)\chi_J(x) = (\prod{i \in I} x_i)(\prod_{j \in J} x_j) = \prod_{k \in I \oplus H} x_k" class="latex" title="\chi_I(x)\chi_J(x) = (\prod{i \in I} x_i)(\prod_{j \in J} x_j) = \prod_{k \in I \oplus H} x_k" /> where <img src="https://s0.wp.com/latex.php?latex=I%5Coplus+J&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I\oplus J" class="latex" title="I\oplus J" /> is the symmetric difference of <img src="https://s0.wp.com/latex.php?latex=I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I" class="latex" title="I" /> and <img src="https://s0.wp.com/latex.php?latex=J&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="J" class="latex" title="J" />. The reason is that <img src="https://s0.wp.com/latex.php?latex=x_i%5E2+%3D1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x_i^2 =1" class="latex" title="x_i^2 =1" /> for all <img src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="i" class="latex" title="i" /> and so elements that appear in both <img src="https://s0.wp.com/latex.php?latex=I&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I" class="latex" title="I" /> and <img src="https://s0.wp.com/latex.php?latex=J&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="J" class="latex" title="J" /> “cancel out”. Since the coordinates of <img src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x" class="latex" title="x" /> are distributed independently and uniformly, the expectation of the product is the product of expectations. This means that as long as <img src="https://s0.wp.com/latex.php?latex=I+%5Coplus+J&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I \oplus J" class="latex" title="I \oplus J" /> is not empty (i.e., <img src="https://s0.wp.com/latex.php?latex=I+%5Cneq+J&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I \neq J" class="latex" title="I \neq J" />) this will be a product of one or more terms of the form <img src="https://s0.wp.com/latex.php?latex=%28%5Cmathbb%7BE%7D+x_k%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(\mathbb{E} x_k)" class="latex" title="(\mathbb{E} x_k)" />. Since <img src="https://s0.wp.com/latex.php?latex=x_k&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x_k" class="latex" title="x_k" /> is uniform over <img src="https://s0.wp.com/latex.php?latex=%7B+pm+1+%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="{ pm 1 }" class="latex" title="{ pm 1 }" />, <img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D+x_k+%3D+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{E} x_k = 0" class="latex" title="\mathbb{E} x_k = 0" /> and so we get that if <img src="https://s0.wp.com/latex.php?latex=I+%5Cneq+J&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="I \neq J" class="latex" title="I \neq J" />, <img src="https://s0.wp.com/latex.php?latex=%5Clangle+%5Cchi_I%2C%5Cchi_J+%5Crangle+%3D0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\langle \chi_I,\chi_J \rangle =0" class="latex" title="\langle \chi_I,\chi_J \rangle =0" />.</p>
+
+
+
+<p>Given the above</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D_x+g%28x%29%5E2+%3D+%5Clangle+g%2Cg%5Crangle+%3D+%5Csum%7BI+%5Csubseteq+%5Bd%5D%7D+%5Clangle+g+%2C+%5Cchi_I+%5Crangle%5E2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{E}_x g(x)^2 = \langle g,g\rangle = \sum{I \subseteq [d]} \langle g , \chi_I \rangle^2" class="latex" title="\mathbb{E}_x g(x)^2 = \langle g,g\rangle = \sum{I \subseteq [d]} \langle g , \chi_I \rangle^2" /></p>
+
+
+
+<p>which means that (since there are <img src="https://s0.wp.com/latex.php?latex=2%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="2^d" class="latex" title="2^d" /> subsets of <img src="https://s0.wp.com/latex.php?latex=%5Bd%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="[d]" class="latex" title="[d]" />) on average <img src="https://s0.wp.com/latex.php?latex=%5Clangle+g%2C+%5Cchi_I+%5Crangle+%3D+%5Cparallel+g+%5Cparallel%5E2+%2F+2%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\langle g, \chi_I \rangle = \parallel g \parallel^2 / 2^d" class="latex" title="\langle g, \chi_I \rangle = \parallel g \parallel^2 / 2^d" />. In other words, <img src="https://s0.wp.com/latex.php?latex=%5Clangle+g%2C%5Cchi_I+%5Crangle&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\langle g,\chi_I \rangle" class="latex" title="\langle g,\chi_I \rangle" /> is typically exponentially small which is what we wanted to prove.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Boaz Barak <a href="https://windowsontheory.org/2021/02/17/what-do-deep-networks-learn-and-when-do-they-learn-it/"><span class="datestr">at February 17, 2021 09:30 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2834,48 +3184,6 @@ by Brian Hayes <a href="http://bit-player.org/2021/foldable-words"><span class="
 
 <p class="date">
 by Manu <a href="https://emanueleviola.wordpress.com/2021/02/09/et-al-ii/"><span class="datestr">at February 09, 2021 06:07 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="tag:blogger.com,1999:blog-27705661.post-9121434197807183435">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/aceto.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="http://processalgebra.blogspot.com/2021/02/whence-do-research-collaborations-in.html">Whence do research collaborations (in TCS) arise?</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://processalgebra.blogspot.com/" title="Process Algebra Diary">Luca Aceto</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p>About ten days ago, I gave a <a href="http://icetcs.ru.is/slides/intro2icetcs2021.pdf" target="_blank">talk</a> to my colleagues at the <a href="https://en.ru.is/st/dcs/" target="_blank">Department of Computer Science at Reykjavik University</a>, introducing my personal (and admittedly very biased) view of the past, present and future of <a href="http://icetcs.ru.is/" target="_blank">ICE-TCS</a>. </p><p>After my presenta­tion, a colleague asked me how she could engage mathematicians and theoretical computer scientists in joint research. I gave her an answer off the top of my head, but it was clear that she was unconvinc­ed and felt that I was avoid­ing answering her question. (For the record, I basically told her that she should knock on our door, discuss with us the problems she was interested in solving and hope that they are of interest to us. I feel that many research collaborations arise from serendipity and that there is no recipe that is guaranteed to work.) </p><p>The thought that she felt that I might have dodged her question prompted me to look back at my own research collabo­rations and how they came about. The rest of this post is the result of that quick-and-dirty reflection. Let me state right away that my list isn't meant to be exhausti­ve and that I won't mention many of the collaborations in which I have been lucky to be involved and that I have played a crucial role in shaping my academic development.  </p><p><b>Reading papers.</b> One of my long-term research collaborations arose from reading a paper written by a colleague. His paper prompted my companion and me to ask ourselves whether we could prove a similar result to the one our colleague had shown in a different setting. We succeeded and sent him our paper. Subsequently, we invited him to visit us in Aalborg. That visit marked the start of a collaboration and friendship that has lasted for over 20 years. <br /><br /><b>Approaching a colleague via email for help in solving a problem.</b> At some point, my companion and I were thinking about a research problem that had frustrated us for a while. I remembered reading a number of papers by a colleague on related topics, so I wrote to him, describing the problem, our attempts at solving it and where we had hit a brick wall. I asked him whether he would be interested in working with us on solving it. He did and that was one of the lucky breaks I have had in my research career. Once more, that collaboration offer via email led to mutual visits, other joint papers and, IMHO even more importantly, a long-term friendship that extended beyond work. <br /> </p><p><b>Available funding and building on one's mistakes.</b> One day in 2009, an email in my mailbox alerted me to the availability of substantial funding for research collabo­ration between universities in country X and those locat­ed in Norway, Iceland and Lichtenstein. This opportunity was enticing, as I had never visited country X, so I asked myself: "Is there anyone there we might conceivably work with?'' Mulling over that question, I recalled that a colleague from country X had spotted an imprecision in a paper I had coauthored. </p><p>I wrote to him, we applied for that funding jointly and got it. That successful grant application provided the funds for many research visits involving several people in our research groups. Those visits resulted in joint papers, another successful grant application and a number of friendships. </p><p><b>Coffee breaks at conferences.</b> I have at least two exhibits under this heading. The first belongs to a previous geologic­al era (1991). I was attend­ing a conference at CMU and asked a colleague what he was working on. He told me<br />about a problem he was tackling, which I knew was also on the radar of a fellow researcher and on which I had started working independently. Eventually, after some email exchanges, that chat over coffee turned into a three-way collaboration that, thanks to my coauthors, produced one of my best papers. <br /><br />Fast forward to 2017 and I'm in Rome to deliver an invited talk at a small conference. During the coffee break follow­ing my presentation, I was approached by a young research­er, with whom I had a number of pleasant conversations during the conference. Some time later, she sent me a draft paper dealing with a topic related to the content of my invited talk. I invited her to visit our research group in Reykjavik and to join the team working on a research project for which we had funding at the time. Those coffee-break conversations led to a collaboration and friendship that I hope will last for a long time. Meeting that colleague has been another of my lucky breaks. <br /> </p><p><b>Reading groups.</b> Last, but by no means least, let me mention that my first research collaboration that did not involve my thesis supervisors arose when I read Gordon Plotkin's famous "<a href="http://homepages.inf.ed.ac.uk/gdp/publications/Domains_a4.ps">Pisa Notes (On Domain Theory)</a>" with a fellow PhD student. Reading that work led to our first joint paper in 1991 and a companionship that has lasted to this day. I heard <a href="https://www.youtube.com/watch?v=KYfmXpLCiy4&amp;list=PLEyo0HIOhDCSR8os82H_2p5M0dE70K6KL&amp;index=2" target="_blank">Orna Kupferman</a> give the following, tongue-in-cheek advice to young researchers: "Write papers with your twin-sister!" Mine might be: "Write papers with your companion in life!" </p><p>Let me conclude by saying that serendipity and an actual friendship that extends beyond the confines of scientific work were the key aspects in my most pleasant and enduring collaborations. I apologise to the colleagues from whom I have learnt much over the years (former students and postdocs, as well as others) who were the prime movers in research collaborations I did not mention in this post. </p><p> I guess that this note provides much more information than my colleague was intending to receive, but I thought I should put it out for the benefit of the young researchers at Reykjavik University and at the Gran Sasso Science Institute, and of any reader I might have. </p><p>How did your research collaborations arise? If you have anything to add to what I wrote above, and I am sure you do, add your contributions as comments to this post. <br /><br /><br /></p></div>
-
-
-
-
-
-
-
-<p class="date">
-by Luca Aceto (noreply@blogger.com) <a href="http://processalgebra.blogspot.com/2021/02/whence-do-research-collaborations-in.html"><span class="datestr">at February 08, 2021 05:42 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
