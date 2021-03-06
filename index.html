@@ -243,7 +243,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at March 06, 2021 05:39 PM UTC</span>.
+Last updated <span class="datestr">at March 06, 2021 06:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -251,6 +251,93 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://ptreview.sublinear.info/?p=1485">
+<div class="entryheader">
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-US"><a class="entryheader" href="https://ptreview.sublinear.info/?p=1485">News for February 2021</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://ptreview.sublinear.info" title="Property Testing Review">Property Testing Review</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en-US">
+<p>We got quite some action last month. We saw five papers. A lot of action in graph world and some action in quantum property testing which we hope you will find appetizing. Also included is a result on sampling uniformly random <em>graphlets</em>. </p>
+
+
+
+<p><strong>Testing Hamiltonicity (and other problems) in Minor-Free Graphs</strong> (by Reut Levi and Nadav Shoshan)(<a href="https://arxiv.org/abs/2102.11728">arXiv</a>) Graph Property Testing has been explored pretty well for dense graphs (and reasonably well for bounded degree graphs). However, testing properties in the general case still remains an elusive goal. This paper makes contributions in this direction and as a first result it gives an algorithm for testing Hamiltonicity <em>in minor free graphs</em> (with two sided error) with running time \(poly(1/\varepsilon)\). Let me begin by pointing out that Hamiltonicity is an irksome property to test in the following senses.</p>
+
+
+
+<ul><li>It is neither monotone nor additive. So the partition oracle based algorithms do not immediately imply a tester (with running time depending only on \(\varepsilon\) for Hamiltonicity. This annoyance bugs you even in the bounded degree case.</li><li> Czumaj and Sohler characterized what graph properties are testable with one-sided error in general planar graphs. In particular, they show a property of general planar graphs is testable <em>iff</em> this property can be reduced to testing for a finite family of finite forbidden subgraphs. Again, Hamiltonicity does not budge to this result. </li><li>There are (concurrent) results by Goldreich and Adler-Kohler which show that with one-sided error, Hamiltonicity cannot be tested with \(o(n)\) queries. </li></ul>
+
+
+
+<p>The paper shows that distance to Hamiltonicity can be exactly captured in terms of a certain combinatorial parameter. Thereafter, the paper tries to estimate this parameter after cleaning up the graph a little. This allows them to estimate the distance to Hamiltonicity and thus also implies a tolerant tester (restricted to mino-free graphs).</p>
+
+
+
+<p><strong>Testing properties of signed graphs</strong> (by Florian Adriaens, Simon Apers)(<a href="https://arxiv.org/abs/2102.07587">arXiv</a>) Suppose I give you a graph \(G=(V,E)\) where all edges come with a label: which is either “positive” or “negative”. Such signed graphs are used to model various scientific phenomena. Eg, you can use these to model interactions between individuals in social networks into two categories like friendly or antagonistic.</p>
+
+
+
+<p>This paper considers property testing problems on signed graphs. The notion of farness from the property extends naturally to these graphs (both in the dense graph model and the bounded degree model). The paper contains explores three problems in both of these models: signed triangle freeness, balance and clusterability. Below I will zoom into the tester for clusterability in the bounded degree setting developed In the paper. A signed graph is considered clusterable if you can partition the vertex set into some number of components such that the edges within any component are all positive and the edges running across components are all negative.</p>
+
+
+
+<p>The paper exploits a forbidden subgraph characterization of clusterability which shows that any cycle with exactly one negative edge is a certificate of non-clusterability of \(G\). The tester runs multiple random walks from a handful of start vertices to search for these “bad cycles” by building up on ideas in the seminal work of Goldreich and Ron for testing bipariteness. The authors put all of these ideas together and give a \(\widetilde{O}(\sqrt n)\) time one-sided tester for clusterability in signed graphs.</p>
+
+
+
+<p></p>
+
+
+
+<p><strong>Local Access to Random Walks</strong> (by Amartya Shankha Biswas, Edward Pyne, Ronitt Rubinfeld)(<a href="https://arxiv.org/abs/2102.07740">arXiv</a>) Suppose I give you a gigantic graph (with bounded degree) which does not fit in your main memory and I want you to solve some computational problem which requires you to solve longish random walks of length \(t\). And lots of them. It would be convenient to not spend \(\Omega(t)\) units of time performing every single walk. Perhaps it would work just as well for you to have an oracle which provides query access to a \(Position(G,s,t)\) oracle which returns the position of a walk from \(s\) at time \(t\) of your choice. Of course, you would want the sequence of vertices returned to behave consistently with some actual random walk sampled from the distribution of random walks starting at \(s\). Question is: Can I build you this primitive? This paper answers this question in affirmative  and shows that for graphs with spectral gap \(\Delta\), this can be achieved with running time \(\widetilde{O}(\sqrt n/\Delta)\) per query. And you get the guarantee that the joint distribution of the vertices you return at queried times is \(1/poly(n)\) close to the uniform distribution over such walks in \(\ell_1\).  Thus, for a random \(d\)-regular graph, you get running times of the order \(\widetilde{O}(\sqrt n)\) per query. The authors also show tightness of this result by showing to get subconstant error in \(\ell_1\), you necessarily need \(\Omega(\sqrt n/\log n)\) queries in expectation.</p>
+
+
+
+<p></p>
+
+
+
+<p><strong>Efficient and near-optimal algorithms for sampling connected subgraphs</strong> (by Marco Bressan)(<a href="https://arxiv.org/abs/2007.12102">arXiv</a>) As the title suggests, this paper considers efficient algorithms for sampling a uniformly random \(k\)-graphlet from a given graph \(G\) (for \(k \geq 3\)). Recall, a \(k\)-graphlet refers to a collection of \(k\)-vertices which induce a connected graph in \(G\). The algorithm considered in the paper is pretty simple. You just define a Markov Chain \(\mathcal{G}_k\) with all \(k\)-graphlets as its state space. Two states in \(\mathcal{G}_k\) are adjacent <em>iff</em> their intersection is a \((k-1)\)-graphlet. To obtain a uniformly random sample, a classical idea is to just run this Markov Chain and obtain an \(\varepsilon\)-uniform sample. However, the gap between upper and lower bounds on the mixing time of this walk is of the order \(\rho^{k-1}\) where \(\rho = \Delta/\delta\) (that is the ratio of maximum and minimum degrees to the power \(k-1\)). The paper closes this gap up to logarithmic factors and shows that the mixing time of the walk is at most \(t_{mix}(G) \rho^{k-1} \log(n/\varepsilon)\). It also proves an almost matching lower bound. Further, the paper also presents an algorithm with event better running time to return an almost uniform \(k\)-graphlet. This exploits a previous observation: sampling a uniformly random \(k\)-graphlet is equivalent to sampling a uniformly random edge in \(\mathcal{G}_{k-1}\). The paper then proves a lemma which upperbounds the relaxation time of walks in \(\mathcal{G}_k\) to walks in \(\mathcal{G}_{k-1}\). And then you upperbound the mixing time in terms of the relaxation time to get an improved expected running time of the order \(O(t_{mix}(G) \cdot \rho^{k-2} \cdot \log(n/\varepsilon)\).</p>
+
+
+
+<p></p>
+
+
+
+<p><strong>Toward Instance-Optimal State Certification With Incoherent Measurements</strong> (by Sitan Chen, Jerry Li, Ryan O’Donnell)(<a href="https://arxiv.org/abs/2102.13098">arXiv</a>) The problem of quantum state certification has gathered interest over the last few years. Here is the setup: you are given a quantum state \(\sigma in \mathbb{C}^{d \times d}\) and you are also given \(N\) copies of an unknown state \(\rho\). You want to distinguish between the following two cases: Does \(\rho = \sigma\) or is \(\sigma\) at least \(\varepsilon\)-far from \(\rho\) in trace norm? Badescu et al showed in a recent work that if entangled measurements are allowed, you can do this with a mere \(O(d/\varepsilon^2)\) copies of \(\rho\). But using entangled states comes with its own share of problems. On the other hand if you disallow entanglement, as Bubeck et al show, you need \(\Omega(d^{3/2}/\varepsilon^2)\) measurements. This paper asks: for which states \(\sigma\) can you improve upon this bound. The work takes inspirations from <em>a la</em> “instance optimal” bounds for identity testing. Authors show a fairly general result which (yet again) confirms that the quantum world is indeed weird. In particular, the main result of the paper implies that the copy complexity of (the quantum analog of) identity testing in the quantum world (with non-adaptive queries) grows as \(\Theta(d^{1/2}/\varepsilon^2)\). That is, the number of quantum measurements you need increases with \(d\) (which is the stark opposite of the behavior you get in the classical world).</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Akash <a href="https://ptreview.sublinear.info/?p=1485"><span class="datestr">at March 06, 2021 05:50 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -3241,58 +3328,6 @@ Our main technical contribution is the definition and construction of set hiding
 
 <p class="date">
 by Scott <a href="https://www.scottaaronson.com/blog/?p=5350"><span class="datestr">at February 23, 2021 09:00 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://eccc.weizmann.ac.il/report/2021/026">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eccc.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="https://eccc.weizmann.ac.il/report/2021/026">TR21-026 |  Conditional Dichotomy of Boolean Ordered Promise CSPs | 
-
-	Joshua Brakensiek, 
-
-	Venkatesan Guruswami, 
-
-	Sai Sandeep</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://eccc.weizmann.ac.il/" title="ECCC - Reports">ECCC papers</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-Promise Constraint Satisfaction Problems (PCSPs) are a generalization of Constraint Satisfaction Problems (CSPs) where each predicate has a strong and a weak form and given a CSP instance, the objective is to distinguish if the strong form can be satisfied vs. even the weak form cannot be satisfied. Since their formal introduction by Austrin, Guruswami, and Håstad, there has been a flurry of works on PCSPs, including recent breakthroughs in approximate graph coloring. The key tool in studying PCSPs is the algebraic framework developed in the context of CSPs where the closure properties of the satisfying solutions known as *polymorphisms* are analyzed. 
-    
-    The polymorphisms of PCSPs are significantly richer than CSPs---this is illustrated by the fact that even in the Boolean case, we still do not know if there exists a dichotomy result for PCSPs analogous to Schaefer's dichotomy result for CSPs. In this paper, we study a special case of Boolean PCSPs, namely Boolean *Ordered* PCSPs where the Boolean PCSPs have the predicate $x \leq y$. In the algebraic framework, this is the special case of Boolean PCSPs when the polymorphisms are *monotone* functions. We prove that Boolean Ordered PCSPs exhibit a computational dichotomy assuming the Rich $2$-to-$1$ Conjecture due to Braverman, Khot, and Minzer, which is a perfect completeness surrogate of the Unique Games Conjecture. 
-    
-    In particular, assuming the Rich $2$-to-$1$ Conjecture, we prove that a Boolean Ordered PCSP can be solved in polynomial time if for every $\epsilon &gt;0$, it has polymorphisms where each coordinate has *Shapley value* at most $\epsilon$, else it is NP-hard. The algorithmic part of our dichotomy result is based on a structural lemma showing that Boolean monotone functions with each coordinate having low Shapley value have arbitrarily large threshold functions as minors. The hardness part proceeds by showing that the Shapley value is consistent under a uniformly random $2$-to-$1$ minor. As a structural result of independent interest, we construct an example to show that the Shapley value can be inconsistent under an adversarial $2$-to-$1$ minor.</div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="https://eccc.weizmann.ac.il/report/2021/026"><span class="datestr">at February 23, 2021 05:37 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
