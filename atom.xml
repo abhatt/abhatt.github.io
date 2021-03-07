@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-03-07T18:37:15Z</updated>
+  <updated>2021-03-07T18:41:37Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,206 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>https://francisbach.com/?p=5711</id>
+    <link href="https://francisbach.com/self-concordant-analysis-for-logistic-regression/" rel="alternate" type="text/html"/>
+    <title>Going beyond least-squares – II : Self-concordant analysis for logistic regression</title>
+    <summary>Last month, we saw that self-concordance is a key property in optimization, to use local quadratic approximations in the sharpest possible way. In particular it was an affine-invariant quantity leading to a simple and elegant analysis of Newton method. The key assumption was a link between third and second-order derivatives, which took the following form...</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p class="justify-text"><a href="https://francisbach.com/self-concordant-analysis-newton/">Last month</a>, we saw that self-concordance is a key property in optimization, to use local quadratic approximations in the sharpest possible way. In particular it was an affine-invariant quantity leading to a simple and elegant analysis of Newton method. The key assumption was a link between third and second-order derivatives, which took the following form for one-dimensional functions, $$|f^{\prime\prime\prime}(x)| \leqslant 2 f^{\prime\prime}(x)^{3/2}.$$ Alas, some of the most classical smooth functions appearing in machine learning are not self-concordant with this particular link between derivatives. The main example is the logistic loss, which is widely used across machine learning.</p>
+
+
+
+<p class="justify-text">Indeed, if we take this logistic loss function \(f(x) = \log ( 1 + \exp(-x))\), it satisfies $$ f^\prime(x) =  \frac{ -\exp(-x)}{1+\exp(-x)} =\  – \frac{1}{1+\exp(x)} = \ – \sigma(-x),$$ where \(\sigma\) is the usual <a href="https://en.wikipedia.org/wiki/Sigmoid_function">sigmoid function</a> defined as \(\sigma(x) = \frac{1}{1+\exp(-x)}\), and which is increasing from \(0\) to \(1\). We then have \(f^{\prime\prime}(x) = \sigma(x) ( 1- \sigma(x) )\) and \(f^{\prime \prime \prime}(x) = \sigma(x) ( 1- \sigma(x) )( 1 – 2 \sigma(x) )\) leading to $$|f^{\prime\prime\prime}(x)| \leqslant f^{\prime\prime}(x).$$ See below for plots of the logistic loss (left) and its derivatives (right).</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-full is-resized"><img alt="" class="wp-image-5795" height="267" src="https://francisbach.com/wp-content/uploads/2021/03/losses_logistic.png" width="639"/></figure></div>
+
+
+
+<p class="justify-text">There is thus a link between third and second-order derivatives, but <em>without the power \(3/2\)</em>. Does this difference really matter? In this post, I will show how some properties from classical self-concordance can be extended to this slightly different notion. We will then present applications to stochastic gradient descent as well as the statistical analysis of generalized linear models, and in particular logistic regression.</p>
+
+
+
+<p class="justify-text">I will describe applications to Newton method for large-scale logistic regression [<a href="https://papers.nips.cc/paper/8980-globally-convergent-newton-methods-for-ill-conditioned-generalized-self-concordant-losses.pdf">8</a>] in later posts (you read well: Newton method for large-scale machine learning can be useful, in particular for severely ill-conditioned problems).</p>
+
+
+
+<h2>\(\nu\)-self-concordance</h2>
+
+
+
+<p class="justify-text">A function \(f: C \subset \mathbb{R} \to \mathbb{R}\) is said \(\nu\)-self-concordant on the open interval \(C\) if and only if it is convex, three-times differentiable on \(C\), and there exists \(R &gt; 0\), such that $$\tag{1}\forall x \in C, \  |f^{\prime\prime\prime}(x)| \leqslant R f^{\prime\prime}(x)^{\nu\: \!  /2}.$$ </p>
+
+
+
+<p class="justify-text">Note the difference with classical self-concordance (which corresponds to \(\nu=3\) and \(R=2\)). All positive powers are possible (see [<a href="https://link.springer.com/content/pdf/10.1007/s10107-018-1282-4.pdf">1</a>]), but we will focus primarily on \(\nu=2\), for which most of the properties below were derived in [<a href="https://projecteuclid.org/journalArticle/Download?urlid=10.1214%2F09-EJS521">2</a>].</p>
+
+
+
+<p class="justify-text">Note that the definition above in one dimension is still “affine-invariant” if the constant \(R\) is allowed to change (that is, if it is true for \(f\), it is true for \(x \mapsto f(ax)\) for any \(a\)). However, unless \(\nu = 3\), this will not be true in higher dimension, and therefore, the analysis of Newton method will be more complicated.</p>
+
+
+
+<p class="justify-text">For a convex function defined on a convex subset \(C\) of \(\mathbb{R}\), we need the same property along all rays, or equivalently, if \(f^{\prime\prime\prime}(x)[h,h^\prime,h^{\prime\prime}]= \sum_{i,j,k=1}^d h_i h_j^\prime h^{\prime\prime}_k \frac{\partial^3 f}{\partial x_i \partial x_j \partial x_k}(x)\) is the third-order tensor (with three different arguments, as needed below) and \(f^{\prime\prime}(x)[h,h] = \sum_{i,j=1}^d h_i h_j  \frac{\partial^2 f}{\partial x_i \partial x_j}(x)\) the symmetric second-order one, then there exists \(R\) such that $$\tag{2} \forall x \in C, \ \forall h \in \mathbb{R}^d , \ |f^{\prime\prime\prime}(x)[h,h^\prime,h^{\prime}]| \leqslant R \| h\| \cdot f^{\prime\prime}(x)[h^\prime,h^{\prime}],$$ where \(\| h\|\) is the standard Euclidean norm of \(h\). Note here the difference with classical self-concordance where we could consider the symmetric third-order tensor (that is, no need for \(h^\prime\) and \(h^{\prime\prime}\)), and only the Euclidean norm based on the Hessian \(f^{\prime\prime}(x)\) was used.</p>
+
+
+
+<p class="justify-text"><strong>Examples. </strong>One can check that if \(f\) and \(g\) are \(2\)-self-concordant, then so is their average \(\frac{1}{2} ( f+g ) \) with the same constant \(R\) (this is one key advantage over \(3\)-self-concordance). Moreover, if \(f\) is \(2\)-self-concordant with constant \(R\), then \(g(x) = f(Ax)\) is also \(2\)-self concordant, with constant \(R \| A\|_{\rm op}\).</p>
+
+
+
+<p class="justify-text">Classical examples are all linear and quadratic functions (with constant \(R = 0\)), the exponential function and the logistic loss \(f(x) = \log(1+\exp(-x))\), both with constant \(R=1\). This extends to the “log-sum-exp” function \(f(x) = \log\big( \sum_{i=1}^d \exp(x_i)\big)\), which is \(2\)-self-concordant with constant \(R = \sqrt{2}\). More generally, as shown at the end of the post, any log-partition function of the form $$ f(x) = \log \Big( \int_\mathcal{A} \exp( \varphi(a)^\top x) d\mu(a) \Big) $$ arising from <a href="https://en.wikipedia.org/wiki/Generalized_linear_model">generalized linear models</a> with bounded features, will be \(2\)-self-concordant, with constant the diameter of the set of features. Thus, self-concordance applies to all generalized linear models with the canonical link function. This includes <a href="https://en.wikipedia.org/wiki/Multinomial_logistic_regression">softmax regression</a> (for multiple classses), <a href="https://en.wikipedia.org/wiki/Conditional_random_field">conditional random fields</a>, and of course logistic regression which I will focus on below.</p>
+
+
+
+<p class="justify-text"><strong>Logistic regression.</strong> The most classical example is thus logistic regression, with $$f(x) = \frac{1}{n} \sum_{i=1}^n \log(1 + \exp( – x^\top a_i b_i ) ),$$ for observations \((a_i,b_i) \in \mathbb{R}^d \times \{-1,1\}\). See an example below in \(d=2\) dimensions.</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-full"><img alt="" class="wp-image-5814" height="261" src="https://francisbach.com/wp-content/uploads/2021/03/video_log_reg.gif" width="660"/>Logistic regression in two dimensions: data space with \(a_i \in \mathbb{R}^2\) represented with a different color/mark depending on the label \(b_i\) (left), parameter space (right) with level sets of the objective function \(f\) and its minimizer (purple asterisk).</figure></div>
+
+
+
+<p class="justify-text"><strong>Properties in one dimension.</strong>  Mimicking what was done <a href="https://francisbach.com/self-concordant-analysis-newton/">last month</a>, a nice reformulation of Eq. (1) (which is one-dimensional) is $$ \big| \frac{d}{dx} \big( \! \log( f^{\prime\prime}(x)) \big) \big| = \big|   f^{\prime\prime\prime}(x)  f^{\prime \prime}(x)^{-1} \big| \leqslant R,$$ which allows to define upper and lower bounds on \(f^{\prime \prime}(x)\) by integration, as, for \(x &gt; 0\), $$ – Rx \leqslant \log( f^{\prime\prime}(x))  \, – \log(f^{\prime\prime}(0)) \leqslant Rx,$$ which can be transformed into (by isolating \(f^{\prime\prime}(x)\)): $$ \tag{3}  f^{\prime\prime}(0) \exp(\  – R x ) \leqslant f^{\prime\prime}(x) \leqslant f^{\prime\prime}(0) \exp( R x ).$$ We thus obtain global upper and lower bounds on \(f^{\prime\prime}(x)\).</p>
+
+
+
+<p class="justify-text">We can then integrate Eq. (3) twice between \(0\) and \(x\) to obtain lower and upper bounds on \(f^\prime\) and then \(f\): $$  f^{\prime\prime}(0) \frac{1-\exp( \ – R x )}{R} \leqslant f^\prime(x)-f^\prime(0) \leqslant f^{\prime\prime}(0) \frac{\exp( R x )\  – 1}{R},$$ and  $$ \tag{4} \!\!\!\!\!\! f^{\prime\prime}(0) \frac{\exp( \ – R x ) + Rx \ – 1}{R^2}\leqslant f(x) \ – f(0) \ – f^\prime(0) x \leqslant  f^{\prime\prime}(0) \frac{\exp( R x ) \ – Rx \ – 1}{R^2}.$$ We thus get a bound $$f(x) \ – f(0) \ – f^\prime(0) x \in f^{\prime\prime}(0) \frac{x^2}{2} \cdot [ \rho(-Rx), \rho(Rx) ],$$ with \(\displaystyle \rho(u) =\ \frac{\exp( u ) \ – u\  – 1}{u^2 / 2 } \sim 1 \) when \(u\to 0\), that is, the second-order expansion is tight at \(x =0\), but leads to global lower and upper bounds. These upper and lower Taylor expansions are illustrated below.</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-5792" height="227" src="https://francisbach.com/wp-content/uploads/2021/03/rho_log.png" width="292"/></figure></div>
+
+
+
+<p class="justify-text"><strong>Properties in multiple dimensions.</strong> The properties above in Eq. (3) and (4) directly extend to multiple dimensions. For any \(x \in C\), then for any \(\Delta \in \mathbb{R}^d\), we have upper and lower bounds for the Hessian, the gradient (not presented below) and the functions value at \(x + \Delta\), that is, denoting by \(\| \cdot \|\) the standard Euclidean norm $$\tag{5}\exp(\ – R\|\Delta\|) f^{\prime \prime}(x) \preccurlyeq  f^{\prime \prime}(x+\Delta) \preccurlyeq \exp( R\|\Delta\|)  f^{\prime \prime}(x),$$ and $$\tag{6} \!\!\!\!\!\!\!\!\! \frac{ \Delta^\top f^{\prime \prime}(x) \Delta}{2} \rho(-R \|\Delta\|_2) \leqslant f(x+\Delta)\ -f(x) \ – f^\prime(x)^\top \Delta \leqslant \frac{ \Delta^\top f^{\prime \prime}(x) \Delta}{2} \rho(R \|\Delta\|_2).\! $$ These approximations are “second-order tight” at \(\Delta=0\), that is, the term in \(f^{\prime\prime}(x)\) in Taylor expansion around \(x\) is exact. These can be derived by considering \(g(t) = f(x+ t\Delta)\), which is \(2\)-self-concordant with constant \(R \|\Delta\|_2\), and applying the one-dimensional properties above in Eqs. (2) and (3) between \(0\) and \(1\).</p>
+
+
+
+<p class="justify-text"><strong>Avoiding exponentially decaying constants.</strong> In this post, I will focus primarily on the use self-concordant functions in optimization (stochastic gradient descent in this post and Newton method in another post) as well as in statistics.</p>
+
+
+
+<p class="justify-text">The main benefit of using self-concordance is to avoid exponential constants traditionally associated with the analysis of logistic regression. Indeed, for the logistic loss, the second-derivative at \(x\) is is equal to \(\sigma(x) ( 1 – \sigma(x) )\) and is equivalent to \(\exp(-|x|)\) when  \(| x| \) is large. Thus, if we are willing to only apply the logistic loss to small values of \(|x|\), let’s say less than \(M\), then the logistic loss is strongly-convex with constant greater than \(\exp(-M)\). Therefore, we can apply many results in optimization and statistics that apply to such losses. However, all of these results will be impacted by the constant \(\exp(-M)\), which is strictly positive but can be very small. With self-concordance, the analysis will get rid of these annoying constants and replace them by eigenvalues of Hessian matrices at the optimum, which are typically much larger (note that in the worst case, the exponential constants are unavoidable [<a href="http://proceedings.mlr.press/v35/hazan14a.pdf">3</a>]).</p>
+
+
+
+<h2>Adaptivity of stochastic gradient descent</h2>
+
+
+
+<p class="justify-text">I have not written about stochastic gradient descent for quite a while. Self-concordance gives me the occasion to talk about <em>adaptivity</em>.</p>
+
+
+
+<p class="justify-text">It is well known that for smooth convex functions, gradient descent will converge exponentially fast if the function is also strongly-convex (essentially all eigenvalues of all Hessians being strictly positive). If the problem is ill-conditioned, then the exponential convergence rate turns into a rate of \(O(1/t)\) where \(t\) is the number of iterations. Gradient descent is <em>adaptive</em> as the exact same algorithm (with constant step-size or line-search) can be applied without the need to know the strong-convexity parameter. Moreover, if locally around the global optimum, the Hessians are better conditioned, gradient descent will also benefit from it. Therefore, gradient descent is great! What about stochastic gradient descent (SGD)?</p>
+
+
+
+<p class="justify-text">It turns out that similar adaptivity exists for a well-defined version of SGD, and that self-concordance is one way to achieve simple non-asymptotic bounds (asymptotic bounds exist more generally [4]).</p>
+
+
+
+<p class="justify-text"><strong>Logistic regression. </strong>We consider the logistic regression problem where we aim to minimize the expectation $$f(x) = \mathbb{E}_{a,b} \log( 1 + \exp(-b a^\top x) ) = \mathbb{E}_{a,b} g(x|a,b) ,$$ where \((a,b) \in \mathbb{R}^d \times \{-1,1\}\) is a pair of input \(a\) and output \(b\) (hopefully, the machine learning police will excuse my use of \(x\) as the parameter and not the input). We are given \(n\) independent and identically distributed observations \((a_1,b_1),\dots, (a_n,b_n)\) and we aim at finding the minimizer \(x_\ast\) of \(f\) (which is the logistic loss on unseen data), which we assume to exist. We assume that the feature norms \(\|a\|\) are almost surely bounded by \(R\).</p>
+
+
+
+<p>Note here that we are not trying to minimize the empirical risk and by using a single pass, we obtain bounds on the generalization performance. This is one of the classical benefits of SGD.</p>
+
+
+
+<p class="justify-text"><strong>Averaged stochastic gradient descent.</strong> We consider the stochastic gradient recursion: $$x_i = x_{i-1} – \gamma_i g^\prime(x_{i-1}|a_i,b_i),$$ for \(i=1,\dots,n\), with a single pass over the data. We also consider the average iterate \(\bar{x}_n = \frac{1}{n+1} \sum_{i=0}^{n} x_i\). </p>
+
+
+
+<p class="justify-text">Standard results from the stochastic gradient descent literature [<a href="https://epubs.siam.org/doi/pdf/10.1137/070704277">5</a>, <a href="https://papers.nips.cc/paper/2011/file/40008b9a5380fcacce3976bf7c08af5b-Paper.pdf">6</a>] show that if \(\gamma_i = \frac{1}{R^2 \sqrt{i}}\), then, up to universal (small) constants, $$ \mathbb{E} f(\bar{x}_i)\  – f(x_\ast) \leqslant (1 + R^2 \| x_0 – x_\ast\|^2) \frac{\log n}{\sqrt{n}}.$$ If in addition, the function \(f\) is \(\mu\)-strongly-convex, then with the step-size \(\gamma_i = \frac{1}{\mu i}\), up to universal (small) constants, $$ \mathbb{E} f(\bar{x}_i) \ – f(x_\ast) \leqslant   \frac{R^2 \log n}{n\mu}.$$ The strongly convex result seems beneficial as we get a rate in \(O(( \log n) / n)\) instead of \(O(( \log n) / \sqrt{n})\), <em>but</em>, (1) it depends on \(\mu\), which can be very small in problems in high dimension \(d\), (2) it depends on this global strong-convexity constant \(\mu\), that is a lower bound on all Hessians, which is zero for logistic regression unless a projection step is used (and with exponentially small constant as explained above), and (3) the step-size has to be adapted. </p>
+
+
+
+<p class="justify-text"><strong>Adaptivity. </strong>Wouldn’t it be great if these three problems could be solved at once? This is what I worked on a few years ago [<a href="http://">7</a>], where I showed that for constant step-size \(\gamma\) proportional to \(\frac{1}{R^2 \sqrt{n}}\) (thus dependent on the total number of gradient steps), we have. up to constants: $$ \mathbb{E} f(\bar{x}_i)\ – f(x_\ast) \leqslant (1 + R^2 \| x_0 – x_\ast\|^2) \frac{1}{\sqrt{n}},$$ <em>and</em> $$ \mathbb{E} f(\bar{x}_i)\ – f(x_\ast) \leqslant (1 + R^4 \| x_0 – x_\ast\|^4) \frac{R^2 }{\mu_\ast n},$$ where \(\mu_\ast\) is the smallest eigenvalue of the Hessian \(f^{\prime\prime}(x_\ast)\) <em>at the optimum</em>. The two bounds are always satisfied and one can be bigger than the other depending on \(n\) and the condition number \(R^2 / \mu_\ast\).</p>
+
+
+
+<p class="justify-text">We thus get (almost) the best of all worlds! The proof relies strongly on self-concordance and applies to all generalized linear models. Note that (a) no new algorithm is proposed here, I am simply providing partial theoretical justifications why a classical algorithm works so well, (b) this is <em>only an upper-bound</em> on performance (more on this below).</p>
+
+
+
+<h2>Generalization bounds for generalized linear models</h2>
+
+
+
+<p class="justify-text">Beyond optimization, the use of self-concordant can make the non-asymptotic <em>statistical</em> analysis of logistic regression, and more generally all generalized linear models, sharper in the regularized unregularized setting [<a href="https://projecteuclid.org/journalArticle/Download?urlid=10.1214%2F09-EJS521">2</a>, <a href="https://projecteuclid.org/journalArticle/Download?urlid=10.1214%2F20-EJS1780">10</a>], with \(\ell_1\)-norm [<a href="https://projecteuclid.org/journalArticle/Download?urlid=10.1214%2F20-EJS1780">10</a>], or with non-parametric kernel-based models [<a href="https://projecteuclid.org/journalArticle/Download?urlid=10.1214%2F09-EJS521">2</a>, <a href="http://proceedings.mlr.press/v99/marteau-ferey19a/marteau-ferey19a.pdf">9</a>]. The first benefit is to avoid exponential constants associated with usual strong-convexity arguments of the loss (which can also be achieved with other tools, see [<a href="http://proceedings.mlr.press/v9/kakade10a/kakade10a.pdf">11</a>]). But there is another important benefit that requires some digression.</p>
+
+
+
+<p class="justify-text"><strong>Asymptotic statistics is great…</strong> Supervised learning through empirical risk minimization is the workhorse of machine learning. It can be analyzed from different perspectives and with different tools. As shown in the great book by Aad Van der Vaart [12], asymptotics statistics is a very clean way of understanding the behavior of statistical estimators when the number of observations \(n\) goes to infinity. </p>
+
+
+
+<p class="justify-text">Empirical risk minimization is indeed an example of M-estimation problems (estimators based on minimizing the empirical average of some loss functions), and it is known that under general conditions, the estimator has a known asymptotic mean and variance (with the traditional <a href="https://en.wikipedia.org/wiki/Fisher_information">Fisher information matrices</a>), which leads to an asymptotic equivalent of the unseen population risk (e.g., the “test error”). We recover the usual \(d/n\) bound for unregularized problems as well as dimension-independent results when using regularization with squared Euclidean norms (then with worse dependence in \(n\)).</p>
+
+
+
+<p class="justify-text">Because we deal with <em>limits</em>, one can formally compare two methods by favoring the one with the smallest asymptotic risk. This is not possible when non-asymptotic <em>upper bounds</em> are available: the fact that they are true for all \(n\) is a strong benefit, but since they are only bounds, they don’t say anything about which method is best.</p>
+
+
+
+<p class="justify-text"><strong>… But it is only asymptotic.</strong> Of course, these comparisons are only true in the limit of large \(n\), and, in particular for high-dimensional problems (e.g., data and/or parameters in large dimensions), we are unlikely to be in the asymptotic regime. So we cannot really rely only on letting \(n\) go to infinity. Moreover, these asymptotic limits typically depend on some information which is not available at training time. But does this mean that we have to throw away all asymptotic results?</p>
+
+
+
+<p class="justify-text"><strong>Self-concordance to the rescue.</strong> Since many of the asymptotic results are obtained by second-order Taylor expansions, we need non-asymptotic ways of dealing with these expansions, which is exactly what self-concordance allows you to do (with some extra effort of course). Therefore the best of both worlds can be achieved with such tools; see, e.g., [<a href="http://proceedings.mlr.press/v99/marteau-ferey19a/marteau-ferey19a.pdf">9</a>, <a href="https://projecteuclid.org/journalArticle/Download?urlid=10.1214%2F20-EJS1780">10</a>], for examples of analysis, and [<a href="https://projecteuclid.org/download/pdfview_1/euclid.aos/1360332187">13</a>, <a href="https://papers.nips.cc/paper/2015/file/acf4b89d3d503d8252c9c4ba75ddbf6d-Paper.pdf">14</a>] for other tools that can achieve similar results. It is then possible to prove that some asymptotic expansions are valid non-asymptotically.</p>
+
+
+
+<h2>Conclusion</h2>
+
+
+
+<p class="justify-text">In this post I focused on two aspects of self-concordant analysis for logistic regression and its extensions, namely adaptivity of stochastic gradient descent and statistical generalization bounds.</p>
+
+
+
+<p class="justify-text">In a later post, I will go back to Newton’s method, where the lack of affine invariance of \(2\)-self-concordance makes the analysis more complicated. However it will come with some interesting benefits for large-scale severely ill-conditioned problems [<a href="https://papers.nips.cc/paper/8980-globally-convergent-newton-methods-for-ill-conditioned-generalized-self-concordant-losses.pdf">8</a>]. You may wonder why we should bother with Newton method for large-scale machine learning when stochastic gradient descent, with or without variance reduction, seems largely enough. Stay tuned!</p>
+
+
+
+<h2>References</h2>
+
+
+
+<p class="justify-text">[1] Tianxiao Sun, and Quoc Tran-Dinh. <a href="https://link.springer.com/content/pdf/10.1007/s10107-018-1282-4.pdf">Generalized self-concordant functions: a recipe for Newton-type methods</a>. <em>Mathematical Programming</em> 178(1): 145-213, 2019.<br/>[2] Francis Bach. <a href="https://projecteuclid.org/journalArticle/Download?urlid=10.1214%2F09-EJS521">Self-Concordant Analysis for Logistic Regression</a>. Electronic Journal of Statistics, 4, 384-414, 2010.<br/>[3] Elad Hazan, Tomer Koren, and Kfir Y. Levy. <a href="http://proceedings.mlr.press/v35/hazan14a.pdf">Logistic regression: Tight bounds for stochastic and online optimization</a>. Proceedings of the International Conference on Learning Theory (COLT), 2014.<br/>[4] Boris T. Polyak, and Anatoli B. Juditsky. Acceleration of stochastic approximation by averaging. SIAM journal on control and optimization, 30(4):838-855, 1992.<br/>[5] Arkadi Nemirovski, Anatoli Juditsky, Guanghui Lan, and Alexander Shapiro. <a href="https://epubs.siam.org/doi/pdf/10.1137/070704277">Robust stochastic approximation approach to stochastic programming</a>. SIAM Journal on optimization, 19(4), 1574-1609, 2009.<br/>[6] Francis Bach, and Eric Moulines. <a href="https://papers.nips.cc/paper/2011/file/40008b9a5380fcacce3976bf7c08af5b-Paper.pdf">Non-asymptotic analysis of stochastic approximation algorithms for machine learning</a>. Advances in Neural Information Processing Systems (NIPS), 2011.<br/>[7] Francis Bach. <a href="http://jmlr.org/papers/volume15/bach14a/bach14a.pdf">Adaptivity of averaged stochastic gradient descent to local strong convexity for logistic regression</a>. Journal of Machine Learning Research, 15(Feb):595−627, 2014.<br/>[8] Ulysse Marteau-Ferey, Francis Bach, Alessandro Rudi. <a href="https://papers.nips.cc/paper/8980-globally-convergent-newton-methods-for-ill-conditioned-generalized-self-concordant-losses.pdf">Globally convergent Newton methods for ill-conditioned generalized self-concordant Losses</a>. Advances in Neural Information Processing Systems (NeurIPS), 2019.<br/>[9] Ulysse Marteau-Ferey, Dmitrii Ostrovskii, Francis Bach, Alessandro Rudi. <a href="http://proceedings.mlr.press/v99/marteau-ferey19a/marteau-ferey19a.pdf">Beyond Least-Squares: Fast Rates for Regularized Empirical Risk Minimization through Self-Concordance</a>. Proceedings of the International Conference on Learning Theory (COLT), 2019<br/>[10] Dmitrii Ostrovskii, <a href="https://projecteuclid.org/journalArticle/Download?urlid=10.1214%2F20-EJS1780">Francis Bach. Finite-sample Analysis of M-estimators using Self-concordance</a>. Electronic Journal of Statistics, 15(1):326-391, 2021.<br/>[11] Sham Kakade, Ohad Shamir, Karthik Sridharan, and Ambuj Tewari. <a href="http://proceedings.mlr.press/v9/kakade10a/kakade10a.pdf">Learning exponential families in high-dimensions: Strong convexity and sparsity</a>. In Proceedings of the international conference on artificial intelligence and statistics (AISTATS), 2010.<br/>[12] Aad W. Van der Vaart. Asymptotic Statistics. Cambridge University Press, 2000.<br/>[13] Vladimir Spokoiny. <a href="https://projecteuclid.org/download/pdfview_1/euclid.aos/1360332187">Parametric estimation. Finite sample theory</a>. The Annals of Statistics, 40(6), 2877-2909, 2012.<br/>[14] Tomer Koren, and Kfir Y. Levy. <a href="https://papers.nips.cc/paper/2015/file/acf4b89d3d503d8252c9c4ba75ddbf6d-Paper.pdf">Fast Rates for Exp-concave Empirical Risk Minimization</a>. Advances in Neural Information Processing Systems (NIPS), 2015.<br/></p>
+
+
+
+<h2>Self-concordance for generalized linear models</h2>
+
+
+
+<p class="justify-text">We consider a probability distribution on some set \(\mathcal{A}\), with density $$\exp\big( \varphi(a)^\top x) \ – f(x) \big)$$ with respect to the positive measure \(d\mu\), with \(f(x)\) the log-partition function, defined so that the total mass is one, that is, $$ f(x) = \log \Big( \int_\mathcal{A} \exp( \varphi(a)^\top x) d\mu(a) \Big). $$ We assume the feature vector \(\varphi(a)\) and the parameter \(x\) are in \(\mathbb{R}^d\).</p>
+
+
+
+<p class="justify-text">The theory of <a href="https://en.wikipedia.org/wiki/Exponential_family">exponential families</a> tells us that the function \(f(x)\) is the “cumulant generating” function. That is, the cumulants of \(\varphi(a)\) for the probability distribution defined by \(x\), are exactly the derivatives of \(f\) taken at \(x\). More precisely, for the usual mean and covariance matrix, we get $$ \mathbb{E}_{a|x} \varphi(a) = f^\prime (x),$$ $$ \mathbb{E}_{a|x} \big(\varphi(a) \ –  f^\prime (x)\big) \otimes \big(\varphi(a) \ – f^\prime (x)\big) = f^{\prime\prime}(x).$$ For the third order cumulant, we get: $$ \mathbb{E}_{a|x} \big(\varphi(a)\  – f^\prime (x)\big)\otimes \big(\varphi(a)\  – f^\prime (x)\big) \otimes \big(\varphi(a) \ – f^\prime (x)\big) = f^{\prime\prime\prime}(x).$$ Thus, for any \(h \in \mathbb{R}^d\), \(\big(\varphi(a) \ – f^\prime (x)\big)^\top h \leqslant \| h\| D\), where \(D\) is the diameter of the set \(\{ \varphi(a), \ a \in \mathcal{A} \}\), which leads to the desired \(2\)-self-concordance property.</p></div>
+    </content>
+    <updated>2021-03-07T16:06:50Z</updated>
+    <published>2021-03-07T16:06:50Z</published>
+    <category term="Machine learning"/>
+    <category term="Optimization"/>
+    <author>
+      <name>Francis Bach</name>
+    </author>
+    <source>
+      <id>https://francisbach.com</id>
+      <link href="https://francisbach.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://francisbach.com" rel="alternate" type="text/html"/>
+      <subtitle>Francis Bach</subtitle>
+      <title>Machine Learning Research Blog</title>
+      <updated>2021-03-07T18:41:34Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://emanueleviola.wordpress.com/?p=848</id>
@@ -70,7 +270,7 @@
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2021-03-07T15:38:15Z</updated>
+      <updated>2021-03-07T18:40:43Z</updated>
     </source>
   </entry>
 
@@ -632,7 +832,7 @@ Our results are obtained by establishing a new connection between the Fiat-Shami
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-07T15:37:26Z</updated>
+      <updated>2021-03-07T18:39:42Z</updated>
     </source>
   </entry>
 
@@ -654,7 +854,7 @@ Our results are obtained by establishing a new connection between the Fiat-Shami
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-07T15:37:26Z</updated>
+      <updated>2021-03-07T18:39:41Z</updated>
     </source>
   </entry>
 
@@ -884,7 +1084,7 @@ A 2018 WSJ <a href="https://www.wsj.com/articles/dont-believe-the-algorithm-1536
       <link href="https://decentralizedthoughts.github.io/feed.xml" rel="self" type="application/atom+xml"/>
       <subtitle>Decentralized thoughts about decentralization</subtitle>
       <title>Decentralized Thoughts</title>
-      <updated>2021-03-06T22:47:30Z</updated>
+      <updated>2021-03-07T18:41:29Z</updated>
     </source>
   </entry>
 
@@ -912,7 +1112,7 @@ In this work, we show that it is NP-hard to approximate the size (number of leav
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-07T15:37:26Z</updated>
+      <updated>2021-03-07T18:39:41Z</updated>
     </source>
   </entry>
 
@@ -939,7 +1139,7 @@ Email: pbarcelo@uc.cl</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-03-07T15:37:37Z</updated>
+      <updated>2021-03-07T18:40:16Z</updated>
     </source>
   </entry>
 
@@ -1037,7 +1237,7 @@ Email: pbarcelo@uc.cl</p></div>
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2021-03-07T15:39:03Z</updated>
+      <updated>2021-03-07T18:41:08Z</updated>
     </source>
   </entry>
 
@@ -1064,7 +1264,7 @@ Email: tenuretrack@eecs.kth.se</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-03-07T15:37:37Z</updated>
+      <updated>2021-03-07T18:40:16Z</updated>
     </source>
   </entry>
 
@@ -1094,7 +1294,7 @@ In this work, we eliminate these two drawbacks by constructing a public-coin mal
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-07T15:37:26Z</updated>
+      <updated>2021-03-07T18:39:41Z</updated>
     </source>
   </entry>
 
@@ -1230,7 +1430,7 @@ Email: florian.sikora@dauphine.fr</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-03-07T15:37:37Z</updated>
+      <updated>2021-03-07T18:40:17Z</updated>
     </source>
   </entry>
 
@@ -1250,7 +1450,7 @@ Email: florian.sikora@dauphine.fr</p></div>
       <link href="https://decentralizedthoughts.github.io/feed.xml" rel="self" type="application/atom+xml"/>
       <subtitle>Decentralized thoughts about decentralization</subtitle>
       <title>Decentralized Thoughts</title>
-      <updated>2021-03-06T22:47:30Z</updated>
+      <updated>2021-03-07T18:41:29Z</updated>
     </source>
   </entry>
 
@@ -1578,7 +1778,7 @@ We deal with $\mathrm{Search}_{\varphi}$ that is ``relatively easy'' compared to
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-07T15:37:26Z</updated>
+      <updated>2021-03-07T18:39:41Z</updated>
     </source>
   </entry>
 
@@ -1605,7 +1805,7 @@ Email: f.speelman@uva.nl</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-03-07T15:37:37Z</updated>
+      <updated>2021-03-07T18:40:16Z</updated>
     </source>
   </entry>
 
@@ -1634,7 +1834,7 @@ Email: sias.chair_sciences@krea.edu.in</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-03-07T15:37:37Z</updated>
+      <updated>2021-03-07T18:40:16Z</updated>
     </source>
   </entry>
 
@@ -1661,7 +1861,7 @@ Email: chekuri@illinois.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-03-07T15:37:37Z</updated>
+      <updated>2021-03-07T18:40:16Z</updated>
     </source>
   </entry>
 
@@ -1727,7 +1927,7 @@ Email: sias.chair_sciences@krea.edu.in</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-03-07T15:37:37Z</updated>
+      <updated>2021-03-07T18:40:16Z</updated>
     </source>
   </entry>
 
@@ -1757,7 +1957,7 @@ Email: sias.chair_sciences@krea.edu.in</p></div>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-03-07T15:38:35Z</updated>
+      <updated>2021-03-07T18:41:00Z</updated>
     </source>
   </entry>
 
@@ -2272,7 +2472,7 @@ Email: sias.chair_sciences@krea.edu.in</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-03-07T15:38:08Z</updated>
+      <updated>2021-03-07T18:40:35Z</updated>
     </source>
   </entry>
 
@@ -2425,40 +2625,6 @@ Here are the answers:</p>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel’s Lost Letter and P=NP</title>
       <updated>2021-03-07T15:37:34Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2021/027</id>
-    <link href="https://eccc.weizmann.ac.il/report/2021/027" rel="alternate" type="text/html"/>
-    <title>TR21-027 |  Almost Optimal Super-Constant-Pass Streaming Lower Bounds for Reachability | 
-
-	Lijie Chen, 
-
-	Gillat Kol, 
-
-	Dmitry Paramonov, 
-
-	Raghuvansh Saxena, 
-
-	Zhao Song, 
-
-	Huacheng Yu</title>
-    <summary>We give an almost quadratic $n^{2-o(1)}$ lower bound on the space consumption of any $o(\sqrt{\log n})$-pass streaming algorithm solving the (directed) $s$-$t$ reachability problem. This means that any such algorithm must essentially store the entire graph. As corollaries, we obtain almost quadratic space lower bounds for additional fundamental problems, including maximum matching, shortest path, matrix rank, and linear programming.
-
-Our main technical contribution is the definition and construction of set hiding graphs, that may be of independent interest: we give a general way of encoding a set $S \subseteq [k]$ as a directed graph with $n = k^{ 1 + o( 1 ) }$ vertices, such that deciding whether $i \in S$ boils down to deciding if $t_i$ is reachable from $s_i$, for a specific pair of vertices $(s_i,t_i)$ in the graph. Furthermore, we prove that our graph ``hides'' $S$, in the sense that no low-space streaming algorithm with a small number of passes can learn (almost) anything about $S$.</summary>
-    <updated>2021-02-24T02:18:04Z</updated>
-    <published>2021-02-24T02:18:04Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2021-03-07T15:37:26Z</updated>
     </source>
   </entry>
 </feed>
