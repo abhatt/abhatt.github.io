@@ -243,7 +243,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at March 11, 2021 04:22 AM UTC</span>.
+Last updated <span class="datestr">at March 11, 2021 04:39 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -251,6 +251,116 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://differentialprivacy.org/flavoursofdelta/">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/dp.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://differentialprivacy.org/flavoursofdelta/">What is δ, and what δifference does it make?</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://differentialprivacy.org" title="Differential Privacy">DifferentialPrivacy.org</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>There are many variants or flavors of differential privacy (DP) some weaker than others: often, a given variants comes with own guarantees and “conversion theorems” to the others. As an example, “pure” DP has a single parameter \(\varepsilon\), and corresponds to a very stringent notion of DP:</p>
+
+<blockquote>
+  <p>An algorithm \(M\) is \(\varepsilon\)-DP if, for all neighbouring inputs \(D,D'\) and all measurable \(S\), \( \Pr[ M(D) \in S ] \leq e^\varepsilon\Pr[ M(D) \in S ] \).</p>
+</blockquote>
+
+<p>By relaxing this a little, one obtains the standard definition of approximate DP, a.k.a. \((\varepsilon,\delta)\)-DP:</p>
+
+<blockquote>
+  <p>An algorithm M is \((\varepsilon,\delta)\)-DP if, for all neighbouring inputs \(D,D'\) and all measurable \(S\), \( \Pr[ M(D) \in S ] \leq e^\varepsilon\Pr[ M(D) \in S ]+\delta \).</p>
+</blockquote>
+
+<p>This definition is very useful, as in many settings achieving the stronger \(\varepsilon\)-DP guarantee (i.e., \(\delta=0\)) is impossible, or comes at a very high utility cost. But how to interpret it? The above definition, on its face, doesn’t preclude what one may call “<em>catastrophic failures of privacy</em> 💥:” most of the time, things are great, but with some small probability \(\delta\) all hell breaks loose. For instance, the following algorithm is \((\varepsilon,\delta)\)-DP:</p>
+
+<ul>
+  <li>Get a sensitive database \(D\) of \(n\) records</li>
+  <li>Select uniformly at random a fraction \(\delta\) of the database (\(\delta n\) records)</li>
+  <li>Output that subset of records in the clear 💥</li>
+</ul>
+
+<p>(actually, this is even \((0,\delta)\)-DP!). This sounds preposterous, and obviously something that one would want to avoid in practice (lest one wants to face very angry customers or constituents). This is one of the rules of thumb for picking \(\delta\) small enough (or even “cryptographically small”), typically \(\delta \ll 1/n\), so that the records are safe (hard to disclose \(\delta n \ll 1\) records).</p>
+
+<p>So: good privacy most of the time, but with probably \(\delta\) then all bets are off.</p>
+
+<p>However, those catastrophic failure of privacy, while technically allowed by the definition of \((\varepsilon,\delta)\)-DP, <strong>are not something that can really happen with the DP algorithms and techniques used both in practice and in theoretical work.</strong> Before explaining why, let’s see what is the kind of desirable behaviour one would expect: a <em>“smooth, manageable tradeoff of privacy parameters.”</em> For that discussion, let’s introduce the <em>privacy loss random variable</em>: given an algorithm M and two neighbouring inputs D,D’, let \(f(y)\) be defined as
+\[
+	f(y) = \log\frac{\Pr[M(D)=y]}{\Pr[M(D’)=y]}
+\]
+for every possible output \(y\in\Omega\). Now, define the random variable \(Z := f(M(D))\) (implicitly, \(Z\) depends on \(D,D',M\)). This random variable quantifies how much observing the output of the algorithm \(M\) helps distinguishing between \(D\) and \(D'\).</p>
+
+<p>Now, going a little bit fast, you can check that saying that \(M\) is \(\varepsilon\)-DP corresponds to the guarantee “<em>\(\Pr[Z &gt; \varepsilon] = 0\) for all neighbouring inputs \(D,D'\).</em>”
+Similarly, \(M\) being \((\varepsilon,\delta)\)-DP is the guarantee \(\Pr[Z &gt; \varepsilon] \leq \delta\).\({}^{(\dagger)}\) For instance, the “catastrophic failure of privacy” corresponds to the scenario below, which depicts a possible distribution for \(Z\): \(Z\leq \varepsilon\) with probability \(1-\delta\), but then with probability \(\delta\) we have \(Z\gg 1\).</p>
+
+<p><img width="600" style="margin: auto; display: block;" alt="The type of (bad) distribution of Z corresponding to 'our catastrophic failure of privacy'" src="https://differentialprivacy.org/images/flavours-delta-fig1.png" /></p>
+
+<p>What we would like is a smoother thing, where even when \(Z&gt;\varepsilon\) is still remains reasonable and doesn’t immediately become large. A nice behaviour of the tails, ideally something like this:</p>
+
+<p><img width="600" style="margin: auto; display: block;" alt="A distribution for Z with nice tails, leading to smooth tradeoffs between ε and δ" src="https://differentialprivacy.org/images/flavours-delta-fig2.png" /></p>
+
+<p>For instance, if we had a bound on \(\mathbb{E}[|Z|]\), we could use Markov’s inequality to get, well, <em>something</em>. For instance, imagine we had \(\mathbb{E}[|Z|]\leq \varepsilon\delta\): then 
+\[
+	\Pr[ |Z| &gt; \varepsilon ] \leq \frac{\mathbb{E}[|Z|]}{\varepsilon }\leq \delta
+\]
+<em>(great! We have \((\varepsilon,\delta)\)-DP)</em>; but also  \(\Pr[ |Z| &gt; 10\varepsilon ] \leq \frac{\delta}{10}\). Privacy violations do not blow up out of proporxtion immediately, we can trade \(\varepsilon\) for \(\delta\). That seems like the type of behaviour we would like our algorithms to exhibit.</p>
+
+<p><img width="600" style="margin: auto; display: block;" alt="The type of privacy guarantees a Markov-type tail bound would give" src="https://differentialprivacy.org/images/flavours-delta-fig3.png" /></p>
+
+<p>But why stop at Markov’s inequality then, which gives some nice but still weak tail bounds? Why not ask for <em>stronger</em>: Chebyshev’s inequality? Subexponential tail bounds? Hell, <em>subgaussian</em> tail bounds? This is, basically, what some stronger notions of differential privacy than approximate DP give.</p>
+
+<ul>
+  <li>
+    <p><strong>Rényi DP</strong> <a href="https://arxiv.org/abs/1702.07476" title="Ilya Mironov. Renyi Differential Privacy. CSF 2017"><strong>[Mironov17]</strong></a>, for instance, is a guarantee on the moment-generating function (MGF) of the privacy random variable \(Z\): it has two parameters, \(\alpha&gt;1\) and \(\tau\), and requires that \(\mathbb{E}[e^{(\alpha-1)Z}] \leq e^{(\alpha-1)\tau}\) for all neighbouring \(D,D'\). In turn, by applying for instance Markov’s inequality to the MGF of \(Z\), we can control the tail bounds, and get a nice, smooth tradeoff in terms of \((\varepsilon,\delta)\)-DP.</p>
+  </li>
+  <li>
+    <p><strong>Concentrated DP</strong> (CDP)  <a href="https://arxiv.org/abs/1605.02065" title="Mark Bun and Thomas Steinke. Concentrated Differential Privacy: Simplifications, Extensions, and Lower Bounds. TCC 2016"><strong>[BS16]</strong></a> is an even stronger requirement, which roughly speaking requires the algorithm to be Rényi DP <em>simultaneously</em> for all \(1&lt; \alpha \leq \infty\). More simply, this is “morally” a requirement on the MGF of \(Z\) which asks it to be subgaussian.</p>
+  </li>
+</ul>
+
+<p>The above two examples are not just fun but weird variants of DP: they actually capture the behaviour of many well-known differentially private algorithms, and in particular that of the Gaussian mechanism. While the guarantees they provide are less easy to state and interpret than \(\varepsilon\)-DP or \((\varepsilon,\delta)\)-DP, they are incredibly useful to analyze those algorithms, and enjoy very nice composition properties… and, of course, lead to that smooth tradeoff between \(\varepsilon\) and \(\delta\) for \((\varepsilon,\delta)\)-DP.</p>
+
+<p><strong>To summarize:</strong></p>
+<ul>
+  <li>\(\varepsilon\)-DP gives great guarantees, but is a very stringent requirement. Corresponds to the privacy loss random variable supported on \([-\varepsilon,\varepsilon]\) (no tails!)</li>
+  <li>\((\varepsilon,\delta)\)-DP gives guarantees easy to parse, but on its face allows for very bad behaviours. Corresponds to the privacy loss random variable in \([-\varepsilon,\varepsilon]\) with probability \(1-\delta\) (but outside, all bets are off!)</li>
+  <li>Rényi DP and Concentrated DP correspond to something in between, controlling the tails of the privacy loss random variable by a guarantee on its MGF. A bit harder to interpret, but capture the behaviour of many DP building blocks can be converted to \((\varepsilon,\delta)\)-DP (with nice trade-offs between \(\varepsilon\) and \(\delta\).</li>
+</ul>
+
+<hr />
+<p>\({}^{(\dagger)}\) The astute reader may notice that this is not <em>quite</em> true. Namely, the guarantee \(\Pr[Z &gt; \varepsilon] \leq \delta\) on the privacy loss random variable (PLRV) does imply \((\varepsilon,\delta)\)-differential privacy, but the converse does not hold. See, for instance, Lemma 9 of <a href="https://arxiv.org/abs/2004.00010" title="Clément L. Canonne, Gautam Kamath, Thomas Steinke. The Discrete Gaussian for Differential Privacy. NeurIPS 2020"><strong>[CKS20]</strong></a> for an exact characterization of \((\varepsilon,\delta)\)-DP in terms of the PLRV.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Clément Canonne <a href="https://differentialprivacy.org/flavoursofdelta/"><span class="datestr">at March 12, 2021 01:00 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -3139,180 +3249,6 @@ by gasarch (noreply@blogger.com) <a href="https://blog.computationalcomplexity.o
 
 <p class="date">
 by David Eppstein <a href="https://11011110.github.io/blog/2021/02/28/linkage.html"><span class="datestr">at February 28, 2021 04:24 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://rjlipton.wordpress.com/?p=18225">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/lipton.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://rjlipton.wordpress.com/2021/02/27/new-old-ancient-results/">New, Old, Ancient Results</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://rjlipton.wordpress.com" title="Gödel’s Lost Letter and P=NP">Richard Lipton</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p>
-<font color="#0044cc"><br />
-<em>Nonexistence theorems and attempts at lower bounds</em><br />
-<font color="#000000"></font></font></p><font color="#0044cc"><font color="#000000">
-<table class="image alignright">
-<tbody>
-<tr>
-<td>
-<a href="https://rjlipton.files.wordpress.com/2021/02/jgcropped.jpg"><img width="141" alt="" src="https://rjlipton.files.wordpress.com/2021/02/jgcropped.jpg?w=141&amp;h=168" class="alignright wp-image-18228" height="168" /></a>
-</td>
-</tr>
-<tr>
-<td class="caption alignright"><font size="-2">Cropped from <a href="https://home.cs.colorado.edu/~jgrochow/">src</a></font></td>
-</tr>
-</tbody>
-</table>
-<p>
-Joshua Grochow is an assistant professor in Computer Science and Mathematics at the University of Colorado at Boulder. He was a student of Ketan Mulmuley and Lance Fortnow at Chicago; his <a href="https://home.cs.colorado.edu/~jgrochow/grochow-thesis.pdf">dissertation</a> and <a href="https://arxiv.org/pdf/1304.6333.pdf">some</a> <a href="https://arxiv.org/pdf/1112.2012.pdf">subsequent</a> <a href="https://arxiv.org/pdf/1605.02815.pdf">papers</a> did much to widen the horizons of the “Geometric Complexity Theory” (GCT) program. He is also a gifted expositor.</p>
-<p>
-Today we will highlight some of his work and some of his exposition of new and old theorems.<br />
-<span id="more-18225"></span></p>
-<p>
-An ancient one is Stephen Mahaney’s famous theorem on the nonexistence of sparse <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BNP%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf{NP}}" class="latex" />-complete sets (unless <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BNP+%3D+P%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf{NP = P}}" class="latex" />). Grochow <a href="https://arxiv.org/pdf/1610.05825.pdf">discusses</a> a simpler proof of the theorem by Manindra Agrawal and gives some further impacts on GCT. </p>
-<p>
-A recent <a href="https://drops.dagstuhl.de/opus/volltexte/2021/13570/pdf/LIPIcs-ITCS-2021-31.pdf">one</a> with Youming Qiao is on an old topic and is in the 2021 Innovations in Theoretical Computer Science conference. It is titled, “On the Complexity of Isomorphism Problems for Tensors, Groups, and Polynomials I: Tensor Isomorphism-Completeness,” and grows out of a 2019 <a href="https://arxiv.org/abs/1907.00309">paper</a> by the same authors. </p>
-<p>
-This came to my attention through communications with Grochow’s <a href="https://michaellevet.github.io">student</a>, Michael Levet. Indeed, Levet is the reason for my putting this all together. He raised through email some questions about an ancient result of mine on group isomorphism. I reported <a href="https://rjlipton.wordpress.com/2013/05/11/advances-on-group-isomorphism/">previously</a>:</p>
-<blockquote><p><b> </b> <em> Long ago Bob Tarjan and Zeke Zalcstein and I made a simple observation: Group isomorphism could be done in time 	</em></p><em>
-<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++n%5E%7B%5Clog_%7B2%7D+n+%2B+O%281%29%7D.+&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  n^{\log_{2} n + O(1)}. " class="latex" /></p>
-</em><p><em>This relies on the easy-to-prove fact that every group has at most <img src="https://s0.wp.com/latex.php?latex=%7B%5Clog_%7B2%7D+n%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\log_{2} n}" class="latex" /> generators. We have discussed this idea earlier <a href="https://rjlipton.wordpress.com/2011/10/08/an-annoying-open-problem/">here</a>. </em>
-</p></blockquote>
-<p>
-Levet raised an issue about related observations of mine—ones that were misleading at best. I think he has a good point and we are still trying to unravel exactly what I meant back then. I applaud him for reading ancient stuff, for trying to extend it, and for working on such problems. I wish him well.</p>
-<p>
-</p><h2> No Three In a Row </h2><p></p>
-<p>While Levet and I work that out and think about Grochow’s paper on isomorphism problems with Qiao, Ken and I want to highlight a different expository <a href="https://www.ams.org/journals/bull/2019-56-01/S0273-0979-2018-01648-0/S0273-0979-2018-01648-0.pdf">paper</a> by Grochow on news from 2016 that we <a href="https://rjlipton.wordpress.com/2016/06/15/polynomial-prestidigitation/">covered</a> then. Grochow’s paper appeared in the <em>AMS Bulletin</em> and is titled, “New Applications Of The Polynomial Method: The Cap Set Conjecture And Beyond.” </p>
-<p>
-To lead in to the subject, here is a <a href="https://archive.org/stream/amusementsinmath00dude#page/94/mode/2up">problem</a> from 1917 by the English puzzlemaster Henry Dudeney titled, “A Puzzle With Pawns”:</p>
-<blockquote><p><b> </b> <em> Place two pawns in the middle of the chess- board, one at Q 4 and the other at K 5. Now, place the remaining fourteen pawns (sixteen in all) so that no three shall be in a straight line in any possible direction. Note that I purposely do not say queens, because by the words ” any possible direction ” I go beyond attacks on diagonals. The pawns must be regarded as mere points in space — at the centres of the squares. </em>
-</p></blockquote>
-<p>
-Sixteen is obviously the maximum possible for a standard <img src="https://s0.wp.com/latex.php?latex=%7B8+%5Ctimes+8%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{8 \times 8}" class="latex" /> chessboard because a seventeenth pawn would make three in some row and some column. For an <img src="https://s0.wp.com/latex.php?latex=%7Br+%5Ctimes+r%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r \times r}" class="latex" /> board, the limit is <img src="https://s0.wp.com/latex.php?latex=%7B2r%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{2r}" class="latex" /> by similar reasoning—this is an example of the <em>pigeonhole principle</em> which we just <a href="https://rjlipton.wordpress.com/2021/02/15/pigenhole-principle/">mentioned</a>. </p>
-<p>
-It is possible to achieve the maximum for all <img src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r}" class="latex" /> up to <img src="https://s0.wp.com/latex.php?latex=%7B46%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{46}" class="latex" /> and then the only other cases known are <img src="https://s0.wp.com/latex.php?latex=%7B48%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{48}" class="latex" />, <img src="https://s0.wp.com/latex.php?latex=%7B50%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{50}" class="latex" />, and <img src="https://s0.wp.com/latex.php?latex=%7B52%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{52}" class="latex" />. That’s it. Here are solutions for <img src="https://s0.wp.com/latex.php?latex=%7Br+%3D+10%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r = 10}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7Br+%3D+52%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r = 52}" class="latex" />. The latter was found by Achim Flammenkamp, whose <a href="http://wwwhomes.uni-bielefeld.de/achim/no3in/readme.html">page</a> has encyclopedic information. On the former, the pieces are positioned on gridpoints like stones in Go, which seems a better context for this problem than chess. </p>
-<table style="margin: auto;">
-<tbody><tr>
-<td>
-<a href="https://rjlipton.files.wordpress.com/2021/02/3inarow20and52.jpg"><img width="550" alt="" src="https://rjlipton.files.wordpress.com/2021/02/3inarow20and52.jpg?w=550&amp;h=257" class="aligncenter wp-image-18230" height="257" /></a>
-</td>
-</tr>
-<tr>
-<td class="caption alignright"><font size="-2">Composite of <a href="https://en.wikipedia.org/wiki/No-three-in-line_problem">src1</a>, <a href="https://mathworld.wolfram.com/No-Three-in-a-Line-Problem.html">src2</a></font>
-</td>
-</tr>
-</tbody></table>
-<p>
-The conjecture is not only that a <img src="https://s0.wp.com/latex.php?latex=%7B2n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{2n}" class="latex" />-size solution exists for only finitely many <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" />, but also that the maximum size for all sufficiently large <img src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r}" class="latex" /> is bounded by <img src="https://s0.wp.com/latex.php?latex=%7Bcr%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{cr}" class="latex" /> with <img src="https://s0.wp.com/latex.php?latex=%7Bc+%3C+2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{c &lt; 2}" class="latex" />, indeed, with <img src="https://s0.wp.com/latex.php?latex=%7Bc+%3C+1.815%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{c &lt; 1.815}" class="latex" />. It is known that <img src="https://s0.wp.com/latex.php?latex=%7B%281.5-%5Cepsilon_r%29r%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{(1.5-\epsilon_r)r}" class="latex" /> stones can always be placed with no three collinear, where the <img src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon_r%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\epsilon_r}" class="latex" /> depends on the closeness of a prime to <img src="https://s0.wp.com/latex.php?latex=%7B%5Cfrac%7Br%7D%7B2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\frac{r}{2}}" class="latex" />. </p>
-<p>
-The problem can be taken to dimensions <img src="https://s0.wp.com/latex.php?latex=%7Bn+%5Cge+3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n \ge 3}" class="latex" /> that are beyond the plane. We can also extend what is meant by a “line” via various notions of wrapping-around. Then the question is how close the maximum size can stay to being linear in the size of the space—as <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" /> and/or the size <img src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r}" class="latex" /> of an individual dimension increase.</p>
-<p>
-</p><h2> Not As Easy As Tic-Tac-Toe </h2><p></p>
-<p>
-The theme of the no-three-in-a-line problem is fundamental to combinatorics. There are tons of problems of the form: </p>
-<blockquote><p><b> </b> <em> How many objects can one place, so that no pattern of some certain type exists? </em>
-</p></blockquote>
-<p>
-In <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" />-dimensional space the smallest <img src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r}" class="latex" /> of interest is <img src="https://s0.wp.com/latex.php?latex=%7Br+%3D+3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r = 3}" class="latex" />. This means playing on higher-dimensional versions of the <img src="https://s0.wp.com/latex.php?latex=%7B3+%5Ctimes+3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{3 \times 3}" class="latex" /> grid and <img src="https://s0.wp.com/latex.php?latex=%7B3+%5Ctimes+3+%5Ctimes+3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{3 \times 3 \times 3}" class="latex" /> cube. Then the only Euclidean lines are the kind we know from tic-tac-toe: straight across or down, or diagonal. </p>
-<p>
-For dimension <img src="https://s0.wp.com/latex.php?latex=%7Bn+%5Cgeq+3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n \geq 3}" class="latex" /> there are other kinds of diagonals, such as within a face or through the center of the cube, but they all win at <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" />-dimensional tic-tac-toe. So the problem becomes: what is the maximum number of moves you can make by yourself without creating a win at tic-tac-toe? The <em>cap-set problem</em> adds a twist by extending the notion of what is a <em>line</em>. It is like playing tic-tac-toe on a floor of <img src="https://s0.wp.com/latex.php?latex=%7B3+%5Ctimes+3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{3 \times 3}" class="latex" /> tiles where a play in one tile is replicated in all of them. Then you can make a line by playing in a corner and in the middle of the two opposite edges, as shown at left in the following diagram (original drawing).</p>
-<p>
-<a href="https://rjlipton.files.wordpress.com/2021/02/lineandcapset3x3.png"><img width="550" alt="" src="https://rjlipton.files.wordpress.com/2021/02/lineandcapset3x3.png?w=550&amp;h=222" class="aligncenter wp-image-18231" height="222" /></a></p>
-<p>
-The four orange O’s at right have no 3-in-a-line even with this extended notion of line. Note that the four blank cells in the top two rows also avoid putting 3 in a line. Four is the maximum, however: it is not possible to have a drawn game in extended <img src="https://s0.wp.com/latex.php?latex=%7B3+%5Ctimes+3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{3 \times 3}" class="latex" /> tic-tac-toe. </p>
-<p>
-The theorem <a href="https://arxiv.org/pdf/1605.09223v1.pdf">proved</a> by Jordan Ellenberg and Dion Gijswijt in 2016 is that the upper bound is not only a vanishing fraction of the size <img src="https://s0.wp.com/latex.php?latex=%7B3%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{3^n}" class="latex" /> of the space as <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" /> grows, it is bounded by <img src="https://s0.wp.com/latex.php?latex=%7Bc%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{c^n}" class="latex" /> where <img src="https://s0.wp.com/latex.php?latex=%7Bc+%3C+3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{c &lt; 3}" class="latex" />. Namely:</p>
-<blockquote><p><b>Theorem 1</b> <em> Every cap set in the <img src="https://s0.wp.com/latex.php?latex=%7B3%5En%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{3^n}" class="latex" />-cube has size at most <img src="https://s0.wp.com/latex.php?latex=%7B2.756%5En%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{2.756^n}" class="latex" />. </em>
-</p></blockquote>
-<p>
-</p><h2> Using Polynomials </h2><p></p>
-<p>There is a simple way to express the extended notion of “line” that works for all dimensions <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" />: Number the coordinates of each dimension <img src="https://s0.wp.com/latex.php?latex=%7B0%2C1%2C2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{0,1,2}" class="latex" />. Make the space <img src="https://s0.wp.com/latex.php?latex=%7B%5C%7B0%2C1%2C2%5C%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\{0,1,2\}^n}" class="latex" /> with addition modulo <img src="https://s0.wp.com/latex.php?latex=%7Bq+%3D+3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{q = 3}" class="latex" />, that is, make it <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BZ%7D_3%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathbb{Z}_3^n}" class="latex" />. Then the condition for three points <img src="https://s0.wp.com/latex.php?latex=%7BA%2CB%2CC%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{A,B,C}" class="latex" /> to be in a line is simply </p>
-<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++A+%2B+B+%3D+2C.+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  A + B = 2C. " class="latex" /></p>
-<p>It is easy to write polynomial equations over the field <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BF%7D_3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathbb{F}_3}" class="latex" /> to express the property of a set having such a line. What was unexpected, until Ernie Croot, Vsevolod Lev, and Péter Pál Pach solved a related problem with <img src="https://s0.wp.com/latex.php?latex=%7Bq+%3D+4%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{q = 4}" class="latex" />, was that there would be</p>
-<blockquote><p><b> </b> <em> “an ingeniously simple way to split the polynomial[s] into pieces with smaller exponents, which led to a bound on the size of collections with no [lines].” </em>
-</p></blockquote>
-<p>
-The quotation comes from an <a href="https://www.quantamagazine.org/set-proof-stuns-mathematicians-20160531">article</a> by Erica Klarreich for <em>Quanta</em> right then in 2016. A 2016 AMS Feature <a href="http://www.ams.org/publicoutreach/feature-column/fc-2016-08">column</a> by David Austin covers how to make this say a set <img src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S}" class="latex" /> of points is a cap set modulo 3: </p>
-<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++S+%5Cuplus+S+%5Ccap+2S+%3D+%5Cemptyset%2C+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  S \uplus S \cap 2S = \emptyset, " class="latex" /></p>
-<p>where we (not Austin) write <img src="https://s0.wp.com/latex.php?latex=%7BS+%5Cuplus+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S \uplus S}" class="latex" /> to mean the set of sums <img src="https://s0.wp.com/latex.php?latex=%7Ba+%2B+b%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a + b}" class="latex" /> where <img src="https://s0.wp.com/latex.php?latex=%7Ba%2Cb+%5Cin+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a,b \in S}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bb+%5Cneq+a%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{b \neq a}" class="latex" />. If there is an element <img src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r}" class="latex" /> in the intersection then <img src="https://s0.wp.com/latex.php?latex=%7Ba+%2B+b+%3D+r+%3D+2c%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a + b = r = 2c}" class="latex" />, and since <img src="https://s0.wp.com/latex.php?latex=%7B3c+%3D+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{3c = 0}" class="latex" />, we get <img src="https://s0.wp.com/latex.php?latex=%7Ba+%2B+b+%2B+c+%3D+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a + b + c = 0}" class="latex" /> with <img src="https://s0.wp.com/latex.php?latex=%7Ba%2Cb%2Cc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a,b,c}" class="latex" /> in <img src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S}" class="latex" /> and all distinct, a contradiction. (If <img src="https://s0.wp.com/latex.php?latex=%7Bc+%3D+b%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{c = b}" class="latex" /> then <img src="https://s0.wp.com/latex.php?latex=%7Ba+%2B+2b+%3D+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a + 2b = 0}" class="latex" />, so <img src="https://s0.wp.com/latex.php?latex=%7Ba+%3D+b%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{a = b}" class="latex" />.) Let <img src="https://s0.wp.com/latex.php?latex=%7Bm_d%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{m_d}" class="latex" /> stand for the number of monomials of degree at most <img src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{d}" class="latex" /> in the <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" /> variables. The key first insight is:</p>
-<blockquote><p><b>Lemma 2</b> <em> If a polynomial <img src="https://s0.wp.com/latex.php?latex=%7Bp%28x_1%2C%5Cdots%2Cx_n%29%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{p(x_1,\dots,x_n)}" class="latex" /> of degree <img src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{d}" class="latex" /> vanishes on <img src="https://s0.wp.com/latex.php?latex=%7BS%5Cuplus+S%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S\uplus S}" class="latex" />, then <img src="https://s0.wp.com/latex.php?latex=%7Bp%28x%29+%3D+0%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{p(x) = 0}" class="latex" /> for all but at most <img src="https://s0.wp.com/latex.php?latex=%7B2m_%7Bd%2F2%7D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{2m_{d/2}}" class="latex" /> points of <img src="https://s0.wp.com/latex.php?latex=%7B2S%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{2S}" class="latex" />. </em>
-</p></blockquote>
-<p>
-One could first try to interpret this as saying that <img src="https://s0.wp.com/latex.php?latex=%7BS+%5Cuplus+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S \uplus S}" class="latex" /> “looks like” <img src="https://s0.wp.com/latex.php?latex=%7B2S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{2S}" class="latex" /> to polynomials <img src="https://s0.wp.com/latex.php?latex=%7Bp%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{p}" class="latex" /> of “low” degree <img src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{d}" class="latex" />. However, if <img src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{d}" class="latex" /> stays low relative to <img src="https://s0.wp.com/latex.php?latex=%7B%7CS%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{|S|}" class="latex" /> then the “if” part would hold vacuously, opposing the goal of bounding <img src="https://s0.wp.com/latex.php?latex=%7B%7CS%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{|S|}" class="latex" /> and making the whole idea self-defeating. In fact, the important tension comes when <img src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{d}" class="latex" /> is intermediate: <img src="https://s0.wp.com/latex.php?latex=%7Bd+%3D+%28q-1%29n%2F3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{d = (q-1)n/3}" class="latex" />, which for <img src="https://s0.wp.com/latex.php?latex=%7Bq+%3D+3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{q = 3}" class="latex" /> makes <img src="https://s0.wp.com/latex.php?latex=%7Bd%2F2+%3D+n%2F3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{d/2 = n/3}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bd+%3D+2n%2F3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{d = 2n/3}" class="latex" /> neatly occupy the middle of the range <img src="https://s0.wp.com/latex.php?latex=%7B%5C%7B1%2C%5Cdots%2Cn%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\{1,\dots,n\}}" class="latex" />.</p>
-<p>
-The proof also uses the trick that if a product of two monomials has degree <img src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{d}" class="latex" /> then one of them must have degree at most <img src="https://s0.wp.com/latex.php?latex=%7B%5Clfloor+d%2F2%5Crfloor%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\lfloor d/2\rfloor}" class="latex" />. As I (Ken writing these sections) <a href="https://rjlipton.wordpress.com/2016/06/15/polynomial-prestidigitation/">wrote</a> about it back in 2016, this reminds of Roman Smolensky’s degree-halving <a href="https://rjlipton.wordpress.com/2012/03/11/a-note-on-distributions-and-approximation/">trick</a> in his celebrated 1987 <a href="https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.463.883&amp;rep=rep1&amp;type=pdf">theorem</a> on lower bounds for mod-<img src="https://s0.wp.com/latex.php?latex=%7Bp%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{p}" class="latex" /> versus mod-<img src="https://s0.wp.com/latex.php?latex=%7Bq%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{q}" class="latex" />. This trick, however, runs from <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" /> to <img src="https://s0.wp.com/latex.php?latex=%7Bn%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n/2}" class="latex" /> for all moduli. </p>
-<p>
-In any event, the 2016 papers were a new form of the polynomial method that led to striking new results. What Grochow’s survey does for us now is bring out wider implications of this ingenuity.</p>
-<p>
-</p><h2> Applications in Complexity </h2><p></p>
-<p>Grochow’s four application areas in section 4 of his survey are:</p>
-<ol>
-<li>
-Progress on various forms of `sunflower’ conjectures. <p></p>
-</li><li>
-Barriers to attempts to show that the exponent of matrix multiplication is <img src="https://s0.wp.com/latex.php?latex=%7B2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{2}" class="latex" />. <p></p>
-</li><li>
-Removing edges to make graphs triangle-free. <p></p>
-</li><li>
-Matrix rigidity and lower bounds.
-</li></ol>
-<p>
-We say a little more about the last of these. For any <img src="https://s0.wp.com/latex.php?latex=%7BN+%5Ctimes+N%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{N \times N}" class="latex" /> matrix <img src="https://s0.wp.com/latex.php?latex=%7BA%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{A}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7Br+%5Cleq+N%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r \leq N}" class="latex" /> define the <em>rigidity</em> <img src="https://s0.wp.com/latex.php?latex=%7BR_A%28r%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{R_A(r)}" class="latex" /> to be the minimum number of entries in which <img src="https://s0.wp.com/latex.php?latex=%7BA%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{A}" class="latex" /> differs from some matrix of rank (at most) <img src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r}" class="latex" />. The highest possible rigidity for rank <img src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r}" class="latex" /> is <img src="https://s0.wp.com/latex.php?latex=%7B%28N+-+r%29%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{(N - r)^2}" class="latex" />, since zeroing out an <img src="https://s0.wp.com/latex.php?latex=%7B%28n-r%29%5Ctimes%28n-r%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{(n-r)\times(n-r)}" class="latex" /> block leaves a matrix of rank at most <img src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r}" class="latex" />. Sufficiently random matrices meet this upper bound with high probability, but the best lower bounds for explicit families of matrices are <img src="https://s0.wp.com/latex.php?latex=%7B%5COmega%28%5Cfrac%7BN%5E2%7D%7Br%7D%5Clog%5Cfrac%7BN%7D%7Br%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\Omega(\frac{N^2}{r}\log\frac{N}{r})}" class="latex" />, which is only quasi-linear when <img src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r}" class="latex" /> is close to <img src="https://s0.wp.com/latex.php?latex=%7BN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{N}" class="latex" />. The question is whether we can inch this up to <img src="https://s0.wp.com/latex.php?latex=%7B%5COmega%28n%5E%7B1%2B%5Cepsilon%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\Omega(n^{1+\epsilon})}" class="latex" /> for some <img src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon+%3E+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\epsilon &gt; 0}" class="latex" />.</p>
-<blockquote><p><b>Definition 3</b> <em> A family of matrices <img src="https://s0.wp.com/latex.php?latex=%7BA_N%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{A_N}" class="latex" /> is <em>significantly rigid</em> if there is an <img src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon+%3E+0%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\epsilon &gt; 0}" class="latex" /> such that taking <img src="https://s0.wp.com/latex.php?latex=%7Br+%3D+%5Cfrac%7BN%7D%7B%5Clog%5Clog+N%7D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r = \frac{N}{\log\log N}}" class="latex" /> makes <img src="https://s0.wp.com/latex.php?latex=%7BR_%7BA_N%7D%28r%29+%3D+%5COmega%28N%5E%7B1%2B%5Cepsilon%7D%29%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{R_{A_N}(r) = \Omega(N^{1+\epsilon})}" class="latex" />. </em>
-</p></blockquote>
-<p>
-The interest in this definition comes from a lack of lower bounds on linear algebraic circuits computing natural families <img src="https://s0.wp.com/latex.php?latex=%7BA_N%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{A_N}" class="latex" /> of linear transformations that seems even more extreme than our lack of super-linear lower bounds on Boolean circuits, nor better than <img src="https://s0.wp.com/latex.php?latex=%7B%5COmega%28N%5Clog+N%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\Omega(N\log N)}" class="latex" /> for general algebraic circuits computing polynomials in <img src="https://s0.wp.com/latex.php?latex=%7BN%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{N}" class="latex" /> variables of degree <img src="https://s0.wp.com/latex.php?latex=%7BB%5E%7BO%281%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{B^{O(1)}}" class="latex" />. It is still consistent with our knowledge that every natural family <img src="https://s0.wp.com/latex.php?latex=%7BA_N%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{A_N}" class="latex" /> can be computed by linear algebraic circuits of <img src="https://s0.wp.com/latex.php?latex=%7BO%28N%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{O(N)}" class="latex" /> size <b>and</b> <img src="https://s0.wp.com/latex.php?latex=%7BO%28%5Clog+N%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{O(\log N)}" class="latex" /> depth. Leslie Valiant in 1977 proved the following sufficient condition to improve this state of affairs.</p>
-<blockquote><p><b>Theorem 4</b> <em> Every significantly rigid family <img src="https://s0.wp.com/latex.php?latex=%7BA_N%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{A_N}" class="latex" /> cannot be computed by linear algebraic circuits of linear size and logarithmic depth. </em>
-</p></blockquote>
-<p>
-So for coming on half a century the question has been:</p>
-<blockquote><p><b> </b> <em> Can we construct a natural explicit family of significantly rigid matrices? </em>
-</p></blockquote>
-<p>
-Beliefs that the Hadamard matrices provided such a family were <a href="https://arxiv.org/pdf/1611.05558.pdf">refuted</a> by Josh Alman and Ryan Williams at STOC 2017, and <a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.38.3100">known</a> <a href="https://core.ac.uk/download/pdf/82556808.pdf">results</a> for Vandermonde matrices do not have <img src="https://s0.wp.com/latex.php?latex=%7Br%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r}" class="latex" /> close enough to <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" />. </p>
-<p>
-One hope had been to derive such matrices from explicit functions <img src="https://s0.wp.com/latex.php?latex=%7Bf_n%28x_1%2C%5Cdots%2Cx_n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{f_n(x_1,\dots,x_n)}" class="latex" /> over <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathbb%7BZ%7D_p%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathbb{Z}_p}" class="latex" /> for <img src="https://s0.wp.com/latex.php?latex=%7Bp%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{p}" class="latex" /> prime by taking <img src="https://s0.wp.com/latex.php?latex=%7BN+%3D+p%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{N = p^n}" class="latex" /> and defining </p>
-<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++A_%7Bf_n%7D%5B%5Cvec%7Bx%7D%2C%5Cvec%7By%7D%5D+%3D+f%28x_1+%2B+y_1%2C%5Cdots%2Cx_n+%2B+y_n%29.+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  A_{f_n}[\vec{x},\vec{y}] = f(x_1 + y_1,\dots,x_n + y_n). " class="latex" /></p>
-<p>Unfortunately, the polynomial method for cap sets shows that no such attempt can work. Zeev Dvir and Benjamin Edelman <a href="https://theoryofcomputing.org/articles/v015a008/">proved</a> that no matter how <img src="https://s0.wp.com/latex.php?latex=%7Bf%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{f}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\epsilon}" class="latex" /> are chosen, there is <img src="https://s0.wp.com/latex.php?latex=%7B%5Cdelta+%3E+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\delta &gt; 0}" class="latex" /> such that for all large enough <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" />, </p>
-<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++R_%7BA_%7Bf_n%7D%7D%28N%5E%7B1-%5Cdelta%7D%29+%3C+n%5E%7B1%2B%5Cepsilon%7D.+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  R_{A_{f_n}}(N^{1-\delta}) &lt; n^{1+\epsilon}. " class="latex" /></p>
-<p>This means we cannot get <img src="https://s0.wp.com/latex.php?latex=%7BR_%7BA_%7Bf_n%7D%7D%28r%29+%3D+%5COmega%28n%5E%7B1%2B%5COmega%281%29%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{R_{A_{f_n}}(r) = \Omega(n^{1+\Omega(1)})}" class="latex" /> for <img src="https://s0.wp.com/latex.php?latex=%7Br+%3D+%5Cfrac%7BN%7D%7B%5Clog%5Clog+N%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{r = \frac{N}{\log\log N}}" class="latex" />, indeed, far from it. What is most curious to us is that for matrix multiplication, the cap-set related technique frustrates a better complexity upper bound, whereas here it frustrates a better lower bound.</p>
-<p>
-</p><h2> Open Problems </h2><p></p>
-<p>What further applications can we find for the polynomial method?</p>
-<p></p></font></font></div>
-
-
-
-
-
-
-
-<p class="date">
-by RJLipton+KWRegan <a href="https://rjlipton.wordpress.com/2021/02/27/new-old-ancient-results/"><span class="datestr">at February 27, 2021 08:10 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
