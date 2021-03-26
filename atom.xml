@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-03-26T14:39:27Z</updated>
+  <updated>2021-03-26T15:22:22Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -53,7 +53,7 @@
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T14:37:31Z</updated>
+      <updated>2021-03-26T15:20:38Z</updated>
     </source>
   </entry>
 
@@ -182,7 +182,7 @@
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-03-26T14:39:27Z</updated>
+      <updated>2021-03-26T15:22:22Z</updated>
     </source>
   </entry>
 
@@ -230,23 +230,23 @@ Linearized model does not closely approximate the training trajectory of neural 
 <p>The key technical question here is to mathematically understand neural networks operating <em>outside of the NTK regime</em>.</p>
 
 <h2 id="higher-order-taylor-expansion">Higher-order Taylor expansion</h2>
-<p>Our main tool for going beyond the NTK is the <em>Taylor expansion</em>. Consider a two-layer neural network with $m$ neurons, where we only train the “bottom” nonlinear layer $W$:
-[
-f_{W_0 + W}(x) = \frac{1}{\sqrt{m}} \sum_{r=1}^m a_r \sigma( (w_{0,r} + w_r)^\top x).
-]
-(Here, $W_0+W$ is an $m\times d$ weight matrix, where $W_0$ denotes the random initialization and $W$ denotes the trainable “movement” matrix initialized at zero). For small enough $W$, we can perform a Taylor expansion of the network around $W_0$ and get $f_{W_0+W}(x)$ is
-\(= \frac{1}{\sqrt{m}} \sum_{r=1}^m a_r \sigma(w_{0,r}^\top x) + \sum_{k=1}^\infty \frac{1}{\sqrt{m}} \sum_{r=1}^m a_r \frac{\sigma^{(k)} (w_{0,r}^\top x)}{k!} (w_r^\top x)^k\)
- which we is
-\(:= f^{(0)}_{W_0}(x) + \sum_{k=1}^\infty f^{(k)}_{W_0, W}(x).\)
-Above, $f^{(k)}_{W_0, W}(x)$ denotes the $k$-th order term in the Taylor expansion of $f$. For the moment, let us assume that $f^{(0)}_W(x)=0$ (this can be achieved via techniques such as the symmetric initialization).</p>
+<p>Our main tool for going beyond the NTK is the <em>Taylor expansion</em>. Consider a two-layer neural network with $m$ neurons, where we only train the “bottom” nonlinear layer $W$:</p>
+
+\[f_{W_0 + W}(x) = \frac{1}{\sqrt{m}} \sum_{r=1}^m a_r \sigma( (w_{0,r} + w_r)^\top x).\]
+
+<p>(Here, $W_0+W$ is an $m\times d$ weight matrix, where $W_0$ denotes the random initialization and $W$ denotes the trainable “movement” matrix initialized at zero). For small enough $W$, we can perform a Taylor expansion of the network around $W_0$ and get</p>
+
+\[f_{W_0+W}(x) = \frac{1}{\sqrt{m}} \sum_{r=1}^m a_r \sigma(w_{0,r}^\top x) + \sum_{k=1}^\infty \frac{1}{\sqrt{m}} \sum_{r=1}^m a_r \frac{\sigma^{(k)} (w_{0,r}^\top x)}{k!} (w_r^\top x)^k\]
+
+<p>Let us denote the $k$-th order term as $ f^{(k)}_{W_0, W}$, and rewrite this as</p>
+
+\[f_{W_0+W}(x) = f^{(0)}_{W_0}(x) + \sum_{k=1}^\infty f^{(k)}_{W_0, W}(x).\]
+
+<p>For the moment also assume that $f^{(0)}_W(x)=0$ (this can be achieved via techniques such as the symmetric initialization).</p>
 
 <p>The key insight of the NTK theory can be described as the following <strong>linearized approximation</strong> property</p>
 <blockquote>
-  <p>For small enough $W$, we have
-\[
-f_{W_0+W}(x) \approx f^{(1)}<em>{W_0, W}(x) = \langle \nabla</em>{W} f_{W_0}(x), W \rangle,
-\]
-that is, the neural network is closely approximated by the linear model $f^{(1)}_{W_0,W}$.</p>
+  <p>For small enough $W$, the neural network $f_{W_0,W}$ is closely approximated by the linear model $f^{(1)}<em>{W_0,W} = \nabla_W f</em>{W_0}^\top W$.</p>
 </blockquote>
 
 <p>Towards moving beyond the linearized approximation, in our <a href="https://arxiv.org/abs/1910.01619">Beyond Linearization paper</a>, we start by asking</p>
@@ -259,19 +259,19 @@ that is, the neural network is closely approximated by the linear model $f^{(1)}
 <h3 id="killing-the-ntk-term-by-randomized-coupling">“Killing” the NTK term by randomized coupling</h3>
 <p>We bring forward the idea of <em>randomization</em>, which helps us escape the “domination” of $f^{(1)}$ and couple neural networks with their quadratic Taylor expansion term $f^{(2)}$. This idea appeared first in <a href="https://arxiv.org/abs/1811.04918">Allen-Zhu et al. (2018)</a> for analyzing three-layer networks, and as we will show also applies to two-layer networks in a perhaps more intuitive fashion.</p>
 
-<p>Let us now assign each weight movement $w_r$ with a <em>random sign</em> $s_r\in\{\pm 1\}$, and consider the randomized weights $\{s_rw_r\}$. The random signs satisfy the following basic properties:
-\[
-E[s_r]=0~<del>{\rm and}</del>~s_r^2\equiv 1.
-\]
-Therefore, let $SW\in\mathbb{R}^{m\times d}$ denote the randomized weight matrix, we can compare the first and second order terms in the Taylor expansion at $SW$:
-\[
-E_{S} \left[f^{(1)}<em>{W_0, SW}(x)\right] = E</em>{S} \left[ \frac{1}{\sqrt{m}}\sum_{r\le m} a_r \sigma’(w_{0,r}^\top x) (s_rw_r^\top x) \right] = 0,
-\]
-whereas
-\[
-f^{(2)}<em>{W_0, SW}(x) = \frac{1}{\sqrt{m}}\sum</em>{r\le m} a_r \frac{\sigma’‘(w_{0,r}^\top x)}{2} (s_rw_r^\top x)^2 = \frac{1}{\sqrt{m}}\sum_{r\le m} a_r \frac{\sigma’‘(w_{0,r}^\top x)}{2} (w_r^\top x)^2 = f^{(2)}_{W_0, W}(x).
-\]
-Observe that the sign randomization keeps the quadratic term $f^{(2)}$ unchanged, but “kills” the linear term $f^{(1)}$ in expectation!</p>
+<p>Let us now assign each weight movement $w_r$ with a <em>random sign</em> $s_r\in\{\pm 1\}$, and consider the randomized weights $\{s_rw_r\}$. The random signs satisfy the following basic properties:</p>
+
+\[E[s_r]=0 \quad {\rm and} \quad s_r^2 \equiv 1.\]
+
+<p>Therefore, let $SW\in\mathbb{R}^{m\times d}$ denote the randomized weight matrix, we can compare the first and second order terms in the Taylor expansion at $SW$:</p>
+
+\[E_{S} \left[f^{(1)}_{W_0, SW}(x)\right] = E_{S} \left[ \frac{1}{\sqrt{m}}\sum_{r\le m} a_r \sigma'(w_{0,r}^\top x) (s_rw_r^\top x) \right] = 0,\]
+
+<p>whereas</p>
+
+\[f^{(2)}_{W_0, SW}(x) = \frac{1}{\sqrt{m}}\sum_{r\le m} a_r \frac{\sigma^{(2)}(w_{0,r}^\top x)}{2} (s_rw_r^\top x)^2 = \frac{1}{\sqrt{m}}\sum_{r\le m} a_r \frac{\sigma^{(2)}(w_{0,r}^\top x)}{2} (w_r^\top x)^2 = f^{(2)}_{W_0, W}(x).\]
+
+<p>Observe that the sign randomization keeps the quadratic term $f^{(2)}$ unchanged, but “kills” the linear term $f^{(1)}$ in expectation!</p>
 
 <p>If we train such a randomized network with freshly sampled signs $S$ at each iteration, the linear term $f^{(1)}$ will keep oscillating around zero and does not have any power in fitting the data, whereas the quadratic term is not affected at all and thus becomes the leading force for fitting the data. (The keen reader may notice that this randomization is similar to Dropout, with the key difference being that we randomize the weight <em>movement</em> matrix, whereas vanilla Dropout randomizes the weight matrix itself.)</p>
 
@@ -293,11 +293,11 @@ The NTK regime operates in the "NTK ball" where the network is approximately equ
 <p>The proof builds on the quadratic approximation $E_S[f]\approx f^{(2)}$ and recent understandings on neural networks with quadratic activation, e.g. <a href="https://arxiv.org/abs/1707.04926">Soltanolkotabi et al. (2017)</a> &amp; <a href="https://arxiv.org/abs/1803.01206">Du and Lee (2018)</a>.</p>
 
 <h3 id="generalization-and-sample-complexity-case-study-on-learning-low-rank-polynomials">Generalization and sample complexity: Case study on learning low-rank polynomials</h3>
-<p>We next study the generalization of these networks in the context of learning <em>low-rank degree-$p$ polynomials</em>:
-[
-f_\star(x) = \sum_{s=1}^{r_\star} \alpha_s (\beta_s^\top x)^{p_s},~<del>|\alpha_s|\le 1,~|(\beta_s^\top x)^{p_s}|_{L_2} \le 1,~p_s\le p</del>~\textrm{for all}~s.
-]
-We are specifically interested in the case where $r_\star$ is small (e.g. $O(1)$), so that $y$ only depends on the projection of $x$ on a few directions. This for example captures teacher networks with polynomial activation of bounded degree and analytic activation (approximately), as well as constant depth teacher networks with polynomial activations.</p>
+<p>We next study the generalization of these networks in the context of learning <em>low-rank degree-$p$ polynomials</em>:</p>
+
+\[f_\star(x) = \sum_{s=1}^{r_\star} \alpha_s (\beta_s^\top x)^{p_s}, \quad |\alpha_s|\le 1,\|(\beta_s^\top x)^{p_s}\|_{L_2} \le 1, p_s\le p \quad \textrm{for all } s.\]
+
+<p>We are specifically interested in the case where $r_\star$ is small (e.g. $O(1)$), so that $y$ only depends on the projection of $x$ on a few directions. This for example captures teacher networks with polynomial activation of bounded degree and analytic activation (approximately), as well as constant depth teacher networks with polynomial activations.</p>
 
 <p>For the NTK, the sample complexity of learning polynomials have been studied extensively in <a href="https://arxiv.org/abs/1901.08584">(Arora et al. 2019a)</a>, <a href="https://arxiv.org/abs/1904.12191">(Ghorbani et al. 2019)</a>, and many concurrent work. Combined, they showed that the sample complexity for learning degree-$p$ polynomials is $\Theta(d^p)$, with matching lower and upper bounds:</p>
 <blockquote>
@@ -348,7 +348,7 @@ We are specifically interested in the case where $r_\star$ is small (e.g. $O(1)$
       <link href="http://offconvex.github.io/feed.xml" rel="self" type="application/atom+xml"/>
       <subtitle>Algorithms off the convex path.</subtitle>
       <title>Off the convex path</title>
-      <updated>2021-03-26T04:38:42Z</updated>
+      <updated>2021-03-26T15:21:41Z</updated>
     </source>
   </entry>
 
@@ -383,7 +383,7 @@ In addition, we prove a similar bound for noisy decision trees of cost at most $
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T14:37:31Z</updated>
+      <updated>2021-03-26T15:20:38Z</updated>
     </source>
   </entry>
 
@@ -920,7 +920,7 @@ monostatic property of simplices in higher dimensions.
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-03-26T14:38:47Z</updated>
+      <updated>2021-03-26T15:21:39Z</updated>
     </source>
   </entry>
 
@@ -1006,7 +1006,7 @@ Here is an <a href="https://www.newton.ac.uk/science/outreach/women/six-question
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-03-26T14:37:47Z</updated>
+      <updated>2021-03-26T15:20:53Z</updated>
     </source>
   </entry>
 
@@ -1094,7 +1094,7 @@ Here is an <a href="https://www.newton.ac.uk/science/outreach/women/six-question
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-03-26T14:37:40Z</updated>
+      <updated>2021-03-26T15:20:47Z</updated>
     </source>
   </entry>
 
@@ -1164,7 +1164,7 @@ Prior to our work, the only polynomial-time or even subexponential-time algorith
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T14:37:31Z</updated>
+      <updated>2021-03-26T15:20:37Z</updated>
     </source>
   </entry>
 
@@ -1190,7 +1190,7 @@ In this paper, we explore the following natural heuristic idea for decreasing th
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T14:37:31Z</updated>
+      <updated>2021-03-26T15:20:37Z</updated>
     </source>
   </entry>
 
@@ -1218,7 +1218,7 @@ Email: application@dimacs.rutgers.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-03-26T14:37:51Z</updated>
+      <updated>2021-03-26T15:20:57Z</updated>
     </source>
   </entry>
 
@@ -1391,7 +1391,7 @@ Of course we <a href="https://www.nytimes.com/2021/03/17/science/abel-prize-math
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-03-26T14:37:47Z</updated>
+      <updated>2021-03-26T15:20:54Z</updated>
     </source>
   </entry>
 
@@ -1419,7 +1419,7 @@ The main conceptual contribution of this work is to establish that the existence
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T14:37:31Z</updated>
+      <updated>2021-03-26T15:20:38Z</updated>
     </source>
   </entry>
 
@@ -1482,7 +1482,7 @@ The main conceptual contribution of this work is to establish that the existence
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-03-26T14:37:12Z</updated>
+      <updated>2021-03-26T15:20:12Z</updated>
     </source>
   </entry>
 
@@ -1509,7 +1509,7 @@ Email: berufungen@tuhh.de</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-03-26T14:37:51Z</updated>
+      <updated>2021-03-26T15:20:57Z</updated>
     </source>
   </entry>
 
@@ -1725,7 +1725,7 @@ Email: berufungen@tuhh.de</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-03-26T14:37:41Z</updated>
+      <updated>2021-03-26T15:20:47Z</updated>
     </source>
   </entry>
 
@@ -1877,7 +1877,7 @@ Happy St. Patrick’s Day 2021, and may happier days be ahead.</p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-03-26T14:37:47Z</updated>
+      <updated>2021-03-26T15:20:53Z</updated>
     </source>
   </entry>
 
@@ -1904,7 +1904,7 @@ Perhaps surprisingly, the idea for fortification of unique games comes from a re
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T14:37:31Z</updated>
+      <updated>2021-03-26T15:20:38Z</updated>
     </source>
   </entry>
 
@@ -2003,7 +2003,7 @@ Email: forster@cs.sbg.ac.at</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-03-26T14:37:51Z</updated>
+      <updated>2021-03-26T15:20:57Z</updated>
     </source>
   </entry>
 
@@ -2029,7 +2029,7 @@ We derive consequences of this result relevant to the study of data compression,
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T14:37:31Z</updated>
+      <updated>2021-03-26T15:20:38Z</updated>
     </source>
   </entry>
 
@@ -2071,7 +2071,7 @@ This is the first explicit lower bound against circuits with distinct layers of 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T14:37:31Z</updated>
+      <updated>2021-03-26T15:20:38Z</updated>
     </source>
   </entry>
 </feed>
