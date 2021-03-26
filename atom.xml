@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-03-26T02:22:17Z</updated>
+  <updated>2021-03-26T02:39:20Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -99,7 +99,152 @@
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-03-26T02:22:17Z</updated>
+      <updated>2021-03-26T02:39:20Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>http://offconvex.github.io/2021/03/25/beyondNTK/</id>
+    <link href="http://offconvex.github.io/2021/03/25/beyondNTK/" rel="alternate" type="text/html"/>
+    <title>When are Neural Networks more powerful than Neural Tangent Kernels?</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The empirical success of deep learning has posed significant challenges to machine learning theory: Why can we efficiently train neural networks with gradient descent despite its highly non-convex optimization landscape? Why do over-parametrized networks generalize well? The recently proposed Neural Tangent Kernel (NTK) theory offers a powerful framework for understanding these, but yet still comes with its limitations.</p>
+
+<p>In this blog post, we explore how to analyze wide neural networks beyond the NTK theory, based on our recent <a href="https://arxiv.org/abs/1910.01619">Beyond Linearization paper</a> and follow-up <a href="https://arxiv.org/abs/2006.13436">paper on understanding hierarchical learning</a>. (This blog post is also cross-posted at the <a href="http://www.offconvex.org/blog.einstein.ai/beyond-ntk/">Salesforce Research blog</a>.)</p>
+
+<h3 id="neural-tangent-kernels">Neural Tangent Kernels</h3>
+<p>The Neural Tangent Kernel (NTK) is a recently proposed theoretical framework for establishing provable convergence and generalization guarantees for wide (over-parametrized) neural networks <a href="https://arxiv.org/abs/1806.07572">(Jacot et al. 2018)</a>. Roughly speaking, the NTK theory shows that</p>
+
+<blockquote>
+  <ul>
+    <li>A sufficiently wide neural network trains like a linearized model governed by the derivative of the network with respect to its parameters.</li>
+    <li>At the infinite-width limit, this linearized model becomes a kernel predictor with the Neural Tangent Kernel (the NTK).</li>
+  </ul>
+</blockquote>
+
+<p>Consequently, a wide neural network trained with small learning rate converges to 0 training loss and generalize as well as the infinite-width kernel predictor. For a detailed introduction to the NTK, please refer to the earlier <a href="http://www.offconvex.org/2019/10/03/NTK/">blog post</a> by Wei and Simon.</p>
+
+<h3 id="does-ntk-fully-explain-the-success-of-neural-networks">Does NTK fully explain the success of neural networks?</h3>
+<p>Although the NTK yields powerful theoretical results, it turns out that real-world deep learning <em>do not operate in the NTK regime</em>:</p>
+
+<ul>
+  <li>Empirically, infinite-width NTK kernel predictors perform slightly worse (though competitive) than fully trained neural networks on benchmark tasks such as CIFAR-10 <a href="https://arxiv.org/abs/1904.11955">(Arora et al. 2019b)</a>. For finite width networks in practice, this gap is even more profound, as we see in Figure 1: The linearized network is a rather poor approximation of the fully trained network at practical optimization setups such as large initial learning rate <a href="https://arxiv.org/abs/2002.04010">(Bai et al. 2020)</a>.</li>
+  <li>Theoretically, the NTK has poor <em>sample complexity for learning certain simple functions</em>. Though the NTK is a universal kernel that can interpolate any finite, non-degenerate training dataset <a href="https://arxiv.org/abs/1810.02054">(Du et al. 2018</a><a href="https://arxiv.org/abs/1811.03804">, 2019)</a>, the test error of this kernel predictor scales with the RKHS norm of the ground truth function. For certain non-smooth but simple functions such as a single ReLU, this norm can be exponentially large in the feature dimension <a href="https://arxiv.org/abs/1904.00687">(Yehudai &amp; Shamir 2019)</a>. Consequently, NTK analyses yield poor sample complexity upper bounds for learning such functions, whereas empirically neural nets only require a mild sample size <a href="https://arxiv.org/abs/1410.1141">(Livni et al. 2014)</a>.</li>
+</ul>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/taylor-plot.png" style="width: 700px;"/>
+<br/>
+<b>Figure 1.</b> Linearized model does not closely approximate the training trajectory of neural networks with practical optimization setups, whereas higher order Taylor models offer a substantially better approximation.
+</div>
+
+<p>These gaps urge us to ask the following</p>
+<blockquote>
+  <p><strong>Question</strong>: How can we theoretically study neural networks beyond the NTK regime? Can we prove that neural networks outperform the NTK on certain learning tasks?</p>
+</blockquote>
+
+<p>The key technical question here is to mathematically understand neural networks operating <em>outside of the NTK regime</em>.</p>
+
+<h2 id="higher-order-taylor-expansion">Higher-order Taylor expansion</h2>
+<p>Our main tool for going beyond the NTK is the <em>Taylor expansion</em>. Consider a two-layer neural network with $m$ neurons, where we only train the “bottom” nonlinear layer $W$:
+\(f_{W_0 + W}(x) = \frac{1}{\sqrt{m}} \sum_{r=1}^m a_r \sigma( (w_{0,r} + w_r)^\top x).\)
+(Here, $W_0+W$ is an $m\times d$ weight matrix, where $W_0$ denotes the random initialization and $W$ denotes the trainable “movement” matrix initialized at zero). For small enough $W$, we can perform a Taylor expansion of the network around $W_0$ and get
+\(f_{W_0+W}(x) = \frac{1}{\sqrt{m}} \sum_{r=1}^m a_r \sigma(w_{0,r}^\top x) + \sum_{k=1}^\infty \frac{1}{\sqrt{m}} \sum_{r=1}^m a_r \frac{\sigma^{(k)} (w_{0,r}^\top x)}{k!} (w_r^\top x)^k := f^{(0)}_{W_0}(x) + \sum_{k=1}^\infty f^{(k)}_{W_0, W}(x).\)
+Above, $f^{(k)}_{W_0, W}(x)$ denotes the $k$-th order term in the Taylor expansion of $f$. For the moment, let us assume that $f^{(0)}_W(x)=0$ (this can be achieved via techniques such as the symmetric initialization).</p>
+
+<p>The key insight of the NTK theory can be described as the following linearized approximation property</p>
+<blockquote>
+  <p><strong>(Linearized approximation)</strong> For small enough $W$, we have $f_{W_0+W}(x) \approx f^{(1)}<em>{W_0, W}(x) = \langle \nabla</em>{W} f_{W_0}(x), W \rangle$, that is, the neural network is closely approximated by the linear model $f^{(1)}_{W_0,W}$.</p>
+</blockquote>
+
+<p>Towards moving beyond the linearized approximation, in our <a href="https://arxiv.org/abs/1910.01619">Beyond Linearization paper</a>, we start by asking</p>
+<blockquote>
+  <p>Why just $f^{(1)}$? Can we also utilize the higher-order term in the Taylor series such as $f^{(2)}$?</p>
+</blockquote>
+
+<p>At first sight, this seems rather unlikely, as in Taylor expansions we always expect the linear term $f^{(1)}$ to dominate the whole expansion and have a larger magnitude than $f^{(2)}$ (and subsequent terms).</p>
+
+<h3 id="killing-the-ntk-term-by-randomized-coupling">“Killing” the NTK term by randomized coupling</h3>
+<p>We bring forward the idea of <em>randomization</em>, which helps us escape the “domination” of $f^{(1)}$ and couple neural networks with their quadratic Taylor expansion term $f^{(2)}$. This idea appeared first in <a href="https://arxiv.org/abs/1811.04918">Allen-Zhu et al. (2018)</a> for analyzing three-layer networks, and as we will show also applies to two-layer networks in a perhaps more intuitive fashion.</p>
+
+<p>Let us now assign each weight movement $w_r$ with a <em>random sign</em> $s_r\in{\pm 1}$, and consider the randomized weights ${s_rw_r}$. The random signs satisfy the following basic properties:
+\(E[s_r]=0~~~{\rm and}~~~s_r^2\equiv 1.\)
+Therefore, let $SW\in\mathbb{R}^{m\times d}$ denote the randomized weight matrix, we can compare the first and second order terms in the Taylor expansion at $SW$:
+\(E_{S} \left[f^{(1)}_{W_0, SW}(x)\right] = E_{S} \left[ \frac{1}{\sqrt{m}}\sum_{r\le m} a_r \sigma'(w_{0,r}^\top x) (s_rw_r^\top x) \right] = 0,\)
+whereas
+\(f^{(2)}_{W_0, SW}(x) = \frac{1}{\sqrt{m}}\sum_{r\le m} a_r \frac{\sigma''(w_{0,r}^\top x)}{2} (s_rw_r^\top x)^2 = \frac{1}{\sqrt{m}}\sum_{r\le m} a_r \frac{\sigma''(w_{0,r}^\top x)}{2} (w_r^\top x)^2 = f^{(2)}_{W_0, W}(x).\)
+Observe that the sign randomization keeps the quadratic term $f^{(2)}$ unchanged, but “kills” the linear term $f^{(1)}$ in expectation!</p>
+
+<p>If we train such a randomized network with freshly sampled signs $S$ at each iteration, the linear term $f^{(1)}$ will keep oscillating around zero and does not have any power in fitting the data, whereas the quadratic term is not affected at all and thus becomes the leading force for fitting the data. (The keen reader may notice that this randomization is similar to Dropout, with the key difference being that we randomize the weight <em>movement</em> matrix, whereas vanilla Dropout randomizes the weight matrix itself.)</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/beyond-ntk.png" style="width: 700px;"/>
+<br/>
+<b>Figure 2.</b> The NTK regime operates in the "NTK ball" where $\|w_r\|_2=m^{-0.5}$ and the network is approximately equal to the linear term $f^{(1)}$. The quadratic regime operates in a larger ball $\|w_r\|_2=m^{-0.25}$ where the network is approximately equal to $f^{(1)}+f^{(2)}$, but $f^{(1)}$ dominates $f^{(2)}$ and can blow up at large width. Our randomized coupling technique resolves this by introducing the random sign matrix $S$ that in expectation "kills" $f^{(1)}$ but always preserves $f^{(2)}$.
+</div>
+
+<p>Our first result shows that networks with sign randomization can still be efficiently optimized, despite its now non-convex optimization landscape:</p>
+<blockquote>
+  <p><strong>Theorem</strong>: Any escaping-saddle algorithm (e.g. noisy SGD) on the regularized loss function $E_S[L(W_0+SW)]+R(W)$, with freshly sampled sign $S=S_t$ per iteration, can find the global minimum in polynomial time.</p>
+</blockquote>
+
+<p>The proof builds on the quadratic approximation $E_S[f]\approx f^{(2)}$ and recent understandings on neural networks with quadratic activation, e.g. <a href="https://arxiv.org/abs/1707.04926">Soltanolkotabi et al. (2017)</a> &amp; <a href="https://arxiv.org/abs/1803.01206">Du and Lee (2018)</a>.</p>
+
+<h3 id="generalization-and-sample-complexity-case-study-on-learning-low-rank-polynomials">Generalization and sample complexity: Case study on learning low-rank polynomials</h3>
+<p>We next study the generalization of these networks in the context of learning <em>low-rank degree-$p$ polynomials</em>:</p>
+
+<p>\(f_\star(x) = \sum_{s=1}^{r_\star} \alpha_s (\beta_s^\top x)^{p_s},~~~|\alpha_s|\le 1,~\|(\beta_s^\top x)^{p_s}\|_{L_2} \le 1,~p_s\le p~~~\textrm{for all}~s.\)
+We are specifically interested in the case where $r_\star$ is small (e.g. $O(1)$), so that $y$ only depends on the projection of $x$ on a few directions. This for example captures teacher networks with polynomial activation of bounded degree and analytic activation (approximately), as well as constant depth teacher networks with polynomial activations.</p>
+
+<p>For the NTK, the sample complexity of learning polynomials have been studied extensively in <a href="https://arxiv.org/abs/1901.08584">(Arora et al. 2019a)</a>, <a href="https://arxiv.org/abs/1904.12191">(Ghorbani et al. 2019)</a>, and many concurrent work. Combined, they showed that the sample complexity for learning degree-$p$ polynomials is $\Theta(d^p)$, with matching lower and upper bounds:</p>
+<blockquote>
+  <p><strong>Theorem (NTK)</strong> : Suppose $x$ is uniformly distributed on the sphere, then the NTK requires $O(d^p)$ samples in order to achieve a small test error for learning any degree-$p$ polynomial, and there is a matching lower bound of $\Omega(d^p)$ for any inner-product kernel method.</p>
+</blockquote>
+
+<p>In our <a href="https://arxiv.org/abs/1910.0161">Beyond Linearization paper</a>, we show that the quadratic Taylor model achieves an improved sample complexity of  $\tilde{O}(d^{p-1})$ with isotropic inputs:</p>
+<blockquote>
+  <p><strong>Theorem (Quadratic Model)</strong>: For mildly isotropic input distributions, the two-layer quadratic Taylor model (or two-layer NN with sign randomization) only requires $\tilde{O}({\rm poly}(r_\star, p)d^{p-1})$ samples in order to achieve a small test error for learning a low-rank degree-$p$ polynomial.</p>
+</blockquote>
+
+<p>In our <a href="https://arxiv.org/abs/2006.13436">follow-up paper on understanding hierarchical learning</a>, we further design a “hierarchical learner” using a specific three-layer network, and show the following</p>
+<blockquote>
+  <p>**Theorem (Three-layer hierarchical model) **: Under mild input distribution assumptions, a three-layer network with a fixed representation layer of width $D=d^{p/2}$ and a trainable quadratic Taylor layer can achieve a small test error using only $\tilde{O}({\rm poly}(r_\star, p)d^{p/2})$ samples.</p>
+</blockquote>
+
+<p>When $r_\star,p=O(1)$, the quadratic Taylor model can improve over the NTK by a multiplicative factor of $d$, and we can further get a substantially larger improvement of $d^{p/2}$ by using the three-layer hierarchical learner. Here we briefly discuss the proof intuitions, and refer the reader to our papers for more details.</p>
+
+<ul>
+  <li>
+    <p><strong>Generalization bounds</strong>: We show that, while the NTK and quadratic Taylor model expresses functions using similar random feature constructions, their generalization depends differently on the norm of the input. In the NTK, the generalization depends on the L2 norm of the features (as well as the weights), whereas generalization of the quadratic Taylor model depends on the operator norm of the input matrix features $\frac{1}{n}\sum x_ix_i^\top$ times the nuclear norm of $\sum w_rw_r^\top$. It turns out that this decomposition can match the one given by the NTK (it is never worse), and in addition be better by a factor of $O(\sqrt{d})$ if the input distribution is mildly isotropic so that $|\frac{1}{n}\sum x_ix_i^\top|_{\rm op} \le 1/\sqrt{d} \cdot \max |x_i|2^2$, leading to the $O(d)$ improvement in the sample complexity.</p>
+  </li>
+  <li>
+    <p><strong>Hierarchical learning</strong>: The key intuition behind the hierarchical learner is that we can utilize the $O(d)$ sample complexity gain to its fullest, by applying quadratic Taylor model to not the input $x$, but a feature representation $h(x)\in \mathbb{R}^D$ where $D\gg d$. This yields a gain as long as $h$ is rich enough to express $f_\star$ and also isotropic enough to let the operator norm $|\frac{1}{n}\sum h(x_i)h(x_i)^\top|_{\rm op}$ be nice. In particular, for learning degree-$p$ polynomials, the best we can do is to choose $D=d^{p/2}$, leading to a sample complexity saving of $\tilde{O}(D)=\tilde{O}(d^{p/2})$.</p>
+  </li>
+</ul>
+
+<h3 id="concluding-thoughts">Concluding thoughts</h3>
+<p>In this post, we explored higher-order Taylor expansions (in particular the quadratic expansion) as an approach to deep learning theory beyond the NTK regime. The Taylorization approach has several advantages:</p>
+
+<ul>
+  <li>Non-convex but benign optimization landscape;</li>
+  <li>Provable generalization benefits over NTKs;</li>
+  <li>Ability of modeling hierarchical learning;</li>
+  <li>Convenient API for expeirmentation (cf. the <a href="https://github.com/google/neural-tangents">Neural Tangents</a> package and the <a href="https://arxiv.org/abs/2002.04010">Taylorized training</a> paper).</li>
+</ul>
+
+<p>We believe these advantages make the Taylor expansion a powerful tool for deep learning theory, and our results are just a beginning. We also remark that there are other theoretical frameworks such as the <a href="https://arxiv.org/abs/1909.08156">Neural Tangent Hierarchy</a> or the <a href="https://arxiv.org/abs/1804.06561">Mean-Field Theory</a> that go beyond the NTK with their own advantages in various angles, but without computational efficiency guarantees. See the <a href="https://jasondlee88.github.io/slides/beyond_ntk.pdf">slides</a> for more on going beyond NTK. Making progress on any of these directions (or coming up with new ones) would be an exciting direction for future work.</p></div>
+    </summary>
+    <updated>2021-03-25T14:00:00Z</updated>
+    <published>2021-03-25T14:00:00Z</published>
+    <source>
+      <id>http://offconvex.github.io/</id>
+      <author>
+        <name>Off the Convex Path</name>
+      </author>
+      <link href="http://offconvex.github.io/" rel="alternate" type="text/html"/>
+      <link href="http://offconvex.github.io/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Algorithms off the convex path.</subtitle>
+      <title>Off the convex path</title>
+      <updated>2021-03-26T02:38:44Z</updated>
     </source>
   </entry>
 
@@ -134,7 +279,7 @@ In addition, we prove a similar bound for noisy decision trees of cost at most $
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T02:20:27Z</updated>
+      <updated>2021-03-26T02:37:25Z</updated>
     </source>
   </entry>
 
@@ -671,7 +816,7 @@ monostatic property of simplices in higher dimensions.
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-03-26T02:21:25Z</updated>
+      <updated>2021-03-26T02:38:43Z</updated>
     </source>
   </entry>
 
@@ -757,7 +902,7 @@ Here is an <a href="https://www.newton.ac.uk/science/outreach/women/six-question
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-03-26T02:20:36Z</updated>
+      <updated>2021-03-26T02:37:41Z</updated>
     </source>
   </entry>
 
@@ -845,7 +990,7 @@ Here is an <a href="https://www.newton.ac.uk/science/outreach/women/six-question
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-03-26T02:20:30Z</updated>
+      <updated>2021-03-26T02:37:28Z</updated>
     </source>
   </entry>
 
@@ -915,7 +1060,7 @@ Prior to our work, the only polynomial-time or even subexponential-time algorith
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T02:20:27Z</updated>
+      <updated>2021-03-26T02:37:25Z</updated>
     </source>
   </entry>
 
@@ -941,7 +1086,7 @@ In this paper, we explore the following natural heuristic idea for decreasing th
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T02:20:27Z</updated>
+      <updated>2021-03-26T02:37:25Z</updated>
     </source>
   </entry>
 
@@ -969,7 +1114,7 @@ Email: application@dimacs.rutgers.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-03-26T02:20:39Z</updated>
+      <updated>2021-03-26T02:37:48Z</updated>
     </source>
   </entry>
 
@@ -1142,7 +1287,7 @@ Of course we <a href="https://www.nytimes.com/2021/03/17/science/abel-prize-math
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-03-26T02:20:37Z</updated>
+      <updated>2021-03-26T02:37:41Z</updated>
     </source>
   </entry>
 
@@ -1170,7 +1315,7 @@ The main conceptual contribution of this work is to establish that the existence
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T02:20:27Z</updated>
+      <updated>2021-03-26T02:37:25Z</updated>
     </source>
   </entry>
 
@@ -1233,7 +1378,7 @@ The main conceptual contribution of this work is to establish that the existence
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-03-26T02:20:11Z</updated>
+      <updated>2021-03-26T02:37:11Z</updated>
     </source>
   </entry>
 
@@ -1260,7 +1405,7 @@ Email: berufungen@tuhh.de</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-03-26T02:20:40Z</updated>
+      <updated>2021-03-26T02:37:48Z</updated>
     </source>
   </entry>
 
@@ -1476,7 +1621,7 @@ Email: berufungen@tuhh.de</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-03-26T02:20:31Z</updated>
+      <updated>2021-03-26T02:37:29Z</updated>
     </source>
   </entry>
 
@@ -1628,7 +1773,7 @@ Happy St. Patrick’s Day 2021, and may happier days be ahead.</p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-03-26T02:20:36Z</updated>
+      <updated>2021-03-26T02:37:40Z</updated>
     </source>
   </entry>
 
@@ -1655,7 +1800,7 @@ Perhaps surprisingly, the idea for fortification of unique games comes from a re
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T02:20:27Z</updated>
+      <updated>2021-03-26T02:37:25Z</updated>
     </source>
   </entry>
 
@@ -1754,7 +1899,7 @@ Email: forster@cs.sbg.ac.at</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-03-26T02:20:40Z</updated>
+      <updated>2021-03-26T02:37:48Z</updated>
     </source>
   </entry>
 
@@ -1780,7 +1925,7 @@ We derive consequences of this result relevant to the study of data compression,
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T02:20:27Z</updated>
+      <updated>2021-03-26T02:37:25Z</updated>
     </source>
   </entry>
 
@@ -1822,7 +1967,7 @@ This is the first explicit lower bound against circuits with distinct layers of 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T02:20:27Z</updated>
+      <updated>2021-03-26T02:37:25Z</updated>
     </source>
   </entry>
 
@@ -1856,7 +2001,7 @@ More generally, these results suggest new approaches for designing pseudodetermi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T02:20:27Z</updated>
+      <updated>2021-03-26T02:37:25Z</updated>
     </source>
   </entry>
 
@@ -1886,7 +2031,7 @@ At the heart of our proof is a new "measure-and-repair" quantum rewinding proced
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-03-26T02:20:27Z</updated>
+      <updated>2021-03-26T02:37:25Z</updated>
     </source>
   </entry>
 
@@ -1924,91 +2069,6 @@ At the heart of our proof is a new "measure-and-repair" quantum rewinding proced
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
       <updated>2021-03-25T20:03:09Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-US">
-    <id>https://rjlipton.wpcomstaging.com/?p=18335</id>
-    <link href="https://rjlipton.wpcomstaging.com/2021/03/14/the-value-of-pi/" rel="alternate" type="text/html"/>
-    <title>The Value of Pi</title>
-    <summary>A post for Pi Day—but should it be a different day? Unilad story source Emma Haruka Iwao set an official Guinness world record in 2019 by calculating pi to 31,415,926,535,897 digits. If she had calculated it to 62,831,853,071,795 digits, she might still hold that record today. Today, Pi Day (3/14), we ask why was affixed […]</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><font color="#0044cc"><br/>
-<em>A post for Pi Day—but should it be a different day?</em><br/>
-<font color="#000000"/></font></p><font color="#0044cc"><font color="#000000">
-<table class="image alignright">
-<tbody>
-<tr>
-<td>
-<a href="https://rjlipton.wpcomstaging.com/2021/03/14/the-value-of-pi/pi-day-thumb/" rel="attachment wp-att-18337"><img alt="" class="alignright wp-image-18337" height="105" src="https://i0.wp.com/rjlipton.wpcomstaging.com/wp-content/uploads/2021/03/pi-day-thumb.jpg?resize=200%2C105&amp;ssl=1" width="200"/></a>
-</td>
-</tr>
-<tr>
-<td class="caption alignright"><font size="-2">Unilad story <a href="https://www.unilad.co.uk/technology/google-employee-breaks-record-by-calculating-pi-to-31-4-trillion-digits/">source</a></font></td>
-</tr>
-</tbody>
-</table>
-<p>
-Emma Haruka Iwao set an official Guinness world record in 2019 by calculating pi to <b>31,415,926,535,897</b> digits. If she had calculated it to <b>62,831,853,071,795</b> digits, she might still hold that <a href="https://www.guinnessworldrecords.com/world-records/66179-most-accurate-value-of-pi">record</a> today.</p>
-<p>
-Today, Pi Day (3/14), we ask why <img alt="{\pi}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cpi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{\pi}"/> was affixed to the value <b>3.141592653589793…</b><br/>
-<span id="more-18335"/></p>
-<p>
-The main alternatives are the values we currently call <img alt="{2\pi}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%5Cpi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{2\pi}"/> and <img alt="{\frac{\pi}{2}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cfrac%7B%5Cpi%7D%7B2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{\frac{\pi}{2}}"/>. Neither would have caused any extra difficulty for Iwao. The methods she used, including the <a href="http://www.numberworld.org/y-cruncher/">y-cruncher</a> implementation of the fast <a href="https://en.wikipedia.org/wiki/Chudnovsky_algorithm">algorithm</a> of David and Gregory Chudnovsky, could adapt immediately to a factor of <img alt="{2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{2}"/> either way. </p>
-<p>
-Two things that stand out to us from Iwao’s <a href="https://blog.google/products/google-cloud/most-calculated-digits-pi/">story</a> told on Google’s blogs, besides her commanding the power of Google’s cloud services to manage 170 terabytes of data over 121 days for the calculation, are:</p>
-<ul>
-<li>She was inspired while growing up in Japan by the current record holders being Japanese professors, one of whom she later worked for as a student.
-</li><li>There was a quicker checking phase for the final product—in particular, for the 8,956,768,817,536 new digits. This used a mixture of two versions of the <a href="https://en.wikipedia.org/wiki/Bailey-Borwein-Plouffe_formula">BBP</a> method, which we <a href="https://rjlipton.wpcomstaging.com/2010/07/14/making-an-algorithm-an-algorithm-bbp/">covered</a> a <a href="https://rjlipton.wpcomstaging.com/2009/03/15/cooks-class-contains-pi/">few</a> <a href="https://rjlipton.wpcomstaging.com/2012/10/16/one-mans-floor-is-another-mans-ceiling/">times</a>.
-</li></ul>
-<p>
-The new <a href="https://blog.timothymullican.com/calculating-pi-my-attempt-breaking-pi-record">record</a> of 50 trillion digits by Timothy Mullican have been added to Iwao’s available for <a href="https://pi.delivery/">delivery</a> by Google. We do not know the extent to which they are <em>concretely</em> pseudorandom, despite coming from a simple rule, but that extent would be shared equally by <img alt="{2\pi}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%5Cpi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{2\pi}"/> and <img alt="{\frac{\pi}{2}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cfrac%7B%5Cpi%7D%7B2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{\frac{\pi}{2}}"/>.</p>
-<p/><h2> Why This Value? </h2><p/>
-<p>
-Giorgia Fortuna in 2015 wrote a long <a href="https://blog.wolfram.com/2015/06/28/2-pi-or-not-2-pi/">article</a> on the Wolfram blog about <img alt="{\pi}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cpi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{\pi}"/> versus <img alt="{\tau}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctau%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{\tau}"/>, where <img alt="{\tau}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctau%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{\tau}"/> is a suggested symbol for <img alt="{2\pi}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%5Cpi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{2\pi}"/>, which equals <b>6.2831853071795…</b> Her extensive analysis of formulas in the literature shows that the benefit of simplifying mathematical and scientific formulas that involve <img alt="{2\pi}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%5Cpi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{2\pi}"/> by the single symbol <img alt="{\tau}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctau%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{\tau}"/> would be minimal, and more than offset by formulas that would incur <img alt="{\tau/2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctau%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{\tau/2}"/>. Our blogging friend Bill Gasarch has <a href="https://blog.computationalcomplexity.org/2007/08/is-pi-defined-in-best-way.html">written</a> <a href="https://blog.computationalcomplexity.org/2009/07/2pi-day-other-holiday-possibilities.html">about</a> the value of <img alt="{\pi}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cpi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{\pi}"/> and expressed opinions in support of <img alt="{2\pi}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%5Cpi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{2\pi}"/> as “the” value.</p>
-<p>
-We want to pose a different question, one suggested to me today by a reference to the 3rd-century <a href="https://en.wikipedia.org/wiki/Liu_Hui's_pi_algorithm">algorithm</a> of the Chinese mathematician Liu Hui, which efficiently generated values far more precise than what was known in the west: </p>
-<blockquote><p><b> </b> <em> Why did several separate cultures fix upon the ratio of the circumference to the diameter, rather than the ratio of the circumference to the radius, or the diameter to half the circumference? </em>
-</p></blockquote>
-<p>
-The last ratio, <b>1.5707963267948966…</b>, strikes us as the most natural to think of in the great outdoors: You have a choice of rowing across a circular pond or walking around. How much more distance does the latter involve?</p>
-<p>
-We don’t know of a name for partisans of <img alt="{2\pi}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%5Cpi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{2\pi}"/>, but those of <img alt="{\frac{\pi}{2}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cfrac%7B%5Cpi%7D%7B2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{\frac{\pi}{2}}"/> would have a natural moniker:</p>
-<blockquote><p><b> </b> <em> Sesqui<b>pi</b>dalians. </em>
-</p></blockquote>
-<p>
-This branches off the word <a href="https://www.merriam-webster.com/dictionary/sesquipedalian">sesquipedalian</a> in an appropriate way, since <em>sesqui-</em> is Latin for one-and-a-half (as in “sesquicentennial”) and <img alt="{\frac{\pi}{2}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cfrac%7B%5Cpi%7D%7B2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{\frac{\pi}{2}}"/> is near <img alt="{1.5}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1.5%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{1.5}"/>. But that line of thinking led us to wonder about a possible answer to the historical puzzle:</p>
-<blockquote><p><b> </b> <em> Did the ancients favor 3.14… because it was the closest to an integer of three main options? </em>
-</p></blockquote>
-<p/><h2> Open Problems </h2><p/>
-<p>
-Is there any merit to our historical question? We leave it as a riddle until the next Pi Day—or at least until 6/28/2021.  Note also our previous <a href="https://rjlipton.wpcomstaging.com/2014/06/15/honor-thy-fathers-correctly/">query</a> about whether the Indian mathematician Aryabhata favored <img alt="{2\pi}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%5Cpi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" title="{2\pi}"/> as the number of note.</p>
-<p>
-[some word and format tweaks, added note on Aryabhata]</p></font></font></div>
-    </content>
-    <updated>2021-03-15T04:58:05Z</updated>
-    <published>2021-03-15T04:58:05Z</published>
-    <category term="All Posts"/>
-    <category term="fast"/>
-    <category term="News"/>
-    <category term="People"/>
-    <category term="BBP algorithm"/>
-    <category term="Chudnovsky algorithm"/>
-    <category term="Emma Haruka Iwao"/>
-    <category term="Liu Hui"/>
-    <category term="Pi"/>
-    <category term="Pi Day"/>
-    <category term="y-cruncher algorithm"/>
-    <author>
-      <name>KWRegan</name>
-    </author>
-    <source>
-      <id>https://rjlipton.wpcomstaging.com</id>
-      <logo>https://s0.wp.com/i/webclip.png</logo>
-      <link href="https://rjlipton.wpcomstaging.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
-      <subtitle>a personal view of the theory of computation</subtitle>
-      <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-03-26T02:20:37Z</updated>
     </source>
   </entry>
 </feed>
