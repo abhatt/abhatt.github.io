@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-04-02T14:39:17Z</updated>
+  <updated>2021-04-02T15:22:03Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,629 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://windowsontheory.org/?p=8054</id>
+    <link href="https://windowsontheory.org/2021/04/02/inference-and-statistical-physics/" rel="alternate" type="text/html"/>
+    <title>Inference and statistical physics</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Scribe notes by Franklyn Wang Previous post: Robustness in train and test time Next post: TBD. See also all seminar posts and course webpage. lecture slides (pdf) – lecture slides (Powerpoint with animation and annotation) – video Digression: Frequentism vs Bayesianism Before getting started, we’ll discuss the difference between the two dominant schools of thought … <a class="more-link" href="https://windowsontheory.org/2021/04/02/inference-and-statistical-physics/">Continue reading <span class="screen-reader-text">Inference and statistical physics</span></a></div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><em>Scribe notes by Franklyn Wang</em></p>
+
+
+
+<p><strong>Previous post:</strong> <a href="https://windowsontheory.org/2021/04/01/robustness-in-train-and-test-time/">Robustness in train and test time</a> <strong>Next post:</strong> TBD. See also <a href="https://windowsontheory.org/category/ml-theory-seminar/">all seminar posts</a> and <a href="https://boazbk.github.io/mltheoryseminar/cs229br.html#plan">course webpage</a>.</p>
+
+
+
+<p><a href="http://files.boazbarak.org/misc/mltheory/ML_seminar_lecture_5.pdf">lecture slides (pdf)</a> – <a href="http://files.boazbarak.org/misc/mltheory/ML_seminar_lecture_5.pptx">lecture slides (Powerpoint with animation and annotation)</a> – <a href="https://harvard.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=794333ec-0897-48ea-9bc5-ace600facb9f">video</a></p>
+
+
+
+<h2>Digression: Frequentism vs Bayesianism</h2>
+
+
+
+<p>Before getting started, we’ll discuss the difference between the two dominant schools of thought in probability: Frequentism and Bayesianism.</p>
+
+
+
+<p>Frequentism holds that the probability of an event is the long-run average proportion of something that happens many, many times, so a coin has 50% probability of being heads if on average half of the flips are heads. One consequence of this framework is that a one-off event like Biden winning the election doesn’t have any probability as by definition they can only be observed once.</p>
+
+
+
+<p>Bayesians reject this model of the world. For example, a famous Bayesian, Jaynes, even wrote that “probabilities are frequencies only in an imaginary universe.”</p>
+
+
+
+<p>While these branches of thought are different, generally the answers to most questions are the same, so the distinction will not matter for this class. However, these branches of thought inspire different types of methods, which we now discuss.</p>
+
+
+
+<p>For example, suppose that we have a probability distribution <img alt="D" class="latex" src="https://s0.wp.com/latex.php?latex=D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> that we can get samples from in the form of <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. In statistics, our goal is to calculate a hypothesis <img alt="h \in \mathcal{H}" class="latex" src="https://s0.wp.com/latex.php?latex=h+%5Cin+%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> which minimizes <img alt="\mathcal{L}_{D}(h)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BL%7D_%7BD%7D%28h%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> (possibly a loss function, but any minimand will do) where we estimate <img alt="\mathcal{L}_D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BL%7D_D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> with our samples <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/Wvujokc.png"/></figure>
+
+
+
+<p>A <strong>frequentist</strong> does this by defining a family <img alt="\mathcal{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BD%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> of potential distributions, and we need to find a transformation <img alt="\vec{x} \mapsto h(\vec{x})" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvec%7Bx%7D+%5Cmapsto+h%28%5Cvec%7Bx%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> which minimizes the cost for all <img alt="D \in \mathcal{D}" class="latex" src="https://s0.wp.com/latex.php?latex=D+%5Cin+%5Cmathcal%7BD%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, where</p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/CHDrLRW.png"/></figure>
+
+
+
+<p>These equations amount to saying that <img alt="h" class="latex" src="https://s0.wp.com/latex.php?latex=h&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is minimizing the worst-case loss over all distributions.</p>
+
+
+
+<p>By contrast, a <strong>Bayesian</strong> approaches this task by assuming that <img alt="D = D_{\vec{w}}" class="latex" src="https://s0.wp.com/latex.php?latex=D+%3D+D_%7B%5Cvec%7Bw%7D%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> where <img alt="\vec{w} \sim P" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvec%7Bw%7D+%5Csim+P&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> are latent variables sampled from a prior.</p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/GDhqJTT.png"/></figure>
+
+
+
+<p>Then, let <img alt="Q_{\vec{x}}(\vec{w}) = P(w | D_{\vec{w}} = x)" class="latex" src="https://s0.wp.com/latex.php?latex=Q_%7B%5Cvec%7Bx%7D%7D%28%5Cvec%7Bw%7D%29+%3D+P%28w+%7C+D_%7B%5Cvec%7Bw%7D%7D+%3D+x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> be the <em>posterior</em> distribution of <img alt="w" class="latex" src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> conditioned on the observations <img alt="\vec{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvec%7Bx%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. We now minimize</p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/dNTPavw.png"/></figure>
+
+
+
+<p>In fact, Bayesian approaches extend beyond this, as if you can sample from a posterior you can do more than just minimize a loss function.</p>
+
+
+
+<p>In Bayesian inference, chosing the prior <img alt="P" class="latex" src="https://s0.wp.com/latex.php?latex=P&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is often very important. One classical approach is a <em>maximum entropy prior</em>, because it’s the least informative (hence, the most entropy) and requires the fewest assumptions.</p>
+
+
+
+<p>These two minimization equations con sometimes lead to identical results, but often in practice they work out differently once we introduce <strong>computational constraints</strong> into the picture. In the frequentist approach, we generally constrain the family of mappings <img alt="\vec{x} \rightarrow \vec{h}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvec%7Bx%7D+%5Crightarrow+%5Cvec%7Bh%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to be efficiently computable. In the Bayesian approach, we typically approximate the posterior instead and either use approximate sampling or a restricted hypothesis class for the posterior to be able to efficiently sample from it.</p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/KgOrLqR.png"/></figure>
+
+
+
+<h2>Part 1. An introduction to Statistical Physics</h2>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/FOIcEVs.jpg"/></figure>
+
+
+
+<p>Compare water and ice. Water is hotter, and the molecules move around more. In ice, by contrast, the molecules are more stationary. When the temperature increases, the objects move more quickly, and when they decrease the objects have less energy and stop moving. There are also phase transitions, where certain temperatures cause qualitative discontinuities in behavior, like solid to liquid or liquid to gas.<br/></p>
+
+
+
+<p>See video from <a href="https://phet.colorado.edu/">here</a>:</p>
+
+
+
+<figure class="wp-block-image size-large"><a href="https://windowsontheory.files.wordpress.com/2021/04/ezgif.com-gif-maker-1.gif"><img alt="" class="wp-image-8064" src="https://windowsontheory.files.wordpress.com/2021/04/ezgif.com-gif-maker-1.gif?w=702"/></a></figure>
+
+
+
+<p>An atomic state can be thought of as <img alt="x \in {0, 1}^{n}" class="latex" src="https://s0.wp.com/latex.php?latex=x+%5Cin+%7B0%2C+1%7D%5E%7Bn%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Now, how do we represent the system’s state? The crucial observation that makes statistical physics different from “vanilla physics” is the insight to represent the system state as a probability distribution <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> supported on <img alt="{0, 1}^{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B0%2C+1%7D%5E%7Bn%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, rather than in a single state.</p>
+
+
+
+<p>Each atomic state has a negative energy function (which we will think of as a utility function) <img alt="W: {0, 1}^{n} \rightarrow \mathbb{R}" class="latex" src="https://s0.wp.com/latex.php?latex=W%3A+%7B0%2C+1%7D%5E%7Bn%7D+%5Crightarrow+%5Cmathbb%7BR%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. In some sense, the system “wants” to have a high value of <img alt="\mathbb{E}_{x \sim p}[ W(x)]" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D_%7Bx+%5Csim+p%7D%5B+W%28x%29%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. In addition, when the temperature is high, the system “wants” to have a high value of entropy.</p>
+
+
+
+<p>Thus, an axiom of thermodynamics states that to find the true distribution, we need only look at the maximizer of</p>
+
+
+
+<p><img alt="p = \arg\max_{q} \mathbb{E}_{x \sim q}[W(x)] + \tau \cdot H(q)." class="latex" src="https://s0.wp.com/latex.php?latex=p+%3D+%5Carg%5Cmax_%7Bq%7D+%5Cmathbb%7BE%7D_%7Bx+%5Csim+q%7D%5BW%28x%29%5D+%2B+%5Ctau+%5Ccdot+H%28q%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>That is, it is the probability distribution which maximizes a linear combination of the expected negative energy and the entropy, with the temperature controlling the coefficient of entropy in this combination (the higher the temperature, the more the system prioritizes having high entropy).</p>
+
+
+
+<p>The <strong>variational principle</strong>, which we prove later, states that the <img alt="q" class="latex" src="https://s0.wp.com/latex.php?latex=q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> which maximizes this satisfies</p>
+
+
+
+<p><img alt="p(x) \propto \exp(\tau^{-1} \cdot W(x))" class="latex" src="https://s0.wp.com/latex.php?latex=p%28x%29+%5Cpropto+%5Cexp%28%5Ctau%5E%7B-1%7D+%5Ccdot+W%28x%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>which is known as the <strong>Boltzmann Distribution</strong>. We often write this with a normalizing constant, so <img alt="p(x) = \exp(\tau^{-1} \cdot W(x) - A_{\tau}(W))" class="latex" src="https://s0.wp.com/latex.php?latex=p%28x%29+%3D+%5Cexp%28%5Ctau%5E%7B-1%7D+%5Ccdot+W%28x%29+-+A_%7B%5Ctau%7D%28W%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, where <img alt="A_{\tau}(W) = \log (\int \exp(\tau^{1} \cdot W(x)))" class="latex" src="https://s0.wp.com/latex.php?latex=A_%7B%5Ctau%7D%28W%29+%3D+%5Clog+%28%5Cint+%5Cexp%28%5Ctau%5E%7B1%7D+%5Ccdot+W%28x%29%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>Before proving the variational principle, we will go through some examples of statistical physics.</p>
+
+
+
+<h3>Example: Ising Model</h3>
+
+
+
+<p>In the Ising model, we have <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> magnets that are connected in a square grid. The atomic state is each <img alt="x \in {\pm 1}^{n}" class="latex" src="https://s0.wp.com/latex.php?latex=x+%5Cin+%7B%5Cpm+1%7D%5E%7Bn%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, which represents “spin”. The value of <img alt="W(x)" class="latex" src="https://s0.wp.com/latex.php?latex=W%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is <img alt="J\sum_{i \sim j} x_i x_j + J'\sum_{i} x_i" class="latex" src="https://s0.wp.com/latex.php?latex=J%5Csum_%7Bi+%5Csim+j%7D+x_i+x_j+%2B+J%27%5Csum_%7Bi%7D+x_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, where <img alt="i \sim j" class="latex" src="https://s0.wp.com/latex.php?latex=i+%5Csim+j&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> denotes that <img alt="i" class="latex" src="https://s0.wp.com/latex.php?latex=i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and <img alt="j" class="latex" src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> are adjacent magnets. This encourages adjacent magnets to have aligned spins. One important concept, which we will return to later, is that the values of <img alt="{x_i, x_ix_j}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_i%2C+x_ix_j%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> are sufficient to calculate the value of <img alt="W(x)" class="latex" src="https://s0.wp.com/latex.php?latex=W%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> (these are known as <em>sufficient statistics</em>). Furthermore, if we wanted to calculate <img alt="\mathbb{E}[W(x)]" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D%5BW%28x%29%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, it would be enough to calculate the values of <img alt="\mathbb{E}[x_i]" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D%5Bx_i%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and <img alt="\mathbb{E}[x_i x_j]" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D%5Bx_i+x_j%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and then apply linearity of expectation. An illustration of an Ising model that we cool down slowly can be found here:</p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/VG1ION8.jpg"/></figure>
+
+
+
+<p>and a video can be found <a href="https://www.youtube.com/watch?v=kjwKgpQ-l1s">here</a>.</p>
+
+
+
+<p>This is what a low-temperature Ising model looks like – note that <img alt="W(x)" class="latex" src="https://s0.wp.com/latex.php?latex=W%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is high because almost all adjacent spins are aligned (hence the well-defined regions).</p>
+
+
+
+<p>The <a href="https://arxiv.org/abs/1211.1094">Sherrington-Kirkpatrick model</a> is a generalization of the Ising model to a random graph, which represents a disordered mean field model. Here, <img alt="x \in {\pm 1}^{n}" class="latex" src="https://s0.wp.com/latex.php?latex=x+%5Cin+%7B%5Cpm+1%7D%5E%7Bn%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> still represents spin, and <img alt="W(x) = \sum w_{i, j} x_i x_j" class="latex" src="https://s0.wp.com/latex.php?latex=W%28x%29+%3D+%5Csum+w_%7Bi%2C+j%7D+x_i+x_j&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> where <img alt="w_{i, j} \sim \mathcal{N}(0, 1)" class="latex" src="https://s0.wp.com/latex.php?latex=w_%7Bi%2C+j%7D+%5Csim+%5Cmathcal%7BN%7D%280%2C+1%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. The SK-model is deeply influential in statistical physics. We say that it is <em>disordered</em> because the utility function <img alt="W" class="latex" src="https://s0.wp.com/latex.php?latex=W&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is chosen at random and that it is a <em>mean field</em> model because, unlike the Ising model, there is no geometry in the sense that every pair of individual variables <img alt="x_i" class="latex" src="https://s0.wp.com/latex.php?latex=x_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and <img alt="x_j" class="latex" src="https://s0.wp.com/latex.php?latex=x_j&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> are equally likely to be connected.</p>
+
+
+
+<p>Our third example is the posterior distribution, where <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is a hidden variable with a uniform prior. We now makes, say, <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> independent observations <img alt="O_1, O_2, \ldots O_k" class="latex" src="https://s0.wp.com/latex.php?latex=O_1%2C+O_2%2C+%5Cldots+O_k&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. The probability of <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is given by</p>
+
+
+
+<p><img alt="p(x) \propto p(x\text{ satisfies } O_1) \cdot p(x\text{ satisfies } O_2) \ldots p(x\text{ satisfies } O_k)" class="latex" src="https://s0.wp.com/latex.php?latex=p%28x%29+%5Cpropto+p%28x%5Ctext%7B+satisfies+%7D+O_1%29+%5Ccdot+p%28x%5Ctext%7B+satisfies+%7D+O_2%29+%5Cldots+p%28x%5Ctext%7B+satisfies+%7D+O_k%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>so <img alt="p(x) \propto \exp(\log \sum \mathbb{P}(x\text{ satisfies } O_i))" class="latex" src="https://s0.wp.com/latex.php?latex=p%28x%29+%5Cpropto+%5Cexp%28%5Clog+%5Csum+%5Cmathbb%7BP%7D%28x%5Ctext%7B+satisfies+%7D+O_i%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Note that the RHS is easy to calculate, but in practice the normalizing factor (also known as the partition function) can be difficult to calculate and often represents a large barrier, in the sense that computing the partition function makes many of these questions far easier.</p>
+
+
+
+<h3>Proof of the Variational Principle</h3>
+
+
+
+<p>Now, we prove the variational principle, which states that if <img alt="p(x) = \exp(\tau^{-1} \cdot W(x) - A_\tau(W))" class="latex" src="https://s0.wp.com/latex.php?latex=p%28x%29+%3D+%5Cexp%28%5Ctau%5E%7B-1%7D+%5Ccdot+W%28x%29+-+A_%5Ctau%28W%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, where <img alt="A_\tau(W) = \log \int \exp(\tau^{-1} \cdot W(x))" class="latex" src="https://s0.wp.com/latex.php?latex=A_%5Ctau%28W%29+%3D+%5Clog+%5Cint+%5Cexp%28%5Ctau%5E%7B-1%7D+%5Ccdot+W%28x%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is the normalizing factor, then</p>
+
+
+
+<p><img alt="p = \arg\max_{q} \mathbb{E}_{x \sim q} W(x) + \tau \cdot H(q)" class="latex" src="https://s0.wp.com/latex.php?latex=p+%3D+%5Carg%5Cmax_%7Bq%7D+%5Cmathbb%7BE%7D_%7Bx+%5Csim+q%7D+W%28x%29+%2B+%5Ctau+%5Ccdot+H%28q%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>Before proving the variational principle, we make the following claim: if <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is defined as <img alt="p(x) = \exp(\tau^{-1} \cdot W(x) - A_\tau(W))" class="latex" src="https://s0.wp.com/latex.php?latex=p%28x%29+%3D+%5Cexp%28%5Ctau%5E%7B-1%7D+%5Ccdot+W%28x%29+-+A_%5Ctau%28W%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> then</p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/yACUUCV.png"/></figure>
+
+
+
+<p><strong>Proof of claim:</strong><br/>Write<br/><img alt="H(p) = -\int \log p(x) p(x) dx = -\int (\tau^{-1} \cdot W(x) - A_{\tau}(W)) p(x) dx" class="latex" src="https://s0.wp.com/latex.php?latex=H%28p%29+%3D+-%5Cint+%5Clog+p%28x%29+p%28x%29+dx+%3D+-%5Cint+%28%5Ctau%5E%7B-1%7D+%5Ccdot+W%28x%29+-+A_%7B%5Ctau%7D%28W%29%29+p%28x%29+dx&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/><br/>(where we plugged in the definition of <img alt="p(x)" class="latex" src="https://s0.wp.com/latex.php?latex=p%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> in <img alt="\log p(x)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clog+p%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>).</p>
+
+
+
+<p>We can now rewrite this as</p>
+
+
+
+<p><img alt="H(p) = -\tau^{-1} \cdot \mathbb{E}_{x \sim p} W(x) + \mathbb{E}_{x \sim p} A_{\tau}(W)" class="latex" src="https://s0.wp.com/latex.php?latex=H%28p%29+%3D+-%5Ctau%5E%7B-1%7D+%5Ccdot+%5Cmathbb%7BE%7D_%7Bx+%5Csim+p%7D+W%28x%29+%2B+%5Cmathbb%7BE%7D_%7Bx+%5Csim+p%7D+A_%7B%5Ctau%7D%28W%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>which means that</p>
+
+
+
+<p><img alt="H(p) = -\tau^{-1} \cdot \mathbb{E}_{x \sim p} W(x) + A{\tau}(W)" class="latex" src="https://s0.wp.com/latex.php?latex=H%28p%29+%3D+-%5Ctau%5E%7B-1%7D+%5Ccdot+%5Cmathbb%7BE%7D_%7Bx+%5Csim+p%7D+W%28x%29+%2B+A%7B%5Ctau%7D%28W%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>using the fact that <img alt="A_\tau(W)" class="latex" src="https://s0.wp.com/latex.php?latex=A_%5Ctau%28W%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is a constant (independent of <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>). Multiplying by <img alt="\tau" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctau&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and rearranging, we obtain the claim. <img alt="\blacksquare" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cblacksquare&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p><strong>Proof of variational principle:</strong><br/>Given the claim, we can now prove the variational principle.<br/>Let <img alt="q" class="latex" src="https://s0.wp.com/latex.php?latex=q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> be any distribution. We write</p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/KVij2G2.png"/></figure>
+
+
+
+<p>where the first equation uses our likelihood expression. This implies that <img alt="\mathbb{E}_{x \sim q} W(x) + \tau \cdot H(q)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D_%7Bx+%5Csim+q%7D+W%28x%29+%2B+%5Ctau+%5Ccdot+H%28q%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is maximized at <img alt="q = p" class="latex" src="https://s0.wp.com/latex.php?latex=q+%3D+p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, as desired. <img alt="\blacksquare" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cblacksquare&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p><strong>Remarks:</strong></p>
+
+
+
+<ul><li>When <img alt="\tau = 1" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctau+%3D+1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, we have <img alt="A(W) = \max_{q} H(q) + \mathbb{E}_{x \sim q} W(x)" class="latex" src="https://s0.wp.com/latex.php?latex=A%28W%29+%3D+%5Cmax_%7Bq%7D+H%28q%29+%2B+%5Cmathbb%7BE%7D_%7Bx+%5Csim+q%7D+W%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</li><li>In particular, for every value of <img alt="q" class="latex" src="https://s0.wp.com/latex.php?latex=q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, we have that<br/><img alt="" src="https://i.imgur.com/F0NNlGQ.png"/></li></ul>
+
+
+
+<p>which <a href="https://windowsontheory.org/2021/02/24/unsupervised-learning-and-generative-models/">we’ve seen before</a>! Note that equality holds when <img alt="q = p" class="latex" src="https://s0.wp.com/latex.php?latex=q+%3D+p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, but to approximate <img alt="A" class="latex" src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> we can simply take more tractable values of <img alt="q" class="latex" src="https://s0.wp.com/latex.php?latex=q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>In many situations, we can compute <img alt="W(x)" class="latex" src="https://s0.wp.com/latex.php?latex=W%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, but can’t compute <img alt="A_{\tau}(W)" class="latex" src="https://s0.wp.com/latex.php?latex=A_%7B%5Ctau%7D%28W%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, which stifles many applications. One upshot of this, though, is that we can calculate ratios of <img alt="p(x)" class="latex" src="https://s0.wp.com/latex.php?latex=p%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and <img alt="p(x')" class="latex" src="https://s0.wp.com/latex.php?latex=p%28x%27%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, which is good enough for some applications, like Markov Chain Monte Carlo.</p>
+
+
+
+<h3>Markov Chain Monte Carlo (MCMC)</h3>
+
+
+
+<p>An important task in statistics is to sample from a distribution <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, for very complicated values of <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. MCMC does this by constructing a Markov Chain whose stationary distribution is <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. The most common instantiation of MCMC is Metropolis-Hastings, which we now describe. First, we assume that there exists an undirected graph on the states <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, so that <img alt="x \sim x'" class="latex" src="https://s0.wp.com/latex.php?latex=x+%5Csim+x%27&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> iff <img alt="x' \sim x" class="latex" src="https://s0.wp.com/latex.php?latex=x%27+%5Csim+x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and that for <img alt="x \sim x'" class="latex" src="https://s0.wp.com/latex.php?latex=x+%5Csim+x%27&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, the probabilities of <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and <img alt="x'" class="latex" src="https://s0.wp.com/latex.php?latex=x%27&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> are similar in the sense that <img alt="W(x)/W(x')" class="latex" src="https://s0.wp.com/latex.php?latex=W%28x%29%2FW%28x%27%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is neither too small nor too large. Then the Metropolis-Hastings algortihm is as follows.</p>
+
+
+
+<p><strong>Metropolis-Hastings Algorithm</strong>:</p>
+
+
+
+<ol><li>Draw <img alt="x_0" class="latex" src="https://s0.wp.com/latex.php?latex=x_0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> at random.</li><li>For <img alt="i = 1, 2, \ldots" class="latex" src="https://s0.wp.com/latex.php?latex=i+%3D+1%2C+2%2C+%5Cldots&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, choose an arbitrary <img alt="x' \sim x" class="latex" src="https://s0.wp.com/latex.php?latex=x%27+%5Csim+x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, and let</li></ol>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/HQBwr77.png"/></figure>
+
+
+
+<p>Then, <img alt="x_t" class="latex" src="https://s0.wp.com/latex.php?latex=x_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> eventually is distributed as <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>! To show that this samples from <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, we show that the stationary distribution is of this Markov chain is <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. In this case, this turns out to be easy, since we can check the <em>detailed balance conditions</em> <img alt="p(x' | x)p(x) = \min{(p(x), p(x'))} = p(x | x')p(x')" class="latex" src="https://s0.wp.com/latex.php?latex=p%28x%27+%7C+x%29p%28x%29+%3D+%5Cmin%7B%28p%28x%29%2C+p%28x%27%29%29%7D+%3D+p%28x+%7C+x%27%29p%28x%27%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> so <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is the stationary distribution of the Markov Chain.</p>
+
+
+
+<p>The stationary distribution is often unique, so we’ve proven that this samples from <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> eventually. In MCMC algorithms, however, often an important question is how fast we converge to the stationary distribution. Often this is rather slow, which is especially dissappointing because if it were faster many very difficult problems could be solved much more easily, like generic optimization.<br/>Indeed, there are examples where convergence to the stationary distribution would take exponential time.</p>
+
+
+
+<p><strong>Note:</strong> One way to make MCMC faster is to let <img alt="x'" class="latex" src="https://s0.wp.com/latex.php?latex=x%27&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> be really close from <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, because the likelihood ratio will be closer to <img alt="1" class="latex" src="https://s0.wp.com/latex.php?latex=1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and <img alt="x_i" class="latex" src="https://s0.wp.com/latex.php?latex=x_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> will spend less time stuck at its original location. There’s a tradeoff, however. If <img alt="x'" class="latex" src="https://s0.wp.com/latex.php?latex=x%27&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is too close to <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, then the chain will not <em>mix</em> as quickly, where mixing is the convergence of <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to the stationary distribution, because generally to mix the value <img alt="x_t" class="latex" src="https://s0.wp.com/latex.php?latex=x_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> must get close to every point, and making each of <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>‘s steps smaller will make that more difficult.</p>
+
+
+
+<h3>Applications of MCMC: Simulated Annealing</h3>
+
+
+
+<p>One application of MCMC is in simulated annealing. Suppose that we have <img alt="W: {0, 1}^{n} \rightarrow \mathbb{R}" class="latex" src="https://s0.wp.com/latex.php?latex=W%3A+%7B0%2C+1%7D%5E%7Bn%7D+%5Crightarrow+%5Cmathbb%7BR%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, and we want to find <img alt="x = \arg \max_{x} W(x)" class="latex" src="https://s0.wp.com/latex.php?latex=x+%3D+%5Carg+%5Cmax_%7Bx%7D+W%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. The most direct attempt at solving this problem is creating a Markov Chain that simply samples from <img alt="x \in \arg\max_{x} W(x)" class="latex" src="https://s0.wp.com/latex.php?latex=x+%5Cin+%5Carg%5Cmax_%7Bx%7D+W%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. However, this is impractical, at least directly. It is like we have a domino that is far away from us, and we can’t knock it down. What do we do in this case? We put some dominoes in between us!</p>
+
+
+
+<p>To this end, we now create a sequence of Markov chains supported on <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, whose stationary distribution <img alt="p_{\tau}(x) \sim W(x)^{1/\tau}" class="latex" src="https://s0.wp.com/latex.php?latex=p_%7B%5Ctau%7D%28x%29+%5Csim+W%28x%29%5E%7B1%2F%5Ctau%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, as <img alt="\tau" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctau&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> gets smaller and smaller. This corresponds to cooling a system from a high-temperature to a low-temperature. Essentially, we want to sample from <img alt="p_0(x)" class="latex" src="https://s0.wp.com/latex.php?latex=p_0%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>Simulated annealing lets us begin by sampling from <img alt="p_{\infty}" class="latex" src="https://s0.wp.com/latex.php?latex=p_%7B%5Cinfty%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, which is uniform on the support. Then we can slowly reduce <img alt="\tau" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctau&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> from <img alt="\infty" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cinfty&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to <img alt="0" class="latex" src="https://s0.wp.com/latex.php?latex=0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. When cooling a system, it will be helpful to think of two stages. First, a stage in which the object cools down. Second, a settling stage in which the system settles into a more stable state. The settling stage is simulated via MCMC on <img alt="p_{\tau}(x)" class="latex" src="https://s0.wp.com/latex.php?latex=p_%7B%5Ctau%7D%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, so the transition probability from <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to <img alt="x'" class="latex" src="https://s0.wp.com/latex.php?latex=x%27&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is <img alt="\min(1, \text{exp}(\tau^{-1} \cdot (W(x') - W(x))))" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmin%281%2C+%5Ctext%7Bexp%7D%28%5Ctau%5E%7B-1%7D+%5Ccdot+%28W%28x%27%29+-+W%28x%29%29%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p><strong>Simulated Annealing Algorithm</strong>:</p>
+
+
+
+<ol><li><em>Cooling</em> Begin <img alt="\tau" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctau&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> at <img alt="\infty" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cinfty&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> (or very large), and lower the value of <img alt="\tau" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctau&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to zero according to some schedule.<br/>1a. <em>Settling</em> Now, repeatedly move from <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to <img alt="x'" class="latex" src="https://s0.wp.com/latex.php?latex=x%27&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> with probability <img alt="\min(1, \text{exp}(\tau^{-1} \cdot (W(x') - W(x))))" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmin%281%2C+%5Ctext%7Bexp%7D%28%5Ctau%5E%7B-1%7D+%5Ccdot+%28W%28x%27%29+-+W%28x%29%29%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</li></ol>
+
+
+
+<p>Since simulated annealing is inspired by physical intuition, it turns out that its shortcomings can be interpreted physically too. Namely, when you cool something too quickly it becomes a glassy state instead of a ground state, which often causes simulated annealing to fail, and for this algorithm to get stuck in local minima. Note how this is fundamentally a failure mode with MCMC – it can’t mix quickly enough.</p>
+
+
+
+<p>See <a href="https://www.youtube.com/watch?v=iaq_Fpr4KZc">this video</a> for an illustration of simulated annealing.</p>
+
+
+
+<figure class="wp-block-image size-large"><a href="https://windowsontheory.files.wordpress.com/2021/04/ezgif.com-gif-maker.gif"><img alt="" class="wp-image-8062" src="https://windowsontheory.files.wordpress.com/2021/04/ezgif.com-gif-maker.gif?w=818"/></a></figure>
+
+
+
+<h2>Part 2: Bayesian Analysis</h2>
+
+
+
+<p>Note that the posterior of <img alt="\vec{w}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvec%7Bw%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> conditioned on <img alt="x_1, \ldots x_n" class="latex" src="https://s0.wp.com/latex.php?latex=x_1%2C+%5Cldots+x_n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is</p>
+
+
+
+<p><img alt="p(\vec{w} | x_1, \ldots x_n) = \frac{p(\vec{w})}{p(\vec{x})} \cdot p(x_1 | \vec{w}) p(x_2 | \vec{w}) \ldots p(x_n | \vec{w}) \propto \exp\left(\sum X_i(\vec{w})\right)" class="latex" src="https://s0.wp.com/latex.php?latex=p%28%5Cvec%7Bw%7D+%7C+x_1%2C+%5Cldots+x_n%29+%3D+%5Cfrac%7Bp%28%5Cvec%7Bw%7D%29%7D%7Bp%28%5Cvec%7Bx%7D%29%7D+%5Ccdot+p%28x_1+%7C+%5Cvec%7Bw%7D%29+p%28x_2+%7C+%5Cvec%7Bw%7D%29+%5Cldots+p%28x_n+%7C+%5Cvec%7Bw%7D%29+%5Cpropto+%5Cexp%5Cleft%28%5Csum+X_i%28%5Cvec%7Bw%7D%29%5Cright%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>We now have <img alt="p_{W}(x) = \exp(W(x) - A(W))" class="latex" src="https://s0.wp.com/latex.php?latex=p_%7BW%7D%28x%29+%3D+%5Cexp%28W%28x%29+-+A%28W%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, an exponential distribution. Now suppose that <img alt="W(x) = \langle w, \hat{x} \rangle" class="latex" src="https://s0.wp.com/latex.php?latex=W%28x%29+%3D+%5Clangle+w%2C+%5Chat%7Bx%7D+%5Crangle&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, where <img alt="\hat{x} \in \mathbb{R}^{m}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7Bx%7D+%5Cin+%5Cmathbb%7BR%7D%5E%7Bm%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> are the sufficient statistics of <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. For example, the energy function could follow that of a tree, so <img alt="W(x) = \sum_{(i, j) \in T} w_{i, j} x_i x_j" class="latex" src="https://s0.wp.com/latex.php?latex=W%28x%29+%3D+%5Csum_%7B%28i%2C+j%29+%5Cin+T%7D+w_%7Bi%2C+j%7D+x_i+x_j&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. If you want to find the expected value of $latex \mathbb{E}<em>{x \sim p</em>{W}}[W(x)]&amp;bg=ffffff$ its enough to know $latex \mu = \mathbb{E}<em>{x \sim p</em>{W} }[\hat{x}]&amp;bg=ffffff$. (By following a tree, we mean that the undirected graphical model of the distribution is that of a tree.)</p>
+
+
+
+<h3>Sampling from a Tree-Structured Distribution</h3>
+
+
+
+<p>Now how do we sample from a tree-structured distribution? The most direct way is by calculating the marginals. While marginalization is generally quite difficult, it is much more tractable on certain types of graphs. For a sense of what this entails, suppose that we have the following tree-structured statistical model:</p>
+
+
+
+<p><img alt="" src="https://i.imgur.com/mnC1vkM.png"/>,<br/>whose joint PDF is <img alt="W(x) = \exp(\sum_{i, j \in E} -w_{i, j} (x_i - x_j)^2)" class="latex" src="https://s0.wp.com/latex.php?latex=W%28x%29+%3D+%5Cexp%28%5Csum_%7Bi%2C+j+%5Cin+E%7D+-w_%7Bi%2C+j%7D+%28x_i+-+x_j%29%5E2%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> where <img alt="x \in {0, 1}^{n}" class="latex" src="https://s0.wp.com/latex.php?latex=x+%5Cin+%7B0%2C+1%7D%5E%7Bn%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.<br/>(The unusual notation is chosen so that the relationships between the marginals is clean. The log-density in question is a Laplacian Quadratic Form.)</p>
+
+
+
+<p>Then one can show that if the marginal of <img alt="x_3" class="latex" src="https://s0.wp.com/latex.php?latex=x_3&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is <img alt="\mu_3 = \mathbb{P}(x_3 = 1)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu_3+%3D+%5Cmathbb%7BP%7D%28x_3+%3D+1%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, then we have that</p>
+
+
+
+<p><img alt="\mu_6 = \mu_3 \cdot \frac{e^{w_{3,6}}}{1 + e^{w_{3, 6}}} + (1 - \mu_3) \cdot \frac{1}{1 + e^{w_{3, 6}}}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu_6+%3D+%5Cmu_3+%5Ccdot+%5Cfrac%7Be%5E%7Bw_%7B3%2C6%7D%7D%7D%7B1+%2B+e%5E%7Bw_%7B3%2C+6%7D%7D%7D+%2B+%281+-+%5Cmu_3%29+%5Ccdot+%5Cfrac%7B1%7D%7B1+%2B+e%5E%7Bw_%7B3%2C+6%7D%7D%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>This will give six linear equations in six unknowns, which we can solve. Once we can marginalize a variable, say, <img alt="x_6" class="latex" src="https://s0.wp.com/latex.php?latex=x_6&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, we can then simply sample from the marginal, then sample from the conditional distribution on <img alt="x_6" class="latex" src="https://s0.wp.com/latex.php?latex=x_6&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to sample from the entire distribution. This method is known as belief propogation.</p>
+
+
+
+<p>This algorithm (with some modifications) also works for general graphs, but what it represents on general graphs is not the exact marginal, but rather an extension of that graph to a tree.</p>
+
+
+
+<h3>General Exponential Distributions</h3>
+
+
+
+<p>Now let’s try to develop more theory for exponential distributions. Let the PDF of this distribution be <img alt="p_W(x) = \exp(\langle w, \hat{x} \rangle - A(w))" class="latex" src="https://s0.wp.com/latex.php?latex=p_W%28x%29+%3D+%5Cexp%28%5Clangle+w%2C+%5Chat%7Bx%7D+%5Crangle+-+A%28w%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. A few useful facts about these distributions that often appear in calculations: <img alt="\nabla A(w) = \mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cnabla+A%28w%29+%3D+%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and $latex \nabla^2 (A(w)) = \text{Cov}<em>{p</em>{W}}(x) \succeq 0&amp;bg=ffffff$.</p>
+
+
+
+<p>By the variational principle, we have that among all distributions with the same sufficient statistics as a given Boltzmann distribution, the true one maximizes the entropy, so</p>
+
+
+
+<p><img alt="p_w = \arg\max_{\mathbb{E}_{q} \hat{x} = \mu} H(q)." class="latex" src="https://s0.wp.com/latex.php?latex=p_w+%3D+%5Carg%5Cmax_%7B%5Cmathbb%7BE%7D_%7Bq%7D+%5Chat%7Bx%7D+%3D+%5Cmu%7D+H%28q%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>An analagous idea gives us<br/><img alt="\mu = \arg \max_{H(\mu) \ge H(p_{w})} \langle w, \mu \rangle," class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu+%3D+%5Carg+%5Cmax_%7BH%28%5Cmu%29+%5Cge+H%28p_%7Bw%7D%29%7D+%5Clangle+w%2C+%5Cmu+%5Crangle%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>so <img alt="p_w" class="latex" src="https://s0.wp.com/latex.php?latex=p_w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is the <em>maximum entropy</em> distribution consistent with observations <img alt="\mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>The important consequence of these two facts is that in principle, <img alt="w" class="latex" src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> determines <img alt="\mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and vice versa. (Up to fine print of using <em>minimal</em> sufficient statistics, which we ignore here.) We will refer to <img alt="w" class="latex" src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> as the “canonical parameter space” and <img alt="\mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> as the “mean representation space”. Now note that the first equation gives us a way of going from <img alt="\mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to <img alt="w" class="latex" src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, and the second equation gives us a way to go from <img alt="w" class="latex" src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to <img alt="\mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, at least information-theoretically.</p>
+
+
+
+<p>Now, how do we do this algorithmically? Using <img alt="w" class="latex" src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, if were able to sample from <img alt="p_w" class="latex" src="https://s0.wp.com/latex.php?latex=p_w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> (which is generally possible if we can evaluate <img alt="A(w)" class="latex" src="https://s0.wp.com/latex.php?latex=A%28w%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> then we can estimate the mean <img alt="\mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> through samples. We can also obtain <img alt="\mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> from <img alt="A(w)" class="latex" src="https://s0.wp.com/latex.php?latex=A%28w%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> by estimating <img alt="\nabla A" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cnabla+A&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/qFKGiMa.png"/></figure>
+
+
+
+<p>On the other hand, if you have <img alt="\mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, to obtain <img alt="w" class="latex" src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> you first consider <img alt="A^{\ast}(\mu) = \sup_{w \in \Omega} {\langle \mu, w \rangle - A(w)}" class="latex" src="https://s0.wp.com/latex.php?latex=A%5E%7B%5Cast%7D%28%5Cmu%29+%3D+%5Csup_%7Bw+%5Cin+%5COmega%7D+%7B%5Clangle+%5Cmu%2C+w+%5Crangle+-+A%28w%29%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and then note that the desired value is <img alt="\arg\max_{w \in \Omega}{\langle \mu, w \rangle - A(w)}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Carg%5Cmax_%7Bw+%5Cin+%5COmega%7D%7B%5Clangle+%5Cmu%2C+w+%5Crangle+-+A%28w%29%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, so solving this problem boils down to estimating <img alt="\nabla A^{\ast}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cnabla+A%5E%7B%5Cast%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> efficiently, because setting it to zero will give us <img alt="w" class="latex" src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>Thus going from <img alt="w" class="latex" src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to <img alt="\mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> requires estimating <img alt="\nabla A" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cnabla+A&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, whereas going from <img alt="\mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to <img alt="w" class="latex" src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> requires estimating <img alt="\nabla A^{\ast}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cnabla+A%5E%7B%5Cast%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>When <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is a <em>posterior distribution</em>, the observed data typically gives us the weights <img alt="w" class="latex" src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, and hence the inference problem becomes to use that to sample from the posterior.</p>
+
+
+
+<h4>Examples of Exponential Distributions</h4>
+
+
+
+<p>There are many examples of exponential distributions, which we now give.</p>
+
+
+
+<ul><li>High-Dimensional Normals: <img alt="x\in \mathbb{R}^{d}" class="latex" src="https://s0.wp.com/latex.php?latex=x%5Cin+%5Cmathbb%7BR%7D%5E%7Bd%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, <img alt="W(x) = -(x - \mu)^{\top} \Sigma^{-1} (x-\mu)" class="latex" src="https://s0.wp.com/latex.php?latex=W%28x%29+%3D+-%28x+-+%5Cmu%29%5E%7B%5Ctop%7D+%5CSigma%5E%7B-1%7D+%28x-%5Cmu%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></li><li>Ising Model: <img alt="x\in {0, 1}^{d}" class="latex" src="https://s0.wp.com/latex.php?latex=x%5Cin+%7B0%2C+1%7D%5E%7Bd%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, <img alt="W(x) = \sum w_i x_I + \sum_{i, j \in E} w_{i, j} x_i x_j" class="latex" src="https://s0.wp.com/latex.php?latex=W%28x%29+%3D+%5Csum+w_i+x_I+%2B+%5Csum_%7Bi%2C+j+%5Cin+E%7D+w_%7Bi%2C+j%7D+x_i+x_j&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. A sufficient statistic for these is <img alt="\hat{x} = (x, xx^{\top})" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7Bx%7D+%3D+%28x%2C+xx%5E%7B%5Ctop%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, a fact which we will invoke repeatedly.</li><li>There’s many many more, including Gaussian Markov Random Fields, Latend Dirchlet Allocation, and Mixtures of Gaussians.</li></ul>
+
+
+
+<h4>Going from canonical parameters to mean parameters</h4>
+
+
+
+<p>Now, we show how to go from <img alt="w" class="latex" src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to <img alt="\mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> in a special case, namely in the mean-field approximation. The mean field approximation is the approximation of distributions by product distributions over <img alt="x_1, \ldots, x_d \in {0, 1}^{d}" class="latex" src="https://s0.wp.com/latex.php?latex=x_1%2C+%5Cldots%2C+x_d+%5Cin+%7B0%2C+1%7D%5E%7Bd%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, for which</p>
+
+
+
+<p><img alt="\mathbb{P}(x_1, \ldots x_n) = \mathbb{P}(x_1)\mathbb{P}(x_2) \ldots \mathbb{P}(x_n)." class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BP%7D%28x_1%2C+%5Cldots+x_n%29+%3D+%5Cmathbb%7BP%7D%28x_1%29%5Cmathbb%7BP%7D%28x_2%29+%5Cldots+%5Cmathbb%7BP%7D%28x_n%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>Recall that the partition function can be computed as</p>
+
+
+
+<p><img alt="A(w) = \max_{q \in \mathcal{Q}} \langle w, \mathbb{E}_{q} \hat{x} \rangle + H(q)." class="latex" src="https://s0.wp.com/latex.php?latex=A%28w%29+%3D+%5Cmax_%7Bq+%5Cin+%5Cmathcal%7BQ%7D%7D+%5Clangle+w%2C+%5Cmathbb%7BE%7D_%7Bq%7D+%5Chat%7Bx%7D+%5Crangle+%2B+H%28q%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>where <img alt="\mathcal{Q}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BQ%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is the set of all probability distributions. If we instead write <img alt="\mathcal{Q}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BQ%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> as the set of product distributions (parametrized by <img alt="\mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, or the probability that each variable is <img alt="1" class="latex" src="https://s0.wp.com/latex.php?latex=1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>), we get</p>
+
+
+
+<p><img alt="A(w) \ge \max_{\mu \in \mathcal{Q}} \sum w_i \mu_i + \sum w_{i,j} \mu_i \mu_j + \sum H(\mu_i)," class="latex" src="https://s0.wp.com/latex.php?latex=A%28w%29+%5Cge+%5Cmax_%7B%5Cmu+%5Cin+%5Cmathcal%7BQ%7D%7D+%5Csum+w_i+%5Cmu_i+%2B+%5Csum+w_%7Bi%2Cj%7D+%5Cmu_i+%5Cmu_j+%2B+%5Csum+H%28%5Cmu_i%29%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>where <img alt="H(\mu_i) = -\mu_i \log \mu_i - (1 - \mu_i) \log{1 - \mu_i}" class="latex" src="https://s0.wp.com/latex.php?latex=H%28%5Cmu_i%29+%3D+-%5Cmu_i+%5Clog+%5Cmu_i+-+%281+-+%5Cmu_i%29+%5Clog%7B1+-+%5Cmu_i%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and it now suffices to maximize the right hand function over the set <img alt="K = { \mu\in [0,1]^d | \sum \mu_i = 1 }" class="latex" src="https://s0.wp.com/latex.php?latex=K+%3D+%7B+%5Cmu%5Cin+%5B0%2C1%5D%5Ed+%7C+%5Csum+%5Cmu_i+%3D+1+%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>We can generally maximize concave functions over a convex set such as <img alt="K" class="latex" src="https://s0.wp.com/latex.php?latex=K&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Unfortunately, this function is not concave. However, it is concave in every coordinate. This suggests the following algorithm: fix all but one variable and maximize over that variable, and repeat. This approach is known as Coordinate Ascent Variational Inference (CAVI), and its pseudocode is given below.</p>
+
+
+
+<p><strong>CAVI Algorithm</strong></p>
+
+
+
+<ol><li>Let <img alt="\mu = 1/2 \cdot (1, 1, \ldots 1)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu+%3D+1%2F2+%5Ccdot+%281%2C+1%2C+%5Cldots+1%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></li><li>Repatedly choose values of <img alt="j" class="latex" src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> in <img alt="[n]" class="latex" src="https://s0.wp.com/latex.php?latex=%5Bn%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> (possibly at random, or in a loop.)<br/>2a. Update <img alt="\mu_{j} = \arg\max_{x_j} (f(\mu_{-j}, x_j))" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu_%7Bj%7D+%3D+%5Carg%5Cmax_%7Bx_j%7D+%28f%28%5Cmu_%7B-j%7D%2C+x_j%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> (where <img alt="\mu_{-j}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu_%7B-j%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> represents the non-<img alt="j" class="latex" src="https://s0.wp.com/latex.php?latex=j&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> coordinates of <img alt="\mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>)</li></ol>
+
+
+
+<h2>Part 3. Solution landscapes and the replica method</h2>
+
+
+
+<p>This part is best explained visually. Suppose that we have a Boltzman distribution. In the infinite temperature limit the this is the uniform distribution, distributed over the entire domain. As you decrease the temperature, the support’s size decreases. (<em>Note:</em> The gifs below are just cartoons. These pretend as if the probability distribution is always uniform over a subset. Also, in most cases of interest for learning, only higher order derivatives of entropy will be discontinuous.)<br/></p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/rPb67cG.gif"/></figure>
+
+
+
+<p>Sometimes there’s a discontinuity in entropy, and the entropy “suddenly drops” in a discontinuity. Often the entropy function itself is continuous, but the derivatives are not continuous at that point – a higher order phase transition.</p>
+
+
+
+<p>Sometimes the geometry of the solution space undergoes a phase transition as well, with it “shattering” to several distinct clusters.</p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/itUWxrB.gif"/></figure>
+
+
+
+<h3>The replica method</h3>
+
+
+
+<p><strong>Note:</strong> We will have an extended post on the replica method later on.</p>
+
+
+
+<p>If you sampled <img alt="x_1, \ldots x_n" class="latex" src="https://s0.wp.com/latex.php?latex=x_1%2C+%5Cldots+x_n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> from <img alt="p_{w}" class="latex" src="https://s0.wp.com/latex.php?latex=p_%7Bw%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, where <img alt="p_w" class="latex" src="https://s0.wp.com/latex.php?latex=p_w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is a high-dimensional distribution, you’d expect the distances to all be approximately the same. The overlap matrix, or </p>
+
+
+
+<p><img alt="\begin{bmatrix} \langle x_1, x_1 \rangle &amp; \cdots &amp; \langle x_1, x_n \rangle \ \vdots &amp; \ddots &amp; \vdots \ \langle x_n, x_1 \rangle &amp; \cdots &amp; \langle x_n, x_n \rangle \end{bmatrix}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Bbmatrix%7D+%5Clangle+x_1%2C+x_1+%5Crangle+%26+%5Ccdots+%26+%5Clangle+x_1%2C+x_n+%5Crangle+%5C+%5Cvdots+%26+%5Cddots+%26+%5Cvdots+%5C+%5Clangle+x_n%2C+x_1+%5Crangle+%26+%5Ccdots+%26+%5Clangle+x_n%2C+x_n+%5Crangle+%5Cend%7Bbmatrix%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> </p>
+
+
+
+<p>we approximate as </p>
+
+
+
+<p><img alt="\begin{bmatrix} 1 &amp; \cdots &amp; q \ \vdots &amp; \ddots &amp; \vdots \ q&amp; \cdots &amp; 1 \end{bmatrix}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Bbmatrix%7D+1+%26+%5Ccdots+%26+q+%5C+%5Cvdots+%26+%5Cddots+%26+%5Cvdots+%5C+q%26+%5Ccdots+%26+1+%5Cend%7Bbmatrix%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> </p>
+
+
+
+<p>where <img alt="q" class="latex" src="https://s0.wp.com/latex.php?latex=q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is some constant.</p>
+
+
+
+<p>Suppose <img alt="w" class="latex" src="https://s0.wp.com/latex.php?latex=w&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> comes from a probability distribution <img alt="W" class="latex" src="https://s0.wp.com/latex.php?latex=W&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Then a very common problem is computing</p>
+
+
+
+<p><img alt="\mathbb{E}_{w}[A(w)] = \mathbb{E}_{w}\left[ \log \int \exp(\langle w, \hat{x} \rangle)\right]," class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D_%7Bw%7D%5BA%28w%29%5D+%3D+%5Cmathbb%7BE%7D_%7Bw%7D%5Cleft%5B+%5Clog+%5Cint+%5Cexp%28%5Clangle+w%2C+%5Chat%7Bx%7D+%5Crangle%29%5Cright%5D%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>which is the expected free energy. However, it turns out to be much easier to find <img alt="\log (\int E_{w} \exp(\langle w, \hat{x} \rangle))" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clog+%28%5Cint+E_%7Bw%7D+%5Cexp%28%5Clangle+w%2C+%5Chat%7Bx%7D+%5Crangle%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. So here’s what we do. We find</p>
+
+
+
+<p><img alt="\mathbb{E}_{w} [A(w)] = \lim{n \rightarrow 0} \frac{\mathbb{E}_{w} [\text{exp}(n \cdot A(w))] - 1}{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D_%7Bw%7D+%5BA%28w%29%5D+%3D+%5Clim%7Bn+%5Crightarrow+0%7D+%5Cfrac%7B%5Cmathbb%7BE%7D_%7Bw%7D+%5B%5Ctext%7Bexp%7D%28n+%5Ccdot+A%28w%29%29%5D+-+1%7D%7Bn%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>This should already smell weird, because <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is going to zero, an unusal notational choice. We can now write this as<br/><img alt="\mathbb{E}{w} A(w) = \lim_{n \rightarrow 0} \frac{\mathbb{E}_{w}\left( \int{x} \exp(\langle w, \hat{x} \rangle)\right)^{n} - 1}{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D%7Bw%7D+A%28w%29+%3D+%5Clim_%7Bn+%5Crightarrow+0%7D+%5Cfrac%7B%5Cmathbb%7BE%7D_%7Bw%7D%5Cleft%28+%5Cint%7Bx%7D+%5Cexp%28%5Clangle+w%2C+%5Chat%7Bx%7D+%5Crangle%29%5Cright%29%5E%7Bn%7D+-+1%7D%7Bn%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>which we can write as</p>
+
+
+
+<p><img alt="\lim_{n \rightarrow 0} \frac{\int_{x_1, \ldots x_n} \mathbb{E}_{w} \exp(\langle w, \hat{x}_1 + \cdots + \hat{x}_n \rangle) - 1}{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clim_%7Bn+%5Crightarrow+0%7D+%5Cfrac%7B%5Cint_%7Bx_1%2C+%5Cldots+x_n%7D+%5Cmathbb%7BE%7D_%7Bw%7D+%5Cexp%28%5Clangle+w%2C+%5Chat%7Bx%7D_1+%2B+%5Ccdots+%2B+%5Chat%7Bx%7D_n+%5Crangle%29+-+1%7D%7Bn%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>Now these <img alt="x_i" class="latex" src="https://s0.wp.com/latex.php?latex=x_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>‘s represent the replicas! Now, we’d hope <img alt="\psi(n) = \int_{x_1, \ldots x_n} \mathbb{E}_w \exp(\langle w, \hat{x}_1 + \hat{x}_2 + \ldots + \hat{x}_n \rangle)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cpsi%28n%29+%3D+%5Cint_%7Bx_1%2C+%5Cldots+x_n%7D+%5Cmathbb%7BE%7D_w+%5Cexp%28%5Clangle+w%2C+%5Chat%7Bx%7D_1+%2B+%5Chat%7Bx%7D_2+%2B+%5Cldots+%2B+%5Chat%7Bx%7D_n+%5Crangle%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is an analytic function, and we can now write this as <img alt="\frac{\psi(n) - 1}{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B%5Cpsi%28n%29+-+1%7D%7Bn%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> as <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> goes to zero.</p>
+
+
+
+<p>Generally speaking, <img alt="\mathbb{E}_{w} [\exp(w, \hat{x}_1 + \cdots + \hat{x}_n)]" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D_%7Bw%7D+%5B%5Cexp%28w%2C+%5Chat%7Bx%7D_1+%2B+%5Ccdots+%2B+%5Chat%7Bx%7D_n%29%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> only depends on overlaps of <img alt="Q" class="latex" src="https://s0.wp.com/latex.php?latex=Q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, so we often guess the value of <img alt="Q" class="latex" src="https://s0.wp.com/latex.php?latex=Q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and calculate this expectation.</p>
+
+
+
+<h4>Examples:</h4>
+
+
+
+<p>We’ll now give an example of how this is useful. Consider a spiked matrix/tensor model, where we observe <img alt="Y" class="latex" src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> so that <img alt="Y = \lambda S + N" class="latex" src="https://s0.wp.com/latex.php?latex=Y+%3D+%5Clambda+S+%2B+N&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, where <img alt="S" class="latex" src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is the signal and <img alt="N" class="latex" src="https://s0.wp.com/latex.php?latex=N&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is the noise. Thus here we have</p>
+
+
+
+<p><img alt="p(S', N' | Y) \propto \exp(\beta \langle Y - \lambda S', N' \rangle^2) \cdot p(S')," class="latex" src="https://s0.wp.com/latex.php?latex=p%28S%27%2C+N%27+%7C+Y%29+%5Cpropto+%5Cexp%28%5Cbeta+%5Clangle+Y+-+%5Clambda+S%27%2C+N%27+%5Crangle%5E2%29+%5Ccdot+p%28S%27%29%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>and we want to analyze <img alt="\mathbb{E}_{S' \sim p(\cdot | Y)} \langle S, S' \rangle^2" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D_%7BS%27+%5Csim+p%28%5Ccdot+%7C+Y%29%7D+%5Clangle+S%2C+S%27+%5Crangle%5E2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> as a function of <img alt="\lambda" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clambda&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, which can be done by the <a href="https://arxiv.org/pdf/1612.07728.pdf">replica method</a> and exhibits a phase transition.<br/><img alt="" src="https://i.imgur.com/ec3tC8C.png"/></p>
+
+
+
+<p>Other examples include Teacher-student models, where <img alt="X, Y = (X, f_S(X) + N)" class="latex" src="https://s0.wp.com/latex.php?latex=X%2C+Y+%3D+%28X%2C+f_S%28X%29+%2B+N%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Then, <a href="https://arxiv.org/abs/2102.08127">a recent work</a> calculates the training losses and classification errors when training on this dataset, which closely match empirical values.</p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/x9bdDv7.png"/></figure>
+
+
+
+<h3>Symmetry breaking</h3>
+
+
+
+<p>Lastly, we’ll talk about replica symmetry breaking. Sometimes, discontinuities don’t just make the support smaller, but actually break the support into many different parts. For example, at this transition the circle becomes the three green circles.<br/><img alt="" src="https://i.imgur.com/ufck69X.png"/></p>
+
+
+
+<p>When this happens, we can no longer make our overlap matrix assumption, as there are now asymmetries between the points. This leads to the overlap matrix being striped, in the fashion one would anticipate.</p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/0Zua7m9.png"/></figure>
+
+
+
+<p>Sometimes, the support actually breaks into infinitely many parts, in a phenomenon called full replica symmetry breakng.</p>
+
+
+
+<p>Finally, some historical notes. This “plugging in zero” trick was introduced by Parisi approximately 30 years ago, receiving a standing ovation at the ICM. Since then, some of those conjectures have been rigorously formalized, but many haven’t. It is still very impressive that Parisi was able to do it.</p></div>
+    </content>
+    <updated>2021-04-02T15:04:30Z</updated>
+    <published>2021-04-02T15:04:30Z</published>
+    <category term="ML Theory seminar"/>
+    <author>
+      <name>Boaz Barak</name>
+    </author>
+    <source>
+      <id>https://windowsontheory.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://windowsontheory.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://windowsontheory.org" rel="alternate" type="text/html"/>
+      <link href="https://windowsontheory.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>A Research Blog</subtitle>
+      <title>Windows On Theory</title>
+      <updated>2021-04-02T15:21:02Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://lucatrevisan.wordpress.com/?p=4509</id>
@@ -61,7 +684,7 @@
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-04-02T14:37:15Z</updated>
+      <updated>2021-04-02T15:20:10Z</updated>
     </source>
   </entry>
 
@@ -348,13 +971,13 @@ Disjoint Paths.
     <id>http://windowsontheory.org/?p=8044</id>
     <link href="https://windowsontheory.org/2021/04/01/robustness-in-train-and-test-time/" rel="alternate" type="text/html"/>
     <title>Robustness in train and test time</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Scribe notes by Praneeth Vepakomma Previous post: Unsupervised learning and generative models Next post: TBD. See also all seminar posts and course webpage. lecture slides (pdf) – lecture slides (Powerpoint with animation and annotation) – video In this blog post, we will focus on the topic of robustness – how well (or not so well) … <a class="more-link" href="https://windowsontheory.org/2021/04/01/robustness-in-train-and-test-time/">Continue reading <span class="screen-reader-text">Robustness in train and test time</span></a></div>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Scribe notes by Praneeth Vepakomma Previous post: Unsupervised learning and generative models Next post: Inference and statistical physics. See also all seminar posts and course webpage. lecture slides (pdf) – lecture slides (Powerpoint with animation and annotation) – video In this blog post, we will focus on the topic of robustness – how well (or … <a class="more-link" href="https://windowsontheory.org/2021/04/01/robustness-in-train-and-test-time/">Continue reading <span class="screen-reader-text">Robustness in train and test time</span></a></div>
     </summary>
     <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><em>Scribe notes by <a href="https://www.media.mit.edu/people/vepakom/overview/">Praneeth Vepakomma</a></em></p>
 
 
 
-<p><strong>Previous post:</strong> <a href="https://windowsontheory.org/2021/02/24/unsupervised-learning-and-generative-models/">Unsupervised learning and generative models</a> <strong>Next post:</strong> TBD. See also <a href="https://windowsontheory.org/category/ml-theory-seminar/">all seminar posts</a> and <a href="https://boazbk.github.io/mltheoryseminar/cs229br.html#plan">course webpage</a>.</p>
+<p><strong>Previous post:</strong> <a href="https://windowsontheory.org/2021/02/24/unsupervised-learning-and-generative-models/">Unsupervised learning and generative models</a> <strong>Next post:</strong> <a href="https://windowsontheory.org/2021/04/02/inference-and-statistical-physics/">Inference and statistical physics</a>. See also <a href="https://windowsontheory.org/category/ml-theory-seminar/">all seminar posts</a> and <a href="https://boazbk.github.io/mltheoryseminar/cs229br.html#plan">course webpage</a>.</p>
 
 
 
@@ -1099,7 +1722,7 @@ Disjoint Paths.
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-02T14:38:04Z</updated>
+      <updated>2021-04-02T15:21:01Z</updated>
     </source>
   </entry>
 
@@ -1160,7 +1783,7 @@ Disjoint Paths.
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-02T14:37:35Z</updated>
+      <updated>2021-04-02T15:20:27Z</updated>
     </source>
   </entry>
 
@@ -1309,7 +1932,7 @@ If you see a market for NFTs, do you see one for SFTs—or are they both April F
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-02T14:37:45Z</updated>
+      <updated>2021-04-02T15:20:44Z</updated>
     </source>
   </entry>
 
@@ -1642,7 +2265,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-02T14:37:45Z</updated>
+      <updated>2021-04-02T15:20:43Z</updated>
     </source>
   </entry>
 
@@ -1689,7 +2312,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-02T14:38:03Z</updated>
+      <updated>2021-04-02T15:21:00Z</updated>
     </source>
   </entry>
 
@@ -1764,7 +2387,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://dstheory.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://dstheory.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Foundation of Data Science – Virtual Talk Series</title>
-      <updated>2021-04-02T14:39:11Z</updated>
+      <updated>2021-04-02T15:21:52Z</updated>
     </source>
   </entry>
 
@@ -1790,7 +2413,7 @@ We also point out that as a consequence of the recent work on WPRGs, any randomi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-02T14:37:35Z</updated>
+      <updated>2021-04-02T15:20:27Z</updated>
     </source>
   </entry>
 
@@ -1880,7 +2503,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-02T14:37:45Z</updated>
+      <updated>2021-04-02T15:20:44Z</updated>
     </source>
   </entry>
 
@@ -1926,7 +2549,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-02T14:37:35Z</updated>
+      <updated>2021-04-02T15:20:27Z</updated>
     </source>
   </entry>
 
@@ -2055,7 +2678,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-04-02T14:39:17Z</updated>
+      <updated>2021-04-02T15:22:03Z</updated>
     </source>
   </entry>
 
@@ -2256,7 +2879,7 @@ In addition, we prove a similar bound for noisy decision trees of cost at most $
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-02T14:37:35Z</updated>
+      <updated>2021-04-02T15:20:27Z</updated>
     </source>
   </entry>
 
@@ -2287,7 +2910,7 @@ In addition, we prove a similar bound for noisy decision trees of cost at most $
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-04-02T14:38:40Z</updated>
+      <updated>2021-04-02T15:21:26Z</updated>
     </source>
   </entry>
 
@@ -2374,7 +2997,7 @@ Here is an <a href="https://www.newton.ac.uk/science/outreach/women/six-question
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-02T14:37:45Z</updated>
+      <updated>2021-04-02T15:20:43Z</updated>
     </source>
   </entry>
 
@@ -2462,7 +3085,7 @@ Here is an <a href="https://www.newton.ac.uk/science/outreach/women/six-question
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-04-02T14:37:39Z</updated>
+      <updated>2021-04-02T15:20:30Z</updated>
     </source>
   </entry>
 
@@ -2532,7 +3155,7 @@ Prior to our work, the only polynomial-time or even subexponential-time algorith
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-02T14:37:35Z</updated>
+      <updated>2021-04-02T15:20:27Z</updated>
     </source>
   </entry>
 
@@ -2558,7 +3181,7 @@ In this paper, we explore the following natural heuristic idea for decreasing th
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-02T14:37:35Z</updated>
+      <updated>2021-04-02T15:20:27Z</updated>
     </source>
   </entry>
 
@@ -2586,7 +3209,7 @@ Email: application@dimacs.rutgers.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-04-02T14:37:48Z</updated>
+      <updated>2021-04-02T15:20:46Z</updated>
     </source>
   </entry>
 
@@ -2759,7 +3382,7 @@ Of course we <a href="https://www.nytimes.com/2021/03/17/science/abel-prize-math
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-02T14:37:45Z</updated>
+      <updated>2021-04-02T15:20:43Z</updated>
     </source>
   </entry>
 
@@ -2787,70 +3410,7 @@ The main conceptual contribution of this work is to establish that the existence
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-02T14:37:35Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://lucatrevisan.wordpress.com/?p=4504</id>
-    <link href="https://lucatrevisan.wordpress.com/2021/03/18/finally-a-joy/" rel="alternate" type="text/html"/>
-    <title>Finally, a joy</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">In Rome we have an expression, mai una gioia (literally, “never (a moment of) joy”) that applies well to the present times. Yesterday, there was, finally, something to be joyous about: the announcement that two of my heroes, Laszlo Lovasz … <a href="https://lucatrevisan.wordpress.com/2021/03/18/finally-a-joy/">Continue reading <span class="meta-nav">→</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>In Rome we have an expression, <em>mai una gioia</em> (literally, “never (a moment of) joy”) that applies well to the present times. Yesterday, there was, finally, something to be joyous about: the announcement that two of my heroes, Laszlo Lovasz and Avi Wigderson, will share the 2021 Abel Prize, one of the highest honors of mathematics.</p>
-<p>The reader can find a very good article about them on <a href="https://www.quantamagazine.org/avi-wigderson-and-laszlo-lovasz-win-abel-prize-20210317/">Quanta Magazine</a>.</p>
-<p>Instead of talking about their greatest accomplishment, here I would like to recall two beautiful and somewhat related results, that admit a short treatment.</p>
-<p><span id="more-4504"/></p>
-<p>Avi’s first paper was on the 3-coloring problem. He described a polynomial time algorithm that, given a 3-colorable graph <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, finds a valid coloring of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> with <img alt="{O(\sqrt n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Csqrt+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> colors, where <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the number of vertices. The starting point is that if every vertex in <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> had degree <img alt="{\leq \sqrt n -1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cleq+%5Csqrt+n+-1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> then there is an easy way to color the graph with <img alt="{\sqrt n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Csqrt+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> colors (look at the vertices in any order, choose for each vertex a color not already used for the neighbors that have already been considered).</p>
-<p>What if there is some vertex <img alt="{v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> of degree <img alt="{\geq \sqrt n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cgeq+%5Csqrt+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>? Well, and this is the idea of the paper, the <em>neighbors of <img alt="{v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> must induce a bipartite subgraph</em>, so we can color the neighbors of <img alt="{v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> with 2 colors in a way that is consistent with all the edges between neighbors of <img alt="{v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, then remove the neighbors of <img alt="{v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and continue with the rest of the graph, committing to never use those two colors again. Every time we do this, we consume two colors but we get rid of <img alt="{\geq \sqrt n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cgeq+%5Csqrt+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> vertices, so this costs us at most <img alt="{2\sqrt n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%5Csqrt+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> colors. When we are done, all remaining vertices have degree <img alt="{\leq \sqrt n-1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cleq+%5Csqrt+n-1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and we just need <img alt="{\sqrt n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Csqrt+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> more colors as observed above.</p>
-<p>In total, we used at most <img alt="{3\sqrt n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B3%5Csqrt+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> colors.</p>
-<p>This remained the state of the art for approximate graph coloring for a few years, until Avrim Blum improved the bound for 3-colorable graphs to <img alt="{O(n^{0.4})}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28n%5E%7B0.4%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and then to <img alt="{O(n^{3/8})}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28n%5E%7B3%2F8%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> colors, using more sophisticated combinatorial arguments. Later, Karger, Motwani and Sudan devised an approximation algorithm that uses <img alt="{\tilde O(n^{1/4})}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctilde+O%28n%5E%7B1%2F4%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> colors to color 3-colorable graphs, and is based on a semidefinite programming relaxation of the coloring problem, which is related to the Lovasz <em>theta function</em>. It is still open whether there is a polynomial time algorithm that uses <img alt="{n^{o(1)}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%5E%7Bo%281%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> colors.</p>
-<p>The Lovasz theta function <img alt="{\theta (G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctheta+%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> of a graph <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is a convex relaxation of the maximum independent set problem in <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. It is, or it can be formulated as, a semidefinite programming relaxation of the maximum independent set problem, and so it can be computed (up to arbitrarily good accuracy) in polynomial time.</p>
-<p>Lovasz defined the theta function to study the <em>Shannon capacity of a graph</em>. This is a question that arises when one wants to find error-correcting codes for a channel that may introduce errors. Suppose that the channel carries an element of an alphabet <img alt="{V}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BV%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> of size <img alt="{n=|V|}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%3D%7CV%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, and that certain pairs of alphabet elements can be “confused” by the channel, meaning that for certain pairs <img alt="{\{ a,b \}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5C%7B+a%2Cb+%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> the channel may output <img alt="{b}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> given <img alt="{a}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Ba%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> or viceversa. If we construct the graph <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> whose vertex set is <img alt="{V}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BV%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and whose edges are the pairs of “confusable” pairs, then an independent set in this graph gives a set of length-1 codewords that are not confusable, and <img alt="{\log_2 \alpha(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clog_2+%5Calpha%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, where <img alt="{\alpha(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the size of a maximal independent set in <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, is the number of bits that we can transmit in an errorless way by making one use of the channel. If we can access the channel <img alt="{k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> times, then an errorless code is an independent set in <img alt="{G^k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%5Ek%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, the graph that has vertex set <img alt="{V^k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BV%5Ek%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and such that <img alt="{((a_1,\ldots,a_k),(b_1,\ldots,b_k))}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28%28a_1%2C%5Cldots%2Ca_k%29%2C%28b_1%2C%5Cldots%2Cb_k%29%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is an edge if and only if all the pairs <img alt="{(a_i,b_i)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28a_i%2Cb_i%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> are edges of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. The number of bits of information per channel use that we can send is</p>
-<p align="center"><img alt="\displaystyle  \frac 1k \log \alpha(G^k) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac+1k+%5Clog+%5Calpha%28G%5Ek%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> and so we are interested in</p>
-<p align="center"><img alt="\displaystyle  \lim_{k\rightarrow \infty} (\alpha (G^k))^{1/k} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Clim_%7Bk%5Crightarrow+%5Cinfty%7D+%28%5Calpha+%28G%5Ek%29%29%5E%7B1%2Fk%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> Nicely, we have</p>
-<p align="center"><img alt="\displaystyle  \theta (G^k) = (\theta(G))^k " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Ctheta+%28G%5Ek%29+%3D+%28%5Ctheta%28G%29%29%5Ek+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> so we have</p>
-<p align="center"><img alt="\displaystyle  \theta(G) \geq \lim_{k\rightarrow \infty} (\alpha (G^k))^{1/k} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Ctheta%28G%29+%5Cgeq+%5Clim_%7Bk%5Crightarrow+%5Cinfty%7D+%28%5Calpha+%28G%5Ek%29%29%5E%7B1%2Fk%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> and the theta function provides an upper bound to the Shannon capacity of a graph.</p>
-<p>If we compute <img alt="{\theta (\bar G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctheta+%28%5Cbar+G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, where <img alt="{\bar G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbar+G%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the complement of the graph <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> (that is, the graph whose edges are all the non-edges of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>), then we see that <img alt="{\theta(\bar G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctheta%28%5Cbar+G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is a relaxation of the maximum clique problem in <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. Remarkably, <img alt="{\theta(\bar G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctheta%28%5Cbar+G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is also a <em>lower bound</em> to the chromatic number of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, and so it is <em>sandwiched</em> between the clique number and the chromatic number. Don Knuth has used this fact as a starting point for a wonderful <a href="https://arxiv.org/abs/math/9312214">49-page treatise</a> on convex relaxations of the chromatic number and the clique number; here we will see a quick proof of this fact.</p>
-<p>As you can see in Knuth’s survey, there are several equivalent ways to define the theta function. Below we define <img alt="{\theta(\bar G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctheta%28%5Cbar+G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> as a natural semidefinite programming relaxation of the maximum clique problem (we have a variable <img alt="{x_0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> plus one variable <img alt="{x_v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_v%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> for every vertex <img alt="{v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>; all variables are vectors).</p>
-<p align="center"><img alt="\displaystyle \begin{array}{lr} \max \sum_{v\in V} || x_v||^2\\ s.t.\\ ||x_0||^2 = 1\\ \langle x_0,x_v \rangle = ||x_v||^2 &amp; \forall v\in V\\ \langle x_u,x_v \rangle = 0 &amp; \forall u\neq v: (u,v) \not\in E\\ \end{array}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+%5Cbegin%7Barray%7D%7Blr%7D+%5Cmax+%5Csum_%7Bv%5Cin+V%7D+%7C%7C+x_v%7C%7C%5E2%5C%5C+s.t.%5C%5C+%7C%7Cx_0%7C%7C%5E2+%3D+1%5C%5C+%5Clangle+x_0%2Cx_v+%5Crangle+%3D+%7C%7Cx_v%7C%7C%5E2+%26+%5Cforall+v%5Cin+V%5C%5C+%5Clangle+x_u%2Cx_v+%5Crangle+%3D+0+%26+%5Cforall+u%5Cneq+v%3A+%28u%2Cv%29+%5Cnot%5Cin+E%5C%5C+%5Cend%7Barray%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p>To see that it is a relaxation, given a clique <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, let <img alt="{x_0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> be any unit vector, and let <img alt="{x_v = x_0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_v+%3D+x_0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> for <img alt="{v\in K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%5Cin+K%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{x_v = {\bf 0}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_v+%3D+%7B%5Cbf+0%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> for <img alt="{v\not\in K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%5Cnot%5Cin+K%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. We satisfy all constraints and the objective function is <img alt="{|K|}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7CK%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>.</p>
-<p>If we write the semidefinite dual of the above relaxation, we can see that we get a minimization problem which is a relaxation of the chromatic number problem (and which is equivalent to the relaxation used by Karger, Motwani and Sudan to improve on Avi’s result on 3-coloring), so that the “sandwich theorem” follows from weak duality.</p>
-<p>The reader should try to write down the semidefinite dual and reason about why it relaxes the chromatic number problem. Below, we collapse the construction of the dual, the way of embedding colorings into dual solutions, and the proof of weak duality for semidefinite programming, into a short but mystifying “sum of squares” proof.</p>
-<p>Suppose that <img alt="{V = \{ v_1,\ldots,v_n \}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BV+%3D+%5C%7B+v_1%2C%5Cldots%2Cv_n+%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and let <img alt="{x_0,x_{v_1},\ldots,x_{v_n}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_0%2Cx_%7Bv_1%7D%2C%5Cldots%2Cx_%7Bv_n%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> be a feasible solution to the max clique relaxation defined above. Suppose that the graph is <img alt="{k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>-colorable and let <img alt="{(C_1,\ldots,C_k)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28C_1%2C%5Cldots%2CC_k%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> be a partition of <img alt="{V}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BV%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> into color classes. We have</p>
-<p align="center"><img alt="\displaystyle  0 \leq \sum_{i=1}^k \left \| -x_0 + \sum_{v\in C_i} x_v \right \|^2 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++0+%5Cleq+%5Csum_%7Bi%3D1%7D%5Ek+%5Cleft+%5C%7C+-x_0+%2B+%5Csum_%7Bv%5Cin+C_i%7D+x_v+%5Cright+%5C%7C%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p align="center"><img alt="\displaystyle  = \sum_{i=1}^k \left( || x_0||^2 - 2 \sum_{v\in C_i} \langle x_0 , x_v \rangle + \sum_{u,v \in C_i} \langle x_u, x_v\rangle \right) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%3D+%5Csum_%7Bi%3D1%7D%5Ek+%5Cleft%28+%7C%7C+x_0%7C%7C%5E2+-+2+%5Csum_%7Bv%5Cin+C_i%7D+%5Clangle+x_0+%2C+x_v+%5Crangle+%2B+%5Csum_%7Bu%2Cv+%5Cin+C_i%7D+%5Clangle+x_u%2C+x_v%5Crangle+%5Cright%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p align="center"><img alt="\displaystyle  = \sum_{i=1}^k \left( 1 - \sum_{v\in C_i} || x_v||^2 \right) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%3D+%5Csum_%7Bi%3D1%7D%5Ek+%5Cleft%28+1+-+%5Csum_%7Bv%5Cin+C_i%7D+%7C%7C+x_v%7C%7C%5E2+%5Cright%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p align="center"><img alt="\displaystyle  = k - \sum_{v\in V} ||x_v||^2 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%3D+k+-+%5Csum_%7Bv%5Cin+V%7D+%7C%7Cx_v%7C%7C%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> so that the objective function always satisfies</p>
-<p align="center"><img alt="\displaystyle  \sum_{v\in V} ||x_v||^2 \leq k " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_%7Bv%5Cin+V%7D+%7C%7Cx_v%7C%7C%5E2+%5Cleq+k+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> In particular, this is true for an optimal solution <img alt="{x_0,x_{v_1},\ldots,x_{v_k}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_0%2Cx_%7Bv_1%7D%2C%5Cldots%2Cx_%7Bv_k%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and for an optimal coloring, so we have that <img alt="{\theta(\bar G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctheta%28%5Cbar+G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is upper bounded by the chromatic number of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> as promised.</p>
-<p>Above, we used various properties of feasible solutions, such as <img alt="{||x_0||^2 = 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7C%7Cx_0%7C%7C%5E2+%3D+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, <img alt="{\langle x_0, x_v \rangle = ||x_v||^2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clangle+x_0%2C+x_v+%5Crangle+%3D+%7C%7Cx_v%7C%7C%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and</p>
-<p align="center"><img alt="\displaystyle  \sum_{u,v \in C_i } \langle x_u , x_v \rangle = \sum_{v\in C_i} || x_v||^2 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_%7Bu%2Cv+%5Cin+C_i+%7D+%5Clangle+x_u+%2C+x_v+%5Crangle+%3D+%5Csum_%7Bv%5Cin+C_i%7D+%7C%7C+x_v%7C%7C%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> which follows from the fact that each color class is an independent set, and so all inner products <img alt="{\langle x_u, x_v \rangle}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clangle+x_u%2C+x_v+%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> for <img alt="{u,v \in C_i, u\neq v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bu%2Cv+%5Cin+C_i%2C+u%5Cneq+v%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> have to be equal to zero, because <img alt="{(u,v) \not\in E}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28u%2Cv%29+%5Cnot%5Cin+E%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>.</p></div>
-    </content>
-    <updated>2021-03-18T13:22:19Z</updated>
-    <published>2021-03-18T13:22:19Z</published>
-    <category term="math"/>
-    <category term="theory"/>
-    <category term="things that are excellent"/>
-    <author>
-      <name>luca</name>
-    </author>
-    <source>
-      <id>https://lucatrevisan.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://lucatrevisan.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://lucatrevisan.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://lucatrevisan.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
-      <title>in   theory</title>
-      <updated>2021-04-02T14:37:15Z</updated>
+      <updated>2021-04-02T15:20:27Z</updated>
     </source>
   </entry>
 </feed>
