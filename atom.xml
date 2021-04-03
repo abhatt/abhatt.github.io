@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-04-03T14:22:47Z</updated>
+  <updated>2021-04-03T14:39:56Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,375 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://windowsontheory.org/?p=8067</id>
+    <link href="https://windowsontheory.org/2021/04/03/natural-language-processing-guest-lecture-by-sasha-rush/" rel="alternate" type="text/html"/>
+    <title>Natural Language Processing (guest lecture by Sasha Rush)</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Scribe notes by Benjamin Basseri and Richard Xu Previous post: Inference and statistical physics Next post: TBD. See also all seminar posts and course webpage. Alexander (Sasha) Rush is a professor at Cornell working in in Deep Learning / NLP. He applies machine learning to problems of text generation, summarizing long documents, and interactions between … <a class="more-link" href="https://windowsontheory.org/2021/04/03/natural-language-processing-guest-lecture-by-sasha-rush/">Continue reading <span class="screen-reader-text">Natural Language Processing (guest lecture by Sasha Rush)</span></a></div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><em>Scribe notes by Benjamin Basseri and <a href="https://github.com/rxu18">Richard Xu</a></em></p>
+
+
+
+<p><strong>Previous post:</strong> <a href="https://windowsontheory.org/2021/04/02/inference-and-statistical-physics/">Inference and statistical physics</a> <strong>Next post:</strong> TBD. See also <a href="https://windowsontheory.org/category/ml-theory-seminar/">all seminar posts</a> and <a href="https://boazbk.github.io/mltheoryseminar/cs229br.html#plan">course webpage</a>.</p>
+
+
+
+<p><a href="http://rush-nlp.com/">Alexander (Sasha) Rush</a> is a professor at Cornell working in in Deep Learning / NLP. He applies machine learning to problems of text generation, summarizing long documents, and interactions between character and word-based models. Sasha is previously at Harvard, where he taught an awesome NLP class, and we are excited to have him as our guest! (Note: some of the figures in this lecture are taken from other papers or presentations.)</p>
+
+
+
+<p>The first half of the talk will focus on how NLP works and what makes it interesting: a bird’s-eye view of the field. The second half of the talk will focus on current research.</p>
+
+
+
+<h2>Basics of NLP</h2>
+
+
+
+<p>Textual data has many different challenges that differ from computer vision (CV), since it is a human phenomenon. There are methods that work in computer vision / other ML models that just don’t work for NLP (e.g. GANs). As effective methods were found for computer vision around 2009-2014, we thought that these methods would also work well for NLP. While this was sometimes the case, it has not been true in general.</p>
+
+
+
+<p>What are the difficulties of working with natural language? Language works at different scales:</p>
+
+
+<div class="wp-block-syntaxhighlighter-code "><pre class="brush: plain; title: ; notranslate">word &lt; phrase &lt; sentence &lt; document &lt; ...
+</pre></div>
+
+
+<p>Here are examples of structure at each level:</p>
+
+
+
+<ol><li>Zipf’s Law: The frequency of any word is inversely proportional to its popularity rank.</li><li>Given the last <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> symbols, it is often possible to predict the next one (The Shannon Game).</li><li>Linguists have found many rules about syntax and semantics of a language.</li><li>In a document, we have lots of discourse between different sentences. For example, “it” or other pronouns are context dependent.</li></ol>
+
+
+
+<p>In NLP, we will talk about the <em>syntax</em> and <em>semantics</em> of a document. The syntax refers to how words can fit together, and semantics refers to the meaning of these words.</p>
+
+
+
+<h2>Language Modeling</h2>
+
+
+
+<p>There are many different NLP tasks such as sentiment analysis, question answering, named entity recognition, and translation. However, recent research shows that these tasks are often related to language modeling.</p>
+
+
+
+<p>Language modeling, as explained in Shannon 1948, aims to answer the following question: <em>Think of language as a stochastic process producing symbols. Given the last <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> symbols, can we predict the next one?</em></p>
+
+
+
+<p>This question is challenging as is. Consider the following example:</p>
+
+
+<div class="wp-block-syntaxhighlighter-code "><pre class="brush: plain; title: ; notranslate">A reading lamp on the desk shed glow on polished ___
+</pre></div>
+
+
+<p>There are many options: marble/desk/stone/engraving/etc., and it is already difficult to give a probability here. In general, language is hard to model because the next word can be connected to words from a long time ago.</p>
+
+
+
+<p>Shannon proposes variants of Markov models to perform this prediction, based on the last couple characters or the context in general.</p>
+
+
+
+<p>Since local context matters most, we assume that only the <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> most recent words matter. Then, we get the model<br/><img alt="p(w_{t+1}|w_{t-n},\ldots,w_t)=\frac{p(w_{t-n},\ldots,w_t,w_{t+1})}{p(w_{t-n},\ldots,w_t)}." class="latex" src="https://s0.wp.com/latex.php?latex=p%28w_%7Bt%2B1%7D%7Cw_%7Bt-n%7D%2C%5Cldots%2Cw_t%29%3D%5Cfrac%7Bp%28w_%7Bt-n%7D%2C%5Cldots%2Cw_t%2Cw_%7Bt%2B1%7D%29%7D%7Bp%28w_%7Bt-n%7D%2C%5Cldots%2Cw_t%29%7D.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<h3>Measuring Performance</h3>
+
+
+
+<p>As <a href="https://windowsontheory.org/2021/02/24/unsupervised-learning-and-generative-models/">we have seen in the generative models lecture</a>, we can use cross entropy as a loss function for density estimation models. Given model density distribution <img alt="q" class="latex" src="https://s0.wp.com/latex.php?latex=q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and true distribution <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, the cross entropy (which equals negative expected log-likelihood) is defined as follows:</p>
+
+
+
+<p><img alt="H(p, q) = - E_p \log q(w_t | w_1, \ldots , w_{t-1})" class="latex" src="https://s0.wp.com/latex.php?latex=H%28p%2C+q%29+%3D+-+E_p+%5Clog+q%28w_t+%7C+w_1%2C+%5Cldots+%2C+w_%7Bt-1%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>In NLP we tend to use the metric “perplexity”, which is the exponentiated negative cross entropy:</p>
+
+
+
+<p><img alt="ppl(p, q) = \exp -H(p, q)." class="latex" src="https://s0.wp.com/latex.php?latex=ppl%28p%2C+q%29+%3D+%5Cexp+-H%28p%2C+q%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>This corresponds to the equivalent vocabulary size of a uniformly distributed model. Lower perplexity means our model was closer to the underlying text distribution. As an example, the perplexity of the perfect dice-roll model would be 6.</p>
+
+
+
+<p>Why do we care about perplexity anyway?</p>
+
+
+
+<ol><li>With a good model we can determine the natural perplexity of a language, which is interesting.</li><li>Many NLP questions are language modeling with conditioning. Speech recognition is language modeling conditioned on some sound signal, and translation is language modeling conditioned on text from another language.</li><li>More importantly, we have found recent applications in <em>transfer learning</em>. That is, a language model can be trained on some (small) input data for a specific task. Then, such a model becomes effective at the given task!</li></ol>
+
+
+
+<figure class="wp-block-image"><img alt="Transferring" src="https://i.imgur.com/euYVjaG.png"/></figure>
+
+
+
+<p>A few years ago, the best perplexity on WSJ text was 150. Nowadays, it is about 20! To understand how we got here, we look at modern language modeling.</p>
+
+
+
+<h2>Predicting the next word</h2>
+
+
+
+<p>We start with the model</p>
+
+
+
+<p><img alt="p(w_t | w_{1:t-1}; \theta) = softmax(\mathbf{W}\phi(w_{1:t-1}; \theta))." class="latex" src="https://s0.wp.com/latex.php?latex=p%28w_t+%7C+w_%7B1%3At-1%7D%3B+%5Ctheta%29+%3D+softmax%28%5Cmathbf%7BW%7D%5Cphi%28w_%7B1%3At-1%7D%3B+%5Ctheta%29%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>(The softmax function maps a vector <img alt="\vec{v}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvec%7Bv%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> into the probability distribution <img alt="\vec{p}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvec%7Bp%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> such that <img alt="p_i \propto \exp(v_i)" class="latex" src="https://s0.wp.com/latex.php?latex=p_i+%5Cpropto+%5Cexp%28v_i%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. That is, <img alt="p_i = \exp(v_i)/\sum_j \exp(v_j)" class="latex" src="https://s0.wp.com/latex.php?latex=p_i+%3D+%5Cexp%28v_i%29%2F%5Csum_j+%5Cexp%28v_j%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Note that this is a Boltzman distribution of the type we saw in the <a href="https://windowsontheory.org/2021/04/02/inference-and-statistical-physics/">statistical physics and variational algorithms</a> lecture)</p>
+
+
+
+<p>We call <strong>W</strong> the output word embeddings, <img alt="\phi" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cphi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is some neural basis (e.g. <img alt="\phi" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cphi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> are all but the final layers of a neural net with weights <img alt="\theta" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctheta&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, and <strong>W</strong> is the final layer). However, this means to use softmax to predict requires computing softmax over every word in your vocabulary (tens or hundreds of thousands). This was often infeasible until GPU computing became available.</p>
+
+
+
+<p>As an aside, why not predict characters instead of words? The advantage is that there are much fewer characters than words. However, computation with characters is slower. Empirically, character-based models tend to perform worse than word-based. However, character-based models can handle words outside the vocabulary.</p>
+
+
+
+<p><a href="https://en.wikipedia.org/wiki/Byte_pair_encoding">Byte-pair encoding</a> offers a bridge between character and word models. This greedily builds up new tokens as repetitive patterns are found in the original text.</p>
+
+
+
+<p>In the last decade NLP has seen a few dominant architectures, all using SGD but with varying bases. First, we must cast the words as one-hot vectors, then embed them into vector space:<br/><img alt="x_t = Vw_t," class="latex" src="https://s0.wp.com/latex.php?latex=x_t+%3D+Vw_t%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/><br/>where <img alt="w_t" class="latex" src="https://s0.wp.com/latex.php?latex=w_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is the one-hot encoded vector and <img alt="V" class="latex" src="https://s0.wp.com/latex.php?latex=V&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is the learned embedding transformation.</p>
+
+
+
+<h3>NNLM</h3>
+
+
+
+<p>NNLM (Neural Network Language Model) is like a CNN. The model predicts on possibly multiple NN transformations:<br/><img alt="\phi(w_{1:t-1}; \theta) = \sigma(U[x_{t-k-1} \oplus \ldots \oplus x_{t-1}]])," class="latex" src="https://s0.wp.com/latex.php?latex=%5Cphi%28w_%7B1%3At-1%7D%3B+%5Ctheta%29+%3D+%5Csigma%28U%5Bx_%7Bt-k-1%7D+%5Coplus+%5Cldots+%5Coplus+x_%7Bt-1%7D%5D%5D%29%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>where <img alt="\oplus" class="latex" src="https://s0.wp.com/latex.php?latex=%5Coplus&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> denotes concatenation, <img alt="U" class="latex" src="https://s0.wp.com/latex.php?latex=U&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is some convolutional filter and <img alt="\sigma" class="latex" src="https://s0.wp.com/latex.php?latex=%5Csigma&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is the activation function. This has the benefit of learning fast. The matrices it learns also transfer well.</p>
+
+
+
+<p>As an example, GloVe is a NNLM-inspired model. It stores the words in 300-dimensional space. When we project the some words to 2-dimensions using PCA, we find semantic information in the language model.</p>
+
+
+
+<figure class="wp-block-image"><img alt="Language structure" src="https://i.imgur.com/wesRAtM.png"/></figure>
+
+
+
+<h3>Recurrent Models</h3>
+
+
+
+<p>A recurrent model uses a fixed set of previous words to predict the next word. A recurrent network uses all previous words:<br/><img alt="\phi(w_{1:t-1}; \theta) = \sigma(U[x_{t-1}\oplus \phi(w_{1:t-2};\theta)])." class="latex" src="https://s0.wp.com/latex.php?latex=%5Cphi%28w_%7B1%3At-1%7D%3B+%5Ctheta%29+%3D+%5Csigma%28U%5Bx_%7Bt-1%7D%5Coplus+%5Cphi%28w_%7B1%3At-2%7D%3B%5Ctheta%29%5D%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>Previous information is ‘summarized’ in the <img alt="\phi" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cphi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> on the right, so this model uses finite memory. Below is an illustration of the recurrent neural network.</p>
+
+
+
+<figure class="wp-block-image"><img alt="RNN Explanation" src="https://i.imgur.com/iVl2dqZ.png"/></figure>
+
+
+
+<p>Since the recurrent model uses the full context, it is a more plausible model for how we really process language. Furthermore, the introduction of RNN saw drastically improved performance. In the graph below, the items in the chart are performances from previous NNLMs. The recurrent network performance is “off the chart”.</p>
+
+
+
+<figure class="wp-block-image"><img alt="RNN Performance" src="https://i.imgur.com/v5rgNeQ.png"/></figure>
+
+
+
+<p>However, the model grows with sequence length. This requires gradient flow to backpropagate over arbitrarily long sequences, and often required baroque network designs to facilitate longer sequences while avoiding exploding/vanishing gradients.</p>
+
+
+
+<h3>Attentional Models</h3>
+
+
+
+<p>To understand modern NLP we must look at <a href="https://en.wikipedia.org/wiki/Attention_(machine_learning)">attention</a>. For a set of vectors <img alt="v" class="latex" src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, keys <img alt="k_1, \ldots, k_T" class="latex" src="https://s0.wp.com/latex.php?latex=k_1%2C+%5Cldots%2C+k_T&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and a query <img alt="q" class="latex" src="https://s0.wp.com/latex.php?latex=q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, we define attention as</p>
+
+
+
+<p><img alt="Att(q, k, v) = \sum_t \alpha_t v_t" class="latex" src="https://s0.wp.com/latex.php?latex=Att%28q%2C+k%2C+v%29+%3D+%5Csum_t+%5Calpha_t+v_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>where <img alt="\alpha = softmax(q\cdot k_1 \oplus \ldots \oplus q \cdot k_T)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Calpha+%3D+softmax%28q%5Ccdot+k_1+%5Coplus+%5Cldots+%5Coplus+q+%5Ccdot+k_T%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>Here, <img alt="\alpha" class="latex" src="https://s0.wp.com/latex.php?latex=%5Calpha&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> can be considered a probability density of the model’s ‘memory’ of the sequence. The model decides which words are important by combining <img alt="\alpha" class="latex" src="https://s0.wp.com/latex.php?latex=%5Calpha&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and <img alt="v" class="latex" src="https://s0.wp.com/latex.php?latex=v&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>The <em>attentional model</em> can be fully autoregressive (use all previously seen words), and the query <img alt="q" class="latex" src="https://s0.wp.com/latex.php?latex=q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> can be learned or be specific to an input. In general, we have:<br/><img alt="\phi(w_{1:t-1}; \theta) = \sigma(U[Att(q, x_{1:t-1}, x_{1:t-1})])" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cphi%28w_%7B1%3At-1%7D%3B+%5Ctheta%29+%3D+%5Csigma%28U%5BAtt%28q%2C+x_%7B1%3At-1%7D%2C+x_%7B1%3At-1%7D%29%5D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>Since we condense all previous information into the attention mechanism, it is simpler to backpropagate.<br/>In particular attention enables looking at information from a large context without paying for this in the depth of the network and hence in the depth of back-propagation you need to cover. (Boaz’s note: With my crypto background, attention reminds me of the design of <a href="https://en.wikipedia.org/wiki/Block_cipher">block ciphers</a>, which use linear operations to mix between far away parts of the inputs, and then apply non-liearity locally to each small parts.)</p>
+
+
+
+<p>Note that attention is defined with respect to a set of vectors. There is no idea of positional information in the attentional model. How do we encode positional information for the model? One way to do this is using <em>sinusoidal encoding</em> in the keys. We store the word <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> as <img alt="\cos(\pi n/k)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ccos%28%5Cpi+n%2Fk%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> for some period <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Notice that if we choose many different periods, then the cosine ways will almost never meet at the same point. As a result, only recent points will have high dot products between the different cosine values.</p>
+
+
+
+<figure class="wp-block-image"><img alt="Sinusoidal" src="https://i.imgur.com/kAnYjAP.png"/></figure>
+
+
+
+<h3>Transformers</h3>
+
+
+
+<p>A transformer is a stacked attention model. Computation in one layer becomes query, keys and values for the next layer. This is a multiheaded attention model. We learn <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> projections for each query/key (generally between 8 and 32) then do softmax across these projections:<br/><img alt="\alpha^h = softmax((W^{(h)}q)\cdot(V^{(h)}k_1)\oplus \ldots \oplus (W^{(h)}q)\cdot(V^{(h)}k_T))." class="latex" src="https://s0.wp.com/latex.php?latex=%5Calpha%5Eh+%3D+softmax%28%28W%5E%7B%28h%29%7Dq%29%5Ccdot%28V%5E%7B%28h%29%7Dk_1%29%5Coplus+%5Cldots+%5Coplus+%28W%5E%7B%28h%29%7Dq%29%5Ccdot%28V%5E%7B%28h%29%7Dk_T%29%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<figure class="wp-block-image"><img alt="Transformer Architecture" src="https://i.imgur.com/uUp2elD.png"/></figure>
+
+
+
+<p>These heads can be computed in parallel and can be implemented with batch matrix multiplication. As a result, transformers can be massively scaled and are extremely efficient in modern hardware. This has led these models to be very dominant in the field. Here are some example models:</p>
+
+
+
+<ol><li>GPT-1,2,3 are able to generate text that is quite convincing to a human. They also handle the syntax and semantics of a language quite well.</li><li>BERT is a transformer-based model that examines text both forwards and backwards in making its predictions. It works well with transfer fining tuning: train on a large data set, then take the feature representations and train a task on top of the learned representation.</li></ol>
+
+
+
+<h2>Scaling</h2>
+
+
+
+<p>In recent years we have had larger and larger models, from GPT1’s 110 million to GPT3’s 175 billion.</p>
+
+
+
+<figure class="wp-block-image"><img alt="Scaling Up" src="https://i.imgur.com/8drDknV.png"/></figure>
+
+
+
+<p>On these massive scales, scaling has become a very interesting issue: how do we process more samples? How do we run distributed computation? How much autoregressive input should each model looks at?</p>
+
+
+
+<p>For a model like BERT, most of the cost still comes from feed-forward network — mostly matrix multiplications. These are tasks we are familiar with and can scale up.</p>
+
+
+
+<p>One question is to have long-range attentional lookup, which is important for language modeling. For now, models often look at most 512 words back. Can we do longer range lookups? One approach to this is kernel feature attention.</p>
+
+
+
+<h3>Kernel Feature Attention</h3>
+
+
+
+<p>Recall that we have <img alt="\alpha=\mathrm{softmax}(q\cdot k_i)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Calpha%3D%5Cmathrm%7Bsoftmax%7D%28q%5Ccdot+k_i%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Can we approximate this with some kernel <img alt="K" class="latex" src="https://s0.wp.com/latex.php?latex=K&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>? The main approach is that <img alt="\alpha\propto \exp(q\cdot k_i)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Calpha%5Cpropto+%5Cexp%28q%5Ccdot+k_i%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, which we approximate with the kernel <img alt="\exp(v_1\cdot v_2)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cexp%28v_1%5Ccdot+v_2%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. There is a rich literature on approximating <img alt="K" class="latex" src="https://s0.wp.com/latex.php?latex=K&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> where<br/><img alt="K(v_1, v_2) \approx \phi(v_1)\cdot\phi(v_2)" class="latex" src="https://s0.wp.com/latex.php?latex=K%28v_1%2C+v_2%29+%5Capprox+%5Cphi%28v_1%29%5Ccdot%5Cphi%28v_2%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>for some transfomration <img alt="\phi" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cphi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Then, we can try to approximate <img alt="K" class="latex" src="https://s0.wp.com/latex.php?latex=K&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> with linear features.</p>
+
+
+
+<p>Practically, transformers do well but are slower. For longer texts, we have faster models that do slightly worse. A recent model called <a href="https://arxiv.org/abs/2009.14794">performer</a> is such an example.<br/><img alt="LRA Performance" src="https://i.imgur.com/S3vs2o5.png"/></p>
+
+
+
+<h3>Scaling Down</h3>
+
+
+
+<p>Ultimately, we want to make models run on “non Google scale” hardware once it has been trained to a specific task. This can often require scaling down.</p>
+
+
+
+<p>One approach is to prune weights according to their magnitude. However, since models are often overparameterized and weights do not move much, the weights that get pruned according to this method are usually the weights that were simply initialized closest to 0. In the diagram below, we can consider only leaving the orange weights and cutting out the gray.</p>
+
+
+
+<figure class="wp-block-image"><img alt="Pruning" src="https://i.imgur.com/MqY5jK2.png"/></figure>
+
+
+
+<p>Another approach is to mask out the weights that are unnecessary for a specific task, if you’re trying to ship a model for a specific task.</p>
+
+
+
+<h2>Research Questions</h2>
+
+
+
+<p>Two major lines of research dominate NLP today:</p>
+
+
+
+<ol><li>Attention / Transformer architecture,</li><li>Pretraining with language modeling as a deep learning paradigm.</li></ol>
+
+
+
+<p>We are also in a space race to produce efficient models with more parameters, given how much scaling has been effective.</p>
+
+
+
+<p>The paper <a href="https://arxiv.org/abs/2010.00854">Which BERT</a> classifies modern questions in NLP into the following categories:</p>
+
+
+
+<ol><li><strong>Tasks:</strong> Is (masked) language modeling the best task for pretraining? Language modeling emphasizes local information. We could imagine doing other types of denoising. See also <a href="https://openai.com/blog/dall-e/">DALL-E</a>.</li><li><strong>Efficiency:</strong> We see that much fewer parameters are needed in practice after pruning. Does pruning lose something? Pruned models tend to do well on in-sample data, but out-of-sample data tends to make the pruned model do worse.</li><li><strong>Data:</strong> How does data used in pretraining impact task accuracy? How does the data of pretraining impact task bias?</li><li><strong>Interpretability:</strong> What does BERT know, and how can we determine this? Does interpretability need to come at a cost to performance?</li><li><strong>Multilinguality:</strong> Many languages don’t have the same amount of data as English. What methods apply when we have less data?</li></ol>
+
+
+
+<h2>Q&amp;A</h2>
+
+
+
+<p>We have many questions asked during and after lecture. Here are some of the questions.</p>
+
+
+
+<ol><li><strong>Q:</strong> Should we say GANs fail at NLP or that other generative models are more advanced in NLP than in CV? <strong>A:</strong> One argument is that language is a human generated system, there are some inherent structures that help with generation. We can do language in left-to-right, but in CV this would be a lot more difficult. At the same time, this can change in the future!</li><li><strong>Q:</strong> Why are computer vision and NLP somewhat close to each other? <strong>A:</strong> classically, they are both perception-style tasks under AI. Also, around 2014 we had lots of ideas that come from porting CV ideas into NLP, and recently we have seen NLP ideas ported to CV.</li><li><strong>Q:</strong> Since languages have unique grammars, is NLP better at some languages? Do we have to translate language to an “NLP-effective” language and back? <strong>A:</strong> In the past, some languages are better. Ex: we used to struggle with Japanese to other languages but do well with English to other languages. However, modern models are <em>extremely</em> data driven, so we have needed much less hardcoding.</li><li><strong>Q:</strong> Have we done any scatter plot of the form (data available for language X, performance on X) to see if performance is just a function of available data? <strong>A:</strong> Not right now, but these plots can potentially be really cool! Multilinguality is a broad area of research in general.</li><li><strong>Q:</strong> What are some NLP techniques for low-resource languages? <strong>A:</strong> Bridging is commonly used. Iterative models (translate and translate back with some consistency) is also used to augment the data.</li><li><strong>Q:</strong> Do you think old-school parsers will make a comeback? <strong>A:</strong> Unlikely to deploy parsers, but the techniques of parsing is interesting.</li><li><strong>Q:</strong> Given the large number of possible “correct” answers, has there been work on which “contexts” are most informative? <strong>A:</strong> Best context is the closest context, which is expected. The other words matter but matter a lot less.</li><li><strong>Q:</strong> Is there any model that captures the global structure first (e.g. an outline) before writing sequentially, like humans do when they write longer texts? <strong>A:</strong> Currently no. Should be possible, but we do not have data about the global structure of writing.</li><li><strong>Q:</strong> Why is our goal density estimation? <strong>A:</strong> It is useful because it tells us how “surprising” the next word is. This is also related to why a language feels “fast” when you first learn it: because you are not familiar with the words, you cannot anticipate the next words.</li><li><strong>Q:</strong> Why is lower perplexity better? <strong>A:</strong> Recall from past talk that lower cross-entropy means less distance between <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and <img alt="q" class="latex" src="https://s0.wp.com/latex.php?latex=q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, and intuitive you have more “certainty”.</li><li><strong>Q:</strong> Is the reason LM so important because evaluations are syntax-focused? <strong>A:</strong> Evaluations are actually more semantically focused, but syntax and semantics are quite connected.</li><li><strong>Q:</strong> Do we see attentional models in CV? <strong>A:</strong> Yes, we have seen more use of transformer in CV. In a standard model we use data only recently, and here we get to work with data across space and time. As such, we will need to encode time positionally.</li><li><strong>Q:</strong> Why is attention generalized convolution? <strong>A:</strong> If you have attention with all mass in the local area, that’s probably like convolution.</li><li><strong>Q:</strong> How do we compare heads with depth? e.g. Is having 5 heads better than 5x depth? <strong>A:</strong> when we use heads we add a lot less parameters. As such, we can parallelize heads and increase performance.</li><li><strong>Q:</strong> Do you think transformers are the be-all end-all of NLP models? <strong>A:</strong> Maybe. To dethrone transformers, you have to both show similar work on small-scale and show that it can be scaled easily.</li><li><strong>Q:</strong> How does simplicity bias affect these transferrable models? <strong>A:</strong> surprising and we are not sure. In CV we found that the models quickly notice peculiarities in the data (e.g. how mechanical turks are grouped), but the models do work.</li><li><strong>Q:</strong> We get bigger models every year and better performance. Will this end soon? <strong>A:</strong> Probably not, as it seems like having more parameters helps it recognize some additional features.</li><li><strong>Q:</strong> If we prune models to the same size, will they have the same performance? <strong>A:</strong> for small models we can seem to prune them, but for the bigger models it is hard to run them in academica given the computational resource constraints.</li><li><strong>Q:</strong> When we try to remember something from a long time ago we would look up a textbook / etc. Have we had similar approaches in practice? <strong>A:</strong> transformer training is static at first, and tasks happen later. So, we have to decide how to throw away information before we train on the tasks.</li><li><strong>Q:</strong> Are better evaluation metrics an important direction for future research? <strong>A:</strong> Yes — this has been the case for the past few years in academia.</li><li><strong>Q:</strong> What is a benchmark/task where you think current models show deep lack of capability? <strong>A:</strong> During generation, models don’t seem to distinguish between information that makes it “sound good” and factually correct information.</li></ol></div>
+    </content>
+    <updated>2021-04-03T14:37:39Z</updated>
+    <published>2021-04-03T14:37:39Z</published>
+    <category term="ML Theory seminar"/>
+    <author>
+      <name>Boaz Barak</name>
+    </author>
+    <source>
+      <id>https://windowsontheory.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://windowsontheory.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://windowsontheory.org" rel="alternate" type="text/html"/>
+      <link href="https://windowsontheory.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>A Research Blog</subtitle>
+      <title>Windows On Theory</title>
+      <updated>2021-04-03T14:38:22Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>https://11011110.github.io/blog/2021/04/02/islands</id>
@@ -673,7 +1042,7 @@
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-03T14:21:10Z</updated>
+      <updated>2021-04-03T14:38:23Z</updated>
     </source>
   </entry>
 
@@ -727,7 +1096,7 @@
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-04-03T14:20:11Z</updated>
+      <updated>2021-04-03T14:37:17Z</updated>
     </source>
   </entry>
 
@@ -1718,7 +2087,7 @@ a greedy algorithm is a 2-approximation when items have the same size.
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-03T14:21:08Z</updated>
+      <updated>2021-04-03T14:38:21Z</updated>
     </source>
   </entry>
 
@@ -1779,7 +2148,7 @@ a greedy algorithm is a 2-approximation when items have the same size.
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-03T14:20:27Z</updated>
+      <updated>2021-04-03T14:37:38Z</updated>
     </source>
   </entry>
 
@@ -1930,7 +2299,7 @@ If you see a market for NFTs, do you see one for SFTs—or are they both April F
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-03T14:20:44Z</updated>
+      <updated>2021-04-03T14:37:49Z</updated>
     </source>
   </entry>
 
@@ -2121,7 +2490,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-03T14:20:43Z</updated>
+      <updated>2021-04-03T14:37:49Z</updated>
     </source>
   </entry>
 
@@ -2168,7 +2537,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-03T14:21:07Z</updated>
+      <updated>2021-04-03T14:38:19Z</updated>
     </source>
   </entry>
 
@@ -2243,7 +2612,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://dstheory.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://dstheory.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Foundation of Data Science – Virtual Talk Series</title>
-      <updated>2021-04-03T14:22:31Z</updated>
+      <updated>2021-04-03T14:39:48Z</updated>
     </source>
   </entry>
 
@@ -2269,7 +2638,7 @@ We also point out that as a consequence of the recent work on WPRGs, any randomi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-03T14:20:27Z</updated>
+      <updated>2021-04-03T14:37:38Z</updated>
     </source>
   </entry>
 
@@ -2359,7 +2728,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-03T14:20:44Z</updated>
+      <updated>2021-04-03T14:37:49Z</updated>
     </source>
   </entry>
 
@@ -2405,7 +2774,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-03T14:20:27Z</updated>
+      <updated>2021-04-03T14:37:38Z</updated>
     </source>
   </entry>
 
@@ -2534,7 +2903,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-04-03T14:22:46Z</updated>
+      <updated>2021-04-03T14:39:55Z</updated>
     </source>
   </entry>
 
@@ -2735,7 +3104,7 @@ In addition, we prove a similar bound for noisy decision trees of cost at most $
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-03T14:20:27Z</updated>
+      <updated>2021-04-03T14:37:38Z</updated>
     </source>
   </entry>
 
@@ -2766,7 +3135,7 @@ In addition, we prove a similar bound for noisy decision trees of cost at most $
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-04-03T14:21:44Z</updated>
+      <updated>2021-04-03T14:39:03Z</updated>
     </source>
   </entry>
 
@@ -2853,7 +3222,7 @@ Here is an <a href="https://www.newton.ac.uk/science/outreach/women/six-question
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-03T14:20:43Z</updated>
+      <updated>2021-04-03T14:37:49Z</updated>
     </source>
   </entry>
 
@@ -2941,7 +3310,7 @@ Here is an <a href="https://www.newton.ac.uk/science/outreach/women/six-question
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-04-03T14:20:36Z</updated>
+      <updated>2021-04-03T14:37:41Z</updated>
     </source>
   </entry>
 
@@ -3011,7 +3380,7 @@ Prior to our work, the only polynomial-time or even subexponential-time algorith
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-03T14:20:27Z</updated>
+      <updated>2021-04-03T14:37:38Z</updated>
     </source>
   </entry>
 
@@ -3037,7 +3406,7 @@ In this paper, we explore the following natural heuristic idea for decreasing th
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-03T14:20:27Z</updated>
+      <updated>2021-04-03T14:37:38Z</updated>
     </source>
   </entry>
 
@@ -3065,7 +3434,7 @@ Email: application@dimacs.rutgers.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-04-03T14:20:47Z</updated>
+      <updated>2021-04-03T14:37:52Z</updated>
     </source>
   </entry>
 
@@ -3238,7 +3607,7 @@ Of course we <a href="https://www.nytimes.com/2021/03/17/science/abel-prize-math
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-03T14:20:44Z</updated>
+      <updated>2021-04-03T14:37:49Z</updated>
     </source>
   </entry>
 
@@ -3266,7 +3635,7 @@ The main conceptual contribution of this work is to establish that the existence
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-03T14:20:27Z</updated>
+      <updated>2021-04-03T14:37:38Z</updated>
     </source>
   </entry>
 
@@ -3329,7 +3698,7 @@ The main conceptual contribution of this work is to establish that the existence
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-04-03T14:20:11Z</updated>
+      <updated>2021-04-03T14:37:17Z</updated>
     </source>
   </entry>
 
@@ -3356,7 +3725,7 @@ Email: berufungen@tuhh.de</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-04-03T14:20:47Z</updated>
+      <updated>2021-04-03T14:37:52Z</updated>
     </source>
   </entry>
 
@@ -3392,43 +3761,6 @@ Email: berufungen@tuhh.de</p></div>
       <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
       <title xml:lang="en-US">Shtetl-Optimized</title>
       <updated>2021-03-22T23:54:23Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-3722233.post-9101842177146636334</id>
-    <link href="https://blog.computationalcomplexity.org/feeds/9101842177146636334/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2021/03/i-read-news-today-oh-boy.html#comment-form" rel="replies" type="text/html"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/9101842177146636334" rel="edit" type="application/atom+xml"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/9101842177146636334" rel="self" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2021/03/i-read-news-today-oh-boy.html" rel="alternate" type="text/html"/>
-    <title>I read the news today oh boy</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p/><div class="separator" style="clear: both; text-align: center;"><a href="https://1.bp.blogspot.com/-NMc_aH4Gb9o/YFJR2J9R5BI/AAAAAAAB61M/Mez6sk3EWO4mP5AZxnxUM_JszhYdaNZvACLcBGAsYHQ/s400/lovasz.jpg" style="margin-left: 1em; margin-right: 1em;"><img border="0" height="150" src="https://1.bp.blogspot.com/-NMc_aH4Gb9o/YFJR2J9R5BI/AAAAAAAB61M/Mez6sk3EWO4mP5AZxnxUM_JszhYdaNZvACLcBGAsYHQ/w200-h150/lovasz.jpg" width="200"/></a><div class="separator" style="clear: both; text-align: center;"><a href="https://1.bp.blogspot.com/-PzuRktxYKx4/YFJR4Z5NBrI/AAAAAAAB61Q/imp2GYxDJWwYxffkU9deF93T3-lA7m-ZgCLcBGAsYHQ/s260/avi.jpg" style="margin-left: 1em; margin-right: 1em;"><img border="0" height="149" src="https://1.bp.blogspot.com/-PzuRktxYKx4/YFJR4Z5NBrI/AAAAAAAB61Q/imp2GYxDJWwYxffkU9deF93T3-lA7m-ZgCLcBGAsYHQ/w200-h149/avi.jpg" width="200"/></a></div></div><br/><br/>I'm absolutely elated that <a href="https://www.abelprize.no/c76389/seksjon/vis.html?tid=76390&amp;strukt_tid=76389">Lázló Lovász and Avi Wigderson won the Abel Prize</a>. More from the <a href="https://www.nytimes.com/2021/03/17/science/abel-prize-mathematics.html">New York Times</a>, <a href="https://www.quantamagazine.org/avi-wigderson-and-laszlo-lovasz-win-abel-prize-20210317/">Quanta Magazine</a> and <a href="https://gilkalai.wordpress.com/2021/03/17/cheerful-news-in-difficult-times-the-abel-prize-is-awarded-to-laszlo-lovasz-and-avi-wigderson/">Gil Kalai</a>. Another example of how complexity theory and theoretical computer science has reached the upper echelons of mathematics.<p/><p>I'm horrified of the <a href="https://www.nbcnews.com/news/us-news/3-dead-shooting-georgia-massage-parlor-suspect-loose-n1261262">spa shootings in Atlanta</a>. I've driven by those spas many times when I lived there. </p><p>I'm saddened by the <a href="https://www.mills.edu/announcement/index.php">closing of Mills College</a> in Oakland, California. I lived in a dorm Berkeley rented at Mills College during my <a href="https://blog.computationalcomplexity.org/2006/04/one-miserable-year.html">crazy year there</a>.</p><p>I've got mixed emotions about the <a href="https://www.nytimes.com/2021/03/17/obituaries/james-levine-dead.html">death of James Levine</a>. What he did musically with the Metropolitan opera and orchestra was nothing short of incredible. What he did to the young people he abused is inexcusable. I remember watching a Met taped videocast of Die Walküre with my daughter, enjoying the production but telling her "Do you realize we are watching an opera composed by an anti-Semite and conducted by a child molester?"  Can you separate art from artist?</p></div>
-    </content>
-    <updated>2021-03-17T19:57:00Z</updated>
-    <published>2021-03-17T19:57:00Z</published>
-    <author>
-      <name>Lance Fortnow</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-3722233</id>
-      <category term="typecast"/>
-      <category term="focs metacomments"/>
-      <author>
-        <name>Lance Fortnow</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-      </author>
-      <link href="https://blog.computationalcomplexity.org/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default" rel="self" type="application/atom+xml"/>
-      <link href="https://blog.computationalcomplexity.org/" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
-      <title>Computational Complexity</title>
-      <updated>2021-04-03T06:52:55Z</updated>
     </source>
   </entry>
 </feed>
