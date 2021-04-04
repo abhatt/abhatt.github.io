@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-04-04T18:39:18Z</updated>
+  <updated>2021-04-04T19:22:00Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,160 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>https://www.scottaaronson.com/blog/?p=5402</id>
+    <link href="https://www.scottaaronson.com/blog/?p=5402" rel="alternate" type="text/html"/>
+    <link href="https://www.scottaaronson.com/train1.MOV" length="1003960" rel="enclosure" type="video/quicktime"/>
+    <link href="https://www.scottaaronson.com/yjunctions.MOV" length="22264409" rel="enclosure" type="video/quicktime"/>
+    <link href="https://www.scottaaronson.com/blog/?p=5402#comments" rel="replies" type="text/html"/>
+    <link href="https://www.scottaaronson.com/blog/?feed=atom&amp;p=5402" rel="replies" type="application/atom+xml"/>
+    <title xml:lang="en-US">The Computational Expressiveness of a Model Train Set: A Paperlet</title>
+    <summary xml:lang="en-US">My son Daniel had his fourth birthday a couple weeks ago. For a present, he got an electric train set. (For completeness—and since the details of the train set will be rather important to the post—it’s called “WESPREX Create a Dinosaur Track”, but this is not an ad and I’m not getting a kickback for […]</summary>
+    <content type="xhtml" xml:lang="en-US"><div xmlns="http://www.w3.org/1999/xhtml"><p>My son Daniel had his fourth birthday a couple weeks ago.  For a present, he got an electric train set.  (For completeness—and since the details of the train set will be rather important to the post—it’s called <a href="https://www.amazon.com/Dinosaur-Flexible-Tracks-Create-Children/dp/B07ZDLXSXK">“WESPREX Create a Dinosaur Track”</a>, but this is not an ad and I’m not getting a kickback for it.)</p>
+
+
+
+<figure class="wp-block-video"><video src="https://www.scottaaronson.com/yjunctions.MOV"/></figure>
+
+
+
+<p>As you can see, the main feature of this set is a Y-shaped junction, which has a flap that can control which direction the train goes.  The logic is as follows:</p>
+
+
+
+<ul><li>If the train is coming up from the “bottom” of the Y, then it continues to either the left arm or the right arm, depending on where the flap is.  It leaves the flap as it was.</li></ul>
+
+
+
+<ul><li>If the train is coming down the left or right arms of the Y, then it continues to the bottom of the Y, <em>pushing the flap out of its way if it’s in the way</em>.  (Thus, if the train were ever to return to this Y-junction coming up from the bottom, not having passed the junction in the interim, it would necessarily go to the same arm, left or right, that it came down from.)</li></ul>
+
+
+
+<p>The train set also comes with bridges and tunnels; thus, there’s no restriction of planarity.  Finally, the train set comes with little gadgets that can reverse the train’s direction, sending it back in the direction that it came from:</p>
+
+
+
+<figure class="wp-block-video"><video src="https://www.scottaaronson.com/train1.MOV"/></figure>
+
+
+
+<p>These gadgets don’t seem particularly important, though, since we could always replace them if we wanted by a Y-junction together with a loop.</p>
+
+
+
+<p>Notice that, at each Y-junction, the position of the flap stores one bit of internal state, and that the train can both “read” and “write” these bits as it moves around.  Thus, a question naturally arises: can this train set do any nontrivial computations?  If there are <em>n</em> Y-junctions, then can it cycle through exp(<em>n</em>) different states?  Could it even solve <strong>PSPACE</strong>-complete problems, if we let it run for exponential time?  (For a very different example of a model-train-like system that, as it turns out, <em>is</em> able to express <strong>PSPACE</strong>-complete problems, see <a href="https://arxiv.org/abs/1905.00518">this recent paper</a> by Erik Demaine et al.)</p>
+
+
+
+<p>Whatever the answers regarding Daniel’s train set, I knew immediately on watching the thing go that I’d have to write a “paperlet” on the problem and publish it on my blog (no, I don’t inflict such things on journals!).  Today’s post constitutes my third “paperlet,” on the general theme of a discrete dynamical system that someone showed me in real life (e.g. in a children’s toy or in biology) having more structure and regularity than one might naïvely expect.  My first such paperlet, from 2014, was <a href="https://www.scottaaronson.com/blog/?p=1902">on a 1960s toy called the Digi-Comp II</a>; my second, from 2016, was <a href="https://www.scottaaronson.com/blog/?p=2862">on DNA strings acted on by recombinase</a> (OK, that one <em>was</em> associated with a <a href="https://science.sciencemag.org/content/353/6297/aad8559.full?ijkey=wzroPPh1eIu9k&amp;keytype=ref&amp;siteid=sci">paper in <em>Science</em></a>, but my combinatorial analysis wasn’t the main point of the paper).</p>
+
+
+
+<p>Anyway, after spending an enjoyable evening on the problem of Daniel’s train set, I was able to prove that, alas, the possible behaviors are quite limited (I classified them all), falling far short of computational universality.</p>
+
+
+
+<p>If you feel like I’m wasting your time with trivialities (or if you simply enjoy puzzles), then before you read any further, I encourage you to stop and try to prove this for yourself!</p>
+
+
+
+<p>Back yet?  OK then…</p>
+
+
+
+<p/><hr/><p/>
+
+
+
+<p><strong>Theorem:</strong> Assume a finite amount of train track.  Then after a linear amount of time, the train will necessarily enter a “boring infinite loop”—i.e., an attractor state in which at most two of the flaps keep getting toggled, and the rest of the flaps are fixed in place.  In more detail, the attractor must take one of four forms:</p>
+
+
+
+<p>I. a line (with reversing gadgets on both ends),<br/>II. a simple cycle,<br/>III. a “lollipop” (with one reversing gadget and one flap that keeps getting toggled), or<br/>IV. a “dumbbell” (with two flaps that keep getting toggled).</p>
+
+
+
+<p>In more detail still, there are seven possible topologically distinct trajectories for the train, as shown in the figure below.</p>
+
+
+
+<figure class="wp-block-image size-large"><a href="https://www.scottaaronson.com/trajectories.png"><img alt="" src="https://www.scottaaronson.com/trajectories.png"/></a></figure>
+
+
+
+<p>Here the red paths represent the attractors, where the train loops around and around for an unlimited amount of time, while the blue paths represent “runways” where the train spends a limited amount of time on its way into the attractor.  Every degree-3 vertex is assumed to have a Y-junction (with, as we’ll see, the orientation of the Y-junction uniquely determined in each case), while every degree-1 vertex is assumed to have a reversing gadget, unless the train starts at that vertex and never returns to it.</p>
+
+
+
+<p>The proof of the theorem rests on two simple observations.</p>
+
+
+
+<p><strong>Observation 1:</strong> While the Y-junctions are vertices of degree 3 in the graph constituted by the train tracks, there are no vertices of degree 4 or higher.  This means that, if the train ever visits the same vertex <em>v</em> (other than the start vertex) a second time, then there must be some edge <em>e</em> incident to <em>v</em> that it also traverses for a second time immediately afterward.</p>
+
+
+
+<p><strong>Observation 2:</strong> Suppose the train traverses some edge <em>e</em>, then goes around a simple cycle (meaning, one where no edges or vertices are reused), and then traverses <em>e</em> again <em>going in the same direction as the first time</em>.  Then from that point forward, the train will just continue around the same simple cycle forever.</p>
+
+
+
+<p>The proof of Observation 2 is simply that, if there were any flap that might be in the train’s way as it continued around the simple cycle, then the train would already have pushed it out of the way its <em>first</em> time around the cycle, and nothing that happened thereafter could possibly change the flap’s position.</p>
+
+
+
+<p>Using the two observations above, let’s now prove the theorem.  Let the train start where it will, and follow it as it traces out a path.  Since the graph is finite, at some point some already-traversed edge must be traversed a second time.  Let <em>e</em> be the first such edge.  By Observation 1, this will also be the first time the train’s path intersects itself at all.  There are then three cases:</p>
+
+
+
+<p><strong>Case 1:</strong> The train traverses <em>e</em> in the same direction as it did the first time.  By Observation 2, the train is now stuck in a simple cycle forever after.  So the only question is what the train could’ve done <em>before</em> entering the simple cycle.  We claim that at most, it could’ve traversed a simple path.  For otherwise, we’d contradict the assumption that <em>e</em> was the first edge that the train visited twice on its journey.  So the trajectory must have type IIa, IIb, or IIc in the figure.</p>
+
+
+
+<p><strong>Case 2:</strong> Immediately after traversing e in the forward direction, the train hits a reversing gadget and traverses <em>e</em> in the reverse direction.  In this case, the train will clearly retrace its entire path and then continue past its starting point; the question is what happens next.  If it hits another reversing gadget, then the trajectory will have type I in the figure.  If it enters a simple cycle and stays in it, then the trajectory will have type IIb in the figure.  If, finally, it makes a simple cycle and then <em>exits</em> the cycle, then the trajectory will have type III in the figure.  In this last case, the train’s trajectory will form a “lollipop” shape.  Note that there must be a Y-junction where the “stick” of the lollipop meets the “candy” (i.e., the simple cycle), with the base of the Y aligned with the stick (since otherwise the train would’ve continued around and around the candy).  From this, we deduce that every time the train goes around the candy, it does so in a different orientation (clockwise or counterclockwise) than the time before; and that the train toggles the Y-junction’s flap every time it exits the candy (although not when it enters the candy).</p>
+
+
+
+<p><strong>Case 3:</strong> At some point after traversing <em>e</em> in the forward direction (but not <em>immediately</em> after), the train traverses <em>e</em> in the reverse direction.  In this case, the broad picture is analogous to Case 2.  So far, the train has made a lollipop with a Y-junction connecting the stick to the candy (i.e. cycle), and the base of the Y aligned with the stick.  The question is what happens next.  If the train next hits a reversing gadget, the trajectory will have type III in the figure.  If it enters a new simple cycle, disjoint from the first cycle, and never leaves it, the trajectory will have type IId in the figure.  If it enters a new simple cycle, disjoint from the first cycle, and <em>does</em> leave it, then the trajectory now has a “dumbbell” pattern, type IV in the figure (also shown in the first video).  There’s only one last situation to worry about: namely, that the train makes a new cycle that <em>intersects</em> the first cycle, forming a “theta” (θ) shaped trajectory.  In this case, there must be a Y-junction at the point where the new cycle bumps into the old cycle.  Now, if the base of the Y isn’t part of the old cycle, then the train could never have made it all the way around the old cycle (it would’ve exited the old cycle at this Y-junction), contradiction.  If the base of the Y <em>is</em> part of the old cycle, then the flap must have been initially set to let the train make it all the way around the old cycle; when the train then reenters the old cycle, the flap must be moved so that the train will never make it all the way around the old cycle again.  So now the train is stuck in a new simple cycle (sharing some edges with the old cycle), and the trajectory has type IIc in the figure.</p>
+
+
+
+<p>This completes the proof of the theorem.</p>
+
+
+
+<p/><hr/><p/>
+
+
+
+<p>We might wonder: <em>why</em> isn’t this model train set capable of universal computation, of AND, OR, and NOT gates—or at any rate, of <em>some</em> computation more interesting than repeatedly toggling one or two flaps?  My answer might sound tautological: it’s simply that the logic of the Y-junctions is too limited.  Yes, the flaps can get pushed out of the way—that’s a “bit flip”—but every time such a flip happens, it helps to set up a “groove” in which the train just wants to continue around and around forever, not flipping any additional bits, with only the minor complications of the lollipop and dumbbell structures to deal with.  Even though my proof of the theorem might’ve seemed like a tedious case analysis, it had this as its unifying point.</p>
+
+
+
+<p>It’s interesting to think about what gadgets would need to be added to the train set to <em>make</em> it computationally universal, or at least expressively richer—able, as <a href="https://www.scottaaronson.com/blog/?p=1902">turned out</a> to be the case for the Digi-Comp II, to express some nontrivial complexity class that falls short of <strong>P</strong>.  For example, what if we had degree-4 vertices, with little turnstile gadgets?  Or multiple trains, which could be synchronized to the millisecond to control how they interacted with each other via the flaps, or which could even crash into each other?  I look forward to reading your ideas in the comment section!</p>
+
+
+
+<p>For the truth is this: quantum complexity classes, BosonSampling, closed timelike curves, the role of quantum circuit complexity in black holes and AdS/CFT, etc.—all these topics are great, but the same models and problems do get stale after a while.  I aspire for my research agenda constantly to chug forward, full steam ahead, into new computational domains.</p></div>
+    </content>
+    <updated>2021-04-04T18:37:49Z</updated>
+    <published>2021-04-04T18:37:49Z</published>
+    <category scheme="https://www.scottaaronson.com/blog" term="Complexity"/>
+    <category scheme="https://www.scottaaronson.com/blog" term="Embarrassing Myself"/>
+    <category scheme="https://www.scottaaronson.com/blog" term="Procrastination"/>
+    <author>
+      <name>Scott</name>
+      <uri>http://www.scottaaronson.com</uri>
+    </author>
+    <source>
+      <id>https://www.scottaaronson.com/blog/?feed=atom</id>
+      <link href="https://www.scottaaronson.com/blog" rel="alternate" type="text/html"/>
+      <link href="https://www.scottaaronson.com/blog/?feed=atom" rel="self" type="application/atom+xml"/>
+      <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
+      <title xml:lang="en-US">Shtetl-Optimized</title>
+      <updated>2021-04-04T19:02:50Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>https://eccc.weizmann.ac.il/report/2021/050</id>
@@ -35,7 +189,7 @@ We also study the complexity such schemes with the additional requirement that t
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-04T18:37:38Z</updated>
+      <updated>2021-04-04T19:20:25Z</updated>
     </source>
   </entry>
 
@@ -404,7 +558,7 @@ We also study the complexity such schemes with the additional requirement that t
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-04T18:38:18Z</updated>
+      <updated>2021-04-04T19:20:56Z</updated>
     </source>
   </entry>
 
@@ -1302,7 +1456,7 @@ a greedy algorithm is a 2-approximation when items have the same size.
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-04T18:38:18Z</updated>
+      <updated>2021-04-04T19:20:56Z</updated>
     </source>
   </entry>
 
@@ -1356,7 +1510,7 @@ a greedy algorithm is a 2-approximation when items have the same size.
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-04-04T18:37:18Z</updated>
+      <updated>2021-04-04T19:20:11Z</updated>
     </source>
   </entry>
 
@@ -2135,7 +2289,7 @@ a greedy algorithm is a 2-approximation when items have the same size.
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-04T18:38:17Z</updated>
+      <updated>2021-04-04T19:20:55Z</updated>
     </source>
   </entry>
 
@@ -2196,7 +2350,7 @@ a greedy algorithm is a 2-approximation when items have the same size.
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-04T18:37:38Z</updated>
+      <updated>2021-04-04T19:20:25Z</updated>
     </source>
   </entry>
 
@@ -2347,7 +2501,7 @@ If you see a market for NFTs, do you see one for SFTs—or are they both April F
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-04T18:37:53Z</updated>
+      <updated>2021-04-04T19:20:37Z</updated>
     </source>
   </entry>
 
@@ -2538,7 +2692,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-04T18:37:53Z</updated>
+      <updated>2021-04-04T19:20:37Z</updated>
     </source>
   </entry>
 
@@ -2585,7 +2739,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-04T18:38:16Z</updated>
+      <updated>2021-04-04T19:20:54Z</updated>
     </source>
   </entry>
 
@@ -2660,7 +2814,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://dstheory.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://dstheory.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Foundation of Data Science – Virtual Talk Series</title>
-      <updated>2021-04-04T18:39:12Z</updated>
+      <updated>2021-04-04T19:21:54Z</updated>
     </source>
   </entry>
 
@@ -2686,7 +2840,7 @@ We also point out that as a consequence of the recent work on WPRGs, any randomi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-04T18:37:38Z</updated>
+      <updated>2021-04-04T19:20:25Z</updated>
     </source>
   </entry>
 
@@ -2776,7 +2930,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-04T18:37:53Z</updated>
+      <updated>2021-04-04T19:20:37Z</updated>
     </source>
   </entry>
 
@@ -2822,7 +2976,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-04T18:37:38Z</updated>
+      <updated>2021-04-04T19:20:25Z</updated>
     </source>
   </entry>
 
@@ -2951,7 +3105,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-04-04T18:39:18Z</updated>
+      <updated>2021-04-04T19:22:00Z</updated>
     </source>
   </entry>
 
@@ -3152,7 +3306,7 @@ In addition, we prove a similar bound for noisy decision trees of cost at most $
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-04T18:37:38Z</updated>
+      <updated>2021-04-04T19:20:25Z</updated>
     </source>
   </entry>
 
@@ -3183,7 +3337,7 @@ In addition, we prove a similar bound for noisy decision trees of cost at most $
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-04-04T18:38:42Z</updated>
+      <updated>2021-04-04T19:21:20Z</updated>
     </source>
   </entry>
 
@@ -3270,7 +3424,7 @@ Here is an <a href="https://www.newton.ac.uk/science/outreach/women/six-question
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-04T18:37:53Z</updated>
+      <updated>2021-04-04T19:20:37Z</updated>
     </source>
   </entry>
 
@@ -3358,7 +3512,7 @@ Here is an <a href="https://www.newton.ac.uk/science/outreach/women/six-question
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-04-04T18:37:47Z</updated>
+      <updated>2021-04-04T19:20:30Z</updated>
     </source>
   </entry>
 
@@ -3428,7 +3582,7 @@ Prior to our work, the only polynomial-time or even subexponential-time algorith
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-04T18:37:38Z</updated>
+      <updated>2021-04-04T19:20:25Z</updated>
     </source>
   </entry>
 
@@ -3454,7 +3608,7 @@ In this paper, we explore the following natural heuristic idea for decreasing th
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-04T18:37:33Z</updated>
+      <updated>2021-04-04T19:20:25Z</updated>
     </source>
   </entry>
 
@@ -3482,7 +3636,7 @@ Email: application@dimacs.rutgers.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-04-04T18:38:01Z</updated>
+      <updated>2021-04-04T19:20:39Z</updated>
     </source>
   </entry>
 
@@ -3557,7 +3711,7 @@ Email: application@dimacs.rutgers.edu</p></div>
       <link href="https://www.scottaaronson.com/blog/?feed=atom" rel="self" type="application/atom+xml"/>
       <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
       <title xml:lang="en-US">Shtetl-Optimized</title>
-      <updated>2021-03-22T23:54:23Z</updated>
+      <updated>2021-04-04T19:02:50Z</updated>
     </source>
   </entry>
 
@@ -3655,7 +3809,7 @@ Of course we <a href="https://www.nytimes.com/2021/03/17/science/abel-prize-math
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-04T18:37:53Z</updated>
+      <updated>2021-04-04T19:20:37Z</updated>
     </source>
   </entry>
 
@@ -3683,70 +3837,7 @@ The main conceptual contribution of this work is to establish that the existence
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-04T18:37:38Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://lucatrevisan.wordpress.com/?p=4504</id>
-    <link href="https://lucatrevisan.wordpress.com/2021/03/18/finally-a-joy/" rel="alternate" type="text/html"/>
-    <title>Finally, a joy</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">In Rome we have an expression, mai una gioia (literally, “never (a moment of) joy”) that applies well to the present times. Yesterday, there was, finally, something to be joyous about: the announcement that two of my heroes, Laszlo Lovasz … <a href="https://lucatrevisan.wordpress.com/2021/03/18/finally-a-joy/">Continue reading <span class="meta-nav">→</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>In Rome we have an expression, <em>mai una gioia</em> (literally, “never (a moment of) joy”) that applies well to the present times. Yesterday, there was, finally, something to be joyous about: the announcement that two of my heroes, Laszlo Lovasz and Avi Wigderson, will share the 2021 Abel Prize, one of the highest honors of mathematics.</p>
-<p>The reader can find a very good article about them on <a href="https://www.quantamagazine.org/avi-wigderson-and-laszlo-lovasz-win-abel-prize-20210317/">Quanta Magazine</a>.</p>
-<p>Instead of talking about their greatest accomplishment, here I would like to recall two beautiful and somewhat related results, that admit a short treatment.</p>
-<p><span id="more-4504"/></p>
-<p>Avi’s first paper was on the 3-coloring problem. He described a polynomial time algorithm that, given a 3-colorable graph <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, finds a valid coloring of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> with <img alt="{O(\sqrt n)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Csqrt+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> colors, where <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the number of vertices. The starting point is that if every vertex in <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> had degree <img alt="{\leq \sqrt n -1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cleq+%5Csqrt+n+-1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> then there is an easy way to color the graph with <img alt="{\sqrt n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Csqrt+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> colors (look at the vertices in any order, choose for each vertex a color not already used for the neighbors that have already been considered).</p>
-<p>What if there is some vertex <img alt="{v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> of degree <img alt="{\geq \sqrt n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cgeq+%5Csqrt+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>? Well, and this is the idea of the paper, the <em>neighbors of <img alt="{v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> must induce a bipartite subgraph</em>, so we can color the neighbors of <img alt="{v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> with 2 colors in a way that is consistent with all the edges between neighbors of <img alt="{v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, then remove the neighbors of <img alt="{v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and continue with the rest of the graph, committing to never use those two colors again. Every time we do this, we consume two colors but we get rid of <img alt="{\geq \sqrt n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cgeq+%5Csqrt+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> vertices, so this costs us at most <img alt="{2\sqrt n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%5Csqrt+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> colors. When we are done, all remaining vertices have degree <img alt="{\leq \sqrt n-1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cleq+%5Csqrt+n-1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and we just need <img alt="{\sqrt n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Csqrt+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> more colors as observed above.</p>
-<p>In total, we used at most <img alt="{3\sqrt n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B3%5Csqrt+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> colors.</p>
-<p>This remained the state of the art for approximate graph coloring for a few years, until Avrim Blum improved the bound for 3-colorable graphs to <img alt="{O(n^{0.4})}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28n%5E%7B0.4%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and then to <img alt="{O(n^{3/8})}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28n%5E%7B3%2F8%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> colors, using more sophisticated combinatorial arguments. Later, Karger, Motwani and Sudan devised an approximation algorithm that uses <img alt="{\tilde O(n^{1/4})}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctilde+O%28n%5E%7B1%2F4%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> colors to color 3-colorable graphs, and is based on a semidefinite programming relaxation of the coloring problem, which is related to the Lovasz <em>theta function</em>. It is still open whether there is a polynomial time algorithm that uses <img alt="{n^{o(1)}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%5E%7Bo%281%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> colors.</p>
-<p>The Lovasz theta function <img alt="{\theta (G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctheta+%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> of a graph <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is a convex relaxation of the maximum independent set problem in <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. It is, or it can be formulated as, a semidefinite programming relaxation of the maximum independent set problem, and so it can be computed (up to arbitrarily good accuracy) in polynomial time.</p>
-<p>Lovasz defined the theta function to study the <em>Shannon capacity of a graph</em>. This is a question that arises when one wants to find error-correcting codes for a channel that may introduce errors. Suppose that the channel carries an element of an alphabet <img alt="{V}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BV%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> of size <img alt="{n=|V|}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%3D%7CV%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, and that certain pairs of alphabet elements can be “confused” by the channel, meaning that for certain pairs <img alt="{\{ a,b \}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5C%7B+a%2Cb+%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> the channel may output <img alt="{b}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bb%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> given <img alt="{a}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Ba%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> or viceversa. If we construct the graph <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> whose vertex set is <img alt="{V}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BV%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and whose edges are the pairs of “confusable” pairs, then an independent set in this graph gives a set of length-1 codewords that are not confusable, and <img alt="{\log_2 \alpha(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clog_2+%5Calpha%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, where <img alt="{\alpha(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Calpha%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the size of a maximal independent set in <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, is the number of bits that we can transmit in an errorless way by making one use of the channel. If we can access the channel <img alt="{k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> times, then an errorless code is an independent set in <img alt="{G^k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%5Ek%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, the graph that has vertex set <img alt="{V^k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BV%5Ek%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and such that <img alt="{((a_1,\ldots,a_k),(b_1,\ldots,b_k))}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28%28a_1%2C%5Cldots%2Ca_k%29%2C%28b_1%2C%5Cldots%2Cb_k%29%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is an edge if and only if all the pairs <img alt="{(a_i,b_i)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28a_i%2Cb_i%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> are edges of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. The number of bits of information per channel use that we can send is</p>
-<p align="center"><img alt="\displaystyle  \frac 1k \log \alpha(G^k) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac+1k+%5Clog+%5Calpha%28G%5Ek%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> and so we are interested in</p>
-<p align="center"><img alt="\displaystyle  \lim_{k\rightarrow \infty} (\alpha (G^k))^{1/k} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Clim_%7Bk%5Crightarrow+%5Cinfty%7D+%28%5Calpha+%28G%5Ek%29%29%5E%7B1%2Fk%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> Nicely, we have</p>
-<p align="center"><img alt="\displaystyle  \theta (G^k) = (\theta(G))^k " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Ctheta+%28G%5Ek%29+%3D+%28%5Ctheta%28G%29%29%5Ek+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> so we have</p>
-<p align="center"><img alt="\displaystyle  \theta(G) \geq \lim_{k\rightarrow \infty} (\alpha (G^k))^{1/k} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Ctheta%28G%29+%5Cgeq+%5Clim_%7Bk%5Crightarrow+%5Cinfty%7D+%28%5Calpha+%28G%5Ek%29%29%5E%7B1%2Fk%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> and the theta function provides an upper bound to the Shannon capacity of a graph.</p>
-<p>If we compute <img alt="{\theta (\bar G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctheta+%28%5Cbar+G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, where <img alt="{\bar G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cbar+G%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the complement of the graph <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> (that is, the graph whose edges are all the non-edges of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>), then we see that <img alt="{\theta(\bar G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctheta%28%5Cbar+G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is a relaxation of the maximum clique problem in <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. Remarkably, <img alt="{\theta(\bar G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctheta%28%5Cbar+G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is also a <em>lower bound</em> to the chromatic number of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, and so it is <em>sandwiched</em> between the clique number and the chromatic number. Don Knuth has used this fact as a starting point for a wonderful <a href="https://arxiv.org/abs/math/9312214">49-page treatise</a> on convex relaxations of the chromatic number and the clique number; here we will see a quick proof of this fact.</p>
-<p>As you can see in Knuth’s survey, there are several equivalent ways to define the theta function. Below we define <img alt="{\theta(\bar G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctheta%28%5Cbar+G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> as a natural semidefinite programming relaxation of the maximum clique problem (we have a variable <img alt="{x_0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> plus one variable <img alt="{x_v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_v%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> for every vertex <img alt="{v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>; all variables are vectors).</p>
-<p align="center"><img alt="\displaystyle \begin{array}{lr} \max \sum_{v\in V} || x_v||^2\\ s.t.\\ ||x_0||^2 = 1\\ \langle x_0,x_v \rangle = ||x_v||^2 &amp; \forall v\in V\\ \langle x_u,x_v \rangle = 0 &amp; \forall u\neq v: (u,v) \not\in E\\ \end{array}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+%5Cbegin%7Barray%7D%7Blr%7D+%5Cmax+%5Csum_%7Bv%5Cin+V%7D+%7C%7C+x_v%7C%7C%5E2%5C%5C+s.t.%5C%5C+%7C%7Cx_0%7C%7C%5E2+%3D+1%5C%5C+%5Clangle+x_0%2Cx_v+%5Crangle+%3D+%7C%7Cx_v%7C%7C%5E2+%26+%5Cforall+v%5Cin+V%5C%5C+%5Clangle+x_u%2Cx_v+%5Crangle+%3D+0+%26+%5Cforall+u%5Cneq+v%3A+%28u%2Cv%29+%5Cnot%5Cin+E%5C%5C+%5Cend%7Barray%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p>To see that it is a relaxation, given a clique <img alt="{K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BK%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, let <img alt="{x_0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> be any unit vector, and let <img alt="{x_v = x_0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_v+%3D+x_0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> for <img alt="{v\in K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%5Cin+K%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{x_v = {\bf 0}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_v+%3D+%7B%5Cbf+0%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> for <img alt="{v\not\in K}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%5Cnot%5Cin+K%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. We satisfy all constraints and the objective function is <img alt="{|K|}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7CK%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>.</p>
-<p>If we write the semidefinite dual of the above relaxation, we can see that we get a minimization problem which is a relaxation of the chromatic number problem (and which is equivalent to the relaxation used by Karger, Motwani and Sudan to improve on Avi’s result on 3-coloring), so that the “sandwich theorem” follows from weak duality.</p>
-<p>The reader should try to write down the semidefinite dual and reason about why it relaxes the chromatic number problem. Below, we collapse the construction of the dual, the way of embedding colorings into dual solutions, and the proof of weak duality for semidefinite programming, into a short but mystifying “sum of squares” proof.</p>
-<p>Suppose that <img alt="{V = \{ v_1,\ldots,v_n \}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BV+%3D+%5C%7B+v_1%2C%5Cldots%2Cv_n+%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and let <img alt="{x_0,x_{v_1},\ldots,x_{v_n}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_0%2Cx_%7Bv_1%7D%2C%5Cldots%2Cx_%7Bv_n%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> be a feasible solution to the max clique relaxation defined above. Suppose that the graph is <img alt="{k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>-colorable and let <img alt="{(C_1,\ldots,C_k)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28C_1%2C%5Cldots%2CC_k%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> be a partition of <img alt="{V}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BV%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> into color classes. We have</p>
-<p align="center"><img alt="\displaystyle  0 \leq \sum_{i=1}^k \left \| -x_0 + \sum_{v\in C_i} x_v \right \|^2 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++0+%5Cleq+%5Csum_%7Bi%3D1%7D%5Ek+%5Cleft+%5C%7C+-x_0+%2B+%5Csum_%7Bv%5Cin+C_i%7D+x_v+%5Cright+%5C%7C%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p align="center"><img alt="\displaystyle  = \sum_{i=1}^k \left( || x_0||^2 - 2 \sum_{v\in C_i} \langle x_0 , x_v \rangle + \sum_{u,v \in C_i} \langle x_u, x_v\rangle \right) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%3D+%5Csum_%7Bi%3D1%7D%5Ek+%5Cleft%28+%7C%7C+x_0%7C%7C%5E2+-+2+%5Csum_%7Bv%5Cin+C_i%7D+%5Clangle+x_0+%2C+x_v+%5Crangle+%2B+%5Csum_%7Bu%2Cv+%5Cin+C_i%7D+%5Clangle+x_u%2C+x_v%5Crangle+%5Cright%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p align="center"><img alt="\displaystyle  = \sum_{i=1}^k \left( 1 - \sum_{v\in C_i} || x_v||^2 \right) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%3D+%5Csum_%7Bi%3D1%7D%5Ek+%5Cleft%28+1+-+%5Csum_%7Bv%5Cin+C_i%7D+%7C%7C+x_v%7C%7C%5E2+%5Cright%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p align="center"><img alt="\displaystyle  = k - \sum_{v\in V} ||x_v||^2 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%3D+k+-+%5Csum_%7Bv%5Cin+V%7D+%7C%7Cx_v%7C%7C%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> so that the objective function always satisfies</p>
-<p align="center"><img alt="\displaystyle  \sum_{v\in V} ||x_v||^2 \leq k " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_%7Bv%5Cin+V%7D+%7C%7Cx_v%7C%7C%5E2+%5Cleq+k+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> In particular, this is true for an optimal solution <img alt="{x_0,x_{v_1},\ldots,x_{v_k}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_0%2Cx_%7Bv_1%7D%2C%5Cldots%2Cx_%7Bv_k%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and for an optimal coloring, so we have that <img alt="{\theta(\bar G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Ctheta%28%5Cbar+G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is upper bounded by the chromatic number of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> as promised.</p>
-<p>Above, we used various properties of feasible solutions, such as <img alt="{||x_0||^2 = 1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7C%7Cx_0%7C%7C%5E2+%3D+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, <img alt="{\langle x_0, x_v \rangle = ||x_v||^2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clangle+x_0%2C+x_v+%5Crangle+%3D+%7C%7Cx_v%7C%7C%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and</p>
-<p align="center"><img alt="\displaystyle  \sum_{u,v \in C_i } \langle x_u , x_v \rangle = \sum_{v\in C_i} || x_v||^2 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_%7Bu%2Cv+%5Cin+C_i+%7D+%5Clangle+x_u+%2C+x_v+%5Crangle+%3D+%5Csum_%7Bv%5Cin+C_i%7D+%7C%7C+x_v%7C%7C%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> which follows from the fact that each color class is an independent set, and so all inner products <img alt="{\langle x_u, x_v \rangle}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clangle+x_u%2C+x_v+%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> for <img alt="{u,v \in C_i, u\neq v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bu%2Cv+%5Cin+C_i%2C+u%5Cneq+v%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> have to be equal to zero, because <img alt="{(u,v) \not\in E}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28u%2Cv%29+%5Cnot%5Cin+E%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>.</p></div>
-    </content>
-    <updated>2021-03-18T13:22:19Z</updated>
-    <published>2021-03-18T13:22:19Z</published>
-    <category term="math"/>
-    <category term="theory"/>
-    <category term="things that are excellent"/>
-    <author>
-      <name>luca</name>
-    </author>
-    <source>
-      <id>https://lucatrevisan.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://lucatrevisan.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://lucatrevisan.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://lucatrevisan.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
-      <title>in   theory</title>
-      <updated>2021-04-04T18:37:18Z</updated>
+      <updated>2021-04-04T19:20:25Z</updated>
     </source>
   </entry>
 </feed>
