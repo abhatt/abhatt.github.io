@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-04-08T01:39:12Z</updated>
+  <updated>2021-04-08T02:21:59Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -27,10 +27,7 @@ ImageNet etc.) the model designer has full access to the holdout set and is free
 <p>Furthermore, even researchers who scrupulously follow the Basic Dictum may be unknowingly violating it when they take inspiration (and design choices) 
 from published works by others who presumably published <em>only the best of the many models they evaluated on the test set.</em></p>
 
-<p>Dwork et al. showed that if the test set has size $N$, and
-the designer is allowed to see the error of the first $i-1$ models on the test set before designing the $i$’th model, then a clever designer can<br/>
-use so-called <a href="https://arxiv.org/pdf/1502.04585.pdf"><em>wacky boosting</em></a> (see this <a href="http://blog.mrtz.org/2015/03/09/competition.html">blog post</a>) to ensure 
-the accuracy of the $t$’th model on the test set as high as $\Omega(\sqrt{t/N})$. In other words, the test set could become essentially useless once $t \gg N$, a 
+<p>Dwork et al. showed that if the test set has size $N$, and the designer is allowed to see the error of the first $i-1$ models on the test set before designing the $i$’th model, then a clever designer can  use so-called <a href="https://arxiv.org/pdf/1502.04585.pdf"><em>wacky boosting</em></a> (see this <a href="http://blog.mrtz.org/2015/03/09/competition.html">blog post</a>) to ensure the accuracy of the $t$’th model on the test set as high as $\Omega(\sqrt{t/N})$. In other words, the test set could become essentially useless once $t \gg N$, a 
 condition that holds in ML, whereby in popular datasets (CIFAR10, CIFAR100, ImageNet etc.)  $N$ is no more than $100,000$ and the total number of models being trained 
 world-wide is well in the millions if not higher (once you include hyperparameter searches).</p>
 
@@ -41,19 +38,19 @@ world-wide is well in the millions if not higher (once you include hyperparamete
 
 <p>This blog post concerns <a href="https://arxiv.org/pdf/2102.13189.pdf">our new paper</a>, which gives meaningful upper bounds on this sort of trouble for popular 
 deep net architectures, whereas prior ideas from adaptive data analysis gave no nontrivial estimates. We call our estimate  <em>Rip van Winkle’s Razor</em> 
-which combines references to <a href="https://en.wikipedia.org/wiki/Occam%27s_razor">Occam’s Razor</a>) and the 
+which combines references to <a href="https://en.wikipedia.org/wiki/Occam%27s_razor">Occam’s Razor</a> and the 
 <a href="https://en.wikipedia.org/wiki/Rip_Van_Winkle">mythical person who fell asleep for  20 years</a>.</p>
 
 <figure align="center">
-<img alt="drawing" src="http://www.offconvex.org/assets/ripvanwinkle.jpg" width="70%"/>
-  <b>Rip Van Winkle waking up from his 20 year sleep</b>
+<img alt="drawing" src="http://www.offconvex.org/assets/ripvanwinkle.jpg" width="50%"/>
+   *Rip Van Winkle waking up from his 20 year sleep* 
 </figure>
 
 <h2 id="adaptive-data-analysis-brief-tour">Adaptive Data Analysis: Brief tour</h2>
 
 <p>It is well-known that for a model trained <strong>without</strong> ever querying the test set, MOE scales (with high probability over choice of the test set) as $1/\sqrt{N}$ where $N$ 
 is the size of the test set.  Furthermore standard concentration bounds imply that even if we train $t$ models without ever referring to the test set (in other words, 
-using proper data hygiene) then the maximum meta-overfitting error among the $t$ models scales whp as $O(\sqrt{\log(t)/ N})$. The trouble pinpointed by Dwork et al.\ 
+using proper data hygiene) then the maximum meta-overfitting error among the $t$ models scales whp as $O(\sqrt{\log(t)/ N})$. The trouble pinpointed by Dwork et al. 
 can happen only if models are designed adaptively, with test error of the previous models shaping the design of the next model.</p>
 
 <p>Adaptive Data Analysis has come up with many good practices for honest researchers to mitigate such issues. For instance, Dwork et al. showed that using 
@@ -66,8 +63,7 @@ settings where the test dataset resides on a server that can choose to answers o
 inventors never tuned models using the test set, or didn’t get inspiration from existing models that may have been designed that way.  Thus statistically 
 speaking the above results still give no reason to believe that a modern deep net such as ResNet152 has low MOE.</p>
 
-<p><a href="http://proceedings.mlr.press/v97/recht19a/recht19a.pdf">Recht et al. 2019</a> summed up the MOE issue in a catchy title: <em>Do ImageNet Classifiers Generalize to ImageNet?</em><br/>
-They tried to answer their question experimentally by creating new test sets from scratch –we discuss their results later.</p>
+<p><a href="http://proceedings.mlr.press/v97/recht19a/recht19a.pdf">Recht et al. 2019</a> summed up the MOE issue in a catchy title: <em>Do ImageNet Classifiers Generalize to ImageNet?</em>  They tried to answer their question experimentally by creating new test sets from scratch –we discuss their results later.</p>
 
 <h2 id="moe-bounds-and-description-length">MOE bounds and description length</h2>
 
@@ -90,16 +86,19 @@ similar performance using the (universally available) training and validation da
 <p>While this phrasing may appear reminiscent of the review process for conferences and journals, there is a subtle difference  with respect to what the referee 
 can or cannot be assumed to know. (Clearly, assumptions about the referee can greatly affect description length —e.g,  a referee ignorant of even basic 
 calculus might need a very long explanation!)</p>
-<dl>
-  <dt>Informed and Unbiased Referee:</dt>
-  <dd> An *Informed* referee knows everything that was known to humanity (e.g., about deep learning, mathematics,optimization, statistics etc.) right up to the 
-moment of creation of the Test set. An *Unbiased* referee is one who knows nothing discovered since that moment.</dd>
-  <dt>Description length of a model:</dt>
-  <dd>the minimum number of bits in a description needed to allow an informed but unbiased referee to reproduce the claimed result. </dd>
-</dl>
 
-<p>Requiring the referees to be informed allows descriptions to be shorter, while requiring them to be unbiased requires longer descriptions but helps 
-rule out statistical contamination due to any interaction whatsoever with the test set. For example, momentum techniques in optimization were 
+<blockquote>
+  <p><strong>Informed Referee:</strong> “Knows everything that was known to humanity (e.g., about deep learning, mathematics,optimization, statistics etc.) right up to the 
+moment of creation of the Test set.”</p>
+</blockquote>
+
+<blockquote>
+  <p><strong>Unbiased Referee:</strong> Knows nothing discovered since the Test set was created.</p>
+</blockquote>
+
+<p>Thus <em>Description Length</em> of a model is the number of bits in the shortest description that allows an informed but unbiased referee to reproduce the claimed result.</p>
+
+<p>Note that informed referees let descriptions get shorter. Unbiased require longer descriptions that rule out any statistical “contamination” due to any interaction whatsoever with the test set. For example, momentum techniques in optimization were 
 well-studied before the creation of ImageNet test set, so informed referees can be expected to understand a line like “SGD with momentum 0.9.” But a 
 line like “Use Batch Normalization” cannot be understood by unbiased referees since conceivably this technique (invented after 2012) might have
  become popular precisely because it leads to better performance on the test set of ImageNet.</p>
@@ -109,8 +108,7 @@ of as an infinitely well-informed researcher who went into deep sleep at the mom
 to start refereeing the  latest papers.  Real-life journal referees who luckily did not suffer this way should try to simulate the idealized Rip van Winkle 
 in their heads while perusing the description submitted by the researcher.</p>
 
-<p>To allow as short a  description as possible the researcher is allowed to compress the description of their new deep net non-destructively using any compression<br/>
-that would make sense to Rip van Winkle (e.g., <a href="https://en.wikipedia.org/wiki/Huffman_coding">Huffman Coding</a>). The description of the compression method itself 
+<p>To allow as short a  description as possible the researcher is allowed to compress the description of their new deep net non-destructively using any compression  that would make sense to Rip van Winkle (e.g., <a href="https://en.wikipedia.org/wiki/Huffman_coding">Huffman Coding</a>). The description of the compression method itself 
 is not counted towards the description length – provided the same method is used for all papers submitted to Rip van Winkle. To give an example, a 
 technique appearing in a text known to Rip van Winkle could be succinctly referred to using the book’s ISBN number and page number.</p>
 
@@ -135,25 +133,20 @@ reproducing DenseNet-264, which leads to $5.06\%$ upper bound on its meta-overfi
 <p>Note that the number $5.06$ suggests higher precision than actually given by the method, since it is possible to quibble about the coding assumptions 
 that led to it.  Perhaps others might use a more classical coding mechanism and obtain an estimate of $6\%$ or $7\%$.</p>
 
-<p>But the important point is that unlike  existing bounds in Adaptive Data Analysis, there is <strong>no</strong> dependences on $t$, the number of models that have been tested before.</p>
+<p>But the important point is that unlike  existing bounds in Adaptive Data Analysis, there is <strong>no</strong> dependence on $t$, the number of models that have been tested before, and the bound is non-vacuous.</p>
 
 <h2 id="empirical-evidence-about-lack-of-meta-overfitting">Empirical evidence about lack of meta-overfitting</h2>
 
 <p>Our estimates indicate that the issue of meta-overfitting on ImageNet for these mainstream models is mild. The reason is that despite the vast number
  of parameters and hyper-parameters in today’s deep nets, the <em>information content</em> of these models is not high given  knowledge circa 2012.</p>
 
-<p>Recently Recht et al. <a href="https://arxiv.org/abs/1902.10811">tried to reach an empirical upper bound on MOE by creating new test sets</a> for 
-ImageNet and <a href="https://arxiv.org/abs/1806.00451">CIFAR-10</a>. Carefully replicating the methodology used for constructing the original datasets, 
-they created new test sets and found that famous published models of the past seven years have test error higher by as much as 10-15% compared 
-to that on the original test set. On the face of it, this seemed to confirm a case of bad meta-overfitting but they  also presented some evidence 
-that the swing in test error was due to systemic effects during test set creation. For instance, a comparable swing happens also for models that
- predated the creation of ImageNet (and thus were not overfitted to the ImageNet test set). 
+<p>Recently Recht et al. <a href="https://arxiv.org/abs/1902.10811">tried to reach an empirical upper bound on MOE</a> for
+ImageNet and <a href="https://arxiv.org/abs/1806.00451">CIFAR-10</a>. They created new tests sets by carefully replicating the methodology used for constructing the original ones. They found that error of famous published models of the past seven years is as much as 10-15% higher on the new test set as compared to the original.  On the face of it, this seemed to confirm a case of bad meta-overfitting. But they  also presented evidence  that the swing in test error was due to systemic effects during test set creation. For instance, a comparable swing happens also for models that predated the creation of ImageNet (and thus were not overfitted to the ImageNet test set). 
 <a href="https://proceedings.neurips.cc/paper/2019/hash/ee39e503b6bedf0c98c388b7e8589aca-Abstract.html">A followup study</a> of a hundred Kaggle competitions used fresh, 
 identically distributed test sets that were available from the official competition organizers. The authors concluded that MOE does not appear to be significant in modern ML.</p>
 
 <h2 id="conclusions">Conclusions</h2>
-
-<p>But to us the takeaway from Recht et al.’s results was the disquieting realization that  estimating MOE by creating a new test set is rife with systematic bias at best, and perhaps impossible, especially in datasets concerning rare or one-time phenomena (e.g., stock prices).  Thus their work left a pressing need for effective upper bounds on  meta-overfitting error. Our Rip van Winkle’s razor is elementary, and easily deployable by the average researcher. We hope it becomes part of the standard toolbox in Adaptive Data Analysis.</p></div>
+<p>To us the  disquieting takeaway from Recht et al.’s results was that  estimating MOE by creating a new test set is rife with systematic bias at best, and perhaps impossible, especially in datasets concerning rare or one-time phenomena (e.g., stock prices).  Thus their work still left a pressing need for effective upper bounds on  meta-overfitting error. Our Rip van Winkle’s Razor is elementary, and easily deployable by the average researcher. We hope it becomes part of the standard toolbox in Adaptive Data Analysis.</p></div>
     </summary>
     <updated>2021-04-07T21:00:00Z</updated>
     <published>2021-04-07T21:00:00Z</published>
@@ -166,7 +159,7 @@ identically distributed test sets that were available from the official competit
       <link href="http://offconvex.github.io/feed.xml" rel="self" type="application/atom+xml"/>
       <subtitle>Algorithms off the convex path.</subtitle>
       <title>Off the convex path</title>
-      <updated>2021-04-08T01:38:26Z</updated>
+      <updated>2021-04-08T02:21:22Z</updated>
     </source>
   </entry>
 
@@ -198,7 +191,7 @@ identically distributed test sets that were available from the official competit
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-04-08T01:39:12Z</updated>
+      <updated>2021-04-08T02:21:59Z</updated>
     </source>
   </entry>
 
@@ -425,7 +418,7 @@ that solves the problem in $O^*((\frac{r}{2})^n)$ time.
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-04-08T01:38:25Z</updated>
+      <updated>2021-04-08T02:21:21Z</updated>
     </source>
   </entry>
 
@@ -488,7 +481,7 @@ that solves the problem in $O^*((\frac{r}{2})^n)$ time.
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-08T01:37:57Z</updated>
+      <updated>2021-04-08T02:20:54Z</updated>
     </source>
   </entry>
 
@@ -515,7 +508,7 @@ Email: shachar.lovett@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-04-08T01:37:39Z</updated>
+      <updated>2021-04-08T02:20:36Z</updated>
     </source>
   </entry>
 
@@ -629,7 +622,7 @@ Can Matomäki’s theorem be used to get stronger lower bounds on the complexity
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-08T01:37:36Z</updated>
+      <updated>2021-04-08T02:20:34Z</updated>
     </source>
   </entry>
 
@@ -693,7 +686,7 @@ Can Matomäki’s theorem be used to get stronger lower bounds on the complexity
       <link href="https://francisbach.com" rel="alternate" type="text/html"/>
       <subtitle>Francis Bach</subtitle>
       <title>Machine Learning Research Blog</title>
-      <updated>2021-04-08T01:39:05Z</updated>
+      <updated>2021-04-08T02:21:57Z</updated>
     </source>
   </entry>
 
@@ -955,7 +948,7 @@ We also study the complexity such schemes with the additional requirement that t
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-08T01:37:26Z</updated>
+      <updated>2021-04-08T02:20:25Z</updated>
     </source>
   </entry>
 
@@ -1324,7 +1317,7 @@ We also study the complexity such schemes with the additional requirement that t
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-08T01:37:56Z</updated>
+      <updated>2021-04-08T02:20:52Z</updated>
     </source>
   </entry>
 
@@ -1990,7 +1983,7 @@ We also study the complexity such schemes with the additional requirement that t
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-08T01:37:56Z</updated>
+      <updated>2021-04-08T02:20:52Z</updated>
     </source>
   </entry>
 
@@ -2044,7 +2037,7 @@ We also study the complexity such schemes with the additional requirement that t
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-04-08T01:37:12Z</updated>
+      <updated>2021-04-08T02:20:11Z</updated>
     </source>
   </entry>
 
@@ -2823,7 +2816,7 @@ We also study the complexity such schemes with the additional requirement that t
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-08T01:37:54Z</updated>
+      <updated>2021-04-08T02:20:51Z</updated>
     </source>
   </entry>
 
@@ -2884,7 +2877,7 @@ We also study the complexity such schemes with the additional requirement that t
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-08T01:37:26Z</updated>
+      <updated>2021-04-08T02:20:25Z</updated>
     </source>
   </entry>
 
@@ -3036,7 +3029,7 @@ If you see a market for NFTs, do you see one for SFTs—or are they both April F
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-08T01:37:36Z</updated>
+      <updated>2021-04-08T02:20:34Z</updated>
     </source>
   </entry>
 
@@ -3227,7 +3220,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-08T01:37:35Z</updated>
+      <updated>2021-04-08T02:20:33Z</updated>
     </source>
   </entry>
 
@@ -3274,7 +3267,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-08T01:37:53Z</updated>
+      <updated>2021-04-08T02:20:50Z</updated>
     </source>
   </entry>
 
@@ -3349,7 +3342,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://dstheory.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://dstheory.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Foundation of Data Science – Virtual Talk Series</title>
-      <updated>2021-04-08T01:39:01Z</updated>
+      <updated>2021-04-08T02:21:54Z</updated>
     </source>
   </entry>
 
@@ -3375,7 +3368,7 @@ We also point out that as a consequence of the recent work on WPRGs, any randomi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-08T01:37:26Z</updated>
+      <updated>2021-04-08T02:20:25Z</updated>
     </source>
   </entry>
 
@@ -3465,7 +3458,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-08T01:37:36Z</updated>
+      <updated>2021-04-08T02:20:34Z</updated>
     </source>
   </entry>
 
@@ -3511,7 +3504,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-08T01:37:26Z</updated>
+      <updated>2021-04-08T02:20:25Z</updated>
     </source>
   </entry>
 
@@ -3640,7 +3633,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-04-08T01:39:12Z</updated>
+      <updated>2021-04-08T02:21:59Z</updated>
     </source>
   </entry>
 
@@ -3806,7 +3799,7 @@ The NTK regime operates in the "NTK ball" where the network is approximately equ
       <link href="http://offconvex.github.io/feed.xml" rel="self" type="application/atom+xml"/>
       <subtitle>Algorithms off the convex path.</subtitle>
       <title>Off the convex path</title>
-      <updated>2021-04-08T01:38:27Z</updated>
+      <updated>2021-04-08T02:21:23Z</updated>
     </source>
   </entry>
 
@@ -3841,7 +3834,7 @@ In addition, we prove a similar bound for noisy decision trees of cost at most $
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-08T01:37:26Z</updated>
+      <updated>2021-04-08T02:20:25Z</updated>
     </source>
   </entry>
 
@@ -3872,7 +3865,7 @@ In addition, we prove a similar bound for noisy decision trees of cost at most $
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-04-08T01:38:25Z</updated>
+      <updated>2021-04-08T02:21:21Z</updated>
     </source>
   </entry>
 </feed>
