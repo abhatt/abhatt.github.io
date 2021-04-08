@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-04-08T01:22:02Z</updated>
+  <updated>2021-04-08T01:39:12Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,165 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>http://offconvex.github.io/2021/04/07/ripvanwinkle/</id>
+    <link href="http://offconvex.github.io/2021/04/07/ripvanwinkle/" rel="alternate" type="text/html"/>
+    <title>Rip van Winkle's Razor, a Simple New Estimate for Adaptive Data Analysis</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><em>Can you trust a model whose designer had access to the test/holdout set?</em> This implicit question 
+in <a href="https://science.sciencemag.org/content/349/6248/636.full">Dwork et al 2015</a> launched a new field, <em>adaptive data analysis</em>.
+The question referred to the fact that in many scientific settings as well as modern machine learning (with its standardized datasets like CIFAR, 
+ImageNet etc.) the model designer has full access to the holdout set and is free to ignore the</p>
+
+<blockquote>
+  <p>(Basic Dictum of Data Science) “Thou shalt not train on the test/holdout set.”</p>
+</blockquote>
+
+<p>Furthermore, even researchers who scrupulously follow the Basic Dictum may be unknowingly violating it when they take inspiration (and design choices) 
+from published works by others who presumably published <em>only the best of the many models they evaluated on the test set.</em></p>
+
+<p>Dwork et al. showed that if the test set has size $N$, and
+the designer is allowed to see the error of the first $i-1$ models on the test set before designing the $i$’th model, then a clever designer can<br/>
+use so-called <a href="https://arxiv.org/pdf/1502.04585.pdf"><em>wacky boosting</em></a> (see this <a href="http://blog.mrtz.org/2015/03/09/competition.html">blog post</a>) to ensure 
+the accuracy of the $t$’th model on the test set as high as $\Omega(\sqrt{t/N})$. In other words, the test set could become essentially useless once $t \gg N$, a 
+condition that holds in ML, whereby in popular datasets (CIFAR10, CIFAR100, ImageNet etc.)  $N$ is no more than $100,000$ and the total number of models being trained 
+world-wide is well in the millions if not higher (once you include hyperparameter searches).</p>
+
+<blockquote>
+  <p><strong>Meta-overfitting Error (MOE)</strong> of a model is the difference between its average error on the test data and its expected error on the full distribution.
+(It is closely related to <a href="https://en.wikipedia.org/wiki/False_discovery_rate"><em>false discovery rate</em></a> in statistics.)</p>
+</blockquote>
+
+<p>This blog post concerns <a href="https://arxiv.org/pdf/2102.13189.pdf">our new paper</a>, which gives meaningful upper bounds on this sort of trouble for popular 
+deep net architectures, whereas prior ideas from adaptive data analysis gave no nontrivial estimates. We call our estimate  <em>Rip van Winkle’s Razor</em> 
+which combines references to <a href="https://en.wikipedia.org/wiki/Occam%27s_razor">Occam’s Razor</a>) and the 
+<a href="https://en.wikipedia.org/wiki/Rip_Van_Winkle">mythical person who fell asleep for  20 years</a>.</p>
+
+<figure align="center">
+<img alt="drawing" src="http://www.offconvex.org/assets/ripvanwinkle.jpg" width="70%"/>
+  <b>Rip Van Winkle waking up from his 20 year sleep</b>
+</figure>
+
+<h2 id="adaptive-data-analysis-brief-tour">Adaptive Data Analysis: Brief tour</h2>
+
+<p>It is well-known that for a model trained <strong>without</strong> ever querying the test set, MOE scales (with high probability over choice of the test set) as $1/\sqrt{N}$ where $N$ 
+is the size of the test set.  Furthermore standard concentration bounds imply that even if we train $t$ models without ever referring to the test set (in other words, 
+using proper data hygiene) then the maximum meta-overfitting error among the $t$ models scales whp as $O(\sqrt{\log(t)/ N})$. The trouble pinpointed by Dwork et al.\ 
+can happen only if models are designed adaptively, with test error of the previous models shaping the design of the next model.</p>
+
+<p>Adaptive Data Analysis has come up with many good practices for honest researchers to mitigate such issues. For instance, Dwork et al. showed that using 
+Differential Privacy on labels while evaluating models can lower MOE. Or the <a href="https://arxiv.org/pdf/1502.04585.pdf">Ladder mechanism</a> helps in Kaggle-like 
+settings where the test dataset resides on a server that can choose to answers only a  selected subset of queries, which essentially takes away the MOE issue.</p>
+
+<p>For several good practices  matching lower bounds exist showing a way to construct cheating models with MOE matching the upper bound.</p>
+
+<p>However such recommended best practices do not help with understanding the MOE in the performance numbers of a new model  since there is no guarantee that the 
+inventors never tuned models using the test set, or didn’t get inspiration from existing models that may have been designed that way.  Thus statistically 
+speaking the above results still give no reason to believe that a modern deep net such as ResNet152 has low MOE.</p>
+
+<p><a href="http://proceedings.mlr.press/v97/recht19a/recht19a.pdf">Recht et al. 2019</a> summed up the MOE issue in a catchy title: <em>Do ImageNet Classifiers Generalize to ImageNet?</em><br/>
+They tried to answer their question experimentally by creating new test sets from scratch –we discuss their results later.</p>
+
+<h2 id="moe-bounds-and-description-length">MOE bounds and description length</h2>
+
+<p>The starting point of our work is the following classical concentration bounds:</p>
+
+<blockquote>
+  <p><strong>Folklore Theorem</strong> With high probability over the choice of a test set of size $N$, the MOE of <em>all</em> models with description length at most $k$ bits is  $O(\sqrt{k/N})$.</p>
+</blockquote>
+
+<p>At first sight this doesn’t seem to help us because one cannot imagine modern deep nets having a short description. The most obvious description involves reporting 
+values of the net parameters, which requires millions or even hundreds of millions of bits, resulting in a vacuous upper bound  on MOE.</p>
+
+<p>Another obvious description would be the computer program used to produce the model using the (publicly available) training and validation sets. However, these 
+programs usually rely on imported libraries through layers of encapsulation and so the effective program size is pretty large as well.</p>
+
+<h2 id="rip-van-winkles-razor">Rip van Winkle’s Razor</h2>
+<p>Our new upper bound involves a more careful definition of <em>Description Length</em>: it is the smallest description that allows a referee  to reproduce a model of 
+similar performance using the (universally available) training and validation datasets.</p>
+
+<p>While this phrasing may appear reminiscent of the review process for conferences and journals, there is a subtle difference  with respect to what the referee 
+can or cannot be assumed to know. (Clearly, assumptions about the referee can greatly affect description length —e.g,  a referee ignorant of even basic 
+calculus might need a very long explanation!)</p>
+<dl>
+  <dt>Informed and Unbiased Referee:</dt>
+  <dd> An *Informed* referee knows everything that was known to humanity (e.g., about deep learning, mathematics,optimization, statistics etc.) right up to the 
+moment of creation of the Test set. An *Unbiased* referee is one who knows nothing discovered since that moment.</dd>
+  <dt>Description length of a model:</dt>
+  <dd>the minimum number of bits in a description needed to allow an informed but unbiased referee to reproduce the claimed result. </dd>
+</dl>
+
+<p>Requiring the referees to be informed allows descriptions to be shorter, while requiring them to be unbiased requires longer descriptions but helps 
+rule out statistical contamination due to any interaction whatsoever with the test set. For example, momentum techniques in optimization were 
+well-studied before the creation of ImageNet test set, so informed referees can be expected to understand a line like “SGD with momentum 0.9.” But a 
+line like “Use Batch Normalization” cannot be understood by unbiased referees since conceivably this technique (invented after 2012) might have
+ become popular precisely because it leads to better performance on the test set of ImageNet.</p>
+
+<p>By now it should be clear why the estimate is named after  <a href="https://en.wikipedia.org/wiki/Rip_Van_Winkle">“Rip van Winkle”</a>: the referee can be thought 
+of as an infinitely well-informed researcher who went into deep sleep at the moment of creation of the test set, and has just been woken up years later 
+to start refereeing the  latest papers.  Real-life journal referees who luckily did not suffer this way should try to simulate the idealized Rip van Winkle 
+in their heads while perusing the description submitted by the researcher.</p>
+
+<p>To allow as short a  description as possible the researcher is allowed to compress the description of their new deep net non-destructively using any compression<br/>
+that would make sense to Rip van Winkle (e.g., <a href="https://en.wikipedia.org/wiki/Huffman_coding">Huffman Coding</a>). The description of the compression method itself 
+is not counted towards the description length – provided the same method is used for all papers submitted to Rip van Winkle. To give an example, a 
+technique appearing in a text known to Rip van Winkle could be succinctly referred to using the book’s ISBN number and page number.</p>
+
+<h2 id="estimating-moe-of-resnet-152">Estimating MOE of ResNet-152</h2>
+<p>As an illustration, here we provide a suitable description allowing  Rip van Winkle to reproduce a mainstream ImageNet model, ResNet-152, which achieves $4.49\%$ top-5 
+test error.</p>
+
+<p>The description consists of three types of expressions: English phrases, Math equations, and directed graphs. In the paper, we describe in detail how to encode 
+each of them into binary strings and count their lengths.  The allowed vocabulary includes primitive concepts that were known before 2012, such 
+as <em>CONV, MaxPool, ReLU, SGD</em> etc., as well as a graph-theoretic notation/shorthand  for describing net architecture. The newly introduced concepts 
+including <em>Batch-Norm</em>, <em>Layer, Block</em> are defined precisely using Math, English, and other primitive concepts.</p>
+
+<figure align="center">
+<img alt="drawing" src="http://www.offconvex.org/assets/resnet_description.png" width="80%"/>
+  <b>Description for reproducing ResNet-152</b>
+</figure>
+
+<p>According to our estimate, the length of the above description is $1032$ bits, which translates into a upper bound on meta-overfitting error of merely $5\%$! 
+This suggests the real top-5 error of the model on full distribution is at most $9.49\%$. In the paper we also provide a $980$-bit long description for 
+reproducing DenseNet-264, which leads to $5.06\%$ upper bound on its meta-overfitting error.</p>
+
+<p>Note that the number $5.06$ suggests higher precision than actually given by the method, since it is possible to quibble about the coding assumptions 
+that led to it.  Perhaps others might use a more classical coding mechanism and obtain an estimate of $6\%$ or $7\%$.</p>
+
+<p>But the important point is that unlike  existing bounds in Adaptive Data Analysis, there is <strong>no</strong> dependences on $t$, the number of models that have been tested before.</p>
+
+<h2 id="empirical-evidence-about-lack-of-meta-overfitting">Empirical evidence about lack of meta-overfitting</h2>
+
+<p>Our estimates indicate that the issue of meta-overfitting on ImageNet for these mainstream models is mild. The reason is that despite the vast number
+ of parameters and hyper-parameters in today’s deep nets, the <em>information content</em> of these models is not high given  knowledge circa 2012.</p>
+
+<p>Recently Recht et al. <a href="https://arxiv.org/abs/1902.10811">tried to reach an empirical upper bound on MOE by creating new test sets</a> for 
+ImageNet and <a href="https://arxiv.org/abs/1806.00451">CIFAR-10</a>. Carefully replicating the methodology used for constructing the original datasets, 
+they created new test sets and found that famous published models of the past seven years have test error higher by as much as 10-15% compared 
+to that on the original test set. On the face of it, this seemed to confirm a case of bad meta-overfitting but they  also presented some evidence 
+that the swing in test error was due to systemic effects during test set creation. For instance, a comparable swing happens also for models that
+ predated the creation of ImageNet (and thus were not overfitted to the ImageNet test set). 
+<a href="https://proceedings.neurips.cc/paper/2019/hash/ee39e503b6bedf0c98c388b7e8589aca-Abstract.html">A followup study</a> of a hundred Kaggle competitions used fresh, 
+identically distributed test sets that were available from the official competition organizers. The authors concluded that MOE does not appear to be significant in modern ML.</p>
+
+<h2 id="conclusions">Conclusions</h2>
+
+<p>But to us the takeaway from Recht et al.’s results was the disquieting realization that  estimating MOE by creating a new test set is rife with systematic bias at best, and perhaps impossible, especially in datasets concerning rare or one-time phenomena (e.g., stock prices).  Thus their work left a pressing need for effective upper bounds on  meta-overfitting error. Our Rip van Winkle’s razor is elementary, and easily deployable by the average researcher. We hope it becomes part of the standard toolbox in Adaptive Data Analysis.</p></div>
+    </summary>
+    <updated>2021-04-07T21:00:00Z</updated>
+    <published>2021-04-07T21:00:00Z</published>
+    <source>
+      <id>http://offconvex.github.io/</id>
+      <author>
+        <name>Off the Convex Path</name>
+      </author>
+      <link href="http://offconvex.github.io/" rel="alternate" type="text/html"/>
+      <link href="http://offconvex.github.io/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Algorithms off the convex path.</subtitle>
+      <title>Off the convex path</title>
+      <updated>2021-04-08T01:38:26Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-US">
     <id>https://toc4fairness.org/?p=1613</id>
@@ -39,7 +198,7 @@
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-04-08T01:22:02Z</updated>
+      <updated>2021-04-08T01:39:12Z</updated>
     </source>
   </entry>
 
@@ -266,7 +425,7 @@ that solves the problem in $O^*((\frac{r}{2})^n)$ time.
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-04-08T01:21:27Z</updated>
+      <updated>2021-04-08T01:38:25Z</updated>
     </source>
   </entry>
 
@@ -329,7 +488,7 @@ that solves the problem in $O^*((\frac{r}{2})^n)$ time.
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-08T01:21:02Z</updated>
+      <updated>2021-04-08T01:37:57Z</updated>
     </source>
   </entry>
 
@@ -356,7 +515,7 @@ Email: shachar.lovett@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-04-08T01:20:43Z</updated>
+      <updated>2021-04-08T01:37:39Z</updated>
     </source>
   </entry>
 
@@ -470,7 +629,7 @@ Can Matomäki’s theorem be used to get stronger lower bounds on the complexity
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-08T01:20:40Z</updated>
+      <updated>2021-04-08T01:37:36Z</updated>
     </source>
   </entry>
 
@@ -534,7 +693,7 @@ Can Matomäki’s theorem be used to get stronger lower bounds on the complexity
       <link href="https://francisbach.com" rel="alternate" type="text/html"/>
       <subtitle>Francis Bach</subtitle>
       <title>Machine Learning Research Blog</title>
-      <updated>2021-04-08T01:22:00Z</updated>
+      <updated>2021-04-08T01:39:05Z</updated>
     </source>
   </entry>
 
@@ -796,7 +955,7 @@ We also study the complexity such schemes with the additional requirement that t
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-08T01:20:31Z</updated>
+      <updated>2021-04-08T01:37:26Z</updated>
     </source>
   </entry>
 
@@ -1165,7 +1324,7 @@ We also study the complexity such schemes with the additional requirement that t
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-08T01:21:01Z</updated>
+      <updated>2021-04-08T01:37:56Z</updated>
     </source>
   </entry>
 
@@ -1831,7 +1990,7 @@ We also study the complexity such schemes with the additional requirement that t
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-08T01:21:02Z</updated>
+      <updated>2021-04-08T01:37:56Z</updated>
     </source>
   </entry>
 
@@ -1885,7 +2044,7 @@ We also study the complexity such schemes with the additional requirement that t
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-04-08T01:20:11Z</updated>
+      <updated>2021-04-08T01:37:12Z</updated>
     </source>
   </entry>
 
@@ -2664,7 +2823,7 @@ We also study the complexity such schemes with the additional requirement that t
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-08T01:21:00Z</updated>
+      <updated>2021-04-08T01:37:54Z</updated>
     </source>
   </entry>
 
@@ -2725,7 +2884,7 @@ We also study the complexity such schemes with the additional requirement that t
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-08T01:20:31Z</updated>
+      <updated>2021-04-08T01:37:26Z</updated>
     </source>
   </entry>
 
@@ -2877,7 +3036,7 @@ If you see a market for NFTs, do you see one for SFTs—or are they both April F
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-08T01:20:40Z</updated>
+      <updated>2021-04-08T01:37:36Z</updated>
     </source>
   </entry>
 
@@ -3068,7 +3227,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-08T01:20:40Z</updated>
+      <updated>2021-04-08T01:37:35Z</updated>
     </source>
   </entry>
 
@@ -3115,7 +3274,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-08T01:20:57Z</updated>
+      <updated>2021-04-08T01:37:53Z</updated>
     </source>
   </entry>
 
@@ -3190,7 +3349,7 @@ It is <a href="https://nisheethvishnoi.wordpress.com">here</a>. A recent article
       <link href="https://dstheory.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://dstheory.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Foundation of Data Science – Virtual Talk Series</title>
-      <updated>2021-04-08T01:21:57Z</updated>
+      <updated>2021-04-08T01:39:01Z</updated>
     </source>
   </entry>
 
@@ -3216,7 +3375,7 @@ We also point out that as a consequence of the recent work on WPRGs, any randomi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-08T01:20:31Z</updated>
+      <updated>2021-04-08T01:37:26Z</updated>
     </source>
   </entry>
 
@@ -3306,7 +3465,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-08T01:20:40Z</updated>
+      <updated>2021-04-08T01:37:36Z</updated>
     </source>
   </entry>
 
@@ -3352,7 +3511,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-08T01:20:31Z</updated>
+      <updated>2021-04-08T01:37:26Z</updated>
     </source>
   </entry>
 
@@ -3481,7 +3640,7 @@ We also tip our hat to others who have reported on the Abel Prize, including som
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-04-08T01:22:02Z</updated>
+      <updated>2021-04-08T01:39:12Z</updated>
     </source>
   </entry>
 
@@ -3647,7 +3806,7 @@ The NTK regime operates in the "NTK ball" where the network is approximately equ
       <link href="http://offconvex.github.io/feed.xml" rel="self" type="application/atom+xml"/>
       <subtitle>Algorithms off the convex path.</subtitle>
       <title>Off the convex path</title>
-      <updated>2021-04-08T01:21:28Z</updated>
+      <updated>2021-04-08T01:38:27Z</updated>
     </source>
   </entry>
 
@@ -3682,7 +3841,7 @@ In addition, we prove a similar bound for noisy decision trees of cost at most $
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-08T01:20:31Z</updated>
+      <updated>2021-04-08T01:37:26Z</updated>
     </source>
   </entry>
 
@@ -3713,94 +3872,7 @@ In addition, we prove a similar bound for noisy decision trees of cost at most $
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-04-08T01:21:27Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-US">
-    <id>https://rjlipton.wpcomstaging.com/?p=18389</id>
-    <link href="https://rjlipton.wpcomstaging.com/2021/03/23/moby-dick-meet-theory/" rel="alternate" type="text/html"/>
-    <title>Moby Dick Meet Theory</title>
-    <summary>People seem to be afraid of mathematics. And I think that’s such a shame, because I don’t think it’s as hard as people seem to think it is. —Heidi Hammel Sarah Hart holds a chair that dates back to 1597—Gresham Professor of Geometry at Birkbeck, University of London. She is a British mathematician specialising in […]</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>
-<font color="#0044cc"><br/>
-<em>People seem to be afraid of mathematics. And I think that’s such a shame, because I don’t think it’s as hard as people seem to think it is. —Heidi Hammel</em><br/>
-<font color="#000000"/></font></p><font color="#0044cc"><font color="#000000">
-<p><a href="https://rjlipton.wpcomstaging.com/?attachment_id=18328" rel="attachment wp-att-18328"><img alt="" class="alignright  wp-image-18328" src="https://i0.wp.com/rjlipton.wpcomstaging.com/wp-content/uploads/2021/03/sh2.jpg?w=250&amp;ssl=1"/></a></p>
-<p>
-Sarah Hart holds a <a href="https://en.wikipedia.org/wiki/Gresham_Professor_of_Geometry">chair</a> that dates back to 1597—Gresham Professor of Geometry at Birkbeck, University of London.  She is a British mathematician specialising in group theory. The British <a href="https://en.wikipedia.org/wiki/American_and_British_English_spelling_differences">modifier</a> is redundant since I spelled specialising with a “s” not a “z”: </p>
-<blockquote><p><b> </b> <em> Today’s British English spellings mostly follow Samuel Johnson’s <a href="https://en.wikipedia.org/wiki/A_Dictionary_of_the_English_Language">A Dictionary of the English Language</a> (1755), while many American English spellings follow Webster’s <a href="https://en.wikipedia.org/wiki/Webster%27s_Dictionary">An American Dictionary of the English Language</a> (1828). </em>
-</p></blockquote>
-<p>
-Today we will discuss history, making history, and more.<br/>
-<span id="more-18389"/></p>
-<p>
-Hart is an excellent writer about math with a special interest in history and in non-standard applications of math to things like Moby-Dick. See the recent <a href="https://www.nytimes.com/2021/03/06/science/math-gresham-sarah-hart.html">article</a> in the science section of the New York Times about Hart: </p>
-<blockquote><p><b> </b> <em> For the mathematician Sarah Hart, a close reading of “Moby-Dick” reveals not merely “one of the strangest and most wonderful books in the world” and “the greatest book of the sea ever written,” but also a work awash in mathematical metaphors. </em>
-</p></blockquote>
-<p>
-<a href="https://rjlipton.wpcomstaging.com/?attachment_id=18329" rel="attachment wp-att-18329"><img alt="" class="alignright size-full wp-image-18329" height="194" src="https://i1.wp.com/rjlipton.wpcomstaging.com/wp-content/uploads/2021/03/wt.png?resize=259%2C194&amp;ssl=1" width="259"/></a></p>
-<p>
-Hart’s paper on Moby-Dick is titled <a href="https://arxiv.org/pdf/1903.12102.pdf">Ahab’s Arithmetic</a>. I bet few articles on the arxiv website are on fictional works like Moby-Dick: </p>
-<blockquote><p><b> </b> <em> Herman Melville’s novel Moby-Dick contains a surprising number of mathematical allusions. In this article we explore some of these, as well as discussing the questions that naturally follow: why did Melville choose to use so much mathematical imagery? How did Melville come to acquire the level of mathematical knowledge shown in the novel? And is it commensurate with the general level of mathematical literacy at that time? </em>
-</p></blockquote>
-<p>
-Hart also has given many talks on math from a unique point of <a href="https://www.gresham.ac.uk/professorships/geometry-professorship/">view</a>.</p>
-<p/><h2> Group Theory History </h2><p/>
-<p>
-Hart is the current <a href="https://www.bshm.ac.uk/where-our-members-are">president</a> of the British Society for the History of Mathematics: </p>
-<blockquote><p><b> </b> <em> Mathematics has been part of human culture since the beginnings of civilization. Its study and practice has gone hand in hand with the evolution and development of commerce, architecture, legal theory, cosmology, astrology, and countless other activities. The history of mathematics today addresses a rich cultural heritage across continents, peoples, and ages, taking in the practical traditions of merchants’ accounts and surveying just as it does the elevated traditions of learned scholars at court or the modern day university professor. </em>
-</p></blockquote>
-<p>
-Hart adds: </p>
-<blockquote><p><b> </b> <em> In this <a href="https://eprints.bbk.ac.uk/id/eprint/26953/">article</a> we explore mathematical allusions in Herman Melville’s novel Moby-Dick. We argue that both the quantity and sophistication of these allusions are evidence for Melville’s high level of mathematical knowledge and ability. We discuss some of the most compelling mathematical imagery, as well as giving background on the several mathematicians and mathematics books mentioned in the novel. We also include some biographical details supporting the assertion that Melville had an unusually good mathematical education. </em>
-</p></blockquote>
-<p>
-Another view of history is given by Alma <a href="https://history.columbia.edu/person/alma-steingart/">Steingart</a> of the history department of Columbia. Steingart has written, for example, an <a href="https://sites.tufts.edu/histmath/files/2015/11/steingart-group-theory.pdf">article</a> on the history of the classification of all simple groups: </p>
-<blockquote><p><b> </b> <em> Over a period of more than 30 years, more than 100 mathematicians worked on a project to classify mathematical objects known as finite simple groups. The Classification, when officially declared completed in 1981, ranged between 300 and 500 articles and ran somewhere between 5,000 and 10,000 journal pages. Mathematicians have hailed the project as one of the greatest mathematical achievements of the 20th century, and it surpasses, both in scale and scope, any other mathematical proof of the 20th century. </em>
-</p></blockquote>
-<p>
-Decades ago as soon as we started to think about the <a href="https://www.uni-ulm.de/fileadmin/website_uni_ulm/iui.inst.190/Mitarbeiter/wagner/GroupIso_040712.pdf">group isomorphism</a> problem we realized there is an application of the classification theorem: </p>
-<blockquote><p><b> </b> <em> We can use it to prove that isomorphism for finite simple groups is in polynomial time. The proof is simple—bad pun: Just use the fact that all simple groups are generated by at most <img alt="{2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B2%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> elements. So just try all possible pairs. See <a href="https://rjlipton.wordpress.com/2013/05/11/advances-on-group-isomorphism/">GLL</a> for some more comments. </em>
-</p></blockquote>
-<p/><h2> Making Group Theory History </h2><p/>
-<p>
-Hart may be interested in the history of math, but proving new theorems is perhaps the best way to affect history. The <a href="https://www.combinatorics.org/ojs/index.php/eljc/article/view/v16i1r59/pdf">paper</a> titled Small maximal sum-free sets by Michael Giudici and Hart solves a previously open problem. The site <i>Theorem of day</i> highlights this paper <a href="https://www.theoremoftheday.org/GroupTheory/SumFree/TotDSumFree.pdf">here</a>. Also Tim <a href="https://arxiv.org/pdf/0710.3877.pdf">Gowers</a> proved some related results.</p>
-<p>
-Hart’s main theorem is: </p>
-<blockquote><p><b>Theorem 1</b> <em> Let <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> be a finite group and let <img alt="{&lt;S&gt;}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%3CS%3E%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> be the subgroup generated by a subset <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> of the elements of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/>. Then unless <img alt="{|S | \le 2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7CS+%7C+%5Cle+2%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/>, <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> cannot be both maximally sum-free and minimal with respect to generating <img alt="{&lt;S&gt;}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%3CS%3E%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/>. </em>
-</p></blockquote>
-<p>
-Consider a set <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> of elements in a finite group <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. There are two properties that <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> can have, and these properties act in opposite directions.</p>
-<ul>
-<li>Force <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> to be smaller: The set <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is sum-free. This means that for <img alt="{a, b}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Ba%2C+b%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> in <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>,
-<p align="center"><img alt="\displaystyle  ab \not\in S. " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++ab+%5Cnot%5Cin+S.+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-</li><li>Force <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> to be larger: The set is minimal generator for <img alt="{&lt;S&gt;}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%3CS%3E%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. This means that it is not possible to generate <img alt="{&lt;S&gt;}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%3CS%3E%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> with less elements than <img alt="{|S|}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7CS%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>.  Intuitively these properties work against each other. Adding an element to <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> could violate sum-free; deleting an element from <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> could violate generation.
-</li></ul>
-<p/><h2> Open Problems </h2><p/>
-<p>
-Here is an <a href="https://www.newton.ac.uk/science/outreach/women/six-questions/hart-sarah">interview</a> with Hart—take a look.</p>
-<p/></font></font></div>
-    </content>
-    <updated>2021-03-23T14:31:05Z</updated>
-    <published>2021-03-23T14:31:05Z</published>
-    <category term="History"/>
-    <category term="People"/>
-    <category term="Proofs"/>
-    <category term="group theory"/>
-    <category term="Moby dick"/>
-    <category term="Sarah Hart"/>
-    <author>
-      <name>rjlipton</name>
-    </author>
-    <source>
-      <id>https://rjlipton.wpcomstaging.com</id>
-      <logo>https://s0.wp.com/i/webclip.png</logo>
-      <link href="https://rjlipton.wpcomstaging.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
-      <subtitle>a personal view of the theory of computation</subtitle>
-      <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-08T01:20:40Z</updated>
+      <updated>2021-04-08T01:38:25Z</updated>
     </source>
   </entry>
 </feed>
