@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at April 24, 2021 02:41 PM UTC</span>.
+Last updated <span class="datestr">at April 24, 2021 03:25 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -254,6 +254,1068 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://windowsontheory.org/?p=8089">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/wot.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://windowsontheory.org/2021/04/24/towards-a-theory-of-generalization-in-reinforcement-learning-guest-lecture-by-sham-kakade/">Towards a Theory of Generalization in Reinforcement Learning: guest lecture by Sham Kakade</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://windowsontheory.org" title="Windows On Theory">Windows on Theory</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p><em>Scribe notes by <a href="https://pehlevan.seas.harvard.edu/people/hamza-chaudhry">Hamza Chaudhry</a> and Zhaolin Ren</em></p>
+
+
+
+<p><strong>Previous post:</strong> <a href="https://windowsontheory.org/2021/04/03/natural-language-processing-guest-lecture-by-sasha-rush/">Natural Language Processing – guest lecture by Sasha Rush</a> <strong>Next post:</strong> TBD. See also <a href="https://windowsontheory.org/category/ml-theory-seminar/">all seminar posts</a> and <a href="https://boazbk.github.io/mltheoryseminar/cs229br.html#plan">course webpage</a>.</p>
+
+
+
+<p>See also <a href="https://harvard.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=5d1a4401-6dee-4e49-881c-ad13017f606c">video of lecture</a>. <strong>Lecture slides:</strong> Original form: <a href="http://files.boazbarak.org/misc/mltheory/sham1.pdf">main</a> / <a href="http://files.boazbarak.org/misc/mltheory/sham2.pdf">bandit analysis</a>. Annotated: <a href="http://files.boazbarak.org/misc/mltheory/sham1_ink.pdf">main</a> / <a href="http://files.boazbarak.org/misc/mltheory/sham2_ink.pdf">bandit analysis</a>.</p>
+
+
+
+<p><a href="https://homes.cs.washington.edu/~sham/">Sham Kakade</a> is a professor in the Department of Computer Science and the Department of Statistics at the University of Washington, as well as a senior principal researcher at Microsoft Research New York City. He works on the mathematical foundations of machine learning and AI. He is the recipient of the several awards, including the ICML Test of Time Award (2020), the IBM Pat Goldberg best paper award (in 2007), and the INFORMS Revenue Management and Pricing Prize (2014).</p>
+
+
+
+<p>Sham is writing a <a href="https://rltheorybook.github.io/">book on the theory of reinforcement learning</a> with Agarwal, Jiang and Sun.</p>
+
+
+
+<h2>Introduction:</h2>
+
+
+
+<p>Reinforcement learning has found success in a great number of fields because it is a very “natural framework” for interactive learning. It is based around the notion of experimenting with different behaviors in one’s environment and learning from mistakes to identify the optimal strategy. However, there is a lack of understanding regarding how to best optimize reinforcement learning algorithms when there is uncertainty about the agent’s environment and potential rewards. Therefore, it is important to develop a theoretical foundation about this to study generalization in reinforcement learning. The primary question these notes will address is as follows:</p>
+
+
+
+<p><strong>What are necessary representational and distributional conditions that enable provably sample-efficient reinforcement learning?</strong></p>
+
+
+
+<p>We will answer this question in the following parts.</p>
+
+
+
+<ul><li><strong>Part I: Bandits &amp; Linear Bandits</strong> “Bandit problems” correspond to RL where the environment is reset in each step (horizon H=1). This captures the aspect of having an unknown reward function of RL, but does not capture the aspect of a changing environment based on agent’s actions. This part will be based on the papers <a href="https://homes.cs.washington.edu/~sham/papers/ml/bandit_rates.pdf">Dani-Hayes-Kakade 08</a> and <a href="https://arxiv.org/abs/0912.3995">Srinivas-Kakade-Krause-Seeger 10</a></li><li><strong>Part II: Lower Bounds</strong> RL is very much <em>not</em> a solved problem in neither theory nor practice. Even the RL analog of linear regression, when the expected reward is a linear function of the actions, is not solved. We will see that this is for a good reason: there is an exponential lower bound on the number of steps it takes to find a nearly-optimal policy in this case. This part is based on the recent paper <a href="https://arxiv.org/abs/2010.01374">Weisz-Amortila-Szepesvári 20</a> and the follow-up <a href="https://arxiv.org/abs/2103.12690">Wang-Wang-Kakade 21</a></li><li><strong>Interlude:</strong> Do these lower bounds matter in practice?</li><li><strong>Part III: Upper Bounds</strong> Given the lower bound, we see that to get positive results (aka <em>upper bounds</em> on the number of steps) we need to make strong assumptions on the structure of reqards. There have been a number of incomparable such assumptions used, and we will see that there is a way to unify them. This part is based on the recent paper <a href="https://arxiv.org/abs/2103.10897">Du-Kakade-Lee-Lovett-Mahajan-Sun-Wang 21</a></li></ul>
+
+
+
+<p>Before all of these parts, we will start by introducing the general framework of Markov Decision Processes (MDPs) and do a quick tour of generalization for static learning and RL.</p>
+
+
+
+<h3>Markov Decision Processes: A Framework for Reinforcement Learning</h3>
+
+
+
+<p>We have an agent in an environment at state <img src="https://s0.wp.com/latex.php?latex=s_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s_t" class="latex" /> that takes some action <img src="https://s0.wp.com/latex.php?latex=a_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a_t" class="latex" /> which will observe some reward <img src="https://s0.wp.com/latex.php?latex=r_%7Bt%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="r_{t}" class="latex" /> and update the environment to state <img src="https://s0.wp.com/latex.php?latex=s_%7Bt%2B1%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s_{t+1}" class="latex" />.</p>
+
+
+
+<figure class="wp-block-image"><img src="https://windowsontheory.files.wordpress.com/2021/04/f7a66-17cuaqjq97x1h_sbieavvzg.png" alt="" /></figure>
+
+
+
+<p>The following are some key terms that we will need throughout the rest of the notes:</p>
+
+
+
+<ol><li><em>State Space, Action Space, Policy</em>: We denote the state space as <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BS%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{S}" class="latex" />, and the action space as <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BA%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{A}" class="latex" />. A policy <img src="https://s0.wp.com/latex.php?latex=%5Cpi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi" class="latex" /> is a mapping from states to actions: <img src="https://s0.wp.com/latex.php?latex=%5Cpi%3A+%5Cmathcal%7BS%7D+%5Cto+%5Cmathcal%7BA%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi: \mathcal{S} \to \mathcal{A}" class="latex" /></li><li><strong>Trajectory</strong>: The sequence of states, actions, rewards an agent sees for a horizon of <img src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="H" class="latex" /> timesteps. <img src="https://s0.wp.com/latex.php?latex=%28s_1%2C+a_1%2C+r_1%2C+s_2%2C+a_2%2C+r_2%2C+%5Cdots%2C+s_%7BH%7D%2C+a_%7BH%7D%2C+r_%7BH%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(s_1, a_1, r_1, s_2, a_2, r_2, \dots, s_{H}, a_{H}, r_{H})" class="latex" /></li><li><em>State Value at time <img src="https://s0.wp.com/latex.php?latex=h&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h" class="latex" /></em>: The expected cumulative reward starting from state <img src="https://s0.wp.com/latex.php?latex=s&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s" class="latex" /> and using policy <img src="https://s0.wp.com/latex.php?latex=%5Cpi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi" class="latex" /> afterwards.</li><li><img src="https://s0.wp.com/latex.php?latex=V_h%5E%5Cpi%28s%29+%3D+%5Cmathbb%7BE%7D+%5Cleft%5B+%5Csum_%7Bt%3Dh%7D%5E%7BH%7D+r_t+%5Cvert+s_h+%3D+s+%5Cright%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="V_h^\pi(s) = \mathbb{E} \left[ \sum_{t=h}^{H} r_t \vert s_h = s \right]" class="latex" /></li><li><em>State Action Value at time <img src="https://s0.wp.com/latex.php?latex=h&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h" class="latex" /></em>: The expected cumulative reward given a state-action tuple <img src="https://s0.wp.com/latex.php?latex=%28s%2Ca%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(s,a)" class="latex" /> starting from time <img src="https://s0.wp.com/latex.php?latex=h&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h" class="latex" /> and using policy <img src="https://s0.wp.com/latex.php?latex=%5Cpi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi" class="latex" /> afterwards. <img src="https://s0.wp.com/latex.php?latex=Q_h%5E%5Cpi%28s%2Ca%29+%3D+%5Cmathbb%7BE%7D+%5Cleft%5B+%5Csum_%7Bt%3Dh%7D%5E%7BH%7D+r_t+%5Cvert+s_h+%3D+s%2C+a_h+%3D+a+%5Cright%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^\pi(s,a) = \mathbb{E} \left[ \sum_{t=h}^{H} r_t \vert s_h = s, a_h = a \right]" class="latex" /></li><li><em>Optimal value and state-value function</em>: we define an optimal policy by <img src="https://s0.wp.com/latex.php?latex=%5Cpi%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi^\star" class="latex" />, and the associated optimal <img src="https://s0.wp.com/latex.php?latex=Q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q" class="latex" />-function and value function by <img src="https://s0.wp.com/latex.php?latex=Q%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q^\star" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=V%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="V^\star" class="latex" /> respectively (or equivalently, <img src="https://s0.wp.com/latex.php?latex=Q%5E%7B%5Cpi%5E%5Cstar%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q^{\pi^\star}" class="latex" />, <img src="https://s0.wp.com/latex.php?latex=V%5E%7B%5Cpi%5E%5Cstar%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="V^{\pi^\star}" class="latex" />). Note that <img src="https://s0.wp.com/latex.php?latex=Q%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q^\star" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=V%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="V^\star" class="latex" /> can be defined via the Bellman optimality equation as follows:</li></ol>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=V_h%5E%5Cstar%28s%29+%3D+%5Cmax_%7Ba+%5Cin+%5Cmathcal%7BA%7D%7D+Q_h%5E%5Cstar%28s%2Ca%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="V_h^\star(s) = \max_{a \in \mathcal{A}} Q_h^\star(s,a)" class="latex" /></p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=Q_h%5E%5Cstar%28s%2Ca%29+%3D+%5Cmathbb%7BE%7D%5Cleft%5BR_h%28s%2Ca%29+%2B+V_%7Bh%2B1%7D%5E%5Cstar%28s_%7Bh%2B1%7D%29+%5Cmid+s_h+%3D+s%2C+a_h+%3D+a+%5Cright%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^\star(s,a) = \mathbb{E}\left[R_h(s,a) + V_{h+1}^\star(s_{h+1}) \mid s_h = s, a_h = a \right]" class="latex" /></p>
+
+
+
+<p>where we additionally define <img src="https://s0.wp.com/latex.php?latex=V_%7BH%2B1%7D%28s%29+%3D+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="V_{H+1}(s) = 0" class="latex" /> for all <img src="https://s0.wp.com/latex.php?latex=s+%5Cin+%5Cmathcal%7BS%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s \in \mathcal{S}" class="latex" />.</p>
+
+
+
+<ol start="6"><li><strong>Goal:</strong> To find a policy <img src="https://s0.wp.com/latex.php?latex=%5Cpi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi" class="latex" /> that maximizes the cumulative H-step reward <img src="https://s0.wp.com/latex.php?latex=V_1%5E%5Cpi%28s%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="V_1^\pi(s)" class="latex" /> starting from an initial state <img src="https://s0.wp.com/latex.php?latex=s&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s" class="latex" /> with a horizon <img src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="H" class="latex" />. In the episodic setting, one starts at state <img src="https://s0.wp.com/latex.php?latex=s_1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s_1" class="latex" />, acts for <img src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="H" class="latex" /> steps, and then repeats.</li></ol>
+
+
+
+<h3>Challenges in Reinforcement Learning</h3>
+
+
+
+<p>There are three main challenges that we face in reinforcement learning</p>
+
+
+
+<ol><li><strong>Exploration:</strong> The total size and states of the environment may be unknown.</li><li><em>Credit Assignment:</em> We need to assign rewards to actions even if the rewards are delayed.</li><li><em>Large State/Action Spaces:</em> We face the curse of dimensionality.<ul><li><a href="https://openai.com/blog/learning-dexterity/">OpenAI 2019 Dexterous Robotic Hand Manipulation</a></li></ul><img src="https://i.imgur.com/PIIli4L.gif" alt="" /></li></ol>
+
+
+
+<p><strong>We will deal with these problems by framing them in terms of generalization.</strong></p>
+
+
+
+<h2>Part 0: A Whirlwind Tour of Generalization</h2>
+
+
+
+<h3>Provable Generalization in Supervised Learning</h3>
+
+
+
+<p>As we have seen in <a href="https://windowsontheory.org/2021/01/31/a-blitz-through-classical-statistical-learning-theory/">the first lecture of this course</a>, generalization is possible in the supervised learning setting, when the data follows an i.i.d distribution.<br />Specifically we have the following bound</p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Occam’s Razor Bound (Finite Hypothesis Class):</strong> To learn a policy that is <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon-&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon-" class="latex" />close to the best policy in a hypothesis class <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{F}" class="latex" />, we need a number of samples that is <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BO%7D+%28%5Clog%28%7C%5Cmathcal%7BF%7D%7C%29+%2F+%5Cepsilon%5E2%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{O} (\log(|\mathcal{F}|) / \epsilon^2)" class="latex" />.</p></blockquote>
+
+
+
+<p>This means we can try lots of things on our data to see which hypotheses are <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon" class="latex" />-best. To handle infinite hypothesis classes, we can replace <img src="https://s0.wp.com/latex.php?latex=%5Clog+%7C%5Cmathcal%7BF%7D%7C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\log |\mathcal{F}|" class="latex" /> with various other “complexity measures” to obtain generalization bounds such as:</p>
+
+
+
+<ul><li>VC Dimension: <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BO%7D+%28%5Ctext%7BVC%7D%28%5Cmathcal%7BF%7D%29+%2F+%5Cepsilon%5E2%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{O} (\text{VC}(\mathcal{F}) / \epsilon^2)" class="latex" /></li><li>Classification (Margin Bounds): <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BO%7D+%28%5Ctext%7Bmargin%7D+%2F+%5Cepsilon%5E2%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{O} (\text{margin} / \epsilon^2)" class="latex" /></li><li>Linear Regression: <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BO%7D%28%5Ctext%7Bdimension%7D%2F%5Cepsilon%5E2%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{O}(\text{dimension}/\epsilon^2)" class="latex" /></li><li>Deep Learning: Algorithm also determines the complexity control</li></ul>
+
+
+
+<p>Another way to say this is that in all of these cases, we can bound the generalization gap <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon" class="latex" /> by a quantity of the form <img src="https://s0.wp.com/latex.php?latex=O%28%5Csqrt%7Bd%2Fn%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="O(\sqrt{d/n})" class="latex" /> where <img src="https://s0.wp.com/latex.php?latex=d&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="d" class="latex" /> is some “complexity measure” of the class <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{F}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="n" class="latex" /> is the number of samples.</p>
+
+
+
+<p>One reference for these generalization results in the supervised learning setting is the following <a href="https://www.cs.princeton.edu/courses/archive/fall19/cos597B/lecnotes/bookdraft.pdf">book</a> by Sanjeev Arora and collaborators.</p>
+
+
+
+<p>The key enabler of generalization in supervised learning is <em>data reuse</em>. For a given training set, we can in principle simultaneously evaluate the loss of all hypotheses in our class. For example, given the fixed ImageNet dataset, we can evaluate performance on any classifier. As we will see, this is not a property that will always hold in RL (when it does hold, sample-efficient generalization is likely to follow).</p>
+
+
+
+<h3>Sample Efficient RL in the Tabular Case with few states and actions (No Generalization involved):</h3>
+
+
+
+<p>Consider a tabular MDP setting where <img src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="S" class="latex" /> , <img src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="A" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="H" class="latex" /> denote the number of states, number of actions and length of the horizon respectively. Suppose we are operating in a setup where <img src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="S" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="A" class="latex" /> are both small. Suppose also that the MDP is <strong>unknown</strong>.</p>
+
+
+
+<p>Our goal in such a setting is to find a <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon" class="latex" />-optimal policy <img src="https://s0.wp.com/latex.php?latex=%5Cpi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi" class="latex" /> such that <img src="https://s0.wp.com/latex.php?latex=V_%7B1%7D%5E%7B%5Cpi%7D%28s_1%29+%5Cgeq+V_1%5E%7B%5Cpi%5E%5Cstar%7D%28s_1%29+-+%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="V_{1}^{\pi}(s_1) \geq V_1^{\pi^\star}(s_1) - \epsilon" class="latex" />, where <img src="https://s0.wp.com/latex.php?latex=s_1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s_1" class="latex" /> is the initial state (for concreteness let’s assume it is deterministic), and <img src="https://s0.wp.com/latex.php?latex=%5Cpi%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi^\star" class="latex" /> is <strong>truly</strong> an optimal policy for this MDP. Since we assume the number of states and actions to be small, it is possible to explore the entire world, and finding such an <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon" class="latex" />-optimal policy is in principle possible. We thus do not have to consider any hypothesis class here (so no generalization involved), and can instead seek to be optimal under all possible mappings from states to actions.</p>
+
+
+
+<p>Think for example of the following maze MDP, where the state of the world is the cell the agent is in and the action it can take at each state is a move to each of say 4 neighboring cells. Then, if we are able to get to every state and try every action there, we would have learned the world.</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/BxUuayQ.png" alt="" /></figure>
+
+
+
+<p>In this particular scenario, randomly exploring the world will allow us to learn the world. However, if we consider a modified random exploration strategy, where the probability of going left is significantly larger (say 5 times larger) than the probability of going right, then it will take exponential time to hit the goal state. In general, even for MDPs with small state and action spaces, a purely random exploration approach may be insufficient, as we may not be exploring the world enough. What alternative approach might we then adopt in order to achieve a sample-efficient learning algorithm?</p>
+
+
+
+<blockquote class="wp-block-quote"><p><a href="https://www.cis.upenn.edu/~mkearns/papers/KearnsSinghE3.pdf"><strong>Theorem: (Kearns &amp; Singh ’98)</strong></a>. In the episodic setting, <img src="https://s0.wp.com/latex.php?latex=poly%28S%2CA%2CH%2C1%2F%5Cepsilon%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="poly(S,A,H,1/\epsilon)" class="latex" /> samples suffice to find an <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon-&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon-" class="latex" />opt policy, where <img src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="S" class="latex" /> is the number of states, <img src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="A" class="latex" /> is the number of actions, and <img src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="H" class="latex" /> is the length of the horizon.</p></blockquote>
+
+
+
+<p>The above breakthrough result was the first to demonstrate that learning an <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon" class="latex" />-opt policy is possible using just polynomially many samples. The key idea behind this is optimism and dynamic programming. In proving the result, the authors designed an algorithm called the E<img src="https://s0.wp.com/latex.php?latex=%5E3&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="^3" class="latex" /> algorithm (Explicit Explore or Exploit). The E<img src="https://s0.wp.com/latex.php?latex=%5E3&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="^3" class="latex" /> algorithm adopts a model-based approach, and relies on a “plan-to-explore” mechanism. As we act randomly, we will learn some part of the state space, and having learned this region well, we can thus accurately plan to escape it. This is where optimism comes in, since we give ourselves a bonus for escaping a region we know well.</p>
+
+
+
+<p>Based on the Kearns and Singh result, there has been a number of followup works on the tabular MDP setting. One line of work seeks to improve on the precise factors in the sample complexity.</p>
+
+
+
+<p><strong>Improvements on the sample complexity:</strong></p>
+
+
+
+<ul><li><a href="https://jmlr.org/papers/volume3/brafman02a/brafman02a.pdf">A General Polynomial Time Algorithm for Near-Optimal Reinforcement Learning</a> / Brafman-Tennenholtz 2002</li><li><a href="https://homes.cs.washington.edu/~sham/papers/thesis/sham_thesis.html">On the Sample Complexity of Reinforcement Learning</a> – Kakade 2003 (PhD Thesis).</li><li><a href="https://www.jmlr.org/papers/volume11/jaksch10a/jaksch10a.pdf">Near-Optimal Regret Bounds for Reinforcement Learning</a> – Jaksch, Ortner, Auer 2010</li><li><a href="https://arxiv.org/abs/1705.07041">Posterior sampling for reinforcement learning: worst-case regret bounds</a> – Agrawal Jia 2017</li></ul>
+
+
+
+<p>Another line of work seeks to show that <a href="https://en.wikipedia.org/wiki/Q-learning">Q-learning</a>, a model-free approach, can also achieve similar polynomial complexity, if an appropriate optimism bonus is incorporated.</p>
+
+
+
+<p><strong>Provable Q-Learning (+Bonus)</strong></p>
+
+
+
+<ul><li><a href="https://cseweb.ucsd.edu/~ewiewior/06efficient.pdf">PAC Model-Free Reinforcement Learning</a> – Strehl-Li-Wiewiora-Langford-Littman 2006</li><li><a href="https://castlelab.princeton.edu/html/ORF544/Readings/Szepesvari%20-%20Algorithms%20for%20reinforcement%20learning.pdf">Algorithms for Reinforcement Learning</a> – lecture by Szepesv´ari 2009</li><li><a href="https://arxiv.org/abs/1807.03765">Is Q-learning Provably Efficient?</a> – Jin Allen-ZhuBubeck Jordan 2018</li></ul>
+
+
+
+<p>As the range and technical depth of the above results demonstrate, even in the relatively simple tabular case, the problem is already challenging, and a precise sharp characterization of sample complexity is even more difficult. The chief source of difficulty is the unknown nature of the world (if the world was known, then we can just run dynamic programming).</p>
+
+
+
+<h3>Provable Generalization in RL:</h3>
+
+
+
+<p>Ultimately, we want to move beyond small tabular MDPs, where a polynomial dependence in the sample complexity on <img src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="S" class="latex" /> is acceptable, and achieve sample-efficient learning in big problems where the space space could be massive. Think for instance of the game of Go.</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/DNHJgnJ.jpg" alt="" /></figure>
+
+
+
+<p>In such a setting, requiring polynomially (in <img src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="S" class="latex" />) many samples is clearly unacceptable. This gives rise to the following question.</p>
+
+
+
+<p><strong>Question 1: Can we find an <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon-&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon-" class="latex" />opt policy with no <img src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="S" class="latex" /> dependence?</strong></p>
+
+
+
+<p>In order to do so, it is necessary to reutilize data in some way since we will not be able to see all the possible states in the world. How then might we reuse data to estimate the value of all policies in a policy class <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{F}" class="latex" />? A naive approach is the following:</p>
+
+
+
+<ul><li>Idea: Trajectory tree algorithm</li><li>Dataset Collection: Choose actions uniformly at random for all H steps in an episode.</li><li>Estimation: Uses importance sampling to evaluate every <img src="https://s0.wp.com/latex.php?latex=f+%5Cin+%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f \in \mathcal{F}" class="latex" />.</li></ul>
+
+
+
+<blockquote class="wp-block-quote"><p><a href="https://www.cis.upenn.edu/~mkearns/papers/traj.pdf"><strong>Theorem: (Kearns, Mansour, &amp; Ng ’00)</strong></a> To find an <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon-&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon-" class="latex" />best in class policy, the trajectory tree algorithm uses <img src="https://s0.wp.com/latex.php?latex=O%28A%5EH%5Clog%28%7C%5Cmathcal%7BF%7D%7C%29%2F%5Cepsilon%5E2%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="O(A^H\log(|\mathcal{F}|)/\epsilon^2)" class="latex" /> samples.</p></blockquote>
+
+
+
+<p>Observe that when <img src="https://s0.wp.com/latex.php?latex=H+%3D+1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="H = 1" class="latex" /> (i.e. a contextual bandit) this is exactly the kind of generalization bound we saw in the Occam Razor’s bound for supervised learning. Since there may be stochasticity in the MDP, such that <img src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="S" class="latex" /> could be infinite or even uncountable, this dependence on <img src="https://s0.wp.com/latex.php?latex=A%5EH&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="A^H" class="latex" /> is a genuine improvement on the results for the tabular MDP setting which depended polynomially on <img src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="S" class="latex" />. In this sense, this really is a generalization result, since we are learning an <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon" class="latex" />-best in class policy without having seen the entire world (i.e. all the states in the world).<br />We note that the result only has <img src="https://s0.wp.com/latex.php?latex=%5Clog%28%5Cmathcal%7BF%7D%7C%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\log(\mathcal{F}|)" class="latex" /> dependence on hypothesis class size and similar to the supervised learning setting, there are VC analogues as well. However, we can not avoid the <img src="https://s0.wp.com/latex.php?latex=A%5EH&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="A^H" class="latex" /> dependence to find an <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon-&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon-" class="latex" />best-in-class policy agnostically (without assumptions on the MDP). To see why, consider a binary tree with <img src="https://s0.wp.com/latex.php?latex=2%5EH&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="2^H" class="latex" />-policies and a sparse reward at a leaf node.</p>
+
+
+
+<p>This <img src="https://s0.wp.com/latex.php?latex=A%5EH&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="A^H" class="latex" /> dependence, while unavoidable without further assumptions, is clearly undesirable. This brings us to the following question.</p>
+
+
+
+<p><strong>Question 2: Can we find an <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon-&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon-" class="latex" />opt policy with no <img src="https://s0.wp.com/latex.php?latex=S%2CA&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="S,A" class="latex" /> dependence and <img src="https://s0.wp.com/latex.php?latex=poly%28H%2C1%2F+%5Cepsilon%2C+%5Ctext%7B%22complexity+measure%22%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="poly(H,1/ \epsilon, \text{&quot;complexity measure&quot;})" class="latex" /> samples?</strong></p>
+
+
+
+<p>As we just saw, agnostically we cannot learn an <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon" class="latex" />-best-in-class policy without an <img src="https://s0.wp.com/latex.php?latex=A%5EH&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="A^H" class="latex" /> dependence. However, as we will see it is possible when appropriate assumptions are made. But what is the nature of the assumptions under which this kind of sample-efficient RL generalization is possible (when there is no (or mild) dependence on <img src="https://s0.wp.com/latex.php?latex=S&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="S" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="A" class="latex" />)? What assumptions are necessary? What assumptions are sufficient? We will seek to address these questions.</p>
+
+
+
+<p>To do so, we start simple, and first look at the bandits and linear bandits problem, where the horizon <img src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="H" class="latex" /> is just 1. Note that this is still an interactive learning problem, just that we reset the episode after one time-step, and that it is an example of a problem with a potentially large action space.</p>
+
+
+
+<h2>Part 1: Bandits and Linear Bandits</h2>
+
+
+
+<h3>Multi-Armed Bandits:</h3>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/LHEqOwn.png" alt="" /></figure>
+
+
+
+<p>The multi-armed bandits algorithm is intimately interwoven with the theory of reinforcement learning. It is based around the question of how to allocate T tokens to A “arms” to maximize one’s return:</p>
+
+
+
+<ul><li><a href="https://www.ams.org/journals/bull/1952-58-05/S0002-9904-1952-09620-8/S0002-9904-1952-09620-8.pdf">Some Aspects of the Sequential Design of Experiments</a> – Robbins 1952</li><li><a href="https://people.eecs.berkeley.edu/~russell/classes/cs294/s11/readings/Gittins:1979.pdf">Bandit Processes and Dynamic Allocations Indices</a> – Gittins 1979</li><li><a href="https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.674.1620&amp;rep=rep1&amp;type=pdf">Asymptotically Efficient Adaptive Allocation Rules</a> – Lai and Robbins 1985</li></ul>
+
+
+
+<p>It is a very successful algorithm when <img src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="A" class="latex" /> is small. What can we do when <img src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="A" class="latex" /> is large?</p>
+
+
+
+<h4>Large-Action Case:</h4>
+
+
+
+<p>The bandits have to make a decision regarding which arm to pull. There is a widely used linear formulation of this problem that will assist us in understanding generalization. The <a href="http://phillong.info/publications/peval.pdf">linear bandit model</a> is successful in many applications (scheduling, ads, etc.)</p>
+
+
+
+<p><strong>Linear (RKHS) Bandits:</strong></p>
+
+
+
+<ul><li>Decision: <img src="https://s0.wp.com/latex.php?latex=x_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x_t" class="latex" />; Reward: <img src="https://s0.wp.com/latex.php?latex=r_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="r_t" class="latex" />; Reward model:<br /><img src="https://s0.wp.com/latex.php?latex=r_t+%3D+f%28x_t%29+%2B+%5Ctext%7Bnoise%7D%3B+f%28x%29+%3D+w%5E%5Cstar+%5Ccdot+%5Cphi%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="r_t = f(x_t) + \text{noise}; f(x) = w^\star \cdot \phi(x)" class="latex" /></li><li>The hypothesis class <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{F}" class="latex" /> is a set of linear/RKHS functions (an overview of RKHS, which stands for Reproducing Kernel Hilbert Space, can be found <a href="https://en.wikipedia.org/wiki/Reproducing_kernel_Hilbert_space">here</a>).</li></ul>
+
+
+
+<h4>Linear/Gaussian Process Upper Confidence Bounds (UCB):</h4>
+
+
+
+<p>The principle underlying the Linear Bandits algorithm is <strong>optimism in the face of uncertainty</strong>:<br />Pick an input that maximizes the upper confidence bound:</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=x_t+%3D+%5Ctext%7Barg%7D%5Cmax_%7Bx+%5Cin+D%7D+%5Cmu_%7Bt-1%7D%28x%29+%2B+%5Cbeta_t+%5Csigma_%7Bt-1%7D%28x%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x_t = \text{arg}\max_{x \in D} \mu_{t-1}(x) + \beta_t \sigma_{t-1}(x)." class="latex" /></p>
+
+
+
+<p>Note that <img src="https://s0.wp.com/latex.php?latex=%5Cmu_%7Bt-1%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mu_{t-1}" class="latex" /> is the best estimate of the ground-truth and <img src="https://s0.wp.com/latex.php?latex=%5Csigma_%7Bt-1%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\sigma_{t-1}" class="latex" /> is a standard deviation that we have to estimate. In choosing the term <img src="https://s0.wp.com/latex.php?latex=%5Cbeta_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\beta_t" class="latex" />, we have to navigate a trade-off between exploration and exploitation. As we can see, this algorithm will only pick plausible maximizers.</p>
+
+
+
+<h4>Regret of Linear-UCB / Gaussian Process-UCB (Generalization in Action Space)</h4>
+
+
+
+<blockquote class="wp-block-quote"><p><strong><a href="http://people.cs.uchicago.edu/~varsha/pubs/stoch_bandit.pdf">Theorem: (Dani, Hayes, &amp; K. ’08)</a>, <a href="https://arxiv.org/pdf/0912.3995.pdf">(Srinivas, Krause, K., &amp; Seeger ’10)</a></strong>. Assuming <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{F}" class="latex" /> is an RKHS (with bounded norm), if we choose <img src="https://s0.wp.com/latex.php?latex=%5Cbeta_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\beta_t" class="latex" /> “correctly”, then the regret satisfies<br /><img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7BT%7D+%5Csum_%7Bt%3D1%7D%5ET%5Bf%28x%5E%5Cstar%29+-+f%28x_t%29%5D+%3D+%5Ctilde%7B%5Cmathcal%7BO%7D%7D+%5Cleft%28+%5Csqrt%7B%5Cfrac%7B%5Cgamma_T%7D%7BT%7D%7D+%5Cright%29%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\frac{1}{T} \sum_{t=1}^T[f(x^\star) - f(x_t)] = \tilde{\mathcal{O}} \left( \sqrt{\frac{\gamma_T}{T}} \right)," class="latex" /><br />where <img src="https://s0.wp.com/latex.php?latex=%5Ctilde%7B%5Cmathcal%7BO%7D%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\tilde{\mathcal{O}}" class="latex" /> hides logarithmic terms, and </p></blockquote>
+
+
+
+<figure class="wp-block-image size-large"><a href="https://windowsontheory.files.wordpress.com/2021/04/image.png"><img src="https://windowsontheory.files.wordpress.com/2021/04/image.png?w=1024" alt="" class="wp-image-8095" /></a></figure>
+
+
+
+<p>The key complexity concept here is “Maximum Information Gain”: <img src="https://s0.wp.com/latex.php?latex=%5Cgamma_T&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\gamma_T" class="latex" />, which one can think of as the “effective dimension,” determines the regret because <img src="https://s0.wp.com/latex.php?latex=%5Cgamma_T+%5Capprox+d+%5Clog+T&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\gamma_T \approx d \log T" class="latex" /> for <img src="https://s0.wp.com/latex.php?latex=%5Cphi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\phi" class="latex" /> in <img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BR%7D%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{R}^d" class="latex" />. Here are some relevant papers for further understanding regret, which is the difference between the reward of a possible action and the reward of an action that has been taken.</p>
+
+
+
+<ul><li><a href="https://homes.di.unimi.it/cesa-bianchi/Pubblicazioni/ml-02.pdf">Finite-time Analysis of the Multiarmed Bandit Problem</a> – Auer Cesa-Bianchi Fischer 2002</li><li><a href="https://papers.nips.cc/paper/2011/file/e1d5be1c7f2f456670de3d53c7b54f4a-Paper.pdf">Improved Algorithms for Linear Stochastic Bandits</a> – Abbasi-yadkori, Pál, Szepesvári 2011</li></ul>
+
+
+
+<h3>Linear Upper Confidence Bound Analysis</h3>
+
+
+
+<h4>Handling Large Action Spaces</h4>
+
+
+
+<p>On each round, we must choose a decision <img src="https://s0.wp.com/latex.php?latex=x_t+%5Cin+D+%5Csubset+R%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x_t \in D \subset R^d" class="latex" />. This yields a reward <img src="https://s0.wp.com/latex.php?latex=r_t+%5Cin+%5B-1%2C1%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="r_t \in [-1,1]" class="latex" />, where</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D%5Br_t+%7C+x_t+%3D+x%5D+%3D+%5Cmu%5E%5Cstar+%5Ccdot+x+%5Cin+%5B-1%2C1%5D.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{E}[r_t | x_t = x] = \mu^\star \cdot x \in [-1,1]." class="latex" /></p>
+
+
+
+<p>Above, <img src="https://s0.wp.com/latex.php?latex=%5Cmu%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mu^\star" class="latex" /> is an unknown weight vector and <img src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x" class="latex" /> may be replaced by <img src="https://s0.wp.com/latex.php?latex=%5Cphi%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\phi(x)" class="latex" /> if we have access to such a representation. Note that this tells us that the conditional expectation of <img src="https://s0.wp.com/latex.php?latex=r_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="r_t" class="latex" /> upon <img src="https://s0.wp.com/latex.php?latex=x_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x_t" class="latex" /> is linear. We have the a corresponding i.i.d. noise sequence <img src="https://s0.wp.com/latex.php?latex=%5Ceta_t+%3D+r_t+-+%5Cmu%5E%5Cstar+%5Ccdot+x_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\eta_t = r_t - \mu^\star \cdot x_t" class="latex" />. If <img src="https://s0.wp.com/latex.php?latex=%28x_0%2C+%5Cdots%2C+x_%7BT-1%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(x_0, \dots, x_{T-1})" class="latex" /> are our decisions, then our <em>cumulative regret</em> in expectation is</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=R_T+%3D+T%28%5Cmu%5E%5Cstar+%5Ccdot+x%5E%5Cstar%29+-+%5Csum_%7Bt%3D0%7D%5E%7BT+-+1%7D+%5Cmu%5E%5Cstar+%5Ccdot+x_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="R_T = T(\mu^\star \cdot x^\star) - \sum_{t=0}^{T - 1} \mu^\star \cdot x_t" class="latex" /></p>
+
+
+
+<p>where <img src="https://s0.wp.com/latex.php?latex=x%5E%5Cstar%5Cin+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x^\star\in D" class="latex" /> is an optimal decision for <img src="https://s0.wp.com/latex.php?latex=%5Cmu%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mu^\star" class="latex" />, i.e.</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=x%5E%5Cstar+%5Cin+%5Ctext%7Barg%7D%5Cmax_%7Bx+%5Cin+D%7D+%5Cmu%5E%5Cstar+%5Ccdot+x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x^\star \in \text{arg}\max_{x \in D} \mu^\star \cdot x" class="latex" /></p>
+
+
+
+<h4>LinUCB and the Confidence Ball</h4>
+
+
+
+<p>After t rounds, we can define our uncertainty region <img src="https://s0.wp.com/latex.php?latex=%5Ctext%7BBALL%7D_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\text{BALL}_t" class="latex" /> with center <img src="https://s0.wp.com/latex.php?latex=%5Chat%7B%5Cmu_t%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\hat{\mu_t}" class="latex" /> and shape <img src="https://s0.wp.com/latex.php?latex=%5CSigma_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\Sigma_t" class="latex" /> using the <img src="https://s0.wp.com/latex.php?latex=%5Clambda-&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\lambda-" class="latex" />regularized least squares solution:</p>
+
+
+
+<ul><li><img src="https://s0.wp.com/latex.php?latex=%5Chat%7B%5Cmu_t%7D+%3D+%5Ctext%7Barg%7D%5Cmin_%5Cmu+%5Csum_%7B%5Ctau+%3D+0%7D%5E%7Bt-1%7D+%5Cleft%5C%7C+%5Cmu+%5Ccdot+x_%5Ctau+-+r_%5Ctau+%5Cright%5C%7C_2%5E2+%2B+%5Clambda+%5Cleft+%5C%7C+%5Cmu+%5Cright%5C%7C_2%5E2%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\hat{\mu_t} = \text{arg}\min_\mu \sum_{\tau = 0}^{t-1} \left\| \mu \cdot x_\tau - r_\tau \right\|_2^2 + \lambda \left \| \mu \right\|_2^2," class="latex" /></li><li><img src="https://s0.wp.com/latex.php?latex=%5CSigma_t+%3D+%5Clambda+I+%2B+%5Csum_%7B%5Ctau+%3D+0%7D%5E%7Bt-1%7D+x_%5Ctau+x_%5Ctau%5E%5Ctop+%5Ctext%7B%2C+with+%7D+%5CSigma_0+%3D+%5Clambda+I%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\Sigma_t = \lambda I + \sum_{\tau = 0}^{t-1} x_\tau x_\tau^\top \text{, with } \Sigma_0 = \lambda I," class="latex" /></li><li><img src="https://s0.wp.com/latex.php?latex=%5Ctext%7BBALL%7D_t+%3D+%5Cleft%5C%7B+%5Cmu%3A+%28%5Chat%7B%5Cmu_t%7D+-+%5Cmu%29%5E%5Ctop+%5CSigma_t+%28%5Chat%7B%5Cmu_t%7D+-+%5Cmu%29+%5Cleq+%5Cbeta_t+%5Cright%5C%7D%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\text{BALL}_t = \left\{ \mu: (\hat{\mu_t} - \mu)^\top \Sigma_t (\hat{\mu_t} - \mu) \leq \beta_t \right\}," class="latex" /></li><li><img src="https://s0.wp.com/latex.php?latex=%5Cbeta_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\beta_t" class="latex" /> is a parameter of the algorithm and <img src="https://s0.wp.com/latex.php?latex=%5CSigma_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\Sigma_t" class="latex" /> determines how accurately we know <img src="https://s0.wp.com/latex.php?latex=%5Chat%7B%5Cmu_t%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\hat{\mu_t}" class="latex" /></li></ul>
+
+
+
+<p>The LinUCB Algorithm can be understood as follows: For <img src="https://s0.wp.com/latex.php?latex=t+%3D+0%2C1%2C%5Cdots&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="t = 0,1,\dots" class="latex" /></p>
+
+
+
+<ol><li>Execute <img src="https://s0.wp.com/latex.php?latex=x_t+%3D+%5Ctext%7Barg%7D%5Cmax_%7Bx+%5Cin+D%7D+%5Cmax_%7B%5Cmu+%5Cin+%5Ctext%7BBALL%7D_t%7D+%5Cmu+%5Ccdot+x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x_t = \text{arg}\max_{x \in D} \max_{\mu \in \text{BALL}_t} \mu \cdot x" class="latex" /></li><li>Observe the reward <img src="https://s0.wp.com/latex.php?latex=r_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="r_t" class="latex" /> and update <img src="https://s0.wp.com/latex.php?latex=%5Ctext%7BBALL%7D_%7Bt%2B1%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\text{BALL}_{t+1}" class="latex" /></li></ol>
+
+
+
+<h4>LinUCB Regret Bound</h4>
+
+
+
+<p>As the following theorem shows, the regret <img src="https://s0.wp.com/latex.php?latex=R_T+%5Cleq+%5Ctilde%7B%5Cmathcal%7BO%7D+%7D%28d%5Csqrt+T%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="R_T \leq \tilde{\mathcal{O} }(d\sqrt T)" class="latex" /> is sublinear with polynomial dependence on <img src="https://s0.wp.com/latex.php?latex=d&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="d" class="latex" /> and no dependence on the cardinality <img src="https://s0.wp.com/latex.php?latex=%7CD%7C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="|D|" class="latex" /> of the decision space <img src="https://s0.wp.com/latex.php?latex=D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="D" class="latex" />.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><a href="https://homes.cs.washington.edu/~sham/papers/ml/bandit_linear_long.pdf"><strong>Theorem (regret): (Dani, Hayes, Kakade 2009)</strong></a>. Suppose we have bounded noise <img src="https://s0.wp.com/latex.php?latex=%7C%5Ceta_t%7C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="|\eta_t|" class="latex" />; <img src="https://s0.wp.com/latex.php?latex=%7C%7C+%5Cmu%5E%5Cstar+%7C%7C+%5Cleq+W&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="|| \mu^\star || \leq W" class="latex" />; <img src="https://s0.wp.com/latex.php?latex=%7C%7Cx%7C%7C+%5Cleq+B&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="||x|| \leq B" class="latex" />, for <img src="https://s0.wp.com/latex.php?latex=x%5C+%5Cin+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x\ \in D" class="latex" />. Set <img src="https://s0.wp.com/latex.php?latex=%5Clambda+%3D+%5Csigma%5E2%2FW%5E2%2C+%5Cquad+%5Cbeta_t+%3A%3D+c_1+%5Csigma%5E2%5Cleft%28d+%5Clog%5Cleft%281+%2B+%5Cfrac%7BTB%5E2%7D%7Bd%7D%5Cright%29+%2B+%5Clog%281+%2F%5Cdelta%29%5Cright%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\lambda = \sigma^2/W^2, \quad \beta_t := c_1 \sigma^2\left(d \log\left(1 + \frac{TB^2}{d}\right) + \log(1 /\delta)\right)." class="latex" /> Then, with probability greater than <img src="https://s0.wp.com/latex.php?latex=1+-+%5Cdelta&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="1 - \delta" class="latex" />, for all <img src="https://s0.wp.com/latex.php?latex=t+%5Cgeq+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="t \geq 0" class="latex" />,<br /><img src="https://s0.wp.com/latex.php?latex=R_T+%5Cleq+c_2+%5Csigma+%5Csqrt%7BT%7D+%5Cleft+%28+d+%5Clog%5Cleft%281+%2B+%5Cfrac%7BTB%5E2%7D%7Bd+%5Csigma%5E2%7D%5Cright%29+%2B+%5Csqrt%7B%5Clog%281+%2F%5Cdelta%29%7D%5Csqrt%7Bd+%5Clog%5Cleft%281+%2B+%5Cfrac%7BTB%5E2%7D%7Bd%7D%5Cright%29%7D+%5Cright%29%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="R_T \leq c_2 \sigma \sqrt{T} \left ( d \log\left(1 + \frac{TB^2}{d \sigma^2}\right) + \sqrt{\log(1 /\delta)}\sqrt{d \log\left(1 + \frac{TB^2}{d}\right)} \right)," class="latex" /><br />where <img src="https://s0.wp.com/latex.php?latex=c_1%2Cc_2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="c_1,c_2" class="latex" /> are absolute constants.</p></blockquote>
+
+
+
+<p>To prove the regret theorem above, we will require the following two lemmas.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Lemma 1 (Confidence):</strong> Let <img src="https://s0.wp.com/latex.php?latex=%5Cdelta+%3E+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\delta &gt; 0" class="latex" />. We have that <img src="https://s0.wp.com/latex.php?latex=Pr%28%5Cforall+t%2C+%5Cmu%5E%5Cstar+%5Cin+%5Ctext%7BBALL%7D_t%29+%5Cgeq+1+-+%5Cdelta.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Pr(\forall t, \mu^\star \in \text{BALL}_t) \geq 1 - \delta." class="latex" /></p><p><strong>Lemma 2 (Sum of Squares Regret Bound):</strong> Define <img src="https://s0.wp.com/latex.php?latex=%5Ctext%7Bregret%7D_t+%3D+%5Cmu%5E%5Cstar+%5Ccdot+x%5E%5Cstar+-+%5Cmu%5E%5Cstar+%5Ccdot+x_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\text{regret}_t = \mu^\star \cdot x^\star - \mu^\star \cdot x_t" class="latex" />. Suppose <img src="https://s0.wp.com/latex.php?latex=%5Cbeta_t+%5Cgeq+1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\beta_t \geq 1" class="latex" /> is increasing and that for all <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="t" class="latex" />, we have <img src="https://s0.wp.com/latex.php?latex=%5Cmu%5E%5Cstar+%5Cin+%5Ctext%7BBALL%7D_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mu^\star \in \text{BALL}_t" class="latex" />. Then, <img src="https://s0.wp.com/latex.php?latex=%5Csum_%7Bt%3D0%7D%5E%7BT-1%7D+%5Ctext%7Bregret%7D_t%5E2+%5Cleq+8+%5Cbeta_T+d+%5Clog+%5Cleft+%28+1+%2B+%5Cfrac%7BTB%5E2%7D%7Bd%5Clambda%7D+%5Cright+%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\sum_{t=0}^{T-1} \text{regret}_t^2 \leq 8 \beta_T d \log \left ( 1 + \frac{TB^2}{d\lambda} \right )." class="latex" /></p></blockquote>
+
+
+
+<p>We note that Lemma 2 actually depends on Lemma 1, since it assumes that <img src="https://s0.wp.com/latex.php?latex=%5Cmu%5E%5Cstar+%5Cin+%5Ctext%7BBALL%7D_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mu^\star \in \text{BALL}_t" class="latex" /> for each <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="t" class="latex" />, a property that Lemma 1 tells us happens with probability at least <img src="https://s0.wp.com/latex.php?latex=1-%5Cdelta&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="1-\delta" class="latex" />. We defer the proofs of the two lemmas to later, and first show why they can be used to prove the regret theorem.</p>
+
+
+
+<p><strong>Proof of regret theorem:</strong> Using the two lemmas above along with the Cauchy-Schwarz inequality, we have with probability at least <img src="https://s0.wp.com/latex.php?latex=1+-+%5Cdelta&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="1 - \delta" class="latex" /> that</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=R_T+%3D+%5Csum_%7Bt%3D0%7D%5E%7BT-1%7D+%5Ctext%7Bregret%7D_t+%5Cleq+%5Csqrt%7BT+%5Csum%7Bt%3D0%7D%5E%7BT-1%7D+%5Ctext%7Bregret%7D_t%5E2%7D+%5Cleq+%5Csqrt%7B8+T+%5Cbeta_T+d+%5Clog+%5Cleft%28+1+%2B+%5Cfrac%7BTB%5E2%7D%7Bd%5Clambda%7D+%5Cright%29%7D.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="R_T = \sum_{t=0}^{T-1} \text{regret}_t \leq \sqrt{T \sum{t=0}^{T-1} \text{regret}_t^2} \leq \sqrt{8 T \beta_T d \log \left( 1 + \frac{TB^2}{d\lambda} \right)}." class="latex" /></p>
+
+
+
+<p>The rest of the proof follows from our chosen value of <img src="https://s0.wp.com/latex.php?latex=%5Cbeta_T&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\beta_T" class="latex" />. <img src="https://s0.wp.com/latex.php?latex=%5Csquare&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\square" class="latex" /></p>
+
+
+
+<p>We now proceed to sketch out the proofs of Lemma 1 (confidence bound) and Lemma 2 (sum of squares regret bound). We begin with showing why Lemma 2 holds.</p>
+
+
+
+<h4>Analysis and proof of Lemma 2 (sum of squares regret bound)</h4>
+
+
+
+<p>Our first auxilliary result bounds the pointwise width of the confidence ball.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Lemma (pointwise width of confidence ball)</strong>. Let <img src="https://s0.wp.com/latex.php?latex=x+%5Cin+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x \in D" class="latex" />. Consider any <img src="https://s0.wp.com/latex.php?latex=%5Cmu+%5Cin+%5Ctext%7BBALL%7D_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mu \in \text{BALL}_t" class="latex" />. Then,<br /><img src="https://s0.wp.com/latex.php?latex=%7C+%28%5Cmu+-+%5Chat%7B%5Cmu%7D_t%29%5E%5Ctop+x%7C+%5Cleq+%5Csqrt%7B%5Cbeta_t+x%5E%5Ctop+%5CSigma_t%5E%7B-1%7Dx%7D.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="| (\mu - \hat{\mu}_t)^\top x| \leq \sqrt{\beta_t x^\top \Sigma_t^{-1}x}." class="latex" /></p></blockquote>
+
+
+
+<p><em><strong>Proof</strong></em>. We have</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/ghNhZRo.png" alt="" /></figure>
+
+
+
+<p>where the first inequality follows from Cauchy-Schwarx and the second (i.e last) inequality holds by the definition of <img src="https://s0.wp.com/latex.php?latex=%5Ctext%7BBALL%7D_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\text{BALL}_t" class="latex" /> and our assumption that <img src="https://s0.wp.com/latex.php?latex=%5Cmu+%5Cin+%5Ctext%7BBALL%7D_t.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mu \in \text{BALL}_t." class="latex" /> <img src="https://s0.wp.com/latex.php?latex=%5Csquare&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\square" class="latex" /></p>
+
+
+
+<p>Let us now define</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=w_t+%3A%3D+%5Csqrt%7Bx_t%5E%5Ctop+%5CSigma_t%5E%7B-1%7Dx_t%7D%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w_t := \sqrt{x_t^\top \Sigma_t^{-1}x_t}," class="latex" /></p>
+
+
+
+<p>which we can think of as the “normalized width” at time <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="t" class="latex" /> in the direction of our decision. We have the following bound on the instantaneous regret <img src="https://s0.wp.com/latex.php?latex=%5Ctext%7Bregret%7D_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\text{regret}_t" class="latex" />.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Lemma (instantaneous regret lemma)</strong>. Fix <img src="https://s0.wp.com/latex.php?latex=t+%5Cleq+T&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="t \leq T" class="latex" />. If <img src="https://s0.wp.com/latex.php?latex=%5Cmu%5E%5Cstar+%5Cin+%5Ctext%7BBALL%7D_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mu^\star \in \text{BALL}_t" class="latex" />, then<br /><img src="https://s0.wp.com/latex.php?latex=%5Ctext%7Bregret%7D_t+%5Cleq+2+%5Cmin+%28%5Csqrt%7B%5Cbeta_t%7Dw_t%2C+1%29+%5Cleq+2+%5Csqrt%7B%5Cbeta_t%7D+%5Cmin%28w_t%2C1%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\text{regret}_t \leq 2 \min (\sqrt{\beta_t}w_t, 1) \leq 2 \sqrt{\beta_t} \min(w_t,1)." class="latex" /></p></blockquote>
+
+
+
+<p><em><strong>Proof</strong></em>. The basic idea is to use “optimism”. Let $latex \tilde{\mu} \in \text{BALL}<em>t&amp;bg=ffffff$ denote the vector maximizing the dot product <img src="https://s0.wp.com/latex.php?latex=%5Chat%7B%5Cmu%7D%5E%5Ctop+x_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\hat{\mu}^\top x_t" class="latex" />. By choice of <img src="https://s0.wp.com/latex.php?latex=x_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x_t" class="latex" />, $latex \tilde{\mu}^\top x_t = \max{\mu \in \text{BALL}_t} \max</em>{x \in D}\mu^\top x \geq (\mu^\star)^\top x^\star&amp;bg=ffffff$, where the inequality used the hypothesis that <img src="https://s0.wp.com/latex.php?latex=%5Cmu%5E%5Cstar+%5Cin+%5Ctext%7BBALL%7D_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mu^\star \in \text{BALL}_t" class="latex" />. This manifestation of “optimism” is crucial, since it tells us that the “ideal” reward we think we can get at time <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="t" class="latex" /> exceeds the optimal expected reward <img src="https://s0.wp.com/latex.php?latex=%28%5Cmu%5E%5Cstar%29%5E%5Ctop+x%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(\mu^\star)^\top x^\star" class="latex" />. Hence,</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/CO4lDFc.png" alt="" /></figure>
+
+
+
+<p>where the last step follows from the pointwise width lemma (note <img src="https://s0.wp.com/latex.php?latex=%5Ctilde%7B%5Cmu%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\tilde{\mu}" class="latex" /> is in <img src="https://s0.wp.com/latex.php?latex=%5Ctext%7BBALL%7D_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\text{BALL}_t" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%5Cmu%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mu^\star" class="latex" /> is assumed to be <img src="https://s0.wp.com/latex.php?latex=%5Ctext%7BBALL%7D_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\text{BALL}_t" class="latex" /> by the hypothesis in Lemma 2). Since in the linear bandits setup we assumed that <img src="https://s0.wp.com/latex.php?latex=%5Cmu%5E%5Cstar+%5Ccdot+x+%5Cin+%5B-1%2C1%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mu^\star \cdot x \in [-1,1]" class="latex" /> for all <img src="https://s0.wp.com/latex.php?latex=x+%5Cin+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x \in D" class="latex" />, the simple bound <img src="https://s0.wp.com/latex.php?latex=%5Ctext%7Bregret%7D_t+%5Cleq+2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\text{regret}_t \leq 2" class="latex" /> holds as well. We may also assume for simplicity that <img src="https://s0.wp.com/latex.php?latex=%5Cbeta_t+%5Cgeq+1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\beta_t \geq 1" class="latex" />. This then yields the bound in the result. <img src="https://s0.wp.com/latex.php?latex=%5Csquare&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\square" class="latex" /></p>
+
+
+
+<p>In the next two lemmas, we use a geometric potential function argument to bound the sum of widths independently of the choices made by the algorithm (e.g. choice of <img src="https://s0.wp.com/latex.php?latex=%5Clambda&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\lambda" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7B%5Cbeta_t%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="{\beta_t}" class="latex" /> sequence).</p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Geometric Lemma 1</strong>. We have <img src="https://s0.wp.com/latex.php?latex=%5Cdet%28%5CSigma_T%29+%3D+%5Cdet%28%5CSigma_0%29+%5Cprod_%7Bt%3D0%7D%5E%7BT-1%7D+%281%2Bw_t%5E2%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\det(\Sigma_T) = \det(\Sigma_0) \prod_{t=0}^{T-1} (1+w_t^2)." class="latex" /></p></blockquote>
+
+
+
+<p><em><strong>Proof</strong></em>. By definition of <img src="https://s0.wp.com/latex.php?latex=%5CSigma_%7Bt%2B1%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\Sigma_{t+1}" class="latex" />, we have</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/qX7Q3Ft.png" alt="" /></figure>
+
+
+
+<p>We complete the proof by noting that <img src="https://s0.wp.com/latex.php?latex=w_t%5E2+%3D+x_t%5E%5Ctop+%5CSigma_t%5E%7B-1%7Dx_t+%3D+%7C%5CSigma_t%5E%7B-1%2F2%7Dx_t+%7C%5E2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w_t^2 = x_t^\top \Sigma_t^{-1}x_t = |\Sigma_t^{-1/2}x_t |^2" class="latex" />. <img src="https://s0.wp.com/latex.php?latex=%5Csquare&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\square" class="latex" /></p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Geometric Lemma 2</strong>. For any sequence <img src="https://s0.wp.com/latex.php?latex=x_0%2C%5Cdots%2Cx_%7BT-1%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x_0,\dots,x_{T-1}" class="latex" /> such that for <img src="https://s0.wp.com/latex.php?latex=t+%3C+T&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="t &lt; T" class="latex" />, <img src="https://s0.wp.com/latex.php?latex=%7Cx_t%7C_2+%5Cleq+B&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="|x_t|_2 \leq B" class="latex" />, we have<br /><img src="https://s0.wp.com/latex.php?latex=%5Clog%5Cleft%28%5Cdet%28%5CSigma_%7BT-1%7D%29%2F%5Cdet%28%5CSigma_0%29%5Cright%29+%3D+%5Clog+%5Cdet+%5Cleft%28I+%2B+%5Cfrac%7B1%7D%7B%5Cgamma%7D+%5Csum_%7Bt%3D0%7D%5E%7BT-1%7D+x_tx_t%5E%5Ctop+%5Cright%29+%5Cleq+d+%5Clog+%5Cleft%281+%2B+%5Cfrac%7BTB%5E2%7D%7Bd%5Clambda%7D%5Cright%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\log\left(\det(\Sigma_{T-1})/\det(\Sigma_0)\right) = \log \det \left(I + \frac{1}{\gamma} \sum_{t=0}^{T-1} x_tx_t^\top \right) \leq d \log \left(1 + \frac{TB^2}{d\lambda}\right)." class="latex" /></p></blockquote>
+
+
+
+<p><em><strong>Proof</strong></em>. Denote the eigenvalues of <img src="https://s0.wp.com/latex.php?latex=%5Csum_%7Bt%3D0%7D%5E%7BT-1%7Dx_tx_t%5E%5Ctop&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\sum_{t=0}^{T-1}x_tx_t^\top" class="latex" /> as <img src="https://s0.wp.com/latex.php?latex=%5Csigma_1%2C%5Cdots%2C%5Csigma_d&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\sigma_1,\dots,\sigma_d" class="latex" />, and note<br /><img src="https://s0.wp.com/latex.php?latex=%5Csum_%7Bi%3D1%7D%5Ed+%5Csigma_i+%3D+%5Ctext%7BTrace%7D%5Cleft%28%5Csum_%7Bt%3D0%7D%5E%7BT-1%7D+x_t+x_t%5E%5Ctop+%5Cright%29+%3D+%5Csum_%7Bt%3D0%7D%5E%7BT-1%7D+%7Cx_t%7C%5E2+%5Cleq+TB%5E2.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\sum_{i=1}^d \sigma_i = \text{Trace}\left(\sum_{t=0}^{T-1} x_t x_t^\top \right) = \sum_{t=0}^{T-1} |x_t|^2 \leq TB^2." class="latex" /><br />Using the AM-GM inequality,</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/jQDxDYm.png" alt="" /></figure>
+
+
+
+<p>We are now finally ready to prove Lemma 2 (sum of squares regret bound).</p>
+
+
+
+<p><strong>Proof of Lemma 2 (sum of squares regret bound)</strong>.<br />Assume <img src="https://s0.wp.com/latex.php?latex=%5Cmu%5E%5Cstar+%5Cin+%5Ctext%7BBALL%7D_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mu^\star \in \text{BALL}_t" class="latex" /> for all <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="t" class="latex" />. We have<br /><img src="https://i.imgur.com/1rzWWOT.png" alt="" /></p>
+
+
+
+<p>where the first inequality follows from the instantaneous regret lemma, the second from that <img src="https://s0.wp.com/latex.php?latex=%5Cbeta_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\beta_t" class="latex" /> is an increasing function of <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="t" class="latex" />, the third uses the fact that for <img src="https://s0.wp.com/latex.php?latex=0+%5Cleq+y+%5Cleq+1%2C+%5Cln%281%2By%29+%5Cgeq+y%2F2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="0 \leq y \leq 1, \ln(1+y) \geq y/2" class="latex" />, the final equality holds by Geometric Lemma 1, and the final inequality follows from Geometric Lemma 2. <img src="https://s0.wp.com/latex.php?latex=%5Csquare&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\square" class="latex" /></p>
+
+
+
+<p>This wraps up our discussion of Lemma 2.</p>
+
+
+
+<h4>Analysis of Lemma 1 (Confidence bound)</h4>
+
+
+
+<p>Recall that our goal here is to show that <img src="https://s0.wp.com/latex.php?latex=%5Cmu%5E%5Cstar+%5Cin+%5Ctext%7BBall%7D_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mu^\star \in \text{Ball}_t" class="latex" /> with high probability. We begin with the following result, which is a general version of the self-normalized sum argument in <a href="https://homes.cs.washington.edu/~sham/papers/ml/bandit_linear_long.pdf">Dani, Hayes, Kakade 2009</a>.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Lemma (Self-normalized bound for vector-valued Martingalues, <a href="https://arxiv.org/abs/1102.2670">Abbasi et al. 2011</a>)</strong>. Suppose <img src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon_i%7D_%7Bi%3D1%7D%5E%7B%5Cinfty%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="{\epsilon_i}_{i=1}^{\infty}" class="latex" /> are mean zero random variables (can be generalized to martingalues), and <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon_i" class="latex" /> is bounded by <img src="https://s0.wp.com/latex.php?latex=%5Csigma&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\sigma" class="latex" />. Let <img src="https://s0.wp.com/latex.php?latex=%7BX_i%7D_%7Bi%3D1%7D%5E%7B%5Cinfty%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="{X_i}_{i=1}^{\infty}" class="latex" /> be a stochastic process. Define <img src="https://s0.wp.com/latex.php?latex=%5CSigma_t+%3A%3D+%5CSigma_0+%2B+%5Csum_%7Bi%3D1%7D%5Et+X_i+X_i%5E%5Ctop&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\Sigma_t := \Sigma_0 + \sum_{i=1}^t X_i X_i^\top" class="latex" />. With probability at least <img src="https://s0.wp.com/latex.php?latex=1+-+%5Cdelta&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="1 - \delta" class="latex" />, we have for all <img src="https://s0.wp.com/latex.php?latex=t+%5Cgeq+1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="t \geq 1" class="latex" />,<br /><img src="https://s0.wp.com/latex.php?latex=%5Cleft%7C%5Csum_%7Bt%3D1%7D%5Et+X_i+%5Cepsilon_i+%5Cright%7C_%7B%5CSigma_t%5E%7B-1%7D%7D%5E2+%5Cleq+%5Csigma%5E2+%5Clog+%5Cleft%28%5Cfrac%7B%5Cdet%28%5CSigma_t%29%5Cdet%28%5CSigma_0%29%5E%7B-1%7D%7D%7B%5Cdelta%5E2%7D+%5Cright%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\left|\sum_{t=1}^t X_i \epsilon_i \right|_{\Sigma_t^{-1}}^2 \leq \sigma^2 \log \left(\frac{\det(\Sigma_t)\det(\Sigma_0)^{-1}}{\delta^2} \right)." class="latex" /></p></blockquote>
+
+
+
+<p>Equipped with the lemma above, we are now ready to prove Lemma 1, which we will restate here again.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Lemma 1 (Confidence):</strong> Let <img src="https://s0.wp.com/latex.php?latex=%5Cdelta+%3E+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\delta &gt; 0" class="latex" />. We have that <img src="https://s0.wp.com/latex.php?latex=Pr%28%5Cforall+t%2C+%5Cmu%5E%5Cstar+%5Cin+%5Ctext%7BBALL%7D_t%29+%5Cgeq+1+-+%5Cdelta.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Pr(\forall t, \mu^\star \in \text{BALL}_t) \geq 1 - \delta." class="latex" /></p></blockquote>
+
+
+
+<p><strong>Proof of Lemma 1</strong>. Since <img src="https://s0.wp.com/latex.php?latex=r_%7B%5Ctau%7D+%3D+x_%7B%5Ctau%7D%5Ccdot+%5Cmu%5E%5Cstar+%2B+%5Ceta_%7B%5Ctau%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="r_{\tau} = x_{\tau}\cdot \mu^\star + \eta_{\tau}" class="latex" />, we have<br /><img src="https://i.imgur.com/fsVT5QQ.png" alt="" /></p>
+
+
+
+<p>To get the last equality, we recall that <img src="https://s0.wp.com/latex.php?latex=%5CSigma_t+%3D+%5Clambda+I+%2B+%5Csum_%7B%5Ctau%3D0%7D%5E%7Bt-1%7D%5Ceta_%7B%5Ctau%7Dx_%7B%5Ctau%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\Sigma_t = \lambda I + \sum_{\tau=0}^{t-1}\eta_{\tau}x_{\tau}" class="latex" />. By the triangle inequality, it follows that we have</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/8Pr0zPB.png" alt="" /></figure>
+
+
+
+<p>where the last inequality holds with probability at least <img src="https://s0.wp.com/latex.php?latex=1+-+%5Cdelta&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="1 - \delta" class="latex" /> for every <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="t" class="latex" />, using the self-normalized bound above, as well as the fact that <img src="https://s0.wp.com/latex.php?latex=%5CSigma_t%5E%7B-1%2F2%7D+%5Cleq+1%2F%5Csqrt%7B%5Clambda%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\Sigma_t^{-1/2} \leq 1/\sqrt{\lambda}" class="latex" />. Since <img src="https://s0.wp.com/latex.php?latex=%28%7Cv_1+%7C+%2B+%7Cv_2%7C%29%5E2+%5Cleq+2%7Cv_1%7C%5E2+%2B+2%7Cv_2%7C%5E2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(|v_1 | + |v_2|)^2 \leq 2|v_1|^2 + 2|v_2|^2" class="latex" /> for any vectors <img src="https://s0.wp.com/latex.php?latex=v_1%2Cv_2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="v_1,v_2" class="latex" />, it follows that with probability at least <img src="https://s0.wp.com/latex.php?latex=1+-+%5Cdelta&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="1 - \delta" class="latex" />, for every <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="t" class="latex" />,<br /><img src="https://i.imgur.com/TS18lfK.png" alt="" /></p>
+
+
+
+<p>where the final inequality is a consequence of the choice <img src="https://s0.wp.com/latex.php?latex=%5Clambda+%3D+%5Csigma%5E2%2FW%5E2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\lambda = \sigma^2/W^2" class="latex" /> in the algorithm (where we recall the upper bound <img src="https://s0.wp.com/latex.php?latex=%7C%5Cmu%5E%5Cstar%7C+%5Cleq+W&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="|\mu^\star| \leq W" class="latex" />), as well as Geometric Lemma 2. The result then follows by our choice of <img src="https://s0.wp.com/latex.php?latex=%5Cbeta_t&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\beta_t" class="latex" />, which is</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cbeta_t+%3A%3D+c_1+%5Csigma%5E2%5Cleft%28d+%5Clog%5Cleft%281+%2B+%5Cfrac%7BTB%5E2%7D%7Bd%5Clambda%7D%5Cright%29+%2B+%5Clog%281+%2F%5Cdelta%29%5Cright%29%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\beta_t := c_1 \sigma^2\left(d \log\left(1 + \frac{TB^2}{d\lambda}\right) + \log(1 /\delta)\right)," class="latex" /></p>
+
+
+
+<p>where <img src="https://s0.wp.com/latex.php?latex=c_1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="c_1" class="latex" /> is an absolute constant (note in doing so we also subsumed the <img src="https://s0.wp.com/latex.php?latex=2%5Csigma%5E2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="2\sigma^2" class="latex" /> term, simplifying the exposition). <img src="https://s0.wp.com/latex.php?latex=%5Csquare&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\square" class="latex" /></p>
+
+
+
+<p>We move on now to more challenging RL problems where the horizon <img src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="H" class="latex" /> is larger than 1, and explore lower bounds in this regime.</p>
+
+
+
+<h2>Part 2: What are necessary assumptions for generalization in RL?</h2>
+
+
+
+<h3>Approximate dynamic programming with linear function approximation</h3>
+
+
+
+<p>We begin by considering generalization with a very natural assumption: suppose that the value function <img src="https://s0.wp.com/latex.php?latex=Q%28s%2Ca%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q(s,a)" class="latex" /> can be approximated by linear basis functions</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cphi%28s%2Ca%29+%3D+%28%5Cphi_1%28s%2Ca%29%2C%5Cdots%2C%5Cphi_d%28s%2Ca%29%29%2C+%5Cquad+%5Cphi%28s%2Ca%29+%5Cin+%5Cmathbb%7BR%7D%5Ed.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\phi(s,a) = (\phi_1(s,a),\dots,\phi_d(s,a)), \quad \phi(s,a) \in \mathbb{R}^d." class="latex" /></p>
+
+
+
+<p>We assume that the dimension of the representation, <img src="https://s0.wp.com/latex.php?latex=d&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="d" class="latex" />, is low compared the state and action dimensions. The idea of using a linear function approximation in RL and dynamic programming is not new, and had been explored in early works by Shannon (<a href="https://vision.unipv.it/IA1/ProgrammingaComputerforPlayingChess.pdf">“Programming a digital computer for playing chess.”, Philosophical Magazine, 1950</a>) as well as Bellman and Dreyfus (<a href="https://www.rand.org/content/dam/rand/pubs/papers/2006/P1176.pdf">“Functional approximations and dynamic programming”, 1959</a>). There has also since been significant work on this approach, see e.g. <a href="https://dl.acm.org/doi/10.1145/203330.203343">Tesauro 1995</a>, <a href="http://www.mit.edu/~pucci/discountedLP.pdf">de Farias and Van Roy 2003</a>, <a href="https://arxiv.org/abs/1307.4847">Wen and Van Roy 2013</a>.</p>
+
+
+
+<p>One natural question that arises is this: <strong>what conditions must the representation <img src="https://s0.wp.com/latex.php?latex=%5Cphi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\phi" class="latex" /> satisfy in order for this approach to work?</strong></p>
+
+
+
+<p>We proceed by studying the simplest possible case: assuming that the optimal <img src="https://s0.wp.com/latex.php?latex=Q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q" class="latex" />-function <img src="https://s0.wp.com/latex.php?latex=Q_h%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^\star" class="latex" /> is linearly realizable.</p>
+
+
+
+<h4>RL with linearly realizable <img src="https://s0.wp.com/latex.php?latex=Q_h%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^\star" class="latex" /> function approximation: does there exist a sample efficient algorithm?</h4>
+
+
+
+<p>Suppose we have access to a feature map <img src="https://s0.wp.com/latex.php?latex=%5Cphi%28s%2Ca%29+%5Cin+%5Cmathbb%7BR%7D%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\phi(s,a) \in \mathbb{R}^d" class="latex" />. Concretely, the assumption we consider is the following:</p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Assumption 1 (Linearly realizable <img src="https://s0.wp.com/latex.php?latex=Q_h%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^\star" class="latex" />)</strong>: Assume for all <img src="https://s0.wp.com/latex.php?latex=s%2Ca%2Ch+%5Cin+%5BH%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s,a,h \in [H]" class="latex" /> that there exists <img src="https://s0.wp.com/latex.php?latex=w_1%5E%5Cstar%2C%5Cdots%2Cw_H%5E%5Cstar+%5Cin+%5Cmathbb%7BR%7D%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="w_1^\star,\dots,w_H^\star \in \mathbb{R}^d" class="latex" /> such that<br /><img src="https://s0.wp.com/latex.php?latex=Q_h%5E%5Cstar%28s%2Ca%29+%3D+w_h%5E%5Cstar+%5Ccdot+%5Cphi%28s%2Ca%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^\star(s,a) = w_h^\star \cdot \phi(s,a)." class="latex" /></p></blockquote>
+
+
+
+<p>As an aside, with Assumption 1, we can consider the problem from a linear programming viewpoint. Note that:</p>
+
+
+
+<ul><li>We have an underlying LP with <img src="https://s0.wp.com/latex.php?latex=d&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="d" class="latex" /> variables and <img src="https://s0.wp.com/latex.php?latex=O%28SA%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="O(SA)" class="latex" /> constraints.</li><li>The LP is specific to the dynamic programming problem at hand (and hence not general) because it encodes the Bellman optimality constraints.</li><li>We have sampling access (in the episodic setting).</li></ul>
+
+
+
+<p>It may be tempting to think that Assumption 1 is sufficient to enable a sample-efficient algorithm for RL (if we assume we already know the representation <img src="https://s0.wp.com/latex.php?latex=%5Cphi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\phi" class="latex" />). However, that is <strong>not</strong> true, as the following theorem from a very recent work demonstrates:</p>
+
+
+
+<blockquote class="wp-block-quote"><p><a href="https://arxiv.org/abs/2010.01374"><strong>Theorem 1 (Weisz, Amortila, Szepesvári 2021):</strong></a> There exists an MDP and a representation <img src="https://s0.wp.com/latex.php?latex=%5Cphi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\phi" class="latex" /> satisfying Assumption 1, such that any online RL algorithm (with knowledge of <img src="https://s0.wp.com/latex.php?latex=%5Cphi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\phi" class="latex" />) requires <img src="https://s0.wp.com/latex.php?latex=%5COmega%28%5Cmin%282%5Ed%2C2%5EH%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\Omega(\min(2^d,2^H))" class="latex" /> samples to output the value <img src="https://s0.wp.com/latex.php?latex=V_1%5E%5Cstar%28s_1%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="V_1^\star(s_1)" class="latex" /> up to constant additive error, with probability at least 0.9.</p></blockquote>
+
+
+
+<p>While linear realizability alone is insufficient for sample efficiency in online RL, one might consider imposing further assumptions that could suffice for sample-efficient RL. One candidate assumption is to assume that at each state, the optimal action yields significantly more value than the next-best action:</p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Assumption 2 (Large suboptimality gap)</strong>: Assume for all <img src="https://s0.wp.com/latex.php?latex=a+%5Cneq+%5Cpi%5E%5Cstar%28s%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a \neq \pi^\star(s)" class="latex" />, we have<br /><img src="https://s0.wp.com/latex.php?latex=V_h%5E%5Cstar%28s%29+-+Q_h%5E%5Cstar%28s%2Ca%29+%5Cgeq+%5Cfrac%7B1%7D%7B16%7D.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="V_h^\star(s) - Q_h^\star(s,a) \geq \frac{1}{16}." class="latex" /></p></blockquote>
+
+
+
+<p>Perhaps surprisingly, the following theorem shows that an exponential lower bound for online RL remains under <strong>both</strong> Assumption 1 and Assumption 2.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><a href="https://arxiv.org/abs/2103.12690"><strong>Theorem 2 (Wang, Wang, Kakade 2021):</strong></a> There exists an MDP and a representation <img src="https://s0.wp.com/latex.php?latex=%5Cphi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\phi" class="latex" /> satisfying both Assumption 1 and Assumption 2, such that any online RL algorithm (with knowledge of <img src="https://s0.wp.com/latex.php?latex=%5Cphi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\phi" class="latex" />) requires <img src="https://s0.wp.com/latex.php?latex=%5COmega%28%5Cmin%282%5Ed%2C2%5EH%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\Omega(\min(2^d,2^H))" class="latex" /> samples to output the value <img src="https://s0.wp.com/latex.php?latex=V_1%5E%5Cstar%28s_1%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="V_1^\star(s_1)" class="latex" /> up to constant additive error, with probability at least 0.9.</p></blockquote>
+
+
+
+<p><em><strong>Remark</strong></em>: We note a subtle distinction between the online RL setting and the simulator access setting. In the online RL setting, during each episode, we start at some state <img src="https://s0.wp.com/latex.php?latex=s_0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s_0" class="latex" />, and the subsequent states we see are entirely dependent on the policy we choose and the environment dynamics. Meanwhile, in the simulator access setting, at each time-step, we are free to input <strong>any</strong> <img src="https://s0.wp.com/latex.php?latex=%28s%2Ca%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(s,a)" class="latex" /> pair, and the simulator will return the next state <img src="https://s0.wp.com/latex.php?latex=s%27+%5Csim+P%28%5Ccdot+%5Cmid+s%2Ca%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s' \sim P(\cdot \mid s,a)" class="latex" />, as well as the reward <img src="https://s0.wp.com/latex.php?latex=r%28s%2Ca%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="r(s,a)" class="latex" />. While Theorem 1 (when only Assumption 1 is satisfied) holds for both online RL and simulator access, Theorem 2 (when both Assumption 1 and Assumption 2 hold) is valid only in the online RL setting. In the simulator access setting, <a href="https://arxiv.org/abs/1910.03016">Du et al. 2019</a> proved that there exists a sample-efficient approach (i.e. polynomial in all relevant problem parameters) to find an <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon" class="latex" />-optimal policy, when both Assumption 1 and Assumption 2 hold. This demonstrates an <em>exponential separation</em> between the online RL and simulator access settings.</p>
+
+
+
+<p>We next introduce the counterexample used to prove Theorem 2 in detail.</p>
+
+
+
+<h4>Construction sketch for counterexample in Theorem 2</h4>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/ReAcF8x.png" alt="" /></figure>
+
+
+
+<p>Above, we have a pictorial representation of the MDP family in the counterexample. We first describe its state and action spaces.</p>
+
+
+
+<ul><li>The state space is <img src="https://s0.wp.com/latex.php?latex=%7B%5Cbar%7B1%7D%2C%5Cdots%2C%5Cbar%7Bm%7D%2C+f%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="{\bar{1},\dots,\bar{m}, f}" class="latex" />. We use <img src="https://s0.wp.com/latex.php?latex=m&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="m" class="latex" /> to denote an integer, which we set to be approximately <img src="https://s0.wp.com/latex.php?latex=2%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="2^d" class="latex" />.</li><li>State <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" /> is a special state, which we can think of as a “terminal state”.</li><li>At state <img src="https://s0.wp.com/latex.php?latex=%5Cbar%7Bi%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\bar{i}" class="latex" />, the feasible action set is <img src="https://s0.wp.com/latex.php?latex=%5Bm%5D+%5Csetminus+%7Bi%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="[m] \setminus {i}" class="latex" />. At state <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" />, the feasible action set is <img src="https://s0.wp.com/latex.php?latex=%5Bm-1%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="[m-1]" class="latex" />. Hence, there are <img src="https://s0.wp.com/latex.php?latex=m-1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="m-1" class="latex" /> feasible actions at each state.</li><li>Each MDP in this “hard” family is specified by an index <img src="https://s0.wp.com/latex.php?latex=a%5E%5Cstar+%5Cin+%5Bm%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a^\star \in [m]" class="latex" /> and denoted by <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BM%7D_%7Ba%5E%5Cstar%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{M}_{a^\star}" class="latex" />.</li></ul>
+
+
+
+<p>Before we proceed, we first recall the Johnson-Lindenstrauss lemma, which states that a set of points in a high-dimensional space can be embedded into a space of much lower dimension in such a way that the distances between the points are nearly preserved.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><a href="https://en.wikipedia.org/wiki/Johnson%E2%80%93Lindenstrauss_lemma">Johnson-Lindenstrauss Lemma</a>: Suppose we are given <img src="https://s0.wp.com/latex.php?latex=0+%3C+%5Cepsilon+%3C+1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="0 &lt; \epsilon &lt; 1" class="latex" />, a set <img src="https://s0.wp.com/latex.php?latex=X&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="X" class="latex" /> of <img src="https://s0.wp.com/latex.php?latex=m&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="m" class="latex" /> points in <img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BR%7D%5EN&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{R}^N" class="latex" />, and a number <img src="https://s0.wp.com/latex.php?latex=n+%3E+8+%5Cln+m%2F%5Cepsilon%5E2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="n &gt; 8 \ln m/\epsilon^2" class="latex" />. Then, there is a linear map <img src="https://s0.wp.com/latex.php?latex=f+%5Cin+%5Cmathbb%7BR%7D%5EN+%5Cto+%5Cmathbb%7BR%7D%5En&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f \in \mathbb{R}^N \to \mathbb{R}^n" class="latex" /> such that<br /><img src="https://s0.wp.com/latex.php?latex=%281-%5Cepsilon%29%7Cu-v%7C%5E2+%5Cleq+%7Cf%28u%29+-+f%28v%29%7C%5E2+%5Cleq+%281%2B%5Cepsilon%29%7Cu-v%7C%5E2.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(1-\epsilon)|u-v|^2 \leq |f(u) - f(v)|^2 \leq (1+\epsilon)|u-v|^2." class="latex" /></p></blockquote>
+
+
+
+<p>Consider a collection <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BX%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{X}" class="latex" /> of <img src="https://s0.wp.com/latex.php?latex=N&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="N" class="latex" /> orthogonal unit vectors in the high-dimensional space <img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BR%7D%5EN&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{R}^N" class="latex" />. For any two vectors <img src="https://s0.wp.com/latex.php?latex=u%5Cneq+v+%5Cin+%5Cmathcal%7BX%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="u\neq v \in \mathcal{X}" class="latex" />, after applying the linear embedding <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" />, we observe by Johnson-Lindenstrauss that</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cpm%5Cleft+%5Clangle+f%28u%29%2Cf%28v%29%5Cright+%5Crangle%3D+%5Cfrac%7B%7Cf%28u%29+%5Cpm+f%28v%29%7C%5E2+-+%7Cf%28u%29%7C%5E2+-+%7Cf%28v%29%7C%5E2%7D%7B2%7D+%5Cleq+%5Cfrac%7B2%281%2B%5Cepsilon%29+-+2%281-%5Cepsilon%29%7D%7B2%7D+%3D+2%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pm\left \langle f(u),f(v)\right \rangle= \frac{|f(u) \pm f(v)|^2 - |f(u)|^2 - |f(v)|^2}{2} \leq \frac{2(1+\epsilon) - 2(1-\epsilon)}{2} = 2\epsilon" class="latex" /></p>
+
+
+
+<p>where we used the fact that <img src="https://s0.wp.com/latex.php?latex=%281-%5Cepsilon%29+%5Cleq+%7Cf%28u%29+-+0%7C%5E2+%3D+%7Cf%28u%29%7C%5E2%5Cleq+%281%2B%5Cepsilon%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(1-\epsilon) \leq |f(u) - 0|^2 = |f(u)|^2\leq (1+\epsilon)" class="latex" /> holds for any unit <img src="https://s0.wp.com/latex.php?latex=u+%5Cin+%5Cmathcal%7BX%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="u \in \mathcal{X}" class="latex" /> by linearity of <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" />. Hence, we can apply Johnson-Lindenstrauss to derive the following lemma, which will be useful in our construction.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><a href="https://arxiv.org/pdf/2103.12690.pdf">Lemma 1 (Johnson-Lindenstrauss)</a>: For any <img src="https://s0.wp.com/latex.php?latex=%5Cgamma+%3E+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\gamma &gt; 0" class="latex" />, there exists <img src="https://s0.wp.com/latex.php?latex=m+%3D+%5Cleft%5Clfloor%5Cexp%5Cleft%28%5Cfrac%7B1%7D%7B8%7D+%5Cgamma%5E2+d%5Cright%29%5Cright%5Crfloor&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="m = \left\lfloor\exp\left(\frac{1}{8} \gamma^2 d\right)\right\rfloor" class="latex" /> unit vectors <img src="https://s0.wp.com/latex.php?latex=%7Bv_1%2C%5Cdots%2Cv_m%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="{v_1,\dots,v_m}" class="latex" /> in <img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BR%7D%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{R}^d" class="latex" /> such that <img src="https://s0.wp.com/latex.php?latex=%5Cforall+i%2Cj+%5Cin+%5Bm%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\forall i,j \in [m]" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=i+%5Cneq+j&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="i \neq j" class="latex" />, <img src="https://s0.wp.com/latex.php?latex=%7C%5Clangle+v_i%2Cv_j+%5Crangle%7C+%5Cleq+%5Cgamma&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="|\langle v_i,v_j \rangle| \leq \gamma" class="latex" />.</p></blockquote>
+
+
+
+<p>Throughout our discussion, we will set <img src="https://s0.wp.com/latex.php?latex=%5Cgamma+%3A%3D+%5Cfrac%7B1%7D%7B4%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\gamma := \frac{1}{4}" class="latex" />.</p>
+
+
+
+<p>Equipped with the lemma above, we can now describe the transitions, features and rewards of the constructed MDP family. In the sequel, <img src="https://s0.wp.com/latex.php?latex=a_1+%5Cin+%5Bm%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a_1 \in [m]" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=a_2+%5Cin+%5Bm%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a_2 \in [m]" class="latex" /> represent integers associated with the state and action respectively.</p>
+
+
+
+<p><em><strong>Transitions</strong></em>: The initial state <img src="https://s0.wp.com/latex.php?latex=s_0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s_0" class="latex" /> follows the uniform distribution <img src="https://s0.wp.com/latex.php?latex=%5Cmu+%3D+%5Cmathrm%7BUnif%7D%5Cleft%28%7B%5Cbar%7B1%7D%2C%5Cdots%2C%5Cbar%7Bm%7D%7D%5Cright%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mu = \mathrm{Unif}\left({\bar{1},\dots,\bar{m}}\right)" class="latex" />. The transition probabilities are set as follows:</p>
+
+
+
+<figure class="wp-block-image size-large"><a href="https://windowsontheory.files.wordpress.com/2021/04/image-1.png"><img src="https://windowsontheory.files.wordpress.com/2021/04/image-1.png?w=1024" alt="" class="wp-image-8096" /></a></figure>
+
+
+
+<p>After taking action <img src="https://s0.wp.com/latex.php?latex=a_2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a_2" class="latex" />, the next state is either <img src="https://s0.wp.com/latex.php?latex=%5Coverline%7Ba_2%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\overline{a_2}" class="latex" /> or <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" />. We might observe then that this MDP resembles a “leaking complete graph”. It is possible to visit any other state (except for <img src="https://s0.wp.com/latex.php?latex=%5Coverline%7Ba%5E%5Cstar%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\overline{a^\star}" class="latex" />). However, importantly, there is at least <img src="https://s0.wp.com/latex.php?latex=1+-+3%5Cgamma+%3D+%5Cfrac%7B1%7D%7B4%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="1 - 3\gamma = \frac{1}{4}" class="latex" /> probability of going to the terminal state <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" />. Also, observe that the transition probabilities are indeed valid, since by Lemma 1 above, <img src="https://s0.wp.com/latex.php?latex=0+%3C+%5Cgamma+%5Cleq+%5Cleft%5Clangle+v%28a_1%29%2Cv%28a_2%29+%5Cright%5Crangle+%2B+2%5Cgamma+%5Cleq+3%5Cgamma+%3C+1.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="0 &lt; \gamma \leq \left\langle v(a_1),v(a_2) \right\rangle + 2\gamma \leq 3\gamma &lt; 1." class="latex" /></p>
+
+
+
+<p><em><strong>Features</strong></em>: The feature map, which maps state-action pairs to <img src="https://s0.wp.com/latex.php?latex=d&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="d" class="latex" />-dimensional vectors, is defined as<br /><img src="https://s0.wp.com/latex.php?latex=%5Cphi%28%5Coverline%7Ba_1%7D%2Ca_2%29+%3A%3D+%5Cleft%28%5Cleft%5Clangle+v%28a_1%29%2Cv%28a_2%29+%5Cright%5Crangle+%2B+2%5Cgamma+%5Cright%29+v%28a_2%29%2C+%5C%3B+%5Cforall+a_1%2Ca_2+%5Cin+%5Bm%5D%2C+a_1+%5Cneq+a_2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\phi(\overline{a_1},a_2) := \left(\left\langle v(a_1),v(a_2) \right\rangle + 2\gamma \right) v(a_2), \; \forall a_1,a_2 \in [m], a_1 \neq a_2" class="latex" /><br /><img src="https://s0.wp.com/latex.php?latex=%5Cphi%28f%2C%5Ccdot%29+%3A%3D+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\phi(f,\cdot) := 0" class="latex" /></p>
+
+
+
+<p>Note that the feature map is independent of <img src="https://s0.wp.com/latex.php?latex=a%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a^\star" class="latex" /> and is shared across the MDP family.</p>
+
+
+
+<p><em><strong>Rewards</strong></em>: For <img src="https://s0.wp.com/latex.php?latex=1+%5Cleq+h+%5Cleq+H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="1 \leq h \leq H" class="latex" />, the rewards are defined as</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=R_h%28%5Coverline%7Ba_1%7D%2Ca%5E%5Cstar%29+%3A%3D+%5Cleft%5Clangle+v%28a_1%29%2Cv%28a%5E%5Cstar%29+%5Cright%5Crangle+%2B+2+%5Cgamma&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="R_h(\overline{a_1},a^\star) := \left\langle v(a_1),v(a^\star) \right\rangle + 2 \gamma" class="latex" /></p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=R_h%28%5Coverline%7Ba_1%7D%2Ca_2%29+%3A%3D+-2%5Cgamma+%5Cleft%5B%5Cleft%5Clangle+v%28a_1%29%2Cv%28a_2%29+%5Cright%5Crangle+%2B+2%5Cgamma%5Cright%5D%2C+%5C%3B+%28a_2+%5Cneq+a%5E%5Cstar%2C+a_2+%5Cneq+a_1%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="R_h(\overline{a_1},a_2) := -2\gamma \left[\left\langle v(a_1),v(a_2) \right\rangle + 2\gamma\right], \; (a_2 \neq a^\star, a_2 \neq a_1)" class="latex" /></p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=R_h%28f%2C%5Ccdot%29+%3A%3D+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="R_h(f,\cdot) := 0" class="latex" /></p>
+
+
+
+<p>For <img src="https://s0.wp.com/latex.php?latex=h+%3D+H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h = H" class="latex" />, we set <img src="https://s0.wp.com/latex.php?latex=r_H%28s%2Ca%29+%3A%3D+%5Clangle+%5Cphi%28s%2Ca%29%2C+v%28a%5E%5Cstar%29%5Crangle&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="r_H(s,a) := \langle \phi(s,a), v(a^\star)\rangle" class="latex" /> for every state-action pair.</p>
+
+
+
+<p>We now verify that our construction satisfies both the linear realizability and large suboptimality gap assumptions (Assumption 1 and Assumption 2).</p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Lemma (Linear realizability)</strong>. For all <img src="https://s0.wp.com/latex.php?latex=%28s%2Ca%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(s,a)" class="latex" />, we have <img src="https://s0.wp.com/latex.php?latex=Q_h%5E%5Cstar%28s%2Ca%29+%3D+%5Clangle+%5Cphi%28s%2Ca%29%2C+v%28a%5E%5Cstar%29+%5Crangle&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^\star(s,a) = \langle \phi(s,a), v(a^\star) \rangle" class="latex" />.</p></blockquote>
+
+
+
+<p><em><strong>Proof</strong></em>: Throughout, we assume that <img src="https://s0.wp.com/latex.php?latex=a_2+%5Cneq+a%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a_2 \neq a^\star" class="latex" />. We first verify the statement for the terminal state <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" />. At the state <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" />, regardless of the action taken, the next state is always <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" /> and the reward is always 0. Hence, <img src="https://s0.wp.com/latex.php?latex=Q_h%5E%5Cstar%28f%2C%5Ccdot%29+%3D+V_h%5E%5Cstar%28f%29+%3D+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^\star(f,\cdot) = V_h^\star(f) = 0" class="latex" /> for all <img src="https://s0.wp.com/latex.php?latex=h+%5Cin+%5BH%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h \in [H]" class="latex" />. Thus, <img src="https://s0.wp.com/latex.php?latex=Q_h%5E%5Cstar%28f%2C%5Ccdot%29+%3D+%5Clangle+%5Cphi%28f%2C%5Ccdot%29%2Cv%28a%5E%5Cstar%29%5Crangle+%3D+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^\star(f,\cdot) = \langle \phi(f,\cdot),v(a^\star)\rangle = 0" class="latex" />. We next verify realizability for other states via backwards induction on <img src="https://s0.wp.com/latex.php?latex=h+%3D+H%2C+H-1%2C%5Cdots%2C1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h = H, H-1,\dots,1" class="latex" />. The inductive hypothesis is <img src="https://s0.wp.com/latex.php?latex=%5Cforall+a_1+%5Cin+%5Bm%5D%2C+a_2+%5Cneq+a_1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\forall a_1 \in [m], a_2 \neq a_1" class="latex" />,</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=Q_h%5E%5Cstar%28%5Coverline%7Ba_1%7D%2Ca_2%29+%3D+%5Cleft%28%5Cleft%5Clangle+v%28a_1%29%2Cv%28a_2%29+%5Cright%5Crangle+%2B+2%5Cgamma+%5Cright%29+%5Cleft%5Clangle+v%28a_1%29%2Cv%28a%5E%5Cstar%29+%5Cright%5Crangle.+%5C%3B%281%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^\star(\overline{a_1},a_2) = \left(\left\langle v(a_1),v(a_2) \right\rangle + 2\gamma \right) \left\langle v(a_1),v(a^\star) \right\rangle. \;(1)" class="latex" /></p>
+
+
+
+<p>and that <img src="https://s0.wp.com/latex.php?latex=%5Cforall+a_1+%5Cneq+a%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\forall a_1 \neq a^\star" class="latex" />,</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=V_h%5E%5Cstar%28%5Coverline%7Ba_1%7D%29+%3D+Q_h%5E%5Cstar%28%5Coverline%7Ba_1%7D%2Ca%5E%5Cstar%29+%3D+%5Cleft%5Clangle+v%28a_1%29%2Cv%28a%5E%5Cstar%29+%5Cright%5Crangle+%2B+2%5Cgamma+%5C%3B+%282%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="V_h^\star(\overline{a_1}) = Q_h^\star(\overline{a_1},a^\star) = \left\langle v(a_1),v(a^\star) \right\rangle + 2\gamma \; (2)" class="latex" /></p>
+
+
+
+<p>When <img src="https://s0.wp.com/latex.php?latex=h+%3D+H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h = H" class="latex" />, (1) holds by the definition of the rewards at that level. Next, note that <img src="https://s0.wp.com/latex.php?latex=%5Cforall+h&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\forall h" class="latex" />, (2) follows from (1). This is because for <img src="https://s0.wp.com/latex.php?latex=a_2+%5Cneq+a%5E%5Cstar%2Ca_1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a_2 \neq a^\star,a_1" class="latex" />,</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=Q_h%5E%5Cstar%28%5Coverline%7Ba_1%7D%2Ca_2%29+%3D+%5Cleft%28%5Cleft%5Clangle+v%28a_1%29%2Cv%28a_2%29+%5Cright%5Crangle+%2B+2%5Cgamma+%5Cright%29+%5Cleft%5Clangle+v%28a_1%29%2Cv%28a%5E%5Cstar%29+%5Cright%5Crangle+%5Cleq+3%5Cgamma%5E2%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^\star(\overline{a_1},a_2) = \left(\left\langle v(a_1),v(a_2) \right\rangle + 2\gamma \right) \left\langle v(a_1),v(a^\star) \right\rangle \leq 3\gamma^2," class="latex" /></p>
+
+
+
+<p>while (recall <img src="https://s0.wp.com/latex.php?latex=%5Cgamma+%3A%3D+1%2F4&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\gamma := 1/4" class="latex" />)</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=Q_h%5E%5Cstar%28%5Coverline%7Ba_1%7D%2Ca%5E%5Cstar%29+%3D+%5Cleft%5Clangle+v%28a_1%29%2Cv%28a%5E%5Cstar%29+%5Cright%5Crangle+%2B+2%5Cgamma+%5Cgeq+%5Cgamma+%3E+3%5Cgamma%5E2.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^\star(\overline{a_1},a^\star) = \left\langle v(a_1),v(a^\star) \right\rangle + 2\gamma \geq \gamma &gt; 3\gamma^2." class="latex" /></p>
+
+
+
+<p>This means that proving (1) suffices to show that <img src="https://s0.wp.com/latex.php?latex=a%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a^\star" class="latex" /> is always the optimal action. A simple verification via Bellman’s optimality equation suffices to prove the inductive hypothesis for (1) for every <img src="https://s0.wp.com/latex.php?latex=h+%5Cin+%5BH%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h \in [H]" class="latex" />, since the base case <img src="https://s0.wp.com/latex.php?latex=h+%3D+H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h = H" class="latex" /> holds. Thus, both (1) and (2) hold for all <img src="https://s0.wp.com/latex.php?latex=h+%5Cin+%5BH%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h \in [H]" class="latex" />, concluding our proof. <img src="https://s0.wp.com/latex.php?latex=%5Csquare&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\square" class="latex" /></p>
+
+
+
+<p>We next show that the constant suboptimality gap (Assumption 2) is also (approximately) satisfied by our constructed MDP family.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Lemma (Suboptimality gap)</strong>. For all state <img src="https://s0.wp.com/latex.php?latex=%5Coverline%7Ba_1%7D+%5Cneq+%5Coverline%7Ba%5E%5Cstar%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\overline{a_1} \neq \overline{a^\star}" class="latex" />, and <img src="https://s0.wp.com/latex.php?latex=a_2+%5Cneq+a%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a_2 \neq a^\star" class="latex" />, the suboptimality gap is<br /><img src="https://s0.wp.com/latex.php?latex=%5CDelta_h%28%5Coverline%7Ba_1%7D%2Ca_2%29+%3A%3D+V_h%5E%5Cstar%28%5Coverline%7Ba_1%7D%29+-Q_h%5E%5Cstar%28%5Coverline%7Ba_1%7D%2Ca_2%29+%3E+%5Cgamma+-+3%5Cgamma%5E2+%5Cgeq+%5Cfrac%7B1%7D%7B4%7D+%5Cgamma.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\Delta_h(\overline{a_1},a_2) := V_h^\star(\overline{a_1}) -Q_h^\star(\overline{a_1},a_2) &gt; \gamma - 3\gamma^2 \geq \frac{1}{4} \gamma." class="latex" /><br />Hence, in this MDP, Assumption 2 is satisfied with <img src="https://s0.wp.com/latex.php?latex=%5CDelta_%7B%5Cmin%7D+%5Cgeq+%5Cfrac%7B1%7D%7B4%7D%5Cgamma+%3D+%5COmega%281%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\Delta_{\min} \geq \frac{1}{4}\gamma = \Omega(1)" class="latex" />.</p></blockquote>
+
+
+
+<p><em><strong>Remark</strong></em>. Note that that here we ignored the terminal state <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" /> and the essentially unreachable state <img src="https://s0.wp.com/latex.php?latex=%5Coverline%7Ba%5E%5Cstar%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\overline{a^\star}" class="latex" /> for simplicity. This seems reasonable intuitively, since reaching <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" /> is effectively the end of the episode, and the state <img src="https://s0.wp.com/latex.php?latex=%5Coverline%7Ba%5E%5Cstar%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\overline{a^\star}" class="latex" /> can only be reached with negligible probability(recall that <img src="https://s0.wp.com/latex.php?latex=m+%5Capprox+2%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="m \approx 2^d" class="latex" /> is exponentially large). For a more rigorous treatment of this issue, refer to Appendix B in <a href="https://arxiv.org/pdf/2103.12690.pdf">Wang, Wang, Kakade 2021</a>.</p>
+
+
+
+<p>We can now state and prove the following key technical lemma, which directly implies Theorem 2 in <a href="https://arxiv.org/pdf/2103.12690.pdf">Wang, Wang, Kakade 2021</a>.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><em><strong>Lemma</strong></em>. For any algorithm, there exists <img src="https://s0.wp.com/latex.php?latex=a%5E%5Cstar+%5Cin+%5Bm%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a^\star \in [m]" class="latex" /> such that in order to output <img src="https://s0.wp.com/latex.php?latex=%5Cpi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi" class="latex" /> with<br /><img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D_%7Bs_1+%5Csim+%5Cmu%7D+V_1%5E%7B%5Cpi%7D%28s_0%29+%5Cgeq+%5Cmathbb%7BE%7D_%7Bs_1+%5Csim+%5Cmu%7D+V_1%5E%5Cstar%28s_1%29+-+0.05&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{E}_{s_1 \sim \mu} V_1^{\pi}(s_0) \geq \mathbb{E}_{s_1 \sim \mu} V_1^\star(s_1) - 0.05" class="latex" /><br />with probability at least 0.1 for <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BM%7D_%7Ba%5E%5Cstar%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{M}_{a^\star}" class="latex" />, the number of samples required is <img src="https://s0.wp.com/latex.php?latex=2%5E%7B%5COmega%28%5Cmin%28d%2CH%29%29%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="2^{\Omega(\min(d,H))}" class="latex" />.</p></blockquote>
+
+
+
+<p><strong>Proof sketch</strong>. We take an information-theoretic perspective. Observe that the feature map of <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BM%7D_%7Ba%5E%5Cstar%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{M}_{a^\star}" class="latex" /> does not depend on <img src="https://s0.wp.com/latex.php?latex=a%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a^\star" class="latex" />, and that for <img src="https://s0.wp.com/latex.php?latex=h+%3C+H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h &lt; H" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=a_2+%5Cneq+a%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a_2 \neq a^\star" class="latex" />, the reward <img src="https://s0.wp.com/latex.php?latex=R_h%28%5Coverline%7Ba_1%7D%2Ca_2%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="R_h(\overline{a_1},a_2)" class="latex" /> also has no information about <img src="https://s0.wp.com/latex.php?latex=a%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a^\star" class="latex" />. The transition probabilities are also independent of <img src="https://s0.wp.com/latex.php?latex=a%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a^\star" class="latex" />, unless the action <img src="https://s0.wp.com/latex.php?latex=a%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a^\star" class="latex" /> is taken, and the reward at state <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" /> is always 0. Thus, to receive information about the optimal action <img src="https://s0.wp.com/latex.php?latex=a%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a^\star" class="latex" />, the agent either needs to take the action <img src="https://s0.wp.com/latex.php?latex=a%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a^\star" class="latex" />, or be a non-game-over state at the final time step <img src="https://s0.wp.com/latex.php?latex=h%3D+H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h= H" class="latex" /> (i.e <img src="https://s0.wp.com/latex.php?latex=s_H+%5Cneq+f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s_H \neq f" class="latex" />.)</p>
+
+
+
+<p>However, by the design of the transition probabilities, the probability of remaining at a non-game-over state at the next time step is at most</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Csup_%7Ba_1+%5Cneq+a_2%7D+%5Clangle+v%28a_1%29%2Cv%28a_2%29%5Crangle+%2B+2%5Cgamma+%5Cleq+3%5Cgamma+%5Cleq+%5Cfrac%7B3%7D%7B4%7D.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\sup_{a_1 \neq a_2} \langle v(a_1),v(a_2)\rangle + 2\gamma \leq 3\gamma \leq \frac{3}{4}." class="latex" /></p>
+
+
+
+<p>Hence, for any algorithm, <img src="https://s0.wp.com/latex.php?latex=P%28s_H+%5Cneq+f%29+%5Cleq+%5Cleft%28%5Cfrac%7B3%7D%7B4%7D%5Cright%29%5EH&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="P(s_H \neq f) \leq \left(\frac{3}{4}\right)^H" class="latex" />, which is exponentially small.</p>
+
+
+
+<p>Summarizing, any algorithm that does not know <img src="https://s0.wp.com/latex.php?latex=a%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a^\star" class="latex" /> either needs to “get lucky” so that <img src="https://s0.wp.com/latex.php?latex=s_H+%3D+f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s_H = f" class="latex" />, or take the optimal action <img src="https://s0.wp.com/latex.php?latex=a%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a^\star" class="latex" />. For each episode, the first event happens with probability less than <img src="https://s0.wp.com/latex.php?latex=%5Cleft%28%5Cfrac%7B3%7D%7B4%7D%5Cright%29%5EH&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\left(\frac{3}{4}\right)^H" class="latex" />, and the second event happens with probability less than <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7BH%7D%7Bm-1%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\frac{H}{m-1}" class="latex" />. Since the number of actions is <img src="https://s0.wp.com/latex.php?latex=m-1+%3D+2%5E%7B%5CTheta%28d%29%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="m-1 = 2^{\Theta(d)}" class="latex" />, it follows that neither event can happen with constant probability unless the number of episodes is exponential in <img src="https://s0.wp.com/latex.php?latex=%5Cmin%28d%2CH%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\min(d,H)" class="latex" />. This wraps up the sketch. <img src="https://s0.wp.com/latex.php?latex=%5Csquare&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\square" class="latex" /></p>
+
+
+
+<p>We note that our construction is not quite rigorous due to the remark earlier that the suboptimality gap assumption does not hold for the states <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%5Coverline%7Ba%5E%5Cstar%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\overline{a^\star}" class="latex" />. A more rigorous construction can be found in Appendix B of <a href="https://arxiv.org/pdf/2103.12690.pdf">Wang, Wang, Kakade 2021</a>. Note that this lower bound is silent on the dependence of the sample complexity on the size of the action space, giving rise to the following question, which appears to be still unsolved.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Open problem</strong>: Could we get a lower bound that also depends on the action space dimension <img src="https://s0.wp.com/latex.php?latex=A&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="A" class="latex" />, such that the number of samples required to obtain an approximately optimal policy scales with<br /><img src="https://s0.wp.com/latex.php?latex=%5Cexp%28%5Cmin%28A%2Cd%2CH%29%29%3F&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\exp(\min(A,d,H))?" class="latex" /></p></blockquote>
+
+
+
+<h2>Interlude: do these lower bounds matter in practice?</h2>
+
+
+
+<p>A natural question to ask is this: are these exponential lower bounds in Part 2 (when we only assume linear realizability) actually relevant for practice?</p>
+
+
+
+<p>To answer this, we take a brief detour into <em>offline RL</em>. In offline RL (see <a href="https://arxiv.org/abs/2005.01643">Levine et al. 2020</a> for a survey), we assume that the agent has no direct access to the MDP, and is instead provided with a static dataset of transitions, <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BD%7D+%3D+%7B%7Bs_h%5Ei%2Ca_h%5Ei%2Cr_h%5Ei%2Cs_%7Bh%2B1%7D%5Ei%7D_%7Bh%3D1%7D%5E%7BH%7D%7D_%7Bi%3D1%7D%5Em&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{D} = {{s_h^i,a_h^i,r_h^i,s_{h+1}^i}_{h=1}^{H}}_{i=1}^m" class="latex" /> (<img src="https://s0.wp.com/latex.php?latex=m&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="m" class="latex" /> denotes number of independent episodes in the offline data). The goal here could be to learn a policy <img src="https://s0.wp.com/latex.php?latex=%5Cpi%28a%5Cmid+s%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi(a\mid s)" class="latex" /> (based on the static dataset <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BD%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{D}" class="latex" />) that attains the largest possible cumulative reward when applied to the MDP, or to evaluate the performance of some target policy <img src="https://s0.wp.com/latex.php?latex=%5Cpi%28a+%5Cmid+s%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi(a \mid s)" class="latex" /> based on the offline data. We use <img src="https://s0.wp.com/latex.php?latex=%5Cpi_%7B%5Cbeta%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi_{\beta}" class="latex" /> to denote the distribution over states and actions in <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BD%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{D}" class="latex" />, such that we assume the state-action tuples <img src="https://s0.wp.com/latex.php?latex=%28s%2Ca%29+%5Cin+%5Cmathcal%7BD%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(s,a) \in \mathcal{D}" class="latex" /> are sampled according to <img src="https://s0.wp.com/latex.php?latex=s+%5Csim+d%5E%7B%5Cpi_%7B%5Cbeta%7D%7D%28s%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s \sim d^{\pi_{\beta}}(s)" class="latex" />, and the actions are sampled according to the behaviour policy, such that <img src="https://s0.wp.com/latex.php?latex=a+%5Csim+%5Cpi_%7B%5Cbeta%7D%28a+%5Cmid+s%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a \sim \pi_{\beta}(a \mid s)" class="latex" />.</p>
+
+
+
+<p>Analogous to the online RL lower bound, the following theorem shows that linear realizability is also insufficient for sample-efficient evaluation of a target policy using offline data.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Theorem (informal, from <a href="https://arxiv.org/pdf/2010.11895.pdf">Wang, Foster, Kakade 2020</a>))</strong>. In the offline RL setting, suppose the data distributions have (polynomially) lower bounded eigenvalues, and the <img src="https://s0.wp.com/latex.php?latex=Q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q" class="latex" />-functions of every policy are linear with respect to a given feature mapping. Then, any algorithm requires an exponential number of samples in the horizon <img src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="H" class="latex" /> to output a non-trivially accurate estimate of the value of any given policy <img src="https://s0.wp.com/latex.php?latex=%5Cpi&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi" class="latex" />, with constant probability.</p></blockquote>
+
+
+
+<p>Some remarks are in order. First, note that the above hardness result for policy evaluation also holds for finding near-optimal policies using offline data. For a simple reduction, consider an example where at the initial state, one action <img src="https://s0.wp.com/latex.php?latex=a_1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a_1" class="latex" /> leads to a fixed reward and another action <img src="https://s0.wp.com/latex.php?latex=a_2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a_2" class="latex" /> transits us to an instance which is hard to evaluate using offline data. Then, in order to find a good policy, it is necessary for the agent to approximately evaluate the value of the optimal policy in the hard instance. Second, an appropriate eigenvalue lower bound on the offline data distribution ensures that there is sufficient feature coverage in the dataset, without which linear realizability alone is clearly insufficient for sample-efficient estimation. Third, note that the representation condition in the theorem is significantly stronger than assuming than assuming realizability with regards to only a single target policy, and so the result carries over to the latter setting as well. Fourth, the key idea to prove the result is the error amplification (exponential in the horizon <img src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="H" class="latex" />) induced by the <em>distribution shift</em> from the offline policy to the target policy we wish to evaluate.</p>
+
+
+
+<p>Empirical work performed in <a href="https://arxiv.org/pdf/2103.04947.pdf">Wang et al. 2021</a> show that the these negative results do manifest themselves in experimental examples. The methology considered by <a href="https://arxiv.org/pdf/2103.04947.pdf">Wang et al. 2021</a> is as follows:</p>
+
+
+
+<ol><li>Decide on a target policy to be evaluated, along with a good feature mapping for this policy (could be the last layer of a deep neural network trained to evaluate the policy).</li><li>Collect offline data using trajectories that are a mixture of the target policy and another distribution (perhaps generated by a random policy).</li><li>Run offline RL methods to evaluate the target policy using feature mapping found in Step 1 and the offline data obtained in Step 2.</li></ol>
+
+
+
+<p>We note that features extracted from pre-trained deep neural networks should be able to satisfy the linear realizibility assumption approximately (for the target policy). Moreover, the offline dataset is relatively favorable for evaluation of the target policy, since we would not expect realistic offline datasets to have a large number of trajectories from the target policy itself.</p>
+
+
+
+<p>However, numerical results show substantial degradation in the accuracy of policy evaluation, even for a relatively mild distribution shift (e.g. where there is a 50/50 split in target policy and random policy in the offline data). As an example, consider the following plot.</p>
+
+
+
+<figure class="wp-block-image"><img src="https://i.imgur.com/WUpg5nW.png" alt="" /></figure>
+
+
+
+<p>The figure above depicts the performance of Fitted Q-Iteration (FQI) on Walker2d-v2, an environment from the <a href="https://github.com/openai/gym">OpenAI gym benchmark suite</a> which has continuous action space. Here, the <img src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="x" class="latex" />-axis is the number of rounds of FQI used, and the <img src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="y" class="latex" />-axis is the square root of the mean squared error of the predicted values (smaller is better). The blue line corresponds to performance when the dataset is generated by the target policy itself with 1 million samples, and other lines correspond to the performance when adding more offline data induced by random trajectories. As we can see, adding more random trajectories lead to significant degradation of FQI. See <a href="https://arxiv.org/pdf/2103.04947.pdf">Wang et al. 2021</a> for more such experiments.</p>
+
+
+
+<p>These empirical results seem to affirm the hardness results in <a href="https://arxiv.org/pdf/2103.04947.pdf">Wang et al. 2021</a> (offline RL) and <a href="https://arxiv.org/pdf/2103.12690.pdf">Wang, Wang, Kakade 2021</a> (online RL), in that the definition of a good representation in RL is more subtle than in supervised learning, and certainly goes beyond just linear realizibility.</p>
+
+
+
+<h2>Part 3: Sufficient conditions for provable generalization in RL</h2>
+
+
+
+<p>We have seen from Part 1 and Part 2 that finding an <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon" class="latex" />-optimal policy with mild (e.g. logarithmic) dependence on <img src="https://s0.wp.com/latex.php?latex=S%2CA&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="S,A" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=poly%28H%2C1%2F%5Cepsilon%2C%5Cmbox%7B%22complexity+measure%22%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="poly(H,1/\epsilon,\mbox{&quot;complexity measure&quot;})" class="latex" /> samples is <strong>NOT</strong> possible agnostically, or even with linearly realizable <img src="https://s0.wp.com/latex.php?latex=Q%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q^\star" class="latex" />. This leads us to the following question.</p>
+
+
+
+<p><strong>Q: What kind of assumptions enable provable generalization in RL?</strong></p>
+
+
+
+<p>In fact, under various stronger assumptions, sample-efficient generalization <strong>is</strong> possible in many special cases. Amongst others, these include</p>
+
+
+
+<ul><li>Linear Bellman Completion [<a href="https://www.aaai.org/Library/AAAI/2005/aaai05-159.php">Munos 2005</a>, <a href="https://arxiv.org/abs/2003.00153">Zanette et al. 2020</a>]<ul><li>Linear MDPs (low-rank transition matrix) [<a href="https://arxiv.org/abs/1902.04779">Wang and Yang 2018</a>; <a href="https://arxiv.org/abs/1907.05388">Jin et al. 2019</a>]</li><li>Linear Quadratic Regulators (LQR): standard control theory model (see e.g. <a href="https://en.wikipedia.org/wiki/Linear%E2%80%93quadratic_regulator">Wikipedia page for LQR</a>)</li></ul></li><li>FLAMBE/Feature Selection: <a href="https://arxiv.org/abs/2006.10814">Agarwal, Kakade, Krishnamurthy, Sun 2020</a></li><li>Linear Mixture MDPs: [<a href="http://proceedings.mlr.press/v108/modi20a/modi20a.pdf">Modi et al. 2020</a>, <a href="http://proceedings.mlr.press/v119/ayoub20a/ayoub20a.pdf">Ayoub et al. 2020</a>]</li><li>Block MDPs <a href="https://arxiv.org/pdf/1901.09018.pdf">Du et al. 2019</a></li><li>Factored MDPs <a href="https://arxiv.org/abs/1811.08540">Sun et al 2019</a></li><li>Kernelized Nonlinear Regulator <a href="https://arxiv.org/abs/2006.12466">Kakade et al. 2020</a></li></ul>
+
+
+
+<p>What structural commonalities are shared between these underlying assumptions and models? To answer this question, we go back to the start, and revisit the case of linear bandits (<img src="https://s0.wp.com/latex.php?latex=H%3D1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="H=1" class="latex" /> RL problem) for intuition.</p>
+
+
+
+<h3>Intuition from properties satisfied by linear bandits</h3>
+
+
+
+<p>We consider linear contextual bandits, where the context is <img src="https://s0.wp.com/latex.php?latex=s+%5Cin%5Cmathcal%7BS%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="s \in\mathcal{S}" class="latex" />, the action is <img src="https://s0.wp.com/latex.php?latex=a+%5Cin+%5Cmathcal%7BA%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="a \in \mathcal{A}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BS%7D%2C+%5Cmathcal%7BA%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{S}, \mathcal{A}" class="latex" /> denote the state (or context) and action space respectively. We assume as before that associated with each state-action pair is a representation <img src="https://s0.wp.com/latex.php?latex=%5Cphi%28s%2Ca%29+%5Cin+%5Cmathbb%7BR%7D%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\phi(s,a) \in \mathbb{R}^d" class="latex" />. The observed reward is <img src="https://s0.wp.com/latex.php?latex=r%28s%2Ca%29+%3D+w%5E%5Cstar+%5Ccdot+%5Cphi%28s%2Ca%29+%2B+%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="r(s,a) = w^\star \cdot \phi(s,a) + \epsilon" class="latex" />, where <img src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\epsilon" class="latex" /> is a mean-zero stochastic noise term. The hypothesis class is</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BF%7D+%3D+%7Bf%28s%2Ca%29+%3D+w%28f%29+%5Ccdot+%5Cphi%28s%2Ca%29%2C+w%28f%29+%5Cin+%5Cmathcal%7BW%7D%7D%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{F} = {f(s,a) = w(f) \cdot \phi(s,a), w(f) \in \mathcal{W}}," class="latex" /></p>
+
+
+
+<p>where <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BW%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{W}" class="latex" /> is a subset of <img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BR%7D%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{R}^d" class="latex" />. We let <img src="https://s0.wp.com/latex.php?latex=%5Cpi_f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi_f" class="latex" /> denote the greedy policy for <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" />, i.e.</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cpi_f%28s%29+%3D+%5Cmathrm%7Bargmax%7D_%7Ba%7D+f%28s%2Ca%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi_f(s) = \mathrm{argmax}_{a} f(s,a)." class="latex" /></p>
+
+
+
+<p>An important structural property satisfied by linear contextual bandits is the following: <em>data reuse</em>. Indeed, the difference between any <img src="https://s0.wp.com/latex.php?latex=f+%5Cin+%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f \in \mathcal{F}" class="latex" /> and the observed reward <img src="https://s0.wp.com/latex.php?latex=r&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="r" class="latex" /> is estimable when we had in fact played <img src="https://s0.wp.com/latex.php?latex=%5Cpi_g&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi_g" class="latex" /> for some hypothesis <img src="https://s0.wp.com/latex.php?latex=g+%5Cneq+f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="g \neq f" class="latex" />. Via direct calculation, we see that</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D_%7B%28s%2Ca%29+%5Csim+%5Cpi_g%7D+%5Bf%28s%2Ca%29+-+r%28s%2Ca%29%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{E}_{(s,a) \sim \pi_g} [f(s,a) - r(s,a)]" class="latex" /></p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%3D+%5Cmathbb%7BE%7D_%7B%28s%2Ca%29+%5Csim+%5Cpi_g%7D+%5Bw%28f%29+%5Ccdot+%5Cphi%28s%2Ca%29+-+%28w%5E%5Cstar+%5Ccdot+%5Cphi%28s%2Ca%29+%2B+%5Cepsilon%29%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="= \mathbb{E}_{(s,a) \sim \pi_g} [w(f) \cdot \phi(s,a) - (w^\star \cdot \phi(s,a) + \epsilon)]" class="latex" /></p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=%3D+%5Cleft%5Clangle+w%28f%29+-+w%5E%5Cstar%2C+%5Cmathbb%7BE%7D_%7B%28s%2Ca%29+%5Csim+%5Cpi_g%7D+%5B%5Cphi%28s%2Ca%29%5D+%5Cright%5Crangle.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="= \left\langle w(f) - w^\star, \mathbb{E}_{(s,a) \sim \pi_g} [\phi(s,a)] \right\rangle." class="latex" /></p>
+
+
+
+<p>Intuitively, assuming that <img src="https://s0.wp.com/latex.php?latex=%5Cpi_g&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi_g" class="latex" /> induces “sufficient exploration” of the <img src="https://s0.wp.com/latex.php?latex=d&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="d" class="latex" />-dimensional representation space, this implies that we can evaluate the quality of any policy/hypothesis <img src="https://s0.wp.com/latex.php?latex=f+%5Cin+%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f \in \mathcal{F}" class="latex" /> using just the one set of data collected by <img src="https://s0.wp.com/latex.php?latex=%5Cpi_g&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi_g" class="latex" />. This is <strong>precisely</strong> the kind of data reuse property we saw for supervised learning, which enables sample-efficient generalization there. This suggests that to ensure sample-efficient generalization in general RL, it may be fruitful to look for assumptions that enable data reuse. One special case where such data reuse is possible is the class of linear Bellman complete models.</p>
+
+
+
+<h3>Special case: linear Bellman complete class</h3>
+
+
+
+<p>Let <img src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="H" class="latex" /> be the length of each episode as before. We recall that a hypothesis class <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{H}" class="latex" /> is <strong>realizable</strong> for an MDP <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BM%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{M}" class="latex" /> if there exists a hypothesis <img src="https://s0.wp.com/latex.php?latex=f%5E%5Cstar+%5Cin+%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f^\star \in \mathcal{H}" class="latex" /> such that</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=Q_h%5E%5Cstar%28s%2Ca%29+%3D+Q_%7Bh%7D%5E%7Bf%5E%5Cstar%7D%28s%2Ca%29+%5Cquad+%5Cforall+h+%5Cin+%5Bh%5D%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^\star(s,a) = Q_{h}^{f^\star}(s,a) \quad \forall h \in [h]," class="latex" /></p>
+
+
+
+<p>where <img src="https://s0.wp.com/latex.php?latex=Q_h%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^\star" class="latex" /> is the optimal state-action value at time step <img src="https://s0.wp.com/latex.php?latex=h&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h" class="latex" />. Having defined realizability, we are now ready to define the notion of linear Bellman completeness.</p>
+
+
+
+<p>For any <img src="https://s0.wp.com/latex.php?latex=f+%3D+%28%5Ctheta_1%2C%5Cdots%2C%5Ctheta_%7BH%7D%29+%5Cin+%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f = (\theta_1,\dots,\theta_{H}) \in \mathcal{H}" class="latex" />, let <img src="https://s0.wp.com/latex.php?latex=%5Cpi_f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi_f" class="latex" /> be the greedy policy associated with <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" />. By the definition of a linear Bellman complete class, it follows that given some fixed <img src="https://s0.wp.com/latex.php?latex=g+%3D+%28%5Ctheta_1%5Eg%2C%5Cdots%2C%5Ctheta_%7BH%7D%5Eg%29+%5Cin+%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="g = (\theta_1^g,\dots,\theta_{H}^g) \in \mathcal{H}" class="latex" />, for any <img src="https://s0.wp.com/latex.php?latex=h&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h" class="latex" />, we have<br /><img src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D_%7Bs_h%2Ca_h%2C+s%7Bh%2B1%7D+%5Csim+%5Cpi_g%7D+%5Cleft%5BQ_%7Bh%7D%5Ef%28s_h%2Ca_h%29+-+r%28s_h%2Ca_h%29+-+V_%7Bh%2B1%7D%5Ef%28s_%7Bh%2B1%7D%29+%5Cright%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathbb{E}_{s_h,a_h, s{h+1} \sim \pi_g} \left[Q_{h}^f(s_h,a_h) - r(s_h,a_h) - V_{h+1}^f(s_{h+1}) \right]" class="latex" /><br /><img src="https://s0.wp.com/latex.php?latex=%3D+%5Cmathbb%7BE%7D_%7Bs_h%2C+a_h+%5Csim+%5Cpi_g%7D+%5Cleft%5B+%28%5Ctheta_h+-+%5Cmathcal%7BT%7D_h%28%5Ctheta%7Bh%2B1%7D%29+%5Ccdot+%5Cphi%28s_h%2Ca_h%29+%5Cright%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="= \mathbb{E}_{s_h, a_h \sim \pi_g} \left[ (\theta_h - \mathcal{T}_h(\theta{h+1}) \cdot \phi(s_h,a_h) \right]" class="latex" /><br /><img src="https://s0.wp.com/latex.php?latex=%3D+%28%5Ctheta_h+-+%5Cmathcal%7BT%7Dh%28%5Ctheta%7Bh%2B1%7D%29+%5Ccdot+%5Cmathbb%7BE%7D_%7Bs_h%2C+a_h+%5Csim+%5Cpi_g%7D+%5Cleft%5B+%5Cphi%28s_h%2Ca_h%29+%5Cright%5D.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="= (\theta_h - \mathcal{T}h(\theta{h+1}) \cdot \mathbb{E}_{s_h, a_h \sim \pi_g} \left[ \phi(s_h,a_h) \right]." class="latex" /></p>
+
+
+
+<blockquote class="wp-block-quote"><p><strong>Definition (linear Bellman complete)</strong>. A hypothesis class <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{H}" class="latex" />, with respect to some known feature <img src="https://s0.wp.com/latex.php?latex=%5Cphi%3A%5Cmathcal%7BS%7D+%5Ctimes+%5Cmathcal%7BA%7D+%5Cmapsto+%5Cmathbb%7BR%7D%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\phi:\mathcal{S} \times \mathcal{A} \mapsto \mathbb{R}^d" class="latex" />, is linear Bellman complete for an MDP <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BM%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{M}" class="latex" /> if <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{H}" class="latex" /> is realizable and there exists <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BT%7D_h%3A+%5Cmathbb%7BR%7D%5Ed+%5Cto+%5Cmathbb%7BR%7D%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{T}_h: \mathbb{R}^d \to \mathbb{R}^d" class="latex" /> such that for all <img src="https://s0.wp.com/latex.php?latex=%28%5Ctheta_1%2C%5Cdots%2C%5Ctheta%3C_%7BH%7D%29+%5Cin+%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(\theta_1,\dots,\theta&lt;_{H}) \in \mathcal{H}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=h+%5Cin+%5BH%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h \in [H]" class="latex" />,<br /><img src="https://s0.wp.com/latex.php?latex=T_h%28%5Ctheta_%7Bh%2B1%7D%29+%5Ccdot+%5Cphi%28s%2Ca%29+%3D+r%28s%2Ca%29+%2B+%5Cmathbb%7BE%7D_%7Bs%27+%5Csim+P_h%28s%2Ca%29%7D+%5Cleft%5B%5Cmax_%7Ba%27+%5Cin+%5Cmathcal%7BA%7D%7D+%5Ctheta_%7Bh%2B1%7D%5E%5Ctop+%5Cphi%28s%27%2Ca%27%29+%5Cright%5D%2C+%5Cquad+%5Cforall+%28s%2Ca%29+%5Cin+%5Cmathcal%7BS%7D+%5Ctimes+%5Cmathcal%7BA%7D.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="T_h(\theta_{h+1}) \cdot \phi(s,a) = r(s,a) + \mathbb{E}_{s' \sim P_h(s,a)} \left[\max_{a' \in \mathcal{A}} \theta_{h+1}^\top \phi(s',a') \right], \quad \forall (s,a) \in \mathcal{S} \times \mathcal{A}." class="latex" /></p></blockquote>
+
+
+
+<p>This shows that data reuse is possible for any linear Bellman complete class <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{H}" class="latex" />, since any <img src="https://s0.wp.com/latex.php?latex=f+%5Cin+%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f \in \mathcal{H}" class="latex" /> can be evaluated using offline data collected by some fixed policy <img src="https://s0.wp.com/latex.php?latex=g&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="g" class="latex" />.</p>
+
+
+
+<p>As an aside, note that linear Bellman completeness is a very strong condition that can break when new features are added. This is because adding new features expands the hypothesis space (of linear functions), and there is no guarantee that the new hypothesis class will again satisfy linear Bellman completeness.</p>
+
+
+
+<p>It turns out that linear Bellman complete classes are just one example of Bilinear Classes (<a href="https://arxiv.org/pdf/2103.10897.pdf">Du et al. 2021</a>), which encompass many RL models in which sample-efficient generalization has been shown to be possible.</p>
+
+
+
+<h3>Bilinear Classes: structural properties to enable generalization in RL</h3>
+
+
+
+<p>We assume access to a hypothesis class $latex \mathcal{H} = \mathcal{H}<em>1 \times \dots \times \mathcal{H}</em>{H}&amp;bg=ffffff$, which can be abstract sets that permit for both model-based and value-based hypotheses. We assume that for all <img src="https://s0.wp.com/latex.php?latex=f+%5Cin+%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f \in \mathcal{H}" class="latex" />, there is an associated state-action value function <img src="https://s0.wp.com/latex.php?latex=Q_h%5Ef&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_h^f" class="latex" /> and a value function <img src="https://s0.wp.com/latex.php?latex=V_h%5Ef&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="V_h^f" class="latex" /> for each <img src="https://s0.wp.com/latex.php?latex=h+%5Cin+%7B1%2C%5Cdots%2CH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h \in {1,\dots,H}" class="latex" />. As before, let <img src="https://s0.wp.com/latex.php?latex=%5Cpi_%7Bh%7D%5E%7Bf%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi_{h}^{f}" class="latex" /> denote the greedy policy with respect to <img src="https://s0.wp.com/latex.php?latex=Q_%7Bh%7D%5E%7Bf%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q_{h}^{f}" class="latex" />, and let <img src="https://s0.wp.com/latex.php?latex=%5Cpi_f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\pi_f" class="latex" /> denote <img src="https://s0.wp.com/latex.php?latex=%7B%5Cpi_%7Bh%7D%5E%7Bf%7D%7D_%7Bh%3D1%7D%5E%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="{\pi_{h}^{f}}_{h=1}^{H}" class="latex" />. We can now introduce the Bilinear Class.</p>
+
+
+
+<p><strong>Definition (Bilinear Class)</strong>. Consider an MDP <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BM%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{M}" class="latex" />, a hypothesis class <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{H}" class="latex" />, a discrepancy function <img src="https://s0.wp.com/latex.php?latex=%5Cell_f%3A+%5Cmathcal%7BS%7D+%5Ctimes+%5Cmathcal%7BA%7D+%5Ctimes+%5Cmathcal%7BS%7D+%5Ctimes+%5Cmathcal%7BH%7D+%5Cto+%5Cmathbb%7BR%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\ell_f: \mathcal{S} \times \mathcal{A} \times \mathcal{S} \times \mathcal{H} \to \mathbb{R}" class="latex" /> (defined for each <img src="https://s0.wp.com/latex.php?latex=f+%5Cin+%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f \in \mathcal{H}" class="latex" />). Suppose <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{H}" class="latex" /> is realizable in <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BM%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{M}" class="latex" /> and that there exists functions <img src="https://s0.wp.com/latex.php?latex=W_h%3A+%5Cmathcal%7BH%7D+%5Cto+%5Cmathbb%7BR%7D%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="W_h: \mathcal{H} \to \mathbb{R}^d" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=X_h%3A+%5Cmathcal%7BH%7D+%5Cto+%5Cmathbb%7BR%7D%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="X_h: \mathcal{H} \to \mathbb{R}^d" class="latex" /> for some <img src="https://s0.wp.com/latex.php?latex=d+%5Cin+%5Cmathcal%7BN%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="d \in \mathcal{N}" class="latex" />. Then, <img src="https://s0.wp.com/latex.php?latex=%28%5Cmathcal%7BH%7D%2C%5Cell_f%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="(\mathcal{H},\ell_f)" class="latex" /> forms a Bilinear Class for <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BM%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{M}" class="latex" /> if the following two conditions hold.</p>
+
+
+
+<ol><li>Bilinear regret: on-policy difference between claimed reward and true reward satisfies following upper bound,<br /><img src="https://s0.wp.com/latex.php?latex=%7C%5Cmathbb%7BE%7D_%7Ba%7B1%3Ah%7D+%5Csim+%5Cpi_f%7D+%5Cleft%5BQ_%7Bh%7D%5E%7Bf%7D%28s_h%2Ca_h%29+-+r%28s_h%2Ca_h%29+-+V_%7Bh%7D%5E%7Bf%7D%28s_%7Bh%2B1%7D%29+%5Cright%5D+%7C+%5Cleq+%5Clangle+W_h%28f%29++-+W_h%28f%5E%5Cstar%29%2C+X_h%28f%29%5Crangle.f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="|\mathbb{E}_{a{1:h} \sim \pi_f} \left[Q_{h}^{f}(s_h,a_h) - r(s_h,a_h) - V_{h}^{f}(s_{h+1}) \right] | \leq \langle W_h(f)  - W_h(f^\star), X_h(f)\rangle.f" class="latex" /></li><li>Data reuse: <img src="https://s0.wp.com/latex.php?latex=%7C%5Cmathbb%7BE%7D_%7Ba%7B1%3Ah%7D+%5Csim+%5Cpi_f%7D%5Cleft%5B%5Cell_f%28s_h%2Ca_h%2Cs_%7Bh%2B1%7D%2Cg%29+%5Cright%5D%7C+%3D+%7C%5Clangle+W_h%28g%29+-+W_h%28f%5E%5Cstar%29%2C+X_h%28f%29%5Crangle+%7C.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="|\mathbb{E}_{a{1:h} \sim \pi_f}\left[\ell_f(s_h,a_h,s_{h+1},g) \right]| = |\langle W_h(g) - W_h(f^\star), X_h(f)\rangle |." class="latex" /></li></ol>
+
+
+
+<p>As an example to demonstrate what the choices of <img src="https://s0.wp.com/latex.php?latex=%5Cell_f%2CW_h&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\ell_f,W_h" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=X_h&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="X_h" class="latex" /> might look like, for a linear Bellman complete class <img src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BH%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\mathcal{H}" class="latex" />, we can choose<br /><img src="https://s0.wp.com/latex.php?latex=%5Cell_f%28s_h%2Ca_h%2Cs_%7Bh%2B1%7D%2Cg%29+%3D+Q_%7Bh%7D%5E%7Bg%7D%28s_h%2Ca_h%29+-+r%28s_h%2Ca_h%29+-+V_%7Bh%2B1%7D%5E%7Bg%7D%28s_%7Bh%2B1%7D%29%2C&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\ell_f(s_h,a_h,s_{h+1},g) = Q_{h}^{g}(s_h,a_h) - r(s_h,a_h) - V_{h+1}^{g}(s_{h+1})," class="latex" /></p>
+
+
+
+<p>$latex W_h(g) = \theta_h – \mathcal{T}<em>h(\theta</em>{h+1})&amp;bg=ffffff$</p>
+
+
+
+<p><img src="https://s0.wp.com/latex.php?latex=X_h%28f%29+%3D+%5Cmathbb%7BE%7D_%7B%28s_h%2Ca_h%29+%5Csim+%5Cpi_f%7D%5B%5Cphi%28s_h%2Ca_h%29%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="X_h(f) = \mathbb{E}_{(s_h,a_h) \sim \pi_f}[\phi(s_h,a_h)]" class="latex" /></p>
+
+
+
+<p>Above, note that <img src="https://s0.wp.com/latex.php?latex=W_h%28f%5E%5Cstar%29+%3D+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="W_h(f^\star) = 0" class="latex" /> for all <img src="https://s0.wp.com/latex.php?latex=h&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="h" class="latex" /> for linear Bellman complete classes, and that the discrepancy function <img src="https://s0.wp.com/latex.php?latex=%5Cell_f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\ell_f" class="latex" /> in this case does not depend on <img src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="f" class="latex" />. As demonstrated in <a href="https://arxiv.org/pdf/2103.10897.pdf">Du et al. 2021</a>, the following models (in which sample-efficient generalization is known to be possible) can all be shown to be Bilinear Classes for some discrepancy function <img src="https://s0.wp.com/latex.php?latex=%5Cell_f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="\ell_f" class="latex" />:</p>
+
+
+
+<ul><li>Linear Bellman Completion [<a href="https://www.aaai.org/Library/AAAI/2005/aaai05-159.php">Munos 2005</a>, <a href="https://arxiv.org/abs/2003.00153">Zanette et al. 2020</a>]<ul><li>Linear MDPs (low-rank transition matrix) [<a href="https://arxiv.org/abs/1902.04779">Wang and Yang 2018</a>; <a href="https://arxiv.org/abs/1907.05388">Jin et al. 2019</a>]</li><li>Linear Quadratic Regulators (LQR): standard control theory model (see e.g. <a href="https://en.wikipedia.org/wiki/Linear%E2%80%93quadratic_regulator">Wikipedia page for LQR</a>)</li></ul></li><li>FLAMBE/Feature Selection: <a href="https://arxiv.org/abs/2006.10814">Agarwal, Kakade, Krishnamurthy, Sun 2020</a></li><li>Linear Mixture MDPs: [<a href="http://proceedings.mlr.press/v108/modi20a/modi20a.pdf">Modi et al. 2020</a>, <a href="http://proceedings.mlr.press/v119/ayoub20a/ayoub20a.pdf">Ayoub et al. 2020</a>]</li><li>Block MDPs <a href="https://arxiv.org/pdf/1901.09018.pdf">Du et al. 2019</a></li><li>Factored MDPs <a href="https://arxiv.org/abs/1811.08540">Sun et al 2019</a></li><li>Kernelized Nonlinear Regulator <a href="https://arxiv.org/abs/2006.12466">Kakade et al. 2020</a></li><li>and more (see <a href="https://arxiv.org/pdf/2103.10897.pdf">Du et al. 2021</a> for details.)</li></ul>
+
+
+
+<p>Bilinear classes can be seen as a generalization of Bellman rank (<a href="https://arxiv.org/abs/1610.09512">Jiang et al. 2017</a>) and Witness rank (<a href="https://arxiv.org/abs/1811.08540">Wen et al. 2019</a>), which were previous works that sought to identify strucural commonalities between different RL models that enable sample-efficient generalization. That being said, there are still models (with known provable generalization) which Bilinear Classes does not cover. Two such exceptions are the deterministic linear <img src="https://s0.wp.com/latex.php?latex=Q%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q^\star" class="latex" /> (<a href="https://arxiv.org/abs/1307.4847">Wen and Van Roy 2013</a>) model and the <img src="https://s0.wp.com/latex.php?latex=Q%5E%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002" alt="Q^\star" class="latex" />-state aggregation model (<a href="https://arxiv.org/abs/1912.06366">Dong et al. 2020</a>). On a heuristic level, the structural commonalities identified by the Bilinear Classes show that to a large extent, most RL models known to enable sample-efficient generalization resemble linear bandits, in that data reuse is possible. In this sense, understanding why generalization is possible in the linear bandit case gives one intuition for why generalization is possible in these other cases as well. On some level, this may be disappointing since we might hope to capture richer phenomenon than just linear bandits, but promisingly, there is a rich class of RL models which share these structural commonalities that enable generalization in RL (as the examples encompassed by the Bilinear Classes demonstrate).</p>
+
+
+
+<h2>Conclusion</h2>
+
+
+
+<p>From the discussion above, we see that a generalization theory for RL, while significantly distinct from that for supervised learning, is still possible. However, natural assumptions that might seem adequate, such as linear realizability, are in fact insufficient, and much stronger assumptions are required. One such example of sufficient assumptions is the Bilinear Class, which covers a rich set of models. Moreover, as the empirical results we saw in the interlude show, these representational issues identified by theory are relevant for practice. For more on the theory of RL, see the following <a href="https://rltheorybook.github.io">forthcoming book</a>.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Boaz Barak <a href="https://windowsontheory.org/2021/04/24/towards-a-theory-of-generalization-in-reinforcement-learning-guest-lecture-by-sham-kakade/"><span class="datestr">at April 24, 2021 02:56 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2937,128 +3999,6 @@ Email: shachar.lovett@gmail.com</p></div>
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-jobs.org/2021/04/06/ci-fellows-at-any-apply-by-may-1-2021/"><span class="datestr">at April 06, 2021 01:33 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://rjlipton.wpcomstaging.com/?p=18492">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/lipton.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-US"><a class="entryheader" href="https://rjlipton.wpcomstaging.com/2021/04/06/relaxing-the-primes/">Relaxing the Primes</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://rjlipton.wpcomstaging.com" title="Gödel's Lost Letter and P=NP">Richard Lipton</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en-US">
-<p><font color="#0044cc"><br />
-<em>Although the prime numbers are rigidly determined, they somehow feel like experimental data—Tim Gowers</em><br />
-<font color="#000000"></font></font></p><font color="#0044cc"><font color="#000000">
-<table class="image alignright">
-<tbody>
-<tr>
-<td>
-<a href="https://rjlipton.wpcomstaging.com/2021/04/06/relaxing-the-primes/sm/" rel="attachment wp-att-18494"><img width="181" alt="" src="https://i1.wp.com/rjlipton.wpcomstaging.com/wp-content/uploads/2021/04/sm.jpg?resize=181%2C102&amp;ssl=1" class="alignright wp-image-18494" height="102" /></a>
-</td>
-</tr>
-<tr>
-<td class="caption alignright"><font size="-2">Finnish Scientific Courage Award <a href="https://www.utu.fi/en/news/news/2016-academy-of-finland-award-granted-to-kaisa-matomaki">source</a></font></td>
-</tr>
-</tbody>
-</table>
-<p>
-Kaisa Matomäki is a Finnish mathematician working in <a href="https://en.wikipedia.org/wiki/Kaisa_Matomaki">number theory</a>. She has some terrific results on prime numbers—results that have won several important prizes including the 2021 Ruth Lyttle Satter <a href="https://en.wikipedia.org/wiki/Ruth_Lyttle_Satter_Prize_in_Mathematics">Prize</a>: It is presented to a woman who has made an outstanding contribution to mathematics research. The prize <a href="https://www.ams.org/news?news_id=6455">citation</a> specifically mentions a 2015 <a href="https://arxiv.org/abs/1501.04585">paper</a> with Maksym Radziwill that contributed to Terence Tao’s resolution of the Erdős discrepancy problem—and indeed we highlighted Tao’s followup work with her and Radziwill in our 2015 <a href="https://rjlipton.wpcomstaging.com/2015/09/24/frogs-and-lily-pads-and-discrepancy/">post</a> on this.</p>
-<p>
-Today, Ken and I thought we would combine one of her new deep theorems with some shallow observations.<br />
-<span id="more-18492"></span></p>
-<p>
-The set of primes is denoted by <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BPRIMES%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf{PRIMES}}" class="latex" />, as usual. As complexity theorists we have known that for decades that the Boolean circuit complexity of <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BPRIMES%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf{PRIMES}}" class="latex" /> is polynomial. This follows from the existence of a polynomial random algorithm for <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BPRIMES%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf{PRIMES}}" class="latex" /> due to Robert Solovay and Volker Strassen, and then applying Len Adleman’s connection between such algorithms and Boolean circuit complexity.</p>
-<p>
-Matomäki views <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BPRIMES%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf{PRIMES}}" class="latex" /> in a different way. As an analytic number theorist she is concerned with the density and structure of primes, not so much the complexity of recognizing or generating a prime.</p>
-<p>
-</p><h2> Relaxations </h2><p></p>
-<p>
-Exact results on the set of primes are hard to come by. </p>
-<p>
-<b>Twin Primes</b>: We know that there are infinitely many <img src="https://s0.wp.com/latex.php?latex=%7Bp%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{p}" class="latex" /> such that <img src="https://s0.wp.com/latex.php?latex=%7Bp%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{p}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bp%2B2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{p+2}" class="latex" /> are prime. But not proved.</p>
-<p>
-<b>Goldbach</b>: We know that every even number from <img src="https://s0.wp.com/latex.php?latex=%7B4%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{4}" class="latex" /> onward is the sum of two primes. But not proved.</p>
-<p>
-<b>Density of Primes</b>: We known that the gap between consecutive primes is at most <img src="https://s0.wp.com/latex.php?latex=%7B%5Cdots%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\dots}" class="latex" /> But not proved.</p>
-<p>
-The Riemann Hypothesis attempts to say more about density of the primes than the Prime Number Theorem does. It has been proved equivalent to some statements about approximate growth rates, yet even these forms have not been touched.</p>
-<p>
-Instead of trying for better approximate results about primes, can we learn more by relaxing the notion of “prime” itself? For each <img src="https://s0.wp.com/latex.php?latex=%7Bk+%5Cgeq+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{k \geq 1}" class="latex" />, define <img src="https://s0.wp.com/latex.php?latex=%7BP_k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{P_k}" class="latex" /> to be the set of numbers that are products of at most <img src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{k}" class="latex" /> primes. Then <img src="https://s0.wp.com/latex.php?latex=%7BP_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{P_1}" class="latex" /> is the set of primes (not the prime powers) and <img src="https://s0.wp.com/latex.php?latex=%7BP_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{P_2}" class="latex" /> is the set of products of two primes—which include the <a href="https://en.wikipedia.org/wiki/Blum_integer">Blum integers</a> of special interest to cryptography. Collectively the <img src="https://s0.wp.com/latex.php?latex=%7BP_k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{P_k}" class="latex" /> sets represent different levels of being “<a href="https://en.wikipedia.org/wiki/Almost_prime">almost prime</a>.” The motivating question is:</p>
-<blockquote><p><b> </b> <em> How well and in what ways does the structure of the sets of almost-primes model the structure of the primes? </em>
-</p></blockquote>
-<p>
-In 2010, John Friedlander and Henryk Iwaniec wrote a <a href="https://www.ams.org/books/coll/057/coll057-endmatter.pdf">monograph</a> titled <em>Opera de Cribro</em>, which is Latin for “Works of the Sieve.” They proved certain results about <img src="https://s0.wp.com/latex.php?latex=%7BP_%7B13%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{P_{13}}" class="latex" /> and speculated whether their methods improve them to work at least for <img src="https://s0.wp.com/latex.php?latex=%7BP_3%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{P_3}" class="latex" />. Then they say, “It would be interesting to get integers with at most two prime divisors.” This is where Matomäki comes in—with a second kind of relaxing, one applying to “almost all” members of <img src="https://s0.wp.com/latex.php?latex=%7BP_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{P_2}" class="latex" />.</p>
-<p>
-</p><h2> New Result </h2><p></p>
-<p>
-Matomäki has a brand new <a href="https://arxiv.org/abs/2012.11565">paper</a> (revised two weeks ago from a December original) titled, “Almost primes in almost all very short intervals.” It follows on from a <a href="https://arxiv.org/abs/1510.06005">paper</a> by one of her students, Joni Teräväinen, titled “Almost all primes in almost all short intervals.” </p>
-<p>
-Her main result is the following theorem. </p>
-<blockquote><p><b>Theorem 1</b> <em> Suppose <img src="https://s0.wp.com/latex.php?latex=%7Bh_X+%5Crightarrow+%5Cinfty%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{h_X \rightarrow \infty}" class="latex" /> as <img src="https://s0.wp.com/latex.php?latex=%7BX+%5Crightarrow+%5Cinfty%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X \rightarrow \infty}" class="latex" /> and put <img src="https://s0.wp.com/latex.php?latex=%7B%5CDelta_X+%3D+h%5Clog+X%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\Delta_X = h\log X}" class="latex" />. Then for almost all <img src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bx+%5Cin+%28%5Cfrac%7BX%7D%7B2%7D%2CX%5D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x \in (\frac{X}{2},X]}" class="latex" />, the interval <img src="https://s0.wp.com/latex.php?latex=%7B%28x-%5CDelta_X%2Cx%5D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{(x-\Delta_X,x]}" class="latex" /> contains a <img src="https://s0.wp.com/latex.php?latex=%7BP_2%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{P_2}" class="latex" />. </em>
-</p></blockquote>
-<p>
-Roger Heath-Brown had established the corresponding result for primes (that is, for <img src="https://s0.wp.com/latex.php?latex=%7BP_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{P_1}" class="latex" />) but only assuming simultaneously the Riemann hypothesis and the pair correlation conjecture for the zeros of the Riemann zeta function. With no hypotheses, the presence of primes in almost all intervals is known only when the intervals have length <img src="https://s0.wp.com/latex.php?latex=%7BX%5E%7B%5COmega%281%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X^{\Omega(1)}}" class="latex" />—concretely, <img src="https://s0.wp.com/latex.php?latex=%7BX%5E%7B1%2F20%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X^{1/20}}" class="latex" /> is known. Thus, Matomäki has traded off the use of conjectures for the relaxed notion of prime.</p>
-<p>
-The “almost call” is in the sense of average density of <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x}" class="latex" /> whose short interval is populated. This average instead of worst case mirrors our difficulties with circuit lower bounds. We can easily show that on average Boolean function have huge circuit lower bounds. But worst case bounds for specific functions is beyond reach. Hmmm.</p>
-<p>
-</p><h2> Lower Bounds </h2><p></p>
-<p>
-We <a href="https://rjlipton.wordpress.com/2021/01/14/priming-random-restrictions/">previously</a> proved: </p>
-<blockquote><p><b>Theorem 2 (Lower Bound)</b> <em> For any <img src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%3E0%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\epsilon&gt;0}" class="latex" />, the depth of a DeMorgan boolean circuit for <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BPRIMES%7D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf{PRIMES}}" class="latex" /> is at least <img src="https://s0.wp.com/latex.php?latex=%7B%282-%5Cepsilon%29%5Clog_2+n+%2B+O%281%29%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{(2-\epsilon)\log_2 n + O(1)}" class="latex" />. </em>
-</p></blockquote>
-<p>
-Recall a DeMorgan formula <img src="https://s0.wp.com/latex.php?latex=%7BF%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{F}" class="latex" /> on <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" /> variables <img src="https://s0.wp.com/latex.php?latex=%7Bx_1%2C%5Cdots%2Cx_n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x_1,\dots,x_n}" class="latex" /> is a binary tree whose leaves are labeled with variables or their negations, and whose internal nodes are labeled with either <img src="https://s0.wp.com/latex.php?latex=%7B%5Cvee%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\vee}" class="latex" /> for OR and <img src="https://s0.wp.com/latex.php?latex=%7B%5Cwedge%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\wedge}" class="latex" /> for AND gates. </p>
-<p>
-Here is a high level view of this result. See <a href="https://rjlipton.wordpress.com/2021/01/14/priming-random-restrictions/">here</a> for details.</p>
-<p>
-Assume there is a DeMorgan Boolean circuit for <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BPRIMES%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf{PRIMES}}" class="latex" /> is at most <img src="https://s0.wp.com/latex.php?latex=%7B%282-%5Cepsilon%29%5Clog_2+n+%2B+O%281%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{(2-\epsilon)\log_2 n + O(1)}" class="latex" /> depth. We can use the random restriction method to set lots of the inputs to random values <img src="https://s0.wp.com/latex.php?latex=%7B0%2F1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{0/1}" class="latex" />. </p>
-<p>
-We claim that with high probability the input looks like 	</p>
-<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++x_1%2C%5Cdots%2Cx_m%2C+x_%7Bm%2B1%7D%2C%5Cdots%2Cx_n.+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  x_1,\dots,x_m, x_{m+1},\dots,x_n. " class="latex" /></p>
-<p>The right-most bits 	</p>
-<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++x_%7Bm%2B1%7D%2C%5Cdots%2Cx_%7Bn%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  x_{m+1},\dots,x_{n} " class="latex" /></p>
-<p>are left unset, and the other bits to the left have some bits randomly set. Moreover, the number of bits in the above right is order <img src="https://s0.wp.com/latex.php?latex=%7Bn%5E%7B%5Cepsilon%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n^{\epsilon}}" class="latex" />.</p>
-<p>
-Now set all the bits in the left group that are unset also to random values <img src="https://s0.wp.com/latex.php?latex=%7B0%2F1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{0/1}" class="latex" />. Leave the right group unset.</p>
-<p>
-The point of this is that if we assume that the formula had size at most order <img src="https://s0.wp.com/latex.php?latex=%7Bn%5E%7B2-%5Cepsilon%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n^{2-\epsilon}}" class="latex" />, then we have that the formula is likely to be constant. But this contradicts the density of primes and composites. </p>
-<p>
-</p><h2> Open Problems </h2><p></p>
-<p>
-Can Matomäki’s theorem be used to get stronger lower bounds on the complexity of <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BPRIMES%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf{PRIMES}}" class="latex" />? Can it go beyond the quadratic limit?</p>
-<p></p></font></font></div>
-
-
-
-
-
-
-
-<p class="date">
-by KWRegan <a href="https://rjlipton.wpcomstaging.com/2021/04/06/relaxing-the-primes/"><span class="datestr">at April 06, 2021 04:43 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
