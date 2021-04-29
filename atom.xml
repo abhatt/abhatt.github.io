@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-04-29T04:50:49Z</updated>
+  <updated>2021-04-29T05:28:24Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,52 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2021/04/28/how-good-greed</id>
+    <link href="https://11011110.github.io/blog/2021/04/28/how-good-greed.html" rel="alternate" type="text/html"/>
+    <title>How good is greed for the no-three-in-line problem?</title>
+    <summary>The 37th European Workshop on Computational Geometry (EuroCG 2021) was earlier this month, but its book of abstracts remains online. This has an odd position in the world of academic publishing: the “abstracts” are really short papers, so it looks a lot like a published conference proceedings. However, it declares that you should really pretend that it’s not a proceedings, in order to allow the same work to go on to another conference with a published proceedings, getting around the usual prohibitions on double publication. Instead, its papers “should be considered a preprint rather than a formally reviewed paper”. But I think that doesn’t preclude citing them, with care, just as you might occasionally cite arXiv preprints. The workshop’s lack of peer review and selectivity is actually a useful feature, allowing it to act as an outlet for works that are too small or preliminary for publication elsewhere. In North America, the Canadian Conference on Computational Geometry performs much the same role, but does publish a proceedings; its submission deadline is rapidly approaching.</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The <a href="http://eurocg21.spbu.ru/">37th European Workshop on Computational Geometry (EuroCG 2021)</a> was earlier this month, but its <a href="http://eurocg21.spbu.ru/wp-content/uploads/2021/04/proceedings.pdf">book of abstracts</a> remains online. This has an odd position in the world of academic publishing: the “abstracts” are really short papers, so it looks a lot like a published conference proceedings. However, it declares that you should really pretend that it’s not a proceedings, in order to allow the same work to go on to another conference with a published proceedings, getting around the usual prohibitions on double publication. Instead, its papers “should be considered a preprint rather than a formally reviewed paper”. But I think that doesn’t preclude citing them, with care, just as you might occasionally cite arXiv preprints. The workshop’s lack of peer review and selectivity is actually a useful feature, allowing it to act as an outlet for works that are too small or preliminary for publication elsewhere. In North America, the <a href="http://cccg.ca/">Canadian Conference on Computational Geometry</a> performs much the same role, but does publish a proceedings; its <a href="https://projects.cs.dal.ca/cccg2021/the-call-for-papers-is-out/">submission deadline</a> is rapidly approaching.</p>
+
+<p>Anyway, one of the EuroCG not-really-a-published-paper things is mine: “Geometric dominating sets – A minimum version of the no-three-in-line problem”, with Oswin Aichholzer and Eva-Maria Hainzl. As the title suggests, it’s related to the <a href="https://en.wikipedia.org/wiki/No-three-in-line_problem">no-three-in-line problem</a>, in which one must place as many points as possible in a grid so that no three are collinear. I’ve written about the same problem here <a href="https://11011110.github.io/blog/2018/11/10/random-no-three.html">several</a> <a href="https://11011110.github.io/blog/2018/11/12/gurobi-vs-no.html">times</a> <a href="https://11011110.github.io/blog/2018/12/08/general-position-hypercube.html">already</a>. On an \(n\times n\) grid, there’s an easy upper bound of \(2n\) on the number of points, but it’s widely conjectured that the actual number is a smaller linear function of \(n\). It was a big step forward when Erdős showed that \(n\bigl(1-o(1)\bigr)\) points can be placed, and this was later improved to \(\tfrac{3}{2}n\bigl(1-o(1)\bigr)\).</p>
+
+<p>These big no-three-in-line sets are constructed algebraically, but what if we try something simpler, a greedy algorithm that just adds points one by one (in a random or systematic order) until getting stuck? This question was already asked in the 1970s by Martin Gardner, and studied by several other authors since. But it is, if anything, even more frustratingly unknown than the no-three-in-line problem itself. We don’t know whether, in general, it’s possible to get stuck with fewer points than the maximum solution to the no-three-in-line problem, or even whether it’s possible to get stuck with fewer than \(2n\) points for infinitely many values of \(n\). For some values of \(n\) we do know smaller stuck solutions, though: for instance, here’s one with \(28\) points on a \(36\times 36\) grid.</p>
+
+<p style="text-align: center;"><img alt="A 28-point greedy solution to the no-three-in-line problem on a 36x36 grid" src="https://11011110.github.io/blog/assets/2021/greedy-no3-36x36.svg"/></p>
+
+<p>It was known that greedy solutions always have \(\Omega(\sqrt{n})\) points, and one of our main results is to improve this bound to \(\Omega(n^{2/3})\). The known \(\Omega(\sqrt{n})\) lower bound is easy to see: A single line through two selected points can cover at most \(n\) other grid points, so you need \(n\) lines to cover the whole grid, and you need \(\Omega(\sqrt{n})\) points to determine this many lines. With fewer points, there won’t be enough lines through your points to cover the whole grid, and your greedy solution won’t be stuck. Our new \(\Omega(n^{2/3})\) bound looks more carefully at the tradeoff between numbers of lines and numbers of points per line. It can be divided into two cases:</p>
+
+<ul>
+  <li>
+    <p>Suppose, first, that the selected point set has the property that, for any selected point \(p\), the lines through \(p\) cover fewer than \(n^{4/3}\) grid points. Because each selected point covers few grid points, we need to select many points to cover the whole grid: at least \(\Omega(n^{2/3})\) points.</p>
+  </li>
+  <li>
+    <p>Suppose on the other hand that the lines through some point \(p\) cover at least  \(n^{4/3}\) grid points. Parameterize these lines by the \(L_\infty\) distance to the closest grid point (regardless of whether that point is one of the selected ones). Then there are \(O(k)\) lines with parameter \(k\), each of which covers \(O(n/k)\) grid points. Summing over small values of \(k\) shows that, even if we use lines that cover as many grid points as possible, we need  \(\Omega(n^{2/3})\) lines through \(p\) to cover this many grid points. Each of these lines is determined by another selected point, so we need \(\Omega(n^{2/3})\) selected points.</p>
+  </li>
+</ul>
+
+<p>The actual proof in the paper takes into account that not all the grid points near \(p\) are the nearest on their line, and does the summation over small values of \(k\) more carefully, to get more precise constant factors in the bounds. Our paper also includes another variation of the problem in which we allow our selected points to be collinear but require the lines through them to cover all unselected points. There, we can make a little progress: we show that \(n\) points, or in some cases slightly fewer than \(n\) points, are sufficient. The same \(\Omega(n^{2/3})\) lower bound is still valid for this case, but there’s still a big gap between the lower bound and the upper bound.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/106146843522019241">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2021-04-28T18:23:00Z</updated>
+    <published>2021-04-28T18:23:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2021-04-29T04:59:37Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-US">
     <id>https://rjlipton.wpcomstaging.com/?p=18647</id>
@@ -98,7 +144,7 @@ Do you have better fun facts on the winners? Let us know if you do.</p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-29T04:44:58Z</updated>
+      <updated>2021-04-29T05:22:01Z</updated>
     </source>
   </entry>
 
@@ -487,7 +533,7 @@ and column sums, are polynomial time solvable.
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-29T04:47:10Z</updated>
+      <updated>2021-04-29T05:24:30Z</updated>
     </source>
   </entry>
 
@@ -713,7 +759,7 @@ In this work, we show that the maximum error resilience of a protocol for messag
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-29T04:40:54Z</updated>
+      <updated>2021-04-29T05:21:26Z</updated>
     </source>
   </entry>
 
@@ -739,7 +785,7 @@ Our main results shows that for every polynomial $t(n)\geq n^2$, there exists so
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-29T04:40:54Z</updated>
+      <updated>2021-04-29T05:21:26Z</updated>
     </source>
   </entry>
 
@@ -772,7 +818,7 @@ At the core of all of our results is a new notion of universal heuristic scheme,
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-29T04:40:54Z</updated>
+      <updated>2021-04-29T05:21:26Z</updated>
     </source>
   </entry>
 
@@ -1819,7 +1865,7 @@ At the core of all of our results is a new notion of universal heuristic scheme,
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-29T04:48:29Z</updated>
+      <updated>2021-04-29T05:24:38Z</updated>
     </source>
   </entry>
 
@@ -1874,7 +1920,7 @@ At the core of all of our results is a new notion of universal heuristic scheme,
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-04-29T04:48:29Z</updated>
+      <updated>2021-04-29T05:25:30Z</updated>
     </source>
   </entry>
 
@@ -1908,7 +1954,7 @@ At the core of all of our results is a new notion of universal heuristic scheme,
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-29T04:40:54Z</updated>
+      <updated>2021-04-29T05:21:24Z</updated>
     </source>
   </entry>
 
@@ -1938,7 +1984,7 @@ We finally consider other alternative notions of Kolmogorov complexity---includi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-29T04:40:54Z</updated>
+      <updated>2021-04-29T05:21:24Z</updated>
     </source>
   </entry>
 
@@ -2123,7 +2169,7 @@ See this <a href="https://cse.buffalo.edu/~regan/personal/JuneCLarticleKWR.pdf">
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-29T04:43:45Z</updated>
+      <updated>2021-04-29T05:21:56Z</updated>
     </source>
   </entry>
 
@@ -2150,7 +2196,7 @@ Email: applications.taa@univie.ac.at</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-04-29T04:45:06Z</updated>
+      <updated>2021-04-29T05:22:12Z</updated>
     </source>
   </entry>
 
@@ -2178,7 +2224,7 @@ Email: p.k.lehre@cs.bham.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-04-29T04:45:06Z</updated>
+      <updated>2021-04-29T05:22:12Z</updated>
     </source>
   </entry>
 
@@ -2208,7 +2254,7 @@ Email: p.k.lehre@cs.bham.ac.uk</p></div>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-04-29T04:49:01Z</updated>
+      <updated>2021-04-29T05:26:42Z</updated>
     </source>
   </entry>
 
@@ -2345,7 +2391,7 @@ Email: p.k.lehre@cs.bham.ac.uk</p></div>
       <link href="https://www.let-all.com/blog/feed/" rel="self" type="application/atom+xml"/>
       <link href="https://www.let-all.com/blog" rel="alternate" type="text/html"/>
       <title>The Learning Theory Alliance Blog</title>
-      <updated>2021-04-29T04:50:43Z</updated>
+      <updated>2021-04-29T05:28:18Z</updated>
     </source>
   </entry>
 
@@ -2372,7 +2418,7 @@ Email: advertising-es-program@amazon.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-04-29T04:45:06Z</updated>
+      <updated>2021-04-29T05:22:12Z</updated>
     </source>
   </entry>
 
@@ -2401,7 +2447,7 @@ We additionally note that if we want to deduce $T$-hard OWFs where security hold
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-29T04:40:54Z</updated>
+      <updated>2021-04-29T05:21:24Z</updated>
     </source>
   </entry>
 
@@ -2455,7 +2501,7 @@ We additionally note that if we want to deduce $T$-hard OWFs where security hold
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2021-04-29T04:43:40Z</updated>
+      <updated>2021-04-29T05:21:50Z</updated>
     </source>
   </entry>
 
@@ -2634,7 +2680,7 @@ Is there a richer fount for open problems than number theory?</p></font></font><
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-29T04:44:58Z</updated>
+      <updated>2021-04-29T05:22:01Z</updated>
     </source>
   </entry>
 
@@ -2715,7 +2761,7 @@ The equality of area with total units still holds true, because both the area of
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2021-04-18T18:59:15Z</updated>
+      <updated>2021-04-29T04:59:37Z</updated>
     </source>
   </entry>
 
@@ -2784,7 +2830,7 @@ The biennial Algorithms and Data Structures Symposium is usually in Canada, and 
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2021-04-18T18:59:15Z</updated>
+      <updated>2021-04-29T04:59:37Z</updated>
     </source>
   </entry>
 
@@ -2842,7 +2888,7 @@ The biennial Algorithms and Data Structures Symposium is usually in Canada, and 
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2021-04-29T04:49:07Z</updated>
+      <updated>2021-04-29T05:26:55Z</updated>
     </source>
   </entry>
 
@@ -2938,7 +2984,7 @@ We also congratulate Paul Beame on the SIGACT Distinguished Service Award.</p></
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-04-29T04:44:58Z</updated>
+      <updated>2021-04-29T05:22:01Z</updated>
     </source>
   </entry>
 
@@ -2999,75 +3045,7 @@ We also congratulate Paul Beame on the SIGACT Distinguished Service Award.</p></
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-04-29T04:40:54Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-US">
-    <id>https://www.scottaaronson.com/blog/?p=5448</id>
-    <link href="https://www.scottaaronson.com/blog/?p=5448" rel="alternate" type="text/html"/>
-    <link href="https://www.scottaaronson.com/blog/?p=5448#comments" rel="replies" type="text/html"/>
-    <link href="https://www.scottaaronson.com/blog/?feed=atom&amp;p=5448" rel="replies" type="application/atom+xml"/>
-    <title xml:lang="en-US">The ACM Prize thing</title>
-    <summary xml:lang="en-US">Last week I got an email from Dina Katabi, my former MIT colleague, asking me to call her urgently. Am I in trouble? For what, though?? I haven’t even worked at MIT for five years! Luckily, Dina only wanted to tell me that I’d been selected to receive the 2020 ACM Prize in Computing, a […]</summary>
-    <content type="xhtml" xml:lang="en-US"><div xmlns="http://www.w3.org/1999/xhtml"><p>Last week I got an email from Dina Katabi, my former MIT colleague, asking me to call her urgently.  <em>Am I in trouble?  For what, though??  I haven’t even worked at MIT for five years!</em></p>
-
-
-
-<p>Luckily, Dina only wanted to tell me that I’d been <a href="https://awards.acm.org/about/2020-acm-prize">selected</a> to receive the 2020 <a href="https://en.wikipedia.org/wiki/ACM_Prize_in_Computing">ACM Prize in Computing</a>, a mid-career award founded in 2007 that comes with $250,000 from Infosys.  Not the Turing Award but I’d happily take it!  And I could even look back on 2020 fondly for something.</p>
-
-
-
-<p>I was utterly humbled to see the <a href="https://awards.acm.org/acm-prize/award-winners">list</a> of past ACM Prize recipients, which includes amazing computer scientists I’ve been privileged to know and learn from (like Jon Kleinberg, Sanjeev Arora, and Dan Boneh) and others who I’ve admired from afar (like Daphne Koller, Jeff Dean and Sanjay Ghemawat of Google MapReduce, and David Silver of AlphaGo and AlphaZero).</p>
-
-
-
-<p>I was even more humbled, later, to read my <a href="https://awards.acm.org/award_winners/aaronson_9555914">prize citation</a>, which focuses on four things:</p>
-
-
-
-<ol><li>The theoretical foundations of the sampling-based quantum supremacy experiments now being carried out (and in particular, my and Alex Arkhipov’s <a href="https://www.theoryofcomputing.org/articles/v009a004/">2011 paper on BosonSampling</a>);</li><li>My and Avi Wigderson’s <a href="https://www.scottaaronson.com/papers/alg.pdf">2008 paper</a> on the algebrization barrier in complexity theory;</li><li>Work on the limitations of quantum computers (in particular, the 2002 <a href="https://www.scottaaronson.com/papers/collision.pdf">quantum lower bound for the collision problem</a>); and</li><li>Public outreach about quantum computing, including through <a href="https://www.amazon.com/Quantum-Computing-since-Democritus-Aaronson/dp/0521199565">QCSD</a>, popular talks and articles, and this blog.</li></ol>
-
-
-
-<p>I don’t know if I’m worthy of such a prize—but I know that if I am, then it’s mainly for work I did between roughly 2001 and 2012.  This honor inspires me to want to be more like I was back then, when I was driven, non-jaded, and obsessed with figuring out the contours of BQP and efficient computation in the physical universe.  It makes me want to justify the ACM’s faith in me.</p>
-
-
-
-<p>I’m grateful to the committee and nominators, and more broadly, to the whole quantum computing and theoretical computer science communities—which I “joined” in some sense around age 16, and which were the first communities where I ever felt like I belonged.  I’m grateful to the mentors who made me what I am, especially Chris Lynch, Bart Selman, Lov Grover, Umesh Vazirani, Avi Wigderson, and (if he’ll allow me to include him) John Preskill.  I’m grateful to the slightly older quantum computer scientists who I looked up to and tried to emulate, like Dorit Aharonov, Andris Ambainis, Ronald de Wolf, and John Watrous.  I’m grateful to my wonderful colleagues at UT Austin, in the CS department and beyond.  I’m grateful to my students and postdocs, the pride of my professional life.  I’m grateful, of course, to my wife, parents, and kids.</p>
-
-
-
-<p>By coincidence, my <a href="https://www.scottaaronson.com/blog/?p=5437">last post</a> was also about prizes to theoretical computer scientists—in that case, two prizes that attracted controversy because of the recipient’s (or would-be recipient’s) political actions or views.  It would understate matters to point out that not everyone has always agreed with everything I’ve said on this blog.  I’m <em>ridiculously</em> lucky, and I know it, that even living through this polarized and tumultuous era, I never felt forced to choose between academic success and the freedom to speak my conscience in public under my real name.  If there’s been one constant in my public stands, I’d like to think that—inspired by memories of my own years as an unknown, awkward, self-conscious teenager—it’s been my determination to nurture and protect talented young scientists, whatever they look like and wherever they come from.  And I’ve tried to live up to that ideal in real life, and I welcome anyone’s scrutiny as to how well I’ve done.</p>
-
-
-
-<p>What should I do with the prize money? I confess that my first instinct was to donate it, in its entirety, to some suitable charity—specifically, something that would make all the strangers who’ve attacked me on Twitter, Reddit, and so forth over the years realize that I’m fundamentally a good person.  But I was talked out of this plan by my family, who pointed out that<br/>(1) in all likelihood, <em>nothing</em> will make online strangers stop hating me,<br/>(2) in any case this seems like a poor basis for making decisions, and<br/>(3) if I really want to give others a say in what to do with the winnings, then why not everyone who’s stood by me and supported me?</p>
-
-
-
-<p>So, beloved commenters!  Please mention your favorite charitable causes below, especially weird ones that I wouldn’t have heard of otherwise.  If I support their values, I’ll make a small donation from my prize winnings.  Or a larger donation, especially if you donate yourself and challenge me to match.  Whatever’s left after I get tired of donating will probably go to my kids’ college fund.</p>
-
-
-
-<p><strong><span class="has-inline-color has-vivid-red-color">Update:</span></strong> And by an amusing coincidence, today is apparently <a href="https://worldquantumday.org/">“World Quantum Day”</a>!  I hope your Quantum Day is as pleasant as mine (and stable and coherent).</p></div>
-    </content>
-    <updated>2021-04-14T15:41:51Z</updated>
-    <published>2021-04-14T15:41:51Z</published>
-    <category scheme="https://www.scottaaronson.com/blog" term="Announcements"/>
-    <category scheme="https://www.scottaaronson.com/blog" term="Complexity"/>
-    <category scheme="https://www.scottaaronson.com/blog" term="Quantum"/>
-    <author>
-      <name>Scott</name>
-      <uri>http://www.scottaaronson.com</uri>
-    </author>
-    <source>
-      <id>https://www.scottaaronson.com/blog/?feed=atom</id>
-      <link href="https://www.scottaaronson.com/blog" rel="alternate" type="text/html"/>
-      <link href="https://www.scottaaronson.com/blog/?feed=atom" rel="self" type="application/atom+xml"/>
-      <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
-      <title xml:lang="en-US">Shtetl-Optimized</title>
-      <updated>2021-04-25T20:04:49Z</updated>
+      <updated>2021-04-29T05:21:24Z</updated>
     </source>
   </entry>
 </feed>
