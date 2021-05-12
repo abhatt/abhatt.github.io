@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-05-12T02:39:57Z</updated>
+  <updated>2021-05-12T03:22:22Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,595 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://gradientscience.org/glm_saga/</id>
+    <link href="https://gradientscience.org/glm_saga/" rel="alternate" type="text/html"/>
+    <title>Debuggable Deep Networks: Sparse Linear Models (Part 1)</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><!-- <script src="//code.jquery.com/jquery-1.10.2.js"></script> -->
+
+
+<!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
+<!-- <script src=https://code.jquery.com/ui/1.12.1/jquery-ui.min.js></script> -->
+
+
+
+
+
+
+
+
+
+
+<p><a class="bbutton" href="https://arxiv.org/abs/2105.04857" style="float: left; width: 45%;">
+<i class="fas fa-file-pdf"/>
+    Paper
+</a>
+<a class="bbutton" href="https://github.com/MadryLab/DebuggableDeepNetworks" style="float: left; width: 45%;">
+<i class="fab fa-github"/>
+   Code
+</a>
+<!-- <a class="bbutton" href="/breeds_class_hierarchy">
+<i class="fa fa-tree"></i>
+&nbsp;&nbsp; Hierarchies
+</a> -->
+<br/></p>
+
+<p><i>This two-part series overviews our <a href="https://arxiv.org/abs/2105.04857">recent work</a> on constructing deep networks that perform well while, at the same time, being easier to debug. Part 1 (below) describes our toolkit for building such networks and how it can be leveraged in the context of typical language and vision tasks. This toolkit applies the classical primitive of sparse linear classification on top of feature representations derived from deep networks, and includes a custom solver for fitting such sparse linear models at scale. <a href="https://gradientscience.org/debugging">Part 2</a> outlines a suite of human-in-the-loop experiments that we designed to evaluate the debuggability of such networks. These evaluations demonstrate, in particular, that simply inspecting the sparse final decision layer of these networks can facilitate detection of unintended model behaviours—e.g., spurious correlations and input patterns that cause misclassifications. </i></p>
+
+<p>As ML models are being increasingly deployed in the real world, a question that jumps to the forefront is: how do we know these models are doing “the right thing”? In particular, how can we be sure that models aren’t relying on brittle or undesirable correlations extracted from the data, which undermines their robustness and reliability?</p>
+
+<p>It turns out that, as things stand today, we often can’t. In fact, numerous recent studies have pointed out that seemingly accurate ML models base their predictions on data patterns that are unintuitive or unexpected, leading to a variety of  downstream failures. For instance, in a <a href="https://gradientscience.org/adv/">previous post</a> we discussed how adversarial examples arise because models make decisions based on imperceptible features in the data. There are many other examples of this—e.g., image pathology detection models relying on <a href="https://cerre.eu/wp-content/uploads/2020/07/ai_explainability_whitepaper_google.pdf">pen marks made by radiologists</a>; and toxic comment classification systems being disproportionately sensitive to <a href="https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification">identity-group related keywords</a>.</p>
+
+<p>These examples highlight a growing need for model debugging tools: techniques which can facilitate the <i>semi-automatic</i> discovery of such failure modes. In fact, a closely related problem of interpretability—i.e., the task of precisely characterizing how and why models make their decisions, is already a major focus of the ML community.</p>
+
+<h2 id="how-to-debug-your-deep-network">How to debug your deep network?</h2>
+
+<p>A natural approach to model debugging is to inspect the model directly. While this may be feasible in certain settings (e.g., for small linear classifiers or decision trees), it quickly becomes  infeasible as we move towards large, complex models such as deep networks. To work around such scale issues, current approaches (spearheaded in the context of interpretability) attempt to understand  model behavior in a somewhat localized or decomposed manner. In particular, there exist two prominent families of deep network interpretability methods—one that attempts to explain what individual neurons do [<a href="https://arxiv.org/abs/1506.06579">Yosinski et al. 2015</a>, <a href="https://arxiv.org/abs/1704.05796">Bau et al. 2018</a>] and the other one aiming to discern how the model makes decisions for specific inputs [<a href="https://arxiv.org/abs/1312.6034">Simonyan et al. 2013</a>, <a href="https://arxiv.org/abs/1602.04938">Ribeiro et al. 2016</a>]. The challenge however is that, as shown in recent studies [<a href="https://arxiv.org/abs/1810.03292">Adebayo et al., 2018</a>, <a href="https://arxiv.org/abs/2011.05429">Adebayo et al., 2020</a>, <a href="https://arxiv.org/abs/2010.12016">Leavitt &amp; Morcos, 2020</a>], such localized interpretations can be hard to aggregate, are easily fooled, and overall, may not give a clear picture of the model’s reasoning process.</p>
+
+<p>Our work thus takes an alternative approach. First, instead of trying to directly obtain a complete characterization of how and why a deep network makes its decision (which is the goal in  interpretability research), we focus on the more actionable problem of debugging unintended model behaviors. Second, instead of attempting to grapple with the challenge of analyzing these networks in a purely “post hoc” manner, we <i>train</i> them to make them inherently more debuggable.</p>
+
+<p>The specific way we accomplish this goal is motivated by a natural view of a deep network as a composition of a <i>feature extractor</i> and a <i>linear decision layer</i> (see the figure below). From this viewpoint, we can break down the problem of inspecting and understanding a deep network into two subproblems: (1) interpreting the deep features (also known in the literature as neurons—that we will refer to as features henceforth) and (2) understanding how these features are aggregated in the (final) linear decision layer to make predictions.</p>
+
+<p><img alt="Overview" src="https://gradientscience.org/assets/glm_saga/figures/intro.png"/></p>
+<div class="footnote">
+    <b> Overview of our approach to construct deep networks that are more debuggable:</b> We train a sparse decision layer on (pre-trained) deep feature embeddings and then view the network’s decision process as a linear combination of these features.
+</div>
+
+<p>Let us now discuss both of these subproblems in more detail.</p>
+
+<h3 id="task-1-interpreting-deep-features">Task 1: Interpreting (deep) features</h3>
+
+<p>Given the architectural complexity of deep networks, precisely characterizing the role of even a single neuron (in any layer) is challenging. However, research in ML interpretability has brought us a number of heuristics geared towards identifying the input patterns that cause specific neurons (or features) to activate. Thus, for the first task, we leverage some of these existing feature interpretation techniques—specifically, feature visualization, in case of vision models <a href="https://arxiv.org/abs/1904.08939">[Nguyen et al. 2019]</a> and LIME, in case of vision/language models <a href="https://arxiv.org/abs/1602.04938">[Ribeiro et al. 2016]</a>. While these methods have certain limitations, they turn out to be surprisingly effective for model debugging within our framework. Also, note that our approach is fairly modular, and we can substitute these methods with any other/better variants.</p>
+
+<div class="footnote">
+    Although LIME was originally used to interpret the predicted outputs of a network, in our work we adapt it to interpret individual neurons instead (see our <a href="https://arxiv.org/abs/2105.04857">paper</a> for more details). 
+</div>
+
+<p><img alt="Examples of feature visualization" src="https://gradientscience.org/assets/glm_saga/figures/fv_examples_both.png"/></p>
+<div class="footnote">
+    <b>Examples of feature visualizations for ImageNet classifiers:</b> Feature visualizations for standard vision models (<i>top</i>) are often hard to parse despite significant research on this front. This may be a side effect of these models relying on human-unintelligible features to make their predictions (discussed in a <a href="https://gradientscience.org/adv/">previous post</a>). On the other hand, robust vision models (<i>bottom</i>) tend to have more human-aligned features <a href="https://arxiv.org/abs/1906.00945">[Engstrom et al. 2019]</a>.
+</div>
+
+<p><img alt="Examples of word cloud visualization" src="https://gradientscience.org/assets/glm_saga/figures/wordclouds/wordcloud_top5_sst_6.png"/></p>
+<div class="footnote">
+    <b>Feature interpretation for language models</b>: Examples of a word cloud visualization for the positive and negative activation of a single neuron for a text sentiment classifier. We generate these by aggregating LIME explanations for features, with the whole process described in our <a href="https://arxiv.org/abs/2105.04857">paper</a>. 
+</div>
+
+<h3 id="task-2-examining-the-decision-layer">Task 2: Examining the decision layer</h3>
+
+<p>At first glance, the task of making sense of the decision layer of a deep network appears trivial. Indeed, this layer is linear and interpreting a linear model is a routine task in statistical analysis.  However, this intuition is deceptive—the decision layers of modern deep networks often contain upwards of thousands of (deep) features and millions of parameters—making human inspection intractable.</p>
+
+<p><img alt="Feature visualization dump" src="https://gradientscience.org/assets/glm_saga/figures/small_fv_dump.png"/></p>
+<div class="footnote">
+    <b>Scale of typical decision layers</b>: Feature visualizations for one quarter (512 out of 2048) of all the features of a robust ImageNet classifier. A typical dense decision layer will rely on a weighted sum of <i>all</i> of these features to produce a single prediction.
+</div>
+
+<p>So what can we do about this?</p>
+
+<p>Recall that the major roadblock here is the size of the decision layer. What if we just constrained ourselves only to the “important” weights/features within this layer though? Would that allow us to understand the model?</p>
+
+<p>To test this, we focus our attention on the features that are assigned large weights (in terms of magnitude) by the decision layer.  (Note that all the features are standardized to have zero mean and unit variance to make such a weight comparison more meaningful.)</p>
+
+<p>In the figure below, we evaluate the performance of the decision layer when it is restricted to using: (a) only the “important features” or (b) all features <i>but</i> the important ones. The expectation here is that if the important features are to suffice for model debugging, they should at the very least be enough to let the model match its original performance.</p>
+
+<div>
+    <div class="ablation_dense">
+        <canvas height="200" id="ablation_dense_chart" width="400"/>
+    </div>
+</div>
+<div class="footnote">
+     <b>Feature importance in dense decision layers:</b> Performance of the decision layer when it is restricted to using the "important" features vs the rest of the features. 
+</div>
+
+<p>As we can see, this is not the case for typical deep networks. Indeed, for all but one task, the top-k features (k is 10 for vision and 5 for language task) are far from sufficient to recover model performance. Further, there seems to be a great deal of redundancy in the standard decision layer—the model can perform quite well even without using any of the seemingly important features. Clearly, inspecting only the highest-weighted features does not seem to be sufficient from a debugging standpoint.</p>
+
+<h4 id="our-solution-retraining-with-sparsity">Our solution: retraining with sparsity</h4>
+
+<p>To make inspecting the decision layer more tractable for humans and also deal with feature redundancy, we replace that layer entirely. Specifically, rather than finding better heuristics for identifying salient features within the standard (dense) decision layer, we <i>retrain</i> it (on top of the existing feature representations) to be sparse.</p>
+
+<p>To this end, we leverage a classic primitive from statistics: <i>sparse linear classifiers</i>. Concretely, we use the <a href="https://web.stanford.edu/~hastie/Papers/B67.2%20(2005)%20301-320%20Zou%20&amp;%20Hastie.pdf">elastic net</a> approach to train regularized linear decision layers on top of the fixed (pre-trained) feature representation.</p>
+
+<p>The elastic net is a popular approach for fitting linear models in statistics, that combines the benefits of both L1 and L2 regularization.  Elastic net solvers yield not one but a series of sparse linear models—each with different sparsity/accuracy—based on the strength of regularization. We can then let our application-specific accuracy vs sparsity needs guide our choice of a specific sparse decision layer from this series.</p>
+
+<p>However, when employing this approach to modern deep networks, we hit an obstacle—existing solvers for training regularized linear models simply cannot scale to the number of datapoints and input features that we would typically have in deep learning. To overcome this problem, we develop a custom, efficient solver for fitting regularized generalized linear models at scale. This solver leverages recent advances in <a href="https://arxiv.org/abs/1902.00071">variance reduced gradient methods</a> and combines them with <a href="https://web.stanford.edu/~hastie/Papers/glmnet.pdf">path-algorithms</a> from statistics to get fast and stable convergence at ImageNet scales. We won’t go into much detail here, but we point the curious reader to our <a href="https://arxiv.org/abs/2105.04857">paper</a> and our <a href="https://github.com/madrylab/glm_saga">standalone PyTorch package</a> (which might be of independent interest) for more information.</p>
+
+<p>To summarize—the elastic net gives us a sparse decision layer that, in turn, enables us  to debug the resulting network by applying the existing feature interpretation methods to a now-significantly-reduced number of features (i.e., only the ones used by the sparse decision layer).</p>
+
+<h2 id="what-do-we-gain-from-sparity">What do we gain from sparity?</h2>
+
+<p>Now that we have our methodology in place, we can apply it to standard ML tasks and measure the impact of enforcing sparsity of the final decision layer. Specifically, we discuss the results of applying it to ResNet-50 classifiers trained on ImageNet and Places-10 (a 10-class subset of Places365), as well as BERT models trained on the Stanford Sentiment Treebank and Wikipedia toxic comment classification tasks.</p>
+
+<h3 id="sparsity-at-the-last-layer-is-almost-free">Sparsity at the last layer is (almost) free</h3>
+
+<p>Needless to say, the usefulness of our method hinges on the degree of sparsity in the decision layer that we can achieve without losing much accuracy. So how far can we turn the sparsity dial? The answer turns out to be: <i>a lot</i>! For instance, the final decision layer of an ImageNet classifier with 2048 features can be reduced by two orders of
+magnitude, i.e., to use only 20 features per class, at the cost of only 2% test 
+accuracy loss.</p>
+
+<p>In the following demonstration, one can move the slider to the right to increase the density of the final decision layer of a standard ImageNet classifier. And, indeed, with only 2% of weights being non-zero, the model can already essentially match the performance (74%) of a fully dense layer.</p>
+
+<div>
+    <div id="reg_acc">
+        <img id="reg" src="https://gradientscience.org/feed.xml"/>
+        <div id="reg_slider"/>
+        <div class="quarterblock"> </div>
+        <div class="quarterblock" style="text-align: center;">Accuracy: <span id="reg_accuracy"/>%</div>
+        <div class="quarterblock" style="text-align: center;">Non-zero: <span id="reg_sparsity"/>%</div>
+        <div class="quarterblock"> </div>
+    </div>
+</div>
+<div class="footnote">
+    <b>Sparsity-accuracy trade-off:</b> A visualization of the sparsity of an ImageNet decision layer and its corresponding accuracy as a function of the regularization strength. Move the slider all the way to the right to get the fully dense layer (no regularization, 74% accuracy), or all the way to the left to get the fully sparse layer (maximum regularization, 5% accuracy). 
+</div>
+
+<h3 id="a-closer-look-at-sparse-decision-layers">A closer look at sparse decision layers</h3>
+
+<p>Our key motivation for constructing sparse decision layers was that it enables us to manually examine the (reduced set of) features that a network uses. As we saw above, our modified decision layers rely on substantially fewer features per class—which already significantly aids their inspection by a human. But what if we go one step further and look only at the “important” features of our sparse decision layer, as we tried to do with the dense decision layer earlier?</p>
+
+<div>
+    <div class="">
+        <div class="halfblock">
+            <div class="rbutton block clicked sc ablation_button" id="ablation_dense">Dense</div>
+        </div>
+        <div class="halfblock">
+            <div class="rbutton block sc ablation_button" id="ablation_sparse">Sparse</div>
+        </div>
+    </div>
+    <div class="ablation">
+        <canvas height="200" id="ablation_chart" width="400"/>
+    </div>
+</div>
+<div class="footnote">
+    <b>Feature importance in sparse and dense decision layers:</b> Performance of the decision layer when it is restricted to using the "important" features vs the rest of the features. Try toggling between the two to see the effects of sparsity. 
+</div>
+
+<p>As we can see below, for models with a sparse decision layer, the top 5-10 important features are necessary and almost sufficient for capturing the model’s performance. That is, (i) accuracy drops to near chance levels (1/number of classes) if the model does not leverage these features and (ii) using these features alone, the model can nearly recover its original performance. This indicates that the sparsity constraint not only reduces the number of features used by the model, but also makes it easier to rank features based on their importance.</p>
+
+<h3 id="sparse-decision-layers-an-interactive-demonstration">Sparse decision layers: an interactive demonstration</h3>
+
+<p>In the following interactive demonstration, you can explore a subset of the decision layer of a (robust) ResNet-50 on ImageNet with either a sparse or dense decision layer:</p>
+
+<div>
+    <div class="">
+        <div class="halfblock">
+            <div class="rbutton block clicked sc glm_button" id="dense">Dense</div>
+        </div>
+        <div class="halfblock">
+            <div class="rbutton block sc glm_button" id="sparse">Sparse</div>
+        </div>
+    </div>
+    <div class="">
+        <div class="quarterblock">
+            <div class="rbutton block clicked sc class_button" id="576">Gondola</div>
+        </div>
+        <div class="quarterblock">
+            <div class="rbutton block sc class_button" id="415">Bakery</div>
+        </div>
+        <div class="quarterblock">
+            <div class="rbutton block sc class_button" id="292">Tiger</div>
+        </div>
+        <div class="quarterblock">
+            <div class="rbutton block sc class_button" id="537">Dogsled</div>
+        </div>
+    </div>
+    <div class="" id="linear">
+        <div class="block sc" id="glm_class_name">Tiger</div>
+        
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+        
+        <div class="tenthblock">
+            <div class="rbutton block feature_button">
+                <span class="glm_weight" style="text-align: center;"/>
+                <img class="smallimg" src="https://gradientscience.org/feed.xml"/>
+            </div>
+        </div>
+        <div class="tenthblock">
+            <div class="rbutton block feature_button">
+                <span class="glm_weight" style="text-align: center;"/>
+                <img class="smallimg" src="https://gradientscience.org/feed.xml"/>
+            </div>
+        </div>
+        <div class="tenthblock">
+            <div class="rbutton block feature_button">
+                <span class="glm_weight" style="text-align: center;"/>
+                <img class="smallimg" src="https://gradientscience.org/feed.xml"/>
+            </div>
+        </div>
+        <div class="tenthblock">
+            <div class="rbutton block feature_button">
+                <span class="glm_weight" style="text-align: center;"/>
+                <img class="smallimg" src="https://gradientscience.org/feed.xml"/>
+            </div>
+        </div>
+        <div class="tenthblock">
+            <div class="rbutton block feature_button">
+                <span class="glm_weight" style="text-align: center;"/>
+                <img class="smallimg" src="https://gradientscience.org/feed.xml"/>
+            </div>
+        </div>
+        <div class="tenthblock">
+            <div class="rbutton block feature_button">
+                <span class="glm_weight" style="text-align: center;"/>
+                <img class="smallimg" src="https://gradientscience.org/feed.xml"/>
+            </div>
+        </div>
+        <div class="tenthblock">
+            <div class="rbutton block feature_button">
+                <span class="glm_weight" style="text-align: center;"/>
+                <img class="smallimg" src="https://gradientscience.org/feed.xml"/>
+            </div>
+        </div>
+        <div class="tenthblock">
+            <div class="rbutton block feature_button">
+                <span class="glm_weight" style="text-align: center;"/>
+                <img class="smallimg" src="https://gradientscience.org/feed.xml"/>
+            </div>
+        </div>
+        <div class="tenthblock">
+            <div class="rbutton block feature_button">
+                <span class="glm_weight" style="text-align: center;"/>
+                <img class="smallimg" src="https://gradientscience.org/feed.xml"/>
+            </div>
+        </div>
+        <div class="tenthblock">
+            <div class="rbutton block feature_button">
+                <span class="glm_weight" style="text-align: center;"/>
+                <img class="smallimg" src="https://gradientscience.org/feed.xml"/>
+            </div>
+        </div>
+    </div>
+    <div id="zoom">
+        <img id="feature_big" src="https://gradientscience.org/feed.xml"/>
+        
+    </div>
+</div>
+<div class="footnote">
+    <b>An interactive demo of the sparse decision layer:</b> Select a dense or sparse model and a corresponding ImageNet class to visualize the features and weights for the corresponding decision layer. The opacity of each features corresponds to the magnitude of its weight in the decision layer, and you can click on a feature to see a larger version of it. 
+</div>
+
+<p>Finally, one should note that the features used by sparse decision layers seem somewhat more human-aligned than the ones used by the standard (dense) decision layers. This observation coupled with our previous ablations studies indicate that sparse decision layers could offer a path towards more debuggable deep networks. But, is this really the case? In our <a href="https://gradientscience.org/debugging">next post</a>, we will evaluate whether models obtained via our methodology are indeed easier for humans to understand, and whether they truly aid the diagnosis of unexpected model behaviors.</p></div>
+    </summary>
+    <updated>2021-05-12T00:00:00Z</updated>
+    <published>2021-05-12T00:00:00Z</published>
+    <source>
+      <id>https://gradientscience.org/</id>
+      <author>
+        <name>Gradient Science</name>
+      </author>
+      <link href="https://gradientscience.org/" rel="alternate" type="text/html"/>
+      <link href="https://gradientscience.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Research highlights and perspectives on machine learning and optimization from MadryLab.</subtitle>
+      <title>gradient science</title>
+      <updated>2021-05-12T03:21:05Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>https://gradientscience.org/debugging/</id>
+    <link href="https://gradientscience.org/debugging/" rel="alternate" type="text/html"/>
+    <title>Debuggable Deep Networks: Usage and Evaluation (Part 2)</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><!-- <script src="//code.jquery.com/jquery-1.10.2.js"></script> -->
+
+
+<!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
+<!-- <script src=https://code.jquery.com/ui/1.12.1/jquery-ui.min.js></script> -->
+
+
+
+
+
+
+
+
+
+
+<!-- fancybox -->
+
+
+
+
+<p><a class="bbutton" href="https://arxiv.org/abs/2105.04857" style="float: left; width: 45%;">
+<i class="fas fa-file-pdf"/>
+    Paper
+</a>
+<a class="bbutton" href="https://github.com/MadryLab/DebuggableDeepNetworks" style="float: left; width: 45%;">
+<i class="fab fa-github"/>
+   Code
+</a>
+<!-- <a class="bbutton" href="/breeds_class_hierarchy">
+<i class="fa fa-tree"></i>
+&nbsp;&nbsp; Hierarchies
+</a> -->
+<br/></p>
+
+<p><i>This is the second part of the overview of our <a href="https://arxiv.org/abs/2105.04857">recent work</a> on training more debuggable deep networks. In our <a href="https://gradientscience.org/glm_saga">previous post</a>, we outlined our toolkit for constructing such networks, which involved training (very) sparse linear classifiers on (pre-trained) deep feature embeddings and viewing the network’s decision process as a linear combination of these features. In this post, we will delve deeper into evaluating to what extent these networks are amenable to debugging. Specifically, we want to get a sense of whether humans are able to intuit their behavior and pinpoint their failure modes.</i></p>
+
+<h2 id="do-our-sparse-decision-layers-truly-aid-human-understanding">Do our sparse decision layers truly aid human understanding?</h2>
+
+<p>Although our toolkit enables us to greatly simplify the network’s decision layer (by reducing the number of its weights and thus the features it relies on), it is not immediately obvious whether this will make debugging such models significantly easier.  To properly examine  this, we need to factor humans into the equation. One way to do that is to leverage the notion of <a href="https://arxiv.org/abs/1606.03490">simulatibility</a> used in the context of ML interpretability. According to this notion, an interpretability method is “good” if it can enable a human to reproduce the model’s decision. In our setup, this translates into evaluating how sparsity of the final decision layer influences humans’ ability to predict the model’s classification decision (irrespective of whether this decision is “correct” or not).</p>
+
+<h4 id="the-simulatibility-study">The “simulatibility” study</h4>
+
+<p>One approach to assess simulatibility  would be to ask annotators to guess what the model will label an input (e.g., an image) as, given an interpretation corresponding to that input. However, for non-expert annotators, this might be challenging due to the large number of (often fine-grained) classes that a typical dataset contains. Additionally, human cognitive biases may also muddle the evaluation—e.g., it may be hard for annotators to decouple “what they think the model should label the input as” from “what the interpretation suggests the model actually does” (and we are interested in the latter).</p>
+
+<p>To alleviate these difficulties, we resort instead to the following task setup (conducted using an ImageNet-trained ResNet):</p>
+
+<ol>
+  <li>We pick a target class at random, and show annotators visualizations of five randomly-selected features used by the sparse decision layer to detect objects of this class, along with their relative weights.</li>
+  <li>We present the annotators with three images from the validation set with varying (but still non-trivial) probabilities of being classified by the model as the target class. (Note that each of these images can potentially belong to different, non-target classes.)</li>
+  <li>Finally, we ask annotators to pick which one among these three images they believe to best match the target class.</li>
+</ol>
+
+<div class="footnote">
+    As mentioned in <a href="https://gradientscience.org/glm_saga">part 1</a>, feature visualizations for standard vision models are often hard to parse, so we use <a href="https://arxiv.org/abs/1906.00945">adversarially-trained models</a> for this study. 
+</div>
+
+<p>Here is a sample task (click to enlarge):</p>
+
+<p><a href="https://gradientscience.org/assets/glm_saga/figures/hit_example_sim.png"><img height="350" src="https://gradientscience.org/assets/glm_saga/figures/hit_example_sim.png"/></a></p>
+
+<p>Overall, our intention is to gauge whether humans can intuit which image (out of three) is most prototypical for the target class <i>according to the model</i>. Note that we do not show annotators any information about the target class—such as its name or description—other than illustrations of some of the features that the model uses to identify it.  As discussed previously, this is intentional: we want annotators to select the image that <i>visually</i> matches the features used by the model, instead of using their prior knowledge to associate images with the target label itself.  For instance, if the annotators know that the target label was “car”, they might end up choosing the image that most closely resembles their idea of a car—independent of (or even in contradiction to) how the model actually detects cars. In fact, the “most activating image” in our setup may not even belong to the target class.</p>
+
+<p>Now, how well do humans do on this task?</p>
+
+<p>We find that (MTurk) annotators are pretty good at simulating the behavior of our modified networks—they correctly guess the top activating image (out of three) 63% of the time! In contrast, they essentially fail, with only a 35% success rate (i.e., near chance), when this task is performed using models with standard, i.e., dense, decision layers. This suggests that even with a very simple setup—showing non-experts some of the features the sparse decision layer uses to recognize a target class—humans are actually able to emulate the behavior of our modified networks.</p>
+
+<h2 id="debuggability-via-sparsity">Debuggability via Sparsity</h2>
+
+<p>So far, we identified a number of advantages of employing sparse decision layers, such as having fewer components to analyze, selected features being more influential, and better human simulatibility. But what unintended model behaviors can we (semi-automatically) identify by just probing such decision layers?</p>
+
+<h3 id="uncovering-spurious-correlations-and-biases">Uncovering (spurious) correlations and biases</h3>
+
+<p>Let’s start with trying to uncover model biases. After all, it is by now evident that deep networks rely on undesired correlations extracted from the training data (e.g. <a href="https://gradientscience.org/background">backgrounds</a>, <a href="https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification">identity-related keywords</a>). But can we pinpoint this behavior without resorting to a targeted examination?</p>
+
+<h4 id="bias-in-toxic-comment-classification">Bias in toxic comment classification</h4>
+
+<p>In 2019, Jigsaw hosted a <a href="https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification">competition on Kaggle</a> around creating  toxic comment detection systems. This effort was prompted by that fact that the systems available at the time were found to have incorrectly learned to associate the names of frequently attacked identities (e.g., nationality, religion or sexual identity) with toxicity, and so the goal of the competition was to construct a
+“debiased” system. Can we understand to what extent this effort succeeded?</p>
+
+<p>To answer this question we leverage our methodology and fit a sparse decision layer to the debiased model released by the contest organizers, and then inspect the utilized deep features. An example result is shown below:</p>
+
+<p><img alt="Wordcloud visualization of feature used in unbiased BERT" src="https://gradientscience.org/assets/glm_saga/figures/wordclouds/wordcloud_top5_jigsaw-alt-toxic_6_redacted.png"/></p>
+<div class="footnote">
+    <b>Interpreting the deep features of a debiased sentiment classifier:</b>
+    A word cloud visualization (with some of the words redacted) for a deep feature of the debiased model (with a sparse decision layer). The negative activation of this feature turns out to be influenced by Christianity-related words. 
+</div>
+
+<p>Looking at this visualization, we can observe that the debiased model no longer positively associates identity terms with toxicity (refer our <a href="https://arxiv.org/abs/2105.04857">paper</a> for a similar visualization corresponding to the original biased model). This seems to be a success—after all, the goal of the competition was to correct the over-sensitivity of prior models to identity-group keywords. However, upon closer inspection, one will note that the model has actually learned a strong, <i>negative</i> association between these keywords and comment toxicity. For example, one can take a word such as “christianity” and append it to toxic sentences to trick the model into thinking that these are non-toxic 74% of the time. One can try it by selecting words to add to the sentence below:</p>
+
+<div>
+    <div class="">
+        <div class="quarterblock">
+            <div class="rbutton block clicked sc toxic_button" id="toxic_" value="">None</div>
+        </div>
+        <div class="quarterblock">
+            <div class="rbutton block sc toxic_button" id="toxic_christianity" value="christianity">+christianity</div>
+        </div>
+        <div class="quarterblock">
+            <div class="rbutton block sc toxic_button" id="toxic_African" value="African">+African</div>
+        </div>
+        <div class="quarterblock">
+            <div class="rbutton block sc toxic_button" id="toxic_Catholic" value="Catholic">+Catholic</div>
+        </div>
+    </div>
+    <div id="toxic_confidence">
+        <b>Sentence:</b> Jeez Ed, you seem like a ******* ****** ********* <span id="toxic_add"/>
+        <canvas height="200" id="toxic" width="400"/>
+    </div>
+</div>
+<div class="footnote">
+    <b>Bias detection in language models: </b> using sparse decision layers we find that the debiased model is still oversensitive to keywords corresponding to frequently attacked identity group, although in the opposite sense from the previous model.
+</div>
+
+<p>So, what we see is that rather than being debiased, newer toxic comment detection systems remain disproportionately sensitive to identity terms—it is just the nature of the sensitivity that changed.</p>
+
+<h4 id="spurious-correlations-in-imagenet">Spurious correlations in ImageNet</h4>
+
+<p>In the NLP setting, we can directly measure correlations between the model’s predictions and input data patterns by toggling specific words or phrases in the input corpus. However, it is not obvious how to replicate such analysis in the vision setting. After all, we don’t have automated tools to decompose images into a set of human understandable patterns akin to words or phrases (e.g., “dog ears” or “wheels”).</p>
+
+<p>We thus leverage instead a human-in-the-loop approach that uses (sparse) decision layer inspection as a primitive. Specifically, we enlist annotators on MTurk to identify and describe data patterns that activate individual features that the sparse decision layer uses (for a given class). This in turn allows us to pinpoint the correlations the model has learned between the input data and that class.</p>
+
+<p>Concretely, to identify the data patterns that are positively correlated with a particular (deep) feature, we present to MTurk annotators a set of images that strongly activate it. The expectation here is that if a set of images activate a given  feature, these images should share a common input pattern and the annotators will be able to identify it.</p>
+
+<div class="footnote">
+Note that we show annotators images from multiple (two) classes that strongly activate a single feature. This is because images from any single class may have many input patterns in common—only some of which actually activate a specific feature. 
+</div>
+
+<p>We then ask annotators: (a) whether they see a common pattern in the images, and, if so, (b) to provide a free text description of that pattern. If the annotators identify a common input pattern, we also ask them if the identified pattern belongs to the class object (“spurious”) or its surroundings (“non-spurious”) for each of the two classes.</p>
+
+<div class="footnote">
+In general, we recognize that precisely defining spurious correlations might be challenging and context-dependent. Our definition of spurious correlations was chosen to be objective and easy for annotators to assess.
+</div>
+
+<p>Here is an example of the annotation task (click to expand):</p>
+
+<p><a href="https://gradientscience.org/assets/glm_saga/figures/hit_example_spurious.png"><img height="350" src="https://gradientscience.org/assets/glm_saga/figures/hit_example_spurious.png"/></a></p>
+
+<p>Here are a few examples of (spurious) correlations identified by annotators:</p>
+
+<div class="widget">
+<span class="widgetheading" id="spurious">Select a class pair:</span>
+<div class="choices_one_diff" id="sp"/>
+<div class="choices_one_half" id="spuriousimages"> </div>
+<div class="choices_one_quarter" id="wcimage"> </div>
+<!-- <div class="choices_info">
+    <div class="choices_info_text" id="spuriousinfo"> </div>
+  </div> -->
+</div>
+<div style="clear: both;"/>
+<div class="footnote">
+<b>Detecting input-class correlations in vision models: </b> Select a class pair on the top to see the annotator-provided description for the deep feature that is activated by images of these classes (<i>left</i>). The free-text description provided by the annotators is visualized as a wordcloud (<i>right</i>), along with their selections for whether this input pattern is part of the class object ("non-spurious") or its surroundings ("spurious").
+</div>
+
+<p>Note that, one can, in principle, use the same human-in-the-loop methodology to identify input correlations extracted by standard deep networks (with dense decision layers). However, since these models rely on a large number of (deep) features to detect objects of every class, this process can quickly become intractable (see our <a href="https://arxiv.org/abs/2105.04857">paper</a> for details).</p>
+
+<p>The above studies demonstrate that for typical vision and NLP tasks, sparsity in the decision layer makes it easier to look deeper into the model and understand what patterns it has extracted from its training corpus.</p>
+
+<h3 id="creating-effective-counterfactuals">Creating effective counterfactuals</h3>
+
+<p>Our second approach for characterizing model failure modes uses the lens of counterfactuals. We specifically focus on counterfactuals that are (minor) variations of given inputs that prompt the model to make a different prediction. Counterfactuals can be very helpful from a debugging standpoint—they can confirm that specific input patterns are not just correlated with the model prediction but actually causally influence them. Additionally, such counterfactuals can be used to provide recourse to users—e.g., to let them realize what attributes (e.g., credit rating) they should change to get the desired outcome (e.g., granting a loan). We will now discuss how to leverage the correlations identified in the previous section to construct counterfactuals for models with sparse decision layers.</p>
+
+<h4 id="language-counterfactuals-in-sentiment-classification">Language counterfactuals in sentiment classification</h4>
+
+<p>In sentiment classification, the task is to label a given sentence as having either positive or negative sentiment. Here, we consider counterfactuals via word substitution, effectively asking “what word could I have used instead to change the sentiment predicted by the model for a given sentence?”</p>
+
+<p>To this end, we consider the words that are positively and negatively correlated with features used by the sparse decision layer as candidates for word substitution. For example, the word “astounding” activates a feature that a BERT model uses to detect positive sentiment, whereas the word “condescending” is negatively correlated with the activation of this feature. By substituting such a positively-correlated word with its negatively-correlated counterpart, we can effectively “flip” the corresponding feature. A demonstration of this process is shown below:</p>
+
+<div>
+    <div class="halfblock">
+        <table class="reg_table">
+            <tbody><tr>
+                <th class="reg_header" colspan="3">Positive activation</th>
+            </tr>
+            <tr class="reg_cell">
+                <td class="positive_cell">impressed</td><td class="positive_cell">brings</td><td class="positive_cell">marvel</td>
+            </tr>
+            <tr class="reg_cell">
+                <td class="positive_cell">exhilirated</td><td class="positive_cell main_cell rbutton cf_button">astounding</td><td class="positive_cell">completes</td>
+            </tr>
+            <tr class="reg_cell">
+                <td class="positive_cell">hilariously</td><td class="positive_cell">successfully</td><td class="positive_cell">yes</td>
+            </tr>
+        </tbody></table>
+    </div>
+    <div class="halfblock">
+        <table class="reg_table">
+            <tbody><tr>
+                <th class="reg_header" colspan="3">Negative activation</th>
+            </tr>
+            <tr class="reg_cell">
+                <td class="negative_cell rbutton cf_button">idiots</td><td class="negative_cell rbutton cf_button">inconsistent</td><td class="negative_cell rbutton cf_button">maddening</td>
+            </tr>
+            <tr class="reg_cell">
+                <td class="negative_cell rbutton cf_button">cheat</td><td class="negative_cell rbutton cf_button">condescending</td><td class="negative_cell rbutton cf_button">failure</td>
+            </tr>
+            <tr class="reg_cell">
+                <td class="negative_cell rbutton cf_button">dahmer</td><td class="negative_cell rbutton cf_button">pointless</td><td class="negative_cell rbutton cf_button">unseemly</td>
+            </tr>
+        </tbody></table>
+    </div>
+    <div id="sst_counterfactual">
+        <b>Sentence:</b> The acting, costumes, music, cinematography and sound are all <i>[<span id="word_counterfactual">astounding</span>]</i> given the proudction's austere locales.
+        <canvas height="200" id="sst_canvas" width="400"/>
+    </div>
+</div>
+<div class="footnote">
+<b>Language counterfactuals:</b> A wordcloud visualization for a deep feature (used by the sparse decision layer) that positively activates for the  sentence shown above. By replacing the specific word that activated this feature (in this case "astounding"), with any word that  deactivates it (<i>select on the right</i>), we can effectively flip the sentiment predicted by the model. In this way, we can construct counterfactuals for our modified deep networks via one-word substitutions.
+</div>
+
+<p>It turns out that these one-word modifications are indeed already quite successful (i.e., they cause a change in the model’s prediction 73% of the time). The obtained sentence pairs—which can be viewed as counterfactuals for one another—allow us to gain insight into data patterns that cause the model to predict a certain outcome. Finally, we find that for standard models finding effective counterfactuals that flip the model’s prediction is harder—the one-word modifications described above can  only change the model’s decision in 52% of cases.</p>
+
+<h4 id="imagenet-counterfactuals">ImageNet counterfactuals</h4>
+<p>For ImageNet-trained models, we can directly use the patterns <a href="https://gradientscience.org/feed.xml#spurious-correlations-in-imagenet">previously</a> identified by the annotators to generate counterfactual images that change its prediction. To this end, we manually modify images to add or subtract these patterns and observe the effect of this operation on the model’s decision.</p>
+
+<p>For example, annotators identify a background feature “chainlink fence” to be spuriously
+correlated with “ballplayers”. Using this information, we can then take images
+of people playing basketball or tennis (correctly labeled as “basketball” or
+“racket” by the model) and manually insert a “chainlink fence” into the
+background, which successfully changes the model’s prediction to “ballplayer”.</p>
+
+<p><img alt="ImageNet counterfactuals" src="https://gradientscience.org/assets/glm_saga/figures/counterfactuals.png"/></p>
+<div class="footnote">
+<b>Counterfactuals for ImageNet classifiers:</b> By adding specific spurious patterns to correctly-classified images (<i>top</i>), we can fool the model into predicting the desired class (<i>bottom</i>). 
+</div>
+
+<p>Thus, the counterfactuals that our methodology produced indeed allow us to identify data patterns that are causally linked to the model’s decision making process.</p>
+
+<h3 id="identifying-reasons-for-misclassification">Identifying reasons for misclassification</h3>
+<p>Finally, we turn our attention to debugging model errors. After all, when our models are wrong, it would be helpful to know why this was the case.</p>
+
+<p>In the ImageNet setting, we find that many (over 30%) of the misclassifications of the 
+sparse-decision-layer models can be attributed to a single “problematic”
+feature. That is, manually removing this feature results in a correct prediction. One can thus view the feature interpretation for this problematic feature as a justification for the model’s error.</p>
+
+<p><img alt="Problematic features" src="https://gradientscience.org/assets/glm_saga/figures/problematic.png"/></p>
+<div class="footnote">
+<b>A closer look at ImageNet misclassifications:</b> Examples of erroneously classified ImageNet images (<i>top</i>), along with the feature visualization for the "problematic feature" from the incorrect class (<i>bottom</i>). We find that manually setting the activation of this problematic feature to zero is sufficient to fix the model's mistake in each of these cases.
+</div>
+
+<p>Ideally, given such a justification, we would like humans to be able to identify the part of the image corresponding to the problematic feature that caused the model to make a mistake. How can we evaluate whether this is the case?
+Namely, can we obtain an unbiased assessment of whether the data patterns that activate the problematic feature are noticeably present in the misclassified image?</p>
+
+<p>To answer this question, we conduct a study on MTurk wherein we present annotators with an image, along with feature visualizations for: (i) the most activated feature from the true class and (ii) the problematic feature that is activated for the erroneous class. We do not explicitly tell the annotators what classes these features correspond to. We then ask annotators to select the patterns (feature visualizations) that match the image, and to determine which pattern is a better match if they select both.</p>
+
+<p>Here is an example of a task we present to the annotators (click to expand):</p>
+
+<p><a href="https://gradientscience.org/assets/glm_saga/figures/hit_example_mis.png"><img height="350" src="https://gradientscience.org/assets/glm_saga/figures/hit_example_mis.png"/></a></p>
+
+<div class="footnote">
+As a control, we also rerun this experiment while replacing the problematic feature with a randomly-chosen feature. This serves as a baseline to compare annotator selection for the features from the true/incorrect classes. 
+</div>
+
+<p>It turns out that not only do annotators frequently (70% of the time) identify the top feature from the wrongly-predicted class as present in the image, but also that this feature is actually a better match than the top feature for the ground truth class (60% of the time). In contrast, annotators select the control (randomly-chosen) deep feature to be a match for the image only 16% of the time. One can explore some examples here:</p>
+
+<div class="widget">
+<span class="widgetheading" id="misclass">Inspect misclassified images:</span>
+<div class="choices_one_full" id="mis"/>
+  <div class="blocktxt" id="mislabels" style="float: none;"> </div>
+  <div id="misimages" style="clear: both;"> </div>
+</div>
+<div style="clear: both;"/>
+<div class="footnote">
+<b>Misclassifications validated by MTurk annotators: </b> Select an image on the top to see its true and predicted labels, along with the most highly activated deep feature (of those used by the sparse decision layer) for both these classes. In all cases, annotators select the top feature from the (incorrect) predicted class to be present in the image, and to be a better match than the top feature from the true class.
+</div>
+
+<p>This experiment validates (devoid of confirmation biases from the class label) that humans can identify the data patterns that trigger the error-inducing problematic deep features. Note that once these patterns have been identified, one can examine them to better understand the root cause (e.g., issues with the training data) for model errors.</p>
+
+<h2 id="conclusions">Conclusions</h2>
+
+<p>Over the course of this two-part series, we have shown that a natural approach of fitting sparse linear models over deep feature representations can already be surprisingly effective in creating more debuggable deep networks. In particular, we saw that models constructed using this methodology are more concise and amenable to human understanding—making it easier to detect and analyze unintended behaviors such as biases and misclassification. Going forward, this methodology of modifying the network architecture to make it inherently easier to probe can offer an attractive alternative to the existing paradigm of purely post-hoc debugging. Additionally, our analysis introduces a suite of human-in-the-loop techniques for model debugging at scale and thus can help guide further work in this field.</p>
+
+
+
+
+
+
+
+<span class="choices_info_text"/><br/><span class="choices_info_text" style="color: red;"><b/></span><br/><span class="choices_info_text" style="color: green;"><b/></span><br/><hr/><h3 style="text-align: center;"><h3><div class="sp_txt" style="text-align: center; font-weight: 300; margin: 0.75em auto;"/><div class="wc_img blockimg"><img src="https://gradientscience.org/&quot; + base +                     &quot;wc_&quot; + pair + &quot;.png"/><hr style="margin: 0.75em auto;"/><div class="sp_txt" style="text-align: center; font-weight: 200;"><span/></div><hr style="margin: 0.3em auto;"/><h3 style="text-align: center;"><h3><div class="sp_txt" style="text-align: center;"><span style="font-weight: 200;"/></div><br/><span/></h3></h3></div><div class="sp_img blockimg"><img src="https://gradientscience.org/&quot; + base +                     &quot;sample_&quot; + pair + &quot;_&quot; + i + &quot;.png"/></div><div class="mis_txt blocktxt thirdblock"><span class="widgetheading"/><span class="choices_info_text"/><br/><span class="choices_info_text"/><div class="mis_txt blocktxt thirdblock"><br/><span class="widgetheading"/></div><div class="mis_img blockimg thirdblock"><img src="https://gradientscience.org/&quot; + origSrc + &quot;"/></div><div class="mis_img blockimg thirdblock"><img src="https://gradientscience.org/&quot; + base +                     &quot;dst_&quot; + pair + &quot;_&quot; + i + &quot;.png"/></div></div></h3></h3></div>
+    </summary>
+    <updated>2021-05-12T00:00:00Z</updated>
+    <published>2021-05-12T00:00:00Z</published>
+    <source>
+      <id>https://gradientscience.org/</id>
+      <author>
+        <name>Gradient Science</name>
+      </author>
+      <link href="https://gradientscience.org/" rel="alternate" type="text/html"/>
+      <link href="https://gradientscience.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Research highlights and perspectives on machine learning and optimization from MadryLab.</subtitle>
+      <title>gradient science</title>
+      <updated>2021-05-12T03:21:06Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>http://arxiv.org/abs/2105.05130</id>
@@ -864,7 +1453,7 @@ previously no such algorithm was known even in the noiseless setting.
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-05-12T02:38:53Z</updated>
+      <updated>2021-05-12T03:21:16Z</updated>
     </source>
   </entry>
 
@@ -998,7 +1587,7 @@ Email: tcs-applications@dlist.uni-frankfurt.de</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-05-12T02:38:37Z</updated>
+      <updated>2021-05-12T03:20:53Z</updated>
     </source>
   </entry>
 
@@ -1175,7 +1764,7 @@ We also investigate the complexity landscape of this model, showing that QMAPs c
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-05-12T02:38:23Z</updated>
+      <updated>2021-05-12T03:20:41Z</updated>
     </source>
   </entry>
 
@@ -1201,7 +1790,7 @@ As a complement of our explicit construction, we prove a lower bound for the siz
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-05-12T02:38:23Z</updated>
+      <updated>2021-05-12T03:20:41Z</updated>
     </source>
   </entry>
 
@@ -1263,7 +1852,7 @@ Email: michael.mendler@uni-bamberg.de</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-05-12T02:38:37Z</updated>
+      <updated>2021-05-12T03:20:54Z</updated>
     </source>
   </entry>
 
@@ -1355,7 +1944,7 @@ Email: michael.mendler@uni-bamberg.de</p></div>
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-05-12T02:39:56Z</updated>
+      <updated>2021-05-12T03:22:19Z</updated>
     </source>
   </entry>
 
@@ -1384,7 +1973,7 @@ Email: fabrizio@idsia.ch</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-05-12T02:38:37Z</updated>
+      <updated>2021-05-12T03:20:54Z</updated>
     </source>
   </entry>
 
@@ -1417,7 +2006,7 @@ Email: fabrizio@idsia.ch</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-05-12T02:38:27Z</updated>
+      <updated>2021-05-12T03:20:45Z</updated>
     </source>
   </entry>
 
@@ -1625,84 +2214,7 @@ Email: fabrizio@idsia.ch</p></div>
       <link href="https://www.let-all.com/blog/feed/" rel="self" type="application/atom+xml"/>
       <link href="https://www.let-all.com/blog" rel="alternate" type="text/html"/>
       <title>The Learning Theory Alliance Blog</title>
-      <updated>2021-05-12T02:39:57Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-21129445.post-4927313116100787313</id>
-    <link href="http://mysliceofpizza.blogspot.com/feeds/4927313116100787313/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="http://www.blogger.com/comment.g?blogID=21129445&amp;postID=4927313116100787313" rel="replies" type="text/html"/>
-    <link href="http://www.blogger.com/feeds/21129445/posts/default/4927313116100787313" rel="edit" type="application/atom+xml"/>
-    <link href="http://www.blogger.com/feeds/21129445/posts/default/4927313116100787313" rel="self" type="application/atom+xml"/>
-    <link href="http://mysliceofpizza.blogspot.com/2021/05/scaling-research-training.html" rel="alternate" type="text/html"/>
-    <title>Scaling Research Training</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>There is a lot of need in the Industry for engineers who know the art (edited to <i>craft</i>)of research (pursue and find the right literature and algorithms, understand prior art, adopt and modify for a specific context with domain awareness, interpret results,  dive deeper into the unique insights), or researchers who can apply this art with engineering finesse. I wondered yesterday in a meeting if our technological lessons from COVID times have helped us identify a way to train many more in the ways of research, more than what we produce as PhDs in universities (the MS programs seem to train advanced engineers more than padawan researchers). <br/></p></div>
-    </content>
-    <updated>2021-05-06T13:46:00Z</updated>
-    <published>2021-05-06T13:46:00Z</published>
-    <category scheme="http://www.blogger.com/atom/ns#" term="aggregator"/>
-    <author>
-      <name>metoo</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/07192519900962182610</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-21129445</id>
-      <category term="aggregator"/>
-      <category term="Non-CS"/>
-      <author>
-        <name>metoo</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/07192519900962182610</uri>
-      </author>
-      <link href="http://mysliceofpizza.blogspot.com/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="http://www.blogger.com/feeds/21129445/posts/default/-/aggregator" rel="self" type="application/atom+xml"/>
-      <link href="http://mysliceofpizza.blogspot.com/search/label/aggregator" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="http://www.blogger.com/feeds/21129445/posts/default/-/aggregator/-/aggregator?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>books, stories, poems, algorithms, math and computer science. 
-
-some art and anecdotes too.</subtitle>
-      <title>my slice of pizza</title>
-      <updated>2021-05-06T15:39:21Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-3722233.post-6832816500979478899</id>
-    <link href="https://blog.computationalcomplexity.org/feeds/6832816500979478899/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2021/05/negotiations.html#comment-form" rel="replies" type="text/html"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/6832816500979478899" rel="edit" type="application/atom+xml"/>
-    <link href="https://www.blogger.com/feeds/3722233/posts/default/6832816500979478899" rel="self" type="application/atom+xml"/>
-    <link href="https://blog.computationalcomplexity.org/2021/05/negotiations.html" rel="alternate" type="text/html"/>
-    <title>Negotiations</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>So you got an offer to be an assistant professor in the computer science department at Prestigious U. Congratulations! </p><p>Time to negotiate your offer with the chair. Don't be nervous. This shouldn't be adversarial. Both of you have the same goal in mind--for you to come to Prestigious and be successful. </p><p>Let's discuss the different aspects of each package.</p><p><b>Research </b></p><p>Funds for supporting your research such as equipment, graduate student support, travel and postdocs. Here you should explain what you need to be successful. This will vary by subdiscipline, a systems researcher will need more equipment and students than a theorist. Keep in mind the university is giving you funds for 2-4 years to start your research, after which you are expected to fund your own research via grants.</p><p>I don't recommend taking on a postdoc right at the start of your first academic appointment. Postdocs require good mentoring while you need to spend the first year getting your research up and running. If you do ask for postdoc money, ask to have a flexible start time.</p><p>Many departments give course reductions to get your research going. I'd suggest asking to spend your first semester teaching a graduate topics course based on your thesis research to pick up some PhD students followed by a semester with no classes to get you research program going.</p><p><b>Salary</b></p><p>This includes actual salary, which is also the base for future raises, and summer salary in the first couple of years. Feel free to ask for more salary, but often these numbers are fixed for new assistant professors. There is more give if you take an academic job later in your career. You could also say something like, "Well if you can't give me more salary maybe you could give me another semester of grad student support?"</p><p><b>Partner</b></p><p>It seems 80% of the time, a job candidate has a partner that needs accommodating. Don't wait until the end of negotiations, bring it up early. The more time we have, the better we can help. Doesn't matter what job they want--we know people and we know people who know people.</p><p><b>Thesis</b></p><p>Many schools won't hire you as an assistant professor if you haven't finished your thesis. Has to do with college rankings work. Don't worry--they will generally give you some other role with the same package until you finish. This might delay your tenure clock though.</p><p><b>Delayed start time</b></p><p>A January start is usually fine with good reason but if you weren't planning to start until the fall of 2022 why are you on the market this year? If you do get the department to hold a position for you, remember you are also making a commitment--this is not an opportunity to try again for something better.</p><p><b>Overall</b></p><p>You may not get all that you want after a negotiation--don't take it personally. You shouldn't necessarily choose the place that gives you the biggest package. It's far more important in the long run that you pick a place where you can best succeed both professionally and personally, and the package is just a small piece of that puzzle.</p></div>
-    </content>
-    <updated>2021-05-06T13:07:00Z</updated>
-    <published>2021-05-06T13:07:00Z</published>
-    <author>
-      <name>Lance Fortnow</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-3722233</id>
-      <category term="typecast"/>
-      <category term="focs metacomments"/>
-      <author>
-        <name>Lance Fortnow</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-      </author>
-      <link href="https://blog.computationalcomplexity.org/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default" rel="self" type="application/atom+xml"/>
-      <link href="https://blog.computationalcomplexity.org/" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="https://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
-      <title>Computational Complexity</title>
-      <updated>2021-05-11T21:06:32Z</updated>
+      <updated>2021-05-12T03:22:22Z</updated>
     </source>
   </entry>
 </feed>
