@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-06-03T22:21:50Z</updated>
+  <updated>2021-06-03T23:14:44Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,72 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://differentialprivacy.org/inference-is-not-a-privacy-violation/</id>
+    <link href="https://differentialprivacy.org/inference-is-not-a-privacy-violation/" rel="alternate" type="text/html"/>
+    <title>Statistical Inference is Not a Privacy Violation</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>On April 28, 2021, the US Census Bureau <a href="https://www.census.gov/programs-surveys/decennial-census/decade/2020/planning-management/process/disclosure-avoidance/2020-das-updates.html">released</a> a new demonstration of its differentially private Disclosure Avoidance System (DAS) for the 2020 US Census. The public were given a month to submit feedback before the system is finalized.
+This demonstration data and the feedback has generated a lot of discussion, including media coverage on <a href="https://www.npr.org/2021/05/19/993247101/for-the-u-s-census-keeping-your-data-anonymous-and-useful-is-a-tricky-balance">National Public Radio</a>, in <a href="https://www.washingtonpost.com/local/social-issues/2020-census-differential-privacy-ipums/2021/06/01/6c94b46e-c30d-11eb-93f5-ee9558eecf4b_story.html">the Washington Post</a>, and via <a href="https://apnews.com/article/business-census-2020-technology-e701e313e841674be6396321343b7e49">the Associated Press</a>. The DAS is also the subject of an <a href="https://www.courtlistener.com/docket/59728874/state-v-united-states-department-of-commerce/">ongoing lawsuit</a>.</p>
+
+<p>The following is a response from experts on differential privacy and cryptography to the <a href="https://alarm-redist.github.io/posts/2021-05-28-census-das/Harvard-DAS-Evaluation.pdf">working paper of Kenny et al.</a> on the impact of the 2020 U.S. Census Disclosure Avoidance System (DAS) on redistricting.</p>
+
+<p>This paper makes a <a href="https://github.com/frankmcsherry/blog/blob/master/posts/2016-06-14.md">common but serious mistake</a>, from which the authors wrongfully conclude the Census Bureau should not modernize its privacy-protection technology.  Not only do the results not support this conclusion, but they instead show the power of the methodology, known as differential privacy, adopted by the Bureau, precisely the opposite of the authors’ erroneous conclusions.</p>
+
+<p>Trust is essential; once destroyed it can be nearly impossible to rebuild, and getting privacy wrong in this Census will have an impact on all future government surveys.  The Census Bureau has shown that their <a href="https://desfontain.es/privacy/index.html">2010 (DAS) does not survive modern privacy threats</a>, and in fact was roughly equivalent to publishing nearly three quarters of the responses.  The Census Bureau’s decision to modernize its Disclosure Avoidance System (DAS) for the 2020 Decennial Census to be differentially private is the correct response to decades of theoretical and empirical work on the privacy risks inherent in releasing large numbers of statistics derived from a dataset.</p>
+
+<p>The importance of the Census, and the reality that no technology competing with differential privacy exists for meeting their confidentiality obligations, makes it very important that the public and policy makers have accurate information. We imagine you will be reporting on this topic in the future.  Others have <a href="https://gerrymander.princeton.edu/DAS-evaluation-Kenny-response">addressed flaws</a> in the paper regarding implications for redistricting; we want to provide you with an understanding of the privacy mistake in the study.</p>
+
+<p>To understand the flaw in the paper’s argument, consider the role of smoking in determining cancer risk.  Statistical study of medical data has taught us that smoking causes cancer.   Armed with this knowledge, if we are told that 40 year old Mr. S is a smoker, we can conclude that he has an elevated cancer risk.  The statistical inference of elevated cancer risk—made before Mr. S was born—did not violate Mr. S’s privacy. To conclude otherwise is to define science to be a privacy attack.  This is the mistake made in the paper.</p>
+
+<p>This is basically what Kenny et al. found.</p>
+
+<p>The authors looked at three different predictors: one built directly from (swapped) 2010 Census data and the other two built using differential privacy applied to (swapped) 2010 Census data, and evaluated all three “on approximately 5.8 million registered voters included in the North Carolina February 2021 voter file.”  What did they find?</p>
+
+<blockquote>
+  <p>“Our analysis shows that across three main racial and ethnic groups, the predictions based on the [differential privacy based] DAS data appear to be as accurate as those based on the 2010 Census data.”</p>
+</blockquote>
+
+<p>This makes perfect sense. Bayesian Improved Surname Geocoding, or BISG, is a statistical method of building a predictor inferring ethnicity (or race) from name and geography.  Here, name and geography play the role of the information as to whether or not one smokes, and the prediction of ethnicity corresponds to the cancer risk prediction.  The predictor is constructed from census data on the ethnic makeup of individual census blocks and statistical information about the popularity of individual surnames within different ethnic groups.  With such a predictor, moving across the country can change the outcome, as can changing one’s name.  But a BISG prediction is not about the individual, it is about the statistical—population-level—relationship between name, geography, and ethnicity.</p>
+
+<p>The differentially private DAS enabled learning to make statistical inferences about ethnicity from name and geography, without compromising the privacy of any Census respondent, exactly as it was intended to do.  In other words, the paper establishes fitness-for-use of the DAS data for the BISG statistical method!  Because differential privacy permits learning statistical patterns without compromising the privacy of individual members of the dataset, it should not interfere with learning the predictor, which is exactly what the authors found. Returning to our “smoking causes cancer” example, the researchers found that it was just as easy to detect this statistical pattern with a modern disclosure avoidance system in place as it was with the older, less protective system.</p>
+
+<p>The authors’ conclusions –“ the DAS data may not provide universal privacy protection” – are simply not supported by their findings.</p>
+
+<p>They have confused learning that smoking causes cancer—and applying this predictor to an individual smoker—with learning medical details of individual patients in the dataset. Change the input to the predictor—replace “smoker” with “non-smoker” or move across the country, for example—and the prediction changes.</p>
+
+<p>The BISG prediction is not about the individual, it does not accompany her as she relocates from one neighborhood to another, it is a statistical relationship between name, geography, and ethnicity.  It is not a privacy compromise, it is science.</p>
+
+<p>Signed:</p>
+<ul>
+  <li>Mark Bun, Assistant Professor of Computer Science, Boston University</li>
+  <li>Damien Desfontaines, Privacy Engineer, Google</li>
+  <li>Cynthia Dwork, Professor of Computer Science, Harvard University</li>
+  <li>Moni Naor, Professor of Computer Science, The Weizmann Institute of Science</li>
+  <li>Kobbi Nissim, Professor of Computer Science, Georgetown University</li>
+  <li>Aaron Roth, Professor of Computer and Information Science, University of Pennsylvania</li>
+  <li>Adam Smith, Professor of Computer Science, Boston University</li>
+  <li>Thomas Steinke, Research Scientist, Google</li>
+  <li>Jonathan Ullman, Assistant Professor of Computer Science, Northeastern University</li>
+  <li>Salil Vadhan, Professor of Computer Science and Applied Mathematics, Harvard University</li>
+</ul>
+
+<p>Please contact Cynthia Dwork for contact information for authors happy to speak about this on the record.</p></div>
+    </summary>
+    <updated>2021-06-03T23:30:00Z</updated>
+    <published>2021-06-03T23:30:00Z</published>
+    <author>
+      <name>Jonathan Ullman</name>
+    </author>
+    <source>
+      <id>https://differentialprivacy.org</id>
+      <link href="https://differentialprivacy.org" rel="alternate" type="text/html"/>
+      <link href="https://differentialprivacy.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Website for the differential privacy research community</subtitle>
+      <title>Differential Privacy</title>
+      <updated>2021-06-03T23:14:39Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>tag:blogger.com,1999:blog-3722233.post-583257573096655269</id>
@@ -84,7 +150,7 @@ the logarithm of tree-like size that might be of independent interest.</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-03T22:20:26Z</updated>
+      <updated>2021-06-03T23:11:43Z</updated>
     </source>
   </entry>
 
@@ -130,7 +196,7 @@ and extractors, making them inadequate for the above applications.</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-03T22:20:25Z</updated>
+      <updated>2021-06-03T23:11:43Z</updated>
     </source>
   </entry>
 
@@ -165,29 +231,37 @@ and extractors, making them inadequate for the above applications.</summary>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-06-03T22:21:18Z</updated>
+      <updated>2021-06-03T23:13:24Z</updated>
     </source>
   </entry>
 
   <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00657</id>
-    <link href="http://arxiv.org/abs/2106.00657" rel="alternate" type="text/html"/>
-    <title>Parameterized algorithms for identifying gene co-expression modules via weighted clique decomposition</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Madison Cooley, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Greene:Casey_S=.html">Casey S. Greene</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/i/Issac:Davis.html">Davis Issac</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Pividori:Milton.html">Milton Pividori</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Sullivan:Blair_D=.html">Blair D. Sullivan</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00657">PDF</a><br/><b>Abstract: </b>We present a new combinatorial model for identifying regulatory modules in
-gene co-expression data using a decomposition into weighted cliques. To capture
-complex interaction effects, we generalize the previously-studied weighted edge
-clique partition problem. As a first step, we restrict ourselves to the
-noise-free setting, and show that the problem is fixed parameter tractable when
-parameterized by the number of modules (cliques). We present two new algorithms
-for finding these decompositions, using linear programming and integer
-partitioning to determine the clique weights. Further, we implement these
-algorithms in Python and test them on a biologically-inspired synthetic corpus
-generated using real-world data from transcription factors and a latent
-variable analysis of co-expression in varying cell types.
+    <id>http://arxiv.org/abs/2106.01340</id>
+    <link href="http://arxiv.org/abs/2106.01340" rel="alternate" type="text/html"/>
+    <title>Transaction Fee Mechanism Design</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/r/Roughgarden:Tim.html">Tim Roughgarden</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.01340">PDF</a><br/><b>Abstract: </b>Demand for blockchains such as Bitcoin and Ethereum is far larger than
+supply, necessitating a mechanism that selects a subset of transactions to
+include "on-chain" from the pool of all pending transactions. EIP-1559 is a
+proposal to make several tightly coupled changes to the Ethereum blockchain's
+transaction fee mechanism, including the introduction of variable-size blocks
+and a burned base fee that rises and falls with demand. These changes are
+slated for deployment in Ethereum's "London fork," scheduled for late
+summer~2021, at which point it will be the biggest economic change made to a
+major blockchain to date.
+</p>
+<p>The first goal of this paper is to formalize the problem of designing a
+transaction fee mechanism, taking into account the many idiosyncrasies of the
+blockchain setting (ranging from off-chain collusion between miners and users
+to the ease of money-burning). The second goal is to situate the specific
+mechanism proposed in EIP-1559 in this framework and rigorously interrogate its
+game-theoretic properties. The third goal is to suggest competing designs that
+offer alternative sets of trade-offs. The final goal is to highlight research
+opportunities for the EC community that could help shape the future of
+blockchain transaction fee mechanisms.
 </p></div>
     </summary>
-    <updated>2021-06-02T22:51:21Z</updated>
+    <updated>2021-06-03T22:39:31Z</updated>
     <author>
       <name/>
     </author>
@@ -198,33 +272,67 @@ variable analysis of co-expression in varying cell types.
       <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
       <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
       <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
+      <updated>2021-06-03T01:30:00Z</updated>
     </source>
   </entry>
 
   <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00623</id>
-    <link href="http://arxiv.org/abs/2106.00623" rel="alternate" type="text/html"/>
-    <title>A 4-Approximation Algorithm for Maximum Independent Set of Rectangles</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Waldo Galvez, Arindam Khan, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Mari:Mathieu.html">Mathieu Mari</a>, Tobias Momke, Madhusudhan Reddy, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/w/Wiese:Andreas.html">Andreas Wiese</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00623">PDF</a><br/><b>Abstract: </b>We study the Maximum Independent Set of Rectangles(MISR) problem, where we
-are given a set of axis-parallel rectangles in the plane and the goal is to
-select a subset of non-overlapping rectangles of maximum cardinality. In a
-recent breakthrough, Mitchell obtained the first constant-factor approximation
-algorithm for MISR. His algorithm achieves an approximation ratio of 10 and it
-is based on a dynamic program that intuitively recursively partitions the input
-plane into special polygons called corner-clipped rectangles (CCRs).
-</p>
-<p>In this paper, we present a 4-approximation algorithm for MISR which is based
-on a similar recursive partitioning scheme. However, we use a more general
-class of polygons -- polygons that are horizontally or vertically convex --
-which allows us to provide an arguably simpler analysis and already improve the
-approximation ratio. Using a new fractional charging argument and fork-fences
-to guide the partitions, we improve the approximation ratio even more to 4. We
-hope that our ideas will lead to further progress towards a PTAS for MISR.
+    <id>http://arxiv.org/abs/2106.01336</id>
+    <link href="http://arxiv.org/abs/2106.01336" rel="alternate" type="text/html"/>
+    <title>Improved Rates for Differentially Private Stochastic Convex Optimization with Heavy-Tailed Data</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Gautam Kamath, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Liu:Xingtu.html">Xingtu Liu</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/z/Zhang:Huanyu.html">Huanyu Zhang</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.01336">PDF</a><br/><b>Abstract: </b>We study stochastic convex optimization with heavy-tailed data under the
+constraint of differential privacy. Most prior work on this problem is
+restricted to the case where the loss function is Lipschitz. Instead, as
+introduced by Wang, Xiao, Devadas, and Xu, we study general convex loss
+functions with the assumption that the distribution of gradients has bounded
+$k$-th moments. We provide improved upper bounds on the excess population risk
+under approximate differential privacy of
+$\tilde{O}\left(\sqrt{\frac{d}{n}}+\left(\frac{d}{\epsilon
+n}\right)^{\frac{k-1}{k}}\right)$ and
+$\tilde{O}\left(\frac{d}{n}+\left(\frac{d}{\epsilon
+n}\right)^{\frac{2k-2}{k}}\right)$ for convex and strongly convex loss
+functions, respectively. We also prove nearly-matching lower bounds under the
+constraint of pure differential privacy, giving strong evidence that our bounds
+are tight.
 </p></div>
     </summary>
-    <updated>2021-06-02T00:00:00Z</updated>
+    <updated>2021-06-03T22:47:46Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2021-06-03T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2106.01236</id>
+    <link href="http://arxiv.org/abs/2106.01236" rel="alternate" type="text/html"/>
+    <title>Improved Spanning on Theta-5</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Bose:Prosenjit.html">Prosenjit Bose</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Hill:Darryl.html">Darryl Hill</a>, Aurélien Ooms Carleton University) <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.01236">PDF</a><br/><b>Abstract: </b>We show an upper bound of $\frac{
+</p>
+<p>\sin\left(\frac{3\pi}{10}\right)
+</p>
+<p>}{
+</p>
+<p>\sin\left(\frac{2\pi}{5}\right)-\sin\left(\frac{3\pi}{10}\right)
+</p>
+<p>}
+</p>
+<p>&lt;5.70$ on the spanning ratio of $\Theta_5$-graphs, improving on the previous
+best known upper bound of $9.96$ [Bose, Morin, van Renssen, and Verdonschot.
+The Theta-5-graph is a spanner. Computational Geometry, 2015.]
+</p></div>
+    </summary>
+    <updated>2021-06-03T22:59:17Z</updated>
     <author>
       <name/>
     </author>
@@ -235,44 +343,64 @@ hope that our ideas will lead to further progress towards a PTAS for MISR.
       <link href="http://export.arxiv.org/rss/cs.CG" rel="self" type="application/rdf+xml"/>
       <subtitle>Computer Science -- Computational Geometry (cs.CG) updates on the arXiv.org e-print archive</subtitle>
       <title>cs.CG updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
+      <updated>2021-06-03T01:30:00Z</updated>
     </source>
   </entry>
 
   <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00604</id>
-    <link href="http://arxiv.org/abs/2106.00604" rel="alternate" type="text/html"/>
-    <title>Optimal Stopping with Behaviorally Biased Agents: The Role of Loss Aversion and Changing Reference Points</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Jon Kleinberg, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Kleinberg:Robert.html">Robert Kleinberg</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/o/Oren:Sigal.html">Sigal Oren</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00604">PDF</a><br/><b>Abstract: </b>People are often reluctant to sell a house, or shares of stock, below the
-price at which they originally bought it. While this is generally not
-consistent with rational utility maximization, it does reflect two strong
-empirical regularities that are central to the behavioral science of human
-decision-making: a tendency to evaluate outcomes relative to a reference point
-determined by context (in this case the original purchase price), and the
-phenomenon of loss aversion in which people are particularly prone to avoid
-outcomes below the reference point. Here we explore the implications of
-reference points and loss aversion in optimal stopping problems, where people
-evaluate a sequence of options in one pass, either accepting the option and
-stopping the search or giving up on the option forever. The best option seen so
-far sets a reference point that shifts as the search progresses, and a biased
-decision-maker's utility incurs an additional penalty when they accept a later
-option that is below this reference point.
-</p>
-<p>We formulate and study a behaviorally well-motivated version of the optimal
-stopping problem that incorporates these notions of reference dependence and
-loss aversion. We obtain tight bounds on the performance of a biased agent in
-this model relative to the best option obtainable in retrospect (a type of
-prophet inequality for biased agents), as well as tight bounds on the ratio
-between the performance of a biased agent and the performance of a rational
-one. We further establish basic monotonicity results, and show an exponential
-gap between the performance of a biased agent in a stopping problem with
-respect to a worst-case versus a random order. As part of this, we establish
-fundamental differences between optimal stopping problems for rational versus
-biased agents, and these differences inform our analysis.
+    <id>http://arxiv.org/abs/2106.01215</id>
+    <link href="http://arxiv.org/abs/2106.01215" rel="alternate" type="text/html"/>
+    <title>Visual Analysis of Electronic Densities and Transitions in Molecules</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Masood:Talha_Bin.html">Talha Bin Masood</a>, Signe Sidwall Thygesen, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Linares:Mathieu.html">Mathieu Linares</a>, Alexei I. Abrikosov, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Natarajan:Vijay.html">Vijay Natarajan</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Hotz:Ingrid.html">Ingrid Hotz</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.01215">PDF</a><br/><b>Abstract: </b>The study of electronic transitions within a molecule connected to the
+absorption or emission of light is a common task in the process of the design
+of new materials. The transitions are complex quantum mechanical processes and
+a detailed analysis requires a breakdown of these processes into components
+that can be interpreted via characteristic chemical properties. We approach
+these tasks by providing a detailed analysis of the electron density field.
+This entails methods to quantify and visualize electron localization and
+transfer from molecular subgroups combining spatial and abstract
+representations. The core of our method uses geometric segmentation of the
+electronic density field coupled with a graph-theoretic formulation of charge
+transfer between molecular subgroups. The design of the methods has been guided
+by the goal of providing a generic and objective analysis following fundamental
+concepts. We illustrate the proposed approach using several case studies
+involving the study of electronic transitions in different molecular systems.
 </p></div>
     </summary>
-    <updated>2021-06-02T22:44:30Z</updated>
+    <updated>2021-06-03T23:10:26Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Computational Geometry"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.CG" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Computational Geometry (cs.CG) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.CG updates on arXiv.org</title>
+      <updated>2021-06-03T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2106.01173</id>
+    <link href="http://arxiv.org/abs/2106.01173" rel="alternate" type="text/html"/>
+    <title>On the approximation ratio of LZ-End to LZ77</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Takumi Ideue, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Mieno:Takuya.html">Takuya Mieno</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/f/Funakoshi:Mitsuru.html">Mitsuru Funakoshi</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Nakashima:Yuto.html">Yuto Nakashima</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/i/Inenaga:Shunsuke.html">Shunsuke Inenaga</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/t/Takeda:Masayuki.html">Masayuki Takeda</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.01173">PDF</a><br/><b>Abstract: </b>A family of Lempel-Ziv factorizations is a well-studied string structure. The
+LZ-End factorization is a member of the family that achieved faster extraction
+of any substrings (Kreft &amp; Navarro, TCS 2013). One of the interests for LZ-End
+factorizations is the possible difference between the size of LZ-End and LZ77
+factorizations. They also showed families of strings where the approximation
+ratio of the number of LZ-End phrases to the number of LZ77 phrases
+asymptotically approaches 2. However, the alphabet size of these strings is
+unbounded. In this paper, we analyze the LZ-End factorization of the
+period-doubling sequence. We also show that the approximation ratio for the
+period-doubling sequence asymptotically approaches 2 for the binary alphabet.
+</p></div>
+    </summary>
+    <updated>2021-06-03T22:50:36Z</updated>
     <author>
       <name/>
     </author>
@@ -283,46 +411,34 @@ biased agents, and these differences inform our analysis.
       <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
       <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
       <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
+      <updated>2021-06-03T01:30:00Z</updated>
     </source>
   </entry>
 
   <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00508</id>
-    <link href="http://arxiv.org/abs/2106.00508" rel="alternate" type="text/html"/>
-    <title>Differentially Private Densest Subgraph</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/f/Farhadi:Alireza.html">Alireza Farhadi</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Hajiaghayi:MohammadTaghi.html">MohammadTaghi Hajiaghayi</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Shi:Elaine.html">Elaine Shi</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00508">PDF</a><br/><b>Abstract: </b>Given a graph, the densest subgraph problem asks for a set of vertices such
-that the average degree among these vertices is maximized. Densest subgraph has
-numerous applications in learning, e.g., community detection in social
-networks, link spam detection, correlation mining, bioinformatics, and so on.
-Although there are efficient algorithms that output either exact or approximate
-solutions to the densest subgraph problem, existing algorithms may violate the
-privacy of the individuals in the network, e.g., leaking the
-existence/non-existence of edges.
+    <id>http://arxiv.org/abs/2106.01135</id>
+    <link href="http://arxiv.org/abs/2106.01135" rel="alternate" type="text/html"/>
+    <title>MNL-Bandit with Knapsacks</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Abdellah Aznag, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Goyal:Vineet.html">Vineet Goyal</a>, Noemie Perivier <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.01135">PDF</a><br/><b>Abstract: </b>We consider a dynamic assortment selection problem where a seller has a fixed
+inventory of $N$ substitutable products and faces an unknown demand that
+arrives sequentially over $T$ periods. In each period, the seller needs to
+decide on the assortment of products (of cardinality at most $K$) to offer to
+the customers. The customer's response follows an unknown multinomial logit
+model (MNL) with parameters $v$. The goal of the seller is to maximize the
+total expected revenue given the fixed initial inventory of $N$ products. We
+give a policy that achieves a regret of $\tilde O\left(K \sqrt{K N T}\left(1 +
+\frac{\sqrt{v_{\max}}}{q_{\min}}\text{OPT}\right) \right)$ under a mild
+assumption on the model parameters. In particular, our policy achieves a
+near-optimal $\tilde O(\sqrt{T})$ regret in the large inventory setting.
 </p>
-<p>In this paper, we study the densest subgraph problem in the framework of the
-differential privacy, and we derive the first upper and lower bounds for this
-problem. We show that there exists a linear-time $\epsilon$-differentially
-private algorithm that finds a $2$-approximation of the densest subgraph with
-an extra poly-logarithmic additive error. Our algorithm not only reports the
-approximate density of the densest subgraph, but also reports the vertices that
-form the dense subgraph.
-</p>
-<p>Our upper bound almost matches the famous $2$-approximation by Charikar both
-in performance and in approximation ratio, but we additionally achieve
-differential privacy. In comparison with Charikar's algorithm, our algorithm
-has an extra poly-logarithmic additive error. We partly justify the additive
-error with a new lower bound, showing that for any differentially private
-algorithm that provides a constant-factor approximation, a sub-logarithmic
-additive error is inherent.
-</p>
-<p>We also practically study our differentially private algorithm on real-world
-graphs, and we show that in practice the algorithm finds a solution which is
-very close to the optimal
+<p>Our policy builds upon the UCB-based approach for MNL-bandit without
+inventory constraints in [1] and addresses the inventory constraints through an
+exponentially sized LP for which we present a tractable approximation while
+keeping the $\tilde O(\sqrt{T})$ regret bound.
 </p></div>
     </summary>
-    <updated>2021-06-02T22:52:08Z</updated>
+    <updated>2021-06-03T22:57:45Z</updated>
     <author>
       <name/>
     </author>
@@ -333,27 +449,42 @@ very close to the optimal
       <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
       <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
       <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
+      <updated>2021-06-03T01:30:00Z</updated>
     </source>
   </entry>
 
   <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00463</id>
-    <link href="http://arxiv.org/abs/2106.00463" rel="alternate" type="text/html"/>
-    <title>Instance-optimal Mean Estimation Under Differential Privacy</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Huang:Ziyue.html">Ziyue Huang</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Liang:Yuting.html">Yuting Liang</a>, Ke Yi <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00463">PDF</a><br/><b>Abstract: </b>Mean estimation under differential privacy is a fundamental problem, but
-worst-case optimal mechanisms do not offer meaningful utility guarantees in
-practice when the global sensitivity is very large. Instead, various heuristics
-have been proposed to reduce the error on real-world data that do not resemble
-the worst-case instance. This paper takes a principled approach, yielding a
-mechanism that is instance-optimal in a strong sense. In addition to its
-theoretical optimality, the mechanism is also simple and practical, and adapts
-to a variety of data characteristics without the need of parameter tuning. It
-easily extends to the local and shuffle model as well.
+    <id>http://arxiv.org/abs/2106.01108</id>
+    <link href="http://arxiv.org/abs/2106.01108" rel="alternate" type="text/html"/>
+    <title>Efficient Deterministic Leader Election for Programmable Matter</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Dufoulon:Fabien.html">Fabien Dufoulon</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Kutten:Shay.html">Shay Kutten</a>, William K. Moses Jr. <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.01108">PDF</a><br/><b>Abstract: </b>It was suggested that a programmable matter system (composed of multiple
+computationally weak mobile particles) should remain connected at all times
+since otherwise, reconnection is difficult and may be impossible. At the same
+time, it was not clear that allowing the system to disconnect carried a
+significant advantage in terms of time complexity. We demonstrate for a
+fundamental task, that of leader election, an algorithm where the system
+disconnects and then reconnects automatically in a non-trivial way (particles
+can move far away from their former neighbors and later reconnect to others).
+Moreover, the runtime of the temporarily disconnecting deterministic leader
+election algorithm is linear in the diameter. Hence, the disconnecting --
+reconnecting algorithm is as fast as previous randomized algorithms. When
+comparing to previous deterministic algorithms, we note that some of the
+previous work assumed weaker schedulers. Still, the runtime of all the previous
+deterministic algorithms that did not assume special shapes of the particle
+system (shapes with no holes) was at least quadratic in $n$, where $n$ is the
+number of particles in the system. (Moreover, the new algorithm is even faster
+in some parameters than the deterministic algorithms that did assume special
+initial shapes.)
+</p>
+<p>Since leader election is an important module in algorithms for various other
+tasks, the presented algorithm can be useful for speeding up other algorithms
+under the assumption of a strong scheduler. This leaves open the question: "can
+a deterministic algorithm be as fast as the randomized ones also under weaker
+schedulers?"
 </p></div>
     </summary>
-    <updated>2021-06-02T22:49:03Z</updated>
+    <updated>2021-06-03T22:48:43Z</updated>
     <author>
       <name/>
     </author>
@@ -364,31 +495,135 @@ easily extends to the local and shuffle model as well.
       <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
       <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
       <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
+      <updated>2021-06-03T01:30:00Z</updated>
     </source>
   </entry>
 
   <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00399</id>
-    <link href="http://arxiv.org/abs/2106.00399" rel="alternate" type="text/html"/>
-    <title>Computing Least and Greatest Fixed Points in Absorptive Semirings</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Naaf:Matthias.html">Matthias Naaf</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00399">PDF</a><br/><b>Abstract: </b>We present two methods to algorithmically compute both least and greatest
-solutions of polynomial equation systems over absorptive semirings (with
-certain completeness and continuity assumptions), such as the tropical
-semiring. Both methods require a polynomial number of semiring operations,
-including semiring addition, multiplication and an infinitary power operation.
-</p>
-<p>Our main result is a closed-form solution for least and greatest fixed points
-based on the fixed-point iteration. The proof builds on the notion of (possibly
-infinite) derivation trees; a careful analysis of the shape of these trees
-allows us to collapse the fixed-point iteration to a linear number of steps.
-</p>
-<p>The second method is an iterative symbolic computation in the semiring of
-absorptive polynomials, largely based on results on Kleene algebras.
+    <id>http://arxiv.org/abs/2106.01079</id>
+    <link href="http://arxiv.org/abs/2106.01079" rel="alternate" type="text/html"/>
+    <title>Using Predicted Weights for Ad Delivery</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Lavastida:Thomas.html">Thomas Lavastida</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Moseley:Benjamin.html">Benjamin Moseley</a>, R. Ravi, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/x/Xu:Chenyang.html">Chenyang Xu</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.01079">PDF</a><br/><b>Abstract: </b>We study the performance of a proportional weights algorithm for online
+capacitated bipartite matching modeling the delivery of impression ads. The
+algorithm uses predictions on the advertiser nodes to match arriving impression
+nodes fractionally in proportion to the weights of its neighbors. This paper
+gives a thorough empirical study of the performance of the algorithm on a
+data-set of ad impressions from Yahoo! and shows its superior performance
+compared to natural baselines such as a greedy water-filling algorithm and the
+ranking algorithm. The proportional weights algorithm has recently received
+interest in the theoretical literature where it was shown to have strong
+guarantees beyond the worst-case model of algorithms augmented with
+predictions. We extend these results to the case where the advertisers'
+capacities are no longer stationary over time. Additionally, we show the
+algorithm has near optimal performance in the random-order arrival model when
+the number of impressions and the optimal matching are sufficiently large.
 </p></div>
     </summary>
-    <updated>2021-06-02T22:37:40Z</updated>
+    <updated>2021-06-03T22:58:01Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2021-06-03T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2106.01036</id>
+    <link href="http://arxiv.org/abs/2106.01036" rel="alternate" type="text/html"/>
+    <title>Ultra-Sparse Near-Additive Emulators</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/e/Elkin:Michael.html">Michael Elkin</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Matar:Shaked.html">Shaked Matar</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.01036">PDF</a><br/><b>Abstract: </b>Near-additive (aka $(1+\epsilon,\beta)$-) emulators and spanners are a
+fundamental graph-algorithmic construct, with numerous applications for
+computing approximate shortest paths and related problems in distributed,
+streaming and dynamic settings.
+</p>
+<p>Known constructions of near-additive emulators enable one to trade between
+their sparsity (i.e., number of edges) and the additive stretch $\beta$.
+Specifically, for any pair of parameters $\epsilon &gt;0$, $ \kappa=1,2,\dots$,
+one can have a $(1+\epsilon,\beta)$-emulator with $O(n^{1+1/\kappa})$ edges,
+with $\beta = \left(\frac{\log \kappa}{\epsilon}\right)^{\log \kappa}$. At
+their sparsest, these emulators employ $c\cdot n$ edges, for some constant
+$c\geq 2$.
+</p>
+<p>We tighten this bound, and show that in fact precisely $n^{1+1/\kappa}$ edges
+suffice.
+</p>
+<p>In particular, our emulators can be \emph{ultra-sparse}, i.e., we can have an
+emulator with $n+o(n)$ edges and $\beta = \left(\frac{\log {\log n}}{\epsilon
+}\right)^{{\log {\log n}}(1+o(1))}$.
+</p>
+<p>We also devise a distributed deterministic algorithm in the CONGEST model
+that builds these emulators in low polynomial time (i.e., in $O(n^\rho)$ time,
+for an arbitrarily small constant parameter $\rho &gt;0$).
+</p>
+<p>Finally, we also improve the state-of-the-art distributed deterministic
+\congest-model construction of
+</p>
+<p>$(1+\epsilon,\beta)$-spanners devised in the PODC'19 paper
+</p>
+<p>[ElkinM19]. Specifically, the spanners of [ElkinM19] have $O(\beta\cdot
+n^{1+1/\kappa})$ edges, i.e., at their sparsest they employ
+</p>
+<p>$ O\left(\frac{\log {\log n}}{\epsilon }\right)^{{\log {\log n}}}\cdot n$
+edges. In this paper, we devise an efficient distributed deterministic
+CONGEST-model algorithm that builds such spanners with $O(n^{1+1/\kappa})$
+edges for $\kappa = O\left(\frac{\log n}{\log ^{(3)}n}\right)$. At their
+sparsest, these spanners employ only $O(n\cdot {\log {\log n}})$ edges.
+</p></div>
+    </summary>
+    <updated>2021-06-03T22:46:36Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2021-06-03T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2106.00937</id>
+    <link href="http://arxiv.org/abs/2106.00937" rel="alternate" type="text/html"/>
+    <title>Putting the Squeeze on Array Programs: Loop Verification via Inductive Rank Reduction</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Oren Ish Shalom, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/i/Itzhaky:Shachar.html">Shachar Itzhaky</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/r/Rinetzky:Noam.html">Noam Rinetzky</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Shoham:Sharon.html">Sharon Shoham</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00937">PDF</a><br/><b>Abstract: </b>Automatic verification of array manipulating programs is a challenging
+problem because it often amounts to the inference of in ductive quantified loop
+invariants which, in some cases, may not even be firstorder expressible. In
+this paper, we suggest a novel verification tech nique that is based on
+induction on userdefined rank of program states as an alternative to
+loopinvariants. Our technique, dubbed inductive rank reduction, works in two
+steps. Firstly, we simplify the verification problem and prove that the program
+is correct when the input state con tains an input array of length B or less,
+using the length of the array as the rank of the state. Secondly, we employ a
+squeezing function g which converts a program state sigma with an array of
+length &gt; B to a state g(sigma) containing an array of length minus 1 or less.
+We prove that when g satisfies certain natural conditions then if the program
+violates its specification on sigma then it does so also on g(sigma). The
+correctness of the program on inputs with arrays of arbitrary lengths follows
+by induction. We make our technique automatic for array programs whose length
+of execution is proportional to the length of the input arrays by (i) perform
+ing the first step using symbolic execution, (ii) verifying the conditions
+required of g using Z3, and (iii) providing a heuristic procedure for syn
+thesizing g. We implemented our technique and applied it successfully to
+several interesting arraymanipulating programs, including a bidirec tional
+summation program whose loop invariant cannot be expressed in firstorder logic
+while its specification is quantifier free.
+</p></div>
+    </summary>
+    <updated>2021-06-03T22:37:42Z</updated>
     <author>
       <name/>
     </author>
@@ -399,48 +634,40 @@ absorptive polynomials, largely based on results on Kleene algebras.
       <link href="http://export.arxiv.org/rss/cs.CC" rel="self" type="application/rdf+xml"/>
       <subtitle>Computer Science -- Computational Complexity (cs.CC) updates on the arXiv.org e-print archive</subtitle>
       <title>cs.CC updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
+      <updated>2021-06-03T01:30:00Z</updated>
     </source>
   </entry>
 
   <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00374</id>
-    <link href="http://arxiv.org/abs/2106.00374" rel="alternate" type="text/html"/>
-    <title>Fault-Tolerant Labeling and Compact Routing Schemes</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Dory:Michal.html">Michal Dory</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Parter:Merav.html">Merav Parter</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00374">PDF</a><br/><b>Abstract: </b>The paper presents fault-tolerant (FT) labeling schemes for general graphs,
-as well as, improved FT routing schemes. For a given $n$-vertex graph $G$ and a
-bound $f$ on the number of faults, an $f$-FT connectivity labeling scheme is a
-distributed data structure that assigns each of the graph edges and vertices a
-short label, such that given the labels of the vertices $s$ and $t$, and at
-most $f$ failing edges $F$, one can determine if $s$ and $t$ are connected in
-$G \setminus F$. The primary complexity measure is the length of the individual
-labels. Since their introduction by [Courcelle, Twigg, STACS '07], compact FT
-labeling schemes have been devised only for a limited collection of graph
-families. In this work, we fill in this gap by proposing two (independent) FT
-connectivity labeling schemes for general graphs, with a nearly optimal label
-length. This serves the basis for providing also FT approximate distance
-labeling schemes, and ultimately also routing schemes. Our main results for an
-$n$-vertex graph and a fault bound $f$ are:
-</p>
-<p>-- There is a randomized FT connectivity labeling scheme with a label length
-of $O(f+\log n)$ bits, hence optimal for $f=O(\log n)$. This scheme is based on
-the notion of cycle space sampling [Pritchard, Thurimella, TALG '11].
-</p>
-<p>-- There is a randomized FT connectivity labeling scheme with a label length
-of $O(\log^3 n)$ bits (independent of the number of faults $f$). This scheme is
-based on the notion of linear sketches of [Ahn et al., SODA '12].
-</p>
-<p>-- For $k\geq 1$, there is a randomized routing scheme that routes a message
-from $s$ to $t$ in the presence of a set $F$ of faulty edges, with stretch
-$O(|F|^2 k)$ and routing tables of size $\tilde{O}(f^3 n^{1/k})$.
-</p>
-<p>This significantly improves over the state-of-the-art bounds by [Chechik,
-ICALP '11], providing the first scheme with sub-linear FT labeling and routing
-schemes for general graphs.
+    <id>http://arxiv.org/abs/2106.00909</id>
+    <link href="http://arxiv.org/abs/2106.00909" rel="alternate" type="text/html"/>
+    <title>The Generalized Mean Densest Subgraph Problem</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/v/Veldt:Nate.html">Nate Veldt</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Benson:Austin_R=.html">Austin R. Benson</a>, Jon Kleinberg <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00909">PDF</a><br/><b>Abstract: </b>Finding dense subgraphs of a large graph is a standard problem in graph
+mining that has been studied extensively both for its theoretical richness and
+its many practical applications. In this paper we introduce a new family of
+dense subgraph objectives, parameterized by a single parameter $p$, based on
+computing generalized means of degree sequences of a subgraph. Our objective
+captures both the standard densest subgraph problem and the maximum $k$-core as
+special cases, and provides a way to interpolate between and extrapolate beyond
+these two objectives when searching for other notions of dense subgraphs. In
+terms of algorithmic contributions, we first show that our objective can be
+minimized in polynomial time for all $p \geq 1$ using repeated submodular
+minimization. A major contribution of our work is analyzing the performance of
+different types of peeling algorithms for dense subgraphs both in theory and
+practice. We prove that the standard peeling algorithm can perform arbitrarily
+poorly on our generalized objective, but we then design a more sophisticated
+peeling method which for $p \geq 1$ has an approximation guarantee that is
+always at least $1/2$ and converges to 1 as $p \rightarrow \infty$. In
+practice, we show that this algorithm obtains extremely good approximations to
+the optimal solution, scales to large graphs, and highlights a range of
+different meaningful notions of density on graphs coming from numerous domains.
+Furthermore, it is typically able to approximate the densest subgraph problem
+better than the standard peeling algorithm, by better accounting for how the
+removal of one node affects other nodes in its neighborhood.
 </p></div>
     </summary>
-    <updated>2021-06-02T22:42:10Z</updated>
+    <updated>2021-06-03T22:48:01Z</updated>
     <author>
       <name/>
     </author>
@@ -451,37 +678,87 @@ schemes for general graphs.
       <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
       <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
       <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
+      <updated>2021-06-03T01:30:00Z</updated>
     </source>
   </entry>
 
   <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00323</id>
-    <link href="http://arxiv.org/abs/2106.00323" rel="alternate" type="text/html"/>
-    <title>Boosting the Search Performance of B+-tree for Non-volatile Memory with Sentinels</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Chongnan Ye, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/w/Wang:Chundong.html">Chundong Wang</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00323">PDF</a><br/><b>Abstract: </b>The next-generation non-volatile memory (NVM) is striding into computer
-systems as a new tier as it incorporates both DRAM's byte-addressability and
-disk's persistency. Researchers and practitioners have considered building
-persistent memory by placing NVM on the memory bus for CPU to directly load and
-store data. As a result, cache-friendly data structures have been developed for
-NVM. One of them is the prevalent B+-tree. State-of-the-art in-NVM B+-trees
-mainly focus on the optimization of write operations (insertion and deletion).
-However, search is of vital importance for B+-tree. Not only search-intensive
-workloads benefit from an optimized search, but insertion and deletion also
-rely on a preceding search operation to proceed. In this paper, we attentively
-study a sorted B+-tree node that spans over contiguous cache lines. Such cache
-lines exhibit a monotonically increasing trend and searching a target key
-across them can be accelerated by estimating a range the key falls into. To do
-so, we construct a probing Sentinel Array in which a sentinel stands for each
-cache line of B+-tree node. Checking the Sentinel Array avoids scanning
-unnecessary cache lines and hence significantly reduces cache misses for a
-search. A quantitative evaluation shows that using Sentinel Arrays boosts the
-search performance of state-of-the-art in-NVM B+-trees by up to 48.4% while the
-cost of maintaining of Sentinel Array is low.
+    <id>http://arxiv.org/abs/2106.00875</id>
+    <link href="http://arxiv.org/abs/2106.00875" rel="alternate" type="text/html"/>
+    <title>The Hardest Explicit Construction</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Korten:Oliver.html">Oliver Korten</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00875">PDF</a><br/><b>Abstract: </b>We investigate the complexity of explicit construction problems, where the
+goal is to produce a particular object of size $n$ possessing some pseudorandom
+property in time polynomial in $n$. We give overwhelming evidence that ${\bf
+APEPP}$, defined originally by Kleinberg et al., is the natural complexity
+class associated with explicit constructions for objects whose existence
+follows from the probabilistic method, by proving that a host of well-studied
+explicit construction problems lie in this class. We then observe that a result
+of Je\v{r}\'{a}bek on provability in Bounded Arithmetic, when reinterpreted as
+a reduction between search problems, shows that constructing a truth table of
+high circuit complexity is complete for ${\bf APEPP}$ under ${\bf P}^{\bf NP}$
+reductions. This demonstrates that constructing a hard truth table is a
+universal explicit construction problem in a concrete sense. This result in
+fact gives a precise algorithmic characterization of proving $2^{\Omega(n)}$
+circuit lower bounds for ${\bf E}^{\bf NP}$: the complete problem for ${\bf
+APEPP}$ has a ${\bf P}^{\bf NP}$ algorithm if and only if such a lower bound
+holds. Together with our proof that pseudorandom generators can be constructed
+in ${\bf APEPP}$, this also yields a self-contained and significantly
+simplified proof of the celebrated result of Impagliazzo and Wigderson that
+worst-case-hard truth tables can be used to derandomize algorithms (although
+the conclusion is weaker as our derandomization requires an ${\bf NP}$ oracle).
+As another corollary of this completeness result, we show that ${\bf E}^{\bf
+NP}$ contains a language of circuit complexity $2^{\Omega(n)}$ if and only if
+it contains a language of circuit complexity $\frac{2^n}{3n}$. Finally, for
+several of the problems shown to lie in ${\bf APEPP}$, we demonstrate direct
+polynomial time reductions to the explicit construction of hard truth tables.
 </p></div>
     </summary>
-    <updated>2021-06-02T22:39:35Z</updated>
+    <updated>2021-06-03T22:37:35Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Computational Complexity"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.CC" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Computational Complexity (cs.CC) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.CC updates on arXiv.org</title>
+      <updated>2021-06-03T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2106.00730</id>
+    <link href="http://arxiv.org/abs/2106.00730" rel="alternate" type="text/html"/>
+    <title>Enabling Efficiency-Precision Trade-offs for Label Trees in Extreme Classification</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Baharav:Tavor_Z=.html">Tavor Z. Baharav</a>, Daniel L. Jiang, Kedarnath Kolluri, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Sanghavi:Sujay.html">Sujay Sanghavi</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Dhillon:Inderjit_S=.html">Inderjit S. Dhillon</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00730">PDF</a><br/><b>Abstract: </b>Extreme multi-label classification (XMC) aims to learn a model that can tag
+data points with a subset of relevant labels from an extremely large label set.
+Real world e-commerce applications like personalized recommendations and
+product advertising can be formulated as XMC problems, where the objective is
+to predict for a user a small subset of items from a catalog of several million
+products. For such applications, a common approach is to organize these labels
+into a tree, enabling training and inference times that are logarithmic in the
+number of labels. While training a model once a label tree is available is well
+studied, designing the structure of the tree is a difficult task that is not
+yet well understood, and can dramatically impact both model latency and
+statistical performance. Existing approaches to tree construction fall at an
+extreme point, either optimizing exclusively for statistical performance, or
+for latency. We propose an efficient information theory inspired algorithm to
+construct intermediary operating points that trade off between the benefits of
+both. Our algorithm enables interpolation between these objectives, which was
+not previously possible. We corroborate our theoretical analysis with numerical
+results, showing that on the Wiki-500K benchmark dataset our method can reduce
+a proxy for expected latency by up to 28% while maintaining the same accuracy
+as Parabel. On several datasets derived from e-commerce customer logs, our
+modified label tree is able to improve this expected latency metric by up to
+20% while maintaining the same accuracy. Finally, we discuss challenges in
+realizing these latency improvements in deployed models.
+</p></div>
+    </summary>
+    <updated>2021-06-03T22:42:22Z</updated>
     <author>
       <name/>
     </author>
@@ -492,34 +769,29 @@ cost of maintaining of Sentinel Array is low.
       <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
       <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
       <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
+      <updated>2021-06-03T01:30:00Z</updated>
     </source>
   </entry>
 
   <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00308</id>
-    <link href="http://arxiv.org/abs/2106.00308" rel="alternate" type="text/html"/>
-    <title>Fast Splitting Algorithms for Sparsity-Constrained and Noisy Group Testing</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Price:Eric.html">Eric Price</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Scarlett:Jonathan.html">Jonathan Scarlett</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/t/Tan:Nelvin.html">Nelvin Tan</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00308">PDF</a><br/><b>Abstract: </b>In group testing, the goal is to identify a subset of defective items within
-a larger set of items based on tests whose outcomes indicate whether at least
-one defective item is present. This problem is relevant in areas such as
-medical testing, DNA sequencing, communication protocols, and many more. In
-this paper, we study (i) a sparsity-constrained version of the problem, in
-which the testing procedure is subjected to one of the following two
-constraints: items are finitely divisible and thus may participate in at most
-$\gamma$ tests; or tests are size-constrained to pool no more than $\rho$ items
-per test; and (ii) a noisy version of the problem, where each test outcome is
-independently flipped with some constant probability. Under each of these
-settings, considering the for-each recovery guarantee with asymptotically
-vanishing error probability, we introduce a fast splitting algorithm and
-establish its near-optimality not only in terms of the number of tests, but
-also in terms of the decoding time. While the most basic formulations of our
-algorithms require $\Omega(n)$ storage for each algorithm, we also provide
-low-storage variants based on hashing, with similar recovery guarantees.
+    <id>http://arxiv.org/abs/2106.00718</id>
+    <link href="http://arxiv.org/abs/2106.00718" rel="alternate" type="text/html"/>
+    <title>Public Good Games in Directed Networks</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Papadimitriou:Christos.html">Christos Papadimitriou</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Peng:Binghui.html">Binghui Peng</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00718">PDF</a><br/><b>Abstract: </b>Public goods games in undirected networks are generally known to have pure
+Nash equilibria, which are easy to find. In contrast, we prove that, in
+directed networks, a broad range of public goods games have intractable
+equilibrium problems: The existence of pure Nash equilibria is NP-hard to
+decide, and mixed Nash equilibria are PPAD-hard to find. We define general
+utility public goods games, and prove a complexity dichotomy result for finding
+pure equilibria, and a PPAD-completeness proof for mixed Nash equilibria. Even
+in the divisible goods variant of the problem, where existence is easy to
+prove, finding the equilibrium is PPAD-complete. Finally, when the treewidth of
+the directed network is appropriately bounded, we prove that polynomial-time
+algorithms are possible.
 </p></div>
     </summary>
-    <updated>2021-06-02T22:46:52Z</updated>
+    <updated>2021-06-03T22:46:20Z</updated>
     <author>
       <name/>
     </author>
@@ -530,183 +802,28 @@ low-storage variants based on hashing, with similar recovery guarantees.
       <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
       <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
       <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
+      <updated>2021-06-03T01:30:00Z</updated>
     </source>
   </entry>
 
   <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00287</id>
-    <link href="http://arxiv.org/abs/2106.00287" rel="alternate" type="text/html"/>
-    <title>Junta Distance Approximation with Sub-Exponential Queries</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/i/Iyer:Vishnu.html">Vishnu Iyer</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/t/Tal:Avishay.html">Avishay Tal</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/w/Whitmeyer:Michael.html">Michael Whitmeyer</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00287">PDF</a><br/><b>Abstract: </b>Leveraging tools of De, Mossel, and Neeman [FOCS, 2019], we show two
-different results pertaining to the \emph{tolerant testing} of juntas. Given
-black-box access to a Boolean function $f:\{\pm1\}^{n} \to \{\pm1\}$, we give a
-$poly(k, \frac{1}{\varepsilon})$ query algorithm that distinguishes between
-functions that are $\gamma$-close to $k$-juntas and $(\gamma+\varepsilon)$-far
-from $k'$-juntas, where $k' = O(\frac{k}{\varepsilon^2})$.
-</p>
-<p>In the non-relaxed setting, we extend our ideas to give a
-$2^{\tilde{O}(\sqrt{k/\varepsilon})}$ (adaptive) query algorithm that
-distinguishes between functions that are $\gamma$-close to $k$-juntas and
-$(\gamma+\varepsilon)$-far from $k$-juntas. To the best of our knowledge, this
-is the first subexponential-in-$k$ query algorithm for approximating the
-distance of $f$ to being a $k$-junta (previous results of Blais, Canonne, Eden,
-Levi, and Ron [SODA, 2018] and De, Mossel, and Neeman [FOCS, 2019] required
-exponentially many queries in $k$).
-</p>
-<p>Our techniques are Fourier analytical and make use of the notion of
-"normalized influences" that was introduced by Talagrand [AoP, 1994].
+    <id>http://arxiv.org/abs/2106.00715</id>
+    <link href="http://arxiv.org/abs/2106.00715" rel="alternate" type="text/html"/>
+    <title>A Theory for Locus Ellipticity of Poncelet 3-Periodics</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Helman:Mark.html">Mark Helman</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Laurain:Dominique.html">Dominique Laurain</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/r/Reznik:Dan.html">Dan Reznik</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Garcia:Ronaldo.html">Ronaldo Garcia</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00715">PDF</a><br/><b>Abstract: </b>We provide a theory as to why the locus of a triangle center over Poncelet
+3-periodics in an ellipse pair is an ellipse or not. For the confocal pair
+(elliptic billiard), we show that if the center can be expressed as a fixed
+affine combination of barycenter, circumcenter, and mittenpunkt (which is
+stationary over the confocal family), then its locus will be an ellipse. We
+also provide conditions under which a particular locus will be a circle or a
+segment. We also analyze locus turning number and monotonicity with respect to
+vertices of the 3-periodic family. Finally we write out expressions for the
+convex quartic locus of the incenter for a generic Poncelet family,
+conjecturing it can only be an ellipse if the pair is confocal.
 </p></div>
     </summary>
-    <updated>2021-06-02T00:00:00Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00279</id>
-    <link href="http://arxiv.org/abs/2106.00279" rel="alternate" type="text/html"/>
-    <title>$L_0$ Isotonic Regression With Secondary Objectives</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Stout:Quentin_F=.html">Quentin F. Stout</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00279">PDF</a><br/><b>Abstract: </b>We provide algorithms for isotonic regression minimizing $L_0$ error (Hamming
-distance). This is also known as monotonic relabeling, and is applicable when
-labels have a linear ordering but not necessarily a metric. There may be
-exponentially many optimal relabelings, so we look at secondary criteria to
-determine which are best. For arbitrary ordinal labels the criterion is
-maximizing the number of labels which are only changed to an adjacent label
-(and recursively apply this). For real-valued labels we minimize the $L_p$
-error. For linearly ordered sets we also give algorithms which minimize the sum
-of the $L_p$ and weighted $L_0$ errors, a form of penalized (regularized)
-regression. We also examine $L_0$ isotonic regression on multidimensional
-coordinate-wise orderings. Previous algorithms took $\Theta(n^3)$ time, but we
-reduce this to $o(n^{3/2})$.
-</p></div>
-    </summary>
-    <updated>2021-06-02T22:48:38Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00274</id>
-    <link href="http://arxiv.org/abs/2106.00274" rel="alternate" type="text/html"/>
-    <title>Analysis of classifiers robust to noisy labels</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Alex Díaz, Damian Steele <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00274">PDF</a><br/><b>Abstract: </b>We explore contemporary robust classification algorithms for overcoming
-class-dependant labelling noise: Forward, Importance Re-weighting and
-T-revision. The classifiers are trained and evaluated on class-conditional
-random label noise data while the final test data is clean. We demonstrate
-methods for estimating the transition matrix in order to obtain better
-classifier performance when working with noisy data. We apply deep learning to
-three data-sets and derive an end-to-end analysis with unknown noise on the
-CIFAR data-set from scratch. The effectiveness and robustness of the
-classifiers are analysed, and we compare and contrast the results of each
-experiment are using top-1 accuracy as our criterion.
-</p></div>
-    </summary>
-    <updated>2021-06-02T22:48:33Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00232</id>
-    <link href="http://arxiv.org/abs/2106.00232" rel="alternate" type="text/html"/>
-    <title>Multimodal Transportation with Ridesharing of Personal Vehicles</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/g/Gu:Qian=Ping.html">Qian-Ping Gu</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Liang:Jiajian_Leo.html">Jiajian Leo Liang</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00232">PDF</a><br/><b>Abstract: </b>The current public transportation system is unable to keep up with the
-growing passenger demand as the population grows in urban areas. The slow or
-lack of improvements for public transportation pushes people to use private
-transportation modes, such as carpooling and ridesharing. However, the
-occupancy rate of personal vehicles has been dropping in many cities. In this
-paper, we propose a centralized transit system that integrates public transit
-and ridesharing, which is capable of matching drivers and public transit riders
-such that the riders would result in shorter travel time. The optimization goal
-of the system is to assign as many riders to drivers as possible for
-ridesharing. We describe an exact approach and approximation algorithms to
-achieve the optimization goal. We conduct an extensive computational study to
-show the effectiveness of the transit system for different approximation
-algorithms. Our experiments are based on the real-world traffic data in Chicago
-City; the data sets include both public transit and ridesharing trip
-information. The experiment results show that our system is able to assign more
-than 60% of riders to drivers, leading to a substantial increase in occupancy
-rate of personal vehicles and reducing riders' travel time.
-</p></div>
-    </summary>
-    <updated>2021-06-02T22:50:44Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00220</id>
-    <link href="http://arxiv.org/abs/2106.00220" rel="alternate" type="text/html"/>
-    <title>Integer Coordinates for Intrinsic Geometry Processing</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>Mark Gillespie, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Sharp:Nicholas.html">Nicholas Sharp</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Crane:Keenan.html">Keenan Crane</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00220">PDF</a><br/><b>Abstract: </b>In this work, we present a general, efficient, and provably robust
-representation for intrinsic triangulations. These triangulations have emerged
-as a powerful tool for robust geometry processing of surface meshes, taking a
-low-quality mesh and retriangulating it with high-quality intrinsic triangles.
-However, existing representations either support only edge flips, or do not
-offer a robust procedure to recover the common subdivision, that is, how the
-intrinsic triangulation sits along the original surface. To build a
-general-purpose robust structure, we extend the framework of normal
-coordinates, which have been deeply studied in topology, as well as the more
-recent idea of roundabouts from geometry processing, to support a variety of
-mesh processing operations like vertex insertions, edge splits, etc. The basic
-idea is to store an integer per mesh edge counting the number of times a curve
-crosses that edge. We show that this paradigm offers a highly effective
-representation for intrinsic triangulations with strong robustness guarantees.
-The resulting data structure is general and efficient, while offering a
-guarantee of always encoding a valid subdivision. Among other things, this
-allows us to generate a high-quality intrinsic Delaunay refinement of all
-manifold meshes in the challenging Thingi10k dataset for the first time. This
-enables a broad class of existing surface geometry algorithms to be applied
-out-of-the-box to low-quality triangulations.
-</p></div>
-    </summary>
-    <updated>2021-06-02T23:01:02Z</updated>
+    <updated>2021-06-03T23:09:57Z</updated>
     <author>
       <name/>
     </author>
@@ -717,211 +834,40 @@ out-of-the-box to low-quality triangulations.
       <link href="http://export.arxiv.org/rss/cs.CG" rel="self" type="application/rdf+xml"/>
       <subtitle>Computer Science -- Computational Geometry (cs.CG) updates on the arXiv.org e-print archive</subtitle>
       <title>cs.CG updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
+      <updated>2021-06-03T01:30:00Z</updated>
     </source>
   </entry>
 
   <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00185</id>
-    <link href="http://arxiv.org/abs/2106.00185" rel="alternate" type="text/html"/>
-    <title>Construction of Simplicial Complexes with Prescribed Degree-Size Sequences</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/y/Yen:Tzu=Chi.html">Tzu-Chi Yen</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00185">PDF</a><br/><b>Abstract: </b>We study the realizability of simplicial complexes with a given pair of
-integer sequences, representing the node degree distribution and facet size
-distribution, respectively. While the $s$-uniform variant of the problem is
-$\mathsf{NP}$-complete when $s \geq 3$, we identify two populations of input
-sequences, most of which can be solved in polynomial time using a recursive
-algorithm that we contribute. Combining with a sampler for the simplicial
-configuration model [Young $\textit{et al.}$, Phys. Rev. E $\textbf{96}$,
-032312 (2017)], we facilitate efficient sampling of simplicial ensembles from
-arbitrary degree and size distributions. We find that, contrary to expectations
-based on dyadic networks, increasing nodes' degrees reduces the number of loops
-in simplicial complexes. Our work unveils a fundamental constraint on the
-degree-size sequences and sheds light on further analysis of higher-order
-phenomena based on local structures.
+    <id>http://arxiv.org/abs/2106.00714</id>
+    <link href="http://arxiv.org/abs/2106.00714" rel="alternate" type="text/html"/>
+    <title>Parallel Polynomial Permanent Mod Powers of 2 and Shortest Disjoint Cycles</title>
+    <feedworld_mtime>1622678400</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/d/Datta:Samir.html">Samir Datta</a>, Kishlaya Jaiswal <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00714">PDF</a><br/><b>Abstract: </b>We present a parallel algorithm for permanent mod 2^k of a matrix of
+univariate integer polynomials. It places the problem in ParityL subset of
+NC^2. This extends the techniques of [Valiant], [Braverman, Kulkarni, Roy] and
+[Bj\"orklund, Husfeldt], and yields a (randomized) parallel algorithm for
+shortest 2-disjoint paths improving upon the recent result from (randomized)
+polynomial time.
+</p>
+<p>We also recognize the disjoint paths problem as a special case of finding
+disjoint cycles, and present (randomized) parallel algorithms for finding a
+shortest cycle and shortest 2-disjoint cycles passing through any given fixed
+number of vertices or edges.
 </p></div>
     </summary>
-    <updated>2021-06-02T22:42:04Z</updated>
+    <updated>2021-06-03T22:38:58Z</updated>
     <author>
       <name/>
     </author>
     <source>
       <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <category term="Computer Science -- Computational Complexity"/>
       <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00157</id>
-    <link href="http://arxiv.org/abs/2106.00157" rel="alternate" type="text/html"/>
-    <title>Scalar Field Comparison with Topological Descriptors: Properties and Applications for Scientific Visualization</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/y/Yan:Lin.html">Lin Yan</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Masood:Talha_Bin.html">Talha Bin Masood</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Sridharamurthy:Raghavendra.html">Raghavendra Sridharamurthy</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/r/Rasheed:Farhan.html">Farhan Rasheed</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Natarajan:Vijay.html">Vijay Natarajan</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Hotz:Ingrid.html">Ingrid Hotz</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/w/Wang:Bei.html">Bei Wang</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00157">PDF</a><br/><b>Abstract: </b>In topological data analysis and visualization, topological descriptors such
-as persistence diagrams, merge trees, contour trees, Reeb graphs, and
-Morse-Smale complexes play an essential role in capturing the shape of scalar
-field data. We present a state-of-the-art report on scalar field comparison
-using topological descriptors. We provide a taxonomy of existing approaches
-based on visualization tasks associated with three categories of data: single
-fields, time-varying fields, and ensembles. These tasks include symmetry
-detection, periodicity detection, key event/feature detection, feature
-tracking, clustering, and structure statistics. Our main contributions include
-the formulation of a set of desirable mathematical and computational properties
-of comparative measures, and the classification of visualization tasks and
-applications that are enabled by these measures.
-</p></div>
-    </summary>
-    <updated>2021-06-02T23:01:21Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Computational Geometry"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.CG" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Computational Geometry (cs.CG) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.CG updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00124</id>
-    <link href="http://arxiv.org/abs/2106.00124" rel="alternate" type="text/html"/>
-    <title>Multidimensional Included and Excluded Sums</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/x/Xu:Helen.html">Helen Xu</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/f/Fraser:Sean.html">Sean Fraser</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Leiserson:Charles_E=.html">Charles E. Leiserson</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00124">PDF</a><br/><b>Abstract: </b>This paper presents algorithms for the included-sums and excluded-sums
-problems used by scientific computing applications such as the fast multipole
-method. These problems are defined in terms of a $d$-dimensional array of $N$
-elements and a binary associative operator~$\oplus$ on the elements. The
-included-sum problem requires that the elements within overlapping boxes
-cornered at each element within the array be reduced using $\oplus$. The
-excluded-sum problem reduces the elements outside each box. The weak versions
-of these problems assume that the operator $\oplus$ has an inverse $\ominus$,
-whereas the strong versions do not require this assumption. In addition to
-studying existing algorithms to solve these problems, we introduce three new
-algorithms.
-</p>
-<p>The bidirectional box-sum (BDBS) algorithm solves the strong included-sums
-problem in $\Theta(d N)$ time, asymptotically beating the classical summed-area
-table (SAT) algorithm, which runs in $\Theta(2^d N)$ and which only solves the
-weak version of the problem. Empirically, the BDBS algorithm outperforms the
-SAT algorithm in higher dimensions by up to $17.1\times$.
-</p>
-<p>The \defn{box-complement} algorithm can solve the strong excluded-sums
-problem in $\Theta(d N)$ time, asymptotically beating the state-of-the-art
-corners algorithm by Demaine et al., which runs in $\Omega(2^d N)$ time. In 3
-dimensions the box-complement algorithm empirically outperforms the corners
-algorithm by about $1.4\times$ given similar amounts of space.
-</p>
-<p>The weak excluded-sums problem can be solved in $\Theta(d N)$ time by the
-bidirectional box-sum complement (BDBSC) algorithm, which is a trivial
-extension of the BDBS algorithm. Given an operator inverse $\ominus$, BDBSC can
-beat box-complement by up to a factor of $4$.
-</p></div>
-    </summary>
-    <updated>2021-06-02T22:40:18Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00091</id>
-    <link href="http://arxiv.org/abs/2106.00091" rel="alternate" type="text/html"/>
-    <title>Optimal Algorithms for Multiwinner Elections and the Chamberlin-Courant Rule</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Munagala:Kamesh.html">Kamesh Munagala</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Shen:Zeyu.html">Zeyu Shen</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/w/Wang:Kangning.html">Kangning Wang</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00091">PDF</a><br/><b>Abstract: </b>We consider the algorithmic question of choosing a subset of candidates of a
-given size $k$ from a set of $m$ candidates, with knowledge of voters' ordinal
-rankings over all candidates. We consider the well-known and classic scoring
-rule for achieving diverse representation: the Chamberlin-Courant (CC) or
-$1$-Borda rule, where the score of a committee is the average over the voters,
-of the rank of the best candidate in the committee for that voter; and its
-generalization to the average of the top $s$ best candidates, called the
-$s$-Borda rule.
-</p>
-<p>Our first result is an improved analysis of the natural and well-studied
-greedy heuristic. We show that greedy achieves a $\left(1 -
-\frac{2}{k+1}\right)$-approximation to the maximization (or satisfaction)
-version of CC rule, and a $\left(1 - \frac{2s}{k+1}\right)$-approximation to
-the $s$-Borda score. Our result improves on the best known approximation
-algorithm for this problem. We show that these bounds are almost tight.
-</p>
-<p>For the dissatisfaction (or minimization) version of the problem, we show
-that the score of $\frac{m+1}{k+1}$ can be viewed as an optimal benchmark for
-the CC rule, as it is essentially the best achievable score of any
-polynomial-time algorithm even when the optimal score is a polynomial factor
-smaller (under standard computational complexity assumptions). We show that
-another well-studied algorithm for this problem, called the Banzhaf rule,
-attains this benchmark.
-</p>
-<p>We finally show that for the $s$-Borda rule, when the optimal value is small,
-these algorithms can be improved by a factor of $\tilde \Omega(\sqrt{s})$ via
-LP rounding. Our upper and lower bounds are a significant improvement over
-previous results, and taken together, not only enable us to perform a finer
-comparison of greedy algorithms for these problems, but also provide analytic
-justification for using such algorithms in practice.
-</p></div>
-    </summary>
-    <updated>2021-06-02T22:49:18Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2106.00001</id>
-    <link href="http://arxiv.org/abs/2106.00001" rel="alternate" type="text/html"/>
-    <title>Privately Learning Subspaces</title>
-    <feedworld_mtime>1622592000</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Singhal:Vikrant.html">Vikrant Singhal</a>, Thomas Steinke <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2106.00001">PDF</a><br/><b>Abstract: </b>Private data analysis suffers a costly curse of dimensionality. However, the
-data often has an underlying low-dimensional structure. For example, when
-optimizing via gradient descent, the gradients often lie in or near a
-low-dimensional subspace. If that low-dimensional structure can be identified,
-then we can avoid paying (in terms of privacy or accuracy) for the high ambient
-dimension.
-</p>
-<p>We present differentially private algorithms that take input data sampled
-from a low-dimensional linear subspace (possibly with a small amount of error)
-and output that subspace (or an approximation to it). These algorithms can
-serve as a pre-processing step for other procedures.
-</p></div>
-    </summary>
-    <updated>2021-06-02T22:41:54Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2021-06-02T01:30:00Z</updated>
+      <link href="http://export.arxiv.org/rss/cs.CC" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Computational Complexity (cs.CC) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.CC updates on arXiv.org</title>
+      <updated>2021-06-03T01:30:00Z</updated>
     </source>
   </entry>
 
@@ -1093,7 +1039,7 @@ serve as a pre-processing step for other procedures.
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2021-06-03T22:20:31Z</updated>
+      <updated>2021-06-03T23:12:10Z</updated>
     </source>
   </entry>
 
@@ -1133,7 +1079,7 @@ serve as a pre-processing step for other procedures.
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-06-03T22:21:49Z</updated>
+      <updated>2021-06-03T23:14:41Z</updated>
     </source>
   </entry>
 
@@ -1305,7 +1251,7 @@ serve as a pre-processing step for other procedures.
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-06-03T22:20:29Z</updated>
+      <updated>2021-06-03T23:12:08Z</updated>
     </source>
   </entry>
 
@@ -1387,7 +1333,7 @@ serve as a pre-processing step for other procedures.
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2021-06-03T22:21:24Z</updated>
+      <updated>2021-06-03T23:13:42Z</updated>
     </source>
   </entry>
 
@@ -1485,7 +1431,7 @@ Ken notes that “Trust but verify” was first the Russian proverb <i>Doveryay 
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-06-03T22:20:35Z</updated>
+      <updated>2021-06-03T23:12:19Z</updated>
     </source>
   </entry>
 
@@ -1514,7 +1460,7 @@ Email: ilya.volkovich@bc.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-06-03T22:20:38Z</updated>
+      <updated>2021-06-03T23:12:24Z</updated>
     </source>
   </entry>
 
@@ -1841,7 +1787,7 @@ The puzzle key:</p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-06-03T22:20:35Z</updated>
+      <updated>2021-06-03T23:12:19Z</updated>
     </source>
   </entry>
 
@@ -1872,7 +1818,7 @@ We also show a hardness result when the degrees of the rational functions are hi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-03T22:20:25Z</updated>
+      <updated>2021-06-03T23:11:43Z</updated>
     </source>
   </entry>
 
@@ -1894,7 +1840,7 @@ We also show a hardness result when the degrees of the rational functions are hi
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-03T22:20:25Z</updated>
+      <updated>2021-06-03T23:11:43Z</updated>
     </source>
   </entry>
 
@@ -1955,6 +1901,59 @@ We also show a hardness result when the degrees of the rational functions are hi
       <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
       <title xml:lang="en-US">Shtetl-Optimized</title>
       <updated>2021-06-01T20:00:21Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://cstheory-events.org/2021/05/21/international-school-conference-in-algorithms-combinatorics-and-complexity/</id>
+    <link href="https://cstheory-events.org/2021/05/21/international-school-conference-in-algorithms-combinatorics-and-complexity/" rel="alternate" type="text/html"/>
+    <title>International School-conference in Algorithms, Combinatorics, and Complexity</title>
+    <summary>May 24-28, 2021 Online https://indico.eimi.ru/event/199/ An advanced school for young researchers featuring three minicourses in vibrant areas of mathematics and computer science. The target audience includes graduate, master, and senior bachelor students of any mathematical speciality.</summary>
+    <updated>2021-05-21T09:14:41Z</updated>
+    <published>2021-05-21T09:14:41Z</published>
+    <category term="school"/>
+    <author>
+      <name>shacharlovett</name>
+    </author>
+    <source>
+      <id>https://cstheory-events.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://cstheory-events.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://cstheory-events.org" rel="alternate" type="text/html"/>
+      <link href="https://cstheory-events.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
+      <title>CS Theory Events</title>
+      <updated>2021-06-03T23:13:40Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://tcsplus.wordpress.com/?p=562</id>
+    <link href="https://tcsplus.wordpress.com/2021/05/20/tcs-talk-wednesday-may-26-kira-goldner-columbia-university/" rel="alternate" type="text/html"/>
+    <title>TCS+ talk: Wednesday, May 26 — Kira Goldner, Columbia University</title>
+    <summary>The next TCS+ talk will take place this coming Wednesday, May 26th at 1:00 PM Eastern Time (10:00 AM Pacific Time, 19:00 Central European Time, 17:00 UTC). Kira Goldner from Columbia University will speak about “An Overview of Using Mechanism Design for Social Good” (abstract below). You can reserve a spot as an individual or […]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The next TCS+ talk will take place this coming Wednesday, May 26th at 1:00 PM Eastern Time (10:00 AM Pacific Time, 19:00 Central European Time, 17:00 UTC). <a href="https://www.kiragoldner.com/"><strong>Kira Goldner</strong></a> from Columbia University will speak about “<em>An Overview of Using Mechanism Design for Social Good</em>” (abstract below).</p>
+<p>You can reserve a spot as an individual or a group to join us live by signing up on <a href="https://sites.google.com/view/tcsplus/welcome/next-tcs-talk">the online form</a>. Due to security concerns, <em>registration is required</em> to attend the interactive talk. (The recorded talk will also be posted <a href="https://sites.google.com/view/tcsplus/welcome/past-talks">on our website</a> afterwards, so people who did not sign up will still be able to watch the talk) As usual, for more information about the TCS+ online seminar series and the upcoming talks, or to <a href="https://sites.google.com/view/tcsplus/welcome/suggest-a-talk">suggest</a> a possible topic or speaker, please see <a href="https://sites.google.com/view/tcsplus/">the website</a>.</p>
+<blockquote class="wp-block-quote"><p>Abstract: In order to accurately predict an algorithm’s outcome and quality when it interacts with participants who have a stake in the outcome, we must design it to be robust to strategic manipulation. This is the subject of algorithmic mechanism design, which borrows ideas from game theory and economics to design robust algorithms. In this talk, I will show how results from the theoretical foundations of algorithmic mechanism design can be used to solve problems of societal concern.</p>
+<p>I will overview recent work in this area in many different applications — housing, labor markets, carbon license allocations, health insurance markets, and more — as well as discuss open problems and directions ripe for tools from both mechanism design and general TCS.</p></blockquote></div>
+    </content>
+    <updated>2021-05-20T21:53:27Z</updated>
+    <published>2021-05-20T21:53:27Z</published>
+    <category term="Announcements"/>
+    <author>
+      <name>plustcs</name>
+    </author>
+    <source>
+      <id>https://tcsplus.wordpress.com</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://tcsplus.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://tcsplus.wordpress.com" rel="alternate" type="text/html"/>
+      <link href="https://tcsplus.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
+      <title>TCS+</title>
+      <updated>2021-06-03T23:13:24Z</updated>
     </source>
   </entry>
 </feed>
