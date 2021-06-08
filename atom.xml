@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-06-08T17:39:55Z</updated>
+  <updated>2021-06-08T18:22:26Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -32,7 +32,1649 @@
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-08T17:37:29Z</updated>
+      <updated>2021-06-08T18:20:34Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>https://gradientscience.org/3db-light/</id>
+    <link href="https://gradientscience.org/3db-light/" rel="alternate" type="text/html"/>
+    <title>3DB: A Framework for Debugging Vision Models</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><a class="bbutton" href="https://arxiv.org/abs/2106.03805" style="float: left; width: 45%; margin-bottom: 0;">
+<i class="fas fa-file-pdf"/>
+    Paper
+</a>
+<a class="bbutton" href="https://github.com/3db/3db/" style="float: left; width: 45%; margin-bottom: 0;">
+<i class="fab fa-github"/>
+   Project Repo
+</a>
+<a class="bbutton" href="https://3db.github.io/3db/usage/quickstart.html" style="float: left; width: 45%;">
+<i class="fas fa-file-alt"/>
+   Documentation and Guides
+</a> 
+<a class="bbutton" href="https://github.com/3db/blog_demo/" style="float: left; width: 45%;">
+<i class="fab fa-github"/>
+   Blog Demo
+</a> 
+<br/></p>
+
+<p><i>In our <a href="https://arxiv.org/abs/2106.03805">latest paper</a>, in collaboration with Microsoft Research, we introduce
+3DB: an extendable, unified framework for debugging and analyzing vision models
+using photorealistic simulation. We’re releasing 3DB as a package, accompanied
+by extensive API documentation, guides, and demos.</i></p>
+
+<p><em>Note: You are now viewing the Javascript-free/lightweight version of this
+post—to see the full version (with interactive plots, diagrams, and models!),
+click <a href="https://gradientscience.org/3db/">here</a></em></p>
+
+<p>Identifying failure modes and biases in vision models is a rapidly
+emerging challenge in machine learning. In high-stakes
+applications, simply deploying models and collecting failures that arise in
+the wild is often difficult, expensive, and irresponsible. To this end, a
+recent line of work in vision focuses on identifying model failure
+modes via in-depth analyses of <a href="https://arxiv.org/abs/1712.02779">image transformations</a> and 
+<a href="https://arxiv.org/abs/1903.12261">corruptions</a>, <a href="https://objectnet.dev">object orientations</a>,
+<a href="https://gradientscience.org/background/">backgrounds</a>, or <a href="https://arxiv.org/abs/1811.12231v2">shape-texture conflicts</a>. These studies 
+(and other similarly important ones) reveal a variety of patterns of
+performance degradation in vision models. Still, performing each such study
+requires time, developing (often complex)
+toolingFor <a href="https://gradientscience.org/background/">our study of image backgrounds</a>, for example, we used a
+combination of bounding boxes and classical computer vision tools to crop out
+image backgrounds. We then had to manually filter out the images for which
+the tools failed. Even for the images where the toolkit succeeded, there
+remained inevitable cropping artifacts., and a willingness to settle for less than perfect simulations of each
+potential failure mode. Our question is: can we support reliable discovery of model failures in a systematic,
+automated, and unified way?</p>
+
+<h2 id="3db-a-rendering-based-debugging-platform">3DB: A Rendering-based Debugging Platform</h2>
+
+<p><img alt="A sampling of the analyses enabled by 3DB." class="bigimg" src="https://gradientscience.org/assets/3db/3db_headline.png"/></p>
+<div class="caption" style="margin-top: 0;">
+A sampling of the analyses enabled by 3DB.
+</div>
+
+<p>In our <a href="https://arxiv.org/abs/2106.03805">latest paper</a>, we try to make progress on this question and propose
+3DB, a platform for automatically identifying and analyzing the failure modes
+of computer vision models using 3D rendering. 3DB aims to allow users to go
+from a testable, robustness-based hypothesis to concrete, photorealistic
+experimental evidence with minimal time and effort.</p>
+
+<p>The platform revolves around the modular workflow pictured below. First,
+users specify a set of 3D objects and environments, as well as a set of 3D
+(or 2D) transformations called controls that determine the space of
+admissible object-environment configurations. 3DB then renders a myriad of
+admissible scenes and feeds them through the user’s computer vision model of
+choice. The user can finally stratify, aggregate, or otherwise analyze the
+results either by reading the outputted JSON, or through the pre-packaged
+dashboard.</p>
+
+<p><img alt="An illustration of the 3DB workflow." class="bigimg" src="https://gradientscience.org/assets/3db/workflow.png"/></p>
+
+<p>3DB easily adapts to a variety of use cases: in particular, users can
+modify and swap out any part of this pipeline (e.g., the renderer, the
+logger, the model type, or the controls) for their own custom-written
+components, without needing to modify any of the 3DB codebase. We’ve compiled <a href="https://3db.github.io/3db/">guides</a>,
+extensive <a href="https://3db.github.io/3db/api_doc.html">API documentation</a>, and a
+<a href="https://github.com/3db/demo">full demo</a> showing how 3DB streamlines model debugging.</p>
+
+<p><strong>In fact, this blog post will double as another demo! We’ll present the (short) code
+necessary to reproduce every plot in the post below using 3DB. You can download 
+the aggregated code for this blog post <a href="https://github.com/3db/blog_demo">here</a>.</strong></p>
+
+<p><em>To set up, follow the steps below—then, in the remainder of this post, press
+“Show/hide code and instructions” to see the steps necessary to reproduce each
+experiment below.</em></p>
+<div class="code-container">
+  <input checked="" class="tab1" id="general-tab1" name="general-tab" type="radio"/>
+  <label for="general-tab1"><i class="fa fa-gear"/>  Setup</label>
+  <input class="tab2" id="general-tab2" name="general-tab" type="radio"/>
+  <label for="general-tab2"><i class="fa fa-code"/>  Config (base.yaml)</label>
+  <div class="line"/>
+  <div class="content-container">
+<div class="content c1">
+<!-- <pre class='wrapped'><code class="markdown"> -->
+<ol class="instructions">
+<li>Clone the  <a href="https://github.com/3db/blog_demo">blog demo <i class="fab fa-github"/></a> repo</li>
+<li>Run <pre>cd blog_demo</pre>, then <pre>bash setup.sh</pre> (assumes
+<pre>unzip</pre> is installed) to download a large Blender environment, then
+<pre>cd ../</pre></li>
+<li>Install 3DB: <pre>curl -L https://git.io/Js8eT | bash /dev/stdin threedb</pre></li>
+<li>Run <pre>conda activate threedb</pre></li>
+<li>Our experiments below will need a <pre>BLENDER_DATA</pre> folder that contains two
+subfolders: <pre>blender_models/</pre> containing 3D models (<pre>.blend</pre> files with a single
+object whose name matches the filename), and <pre>blender_environments/</pre>
+containing environments. We will provide you with these later</li> 
+<li>Separately, make a file called <pre>base.yaml</pre> and paste in the configuration from the next pane.</li>
+</ol>
+<!-- </code></pre> -->
+</div>
+<div class="content c2"><pre><code class="YAML">
+inference:
+  module: 'torchvision.models'
+  label_map: 'blog_demo/resources/imagenet_mapping.json'
+  class: 'resnet18'
+  normalization:
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+  resolution: [224, 224]
+  args:
+    pretrained: True
+evaluation:
+  module: 'threedb.evaluators.classification'
+  args:
+    classmap_path: 'blog_demo/resources/ycb_to_IN.json'
+    topk: 1
+render_args:
+  engine: 'threedb.rendering.render_blender'
+  resolution: 256
+  samples: 16
+policy:
+  module: "threedb.policies.random_search"
+  samples: 5
+logging:
+  logger_modules:
+    - "threedb.result_logging.image_logger"
+    - "threedb.result_logging.json_logger"
+
+</code></pre></div>
+ </div>
+</div>
+
+<h2 id="using-3db">Using 3DB</h2>
+
+<p>Prior works have already used 3D rendering (to great effect) to study biases
+of machine learning models, including pose and context-based biases. Our goal
+is not to propose a specific 3D-rendering based analysis, but
+rather to provide an easy-to-use, highly extendable framework that unifies
+prior analyses (both 3D and 2D) while enabling users to (a) conduct a host of
+new analyses with the same ease and with realistic results; and (b)
+effortlessly <em>compose</em> different factors of variation to understand their
+interplay.</p>
+
+<p>We’ll dedicate the rest of this post to illustrating how one
+might actually use 3DB in practice, focusing on a single example 3D
+model3DB works with any 3D model, and we refer the reader to 
+<a href="https://arxiv.org/abs/2106.03805">our paper</a> for more examples and details.:</p>
+
+<p style="text-align: center;">
+<img src="https://gradientscience.org/assets/3db/plain_mug/plain_mug_1.png" style="display: inline; width: 18%;"/>
+<img src="https://gradientscience.org/assets/3db/plain_mug/plain_mug_2.png" style="display: inline; width: 18%;"/>
+<img src="https://gradientscience.org/assets/3db/plain_mug/plain_mug_3.png" style="display: inline; width: 18%;"/>
+<img src="https://gradientscience.org/assets/3db/plain_mug/plain_mug_4.png" style="display: inline; width: 18%;"/>
+<img src="https://gradientscience.org/assets/3db/plain_mug/plain_mug_5.png" style="display: inline; width: 18%;"/>
+</p>
+<div class="caption" style="margin-top: 0px; margin-bottom: 15px;">
+    The 3D mug model that we'll be using throughout this post.
+</div>
+
+<p>In what follows, we will walk through example applications of 3DB to discover biases of
+ML models (some previously documented, others not). For the sake of brevity,
+we’ll highlight just a few of these (re-)discoveries—to see more, check out
+the <a href="https://arxiv.org/abs/2106.03805">paper</a>. We’ll then demonstrate that the discoveries of 3DB
+transfer pretty reliably to the real world!</p>
+
+<p>Our experiments will all operate on an ImageNet-pretrained
+ResNet-18The classifier has a ~70% validation-set
+accuracy. that has 42% accuracy on images from the
+“coffee mug” ImageNet subclass. While we only study classification in this blog post,
+3DB also supports object detection and can be easily extended to support other
+image-based tasks, such as semantic segmentation, too.</p>
+
+<h2 id="image-background-sensitivity">Image Background Sensitivity</h2>
+
+<p>In one of our <a href="https://gradientscience.org/background/">previous posts</a>,
+we continued a long line of prior work (see, e.g.,
+<a href="https://hal.archives-ouvertes.fr/hal-00171412/file/ZhangMarszalekLazebnikSchmid-IJCV07-ClassificationStudy.pdf">here</a>, <a href="https://arxiv.org/abs/1611.06596">here</a>, <a href="https://arxiv.org/abs/1911.08731">here</a>, etc.) showing that models can be
+over-reliant on image backgrounds, and demonstrated that they are easily
+broken by adversarially chosen backgrounds. To accomplish this, our prior
+analysis used classical computer vision tools to separate foregrounds from
+backgrounds, then pasted foregrounds from one image onto backgrounds from
+another. This process was slow and required extensive quality control to
+ensure that backgrounds and foregrounds were being extracted properly—and
+even when they were, a few artifacts remained:</p>
+
+<div style="margin-bottom: 15px; overflow: hidden; text-align: center;">
+    
+        <img src="https://gradientscience.org/assets/3db/backgrounds-manual/1.JPEG" style="width: 15%; margin: 2px; display: inline;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/backgrounds-manual/2.JPEG" style="width: 15%; margin: 2px; display: inline;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/backgrounds-manual/3.JPEG" style="width: 15%; margin: 2px; display: inline;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/backgrounds-manual/4.JPEG" style="width: 15%; margin: 2px; display: inline;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/backgrounds-manual/5.JPEG" style="width: 15%; margin: 2px; display: inline;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/backgrounds-manual/6.JPEG" style="width: 15%; margin: 2px; display: inline;"/>
+    
+</div>
+
+<p>3DB lets us reproduce these findings effortlessly and without introducing
+such artifacts. To demonstrate this, we use 3DB to render our mug 3D model on
+hundreds of HDRI backgrounds, resulting in images such as:</p>
+
+<div style="margin-bottom: 15px; overflow: hidden;">
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/1.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/2.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/3.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/4.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/5.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/6.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/7.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/8.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/9.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/10.png" style="float: right; width: 20%;"/>
+    
+</div>
+
+<p>We then analyze the performance of a pretrained ResNet-18Recall that this model
+obtains 42% accuracy on the corresponding "coffee mug" ImageNet class subset.on these images. We
+find that the performance of the classifier varies significantly across
+backgrounds, and that accuracy correlates with a crude measure of
+“background simplicity” (the JPEG compressed size of the image—with smaller size corresponding to being more simple).</p>
+
+<p><img alt="Simplicity versus model accuracy for HDRI backgrounds" src="https://gradientscience.org/assets/3db/mug_background_complexity.png"/></p>
+
+<div class="caption">
+A graph plotting average accuracy of our pre-trained ImageNet model (y-axis) on
+images rendered by 3DB while varying the complexity of the rendering backgrounds
+(x-axis). 
+</div>
+
+<p><strong>A note on compositionality</strong>: An important part of 3DB that we don’t discuss here is compositionality, i.e., the ability to put together multiple controls and study their joint effect. For example, in our paper we studied how a model’s prediction vary with various zoom levels and backgrounds of an object. We found that the optimal zoom level varies a lot by background.</p>
+
+<details>
+<strong>Show/hide code and instructions</strong>
+<div class="code-container">
+    <input checked="" class="tab1" id="bg-tab1" name="bg-tab" type="radio"/>
+    <label for="bg-tab1"><i class="fa fa-gear"/>  Setup</label>
+    <input class="tab2" id="bg-tab2" name="bg-tab" type="radio"/>
+    <label for="bg-tab2"><i class="fa fa-code"/>  Config (backgrounds.yaml)</label>
+    <input class="tab3" id="bg-tab3" name="bg-tab" type="radio"/>
+    <label for="bg-tab3"><i class="fa fa-search"/>  Analysis (analyze_bgs.py)</label>
+    <div class="line"/>
+    <div class="content-container">
+<div class="content c1"><pre class="wrapped"><code class="bash">
+# $BLENDER_DATA/blender_environments` contains several backgrounds and
+# $BLENDER_DATA/blender_models contains the 3D model of a mug.
+export BLENDER_DATA=$(realpath blog_demo)/data/backgrounds
+# if you want to use the pre-written material in blog_demo, uncomment:
+# cd blog_demo
+
+# (Optional) Download additional backgrounds you want---e.g., from
+# https://hdrihaven.com/hdris/ (both `.hdr` and `.blend` files work) and put
+# them in BLENDER_DATA/blender_environments. 
+wget https://hdrihaven.com/hdris/PATH/TO/HDRI \
+    -O $BLENDER_DATA/blender_environments
+
+# Direct results
+export RESULTS_FOLDER='results_backgrounds'
+
+# Run 3DB (with the YAML file from the next pane saved as `backgrounds.yaml`):
+threedb_workers 1 $BLENDER_DATA 5555 &gt; client.log &amp;
+threedb_master $BLENDER_DATA backgrounds.yaml $RESULTS_FOLDER 5555
+
+# Analyze results in the dashboard
+python -m threedboard $RESULTS_FOLDER --port 3000
+# Navigate to localhost:3000 to view the results!
+
+# Finally, run analysis using pandas (third pane)
+python analyze_bgs.py
+
+</code></pre></div>
+<div class="content c2"><pre><code class="YAML">
+base_config: "base.yaml"
+policy:
+  module: "threedb.policies.random_search"
+  samples: 20
+controls:
+  - module: "threedb.controls.blender.orientation"
+  - module: "threedb.controls.blender.camera"
+    zoom_factor: [0.7, 1.3]
+    aperture: 8.
+    focal_length: 50.
+  - module: "threedb.controls.blender.denoiser"
+
+</code></pre></div>
+<div class="content c3"><pre><code class="python">
+import pandas as pd
+import numpy as np
+import json
+
+log_lines = open('results_backgrounds/details.log').readlines()
+class_map = json.load(open('results_backgrounds/class_maps.json'))
+df = pd.DataFrame.from_records(list(map(json.loads, log_lines)))
+df['prediction'] = df['prediction'].apply(lambda x: class_map[x[0]])
+df['is_correct'] = (df['is_correct'] == 'True')
+
+res = df.groupby('environment').agg(accuracy=('is_correct', 'mean'),
+        most_frequent_prediction=('prediction', lambda x: x.mode()))
+print(res)
+
+</code></pre></div>
+</div>
+</div>
+</details>
+
+<h2 id="texture-bias">Texture Bias</h2>
+<p>Another <a href="https://arxiv.org/abs/1811.12231v2">recent study</a> of neural network biases showed that in
+contrast to humans, convolutional neural networks (CNNs) rely more on texture
+to recognize objects than on shape. The example below typifies this
+phenomenon—a cat with an elephant texture is recognized as a cat by humans,
+but as an elephant by CNNs:</p>
+
+<p><img alt="Cue-conflict images introduced by Geirhos et al." src="https://gradientscience.org/assets/3db/cue_conflict.png"/></p>
+<div class="caption">
+An example of the cue-conflict images introduced by Geirhos et al. Combining the
+elephant texture with the cat shape results in a mixed image on which CNNs
+consistently predict with the texture signal.
+</div>
+
+<p>This example and others like it (dubbed ‘cue-conflict’ images) provide a
+striking illustration of the contrast between human and CNN-based
+classification mechanisms. Still, just as in the case of image backgrounds,
+creating such images typically necessitates time, technical skill,
+quality control, and/or introduction of unwanted artifacts (for example, in the above figure,
+ideally we would modify only the texture of the cat without altering the background).</p>
+
+<p>However, using 3DB we can easily collect photorealistic empirical evidence of
+texture bias. Without modifying the internal 3DB codebase at all,
+one can write a <a href="https://github.com/3db/3db/blob/main/threedb/controls/blender/material.py">custom control</a> that modifies the texture of
+objects in the scene while keeping the rest intact. With this custom control
+in placeIn fact, the texture-swapping control for this experiment is now 
+pre-packaged with 3DB, since we already wrote it ourselves!, one can simply 
+randomize the texture of the mug across various
+backgrounds, poses and camera parameters before stratifying results:</p>
+
+<p><img alt="Chungus" src="https://gradientscience.org/assets/3db/texture_swap_histograms.png"/></p>
+
+<p>The performance of the pretrained model on mugs (and other objects)
+deteriorates severely upon replacing the mug’s texture with a “wrong” one,
+providing clear corroborating evidence of the texture bias! We noticed in our
+experiments that for some textures (e.g., zebra), the coffee mug was
+consistently misclassified as the corresponding animal, whereas for others
+(e.g., crocodile), the mug is misclassified as either a related class (e.g.,
+turtle or other reptile), or as an unrelated object (e.g., a trash can).</p>
+
+<details>
+<strong>Show/hide code and instructions</strong>
+<div class="code-container">
+    <input checked="" class="tab1" id="texture-tab1" name="texture-tab" type="radio"/>
+    <label for="texture-tab1"><i class="fa fa-gear"/>  Setup</label>
+    <input class="tab2" id="texture-tab2" name="texture-tab" type="radio"/>
+    <label for="texture-tab2"><i class="fa fa-code"/>  Config (texture_swaps.yaml)</label>
+    <input class="tab3" id="texture-tab3" name="texture-tab" type="radio"/>
+    <label for="texture-tab3"><i class="fa fa-search"/>  Analysis (analyze_ts.py)</label>
+    <div class="line"/>
+    <div class="content-container">
+<div class="content c1">
+<pre class="wrapped"><code class="bash">
+# ${BLENDER_DATA}/blender_environments contains several backgrounds,
+# ${BLENDER_DATA}/blender_models contain the 3D model of a mug.
+export BLENDER_DATA=$(realpath blog_demo)/data/texture_swaps
+
+# List the materials that we will use for this post:
+ls blog_demo/data/texture_swaps/blender_control_material
+# You can also make or download blender materials corresponding 
+# to other textures you want to test, and add them to that folder 
+
+# if you want to use the pre-written material in blog_demo, uncomment:
+# cd blog_demo
+
+export RESULTS_FOLDER=results_texture
+
+# Run 3DB (with the YAML file from the next pane saved as texture_swaps.yaml):
+threedb_workers 1 $BLENDER_DATA 5555 &gt; client.log &amp;
+threedb_master $BLENDER_DATA texture_swaps.yaml $RESULTS_FOLDER 5555
+
+# Analyze results in the dashboard
+python -m threedboard $RESULTS_FOLDER --port 3000
+# Navigate to localhost:3000 to view the results!
+
+# Finally, run analysis using pandas (copy from third pane)
+python analyze_ts.py
+
+</code></pre>
+</div>
+<div class="content c2"><pre><code class="YAML">
+base_config: "base.yaml"
+controls:
+  - module: "threedb.controls.blender.orientation"
+    rotation_x: -1.57
+    rotation_y: 0.
+    rotation_z: [-3.14, 3.14]
+  - module: "threedb.controls.blender.position"
+    offset_x: 0.
+    offset_y: 0.5
+    offset_z: 0.
+  - module: "threedb.controls.blender.pin_to_ground"
+    z_ground: 0.25
+  - module: "threedb.controls.blender.camera"
+    zoom_factor: [0.7, 1.3]
+    view_point_x: 1.
+    view_point_y: 1.
+    view_point_z: [0., 1.]
+    aperture: 8.
+    focal_length: 50.
+  - module: "threedb.controls.blender.material"
+    replacement_material: ["cow.blend", "elephant.blend", "zebra.blend", "crocodile.blend", "keep_original"]
+  - module: "threedb.controls.blender.denoiser"
+
+</code></pre></div>
+<div class="content c3"><pre><code class="python">
+import pandas as pd
+import numpy as np
+import json
+
+log_lines = open('results_texture/details.log').readlines()
+class_map = json.load(open('results_texture/class_maps.json'))
+df = pd.DataFrame.from_records(list(map(json.loads, log_lines)))
+df = df.drop('render_args', axis=1).join(pd.DataFrame(df.render_args.values.tolist()))
+df['prediction'] = df['prediction'].apply(lambda x: class_map[x[0]])
+df['is_correct'] = (df['is_correct'] == 'True')
+
+res = df.groupby('MaterialControl.replacement_material').agg(acc=('is_correct', 'mean'),
+      most_frequent_prediction=('prediction', lambda x: x.mode()))
+print(res)
+
+</code></pre></div>
+    </div>
+</div>
+</details>
+
+<h2 id="part-of-object-attribution">Part-of-Object Attribution</h2>
+
+<p>Beyond general hypotheses about model biases, 3DB allows us to test vision
+systems on a more fine-grained level. In the case of our running mug example,
+for instance, we can use the platform to understand which specific parts of
+its 3D mesh correlate with classifier accuracy. Specifically, below we
+generate (and classify) scenes with random mug positions, rotations, and
+backgrounds. Since 3DB stores texture-coordinate information for each
+rendering, we can reconstruct a three-dimensional heatmap that encodes, for
+each point on the surface of the mug, the classifier’s accuracy conditioned
+on that point being visible:</p>
+
+<p style="text-align: center;">
+    <img src="https://gradientscience.org/assets/3db/heatmap_mug/heatmap_mug_1.png" style="width: 18%; display: inline;"/>
+    <img src="https://gradientscience.org/assets/3db/heatmap_mug/heatmap_mug_2.png" style="width: 18%; display: inline;"/>
+    <img src="https://gradientscience.org/assets/3db/heatmap_mug/heatmap_mug_3.png" style="width: 18%; display: inline;"/>
+    <img src="https://gradientscience.org/assets/3db/heatmap_mug/heatmap_mug_4.png" style="width: 18%; display: inline;"/>
+    <img src="https://gradientscience.org/assets/3db/heatmap_mug/heatmap_mug_5.png" style="width: 18%; display: inline;"/>
+</p>
+<div class="caption" style="margin-top: 0px; margin-bottom: 15px;">
+    A part-of-object attribution heatmap for our mug 3D model. <span style="color: red;">Red</span> pixels indicate areas whose visibility most
+    improves accuracy, whereas <span style="color: blue;">blue</span> areas'
+    visibility correlates with incorrect classifications.
+</div>
+
+<p>A number of phenomena stand out from this heatmap, including:</p>
+
+<ol>
+  <li>The classifier is worse when the side of the mug opposite the handle is seen.</li>
+  <li>The classifier is more accurate when the bottom rim is visible.</li>
+  <li>The classifier performs worst when the inside of the mug is visible.</li>
+</ol>
+
+<details>
+<strong>Show/hide code and instructions</strong>
+<div class="code-container">
+    <input checked="" class="tab1" id="pobj-tab1" name="pobj-tab" type="radio"/>
+    <label for="pobj-tab1"><i class="fa fa-gear"/>  Setup</label>
+    <input class="tab2" id="pobj-tab2" name="pobj-tab" type="radio"/>
+    <label for="pobj-tab2"><i class="fa fa-code"/>  Config (part_of_object.yaml)</label>
+    <input class="tab3" id="pobj-tab3" name="pobj-tab" type="radio"/>
+    <label for="pobj-tab3"><i class="fa fa-search"/>  Analysis (analyze_po.py)</label>
+    <div class="line"/>
+    <div class="line"/>
+    <div class="content-container">
+<div class="content c1"><pre class="wrapped"><code class="makefile">
+# point BLENDER_DATA to the environments and models for this experiment
+export BLENDER_DATA=$(realpath blog_demo)/data/part_of_object
+# if you want to use the pre-written material in blog_demo, uncomment:
+# cd blog_demo
+
+# Optionally: download additional backgrounds (`.hdr` or `.blend`) e.g.,
+wget URL -O $BLENDER_DATA/blender_environments/new_env.hdr
+
+# Point results folder to where you want output written
+export RESULTS_FOLDER='results_part_of_object'
+
+# Run 3DB (with the YAML file from the next pane):
+threedb_workers 1 $BLENDER_DATA 5555 &gt; client.log &amp;
+threedb_master $BLENDER_DATA part_of_object.yaml $RESULTS_FOLDER 5555
+
+# Analyze results in the dashboard
+python -m threedboard $RESULTS_FOLDER --port 3000
+# Navigate to localhost:3000 to view the results!
+
+# Run `part_of_object.py` (third pane) to generate the heat map of the mug.
+python po_analysis.py
+
+</code></pre></div>
+<div class="content c2"><pre><code class="YAML">
+base_config: "base.yaml"
+policy:
+  module: "threedb.policies.random_search"
+  samples: 20
+render_args:
+  engine: 'threedb.rendering.render_blender'
+  resolution: 256
+  samples: 16
+  with_uv: True
+controls:
+  - module: "threedb.controls.blender.orientation"
+    rotation_x: -1.57
+    rotation_y: 0.
+    rotation_z: [-3.14, 3.14]
+  - module: "threedb.controls.blender.camera"
+    zoom_factor: [0.7, 1.3]
+    view_point_x: 1.
+    view_point_y: 1.
+    view_point_z: 1.
+    aperture: 8.
+    focal_length: 50.
+  - module: "threedb.controls.blender.denoiser"
+  - module: "threedb.controls.blender.background"
+    H: 1.
+    S: 0.
+    V: 1.
+</code></pre></div>
+<div class="content c3"><pre><code class="python">
+import pandas as pd
+import numpy as np
+import json
+from PIL import Image
+
+DIR = 'results_part_of_object'
+log_lines = open(f'{DIR}/details.log').readlines()
+df = pd.DataFrame.from_records(list(map(json.loads, log_lines)))
+
+# From class index to class name (for readability)
+class_map = json.load(open(f'{DIR}/class_maps.json'))
+df['prediction'] = df['prediction'].apply(lambda x: class_map[x[0]])
+
+# We'll be a little lenient here to get a more interesting heatmap
+df['is_correct'] = df['prediction'].isin(['cup', 'coffee mug'])
+
+uv_num_correct = np.zeros((256, 256))
+uv_num_visible = np.zeros((256, 256))
+for imid in df["id"].unique().tolist():
+    is_correct = float(df.set_index('id').loc[imid]['is_correct'])
+    vis_coords_im = Image.open(f'{DIR}/images/{imid}_uv.png')
+    vis_coords = np.array(vis_coords_im).reshape(-1, 3)
+    # R and G channels encode texture coordinates (x, y), 
+    # B channel is 255 for object and 0 for background
+    # So we will filter by B then only look at R and G.
+    vis_coords = vis_coords[vis_coords[:,2] &gt; 0][:,:2]
+
+    uv_num_visible[vis_coords[:,0], vis_coords[:,1]] += 1.
+    uv_num_correct[vis_coords[:,0], vis_coords[:,1]] += is_correct
+
+# Accuracy = # correct / # visible
+uv_accuracy = uv_num_correct / (uv_num_visible + 1e-4)
+
+# Saves a black-and-white heatmap
+Image.fromarray((255 * uv_accuracy).astype('uint8'))
+
+</code></pre></div>
+</div>
+</div>
+</details>
+<p><br/></p>
+
+<p>Now that we have hypotheses regarding model performance, we can test them! Inspecting
+the ImageNet validation set, we found that our classifier indeed (a) struggles on coffee mugs when the
+handle is not showing (providing a feasible explanation for (1), since the side
+opposite the handle is only visible when the handle itself isn’t), and (b)
+performs worse at higher camera angles (providing a plausible explanation for
+(2)). We want to focus, however, on the third phenomenon,
+i.e., that the classifier performs quite poorly whenever the inside of the
+mug is visible. Why could this be the case? We can use 3DB to gain insight into the
+phenomenon. Specifically, we want to test the following hypothesis: when
+classifying mugs, does our ImageNet model rely on the exact liquid inside the
+cup?</p>
+
+<p>We investigate this hypothesis by writing a custom control that fills
+our mug with various liquids (more precisely, a parameterized mixture of
+water, milk, and coffee):</p>
+
+<p><img alt="Examples of the mugs rendered in this experiment" src="https://gradientscience.org/assets/3db/mug_liquid_experiment_samples.png"/></p>
+<div class="caption">
+Our running example mug, filled with different parameterized liquids: 100% water
+(top left), 100% coffee (top right), 100% milk (bottom right), and a coffee-milk
+mixture (bottom left)
+</div>
+
+<p>In contrast to the last experiment (where we varied the orientation of the
+mug), we render scenes containing the mug in a fixed set of poses that reveal
+the contents—just as in the last experiment, however, we still vary
+background and mug location. We visualize the results below—each cell in
+the heatmap corresponds to a fixed mixture of coffee, water, and milk (i.e.,
+the labeled corners are 100% coffee, 100% milk, and 100% water, and the other
+cells are linear interpolations of these ratios) and the color of the cell
+encodes the relative accuracy of the classifier when the mug is filled with
+that liquid:</p>
+
+<!-- <img src="/assets/3db/mug_liquid_experiment_simplex.png" 
+    class="bigimg" alt="A diagram illustrating how ImageNet classifiers are
+    sensitive to the liquid inside of the rendered mug." /> -->
+
+<p><img alt="" src="https://gradientscience.org/assets/3db/mug_liquid_experiment_simplex.png"/></p>
+
+<div class="caption">
+Measuring the relative effect of the liquid mixture in the mug on model
+predictions. Each cell represents a specific liquid mixture, and the color of
+the cell represents the tendency of the model (averaged over random viewpoints
+and relative to the other cells) to predict "cup"/"pill bottle," "bucket," or
+"mug."
+</div>
+
+<p>It turns out that mug content indeed highly impacts classification:
+our model is much less likely to correctly classify a mug that doesn’t contain coffee!
+This is just one example of how 3DB can help in proving or disproving hypotheses
+about model behavior.</p>
+
+<h2 id="from-simulation-to-reality">From Simulation to Reality</h2>
+
+<p>So far, we’ve used 3DB to discover ML models’ various failure modes and biases
+via photorealistic rendering. To what extent though do the insights
+gleaned from simulated 3DB experiments actually “transfer” to the physical
+world?</p>
+
+<p>To test such transferability, we began by creating a 3D model of a physical room we
+had access to. We also collected eight different 3D models with closely matching
+physical world counterparts—including the mug analyzed above. Next, we used 3DB to find correctly and incorrectly classified
+configurations (pose, orientation, location) of these eight objects inside that
+room. Finally, we replicated these poses (to
+the best of our abilities) in the physical room, and took photos with a
+cellphone camera:</p>
+
+<p><img alt="Samples from our physical-world experiment." class="bigimg" src="https://gradientscience.org/assets/3db/real_life_exp_samples.png"/></p>
+
+<div class="caption">
+Examples of simulated scenes (top) and their re-created counterparts (bottom)
+from our physical-world experiment.
+</div>
+
+<p>We classified these photos with the same vision model as before and measured
+how often the simulated classifier correctness matched correctness on the
+real photographs. We observed an ~85% match! So the failure
+modes identified by 3DB are not merely simulation artifacts, and can indeed arise in
+the real world.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>3DB is a flexible, easy-to-use, and extensible framework for
+identifying model failure modes, uncovering biases, and testing fine-grained
+hypotheses about model behavior. We hope it will prove to be a useful tool
+for debugging vision models.</p>
+<h2 id="bonus-object-detection-web-dashboard-and-more">Bonus: Object Detection, Web Dashboard, and more!</h2>
+
+<p>We’ll wrap up by highlighting some additional capabilities of 3DB that we didn’t
+get to demonstrate in this blog post:</p>
+
+<h3 id="3dboard-a-web-interface-for-exploring-results">3DBoard: a web interface for exploring results</h3>
+
+<p>In all of the code examples above, we showed how to analyze the results of a 3DB
+experiment by loading the output into a <code class="language-plaintext highlighter-rouge">pandas</code> dataframe. For additional
+convenience, however, 3DB also comes with a web-based dashboard for exploring
+experimental results. The following commands suffice to install the dashboard
+and visualize the backgrounds experiment from earlier:</p>
+
+<pre style="padding: 0; margin: 0;"><code class="bash">
+python -m threedboard $RESULTS_DIR/texture_swaps --port 3000
+
+</code>
+</pre>
+
+<p>Navigating to <code class="language-plaintext highlighter-rouge">YOUR_IP:3000</code> should lead you to a page that looks like this:</p>
+
+<p><img alt="Dashboard screenshot" src="https://gradientscience.org/assets/3db/dashboard_screenshot.png"/></p>
+
+<h3 id="object-detection-and-other-tasks">Object detection and other tasks</h3>
+
+<p>In this blog post, we focused on using 3DB to analyze image classification
+models. However, the library also supports object detection out-of-the-box, and
+can easily be extended to support a variety of image-based tasks (e.g.,
+segmentation or regression-based tasks). For example, below we provide a simple
+end-to-end object detection example:</p>
+
+<details>
+<strong>Show/hide code and instructions</strong>
+<div class="code-container">
+    <input checked="" class="tab1" id="objdet-tab1" name="objdet-tab" type="radio"/>
+    <label for="objdet-tab1"><i class="fa fa-gear"/>  Setup</label>
+    <input class="tab2" id="objdet-tab2" name="objdet-tab" type="radio"/>
+    <label for="objdet-tab2"><i class="fa fa-code"/>  Config (part_of_object.yaml)</label>
+    <div class="line"/>
+    <div class="line"/>
+    <div class="content-container">
+<div class="content c1"><pre class="wrapped"><code class="makefile">
+# The object detection example is separate from the rest of the blog demo, so
+# run the following in a separate repo:
+git clone https://github.com/3db/object_detection_demo
+
+# The repo has a data/ folder containing the Blender model (a banana) and some
+# HDRI backgrounds, a classmap.json file mapping the UID of the model to a COCO
+# class, and the detection.yaml file from the next pane.
+cd object_detection_demo/
+
+export BLENDER_DATA=data/
+export RESULTS_FOLDER=results/
+
+# Run 3DB
+threedb_workers 1 $BLENDER_DATA 5555 &gt; client.log &amp; 
+threedb_master $BLENDER_DATA detection.yaml $RESULTS_FOLDER 5555
+
+# Analyze results in the dashboard
+python -m threedboard $RESULTS_FOLDER --port 3000
+# Navigate to localhost:3000 to view the results!
+
+</code></pre></div> 
+<div class="content c2"><pre><code class="YAML">
+inference:
+  module: 'torchvision.models.detection'
+  class: 'retinanet_resnet50_fpn'
+  label_map: './resources/coco_mapping.json'
+  normalization:
+    mean: [0., 0., 0.]
+    std: [1., 1., 1.]
+  resolution: [224, 224]
+  args:
+    pretrained: True
+evaluation:
+  module: 'threedb.evaluators.detection'
+  args:
+    iou_threshold: 0.5
+    nms_threshold: 0.1
+    max_num_boxes: 10
+    classmap_path: 'classmap.json'
+render_args:
+  engine: 'threedb.rendering.render_blender'
+  resolution: 256
+  samples: 16
+  with_segmentation: true
+policy:
+  module: "threedb.policies.random_search"
+  samples: 2
+logging:
+  logger_modules:
+    - "threedb.result_logging.image_logger"
+    - "threedb.result_logging.json_logger"
+controls:
+  - module: "threedb.controls.blender.orientation"
+  - module: "threedb.controls.blender.camera"
+    zoom_factor: [0.7, 1.3]
+    aperture: 8.
+    focal_length: 50.
+  - module: "threedb.controls.blender.denoiser"
+
+</code></pre></div>
+</div>
+</div>
+</details></div>
+    </summary>
+    <updated>2021-06-08T00:00:00Z</updated>
+    <published>2021-06-08T00:00:00Z</published>
+    <source>
+      <id>https://gradientscience.org/</id>
+      <author>
+        <name>Gradient Science</name>
+      </author>
+      <link href="https://gradientscience.org/" rel="alternate" type="text/html"/>
+      <link href="https://gradientscience.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Research highlights and perspectives on machine learning and optimization from MadryLab.</subtitle>
+      <title>gradient science</title>
+      <updated>2021-06-08T18:20:54Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>https://gradientscience.org/3db/</id>
+    <link href="https://gradientscience.org/3db/" rel="alternate" type="text/html"/>
+    <title>3DB: A Framework for Debugging Vision Models</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><a class="bbutton" href="https://arxiv.org/abs/2106.03805" style="float: left; width: 45%; margin-bottom: 0;">
+<i class="fas fa-file-pdf"/>
+    Paper
+</a>
+<a class="bbutton" href="https://github.com/3db/3db/" style="float: left; width: 45%; margin-bottom: 0;">
+<i class="fab fa-github"/>
+   Project Repo
+</a>
+<a class="bbutton" href="https://3db.github.io/3db/usage/quickstart.html" style="float: left; width: 45%;">
+<i class="fas fa-file-alt"/>
+   Documentation and Guides
+</a> 
+<a class="bbutton" href="https://github.com/3db/blog_demo/" style="float: left; width: 45%;">
+<i class="fab fa-github"/>
+   Blog Demo
+</a> 
+<br/></p>
+
+<p><i>In our <a href="https://arxiv.org/abs/2106.03805">latest paper</a>, in collaboration with Microsoft Research, we introduce
+3DB: an extendable, unified framework for debugging and analyzing vision models
+using photorealistic simulation. We’re releasing 3DB as a package, accompanied
+by extensive API documentation, guides, and demos.</i></p>
+
+<p><em>Note: this post contains some interactive plots and 3D models that use
+JavaScript: click <a href="https://gradientscience.org/3db-light/">here</a> for a JS-free version of this post.</em></p>
+
+<p>Identifying failure modes and biases in vision models is a rapidly
+emerging challenge in machine learning. In high-stakes
+applications, simply deploying models and collecting failures that arise in
+the wild is often difficult, expensive, and irresponsible. To this end, a
+recent line of work in vision focuses on identifying model failure
+modes via in-depth analyses of <a href="https://arxiv.org/abs/1712.02779">image transformations</a> and 
+<a href="https://arxiv.org/abs/1903.12261">corruptions</a>, <a href="https://objectnet.dev">object orientations</a>,
+<a href="https://gradientscience.org/background/">backgrounds</a>, or <a href="https://arxiv.org/abs/1811.12231v2">shape-texture conflicts</a>. These studies 
+(and other similarly important ones) reveal a variety of patterns of
+performance degradation in vision models. Still, performing each such study
+requires time, developing (often complex)
+toolingFor <a href="https://gradientscience.org/background/">our study of image backgrounds</a>, for example, we used a
+combination of bounding boxes and classical computer vision tools to crop out
+image backgrounds. We then had to manually filter out the images for which
+the tools failed. Even for the images where the toolkit succeeded, there
+remained inevitable cropping artifacts., and a willingness to settle for less than perfect simulations of each
+potential failure mode. Our question is: can we support reliable discovery of model failures in a systematic,
+automated, and unified way?</p>
+
+<h2 id="3db-a-rendering-based-debugging-platform">3DB: A Rendering-based Debugging Platform</h2>
+
+<p><img alt="A sampling of the analyses enabled by 3DB." class="bigimg" src="https://gradientscience.org/assets/3db/3db_headline.png"/></p>
+<div class="caption" style="margin-top: 0;">
+A sampling of the analyses enabled by 3DB.
+</div>
+
+<p>In our <a href="https://arxiv.org/abs/2106.03805">latest paper</a>, we try to make progress on this question and propose
+3DB, a platform for automatically identifying and analyzing the failure modes
+of computer vision models using 3D rendering. 3DB aims to allow users to go
+from a testable, robustness-based hypothesis to concrete, photorealistic
+experimental evidence with minimal time and effort.</p>
+
+<p>The platform revolves around the modular workflow pictured below. First,
+users specify a set of 3D objects and environments, as well as a set of 3D
+(or 2D) transformations called controls that determine the space of
+admissible object-environment configurations. 3DB then renders a myriad of
+admissible scenes and feeds them through the user’s computer vision model of
+choice. The user can finally stratify, aggregate, or otherwise analyze the
+results either by reading the outputted JSON, or through the pre-packaged
+dashboard.</p>
+
+<p><img alt="An illustration of the 3DB workflow." class="bigimg" src="https://gradientscience.org/assets/3db/workflow.png"/></p>
+
+<p>3DB easily adapts to a variety of use cases: in particular, users can
+modify and swap out any part of this pipeline (e.g., the renderer, the
+logger, the model type, or the controls) for their own custom-written
+components, without needing to modify any of the 3DB codebase. We’ve compiled <a href="https://3db.github.io/3db/">guides</a>,
+extensive <a href="https://3db.github.io/3db/api_doc.html">API documentation</a>, and a
+<a href="https://github.com/3db/demo">full demo</a> showing how 3DB streamlines model debugging.</p>
+
+<p><strong>In fact, this blog post will double as another demo! We’ll present the (short) code
+necessary to reproduce every plot in the post below using 3DB. You can download 
+the aggregated code for this blog post <a href="https://github.com/3db/blog_demo">here</a>.</strong></p>
+
+<p><em>To set up, follow the steps below—then, in the remainder of this post, press
+“Show/hide code and instructions” to see the steps necessary to reproduce each
+experiment below.</em></p>
+<div class="code-container">
+  <input checked="" class="tab1" id="general-tab1" name="general-tab" type="radio"/>
+  <label for="general-tab1"><i class="fa fa-gear"/>  Setup</label>
+  <input class="tab2" id="general-tab2" name="general-tab" type="radio"/>
+  <label for="general-tab2"><i class="fa fa-code"/>  Config (base.yaml)</label>
+  <div class="line"/>
+  <div class="content-container">
+<div class="content c1">
+<!-- <pre class='wrapped'><code class="markdown"> -->
+<ol class="instructions">
+<li>Clone the  <a href="https://github.com/3db/blog_demo">blog demo <i class="fab fa-github"/></a> repo</li>
+<li>Run <pre>cd blog_demo</pre>, then <pre>bash setup.sh</pre> (assumes
+<pre>unzip</pre> is installed) to download a large Blender environment, then
+<pre>cd ../</pre></li>
+<li>Install 3DB: <pre>curl -L https://git.io/Js8eT | bash /dev/stdin threedb</pre></li>
+<li>Run <pre>conda activate threedb</pre></li>
+<li>Our experiments below will need a <pre>BLENDER_DATA</pre> folder that contains two
+subfolders: <pre>blender_models/</pre> containing 3D models (<pre>.blend</pre> files with a single
+object whose name matches the filename), and <pre>blender_environments/</pre>
+containing environments. We will provide you with these later</li> 
+<li>Separately, make a file called <pre>base.yaml</pre> and paste in the configuration from the next pane.</li>
+</ol>
+<!-- </code></pre> -->
+</div>
+<div class="content c2"><pre><code class="YAML">
+inference:
+  module: 'torchvision.models'
+  label_map: 'blog_demo/resources/imagenet_mapping.json'
+  class: 'resnet18'
+  normalization:
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+  resolution: [224, 224]
+  args:
+    pretrained: True
+evaluation:
+  module: 'threedb.evaluators.classification'
+  args:
+    classmap_path: 'blog_demo/resources/ycb_to_IN.json'
+    topk: 1
+render_args:
+  engine: 'threedb.rendering.render_blender'
+  resolution: 256
+  samples: 16
+policy:
+  module: "threedb.policies.random_search"
+  samples: 5
+logging:
+  logger_modules:
+    - "threedb.result_logging.image_logger"
+    - "threedb.result_logging.json_logger"
+
+</code></pre></div>
+ </div>
+</div>
+
+<h2 id="using-3db">Using 3DB</h2>
+
+<p>Prior works have already used 3D rendering (to great effect) to study biases
+of machine learning models, including pose and context-based biases. Our goal
+is not to propose a specific 3D-rendering based analysis, but
+rather to provide an easy-to-use, highly extendable framework that unifies
+prior analyses (both 3D and 2D) while enabling users to (a) conduct a host of
+new analyses with the same ease and with realistic results; and (b)
+effortlessly <em>compose</em> different factors of variation to understand their
+interplay.</p>
+
+<p>We’ll dedicate the rest of this post to illustrating how one
+might actually use 3DB in practice, focusing on a single example 3D
+model3DB works with any 3D model, and we refer the reader to 
+<a href="https://arxiv.org/abs/2106.03805">our paper</a> for more examples and details.:</p>
+
+
+
+
+
+<div id="mug-blocker" style="text-align: center;">
+    
+        
+            
+        
+        
+    
+</div>
+<div class="caption" style="margin-top: 0px; margin-bottom: 15px;">
+    The 3D mug model that we'll be using throughout this post. <strong>
+    Click to <a id="mug-interact">enable 
+    interactivity</a>.</strong>
+</div>
+
+<p>In what follows, we will walk through example applications of 3DB to discover biases of
+ML models (some previously documented, others not). For the sake of brevity,
+we’ll highlight just a few of these (re-)discoveries—to see more, check out
+the <a href="https://arxiv.org/abs/2106.03805">paper</a>. We’ll then demonstrate that the discoveries of 3DB
+transfer pretty reliably to the real world!</p>
+
+<p>Our experiments will all operate on an ImageNet-pretrained
+ResNet-18The classifier has a ~70% validation-set
+accuracy. that has 42% accuracy on images from the
+“coffee mug” ImageNet subclass. While we only study classification in this blog post,
+3DB also supports object detection and can be easily extended to support other
+image-based tasks, such as semantic segmentation, too.</p>
+
+<h2 id="image-background-sensitivity">Image Background Sensitivity</h2>
+
+<p>In one of our <a href="https://gradientscience.org/background/">previous posts</a>,
+we continued a long line of prior work (see, e.g.,
+<a href="https://hal.archives-ouvertes.fr/hal-00171412/file/ZhangMarszalekLazebnikSchmid-IJCV07-ClassificationStudy.pdf">here</a>, <a href="https://arxiv.org/abs/1611.06596">here</a>, <a href="https://arxiv.org/abs/1911.08731">here</a>, etc.) showing that models can be
+over-reliant on image backgrounds, and demonstrated that they are easily
+broken by adversarially chosen backgrounds. To accomplish this, our prior
+analysis used classical computer vision tools to separate foregrounds from
+backgrounds, then pasted foregrounds from one image onto backgrounds from
+another. This process was slow and required extensive quality control to
+ensure that backgrounds and foregrounds were being extracted properly—and
+even when they were, a few artifacts remained:</p>
+
+<div style="margin-bottom: 15px; overflow: hidden; text-align: center;">
+    
+        <img src="https://gradientscience.org/assets/3db/backgrounds-manual/1.JPEG" style="width: 15%; margin: 2px; display: inline;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/backgrounds-manual/2.JPEG" style="width: 15%; margin: 2px; display: inline;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/backgrounds-manual/3.JPEG" style="width: 15%; margin: 2px; display: inline;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/backgrounds-manual/4.JPEG" style="width: 15%; margin: 2px; display: inline;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/backgrounds-manual/5.JPEG" style="width: 15%; margin: 2px; display: inline;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/backgrounds-manual/6.JPEG" style="width: 15%; margin: 2px; display: inline;"/>
+    
+</div>
+
+<p>3DB lets us reproduce these findings effortlessly and without introducing
+such artifacts. To demonstrate this, we use 3DB to render our mug 3D model on
+hundreds of HDRI backgrounds, resulting in images such as:</p>
+
+<div style="margin-bottom: 15px; overflow: hidden;">
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/1.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/2.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/3.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/4.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/5.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/6.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/7.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/8.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/9.png" style="float: right; width: 20%;"/>
+    
+        <img src="https://gradientscience.org/assets/3db/background-renders/10.png" style="float: right; width: 20%;"/>
+    
+</div>
+
+<p>We then analyze the performance of a pretrained ResNet-18Recall that this model
+obtains 42% accuracy on the corresponding "coffee mug" ImageNet class subset.on these images. We
+find that the performance of the classifier varies significantly across
+backgrounds, and that accuracy correlates with a crude measure of
+“background simplicity” (the JPEG compressed size of the image—with smaller size corresponding to being more simple).</p>
+
+<div>
+  <canvas id="myChart"/>
+</div>
+
+<div class="caption">
+A graph plotting average accuracy of our pre-trained ImageNet model (y-axis) on
+images rendered by 3DB while varying the complexity of the rendering backgrounds
+(x-axis). 
+</div>
+
+<p><strong>A note on compositionality</strong>: An important part of 3DB that we don’t discuss here is compositionality, i.e., the ability to put together multiple controls and study their joint effect. For example, in our paper we studied how a model’s prediction vary with various zoom levels and backgrounds of an object. We found that the optimal zoom level varies a lot by background.</p>
+
+<details>
+<strong>Show/hide code and instructions</strong>
+<div class="code-container">
+    <input checked="" class="tab1" id="bg-tab1" name="bg-tab" type="radio"/>
+    <label for="bg-tab1"><i class="fa fa-gear"/>  Setup</label>
+    <input class="tab2" id="bg-tab2" name="bg-tab" type="radio"/>
+    <label for="bg-tab2"><i class="fa fa-code"/>  Config (backgrounds.yaml)</label>
+    <input class="tab3" id="bg-tab3" name="bg-tab" type="radio"/>
+    <label for="bg-tab3"><i class="fa fa-search"/>  Analysis (analyze_bgs.py)</label>
+    <div class="line"/>
+    <div class="content-container">
+<div class="content c1"><pre class="wrapped"><code class="bash">
+# $BLENDER_DATA/blender_environments` contains several backgrounds and
+# $BLENDER_DATA/blender_models contains the 3D model of a mug.
+export BLENDER_DATA=$(realpath blog_demo)/data/backgrounds
+# if you want to use the pre-written material in blog_demo, uncomment:
+# cd blog_demo
+
+# (Optional) Download additional backgrounds you want---e.g., from
+# https://hdrihaven.com/hdris/ (both `.hdr` and `.blend` files work) and put
+# them in BLENDER_DATA/blender_environments. 
+wget https://hdrihaven.com/hdris/PATH/TO/HDRI \
+    -O $BLENDER_DATA/blender_environments
+
+# Direct results
+export RESULTS_FOLDER='results_backgrounds'
+
+# Run 3DB (with the YAML file from the next pane saved as `backgrounds.yaml`):
+threedb_workers 1 $BLENDER_DATA 5555 &gt; client.log &amp;
+threedb_master $BLENDER_DATA backgrounds.yaml $RESULTS_FOLDER 5555
+
+# Analyze results in the dashboard
+python -m threedboard $RESULTS_FOLDER --port 3000
+# Navigate to localhost:3000 to view the results!
+
+# Finally, run analysis using pandas (third pane)
+python analyze_bgs.py
+
+</code></pre></div>
+<div class="content c2"><pre><code class="YAML">
+base_config: "base.yaml"
+policy:
+  module: "threedb.policies.random_search"
+  samples: 20
+controls:
+  - module: "threedb.controls.blender.orientation"
+  - module: "threedb.controls.blender.camera"
+    zoom_factor: [0.7, 1.3]
+    aperture: 8.
+    focal_length: 50.
+  - module: "threedb.controls.blender.denoiser"
+
+</code></pre></div>
+<div class="content c3"><pre><code class="python">
+import pandas as pd
+import numpy as np
+import json
+
+log_lines = open('results_backgrounds/details.log').readlines()
+class_map = json.load(open('results_backgrounds/class_maps.json'))
+df = pd.DataFrame.from_records(list(map(json.loads, log_lines)))
+df['prediction'] = df['prediction'].apply(lambda x: class_map[x[0]])
+df['is_correct'] = (df['is_correct'] == 'True')
+
+res = df.groupby('environment').agg(accuracy=('is_correct', 'mean'),
+        most_frequent_prediction=('prediction', lambda x: x.mode()))
+print(res)
+
+</code></pre></div>
+</div>
+</div>
+</details>
+
+<h2 id="texture-bias">Texture Bias</h2>
+<p>Another <a href="https://arxiv.org/abs/1811.12231v2">recent study</a> of neural network biases showed that in
+contrast to humans, convolutional neural networks (CNNs) rely more on texture
+to recognize objects than on shape. The example below typifies this
+phenomenon—a cat with an elephant texture is recognized as a cat by humans,
+but as an elephant by CNNs:</p>
+
+<p><img alt="Cue-conflict images introduced by Geirhos et al." src="https://gradientscience.org/assets/3db/cue_conflict.png"/></p>
+<div class="caption">
+An example of the cue-conflict images introduced by Geirhos et al. Combining the
+elephant texture with the cat shape results in a mixed image on which CNNs
+consistently predict with the texture signal.
+</div>
+
+<p>This example and others like it (dubbed ‘cue-conflict’ images) provide a
+striking illustration of the contrast between human and CNN-based
+classification mechanisms. Still, just as in the case of image backgrounds,
+creating such images typically necessitates time, technical skill,
+quality control, and/or introduction of unwanted artifacts (for example, in the above figure,
+ideally we would modify only the texture of the cat without altering the background).</p>
+
+<p>However, using 3DB we can easily collect photorealistic empirical evidence of
+texture bias. Without modifying the internal 3DB codebase at all,
+one can write a <a href="https://github.com/3db/3db/blob/main/threedb/controls/blender/material.py">custom control</a> that modifies the texture of
+objects in the scene while keeping the rest intact. With this custom control
+in placeIn fact, the texture-swapping control for this experiment is now 
+pre-packaged with 3DB, since we already wrote it ourselves!, one can simply 
+randomize the texture of the mug across various
+backgrounds, poses and camera parameters before stratifying results:</p>
+
+<div class="widget">
+    <div class="choices_one_full" id="gen">
+    <span class="widgetheading" id="genclass">Choose an Image</span>
+    </div>
+    <div style="border-right: 3px white solid;">
+        <div class="image-container" style="width: 32%; margin-right: 2%;">
+            <h4 style="text-align: center;">Average accuracy (compare to 42% on ImageNet val set)</h4>
+            <canvas id="gen1"/>
+        </div>
+        <div class="image-container" id="gen2" style="width: 66%;">
+            <img class="example-texture" id="gen2-0"/>
+            <img class="example-texture" id="gen2-1"/>
+            <img class="example-texture" id="gen2-2"/>
+            <img class="example-texture" id="gen2-3"/>
+            <img class="example-texture" id="gen2-4"/>
+            <img class="example-texture" id="gen2-5"/>
+            <img class="example-texture" id="gen2-6"/>
+            <img class="example-texture" id="gen2-7"/>
+        </div>
+    </div>
+</div>
+<div style="clear: both;"/>
+<div class="caption">
+<strong>Interactive demo</strong>: select any image in the top two rows to see additional
+samples of that class.
+</div>
+
+<p>The performance of the pretrained model on mugs (and other objects)
+deteriorates severely upon replacing the mug’s texture with a “wrong” one,
+providing clear corroborating evidence of the texture bias! We noticed in our
+experiments that for some textures (e.g., zebra), the coffee mug was
+consistently misclassified as the corresponding animal, whereas for others
+(e.g., crocodile), the mug is misclassified as either a related class (e.g.,
+turtle or other reptile), or as an unrelated object (e.g., a trash can).</p>
+
+<details>
+<strong>Show/hide code and instructions</strong>
+<div class="code-container">
+    <input checked="" class="tab1" id="texture-tab1" name="texture-tab" type="radio"/>
+    <label for="texture-tab1"><i class="fa fa-gear"/>  Setup</label>
+    <input class="tab2" id="texture-tab2" name="texture-tab" type="radio"/>
+    <label for="texture-tab2"><i class="fa fa-code"/>  Config (texture_swaps.yaml)</label>
+    <input class="tab3" id="texture-tab3" name="texture-tab" type="radio"/>
+    <label for="texture-tab3"><i class="fa fa-search"/>  Analysis (analyze_ts.py)</label>
+    <div class="line"/>
+    <div class="content-container">
+<div class="content c1">
+<pre class="wrapped"><code class="bash">
+# ${BLENDER_DATA}/blender_environments contains several backgrounds,
+# ${BLENDER_DATA}/blender_models contain the 3D model of a mug.
+export BLENDER_DATA=$(realpath blog_demo)/data/texture_swaps
+
+# List the materials that we will use for this post:
+ls blog_demo/data/texture_swaps/blender_control_material
+# You can also make or download blender materials corresponding 
+# to other textures you want to test, and add them to that folder 
+
+# if you want to use the pre-written material in blog_demo, uncomment:
+# cd blog_demo
+
+export RESULTS_FOLDER=results_texture
+
+# Run 3DB (with the YAML file from the next pane saved as texture_swaps.yaml):
+threedb_workers 1 $BLENDER_DATA 5555 &gt; client.log &amp;
+threedb_master $BLENDER_DATA texture_swaps.yaml $RESULTS_FOLDER 5555
+
+# Analyze results in the dashboard
+python -m threedboard $RESULTS_FOLDER --port 3000
+# Navigate to localhost:3000 to view the results!
+
+# Finally, run analysis using pandas (copy from third pane)
+python analyze_ts.py
+
+</code></pre>
+</div>
+<div class="content c2"><pre><code class="YAML">
+base_config: "base.yaml"
+controls:
+  - module: "threedb.controls.blender.orientation"
+    rotation_x: -1.57
+    rotation_y: 0.
+    rotation_z: [-3.14, 3.14]
+  - module: "threedb.controls.blender.position"
+    offset_x: 0.
+    offset_y: 0.5
+    offset_z: 0.
+  - module: "threedb.controls.blender.pin_to_ground"
+    z_ground: 0.25
+  - module: "threedb.controls.blender.camera"
+    zoom_factor: [0.7, 1.3]
+    view_point_x: 1.
+    view_point_y: 1.
+    view_point_z: [0., 1.]
+    aperture: 8.
+    focal_length: 50.
+  - module: "threedb.controls.blender.material"
+    replacement_material: ["cow.blend", "elephant.blend", "zebra.blend", "crocodile.blend", "keep_original"]
+  - module: "threedb.controls.blender.denoiser"
+
+</code></pre></div>
+<div class="content c3"><pre><code class="python">
+import pandas as pd
+import numpy as np
+import json
+
+log_lines = open('results_texture/details.log').readlines()
+class_map = json.load(open('results_texture/class_maps.json'))
+df = pd.DataFrame.from_records(list(map(json.loads, log_lines)))
+df = df.drop('render_args', axis=1).join(pd.DataFrame(df.render_args.values.tolist()))
+df['prediction'] = df['prediction'].apply(lambda x: class_map[x[0]])
+df['is_correct'] = (df['is_correct'] == 'True')
+
+res = df.groupby('MaterialControl.replacement_material').agg(acc=('is_correct', 'mean'),
+      most_frequent_prediction=('prediction', lambda x: x.mode()))
+print(res)
+
+</code></pre></div>
+    </div>
+</div>
+</details>
+
+<h2 id="part-of-object-attribution">Part-of-Object Attribution</h2>
+
+<p>Beyond general hypotheses about model biases, 3DB allows us to test vision
+systems on a more fine-grained level. In the case of our running mug example,
+for instance, we can use the platform to understand which specific parts of
+its 3D mesh correlate with classifier accuracy. Specifically, below we
+generate (and classify) scenes with random mug positions, rotations, and
+backgrounds. Since 3DB stores texture-coordinate information for each
+rendering, we can reconstruct a three-dimensional heatmap that encodes, for
+each point on the surface of the mug, the classifier’s accuracy conditioned
+on that point being visible:</p>
+
+<div id="heatmap-blocker" style="text-align: center;">
+    
+        
+            
+        
+        
+        
+    
+</div>
+<div class="caption" style="margin-top: 0px; margin-bottom: 15px;">
+    A part-of-object attribution heatmap for our mug 3D model. <span style="color: red;">Red</span> pixels indicate areas whose visibility most
+    improves accuracy, whereas <span style="color: blue;">blue</span> areas'
+    visibility correlates with incorrect classifications. <strong>Click here to <a id="heatmap-interact">enable
+    interactivity</a>.</strong>
+</div>
+
+<p>A number of phenomena stand out from this heatmap, including:</p>
+
+<ol>
+  <li>The classifier is worse when the side of the mug opposite the handle is seen.</li>
+  <li>The classifier is more accurate when the bottom rim is visible.</li>
+  <li>The classifier performs worst when the inside of the mug is visible.</li>
+</ol>
+
+<details>
+<strong>Show/hide code and instructions</strong>
+<div class="code-container">
+    <input checked="" class="tab1" id="pobj-tab1" name="pobj-tab" type="radio"/>
+    <label for="pobj-tab1"><i class="fa fa-gear"/>  Setup</label>
+    <input class="tab2" id="pobj-tab2" name="pobj-tab" type="radio"/>
+    <label for="pobj-tab2"><i class="fa fa-code"/>  Config (part_of_object.yaml)</label>
+    <input class="tab3" id="pobj-tab3" name="pobj-tab" type="radio"/>
+    <label for="pobj-tab3"><i class="fa fa-search"/>  Analysis (analyze_po.py)</label>
+    <div class="line"/>
+    <div class="line"/>
+    <div class="content-container">
+<div class="content c1"><pre class="wrapped"><code class="makefile">
+# point BLENDER_DATA to the environments and models for this experiment
+export BLENDER_DATA=$(realpath blog_demo)/data/part_of_object
+# if you want to use the pre-written material in blog_demo, uncomment:
+# cd blog_demo
+
+# Optionally: download additional backgrounds (`.hdr` or `.blend`) e.g.,
+wget URL -O $BLENDER_DATA/blender_environments/new_env.hdr
+
+# Point results folder to where you want output written
+export RESULTS_FOLDER='results_part_of_object'
+
+# Run 3DB (with the YAML file from the next pane):
+threedb_workers 1 $BLENDER_DATA 5555 &gt; client.log &amp;
+threedb_master $BLENDER_DATA part_of_object.yaml $RESULTS_FOLDER 5555
+
+# Analyze results in the dashboard
+python -m threedboard $RESULTS_FOLDER --port 3000
+# Navigate to localhost:3000 to view the results!
+
+# Run `part_of_object.py` (third pane) to generate the heat map of the mug.
+python po_analysis.py
+
+</code></pre></div>
+<div class="content c2"><pre><code class="YAML">
+base_config: "base.yaml"
+policy:
+  module: "threedb.policies.random_search"
+  samples: 20
+render_args:
+  engine: 'threedb.rendering.render_blender'
+  resolution: 256
+  samples: 16
+  with_uv: True
+controls:
+  - module: "threedb.controls.blender.orientation"
+    rotation_x: -1.57
+    rotation_y: 0.
+    rotation_z: [-3.14, 3.14]
+  - module: "threedb.controls.blender.camera"
+    zoom_factor: [0.7, 1.3]
+    view_point_x: 1.
+    view_point_y: 1.
+    view_point_z: 1.
+    aperture: 8.
+    focal_length: 50.
+  - module: "threedb.controls.blender.denoiser"
+  - module: "threedb.controls.blender.background"
+    H: 1.
+    S: 0.
+    V: 1.
+</code></pre></div>
+<div class="content c3"><pre><code class="python">
+import pandas as pd
+import numpy as np
+import json
+from PIL import Image
+
+DIR = 'results_part_of_object'
+log_lines = open(f'{DIR}/details.log').readlines()
+df = pd.DataFrame.from_records(list(map(json.loads, log_lines)))
+
+# From class index to class name (for readability)
+class_map = json.load(open(f'{DIR}/class_maps.json'))
+df['prediction'] = df['prediction'].apply(lambda x: class_map[x[0]])
+
+# We'll be a little lenient here to get a more interesting heatmap
+df['is_correct'] = df['prediction'].isin(['cup', 'coffee mug'])
+
+uv_num_correct = np.zeros((256, 256))
+uv_num_visible = np.zeros((256, 256))
+for imid in df["id"].unique().tolist():
+    is_correct = float(df.set_index('id').loc[imid]['is_correct'])
+    vis_coords_im = Image.open(f'{DIR}/images/{imid}_uv.png')
+    vis_coords = np.array(vis_coords_im).reshape(-1, 3)
+    # R and G channels encode texture coordinates (x, y), 
+    # B channel is 255 for object and 0 for background
+    # So we will filter by B then only look at R and G.
+    vis_coords = vis_coords[vis_coords[:,2] &gt; 0][:,:2]
+
+    uv_num_visible[vis_coords[:,0], vis_coords[:,1]] += 1.
+    uv_num_correct[vis_coords[:,0], vis_coords[:,1]] += is_correct
+
+# Accuracy = # correct / # visible
+uv_accuracy = uv_num_correct / (uv_num_visible + 1e-4)
+
+# Saves a black-and-white heatmap
+Image.fromarray((255 * uv_accuracy).astype('uint8'))
+
+</code></pre></div>
+</div>
+</div>
+</details>
+<p><br/></p>
+
+<p>Now that we have hypotheses regarding model performance, we can test them! Inspecting
+the ImageNet validation set, we found that our classifier indeed (a) struggles on coffee mugs when the
+handle is not showing (providing a feasible explanation for (1), since the side
+opposite the handle is only visible when the handle itself isn’t), and (b)
+performs worse at higher camera angles (providing a plausible explanation for
+(2)). We want to focus, however, on the third phenomenon,
+i.e., that the classifier performs quite poorly whenever the inside of the
+mug is visible. Why could this be the case? We can use 3DB to gain insight into the
+phenomenon. Specifically, we want to test the following hypothesis: when
+classifying mugs, does our ImageNet model rely on the exact liquid inside the
+cup?</p>
+
+<p>We investigate this hypothesis by writing a custom control that fills
+our mug with various liquids (more precisely, a parameterized mixture of
+water, milk, and coffee):</p>
+
+<p><img alt="Examples of the mugs rendered in this experiment" src="https://gradientscience.org/assets/3db/mug_liquid_experiment_samples.png"/></p>
+<div class="caption">
+Our running example mug, filled with different parameterized liquids: 100% water
+(top left), 100% coffee (top right), 100% milk (bottom right), and a coffee-milk
+mixture (bottom left)
+</div>
+
+<p>In contrast to the last experiment (where we varied the orientation of the
+mug), we render scenes containing the mug in a fixed set of poses that reveal
+the contents—just as in the last experiment, however, we still vary
+background and mug location. We visualize the results below—each cell in
+the heatmap corresponds to a fixed mixture of coffee, water, and milk (i.e.,
+the labeled corners are 100% coffee, 100% milk, and 100% water, and the other
+cells are linear interpolations of these ratios) and the color of the cell
+encodes the relative accuracy of the classifier when the mug is filled with
+that liquid:</p>
+
+<!-- <img src="/assets/3db/mug_liquid_experiment_simplex.png" 
+    class="bigimg" alt="A diagram illustrating how ImageNet classifiers are
+    sensitive to the liquid inside of the rendered mug." /> -->
+
+<p><img alt="" src="https://gradientscience.org/assets/3db/mug_liquid_experiment_simplex.png"/></p>
+
+<div class="caption">
+Measuring the relative effect of the liquid mixture in the mug on model
+predictions. Each cell represents a specific liquid mixture, and the color of
+the cell represents the tendency of the model (averaged over random viewpoints
+and relative to the other cells) to predict "cup"/"pill bottle," "bucket," or
+"mug."
+</div>
+
+<p>It turns out that mug content indeed highly impacts classification:
+our model is much less likely to correctly classify a mug that doesn’t contain coffee!
+This is just one example of how 3DB can help in proving or disproving hypotheses
+about model behavior.</p>
+
+<h2 id="from-simulation-to-reality">From Simulation to Reality</h2>
+
+<p>So far, we’ve used 3DB to discover ML models’ various failure modes and biases
+via photorealistic rendering. To what extent though do the insights
+gleaned from simulated 3DB experiments actually “transfer” to the physical
+world?</p>
+
+<p>To test such transferability, we began by creating a 3D model of a physical room we
+had access to. We also collected eight different 3D models with closely matching
+physical world counterparts—including the mug analyzed above. Next, we used 3DB to find correctly and incorrectly classified
+configurations (pose, orientation, location) of these eight objects inside that
+room. Finally, we replicated these poses (to
+the best of our abilities) in the physical room, and took photos with a
+cellphone camera:</p>
+
+<p><img alt="Samples from our physical-world experiment." class="bigimg" src="https://gradientscience.org/assets/3db/real_life_exp_samples.png"/></p>
+
+<div class="caption">
+Examples of simulated scenes (top) and their re-created counterparts (bottom)
+from our physical-world experiment.
+</div>
+
+<p>We classified these photos with the same vision model as before and measured
+how often the simulated classifier correctness matched correctness on the
+real photographs. We observed an ~85% match! So the failure
+modes identified by 3DB are not merely simulation artifacts, and can indeed arise in
+the real world.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>3DB is a flexible, easy-to-use, and extensible framework for
+identifying model failure modes, uncovering biases, and testing fine-grained
+hypotheses about model behavior. We hope it will prove to be a useful tool
+for debugging vision models.</p>
+<h2 id="bonus-object-detection-web-dashboard-and-more">Bonus: Object Detection, Web Dashboard, and more!</h2>
+
+<p>We’ll wrap up by highlighting some additional capabilities of 3DB that we didn’t
+get to demonstrate in this blog post:</p>
+
+<h3 id="3dboard-a-web-interface-for-exploring-results">3DBoard: a web interface for exploring results</h3>
+
+<p>In all of the code examples above, we showed how to analyze the results of a 3DB
+experiment by loading the output into a <code class="language-plaintext highlighter-rouge">pandas</code> dataframe. For additional
+convenience, however, 3DB also comes with a web-based dashboard for exploring
+experimental results. The following commands suffice to install the dashboard
+and visualize the backgrounds experiment from earlier:</p>
+
+<pre style="padding: 0; margin: 0;"><code class="bash">
+python -m threedboard $RESULTS_DIR/texture_swaps --port 3000
+
+</code>
+</pre>
+
+<p>Navigating to <code class="language-plaintext highlighter-rouge">YOUR_IP:3000</code> should lead you to a page that looks like this:</p>
+
+<p><img alt="Dashboard screenshot" src="https://gradientscience.org/assets/3db/dashboard_screenshot.png"/></p>
+
+<h3 id="object-detection-and-other-tasks">Object detection and other tasks</h3>
+
+<p>In this blog post, we focused on using 3DB to analyze image classification
+models. However, the library also supports object detection out-of-the-box, and
+can easily be extended to support a variety of image-based tasks (e.g.,
+segmentation or regression-based tasks). For example, below we provide a simple
+end-to-end object detection example:</p>
+
+<details>
+<strong>Show/hide code and instructions</strong>
+<div class="code-container">
+    <input checked="" class="tab1" id="objdet-tab1" name="objdet-tab" type="radio"/>
+    <label for="objdet-tab1"><i class="fa fa-gear"/>  Setup</label>
+    <input class="tab2" id="objdet-tab2" name="objdet-tab" type="radio"/>
+    <label for="objdet-tab2"><i class="fa fa-code"/>  Config (part_of_object.yaml)</label>
+    <div class="line"/>
+    <div class="line"/>
+    <div class="content-container">
+<div class="content c1"><pre class="wrapped"><code class="makefile">
+# The object detection example is separate from the rest of the blog demo, so
+# run the following in a separate repo:
+git clone https://github.com/3db/object_detection_demo
+
+# The repo has a data/ folder containing the Blender model (a banana) and some
+# HDRI backgrounds, a classmap.json file mapping the UID of the model to a COCO
+# class, and the detection.yaml file from the next pane.
+cd object_detection_demo/
+
+export BLENDER_DATA=data/
+export RESULTS_FOLDER=results/
+
+# Run 3DB
+threedb_workers 1 $BLENDER_DATA 5555 &gt; client.log &amp; 
+threedb_master $BLENDER_DATA detection.yaml $RESULTS_FOLDER 5555
+
+# Analyze results in the dashboard
+python -m threedboard $RESULTS_FOLDER --port 3000
+# Navigate to localhost:3000 to view the results!
+
+</code></pre></div> 
+<div class="content c2"><pre><code class="YAML">
+inference:
+  module: 'torchvision.models.detection'
+  class: 'retinanet_resnet50_fpn'
+  label_map: './resources/coco_mapping.json'
+  normalization:
+    mean: [0., 0., 0.]
+    std: [1., 1., 1.]
+  resolution: [224, 224]
+  args:
+    pretrained: True
+evaluation:
+  module: 'threedb.evaluators.detection'
+  args:
+    iou_threshold: 0.5
+    nms_threshold: 0.1
+    max_num_boxes: 10
+    classmap_path: 'classmap.json'
+render_args:
+  engine: 'threedb.rendering.render_blender'
+  resolution: 256
+  samples: 16
+  with_segmentation: true
+policy:
+  module: "threedb.policies.random_search"
+  samples: 2
+logging:
+  logger_modules:
+    - "threedb.result_logging.image_logger"
+    - "threedb.result_logging.json_logger"
+controls:
+  - module: "threedb.controls.blender.orientation"
+  - module: "threedb.controls.blender.camera"
+    zoom_factor: [0.7, 1.3]
+    aperture: 8.
+    focal_length: 50.
+  - module: "threedb.controls.blender.denoiser"
+
+</code></pre></div>
+</div>
+</div>
+</details></div>
+    </summary>
+    <updated>2021-06-08T00:00:00Z</updated>
+    <published>2021-06-08T00:00:00Z</published>
+    <source>
+      <id>https://gradientscience.org/</id>
+      <author>
+        <name>Gradient Science</name>
+      </author>
+      <link href="https://gradientscience.org/" rel="alternate" type="text/html"/>
+      <link href="https://gradientscience.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Research highlights and perspectives on machine learning and optimization from MadryLab.</subtitle>
+      <title>gradient science</title>
+      <updated>2021-06-08T18:20:54Z</updated>
     </source>
   </entry>
 
@@ -67,7 +1709,7 @@
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-06-08T17:38:15Z</updated>
+      <updated>2021-06-08T18:21:06Z</updated>
     </source>
   </entry>
 
@@ -245,7 +1887,7 @@ Steve Chien, <a href="https://www.prateekjain.org/">Prateek Jain</a>, <a href="h
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2021-06-08T17:38:28Z</updated>
+      <updated>2021-06-08T18:21:20Z</updated>
     </source>
   </entry>
 
@@ -355,7 +1997,7 @@ Which “doctor mothers” have you known or been influenced by?</p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-06-08T17:37:42Z</updated>
+      <updated>2021-06-08T18:20:45Z</updated>
     </source>
   </entry>
 
@@ -380,7 +2022,7 @@ Which “doctor mothers” have you known or been influenced by?</p>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2021-06-08T17:39:01Z</updated>
+      <updated>2021-06-08T18:21:52Z</updated>
     </source>
   </entry>
 
@@ -1030,7 +2672,7 @@ Our techniques rely on the representation of stabilizer states as quadratic func
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-08T17:37:29Z</updated>
+      <updated>2021-06-08T18:20:34Z</updated>
     </source>
   </entry>
 
@@ -1056,7 +2698,7 @@ In this paper, we introduce a ``heavy width'' measure for Resolution that allows
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-08T17:37:29Z</updated>
+      <updated>2021-06-08T18:20:34Z</updated>
     </source>
   </entry>
 
@@ -1150,7 +2792,7 @@ Our construction is based on the framework of using correlation breakers and res
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-08T17:37:29Z</updated>
+      <updated>2021-06-08T18:20:34Z</updated>
     </source>
   </entry>
 
@@ -1227,7 +2869,7 @@ the logarithm of tree-like size that might be of independent interest.</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-08T17:37:29Z</updated>
+      <updated>2021-06-08T18:20:34Z</updated>
     </source>
   </entry>
 
@@ -1273,7 +2915,7 @@ and extractors, making them inadequate for the above applications.</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-08T17:37:29Z</updated>
+      <updated>2021-06-08T18:20:34Z</updated>
     </source>
   </entry>
 
@@ -1308,7 +2950,7 @@ and extractors, making them inadequate for the above applications.</summary>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-06-08T17:38:56Z</updated>
+      <updated>2021-06-08T18:21:43Z</updated>
     </source>
   </entry>
 
@@ -1480,7 +3122,7 @@ and extractors, making them inadequate for the above applications.</summary>
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2021-06-08T17:37:39Z</updated>
+      <updated>2021-06-08T18:20:42Z</updated>
     </source>
   </entry>
 
@@ -1520,7 +3162,7 @@ and extractors, making them inadequate for the above applications.</summary>
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-06-08T17:39:50Z</updated>
+      <updated>2021-06-08T18:22:25Z</updated>
     </source>
   </entry>
 
@@ -1692,7 +3334,7 @@ and extractors, making them inadequate for the above applications.</summary>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-06-08T17:37:36Z</updated>
+      <updated>2021-06-08T18:20:40Z</updated>
     </source>
   </entry>
 
@@ -1774,7 +3416,7 @@ and extractors, making them inadequate for the above applications.</summary>
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2021-06-08T17:39:07Z</updated>
+      <updated>2021-06-08T18:21:54Z</updated>
     </source>
   </entry>
 
@@ -1873,71 +3515,7 @@ Ken notes that “Trust but verify” was first the Russian proverb <i>Doveryay 
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-06-08T17:37:45Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-jobs.org/2021/05/26/postdoc-opportunity-in-algebraic-complexity-at-boston-college-apply-by-july-30-2021/</id>
-    <link href="https://cstheory-jobs.org/2021/05/26/postdoc-opportunity-in-algebraic-complexity-at-boston-college-apply-by-july-30-2021/" rel="alternate" type="text/html"/>
-    <title>Postdoc Opportunity in Algebraic Complexity at Boston College (apply by July 30, 2021)</title>
-    <summary>The Computer Science department at Boston College invites applications for a postdoctoral position in the area of algebraic complexity under the supervision of Ilya Volkovich. See attached pamphlet for more information. Please direct any inquiries to Ilya Volkovich (Email: ilya.volkovich@bc.edu) Website: https://sites.google.com/site/ilyavv/Postdoc%20add.pdf Email: ilya.volkovich@bc.edu</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The Computer Science department at Boston College invites applications for a postdoctoral position in the area of algebraic complexity under the supervision of Ilya Volkovich.</p>
-<p>See attached pamphlet for more information.</p>
-<p>Please direct any inquiries to Ilya Volkovich (Email: ilya.volkovich@bc.edu)</p>
-<p>Website: <a href="https://sites.google.com/site/ilyavv/Postdoc%20add.pdf">https://sites.google.com/site/ilyavv/Postdoc%20add.pdf</a><br/>
-Email: ilya.volkovich@bc.edu</p></div>
-    </content>
-    <updated>2021-05-26T21:04:52Z</updated>
-    <published>2021-05-26T21:04:52Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-jobs.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-jobs.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-jobs.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-06-08T17:37:51Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-27705661.post-8805390553192485548</id>
-    <link href="http://processalgebra.blogspot.com/feeds/8805390553192485548/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="http://www.blogger.com/comment.g?blogID=27705661&amp;postID=8805390553192485548" rel="replies" type="text/html"/>
-    <link href="http://www.blogger.com/feeds/27705661/posts/default/8805390553192485548" rel="edit" type="application/atom+xml"/>
-    <link href="http://www.blogger.com/feeds/27705661/posts/default/8805390553192485548" rel="self" type="application/atom+xml"/>
-    <link href="http://processalgebra.blogspot.com/2021/05/course-on-ethics-and-accountability-in.html" rel="alternate" type="text/html"/>
-    <title>Course on Ethics and Accountability in Computer Science</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>About one year ago, I became aware of the course "Ethics and Accountability in Computer Science" designed and taught by <a href="https://riceacademy.rice.edu/junior-fellows/dr-rodrigo-ferreira" target="_blank">Rodrigo Ferreira</a> and <a href="https://www.cs.rice.edu/~vardi/" target="_blank">Moshe Y. Vardi</a> at Rice University. The goals and high-level structure of the course, as well as its context, are described in an informative and thoughtful <a href="https://www.cs.rice.edu/~vardi/papers/sigcse21.pdf" target="_blank">paper</a> by Moshe and Rodrigo that appears in the <a href="https://dl.acm.org/doi/proceedings/10.1145/3408877" target="_blank">Proceedings of the  52nd ACM Technical Symposium on Computer Science Education (SIGCSE ’21)</a>, which I strongly recommend. You can also read a <a href="https://www.pdcnet.org/tej/content/tej_2021_0999_3_31_87" target="_blank">journal paper</a> reporting on one of their course assignments, which was designed to make students focus on practising <a href="https://medium.com/@the_jennitaur/how-to-do-nothing-57e100f59bbb" target="_blank">"deep attention"</a> in the sense of artist and academic <a href="https://www.jennyodell.com/" target="_blank">Jenny Odell</a>.</p><p>I was smitten by the underlying tenet for their course, namely that "social justice is  the single  most important issue  confronting computer science  students today." That tenet is also very much in line with a reflection on the impact that digital technology has on social justice that the <a href="https://www.gssi.it/institute/organization" target="_blank">Scientific Advisory Board of the Gran Sasso Science Institute</a> asked the Computer Science group at that institute to undertake. Therefore, after having invited Rodrigo to deliver a <a href="http://www.google.com/url?q=http%3A%2F%2Ficetcs.ru.is%2Fwebinars%2Fdeep_ethics.mp4&amp;sa=D&amp;sntz=1&amp;usg=AFQjCNH9ux4zX7PThxWzwoNa_yyZNa-ILA" target="_blank">webinar on the course</a> at the <a href="https://sites.google.com/gssi.it/csgssi/seminars-and-events/joint-ice-tcs-csgssi-virtual-seminar" target="_blank">ICE-TCS+GSSI webinar series</a>, I decided that, as an experiment, I would offer a version of the Rice University course to master students in computer science, language technology and software engineering at Reykjavik University during our spring semester 2021. </p><p>Mine was a foolhardy decision for a variety of reasons. However, I have always believed that computer scientists should strive to be the 21st century Renaissance men and women, and bridge the gap between C. P. Snow's <a href="https://en.wikipedia.org/wiki/The_Two_Cultures" target="_blank">"two cultures"</a>. Indeed, to quote <a href="https://ptolemy.berkeley.edu/~eal/" target="_blank">Edward A. Lee</a> freely, to my mind technologists ought to be amongst the greatest humanists of our age. Despite my other commitments, offering a version of the Ferreira-Vardi course at Reykjavik University felt like the right thing to do at this time. </p><p>I taught the course over twelve weeks to a varied group of eight students, in cooperation with <a href="http://claudiopedica.com/" target="_blank">Claudio Pedica</a>. Thanks to the constant support I received from Rodrigo Ferreira, I lived to tell the tale and I hope that I managed to do some justice to the truly excellent course that Moshe and Rodrigo put together. Having a dream team of students with a variety of cultural backgrounds made the course extremely interesting and a learning experience for me. I had to refresh my memory of the philosophy I studied at high school in Italy in a previous life, learn some modern moral philosophy I had not met at school (such as the work by <a href="https://plato.stanford.edu/entries/anscombe/" target="_blank">Elisabeth Anscombe</a> and <a href="https://plato.stanford.edu/entries/philippa-foot/" target="_blank">Philippa Foot</a>, amongst others), read a substantial amount of new material (some of it fresh off the press as the course was unfolding) and broaden my horizons. I could not have asked for a better intellectual experience and the students in the course, from Denmark, France, Germany, Iceland and the Netherlands taught me well, kept me on my toes and stimulated me to keep reading material related to ethics even now that the course is over. <br/></p><p>Teaching the course reinforced my belief that a course on ethics and on the impact that our field has on social justice should be required for all students in computer science. If you plan to run such a course, I strongly recommend that you consider the Ferreira-Vardi course as a blueprint. <br/></p><p><br/></p><p><br/></p><p><br/></p></div>
-    </content>
-    <updated>2021-05-26T19:04:00Z</updated>
-    <published>2021-05-26T19:04:00Z</published>
-    <author>
-      <name>Luca Aceto</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/01092671728833265127</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-27705661</id>
-      <author>
-        <name>Luca Aceto</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/01092671728833265127</uri>
-      </author>
-      <link href="http://processalgebra.blogspot.com/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="http://www.blogger.com/feeds/27705661/posts/default" rel="self" type="application/atom+xml"/>
-      <link href="http://processalgebra.blogspot.com/" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="http://www.blogger.com/feeds/27705661/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>Papers I find interesting---mostly, but not solely, in Process Algebra---, and some fun stuff in Mathematics and Computer Science at large and on general issues related to research, teaching and academic life.</subtitle>
-      <title>Process Algebra Diary</title>
-      <updated>2021-06-01T21:43:16Z</updated>
+      <updated>2021-06-08T18:20:46Z</updated>
     </source>
   </entry>
 </feed>
