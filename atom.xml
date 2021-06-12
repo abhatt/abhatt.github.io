@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-06-12T17:39:02Z</updated>
+  <updated>2021-06-12T18:22:19Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -98,7 +98,148 @@ Typically many candidates are available, but only the most dramatic cases will b
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-06-12T17:37:45Z</updated>
+      <updated>2021-06-12T18:20:43Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2021/06/12/carrying-chip-firing</id>
+    <link href="https://11011110.github.io/blog/2021/06/12/carrying-chip-firing.html" rel="alternate" type="text/html"/>
+    <title>Carrying as chip-firing for the Zeckendorf representation</title>
+    <summary>You may have heard of the Zeckendorf representation according to which any positive integer can be represented as a sum of non-consecutive Fibonacci numbers. Its uses include the optimal strategy in the game of Fibonacci nim. But did you know that it’s possible to efficiently add and subtract Zeckendorf representations?1 The algorithm from the paper linked above takes three passes over the input digit sequences using finite state automata, much like binary number addition can be performed by a single pass of a finite state automaton. I thought it might be interesting to describe an alternative path to the same result, using chip-firing games. Connor Ahlbach, Jeremy Usatine, Christiane Frougny, and Nicholas Pippenger (2013), “Efficient algorithms for Zeckendorf arithmetic”, Fibonacci Quarterly 51 (3): 249–255, arXiv:1207.4497, MR3093678. ↩</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>You may have heard of the <a href="https://en.wikipedia.org/wiki/Zeckendorf%27s_theorem">Zeckendorf representation</a> according to which any positive integer can be represented as a sum of non-consecutive Fibonacci numbers. Its uses include the optimal strategy in the game of <a href="https://en.wikipedia.org/wiki/Fibonacci_nim">Fibonacci nim</a>. But did you know that <a href="https://www.irif.fr/~cf/publications/AUFP.pdf">it’s possible to efficiently add and subtract Zeckendorf representations</a>?<sup id="fnref:a"><a class="footnote" href="https://11011110.github.io/blog/2021/06/12/carrying-chip-firing.html#fn:a" rel="footnote">1</a></sup> The algorithm from the paper linked above takes three passes over the input digit sequences using finite state automata, much like binary number addition can be performed by a single pass of a finite state automaton. I thought it might be interesting to describe an alternative path to the same result, using <a href="https://en.wikipedia.org/wiki/Chip-firing_game">chip-firing games</a>.</p>
+
+<h1 id="the-chip-firing-antimatroid">The chip-firing antimatroid</h1>
+
+<p><a href="https://en.wikipedia.org/wiki/Chip-firing_game">Chip-firing games</a>, or <a href="https://en.wikipedia.org/wiki/Abelian_sandpile_model">sandpile models</a>, are systems described by a graph, with markers of some kind such as coins on its vertices. The graph may possibly be directed, although in the simplest examples it is undirected, and it may be infinite. Each vertex may have arbitrarily many coins on it. But, if a vertex has at least as many coins as it has outgoing edges, we can “fire” the vertex, moving one coin to each neighbor. This repeats until no more such events are possible. Doing this on an infinite square grid with an initial state that piles many coins on a single vertex leads to pretty fractals; here’s a detail of <a href="https://commons.wikimedia.org/wiki/File:Sandpile_on_infinite_grid,_3e7_grains.png">the result of starting with 30 million coins</a>:</p>
+
+<p style="text-align: center;"><img alt="Detail of abelian sandpile model on square grid with 3x10^7 starting coins, extracted from CC-BY-SA image https://commons.wikimedia.org/wiki/File:Sandpile_on_infinite_grid,_3e7_grains.png by colt_browning" src="https://11011110.github.io/blog/assets/2021/sandpile-30M-detail.png" width="80%"/></p>
+
+<p>However, we’ll be looking at this sort of system on one-dimensional infinite graphs, where their behavior is not quite as complicated.</p>
+
+<p>Chip-firing, on any graph and any placement of coins for which it terminates, forms an <a href="https://en.wikipedia.org/wiki/Antimatroid">antimatroid</a>.<sup id="fnref:bls"><a class="footnote" href="https://11011110.github.io/blog/2021/06/12/carrying-chip-firing.html#fn:bls" rel="footnote">2</a></sup> <sup id="fnref:k"><a class="footnote" href="https://11011110.github.io/blog/2021/06/12/carrying-chip-firing.html#fn:k" rel="footnote">3</a></sup> A vertex \(v\) can fire for the \(i\)th time, as long as it has already fired \(i-1\) times and a total of \(i\cdot\deg(v)\) coins have reached it. Once these conditions are met, they remain true until \(v\) fires. This idea, that once the item \((v,i)\) becomes available to be added to the sequence of firings it remains available until it is added, is the defining principle of an antimatroid. From it one can prove that, if any firing sequence terminates in a stable configuration, then all sequences terminate, they all fire the same vertices the same numbers of times, and they all end in the same stable configuration.</p>
+
+<h1 id="binary-carrying-as-chip-firing">Binary carrying as chip-firing</h1>
+
+<p>A binary representation of a number \(x\) is just a set of distinct powers of two, summing to \(x\). If you add two binary numbers \(x\) and \(y\), you can combine their sets into a single multiset; carrying can be thought of as a systematic method of getting rid of the duplicate powers of two in this multiset. Whenever you have two equal powers of two in a multiset, whose sum you are trying to represent, you can merge them with the fusion rule</p>
+
+\[2^i+2^i \Rightarrow 2^{i+1}.\]
+
+<p>This can be thought of as a chip-firing game on a graph where there is a vertex for every power of two, an edge to the next larger power of two, and an edge to a “<a href="https://en.wikipedia.org/wiki/Bit_bucket">bit bucket</a>” vertex with no outgoing edges (which cannot be fired). Each instantiation of the fusion rule fires vertex \(2^i\), moving one coin to \(2^{i+1}\) and one to the bit bucket.</p>
+
+<p>This is exactly what we are doing when we carry a term in binary addition: taking two powers of two from a column of the addition problem and fusing them into a single power of two in the next column. We can also think of this physically, using a one-dimensional array of cells with poker chips or coins on them, with a coin on cell \(i\) representing the number \(2^i\). The fusion rule takes two coins from any cell and replaces them by a single coin in the next cell. In binary addition of pairs of numbers, there are at most three coins per cell (the two that started out there and one carry), but you could use the same fusion rule for addition of more than two numbers, using an array of cells that can each contain a large pile of coins.</p>
+
+<p style="text-align: center;"><img alt="Five stacks of coins. Image Money-2180330 1920.jpg on Wikimedia commons, uploaded by Stella Vogt from pixabay free images, described as &quot;probably free&quot; but tagged with a CC-BY-SA license." src="https://11011110.github.io/blog/assets/2021/stacks-of-coins.jpg" style="border-style: solid; border-color: black;" width="80%"/></p>
+
+<p>Carrying the coin analogy further, we might imagine that the coins have values that are powers of two, and that we are making change by replacing pairs of small coins by a single larger coin of equal value.</p>
+
+<p>Conventional binary arithmetic does these fusion steps in a systematic order, from low-order bits of the binary representation (smaller powers of two) to higher-order bits (larger powers of two). It’s that systematic order, together with the observation that each pile has at most three coins, that makes this method suitable for a finite state machine. But actually, you could apply the fusion rule in any order, and it would work equally well. Each step reduces the number of coins by one, so you can never do more steps than your starting number of coins. We can only halt when we reach the binary representation of the sum, which is uniquely determined, so this process is <a href="https://en.wikipedia.org/wiki/Confluence_(abstract_rewriting)">confluent</a>: every sequence of choices leads to the same eventual outcome. In this case, confluence can also be seen from the antimatroid property of chip-firing games.</p>
+
+<p>This observation about reducing the number of powers of two gives an immediate proof of a fact about binary representations that you may not have known: the binary representation of \(x+y\) has at most as many nonzero bits as there are in \(x\) and \(y\) separately.</p>
+
+<h1 id="chip-firing-for-fibonacci-numbers">Chip-firing for Fibonacci numbers</h1>
+
+<p>Now, instead of coins with power-of-two values, let’s suppose that they have Fibonacci numbers as their values, representing any multiset of Fibonacci numbers. We can still combine pairs of Fibonacci numbers by a fusion rule, that now applies when we have two coins in adjacent piles:</p>
+
+\[F_i + F_{i+1} \Rightarrow F_{i+2}.\]
+
+<p>But in order to get the Zeckendorf representation of the sum of the multiset, we also need to deal with pairs of coins that have the same value, because repeated copies of the same Fibonacci number are not allowed in the Zeckendorf representation. We can accomplish this by a “fission” rule, that steps backwards according to the fusion rule in order to take a bigger step forwards:</p>
+
+\[F_i+F_i \Rightarrow F_{i-2}+F_{i-1}+F_i\Rightarrow F_{i-2}+F_{i+1}.\]
+
+<p>This makes sense even when \(F_i\) is \(1\) or \(2\): for \(F_i=1\), the \(F_{i-2}\) term is zero and can be dropped from the sum, and for \(F_i=2\) it equals one, a Fibonacci number. So as special cases of this rule we have \(1+1\Rightarrow 2\) and \(2+2\Rightarrow 1+3\).</p>
+
+<p>Several issues complicate the analysis of this replacement system. First, although fission by itself is a chip-firing rule on an infinite graph with outdegree two, fission and fusion together make a more complicated system that is not an antimatroid, so different orderings of choosing what to do may lead to different numbers of steps. Second, the fission rule changes the piles of coins both to the left and to the right of the pile to which it applies, making it harder to find a consistent ordering in which to apply these rules. And third, fission preserves the number of coins rather than reducing them, making both the eventual termination of the system and the analysis of how many steps it takes less obvious. But assuming it does terminate, it can only terminate at the Zeckendorf representation, which is unique. So termination implies confluence.</p>
+
+<h1 id="fission-without-fusion">Fission without fusion</h1>
+
+<p>First let’s see what happens if we just use the fission rule, forgetting about the fusion rule. Because fission by itself is a chip-firing rule, any initial state has an invariant number of firings and an invariant final state, regardless of the order of operations. For an initial state with \(n\) copies of \(F_i\), the final state gives us an expansion of \(F_i\) into a sum of \(n\) distinct Fibonacci numbers:</p>
+
+\[F_i = F_i\]
+
+\[2\,F_i = F_{i-2}+F_{i+1}\]
+
+\[3\,F_i=F_{i-2}+F_i+F_{i+1}\]
+
+\[4\,F_i=F_{i-4}+F_{i-3}+F_i+F_{i+2}\]
+
+\[\vdots\]
+
+<p>The indexes appearing in these identities can be summarized in a <a href="https://en.wikipedia.org/wiki/Category:Triangles_of_numbers">triangle of numbers</a>:</p>
+
+\[\begin{array}{ccccccc}
+&amp;&amp;&amp;&amp;&amp;&amp;0&amp;&amp;&amp;&amp;&amp;&amp;\\
+&amp;&amp;&amp;&amp;&amp;-2&amp;&amp;\ 1\ &amp;&amp;&amp;&amp;&amp;\\
+&amp;&amp;&amp;&amp;-2&amp;&amp;0&amp;&amp;\ 1\ &amp;&amp;&amp;&amp;\\
+&amp;&amp;&amp;-4&amp;&amp;-3&amp;&amp;0&amp;&amp;\ 2\ &amp;&amp;&amp;\\
+&amp;&amp;-4&amp;&amp;-3&amp;&amp;-2&amp;&amp;1&amp;&amp;\ 2\ &amp;&amp;\\
+&amp;-4&amp;&amp;-3&amp;&amp;-2&amp;&amp;0&amp;&amp;1&amp;&amp;\ 2\ &amp;\\
+-6&amp;&amp;-5&amp;&amp;-4&amp;&amp;-3&amp;&amp;-1&amp;&amp;1&amp;&amp;\ 3\ \\
+&amp;&amp;&amp;&amp;&amp;&amp;\vdots&amp;&amp;&amp;&amp;&amp;&amp;\\
+\end{array}\]
+
+<p>The largest number in each row grows only logarithmically with \(n\), because of the way the values of the Fibonacci numbers grow exponentially as a function of their index. The fission rule cannot create gaps of three or more empty cells,
+so consecutive numbers in a row differ by at most three, implying that the smallest number in each row is greater than \(-3n\). Because of this linear bound on how far fission can move the coins, we get a quadratic bound on the total number of firing events: each firing decreases the total distance of the coins from cell \(-3n\). This total distance starts at \(3n^2\) and remains positive, so there can  be at most \(3n^2\) firings. In computational experiments up to \(n=10000\) the actual number of firings never exceeded \(n^2\) and appeared to be growing as \(n^2\bigl(1-o(1)\bigr)\). This is a big contrast from the behavior of the similar-looking chip-firing rule on a line of cells that replaces pairs of coins by a coin one cell to the left and a coin one cell to the right, which (with \(n\) chips starting in a pile on one cell) produces a <a href="https://en.wikipedia.org/wiki/Square_pyramidal_number">square pyramidal number</a> of firings, cubic in \(n\).</p>
+
+<p>For initial coins that are not all in one big pile, it remains impossible for fission to produce new long gaps, and we can decompose the sequence of cells into subsequences of linear length separated by gaps too long to be crossed. The same analysis of total distance of coins from the starts of sequences of cells shows that, regardless of starting state, and even if we also allow fusion rules, we get an \(O(n^2)\) bound on the total number of steps. In particular, this system always terminates.</p>
+
+<h1 id="taking-few-steps">Taking few steps</h1>
+
+<p>Fortunately, we don’t have to take quadratic time to simplify sums of Fibonacci numbers into their Zeckendorf representations using these rules. The problem with the previous analysis was that we were doing too much fission before we did any fusion. Suppose we sidestep that with the following prioritization:</p>
+
+<ul>
+  <li>If any fusion step would put a coin into a pile that is currently empty, do it.</li>
+  <li>Otherwise, perform a fission step at the pile with the largest possible index.</li>
+</ul>
+
+<p>If any fusion steps are possible, there must be at least one (for instance, the one with the largest index) that is prioritized. To analyze these prioritized steps, define \(N\) to be the current number of coins, and \(M\) to be the number of coins that are at or below a pile with two or more coins on it. The key insight is that whenever a step moves a coin to a pile with a larger index, it cannot form a new larger-index multi-coin pile, so both \(M\) and \(N\) are non-decreasing. They can stay the same only for a fission step at a pile of three or more coins, but in that case the next step must be a fusion. \(M\) and \(N\) are both \(\le n\), and their sum decreases at least once for every two steps, so the total number of steps is \(\le 4n\). Thus, this prioritized chip-firing method can reduce any sum of Fibonacci numbers to its Zeckendorf representation in a linear number of steps. It’s also not difficult to implement so that it takes linear time.</p>
+
+<h1 id="zeckendorf-arithmetic">Zeckendorf arithmetic</h1>
+
+<p>Anyway, now that we have a way of simplifying sums of Fibonacci numbers to their Zeckendorf form, let’s use it for arithmetic on Zeckendorf representations, without the need to reduce them to simpler forms.</p>
+
+<p>First, addition. This is very easy: Add the two Zeckendorf representations as multisets (producing piles of coins that might be adjacent, or might have two coins in them) and then simplify. The result is a linear time for adding two Zeckendorf representations, as was already known. But because it isn’t based on finite state machines, it can also handle more than two coins, for instance by adding multiple numbers at once rather than having to reduce the problem to multiple pairwise additions. As with binary arithmetic, the chip-firing method gives a quick proof of a non-obvious fact: the Zeckendorf representation of \(x+y\) has at most as many nonzero terms as there are in \(x\) and \(y\) put together.</p>
+
+<p>It’s also possible to use this technique (or really, any linear-time Zeckendorf addition algorithm) as part of a long multiplication algorithm for Zeckendorf representations. To multiply two numbers \(x\) and \(y\), both given by their Zeckendorf representations, first perform a sequence of additions to compute the representations of the numbers \(F_i\cdot x\), each computed as \((F_{i-1}\cdot x)+(F_{i-2}\cdot x)\) in a single addition from earlier numbers in the sequence. Then pick out the subset of these representations for which \(F_i\) belongs to the Zeckendorf representation of \(y\), and add them together. (Or interleave the computation of \(F_i\cdot x\) and the sum of these representations, to save space.) The total time for \(\ell\)-bit inputs is \(O(\ell^2)\), as it is for the usual long multiplication algorithm. I’m using the different variable \(\ell\), because the time here is a function of all the bits in the input Zeckendorf representation, rather than just the number of nonzero bits.</p>
+
+<p>You can convert a binary number to Zeckendorf with the same idea, computing the sequence of powers of two and then picking out and adding together the subset of these powers used in the binary representation of the input. In the other direction, you can convert a Zeckendorf representation to binary by computing the Fibonacci sequence in binary, picking out the terms from the given Zeckendorf representation, and adding them. Both directions of conversion take time \(O(\ell^2)\). A recent paper by Sergeev shows how to do these conversions much more efficient, only logarithmically slower than binary-number multiplication.<sup id="fnref:s"><a class="footnote" href="https://11011110.github.io/blog/2021/06/12/carrying-chip-firing.html#fn:s" rel="footnote">4</a></sup> Based on Sergeev’s results it would also be much more efficient (in theory at least, if not necessarily in practice) to multiply Zeckendorf representations by converting to binary, multiplying in binary, and converting back.</p>
+
+<p>As the article I linked at the start hints, the direct algorithms described here are a bit unsatisfactory from the point of view of circuit complexity: the circuit size is ok but the circuit depth is much larger than it would be for binary arithmetic. I’m not convinced that this is a serious deficiency, because we’re not likely to build computers that use this arithmetic at the circuit level. Any algorithms like this are more likely to be used only in specialized situations where Zeckendorf arithmetic is relevant, like the analysis of certain combinatorial games.</p>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:a">
+      <p>Connor Ahlbach, Jeremy Usatine, Christiane Frougny, and Nicholas Pippenger (2013), “Efficient algorithms for Zeckendorf arithmetic”, <em>Fibonacci Quarterly</em> 51 (3): 249–255, <a href="https://arxiv.org/abs/1207.4497">arXiv:1207.4497</a>, <a href="https://www.ams.org/mathscinet-getitem?mr=3093678">MR3093678</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2021/06/12/carrying-chip-firing.html#fnref:a">↩</a></p>
+    </li>
+    <li id="fn:bls">
+      <p>Anders Björner, László Lovász, and Peter Shor (1991), “Chip-firing games on graphs”, <em>European Journal on Combinatorics</em> 12 (4): 283–291, <a href="https://doi.org/10.1016/S0195-6698(13)80111-4">doi:10.1016/S0195-6698(13)80111-4</a>, <a href="https://www.ams.org/mathscinet-getitem?mr=1120415">MR1120415</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2021/06/12/carrying-chip-firing.html#fnref:bls">↩</a></p>
+    </li>
+    <li id="fn:k">
+      <p>Kolja Knauer (2009), “Chip-firing, antimatroids, and polyhedra”, EuroComb 2009, <em>Electronic Notes in Discrete Mathematics</em> 34: 9–13, <a href="https://doi.org/10.1016/j.endm.2009.07.002">doi:10.1016/j.endm.2009.07.002</a>, <a href="https://www.ams.org/mathscinet-getitem?mr=2591410">MR2591410</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2021/06/12/carrying-chip-firing.html#fnref:k">↩</a></p>
+    </li>
+    <li id="fn:s">
+      <p>I. S. Sergeev (2018), “On the complexity of Fibonacci coding”, <em>Problems of Information Transmission</em> 54: 343–350, <a href="https://doi.org/10.1134/S0032946018040038">doi:10.1134/S0032946018040038</a>, <a href="https://www.ams.org/mathscinet-getitem?mr=3917588">MR3917588</a>. <a class="reversefootnote" href="https://11011110.github.io/blog/2021/06/12/carrying-chip-firing.html#fnref:s">↩</a></p>
+    </li>
+  </ol>
+</div>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/106399026271211456">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2021-06-12T10:47:00Z</updated>
+    <published>2021-06-12T10:47:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2021-06-12T17:54:14Z</updated>
     </source>
   </entry>
 
@@ -709,7 +850,7 @@ Rules for the spreadsheet have been copied from previous years and all edits to 
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-06-12T17:38:04Z</updated>
+      <updated>2021-06-12T18:21:22Z</updated>
     </source>
   </entry>
 
@@ -749,7 +890,7 @@ Rules for the spreadsheet have been copied from previous years and all edits to 
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-06-12T17:37:09Z</updated>
+      <updated>2021-06-12T18:20:09Z</updated>
     </source>
   </entry>
 
@@ -780,7 +921,7 @@ Rules for the spreadsheet have been copied from previous years and all edits to 
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-06-12T17:37:09Z</updated>
+      <updated>2021-06-12T18:20:09Z</updated>
     </source>
   </entry>
 
@@ -915,7 +1056,7 @@ Technically, our approach is to design **targeted PRGs and HSGs**, as introduced
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-12T17:37:33Z</updated>
+      <updated>2021-06-12T18:20:32Z</updated>
     </source>
   </entry>
 
@@ -943,7 +1084,7 @@ Our techniques include string regularity arguments and a structural lemma that c
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-12T17:37:33Z</updated>
+      <updated>2021-06-12T18:20:32Z</updated>
     </source>
   </entry>
 
@@ -989,7 +1130,7 @@ Our techniques include string regularity arguments and a structural lemma that c
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-06-12T17:37:39Z</updated>
+      <updated>2021-06-12T18:20:37Z</updated>
     </source>
   </entry>
 
@@ -1137,7 +1278,7 @@ Our techniques include string regularity arguments and a structural lemma that c
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-12T17:37:34Z</updated>
+      <updated>2021-06-12T18:20:32Z</updated>
     </source>
   </entry>
 
@@ -1172,7 +1313,7 @@ Our techniques include string regularity arguments and a structural lemma that c
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-06-12T17:38:04Z</updated>
+      <updated>2021-06-12T18:21:22Z</updated>
     </source>
   </entry>
 
@@ -1350,7 +1491,7 @@ Steve Chien, <a href="https://www.prateekjain.org/">Prateek Jain</a>, <a href="h
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2021-06-12T17:38:13Z</updated>
+      <updated>2021-06-12T18:21:29Z</updated>
     </source>
   </entry>
 
@@ -1460,7 +1601,7 @@ Which “doctor mothers” have you known or been influenced by?</p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-06-12T17:37:44Z</updated>
+      <updated>2021-06-12T18:20:42Z</updated>
     </source>
   </entry>
 
@@ -1485,7 +1626,7 @@ Which “doctor mothers” have you known or been influenced by?</p>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2021-06-12T17:38:33Z</updated>
+      <updated>2021-06-12T18:21:49Z</updated>
     </source>
   </entry>
 
@@ -1552,7 +1693,7 @@ Our techniques rely on the representation of stabilizer states as quadratic func
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-12T17:37:34Z</updated>
+      <updated>2021-06-12T18:20:32Z</updated>
     </source>
   </entry>
 
@@ -1578,7 +1719,7 @@ In this paper, we introduce a ``heavy width'' measure for Resolution that allows
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-12T17:37:34Z</updated>
+      <updated>2021-06-12T18:20:32Z</updated>
     </source>
   </entry>
 
@@ -1672,7 +1813,7 @@ Our construction is based on the framework of using correlation breakers and res
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-12T17:37:34Z</updated>
+      <updated>2021-06-12T18:20:32Z</updated>
     </source>
   </entry>
 
@@ -1749,7 +1890,7 @@ the logarithm of tree-like size that might be of independent interest.</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-12T17:37:34Z</updated>
+      <updated>2021-06-12T18:20:32Z</updated>
     </source>
   </entry>
 
@@ -1795,7 +1936,7 @@ and extractors, making them inadequate for the above applications.</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-06-12T17:37:34Z</updated>
+      <updated>2021-06-12T18:20:32Z</updated>
     </source>
   </entry>
 
@@ -1830,7 +1971,7 @@ and extractors, making them inadequate for the above applications.</summary>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-06-12T17:38:29Z</updated>
+      <updated>2021-06-12T18:21:45Z</updated>
     </source>
   </entry>
 
@@ -1967,7 +2108,7 @@ and extractors, making them inadequate for the above applications.</summary>
       <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Computation, Economics, and Game Theory</subtitle>
       <title>Turing's Invisible Hand</title>
-      <updated>2021-06-12T17:37:41Z</updated>
+      <updated>2021-06-12T18:20:39Z</updated>
     </source>
   </entry>
 
@@ -2007,7 +2148,85 @@ and extractors, making them inadequate for the above applications.</summary>
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-06-12T17:39:01Z</updated>
+      <updated>2021-06-12T18:22:18Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2021/05/31/linkage</id>
+    <link href="https://11011110.github.io/blog/2021/05/31/linkage.html" rel="alternate" type="text/html"/>
+    <title>Linkage</title>
+    <summary>Ememem’s mosaic interventions in the potholes of Lyon (\(\mathbb{M}\), see also, and also). I find this kind of urban kintsugi pleasing, not just for its aspect of guerilla art, but for the sharp geometric patterns of the mosaics and the rough boundaries where they meet the landscape around them.</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><ul>
+  <li>
+    <p><a href="https://www.thisiscolossal.com/2021/05/ememem-street-mosaics/">Ememem’s mosaic interventions in the potholes of Lyon</a> (<a href="https://mathstodon.xyz/@11011110/106251596474278206">\(\mathbb{M}\)</a>, <a href="https://www.ememem-flacking.net/flacking">see also</a>, <a href="https://boingboing.net/2021/05/17/this-artist-repairs-damaged-sidewalks-with-beautiful-mosaic-tiles.html">and also</a>). I find this kind of urban kintsugi pleasing, not just for its aspect of guerilla art, but for the sharp geometric patterns of the mosaics and the rough boundaries where they meet the landscape around them.</p>
+  </li>
+  <li>
+    <p><a href="https://tilings.math.uni-bielefeld.de/">Tilings encyclopedia</a> (<a href="https://mathstodon.xyz/@11011110/106255097813445827">\(\mathbb{M}\)</a>). An online collection of many pretty substitution tilings. What’s missing to make it closer to OEIS in usefulness is a way to search by tiling rather than by keyword in the description of the tiling.</p>
+  </li>
+  <li>
+    <p>At UC Irvine, we’ve been using Piazza for online course forums, but Piazza insists on serving ads to students (despite being paid), so we’re moving to <a href="https://edstem.org/us/">Ed Discussion</a> instead (<a href="https://mathstodon.xyz/@11011110/106258490049583719">\(\mathbb{M}\)</a>). You can see similar moves at <a href="https://rtl.berkeley.edu/news/piazza-and-new-online-discussion-platform-update">Berkeley</a> and <a href="https://news.psu.edu/story/641227/2020/12/07/academics/piazza-class-discussion-platform-start-displaying-advertisements">Penn State</a>. Usually I mistrust campus choices of software infrastructure — they tend to go for big crufty hard-to-use packages that are a poor fit for our needs — but this appears to be for good reason and I support it.</p>
+  </li>
+  <li>
+    <p><a href="https://www.quantamagazine.org/mathematicians-answer-old-question-about-odd-graphs-20210519/"><em>Quanta</em> highlights one of my UCI colleagues, Asaf Ferber, for his work with Michael Krivelevich proving that every graph without isolated vertices has an induced subgraph of \(\Omega(n)\) vertices in which all vertices have odd degree</a> <span style="white-space: nowrap;">(<a href="https://mathstodon.xyz/@11011110/106265785749549559">\(\mathbb{M}\)</a>).</span> As usual, they also get important details wrong, forgetting to mention that the subgraphs must be induced, and also not mentioning the requirement of no isolated vertices. For the actual preprint see <a href="https://arxiv.org/abs/2009.05495">arXiv:2009.05495</a>.</p>
+  </li>
+  <li>
+    <p><a href="https://www.insidehighered.com/news/2021/05/20/unc-chapel-hill-board-doesnt-approve-tenure-noted-journalist">Academic freedom dead at  U. of North Carolina</a> (<a href="https://mathstodon.xyz/@11011110/106269430445568583">\(\mathbb{M}\)</a>, <a href="https://www.metafilter.com/191525/Nikole-Hannah-Jones-Denied-Tenure-at-UNC">via</a>, <a href="https://www.nytimes.com/2021/05/19/business/media/nikole-hannah-jones-unc.html">see also</a>): right-wing board of trustees cancel-cultures MacArthur and Pulitzer winner Nikole Hannah-Jones for racist/political reasons (they don’t want anyone to talk about US slavery and ongoing systemic racism). To be clear, she still has a position at UNC; after the trustees denied her tenure, her department gave her a five-year-renewable spot not requiring trustee approval.</p>
+  </li>
+  <li>
+    <p><a href="https://gilkalai.wordpress.com/2021/05/20/to-cheer-you-up-in-difficult-times-25-some-mathematical-news-part-2/">Some mathematical news</a> (<a href="https://mathstodon.xyz/@11011110/106277146476845581">\(\mathbb{M}\)</a>). Gil Kalai rounds up a lot of recent developments in knot recognition complexity, exotic spheres, numbers of fixed points, graph theory, and additive combinatorics.</p>
+  </li>
+  <li>
+    <p><a href="https://www34.homepage.villanova.edu/robert.jantzen/notes/torus/cavatappo20/">Tilted cavatappo surfaces</a> (<a href="https://mathstodon.xyz/@11011110/106280088634102191">\(\mathbb{M}\)</a>). Robert Jantzen studies the shape of <a href="https://en.wikipedia.org/wiki/Cavatappi">corkscrew tube pasta</a> and of shortest paths on its surface. See also his preprints <a href="https://arxiv.org/abs/1301.0013">arXiv:1301.0013</a> and <a href="https://arxiv.org/abs/1402.3284">arXiv:1402.3284</a>.</p>
+  </li>
+  <li>
+    <p>Here’s an unexpected property of hyperbolic geometry (<a href="https://mathstodon.xyz/@11011110/106288718744948273">\(\mathbb{M}\)</a>), or at least, it struck me as counterintuitive: all lines through two opposite quadrants of two perpendicular lines pass near their crossing, within distance \(\ln(1+\sqrt2)\). The figure below uses the upper halfplane model to show two quadrants (dark yellow), their convex hull (light yellow, from which the lines cannot escape), and a circle of radius \(\ln(1+\sqrt2)\) centered at the crossing, separating the quadrants.</p>
+
+    <p style="text-align: center;"><img alt="Convex hull of the quadrants formed in the hyperbolic plane by two perpendicular lines, and a circle centered at the crossing separating the quadrants" src="https://11011110.github.io/blog/assets/2021/double-wedge-hull.svg"/></p>
+  </li>
+  <li>
+    <p><a href="https://www.youtube.com/watch?v=HeQX2HjkcNo">Veritaserium on Cantor, Gödel, and Turing</a> (<a href="https://mathstodon.xyz/@gnivasch/106290995069247640">\(\mathbb{M}\)</a>).</p>
+  </li>
+  <li>
+    <p>At a time when national borders have largely shut down, significantly decreasing the opportunities for higher education for people with the misfortune to be born in the wrong part of the world, <a href="https://www.latimes.com/california/story/2021-05-25/bold-plan-for-uc-admissions-reduce-out-of-state-students">California’s legislators are pushing to enact the same barriers to education across state lines</a> (<a href="https://mathstodon.xyz/@11011110/106297102605074297">\(\mathbb{M}\)</a>), preventing access to education and hurting the state itself by discouraging the best and brightest from coming here.</p>
+  </li>
+  <li>
+    <p>Cellphone snapshot of the UC Irvine Ecological Preserve on a recent cloudy day (<a href="https://mathstodon.xyz/@11011110/106305347918888735">\(\mathbb{M}\)</a>). The foreground is mostly mustard, of no particular ecological significance; the ecological part is the coastal sage scrub on the sunny hillside in the background.</p>
+
+    <p style="text-align: center;"><img alt="UCI Ecological Preserve" src="https://www.ics.uci.edu/~eppstein/pix/uciep2/DriedMustard-m.jpg" style="border-style: solid; border-color: black;" width="80%"/></p>
+  </li>
+  <li>
+    <p><a href="https://doi.org/10.1007/BF02764015">Aperiodic tilings of the hyperbolic plane by convex polygons</a> (<a href="https://mathstodon.xyz/@11011110/106314334930093898">\(\mathbb{M}\)</a>), Margulis and Mozes, 1998. I knew about the <a href="https://en.wikipedia.org/wiki/Binary_tiling">binary tilings</a> but not this, which gets aperiodicity differently: if a tile’s area isn’t a rational multiple of \(\pi\), it cannot be periodic. This works even for certain hyperbolic rhombi, with angles chosen so they can tile. The tilings can still have 1d symmetry. If some single tile  avoids all symmetries, I don’t know about it.</p>
+  </li>
+  <li>
+    <p><a href="http://www.geometrictomography.com/">Geometric tomography</a> (<a href="https://mathstodon.xyz/@11011110/106317414925334494">\(\mathbb{M}\)</a>). A nicely presented brief web survey of this subject, on the reconstruction of 3d shapes from 2d information (such as its brightness function, the areas of its perpendicular projections), by Richard J. Gardner based on his 1995 book of the same title.</p>
+  </li>
+  <li>
+    <p><a href="https://cacm.acm.org/magazines/2021/6/252840-collusion-rings-threaten-the-integrity-of-computer-science-research/fulltext">Collusion rings threaten the integrity of computer science research</a> (<a href="https://mathstodon.xyz/@11011110/106320077489874249">\(\mathbb{M}\)</a>), Michael L. Littman, CACM. Relatedly: <a href="https://www.chemistryworld.com/news/publishers-grapple-with-an-invisible-foe-as-huge-organised-fraud-hits-scientific-journals/4013652.article">“huge organised fraud” in scientific journals</a>, <a href="https://retractionwatch.com/2021/05/29/weekend-reads-gibberish-papers-persist-the-academic-who-faked-cherokee-heritage-organised-fraud-hits-scientific-journals/">via Retraction Watch</a>.</p>
+  </li>
+  <li>
+    <p><a href="https://www.youtube.com/watch?v=8Sv_FaEN8zE">Five talks from CanaDAM 2021 introducing graph product structure theory and its applications</a> (<a href="https://mathstodon.xyz/@patmorin/106300452133561408">\(\mathbb{M}\)</a>).</p>
+  </li>
+  <li>
+    <p><a href="https://isohedral.ca/heesch-numbers-of-unmarked-polyforms/">Big progress in classifying polyforms by their Heesch numbers, obtained by using a SAT solver in place of an ad-hoc backtracking search for tilings</a> (<a href="https://mathstodon.xyz/@11011110/106331731989277653">\(\mathbb{M}\)</a>, <a href="https://www.metafilter.com/191587/TikTok-teen-points-to-inside-elbow-bites-lip-Heeeeeeeesch">via</a>). See also <a href="https://twitter.com/mathpuzzle/status/1397040707706236928">Ed Pegg on an infinite set of polyforms with Heesch = 3</a>.</p>
+  </li>
+</ul></div>
+    </content>
+    <updated>2021-05-31T14:09:00Z</updated>
+    <published>2021-05-31T14:09:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2021-06-12T17:54:14Z</updated>
     </source>
   </entry>
 
@@ -2101,7 +2320,7 @@ and extractors, making them inadequate for the above applications.</summary>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-06-12T17:37:39Z</updated>
+      <updated>2021-06-12T18:20:37Z</updated>
     </source>
   </entry>
 
@@ -2183,7 +2402,7 @@ and extractors, making them inadequate for the above applications.</summary>
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2021-06-12T17:38:35Z</updated>
+      <updated>2021-06-12T18:21:51Z</updated>
     </source>
   </entry>
 
@@ -2282,7 +2501,7 @@ Ken notes that “Trust but verify” was first the Russian proverb <i>Doveryay 
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-06-12T17:37:45Z</updated>
+      <updated>2021-06-12T18:20:42Z</updated>
     </source>
   </entry>
 
@@ -2311,7 +2530,7 @@ Email: ilya.volkovich@bc.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-06-12T17:37:48Z</updated>
+      <updated>2021-06-12T18:21:05Z</updated>
     </source>
   </entry>
 
@@ -2604,60 +2823,7 @@ The puzzle key:</p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-06-12T17:37:44Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2021/072</id>
-    <link href="https://eccc.weizmann.ac.il/report/2021/072" rel="alternate" type="text/html"/>
-    <title>TR21-072 |  Arithmetic Circuit Complexity of Division and Truncation | 
-
-	Gorav Jindal, 
-
-	Pranjal Dutta, 
-
-	Anurag Pandey, 
-
-	Amit Sinhababu</title>
-    <summary>Given polynomials $f,g,h\,\in \mathbb{F}[x_1,\ldots,x_n]$ such that $f=g/h$, where both $g$ and $h$ are computable by arithmetic circuits of size $s$, we show that $f$ can be computed by a circuit of size  $\poly(s,\deg(h))$.  This solves a special case of division elimination for high-degree circuits (Kaltofen'87 \&amp; WACT'16). The result is an exponential improvement over Strassen's classic result (Strassen'73) when $\deg(h)$ is $\poly(s)$ and $\deg(f)$ is $\exp(s)$, since the latter gives an upper bound of $\poly(s, \deg(f))$.
-
-Further, we show that any univariate polynomial family $(f_d)_d$, defined by the initial segment of the power series expansion of rational function $g_d(x)/h_d(x)$ up to degree $d$ (i.e.~$f_d = g_d/h_d \bmod x^{d+1}$), where circuit size of $g$ is $s_d$ and degree of $g_d$ is at most $d$, can be computed by a circuit of size $\poly(s_d,\deg(h_d),\log d)$.
-We also show a hardness result when the degrees of the rational functions are high (i.e.~$\Omega (d)$), assuming hardness of the integer factorization problem.</summary>
-    <updated>2021-05-24T13:20:40Z</updated>
-    <published>2021-05-24T13:20:40Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2021-06-12T17:37:34Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2021/071</id>
-    <link href="https://eccc.weizmann.ac.il/report/2021/071" rel="alternate" type="text/html"/>
-    <title>TR21-071 |  On the Algorithmic Content of Quantum Measurements | 
-
-	Samuel Epstein</title>
-    <summary>We show that given a quantum measurement, for an overwhelming majority of pure states, no meaningful information is produced. This is independent of the number of outcomes of the quantum measurement. Due to conservation inequalities, such random noise cannot be processed into coherent data.</summary>
-    <updated>2021-05-23T14:21:48Z</updated>
-    <published>2021-05-23T14:21:48Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2021-06-12T17:37:34Z</updated>
+      <updated>2021-06-12T18:20:42Z</updated>
     </source>
   </entry>
 </feed>
