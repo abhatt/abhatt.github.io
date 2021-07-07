@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-07-07T17:39:28Z</updated>
+  <updated>2021-07-07T18:22:46Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,84 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://differentialprivacy.org/open-problem-optimal-query-release/</id>
+    <link href="https://differentialprivacy.org/open-problem-optimal-query-release/" rel="alternate" type="text/html"/>
+    <title>Open Problem - Optimal Query Release for Pure Differential Privacy</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Releasing large sets of statistical queries is a centerpiece of the theory of differential privacy.  Here, we are given a <em>dataset</em> \(x = (x_1,\dots,x_n) \in [T]^n\), and a set of <em>statistical queries</em> \(f_1,\dots,f_k\), where each query is defined by some bounded function \(f_j : [T] \to [-1,1]\), and (abusing notation) is defined as
+\[
+f_j(x) = \frac{1}{n} \sum_{i=1}^{n} f_j(x_i).
+\]
+We use \(f(x) = (f_1(x),\dots,f_k(x))\) to denote the vector consisting of the true answers to all these queries.
+Our goal is to design an \((\varepsilon, \delta)\)-differentially private algorithm \(M\) that takes a dataset \(x\in [T]^n\) and outputs a random vector \(M(x)\in \mathbb{R}^k\) such that \(\| M(x) - f(x) \|\) is small in expectation for some norm \(\|\cdot\|\). Usually algorithms for this problem also give high probability bounds on the error, but we focus on expected error for simplicity.</p>
+
+<p>This problem has been studied for both <em>pure differential privacy</em> (\(\delta = 0\)) and <em>appproximate differential privacy</em> (\(\delta &gt; 0\)), and for both \(\ell_\infty\)-error
+\[
+\mathbb{E}( \| M(x) - f(x)\|_{\infty} ) \leq \alpha,
+\]
+and \(\ell_2\)-error
+\[
+\mathbb{E}( \| M(x) - f(x)\|_{2} ) \leq \alpha k^{1/2},
+\]
+giving four variants of the problem.  By now we know tight worst-case upper and lower bounds for two of these variants, and nearly tight bounds (up to logarithmic factors) for a third. The tightest known upper bounds are given in the following table.</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td> </td>
+      <td>Pure DP</td>
+      <td>Approx DP</td>
+    </tr>
+    <tr>
+      <td>\( \ell_2 \)<br/>error</td>
+      <td>\( \alpha \lesssim \left(\frac{\log^2 k ~\cdot~ \log^{3/2}T}{\varepsilon n} \right)^{1/2} \) <br/> [<a href="https://arxiv.org/abs/1212.0297">NTZ13</a>]</td>
+      <td>\( \alpha \lesssim \left(\frac{\log^{1/2} T}{\varepsilon n} \right)^{1/2} \) <br/> [<a href="https://guyrothblum.files.wordpress.com/2014/11/drv10.pdf">DRV10</a>]</td>
+    </tr>
+    <tr>
+      <td>\( \ell_\infty \)<br/>error</td>
+      <td>\( \alpha \lesssim \left(\frac{\log k ~\cdot~ \log T}{\varepsilon n} \right)^{1/3} \)  <br/> [<a href="https://arxiv.org/abs/1109.2229">BLR13</a>]</td>
+      <td>\( \alpha \lesssim \left(\frac{\log k ~\cdot~ \log^{1/2} T}{\varepsilon n} \right)^{1/2} \) <br/> [<a href="https://guyrothblum.files.wordpress.com/2014/11/hr10.pdf">HR10</a>, <a href="https://arxiv.org/abs/1107.3731">GRU12</a>]</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The bounds for approximate DP are known to be tight [<a href="https://arxiv.org/abs/1311.3158">BUV14</a>].  Our two open problems both involve improving the best known upper bounds for pure differential privacy.</p>
+
+<blockquote>
+  <p><b>Open Problem 1:</b> What is the best possible \(\ell_\infty\)-error for answering a worst-case set of \(k\) statistical queries over a domain of size \(T\) subject to \((\varepsilon,0)\)-differential privacy?</p>
+</blockquote>
+
+<p>We conjecture that the known upper bound in the table can be improved to
+\[
+\alpha = \left(\frac{\log k \cdot \log T}{\varepsilon n} \right)^{1/2},
+\]
+which is known to be the best possible [<a href="https://dataspace.princeton.edu/handle/88435/dsp01vq27zn422">Har11</a>, Theorem 4.5.1].</p>
+
+<blockquote>
+  <p><b>Open Problem 2:</b> What is the best possible \(\ell_2\)-error for answering a worst-case set of \(k\) statistical queries over a domain of size \(T\) subject to \((\varepsilon,0)\)-differential privacy?</p>
+</blockquote>
+
+<p>We conjecture that the upper bound can be improved to
+\[
+\alpha = \left(\frac{\log T}{\varepsilon n} \right)^{1/2}.
+\]
+The construction used in [<a href="https://dataspace.princeton.edu/handle/88435/dsp01vq27zn422">Har11</a>, Theorem 4.5.1] can be analyzed to show this bound would be tight. Note, in particular, that this conjecture implies that the tight upper bound has no dependence on the number of queries, similarly to the case of \(\ell_2\) error and approximate DP.</p></div>
+    </summary>
+    <updated>2021-07-07T17:45:00Z</updated>
+    <published>2021-07-07T17:45:00Z</published>
+    <author>
+      <name>Jonathan Ullman</name>
+    </author>
+    <source>
+      <id>https://differentialprivacy.org</id>
+      <link href="https://differentialprivacy.org" rel="alternate" type="text/html"/>
+      <link href="https://differentialprivacy.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Website for the differential privacy research community</subtitle>
+      <title>Differential Privacy</title>
+      <updated>2021-07-07T18:22:41Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>tag:blogger.com,1999:blog-3722233.post-8892467103290123546</id>
@@ -71,7 +149,7 @@
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2021-07-07T17:38:17Z</updated>
+      <updated>2021-07-07T18:21:37Z</updated>
     </source>
   </entry>
 
@@ -142,7 +220,7 @@ Moreover, our lower bound holds for all values of $d$, as opposed to the previou
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-07T17:37:35Z</updated>
+      <updated>2021-07-07T18:20:30Z</updated>
     </source>
   </entry>
 
@@ -927,7 +1005,7 @@ Concretely, if every pair of $n^{0.9}$-indistinguishable $\mathbf{X},\mathbf{Y}$
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-07T17:37:35Z</updated>
+      <updated>2021-07-07T18:20:30Z</updated>
     </source>
   </entry>
 
@@ -952,7 +1030,7 @@ Concretely, if every pair of $n^{0.9}$-indistinguishable $\mathbf{X},\mathbf{Y}$
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2021-07-07T17:38:46Z</updated>
+      <updated>2021-07-07T18:21:59Z</updated>
     </source>
   </entry>
 
@@ -995,7 +1073,7 @@ Concretely, if every pair of $n^{0.9}$-indistinguishable $\mathbf{X},\mathbf{Y}$
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-07-07T17:38:08Z</updated>
+      <updated>2021-07-07T18:21:29Z</updated>
     </source>
   </entry>
 
@@ -1066,7 +1144,7 @@ concrete sparse languages.</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-07T17:37:35Z</updated>
+      <updated>2021-07-07T18:20:30Z</updated>
     </source>
   </entry>
 
@@ -1340,7 +1418,7 @@ It should be noted that if we scale down the US to 100,000 people, the numbers a
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-07-07T17:37:44Z</updated>
+      <updated>2021-07-07T18:20:41Z</updated>
     </source>
   </entry>
 
@@ -1562,7 +1640,7 @@ It should be noted that if we scale down the US to 100,000 people, the numbers a
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2021-07-07T17:38:59Z</updated>
+      <updated>2021-07-07T18:22:02Z</updated>
     </source>
   </entry>
 
@@ -1712,7 +1790,7 @@ We continue the study of this question and, in particular, resolve all open prob
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-07T17:37:35Z</updated>
+      <updated>2021-07-07T18:20:30Z</updated>
     </source>
   </entry>
 
@@ -1783,7 +1861,7 @@ Given that the problem whether 2-out-of-2 secret sharing requires uniform random
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-07T17:37:35Z</updated>
+      <updated>2021-07-07T18:20:30Z</updated>
     </source>
   </entry>
 
@@ -1817,7 +1895,7 @@ Given that the problem whether 2-out-of-2 secret sharing requires uniform random
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-07T17:37:35Z</updated>
+      <updated>2021-07-07T18:20:30Z</updated>
     </source>
   </entry>
 
@@ -1860,7 +1938,7 @@ Given that the problem whether 2-out-of-2 secret sharing requires uniform random
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-07-07T17:38:08Z</updated>
+      <updated>2021-07-07T18:21:29Z</updated>
     </source>
   </entry>
 
@@ -1887,42 +1965,7 @@ Email: shachar.lovett@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-07-07T17:37:48Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-27705661.post-4913288096208854339</id>
-    <link href="http://processalgebra.blogspot.com/feeds/4913288096208854339/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="http://www.blogger.com/comment.g?blogID=27705661&amp;postID=4913288096208854339" rel="replies" type="text/html"/>
-    <link href="http://www.blogger.com/feeds/27705661/posts/default/4913288096208854339" rel="edit" type="application/atom+xml"/>
-    <link href="http://www.blogger.com/feeds/27705661/posts/default/4913288096208854339" rel="self" type="application/atom+xml"/>
-    <link href="http://processalgebra.blogspot.com/2021/06/the-detecter-runtime-verification-tool.html" rel="alternate" type="text/html"/>
-    <title>The detectEr runtime-verification tool for Erlang programs</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Thanks to the huge amount of excellent work done by <a href="https://duncanatt.github.io/" target="_blank">Duncan Paul Attard</a> and <a href="http://staff.um.edu.mt/afra1/" target="_blank">Adrian Francalanza</a>, we now have a tutorial on detectEr that some of you might want to check out. See <a href="https://duncanatt.github.io/detecter/index.html">this web page</a> for all the material, tool download and links to the videos of the tutorial Duncan delivered at the <a href="https://www.discotec.org/2021/tutorials" target="_blank">DisCoTec 2021 Tutorial Day</a>. </p><p>detectEr is a runtime verification tool for asynchronous component systems that run on the <a href="https://blog.erlang.org/a-brief-BEAM-primer/" target="_blank">Erlang Virtual Machine</a>. It also supports monitoring systems that can execute outside of the EVM, so long as these can produce traces that are formatted in a way that is parsable by detectEr. The tool itself is developed in <a href="https://www.erlang.org/" target="_blank">Erlang</a>, and is the product of five years of theoretical and practical development. (Erlang is a programming language used to build massively scalable soft real-time systems with requirements on high availability.)  </p> <p>Enjoy!</p></div>
-    </content>
-    <updated>2021-06-24T08:16:00Z</updated>
-    <published>2021-06-24T08:16:00Z</published>
-    <author>
-      <name>Luca Aceto</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/01092671728833265127</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-27705661</id>
-      <author>
-        <name>Luca Aceto</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/01092671728833265127</uri>
-      </author>
-      <link href="http://processalgebra.blogspot.com/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="http://www.blogger.com/feeds/27705661/posts/default" rel="self" type="application/atom+xml"/>
-      <link href="http://processalgebra.blogspot.com/" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="http://www.blogger.com/feeds/27705661/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>Papers I find interesting---mostly, but not solely, in Process Algebra---, and some fun stuff in Mathematics and Computer Science at large and on general issues related to research, teaching and academic life.</subtitle>
-      <title>Process Algebra Diary</title>
-      <updated>2021-06-24T08:16:51Z</updated>
+      <updated>2021-07-07T18:20:44Z</updated>
     </source>
   </entry>
 </feed>
