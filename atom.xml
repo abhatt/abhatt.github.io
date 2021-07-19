@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-07-19T20:39:55Z</updated>
+  <updated>2021-07-19T21:23:07Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,190 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>https://blog.simons.berkeley.edu/?p=304</id>
+    <link href="https://blog.simons.berkeley.edu/2021/07/trends-in-machine-learning-theory/" rel="alternate" type="text/html"/>
+    <title>Trends in Machine Learning Theory</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">IntroductionThroughout the last few decades, we have witnessed unprecedented growth of machine learning. Originally a topic formalized by a small group of computer scientists, machine learning now impacts many areas: the physical sciences, medicine, commerce, finance, urban planning, and more. The … <a href="https://blog.simons.berkeley.edu/2021/07/trends-in-machine-learning-theory/">Continue reading <span class="meta-nav">→</span></a></div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><strong>Introduction</strong><br/>Throughout the last few decades, we have witnessed unprecedented growth of machine learning. Originally a topic formalized by a small group of computer scientists, machine learning now impacts many areas: the physical sciences, medicine, commerce, finance, urban planning, and more. The rapid growth of machine learning can be partially attributed to the availability of large amounts of data and the development of powerful computing devices. Another important factor is that machine learning has foundations in many other fields, such as theoretical computer science, algorithms, applied mathematics, statistics, and optimization. </p>
+
+
+
+<p>If machine learning is already mathematically rooted in many existing research areas, why do we need a field solely dedicated to learning theory? According to <a href="https://www.cs.columbia.edu/~djhsu/" rel="noreferrer noopener" target="_blank">Daniel Hsu</a>, “Learning theory serves (at least) two purposes: to help make sense of machine learning, and also to explore the capabilities and limitations of learning algorithms.” Besides finding innovative applications for existing tools, learning theorists also provide answers to long-standing problems and ask new fundamental questions. </p>
+
+
+
+<p>Modern learning theory goes beyond classical statistical and computer science paradigms by: </p>
+
+
+
+<ul><li>developing insights about specific computational models (e.g., neural networks) </li><li>analyzing popular learning algorithms (e.g., stochastic gradient descent)</li><li>taking into account data distributions (e.g., margin bounds or manifold assumptions)</li><li>adding auxiliary goals (e.g., robustness or privacy), and </li><li>rethinking how algorithms interact with and access data (e.g., online or reinforcement learning).</li></ul>
+
+
+
+<p>By digging deep into the basic questions, researchers generate new concepts and models that change the way we solve problems and help us understand emerging phenomena.</p>
+
+
+
+<p>This article provides a brief overview of three key areas in machine learning theory: new learning paradigms, trustworthy machine learning, and reinforcement learning. We describe the main thrust of each of these areas, as well as point to a few papers from <a href="http://algorithmiclearningtheory.org/alt2021/" rel="noreferrer noopener" target="_blank">ALT 2021</a> (the 32nd International Conference on Algorithmic Learning Theory) that touch each of these topics. To share a broader view, we also asked experts in the areas to comment on the field and on their recent papers. Needless to say, this article only scratches the surface. At the end, we point to places to learn more about learning theory.</p>
+
+
+
+<span id="more-304"/>
+
+
+
+<p><strong>New Machine Learning Paradigms</strong><br/>The traditional learning theory framework, probably approximately correct (PAC) learning, defines what it means to learn a ground-truth classifier from a candidate class of possible classifiers. Alongside PAC learning is Vapnik-Chervonenkis (VC) theory, which characterizes the number of samples needed and sufficient to learn a classifier from a given class. The generalization analysis from VC theory is restricted to guarantees that hold independently of the data distribution — that is, even for worst-case distributions. Additionally, the VC/PAC learning paradigm suggests that whenever learning is possible, it can be accomplished by choosing the classifier that minimizes loss on the training data, called the empirical risk minimizer (ERM). </p>
+
+
+
+<p>This classical framework unfortunately fails to explain the empirical success of machine learning (ML). “The distribution-free setting, while it comes with the elegant VC theory, turned out to be unsatisfactory,” says Csaba Szepesvári. “Due to the oversimplified setting, the theory could not contribute meaningfully to understanding all kinds of learning methods such as learning with trees, boosting, neural networks, SVMs, or using any other nonparametric methods.” Researchers posit that stronger guarantees should be possible if we leverage natural assumptions about the data distribution, though identifying the right “natural assumptions” is a challenging task. Similarly, understanding which of many possible ERM solutions a learning algorithm chooses may yield better generalization results than those yielded by VC theory. </p>
+
+
+
+<p>Methods that provide <em>distribution-specific </em>guarantees aren’t new to learning theory. A canonical example is known as a margin bound, where the test error of a classifier is analyzed in terms of the margin that separates the different prediction categories. In <a href="http://proceedings.mlr.press/v132/hanneke21a.html" rel="noreferrer noopener" target="_blank">one</a> of the ALT best papers, Steve Hanneke and Aryeh Kontorovich prove generalization guarantees in terms of the size of the margin for two popular classification algorithms: <a href="https://en.wikipedia.org/wiki/Support-vector_machine" rel="noreferrer noopener" target="_blank">support vector machines</a> (SVMs) and the <a href="https://en.wikipedia.org/wiki/Perceptron" rel="noreferrer noopener" target="_blank">perceptron</a> algorithm. The authors answer a core open question, showing that SVMs achieve the optimal margin bound!</p>
+
+
+
+<p>Further work at ALT uses an assumption that data lies on a low-dimensional manifold to prove guarantees for generative models. Generative models synthesize <em>original</em> samples, such as images or text, that resemble training data, but without copying the data directly. While so-called <em>generative adversarial networks</em> work well in practice, few guarantees exist because it is challenging to statistically formulate the requirement of generating original samples. Nicolas Schreuder, Victor-Emmanuel Brunel, and Arnak S. Dalalyan consider a new framework in their <a href="http://proceedings.mlr.press/v132/schreuder21a.html" rel="noreferrer noopener" target="_blank">paper</a>, in which they guarantee originality by outputting a continuous distribution, which ensures that it is very unlikely to output training examples. If the training data is generated from a low-dimensional manifold, they show that it is possible to learn a good generator, which outputs a smooth transformation of a random point.</p>
+
+
+
+<p>In another <a href="http://proceedings.mlr.press/v132/tosh21a.html" rel="noreferrer noopener" target="_blank">paper</a>, Christopher Tosh, Akshay Krishnamurthy, and Daniel Hsu use distributional assumptions to show when unsupervised methods can use unlabeled data to learn useful <em>representations </em>of data. A linear function trained on these representations and some labeled data can then be used for downstream prediction of the labels. The key idea is to look at when data has <em>multiview redundancy (MVR), </em>which arises, for instance, when data is augmented: Under MVR, each data point can be viewed as a pair (<em>X,</em> <em>Z</em>), and the label <em>Y</em> can be predicted almost as well from <em>X</em> or <em>Z</em> as from the full pair. For instance, each pair might be two halves of an article, or two rotations of an image. The authors show how a theoretical approach called <em>landmark embedding </em>can produce a representation that enables low-error linear classification. Additionally, they analyze when the representations are learned implicitly while training a model to predict whether two views <em>X</em> and <em>Z</em> correspond to the same example, which is close to what is done in practice. </p>
+
+
+
+<p>Another new paradigm considers how the specific<em> training algorithm</em> affects which of many candidate ERM solutions are chosen. This is called the <em>implicit bias </em>of a training algorithm: If there are multiple equally good solutions, then why does an algorithm choose one over the other? This is particularly relevant when studying neural networks, which are typically<em> overparameterized</em> and can be trained to find many solutions with zero empirical risk. In one <a href="http://proceedings.mlr.press/v132/ji21a/ji21a.pdf" rel="noreferrer noopener" target="_blank">paper</a>, Ziwei Ji and Matus Telgarsky characterize the implicit bias of using gradient descent to train a linear classifier with a general loss function. They show that the solution relates to the optimizer of a particular smoothed margin function. While this paper does not yield generalization guarantees, this type of implicit bias analysis can sometimes lead to generalization guarantees via margin bounds.</p>
+
+
+
+<p>The goal of this area is to go beyond traditional learning theory paradigms by leveraging distributional and algorithmic properties. But a major open question is designing a more general mathematical theory that exploits such properties. <a href="http://www.cs.technion.ac.il/~shaymrn/" rel="noreferrer noopener" target="_blank">Shay Moran</a> offers a standard for new theory: “I hope that in the next 10 years we will develop more realistic models of learning, but I will insist that they still be mathematically clean.”</p>
+
+
+
+<p><strong>Trustworthy ML</strong><br/>Machine learning has inspired many new areas and technologies: personalized health care, drug discovery, advertising, résumé screening, credit loans, and more. However, these critical and user-centered applications require a higher standard of testing and verification because mistakes may deeply affect many people. Addressing these challenges has inspired a new field of research centered on making machine learning more trustworthy and reliable, which is the motivation for many of the ALT papers this year as well. An expert in the area, <a href="http://cseweb.ucsd.edu/~kamalika/" rel="noreferrer noopener" target="_blank">Kamalika Chaudhuri</a>, says, “For my field, which is trustworthy ML, the theoretical goal and challenge remains modeling and frameworks.” She elaborates: “Coming up with new conceptual frameworks for learning has always been one of the core challenges in learning theory since its early days, and it is doubly important now.” Researchers have been exploring this direction in many areas, including privacy, data deletion, robustness, fairness, interpretability, and causality. </p>
+
+
+
+<p>Several ALT 2021 papers cover questions in privacy. The general goal is to understand how to modify existing learning methods to take into account privacy constraints. One of the <a href="http://proceedings.mlr.press/v132/wang21a.html" rel="noreferrer noopener" target="_blank">papers</a>, by Di Wang, Huanyu Zhang, Marco Gaboardi, and Jinhui Xu, considers generalized linear models in a differential privacy model. A central motivation is to understand the role of public, unlabeled data in improving the learnability of these problems in a private setting. Summarizing another direction, <a href="http://www.gautamkamath.com" rel="noreferrer noopener" target="_blank">Gautam Kamath</a> comments on his <a href="http://proceedings.mlr.press/v132/aden-ali21a.html" rel="noreferrer noopener" target="_blank">paper</a> with co-authors Ishaq Aden-Ali and Hassan Ashtiani, “This paper focuses on a very simple but surprisingly challenging question: Can we learn a general multivariate Gaussian under the constraint of differential privacy? Prior works focused on restricted settings — for example, with bounded parameters or known covariance. We gave the first finite sample complexity bound for this problem, which evidence suggests is near optimal. The next question is to design a computationally efficient algorithm for this problem.” Another <a href="http://proceedings.mlr.press/v132/cesar21a.html" rel="noreferrer noopener" target="_blank">paper</a> on privacy, by Mark Cesar and Ryan Rogers, studies the <a href="https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf" rel="noreferrer noopener" target="_blank">composition</a> of various privacy mechanisms in the context of real-world data analytics pipelines.</p>
+
+
+
+<p>Another aspect of respecting user privacy is allowing people to choose to stop sharing their data. Concretely, this means removing their data from data sets and ensuring that existing and future models do not make use of their data in any way. One name for this process is <em>machine unlearning</em>, and the main challenge is removing the data efficiently without retraining all models from scratch. One <a href="http://proceedings.mlr.press/v132/neel21a.html" rel="noreferrer noopener" target="_blank">paper</a>, by Seth Neel, Aaron Roth, and Saeed Sharifi-Malvajerdi, addresses this challenge. They propose ways to strategically update the model by using modified gradient descent methods. They also analyze this approach, and prove new upper and lower bounds for updating models after data deletion with their new optimization algorithm. </p>
+
+
+
+<p>Robust methods for machine learning and statistics aim to provide rigorous guarantees in the presence of outliers or adversarially modified data points. The field of robustness has been steadily growing as researchers uncover more and more models where deviations in the data can lead to unexpected and dramatic changes in model behavior. In ALT 2021, a <a href="http://proceedings.mlr.press/v132/shen21a.html" rel="noreferrer noopener" target="_blank">paper</a> by Jie Shen and Chicheng Zhang covers learning half-spaces nearly optimally even in the presence of malicious noise.</p>
+
+
+
+<p>As a final and thought-provoking direction in trustworthy ML, <a href="https://omereingold.wordpress.com" rel="noreferrer noopener" target="_blank">Omer Reingold</a> points out that we need to better understand “the meaning of individual probabilities/risk scores,” which are common ways that ML systems summarize or justify decisions. Ideally, the output of a model should be something that people can interpret directly and use to potentially modify their future actions. He elaborates that it is important to think about “the individual quantities (which imply important decisions) that ML is trying to approximate” and to answer “what does fitting the parameters of a model on the entire population imply for individuals and subcommunities?” This question brings to the forefront the fact that ML systems affect both individuals and groups of people, which is an important consideration when formulating rigorous definitions of fairness (e.g., see <a href="https://global.oup.com/academic/product/the-ethical-algorithm-9780190948207" rel="noreferrer noopener" target="_blank">this book</a> or <a href="https://fairmlbook.org/" rel="noreferrer noopener" target="_blank">this one</a>).</p>
+
+
+
+<p><strong>Reinforcement Learning</strong><br/>Reinforcement learning (RL) is a framework for interactive learning where an agent interacts with an environment, and the agent’s actions govern the rewards it receives from the environment. Part of the motivation for studying RL is that relevant problems are everywhere. Sometimes the agents are autonomous vehicles. Other times, they are programs playing games like chess or go. People interact more and more with ML models, and hence, living our lives is actually being a part of a multiagent game where we, humans, and the ML models are the agents. “The most exciting direction in learning theory of recent years,” says <a href="https://www.ehazan.com" rel="noreferrer noopener" target="_blank">Elad Hazan</a>, “is adding rigorous theoretical guarantees to reinforcement learning.” </p>
+
+
+
+<p>The RL environment is typically modeled as a <em>Markov decision process (MDP)</em>: a set of states, actions, and transition probabilities that determine the next state and reward given the agent’s current state and action. The agent uses a <em>policy</em> to choose its action from each state with the goal of maximizing its cumulative reward over time. A central challenge is balancing<em> exploration</em> (learning about the environment) and <em>exploitation</em> (spending time choosing actions in states where they can collect high rewards).</p>
+
+
+
+<p>In the most basic setting, <em>multi-armed bandits</em>, there is a single state, and each action (or “arm”) leads to a stochastic reward. “Here, the theory is quite mature, though interesting problems remain in connection to the limits of how structure can be exploited,” <a href="https://sites.ualberta.ca/~szepesva/" rel="noreferrer noopener" target="_blank">Csaba Szepesvári</a> says. In two works at ALT, by <a href="http://proceedings.mlr.press/v132/jourdan21a.html" rel="noreferrer noopener" target="_blank">Marc Jourdan, Mojmír Mutný, Johannes Kirschner, and Andreas Krause</a> and by <a href="http://proceedings.mlr.press/v132/cuvelier21a.html" rel="noreferrer noopener" target="_blank">Thibaut Cuvelier, Richard Combes, and Eric Gourdin</a>, the authors show that efficient exploration is possible in a <em>combinatorial semi-bandit </em>setting. Here, the agent can choose an allowed <em>set</em> of arms in each step, and it receives a distinct reward for each chosen arm. While the number of action choices for the agent is larger, this more detailed feedback makes the problem tractable.</p>
+
+
+
+<p>Beyond the stateless bandit setting, ML theorists are still figuring out how fast agents can learn how to play optimally in MDPs with <em>finite</em> state spaces and action spaces. Recent progress on this front has given lower bounds on the sample complexity required for agents to learn the best policy. In one ALT <a href="http://proceedings.mlr.press/v132/domingues21a.html" rel="noreferrer noopener" target="_blank">paper</a>, the authors give a unified view of lower bounds for three distinct, but related, problems in RL. The hard MDP instances they construct to show lower bounds are based on hard instances for multi-armed bandit problems.</p>
+
+
+
+<p>In the more challenging setting where the state space is infinite, a central question is whether the agent can learn from exploring a finite number of states, and generalize<em> </em>to perform well on unknown areas of the environment. For certain MDPs, generalizing is impossible, but some assumptions on the structure of the MDP may enable generalization. “While algorithm independent problem formulations existed and have been studied in the finite case, a quite recent development is to extend these to the case of ‘large’ environments where the use of <em>function approximation </em>techniques becomes crucial for achieving nontrivial results,” explains Csaba Szepesvári. </p>
+
+
+
+<p>Function approximation has to do with the optimal <em>action-value function, </em>which captures the long-term reward of playing a certain action from a given state. This function can sometimes be approximated by some simple class of functions. One of the strongest such assumptions is <em>linear realizability, </em>where the optimal action-value function<em> </em>is a linear function of some representation of the action and state. In one of the <a href="http://proceedings.mlr.press/v132/weisz21a.html" rel="noreferrer noopener" target="_blank">papers</a> receiving a best paper award in ALT, Gellert Weisz, Philip Amortila, and Csaba Szepesvári show that even under this strong assumption of linear realizability, the agent needs a number of samples exponential in the length of the episode or the dimension of the representation in order to generalize. Looking forward, the goal is to follow the lead of these papers and better understand the landscape of sample complexity: When can we learn models with a polynomial number of samples, and when is an exponential number necessary?</p>
+
+
+
+<p>Nearly every offline learning problem can be studied in an interactive setting, where inputs arrive in an online fashion and need to be processed immediately, which is common in many real-world settings. Models for interactive machine learning provide a framework for studying problems and algorithms in this more challenging setting. Beyond the MDP setting, interactive learning spans online learning (e.g., <a href="http://proceedings.mlr.press/v132/moshkovitz21a.html" rel="noreferrer noopener" target="_blank">no-substitution</a> <a href="http://proceedings.mlr.press/v132/bhattacharjee21a.html" rel="noreferrer noopener" target="_blank">clustering</a>), nonstochastic control theory (e.g., <a href="https://arxiv.org/abs/1911.12178" rel="noreferrer noopener" target="_blank">robust controllers for dynamical systems</a>), <a href="https://arxiv.org/abs/1909.05207" rel="noreferrer noopener" target="_blank">online convex optimization</a>, and many more domains. </p>
+
+
+
+<p><strong>Conclusion</strong><br/>We hope this provides a fairly broad view on some of the topics that people are researching right now in learning theory. Of course, there are many more areas that we don’t have space to describe: theory of deep neural networks, quantum algorithms for machine learning problems, human-centered considerations, learning with strategic agents and multiplayer games, convex/nonconvex optimization, federated and distributed learning algorithms, and many more. In general, as Gautam Kamath observes, “A lot of important questions in learning theory arise through interplay between the theoretical and applied machine learning communities.” To have a greater impact, it is important to collaborate with people doing empirical research, and to learn from the front lines about the most interesting phenomena to explain, or the challenges that do not seem surmountable by combining existing tools.</p>
+
+
+
+<p>To learn more and to get more involved, we have listed a variety of resources (blogs, workshops, videos, etc.) that can help you get started in this area. As a final motivation for writing this article, we remark that people in the area are keenly aware that we need more young talent to help uncover truth and contribute groundbreaking ideas. As Gautam Kamath puts it, “There are far more interesting questions in learning theory than there are researchers to solve them.”</p>
+
+
+
+<h2>Places to learn more</h2>
+
+
+
+<p><strong>Blogs:</strong> <a href="https://ucsdml.github.io" rel="noreferrer noopener" target="_blank">UCSD ML blog</a>, <a href="http://www.offconvex.org" rel="noreferrer noopener" target="_blank"><em>Off the Convex Path</em></a>, <a href="https://windowsontheory.org" rel="noreferrer noopener" target="_blank"><em>Windows On Theory</em></a>, <a href="https://blogs.princeton.edu/imabandit/" rel="noreferrer noopener" target="_blank"><em>I’m a bandit</em></a>, <a href="https://francisbach.com" rel="noreferrer noopener" target="_blank">Francis Bach’s blog</a>, <a href="https://differentialprivacy.org" rel="noreferrer noopener" target="_blank">Differential Privacy blog</a>, <a href="https://distill.pub" rel="noreferrer noopener" target="_blank"><em>Distill</em></a>, <a href="http://thegradient.pub" rel="noreferrer noopener" target="_blank"><em>The Gradient</em></a></p>
+
+
+
+<p><strong>Conferences:</strong> <a href="http://algorithmiclearningtheory.org/alt2021/" rel="noreferrer noopener" target="_blank">ALT</a>, <a href="http://learningtheory.org/colt2021/" rel="noreferrer noopener" target="_blank">COLT</a>, <a href="https://icml.cc" rel="noreferrer noopener" target="_blank">ICML</a>, <a href="https://nips.cc" rel="noreferrer noopener" target="_blank">NeurIPS</a>, <a href="https://aistats.org/aistats2021/" rel="noreferrer noopener" target="_blank">AISTATS</a>, <a href="https://www.auai.org/uai2021/" rel="noreferrer noopener" target="_blank">UAI</a>, <a href="https://responsiblecomputing.org" rel="noreferrer noopener" target="_blank">FORC</a>, <a href="http://acm-stoc.org/stoc2021/" rel="noreferrer noopener" target="_blank">STOC</a>, <a href="http://ieee-focs.org" rel="noreferrer noopener" target="_blank">FOCS</a>, <a href="http://itcs-conf.org" rel="noreferrer noopener" target="_blank">ITCS</a>, <a href="https://iclr.cc/virtual_2020/index.html" rel="noreferrer noopener" target="_blank">ICLR</a>, <a href="https://dl.acm.org/conference/soda" rel="noreferrer noopener" target="_blank">SODA</a></p>
+
+
+
+<p><strong>Podcasts:</strong> <a href="https://twimlai.com" rel="noreferrer noopener" target="_blank"><em>TWIML</em></a>, <a href="https://wandb.ai/site/podcast" rel="noreferrer noopener" target="_blank"><em>Gradient Dissent</em></a>, <a href="https://www.quantamagazine.org/tag/the-joy-of-x/" rel="noreferrer noopener" target="_blank"><em>Joy of x</em></a>, <a href="https://shows.acast.com/the-robot-brains" rel="noreferrer noopener" target="_blank"><em>The Robot Brains</em></a>, <a href="https://www.thetalkingmachines.com/home" rel="noreferrer noopener" target="_blank"><em>Talking Machines</em></a>, <a href="https://www.talkrl.com/episodes/marc-bellemare" rel="noreferrer noopener" target="_blank"><em>TalkRL</em></a>, <a href="https://www.listennotes.com/podcasts/underrated-ml-sara-hooker-sean-hooker-nG4owP2C8s3/" rel="noreferrer noopener" target="_blank"><em>Underrated ML</em></a></p>
+
+
+
+<p><strong>Videos:</strong> <a href="https://simons.berkeley.edu" rel="noreferrer noopener" target="_blank">Simons Institute</a>, <a href="https://www.youtube.com/watch?v=IXotICNx2qk&amp;list=PLdDZb3TwJPZ5dqqg_S-rgJqSFeH4DQqFQ" rel="noreferrer noopener" target="_blank">IAS deep learning workshop</a>, <a href="https://www.oneworldml.org/home" rel="noreferrer noopener" target="_blank">One World ML</a>, <a href="https://www.trustworthyml.org" rel="noreferrer noopener" target="_blank">Trustworthy ML</a>, <a href="https://sites.google.com/view/dstheory/home" rel="noreferrer noopener" target="_blank"><em>Foundations of Data Science</em>,</a> <a href="https://sites.google.com/view/rltheoryseminars/home" rel="noreferrer noopener" target="_blank">RL Theory Virtual Seminars</a>, <a href="https://www.imsi.institute/the-multifaceted-complexity-of-machine-learning/" rel="noreferrer noopener" target="_blank">iMSi: The Multifaceted Complexity of Machine Learning</a>, <em><a href="https://sites.google.com/view/control-meets-learning/home" rel="noreferrer noopener" target="_blank">Control Meets Learning</a></em> </p>
+
+
+
+<p><strong>Acknowledgments:</strong> We thank Kamalika Chaudhuri, Elad Hazan, Daniel Hsu, Gautam Kamath, Shay Moran, Omer Reingold, Csaba Szepesvári, and Claire Vernade for helpful comments and thoughtful quotes. We thank Kush Bhatia, Lee Cohen, Neha Gupta, Nika Haghtalab, Max Hopkins, Gautam Kamath, Gaurav Mahajan, and Uri Sherman for helpful feedback on initial drafts.</p>
+
+
+
+<div class="wp-block-image"><figure class="alignleft is-resized"><img alt="" class="wp-image-339" height="150" src="https://blog.simons.berkeley.edu/wp-content/uploads/2021/07/GlasgowMargalit-2-edited-1.jpg" width="150"/></figure></div>
+
+
+
+<p class="has-text-align-left"><a href="https://web.stanford.edu/~mglasgow/" rel="noreferrer noopener" target="_blank"><strong>Margalit Glasgow</strong></a> is a PhD student in Stanford’s Computer Science Department, advised by Mary Wootters. Her research focuses on theoretical machine learning and random matrices.</p>
+
+
+
+<div class="wp-block-spacer" style="height: 20px;"/>
+
+
+
+<div class="wp-block-image"><figure class="alignright size-large is-resized"><img alt="" class="wp-image-327" height="150" src="https://blog.simons.berkeley.edu/wp-content/uploads/2021/07/MoshkovitzMichal.jpg" width="150"/></figure></div>
+
+
+
+<p><a href="https://sites.google.com/view/michal-moshkovitz" rel="noreferrer noopener" target="_blank"><strong>Michal Moshkovitz</strong></a> is a postdoc at the Qualcomm Institute at UC San Diego. She received her PhD and MSc in computational neuroscience from the Hebrew University of Jerusalem, and her MSc in computer science from Tel Aviv University. Her research focuses on the foundations of AI, exploring how different constraints affect learning. She has worked on bounded-memory learning, explainable machine learning, and online decision-making in unsupervised learning. </p>
+
+
+
+<div class="wp-block-image"><figure class="alignleft size-thumbnail"><img alt="" class="wp-image-332" height="150" src="https://blog.simons.berkeley.edu/wp-content/uploads/2021/07/RashtchianCyrus-150x150.jpg" width="150"/></figure></div>
+
+
+
+<p><strong><a href="https://sites.google.com/site/cyrusrashtchian/" rel="noreferrer noopener" target="_blank">Cyrus Rashtchian</a></strong> is a postdoc at UC San Diego in computer science and engineering, and he received his PhD from the University of Washington. His research focuses on trustworthy machine learning, algorithms for big data, statistical reconstruction, and DNA data storage.</p></div>
+    </content>
+    <updated>2021-07-19T21:20:18Z</updated>
+    <published>2021-07-19T21:20:18Z</published>
+    <category term="General"/>
+    <author>
+      <name>1737780</name>
+    </author>
+    <source>
+      <id>https://blog.simons.berkeley.edu</id>
+      <link href="https://blog.simons.berkeley.edu/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://blog.simons.berkeley.edu" rel="alternate" type="text/html"/>
+      <subtitle>What's New at the Simons Institute for the Theory of Computing.</subtitle>
+      <title>Calvin Café: The Simons Institute Blog</title>
+      <updated>2021-07-19T21:22:22Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>https://eccc.weizmann.ac.il/report/2021/104</id>
@@ -31,7 +215,7 @@
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-19T20:37:35Z</updated>
+      <updated>2021-07-19T21:20:33Z</updated>
     </source>
   </entry>
 
@@ -67,7 +251,7 @@ The efficiency of the classical FFT follows from using the 2-to-1 squaring map t
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-19T20:37:35Z</updated>
+      <updated>2021-07-19T21:20:33Z</updated>
     </source>
   </entry>
 
@@ -92,7 +276,7 @@ The efficiency of the classical FFT follows from using the 2-to-1 squaring map t
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2021-07-19T20:38:43Z</updated>
+      <updated>2021-07-19T21:22:35Z</updated>
     </source>
   </entry>
 
@@ -732,7 +916,7 @@ Email: simonsen@di.ku.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-07-19T20:37:54Z</updated>
+      <updated>2021-07-19T21:20:51Z</updated>
     </source>
   </entry>
 
@@ -913,7 +1097,7 @@ And of course, we have been concerned about the present course of the pandemic a
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-07-19T20:37:50Z</updated>
+      <updated>2021-07-19T21:20:47Z</updated>
     </source>
   </entry>
 
@@ -943,7 +1127,7 @@ And of course, we have been concerned about the present course of the pandemic a
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-19T20:37:35Z</updated>
+      <updated>2021-07-19T21:20:33Z</updated>
     </source>
   </entry>
 
@@ -977,7 +1161,7 @@ Recently, Dinur, Harsha, Venkat, and Yuen [DHVY17] highlighted the GHZ game as a
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-19T20:37:35Z</updated>
+      <updated>2021-07-19T21:20:33Z</updated>
     </source>
   </entry>
 
@@ -1005,7 +1189,7 @@ Recently, Dinur, Harsha, Venkat, and Yuen [DHVY17] highlighted the GHZ game as a
       <link href="https://sarielhp.org/blog" rel="alternate" type="text/html"/>
       <subtitle>Sariel's blog</subtitle>
       <title>Vanity of Vanities, all is Vanity</title>
-      <updated>2021-07-19T20:37:23Z</updated>
+      <updated>2021-07-19T21:20:26Z</updated>
     </source>
   </entry>
 
@@ -1048,7 +1232,7 @@ Recently, Dinur, Harsha, Venkat, and Yuen [DHVY17] highlighted the GHZ game as a
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-07-19T20:37:10Z</updated>
+      <updated>2021-07-19T21:20:11Z</updated>
     </source>
   </entry>
 
@@ -1248,7 +1432,7 @@ We see our results as a significant step towards establishing hazard-free comput
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-19T20:37:35Z</updated>
+      <updated>2021-07-19T21:20:33Z</updated>
     </source>
   </entry>
 
@@ -1270,7 +1454,7 @@ We see our results as a significant step towards establishing hazard-free comput
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-19T20:37:35Z</updated>
+      <updated>2021-07-19T21:20:33Z</updated>
     </source>
   </entry>
 
@@ -1298,7 +1482,7 @@ Here we can give a near-optimal understanding of the probabilistic degree of $n$
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-19T20:37:35Z</updated>
+      <updated>2021-07-19T21:20:33Z</updated>
     </source>
   </entry>
 
@@ -1374,7 +1558,7 @@ Applying these results, we prove the first exponential lower bound for graph iso
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-19T20:37:35Z</updated>
+      <updated>2021-07-19T21:20:33Z</updated>
     </source>
   </entry>
 
@@ -1451,7 +1635,7 @@ These results are (almost) tight, and we prove them using compression arguments 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-19T20:37:35Z</updated>
+      <updated>2021-07-19T21:20:33Z</updated>
     </source>
   </entry>
 
@@ -1708,7 +1892,7 @@ Finally, we make precise potential limitations of theories of bounded arithmetic
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-19T20:37:35Z</updated>
+      <updated>2021-07-19T21:20:33Z</updated>
     </source>
   </entry>
 
@@ -1813,7 +1997,7 @@ The construction used in [<a href="https://dataspace.princeton.edu/handle/88435/
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2021-07-19T20:38:21Z</updated>
+      <updated>2021-07-19T21:22:01Z</updated>
     </source>
   </entry>
 
@@ -1849,54 +2033,6 @@ The construction used in [<a href="https://dataspace.princeton.edu/handle/88435/
       <subtitle>The latest in property testing and sublinear time algorithms</subtitle>
       <title>Property Testing Review</title>
       <updated>2021-07-18T23:31:01Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-US">
-    <id>https://www.scottaaronson.com/blog/?p=5554</id>
-    <link href="https://www.scottaaronson.com/blog/?p=5554" rel="alternate" type="text/html"/>
-    <link href="https://www.scottaaronson.com/blog/?p=5554#comments" rel="replies" type="text/html"/>
-    <link href="https://www.scottaaronson.com/blog/?feed=atom&amp;p=5554" rel="replies" type="application/atom+xml"/>
-    <title xml:lang="en-US">Open thread on new quantum supremacy claims</title>
-    <summary xml:lang="en-US">Happy 4th to those in the US! The group of Chaoyang Lu and Jianwei Pan, based at USTC in China, has been on a serious quantum supremacy tear lately. Recall that last December, USTC announced the achievement of quantum supremacy via Gaussian BosonSampling, with 50-70 detected photons—the second claim of sampling-based quantum supremacy, after Google’s […]</summary>
-    <content type="xhtml" xml:lang="en-US"><div xmlns="http://www.w3.org/1999/xhtml"><p>Happy 4th to those in the US!</p>
-
-
-
-<p>The group of Chaoyang Lu and Jianwei Pan, based at USTC in China, has been on a <em>serious</em> quantum supremacy tear lately.  Recall that last December, USTC announced the achievement of quantum supremacy via Gaussian BosonSampling, with 50-70 detected photons—the second claim of sampling-based quantum supremacy, after Google’s in Fall 2019.  However, skeptics then poked holes in the USTC claim, showing how they could spoof the results with a classical computer, basically by reproducing the k-photon correlations for relatively small values of k.  Debate over the details continues, but the Chinese group seeks to render the debate largely moot with a <a href="https://arxiv.org/abs/2106.15534">new and better Gaussian BosonSampling experiment</a>, with 144 modes and up to 113 detected photons.  They say they were able to measure k-photon correlations for k up to about 19, which if true would constitute a serious obstacle to the classical simulation strategies that people discussed for the previous experiment.</p>
-
-
-
-<p>In the meantime, though, an overlapping group of authors had <a href="https://arxiv.org/abs/2106.14734">put out another paper the day before</a> (!) reporting a sampling-based quantum supremacy experiment using superconducting qubits—extremely similar to what Google did (the same circuit depth and everything), except now with 56 qubits rather than 53.</p>
-
-
-
-<p>I confess that I haven’t yet studied either paper in detail—among other reasons, because I’m on vacation with my family at the beach, and because I’m trying to spend what work-time I have on my own projects.  But anyone who <em>has</em> read them, please use the comments of this post to discuss!  Hopefully I’ll learn something.</p>
-
-
-
-<p>To confine myself to some general comments: since Google’s announcement in Fall 2019, I’ve consistently said that sampling-based quantum supremacy is <em>not</em> yet a done deal.  I’ve said that quantum supremacy seems important enough to want independent replications, and demonstrations in other hardware platforms like ion traps and photonics, and better gate fidelity, and better classical hardness, and better verification protocols.  Most of all, I’ve said that we needed a genuine dialogue between the “quantum supremacists” and the classical skeptics: the former doing experiments and releasing all their data, the latter trying to design efficient classical simulations for those experiments, and so on in an iterative process.  Just like in applied cryptography, we’d only have real confidence in a quantum supremacy claim once it had survived at least a few years of attacks by skeptics.  So I’m delighted that this is precisely what’s now happening.  USTC’s papers are two new volleys in this back-and-forth; we all eagerly await the next volley, whichever side it comes from.</p>
-
-
-
-<p>While I’ve been trying for years to move away from the expectation that I blog about each and every QC announcement that someone messages me about, maybe I’ll also say a word about the recent announcement by IBM of a quantum advantage in space complexity (see <a href="https://www.zdnet.com/article/ibm-researchers-demonstrate-the-advantage-that-quantum-computers-have-over-classical-computers/?fbclid=IwAR0KHVoI8W83Kwmeq9XwmuLHknlKeHjxWcvIjrqjH0QUtLZ8kaIWi6z42yk">here</a> for popular article and <a href="https://arxiv.org/abs/2008.06478">here</a> for arXiv preprint).  There appears to be a nice theoretical result here, about the ability to evaluate any symmetric Boolean function with a single qubit in a branching-program-like model.  I’d love to understand that result better.  But to answer the question I received, this is another case where, once you know the protocol, you know both that the experiment can be done <em>and</em> exactly what its result will be (namely, the thing predicted by QM).  So I think the interest is almost entirely in the protocol itself.</p></div>
-    </content>
-    <updated>2021-07-04T22:34:01Z</updated>
-    <published>2021-07-04T22:34:01Z</published>
-    <category scheme="https://www.scottaaronson.com/blog" term="Announcements"/>
-    <category scheme="https://www.scottaaronson.com/blog" term="Complexity"/>
-    <category scheme="https://www.scottaaronson.com/blog" term="Quantum"/>
-    <author>
-      <name>Scott</name>
-      <uri>http://www.scottaaronson.com</uri>
-    </author>
-    <source>
-      <id>https://www.scottaaronson.com/blog/?feed=atom</id>
-      <link href="https://www.scottaaronson.com/blog" rel="alternate" type="text/html"/>
-      <link href="https://www.scottaaronson.com/blog/?feed=atom" rel="self" type="application/atom+xml"/>
-      <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
-      <title xml:lang="en-US">Shtetl-Optimized</title>
-      <updated>2021-07-04T22:34:01Z</updated>
     </source>
   </entry>
 </feed>
