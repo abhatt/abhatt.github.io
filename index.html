@@ -86,7 +86,7 @@ Stay up to date
 <a class="feedlink" href="" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a class="message" title="404: not found">Center for Computational Intractability</a>
 <br>
-<a class="feedlink" href="http://blog.computationalcomplexity.org/feeds/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
+<a class="feedlink" href="http://www.blogger.com/feeds/3722233/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://blog.computationalcomplexity.org/" title="Computational Complexity">Computational Complexity</a>
 <br>
 <a class="feedlink" href="https://11011110.github.io/blog/feed.xml" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at July 23, 2021 01:39 PM UTC</span>.
+Last updated <span class="datestr">at July 23, 2021 02:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -254,6 +254,104 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://theorydish.blog/?p=2256">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/theorydish.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://theorydish.blog/2021/07/23/average-case-fine-grained-hardness-part-i/">Average-Case Fine-Grained Hardness, Part I</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://theorydish.blog" title="Theory Dish">Theory Dish: Stanford blog</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p>I recently finished my qualifying exam for which I surveyed worst-case to average-case reductions for problems in NP. As part of my survey, I reviewed recent results on average-case hardness in P (a.k.a. average-case fine-grained hardness). I would like to give an overview of some of these results in a series of blog posts, and I want to start by giving some motivations.</p>
+
+
+
+<p><strong>Why do we care about average-case fine-grained hardness?</strong></p>
+
+
+
+<p>(i) We hope to explain why we are struggling to find faster algorithms for problems in P such as DNA sequencing even for some random large datasets.</p>
+
+
+
+<p>(ii) Average-case hard problems in P is useful to cryptography. For example, constructing <a href="https://en.wikipedia.org/wiki/One-way_function">one-way functions</a> (i.e., functions that are easy to compute but hard to invert) based on worst-case complexity assumptions such as NP <img src="https://s0.wp.com/latex.php?latex=%5Cnot%5Csubseteq&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\not\subseteq" class="latex" /> BPP has been a long-standing open question. In this context, “easy” means polynomial-time computable. If we consider “easy” to be computable in time like <img src="https://s0.wp.com/latex.php?latex=O%28n%5E%7B100%7D%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="O(n^{100})" class="latex" /> instead, then a natural alternative question is whether we can construct such one-way functions based on worst-case fine-grained complexity assumptions. Another example is <a href="https://en.wikipedia.org/wiki/Proof_of_work">proof of work</a> <a href="https://link.springer.com/chapter/10.1007/3-540-48071-4_10">[DN92]</a>. When a miner tries to mine the <a href="https://en.wikipedia.org/wiki/Cryptocurrency">cryptocurrency</a>, the miner is asked to solve a random puzzle, that is average-case hard but still tractable, and then the miner needs to prove they have indeed solved the puzzle through efficient protocols. An interesting and more recent follow-up is proof of useful work <a href="https://eprint.iacr.org/2017/203.pdf">[BRSV17b]</a>, which proposes that instead of wasting computing power on a random puzzle that comes from nowhere, we can first reduce a computational task of practical interest to multiple random puzzles and then ask the miner to solve those puzzles.</p>
+
+
+
+<p>The most common approach for proving average-case fine-grained hardness is arguably worst-case to average-case reduction, i.e., reducing an arbitrary instance to a number of random instances of which the distribution is polynomial-time sampable. Before I give concrete examples, I want to describe a general recipe for designing such worst-case to average-case reductions. (Some reader might notice that the step 3 of the recipe is same as the argument for proving <a href="https://en.wikipedia.org/wiki/Random_self-reducibility#Permanent_of_a_matrix">computing permanent is self-reducible</a> <a href="https://www.semanticscholar.org/paper/New-Directions-In-Testing-Lipton/fb2eba4d69bdab34c2d240380d4370be2feeacb9">[L91]</a>, which essentially uses <a href="https://en.wikipedia.org/wiki/Locally_decodable_code#The_Reed%E2%80%93Muller_code">local decoding for Reed-Muller codes</a>.)</p>
+
+
+
+<p><strong>General recipe for worst-case to average-case reductions:</strong></p>
+
+
+
+<ol><li>Choose our favorite hard problem <img src="https://s0.wp.com/latex.php?latex=L%3A%5C%7B0%2C1%5C%7D%5En%5Cto%5Cmathbf%7BZ%7D_%7B%5Cge+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="L:\{0,1\}^n\to\mathbf{Z}_{\ge 0}" class="latex" /> in P.</li><li>Construct a low-degree (degree-<img src="https://s0.wp.com/latex.php?latex=d&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="d" class="latex" />) polynomial <img src="https://s0.wp.com/latex.php?latex=f_%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{L}" class="latex" /> on <img src="https://s0.wp.com/latex.php?latex=%5Cmathbf%7BF%7D_%7Bp%7D%5En&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\mathbf{F}_{p}^n" class="latex" /> such that <img src="https://s0.wp.com/latex.php?latex=f_%7BL%7D%28x%29%3DL%28x%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{L}(x)=L(x)" class="latex" /> for all <img src="https://s0.wp.com/latex.php?latex=x%5Cin%5C%7B0%2C1%5C%7D%5En&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="x\in\{0,1\}^n" class="latex" />.</li><li>To solve <img src="https://s0.wp.com/latex.php?latex=L&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="L" class="latex" /> for worst-case <img src="https://s0.wp.com/latex.php?latex=x%5Cin%5C%7B0%2C1%5C%7D%5En&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="x\in\{0,1\}^n" class="latex" />: sample a uniformly random <img src="https://s0.wp.com/latex.php?latex=y%5Cin%5Cmathbf%7BF%7D_%7Bp%7D%5En&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="y\in\mathbf{F}_{p}^n" class="latex" />, compute <img src="https://s0.wp.com/latex.php?latex=f_%7BL%7D%28x%2Bt_1+y%29%2C%5Cdots%2Cf_%7BL%7D%28x%2Bt_%7Bd%2B1%7D+y%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{L}(x+t_1 y),\dots,f_{L}(x+t_{d+1} y)" class="latex" /> for distinct nonzero <img src="https://s0.wp.com/latex.php?latex=t_1%2C%5Cdots%2Ct_%7Bd%2B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="t_1,\dots,t_{d+1}" class="latex" /> using average-case solver (note each <img src="https://s0.wp.com/latex.php?latex=x%2Bt_%7Bi%7D+y&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="x+t_{i} y" class="latex" /> is uniformly random), interpolate univariate polynomial <img src="https://s0.wp.com/latex.php?latex=g%28t%29%3A%3Df_%7BL%7D%28x%2Bt+y%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="g(t):=f_{L}(x+t y)" class="latex" /> using these points, and output <img src="https://s0.wp.com/latex.php?latex=g%280%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="g(0)" class="latex" /> which is <img src="https://s0.wp.com/latex.php?latex=f_%7BL%7D%28x%29%3DL%28x%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{L}(x)=L(x)" class="latex" />. (This step can be replaced by decoding algorithms for <a href="https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction">Reed-Solomon codes</a> to handle larger errors of average-case solver.)</li><li>(The above steps already show that evaluating <img src="https://s0.wp.com/latex.php?latex=f_%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{L}" class="latex" /> for <img src="https://s0.wp.com/latex.php?latex=d%2B1&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="d+1" class="latex" /> uniformly random inputs is as hard as solving <img src="https://s0.wp.com/latex.php?latex=L&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="L" class="latex" /> for worst-case input.) If we want to show <img src="https://s0.wp.com/latex.php?latex=L&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="L" class="latex" /> itself is average-case fine-grained hard, it suffices to give a reduction from computing <img src="https://s0.wp.com/latex.php?latex=f_%7BL%7D%28x%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{L}(x)" class="latex" /> for <img src="https://s0.wp.com/latex.php?latex=x%5Cin%5Cmathbf%7BF%7D_%7Bp%7D%5En&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="x\in\mathbf{F}_{p}^n" class="latex" /> back to solving <img src="https://s0.wp.com/latex.php?latex=L&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="L" class="latex" />.</li></ol>
+
+
+
+<p>Let us go through a concrete example. Consider one of the flagship problems in fine-grained complexity — orthogonal vector problem (OV): Given <img src="https://s0.wp.com/latex.php?latex=X%3D%5C%7Bx_1%2C%5Cdots%2Cx_n%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="X=\{x_1,\dots,x_n\}" class="latex" />, <img src="https://s0.wp.com/latex.php?latex=Y%3D%5C%7By_1%2C%5Cdots%2Cy_n%5C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="Y=\{y_1,\dots,y_n\}" class="latex" />, where each <img src="https://s0.wp.com/latex.php?latex=x_i%2Cy_i%5Cin%5C%7B0%2C1%5C%7D%5Ed&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="x_i,y_i\in\{0,1\}^d" class="latex" /> for <img src="https://s0.wp.com/latex.php?latex=d%5Cin%5Comega%28%5Clog+n%29%5Ccap+n%5E%7Bo%281%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="d\in\omega(\log n)\cap n^{o(1)}" class="latex" />, decide if there are <img src="https://s0.wp.com/latex.php?latex=x_i%2Cy_j&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="x_i,y_j" class="latex" /> such that <img src="https://s0.wp.com/latex.php?latex=%5Clangle+x_i%2Cy_j%5Crangle%3D0&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\langle x_i,y_j\rangle=0" class="latex" />. It is known OV has no sub-quadratic algorithm assuming strong <a href="https://en.wikipedia.org/wiki/Exponential_time_hypothesis">exponential-time hypothesis</a> (SETH) <a href="https://link.springer.com/chapter/10.1007/978-3-540-27836-8_101">[W05]</a>, and there is a generalization of OV called <img src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="k" class="latex" />-OV problem that has no <img src="https://s0.wp.com/latex.php?latex=O%28n%5E%7Bk-o%281%29%7D%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="O(n^{k-o(1)})" class="latex" /> algorithm under the same assumption <a href="https://dl.acm.org/doi/10.1145/3300150.3300158">[W18]</a>.</p>
+
+
+
+<p><strong>Polynomial evaluation.</strong> Given an OV instance <img src="https://s0.wp.com/latex.php?latex=X%2CY&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="X,Y" class="latex" /> with <img src="https://s0.wp.com/latex.php?latex=d%3Dn%5E%7Bo%281%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="d=n^{o(1)}" class="latex" />, we construct a degree-<img src="https://s0.wp.com/latex.php?latex=2d&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="2d" class="latex" /> polynomial <img src="https://s0.wp.com/latex.php?latex=f_%7B%5Ctextrm%7BOV%7D%7D%28X%2CY%29%3A%3D%5Csum_%7Bi%2Cj%5Cin%5Bn%5D%7D%5Cprod_%7Bt%5Cin%5Bd%5D%7D%281-x_%7Bi%2Ct%7Dy_%7Bi%2Ct%7D%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{\textrm{OV}}(X,Y):=\sum_{i,j\in[n]}\prod_{t\in[d]}(1-x_{i,t}y_{i,t})" class="latex" /> over <img src="https://s0.wp.com/latex.php?latex=%5Cmathbf%7BF%7D_%7Bp%7D%5E%7B2nd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\mathbf{F}_{p}^{2nd}" class="latex" /> for <img src="https://s0.wp.com/latex.php?latex=p%3En%5E2&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="p&gt;n^2" class="latex" />, where <img src="https://s0.wp.com/latex.php?latex=x_%7Bi%2Ct%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="x_{i,t}" class="latex" /> denotes the <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="t" class="latex" />-th coordinate of <img src="https://s0.wp.com/latex.php?latex=x_i%5Cin+X&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="x_i\in X" class="latex" />. Observe that <img src="https://s0.wp.com/latex.php?latex=f_%7B%5Ctextrm%7BOV%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{\textrm{OV}}" class="latex" /> simply enumerates all the pairs of vectors and counts the number of orthogonal pairs for the OV instance, and obviously counting is at least as hard as decision. Using the aforementioned general recipe, it follows immediately that evaluating <img src="https://s0.wp.com/latex.php?latex=f_%7B%5Ctextrm%7BOV%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{\textrm{OV}}" class="latex" /> requires <img src="https://s0.wp.com/latex.php?latex=O%28n%5E%7B2-o%281%29%7D%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="O(n^{2-o(1)})" class="latex" /> time for average case assuming randomized version of SETH. This result was shown in <a href="https://eprint.iacr.org/2017/202.pdf">[BRSV17a]</a>, and analogously, they constructed a polynomial for <img src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="k" class="latex" />-OV, which implies an average-case time hierarchy assuming randomized SETH.</p>
+
+
+
+<p>However, the polynomial evaluation problem is algebraic. Now let us consider a natural combinatorial problem — counting <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="t" class="latex" />-cliques in an <img src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="n" class="latex" />-vertices graph (for simplicity, think of <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="t" class="latex" /> as a large constant). This problem has worst-case complexity <img src="https://s0.wp.com/latex.php?latex=n%5E%7B%5CTheta%28t%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="n^{\Theta(t)}" class="latex" /> assuming ETH <a href="https://core.ac.uk/download/pdf/82508832.pdf">[CHKX06]</a>.</p>
+
+
+
+<p><strong>Counting <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="t" class="latex" />-cliques.</strong> It was first shown in <a href="http://www.wisdom.weizmann.ac.il/~oded/R2/gc.pdf">[GR18]</a> that there is an <img src="https://s0.wp.com/latex.php?latex=%5Cwidetilde%7BO%7D%28n%5E2%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\widetilde{O}(n^2)" class="latex" />-time reduction from counting <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="t" class="latex" />-cliques in any graph to counting <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="t" class="latex" />-cliques with error probability <img src="https://s0.wp.com/latex.php?latex=%3C%5Cfrac%7B1%7D%7B4%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="&lt;\frac{1}{4}" class="latex" /> in some polynomial-time sampable random graph. The proof also follows our general recipe. First, we construct a degree-<img src="https://s0.wp.com/latex.php?latex=%5Cbinom%7Bt%7D%7B2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\binom{t}{2}" class="latex" /> polynomial <img src="https://s0.wp.com/latex.php?latex=f_%7Bt%5Ctextrm%7B-clique%7D%7D%28X%29%3A%3D%5Csum_%7B%5Ctextrm%7Bsize-%7Dt%5C%2C+T%5Csubseteq+%5Bn%5D%7D%5Cprod_%7Bi%3Cj%5Cin+T%7D+X_%7Bi%2Cj%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{t\textrm{-clique}}(X):=\sum_{\textrm{size-}t\, T\subseteq [n]}\prod_{i&lt;j\in T} X_{i,j}" class="latex" /> over <img src="https://s0.wp.com/latex.php?latex=%5Cmathbf%7BF%7D_%7Bp%7D%5E%7Bn%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\mathbf{F}_{p}^{n^2}" class="latex" /> for <img src="https://s0.wp.com/latex.php?latex=p%3En%5Et&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="p&gt;n^t" class="latex" />, where <img src="https://s0.wp.com/latex.php?latex=X&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="X" class="latex" /> is the adjacency matrix. Observe that <img src="https://s0.wp.com/latex.php?latex=f_%7Bt%5Ctextrm%7B-clique%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{t\textrm{-clique}}" class="latex" /> counts <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="t" class="latex" />-cliques by enumerating each size-<img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="t" class="latex" /> subset of vertices and checking whether it is a <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="t" class="latex" />-clique. It remains to work out the step 4 of the general recipe. This was done by a gadget reduction, that runs in <img src="https://s0.wp.com/latex.php?latex=%5Cwidetilde%7BO%7D%28p%5E%7Bt%5E2%7Dn%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\widetilde{O}(p^{t^2}n)" class="latex" /> time, from evaluating <img src="https://s0.wp.com/latex.php?latex=f_%7Bt%5Ctextrm%7B-clique%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{t\textrm{-clique}}" class="latex" /> on <img src="https://s0.wp.com/latex.php?latex=Y%5Cin%5Cmathbf%7BF%7D_%7Bp%7D%5E%7Bn%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="Y\in\mathbf{F}_{p}^{n^2}" class="latex" /> to counting <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="t" class="latex" />-cliques in an <img src="https://s0.wp.com/latex.php?latex=%5Cwidetilde%7BO%7D%28p%5E%7Bt%5E2%7Dn%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\widetilde{O}(p^{t^2}n)" class="latex" />-vertices graph <a href="http://www.wisdom.weizmann.ac.il/~oded/R2/gc.pdf">[GR18]</a>.</p>
+
+
+
+<p>Although this gadget reduction is nice, I will not explain it here, because later works <a href="https://arxiv.org/abs/1903.08247">[BBB19,</a> <a href="https://arxiv.org/abs/2008.06591">DLW20]</a> show that if the polynomial constructed at the step 2 has certain structure, then there is a general technique to reduce evaluating this polynomial back to the original problem (at the cost of requiring smaller error probability of average-case solver), which I will discuss in the next post. Finally, let me point out an issue in the previous paragraph — <img src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="p" class="latex" /> is too large for the gadget reduction to be useful! We need <img src="https://s0.wp.com/latex.php?latex=p%3En%5Et&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="p&gt;n^t" class="latex" /> (note <img src="https://s0.wp.com/latex.php?latex=n%5Et&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="n^t" class="latex" /> is a trivial upper bound of the number of <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="t" class="latex" />-cliques) such that <img src="https://s0.wp.com/latex.php?latex=f_%7Bt%5Ctextrm%7B-clique%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{t\textrm{-clique}}" class="latex" /> indeed outputs the number of <img src="https://s0.wp.com/latex.php?latex=t&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="t" class="latex" />-cliques, but the gadget reduction takes <img src="https://s0.wp.com/latex.php?latex=%5Cwidetilde%7BO%7D%28p%5E%7Bt%5E2%7Dn%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\widetilde{O}(p^{t^2}n)" class="latex" /> time, and moreover, we do not know how to find a prime <img src="https://s0.wp.com/latex.php?latex=%3En%5Et&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="&gt;n^t" class="latex" /> in <img src="https://s0.wp.com/latex.php?latex=%5Cwidetilde%7BO%7D%28n%5E2%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\widetilde{O}(n^2)" class="latex" /> time. This issue was handled in <a href="http://www.wisdom.weizmann.ac.il/~oded/R2/gc.pdf">[GR18]</a> using <a href="https://en.wikipedia.org/wiki/Chinese_remainder_theorem">Chinese remainder theorem</a>. Specifically, we choose <img src="https://s0.wp.com/latex.php?latex=O%28t%5Clog+n%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="O(t\log n)" class="latex" /> many distinct primes <img src="https://s0.wp.com/latex.php?latex=p_i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="p_i" class="latex" />‘s upper bounded by <img src="https://s0.wp.com/latex.php?latex=O%28t%5Clog+n%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="O(t\log n)" class="latex" /> whose product <img src="https://s0.wp.com/latex.php?latex=%3En%5Et&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="&gt;n^t" class="latex" /> (the existence of such primes follows from <a href="https://en.wikipedia.org/wiki/Prime_number_theorem">asymptotic distribution of the prime numbers</a>). Then, we apply the whole reduction described so far to evaluating <img src="https://s0.wp.com/latex.php?latex=f_%7Bt%5Ctextrm%7B-clique%7D%7D%28X%29%5Cmod+p_i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{t\textrm{-clique}}(X)\mod p_i" class="latex" /> for each <img src="https://s0.wp.com/latex.php?latex=p_i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="p_i" class="latex" /> and then use Chinese remainder theorem to recover <img src="https://s0.wp.com/latex.php?latex=f_%7Bt%5Ctextrm%7B-clique%7D%7D%28X%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="f_{t\textrm{-clique}}(X)" class="latex" />. (We can use Chinese remaindering with errors <a href="https://dl.acm.org/doi/10.1109/18.850672">[GRS99]</a> to handle larger error probability.)</p>
+
+
+
+<p>Hopefully, the above examples give you a flavor of worst-case to average-case reductions for fine-grained hard problems. As promised, in the next post, I will continue to discuss the new technique in  <a href="https://arxiv.org/abs/1903.08247">[BBB19,</a> <a href="https://arxiv.org/abs/2008.06591">DLW20]</a>, which automatizes the step 4 of the general recipe by requiring more structural properties for the polynomial constructed in the step 2 of the general recipe.</p>
+
+
+
+<p><strong>Acknowledgements.</strong> I would like to thank my quals committee — Aviad Rubinstein, Tselil Schramm, Li-Yang Tan for valuable feedback to my quals talk.</p>
+
+
+
+<p><br /></p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Junyao Zhao <a href="https://theorydish.blog/2021/07/23/average-case-fine-grained-hardness-part-i/"><span class="datestr">at July 23, 2021 01:50 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2940,56 +3038,6 @@ Here we can give a near-optimal understanding of the probabilistic degree of $n$
 
 <p class="date">
 by David Eppstein <a href="https://11011110.github.io/blog/2021/07/10/angles-arc-triangles.html"><span class="datestr">at July 10, 2021 11:06 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://eccc.weizmann.ac.il/report/2021/097">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eccc.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="https://eccc.weizmann.ac.il/report/2021/097">TR21-097 |  Number of Variables for Graph Identification and the Resolution of GI Formulas | 
-
-	Jacobo Toran, 
-
-	Florian Wörz</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://eccc.weizmann.ac.il/" title="ECCC - Reports">ECCC papers</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-We show that the number of variables and the quantifier depth needed to distinguish a pair of graphs by first-order logic sentences exactly match the complexity measures of clause width and positive depth needed to refute the corresponding graph isomorphism formula in propositional narrow resolution. 
-
-Using this connection, we obtain upper and lower bounds for refuting graph  isomorphism formulas in (normal) resolution. In particular, we show that if $k$ is the minimum number of variables needed to distinguish two graphs with $n$ vertices each, then there is an $n^{\mathrm{O}(k)}$ resolution refutation size upper bound for the corresponding isomorphism formula, as well as lower bounds of $2^{k-1}$ and $k$ for the tree-like resolution size and resolution clause space for this formula. We also show a resolution size lower bound of ${\exp} \big( \Omega(k^2/n) \big)$ for the case of colored graphs with constant color class size.
-
-Applying these results, we prove the first exponential lower bound for graph isomorphism formulas in the proof system SRC-1, a system that extends resolution with a global symmetry rule, thereby answering an open question posed by Schweitzer and Seebach.</div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="https://eccc.weizmann.ac.il/report/2021/097"><span class="datestr">at July 09, 2021 03:37 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
