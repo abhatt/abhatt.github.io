@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-07-23T09:22:28Z</updated>
+  <updated>2021-07-23T09:39:02Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,195 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>https://francisbach.com/?p=6127</id>
+    <link href="https://francisbach.com/laplace-method/" rel="alternate" type="text/html"/>
+    <title>Approximating integrals with Laplace’s method</title>
+    <summary>Integrals appear everywhere in all scientific fields, and their numerical computation is an active area of research. In the playbook of approximation techniques, my personal favorite is “la méthode de Laplace”, a must-know for students that like to cut integrals into pieces, that comes with lots of applications. We will be concerned with integrals of...</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p class="justify-text">Integrals appear everywhere in all scientific fields, and their numerical computation is an active area of research. In the playbook of approximation techniques, my personal favorite is “la méthode de Laplace”, a must-know for students that like to cut integrals into pieces, that comes with lots of applications.</p>
+
+
+
+<p class="justify-text">We will be concerned with integrals of the form $$I(t) =  \int_K h(x) e^{ \, – \, t f(x) } dx, $$ where \(K\) is compact (bounded and closed) subset of \(\mathbb{R}^d\), and \(h\) and \(f\) are two real-valued functions defined on \(K\) such that the integral is well defined for large enough \(t \in \mathbb{R}\). The goal is to obtain an asymptotic equivalent when \(t\) tends to infinity.</p>
+
+
+
+<p class="justify-text">Within machine learning, as explained below, this is useful where computing and approximating integrals is important. This thus comes up naturally in Bayesian inference where \(t\) will be the number of observations in a statistical model. But let’s start with presenting this neat asymptotic result that Laplace discovered for a particular one-dimensional case in 1774 [<a href="http://gallica.bnf.fr/ark:/12148/bpt6k77596b/f32">1</a>].</p>
+
+
+
+<h2>Laplace approximation</h2>
+
+
+
+<p>Let’s first state the main result. Assume that:</p>
+
+
+
+<ul class="justify-text"><li>\(h\) is continuous on \(K\) and that \(f\) is twice continuously differentiable on \(K\).</li><li>\(f\) has a strict global minimizer \(x_\ast\) on \(K\), which is in the interior of \(K\), where the gradient \(f^\prime(x_\ast)\) is thus equal to zero, and where the Hessian \(f^{\prime \prime}(x_\ast)\) is a positive definite matrix (it is always positive semi-definite because \(x_\ast\) is a local minimizer of \(f\)); moreover, \(h(x_\ast) \neq 0\).</li></ul>
+
+
+
+<p class="justify-text">Then, as \(t\) tends to infinity, we have the following asymptotic equivalent: $$ I(t) \sim \frac{h(x_\ast)}{\sqrt{ \det f^{\prime \prime}(x_\ast) }} \Big( \frac{2\pi}{t}\Big)^{d/2}  e^{ \, – \, t f(x_\ast) }.$$</p>
+
+
+
+<p class="justify-text"><strong>Where does it come from?</strong> The idea is quite simple: for \(t&gt;0\), the exponential term \(e^{ \, – \, t f(x) }\) is largest when \(x\) is equal to the minimizer \(x_\ast\). Hence only contributions close to \(x_\ast\) will count in the integral. Then we can do Taylor expansions of the two functions around \(x_\ast\), as \(h(x) \approx h(x_\ast)\) and \(f(x) \approx f(x_\ast) + \frac{1}{2} ( x – x_\ast)^\top f^{\prime \prime}(x_\ast) (x-x_\ast)\), and approximate \(I(t)\) as $$ I(t) \approx \int_K h(x_\ast) \exp\Big[ – t f(x_\ast) \ – \frac{t}{2} ( x – x_\ast)^\top f^{\prime \prime}(x_\ast) (x-x_\ast)\Big] dx.$$ We can then make a change of variable \(y = \sqrt{t} f^{\prime \prime}(x_\ast)^{1/2}( x – x_\ast)\) (where \(f^{\prime \prime}(x_\ast)^{1/2}\) is the positive square root of \(f^{\prime \prime}(x_\ast)\)), to get, with the Jacobian of the transformation leading to the term \(  (\det f^{\prime \prime}(x_\ast) )^{1/2} t^{d/2} \): $$I(t) \approx \frac{ h(x_\ast) e^{ \, – \, t f(x_\ast) }}{( \det f^{\prime \prime}(x_\ast) )^{1/2}t^{d/2} } \int_{\sqrt{t}f^{\prime \prime}(x_\ast)^{1/2}( K \ – x_\ast)} \!\!\! \exp\big[ – \frac{1}{2} y^\top  y  \big] dy.$$ Since \(x_\ast\) is in the interior of \(K\), when \(t\) tends to infinity, the set \(\sqrt{t} f^{\prime \prime}(x_\ast)^{1/2} ( K \ – x_\ast)\) tends to \(\mathbb{R}^d\) (see illustration below), and we obtain the usual Gaussian integral that leads to the normalizing constant of the Gaussian distribution, which is equal to \((2\pi)^{d/2} \).</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-large is-resized"><img alt="" class="wp-image-6263" height="153" src="https://francisbach.com/wp-content/uploads/2021/07/Klaplace-1024x288.png" width="544"/>Left: set \(K\) with \(x_\ast\) in its interior. Right: set \(\sqrt{t} f^{\prime \prime}(x_\ast)^{1/2} ( K \ – x_\ast)\), which is a translated (by \(x_\ast\)), tilted (by \(f^{\prime\prime}(x_\ast)\)) and scaled (by \(\sqrt{t}\)) version of \(K\).</figure></div>
+
+
+
+<p class="justify-text"><strong>Formal proof.</strong> Let’s first make our life simpler: without loss of generality, we may assume that \(f(x_\ast) = 0\) (by subtracting the minimal value), that \(f^{\prime \prime}(x_\ast) = I\) (by a change of variable whose Jacobian is the square root of \(f^{\prime \prime}(x_\ast)\), leading to the determinant term), and that \(x_\ast = 0\). With the dominated convergence theorem (which was unfortunately unknown to me when I first learned about the method in high school, forcing students to cut integrals into multiple pieces), the proof sketch above is almost exact. We simply need a simple argument, based on the existence of a continuous function \(g: K \to \mathbb{R}\) such that $$ g(x) = \frac{f(x) } {\|  x  \|^2}$$ for \(x \neq 0\) and \(g(0) = \frac{1}{2}\) (here \(\| \! \cdot \! \|\) denotes the standard Euclidean norm). The function \(g\) is trivially defined and continuous on \(K \backslash \{0\}\), the value and continuity at zero is a simple consequence of the Taylor expansion $$ f(x) = f(0) + f^\prime(0)^\top x + \frac{1}{2} x^\top f^{\prime\prime}(0)x + o( \| x\|^2) = \frac{1}{2} \| x\|^2 + o( \| x\|^2). $$</p>
+
+
+
+<p class="justify-text">We may then use the same change of variable as above to get the <em>equality</em>: $$I(t) =  \frac{ 1 }{ t^{d/2}  }  \int_{\sqrt{t}  K } h\big( \frac{1}{\sqrt{t}}  y\big) \exp\big[ – \frac{1}{2} y^\top y \cdot g\big(  \frac{1}{\sqrt{t}} y\big) \big] dy.$$ We can write the integral part of the expression above as $$J(t) = \int_{\mathbb{R}^d} a(y,t) dy, $$ with $$a(y,t) = 1_{ y \in \sqrt{t} K } h\big(  \frac{1}{\sqrt{t}}  y\big)\exp\big[ – \frac{1}{2} y^\top y \cdot g\big( \frac{1}{\sqrt{t}} y\big) \big].$$ We have for all \(t&gt;0\) and \(y \in \mathbb{R}^d\), \(|a(y,t)| \leqslant \max_{z \in K} | h(z)| \exp\Big[ – \| y\|^2 \cdot \min_{ z \in K } g(z) \Big]\), which is integrable because \(h\) is continuous on the compact set \(K\) and thus bounded, and \(g\) is strictly positive on \(K\) (since \(f\) is strictly positive except at zero as \(0\) is a strict global minimum), and by continuity, its minimal value is strictly positive. Thus by the <a href="https://en.wikipedia.org/wiki/Dominated_convergence_theorem">dominated convergence theorem</a>: $$\lim_{t \to +\infty} J(t) = \int_{\mathbb{R}^d} \big( \lim_{t \to +\infty} a(y,t) \big) dy = \int_{\mathbb{R}^d}\exp\big[ – \frac{1}{2} y^\top y \big] dy = ( 2\pi)^{d/2}.$$ This leads to the desired result since \(I(t) = J(t) / t^{d/2}\).</p>
+
+
+
+<h2>Classical examples</h2>
+
+
+
+<p>Two cute examples are often mentioned as applications (adapted from [2]).</p>
+
+
+
+<p><strong><a href="https://en.wikipedia.org/wiki/Stirling%27s_approximation">Stirling’s formula</a></strong>. We have, by definition of the <a href="https://en.wikipedia.org/wiki/Gamma_function">Gamma function</a> \(\Gamma\), and the change of variable \(u = tx\):<br/>$$\Gamma(1+t) = \int_0^\infty \!\! e^{-u} u^{t} du = \int_0^\infty \!\! e^{-tx}t^t x^t t dx = t^{t+1} \int_0^\infty \!\! e^{-t(x-\log x)} dx.$$ Since \(x \mapsto x\, – \log x\) is minimized at \(x=1\) with second derivative equal to \(1\), we get: $$\Gamma(1+t) \sim t^{t+1} e^{-t} \sqrt{2\pi / t} = \big( \frac{t}{e} \big)^t \sqrt{ 2\pi t}.,$$ which is exactly Stirling’s formula, often used when \(t\) is an integer, and then, \(\Gamma(1+t) = t!\).</p>
+
+
+
+<p class="justify-text"><strong>Convergence of \(L_p\)-norms to the \(L_\infty\)-norm.</strong> We consider the \(L_p\)-norm of a positive twice continuously differentiable function on the compact set \(K\), with a unique global maximizer at \(x_\ast\) in the interior of \(K\). Then we can write its \(L_p\)-norm \(\|g\|_p\) through $$\| g\|_p^p = \int_K g(x)^p dx = \int_K e^{ p \log g(x)} dx.$$ The function \(f: x \mapsto\  – \log g(x)\) has gradient \(f^\prime(x) = \ – \frac{1}{g(x)}g^\prime(x)\) and Hessian \(f^{\prime\prime}(x)=\  – \frac{1}{g(x)} g^{\prime\prime}(x) + \frac{1}{g(x)^2} g^\prime(x) g^\prime(x)^\top .\) At \(x_\ast\), we get \(f^{\prime\prime}(x_\ast) = \ – \frac{1}{g(x_\ast)} g^{\prime \prime}(x_\ast)\). Thus, using Laplace’s method, we have: $$ \|g\|_p^p =  \frac{A}{p^{d/2}} g(x_\ast)^p (1 + o(1) ),$$ with \(\displaystyle A = \frac{(2\pi g(x_\ast))^{d/2}}{(\det (-g^{\prime\prime}(x_\ast)))^{1/2}}\).</p>
+
+
+
+<p class="justify-text">Taking the power \(1/p\), we get: $$ \|g\|_p = \exp \big( \frac{1}{p} \log \|g\|_p^p\big) =  \exp \Big( \frac{1}{p} \log A \ – \frac{d}{2p} \log p +   \log g(x_\ast) + o(1/p) \Big).$$ This leads to, using \(\exp(u) = 1+u + o(u)\) around zero: $$ \| g\|_p = g(x_\ast) \Big( 1 – \frac{d}{2p} \log p + \frac{1}{p} \log A + o(1/p) \Big) = g(x_\ast) \Big( 1 – \frac{d}{2p} \log p + O(1/p) \Big).$$ A surprising fact is that the second-order term does not depend on anything but \(g(x_\ast)\) (beyond \(p\) and \(d\)). Note that this applies also to continuous log-sum-exp functions.</p>
+
+
+
+<h2>Applications in Bayesian inference</h2>
+
+
+
+<p class="justify-text">It turns out that Laplace’s motivation in deriving this general technique for approximating integrals was exactly Bayesian inference, which he in fact essentially re-discovered and extended (see an interesting account <a href="https://ebrary.net/118879/history/laplaces_bayesian_analysis_1774_1781">here</a>). Let me now explain how Laplace’s method applies.</p>
+
+
+
+<p class="justify-text">We consider a parameterized family of probability distributions with density \(p(x|\theta)\) with respect to some base measure \(\mu\) on \(x \in \mathcal{X}\), with \(\theta \in \Theta \subset \mathbb{R}^d\) a set of parameters. </p>
+
+
+
+<p class="justify-text">As a running example (the one from Laplace in 1774), we consider the classical Bernoulli distribution for \(x \in \mathcal{X} = \{0,1\}\), and densities with respect to the counting measure, that is, the parameter \(\theta \in [0,1]\) is the probability that \(x=1\).</p>
+
+
+
+<p class="justify-text"><strong>From frequentist to Bayesian inference. </strong>We are given \(n\) independent and identically distributed observations \(x_1,\dots,x_n \in \mathcal{X}\), from an unknown probability distribution \(q(x)\). One classical goal of statistical inference is to find the parameter \(\theta \in \Theta\) so that \(p(\cdot| \theta)\) is as close to \(q\) as possible.</p>
+
+
+
+<p class="justify-text">In the frequentist framework, <a href="https://en.wikipedia.org/wiki/Maximum_likelihood_estimation">maximum likelihood estimation</a> amounts to maximizing $$ \sum_{i=1}^n \log p(x_i | \theta)$$ with respect to \(\theta \in \Theta\). It comes with a series of guarantees, in particular (but not only) when \(q = p(\cdot | \theta)\) for a certain \(\theta \in \Theta\). For our running example, the maximum likelihood estimator \(\hat{\theta}_{\rm ML} = \frac{1}{n} \sum_{i=1}^n x_i\) is the frequency of non-zero outcomes.</p>
+
+
+
+<p class="justify-text">In the Bayesian framework, the data are assumed to be generated by a certain \(\theta\), but now with \(\theta\) itself random with some prior probability density \(p(\theta)\) (with respect to the Lebesgue measure). Statistical inference typically does not lead to a point estimator (like the maximum likelihood estimator), but to the full posterior distribution of the parameter \(\theta\) given the observations \(x_1,\dots,x_n\).</p>
+
+
+
+<p class="justify-text">The celebrated <a href="https://en.wikipedia.org/wiki/Bayes%27_theorem">Bayes’ rule</a> states that the posterior density \(p(\theta | x_1,\dots,x_n)\) can be written as: $$p(\theta | x_1,\dots,x_n) = \frac{ p(\theta) \prod_{i=1}^n p(x_i|\theta) }{p(x_1,\dots,x_n)},$$ where \(p(x_1,\dots,x_n)\) is the marginal density of the data (once the parameter has been marginalized out).</p>
+
+
+
+<p class="justify-text">If pressured, a Bayesian will end up giving you a point estimate, but a true Bayesian will not give away the maximum a posteriori estimate (see <a href="https://en.wikipedia.org/wiki/Maximum_a_posteriori_estimation#Limitations">here</a> for some reasons why), but if you give him or her a loss function (e.g., the square loss), he or she will give away (reluctantly) the estimate that minimizes the posterior risk (e.g., the posterior mean for the square loss).</p>
+
+
+
+<p class="justify-text"><strong>Bernoulli and Beta distributions. </strong>In our running Bernoulli example for coin tossing, it is standard to put a <a href="https://en.wikipedia.org/wiki/Conjugate_prior">conjugate prior</a> on \(\theta \in [0,1]\), which is here a <a href="https://en.wikipedia.org/wiki/Beta_distribution">Beta distribution</a> with parameters \(\alpha\) and \(\beta\), that is, $$p(\theta) = \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha) \Gamma(\beta)} \theta^{\alpha-1} ( 1- \theta)^{\beta-1}.$$ The posterior distribution is then also a Beta distribution with parameters \(\alpha + \sum_{i=1}^n x_i\) and \(\beta + \sum_{i=1}^n ( 1- x_i)\). The posterior mean is $$\mathbb{E} [ \theta | x_1,\dots,x_n ] = \frac{\alpha+ \sum_{i=1}^n x_i}{n + \alpha + \beta},$$ and corresponds to having pre-observed \(\alpha\) ones and \(\beta\) zeroes (this is sometimes referred to as Laplace smoothing). However, it is rarely possible to compute the posterior distribution in closed form, hence the need for approximations.</p>
+
+
+
+<p class="justify-text"><strong>Laplace approximation. </strong>Thus, in Bayesian inference, integrals of the form $$ \int_{\Theta} h(\theta) p(\theta) \prod_{i=1}^n p(x_i|\theta) d\theta$$ for some function \(h: \Theta \to \mathbb{R}\), are needed. For example, computing the marginal likelihood corresponds to \(h=1\).</p>
+
+
+
+<p class="justify-text">By taking logarithms, we can write $$\int_{\Theta} h(\theta) p(\theta) \prod_{i=1}^n p(x_i|\theta) d\theta = \int_{\Theta} h(\theta) \exp\Big(  \log p(\theta) + \sum_{i=1}^n \log p(x_i|\theta) \Big) d\theta, $$ and with \(f_n(\theta) = \ – \frac{1}{n} \log p(\theta) \ – \frac{1}{n} \sum_{i=1}^n \log p(x_i|\theta),\) we have an integral in Laplace form, that is, $$\int_{\Theta} h(\theta) \exp( -n f_n(\theta))d\theta,$$ with a function \(f_n\) that now varies with \(n\). This simple variation does not matter as because of the law of large numbers, when \(n\) is large, \(f_n(\theta)\) tends to a fixed function \(\mathbb{E} \big[ \log p(x|\theta) \big]\). </p>
+
+
+
+<p class="justify-text">The Laplace approximation thus requires to compute the minimizer of \(f_n(\theta)\), which is exactly the maximum a posteriori estimate \(\hat{\theta}_{\rm MAP}\), and use the approximation: $$ \int_{\Theta} h(\theta) \exp( -n f_n(\theta))d\theta \approx (2\pi / n)^{d/2} \frac{h( \hat{\theta}_{\rm MAP})}{(\det f_n^{\prime \prime}( \hat{\theta}_{\rm MAP}))^{1/2}} \exp( – n f_n( \hat{\theta}_{\rm MAP})).$$</p>
+
+
+
+<p class="justify-text"><strong>Gaussian posterior approximation.</strong> Note that the Laplace approximation exactly corresponds to approximating the log-posterior density by a quadratic form and thus approximating the posterior by a Gaussian distribution with mean \(\hat{\theta}_{\rm MAP}\) and covariance matrix \(\frac{1}{n} f_n^{\prime \prime}( \hat{\theta}_{\rm MAP})^{-1}\). Note that Laplace’s method gives one natural example of such Gaussian approximation and that <a href="https://en.wikipedia.org/wiki/Variational_Bayesian_methods">variational inference</a> can be used to find better ones.</p>
+
+
+
+<p class="justify-text"><strong>Example.</strong> We consider the Laplace approximation of a Beta random variable, that is a Gaussian with mean at the mode of the original density and variance equal to the inverse of the second derivative of the log-density. Below, the mean \(\alpha / (\alpha +\beta)\) is set to a constant, while the variance shrinks due to an increasing \(\alpha+\beta\) (which corresponds to the number of observations in the Bayesian interpretation above).</p>
+
+
+
+<div class="wp-block-image justify-text"><figure class="aligncenter size-full is-resized"><img alt="" class="wp-image-6335" height="248" src="https://francisbach.com/wp-content/uploads/2021/07/plot_beta-3.gif" width="598"/>Left: densities. Right: negative log-densities translated so that they have matched first two derivatives at their minimum.</figure></div>
+
+
+
+<p class="justify-text">We see above, that for large variances (small \(\alpha +\beta\)), the Gaussian approximation is not tight, while it becomes tighter as the mass gets concentrated around the mode.</p>
+
+
+
+<h2>Extensions</h2>
+
+
+
+<p class="justify-text"><strong>High-order expansion.</strong> The approximation is based on Taylor expansions of the functions \(h\) (order \(0\)) and \(f\) (order \(2\)). In order to obtain extra terms of the form \(t^{d/2+\nu}\), for \(\nu\) a positive integer, we need higher-order derivatives of \(h\) and \(f\). In more than one dimension, that quickly gets complicated (see, e.g., [3, 4]).</p>
+
+
+
+<p class="justify-text">One particular case which is interesting in one dimension is \(h(x) \sim A ( x- x_\ast)^\alpha\), and \(f(x)-f(x_\ast) = B|x-x_\ast|^{\beta}\). Note that \(\alpha=0\) and \(\beta=2\) corresponds to the regular case. A short calculation gives the equivalent \(I(t) \sim \frac{2}{2+\beta}  \frac{A \Gamma\big( \frac{\alpha+1}{\beta} \big)}{(tB)^{\frac{\alpha+1}{\beta}}}\).</p>
+
+
+
+<p class="justify-text"><strong><a href="https://en.wikipedia.org/wiki/Stationary_phase_approximation">Stationary phase approximation</a>.</strong> We can also consider integrals of the form $$I(t) = \int_K h(x) \exp( – i t f(x) ) dx,$$ where \(i\) is the usual square root of \(-1\). Here, the main contribution also comes from vectors \(x\) where the gradient of \(f\) is zero. This can be further extended to more general <a href="https://en.wikipedia.org/wiki/Method_of_steepest_descent">complex integrals</a>.</p>
+
+
+
+<h2>When Napoléon meets Laplace and Lagrange</h2>
+
+
+
+<p class="justify-text">As a conclusion, I cannot resist mentioning a <a href="https://en.wikipedia.org/wiki/Pierre-Simon_Laplace#I_had_no_need_of_that_hypothesis">classical (potentially not totally authentic) anecdote</a> about encounters between Laplace and Lagrange, two mathematical heroes of mine, and Napoléon, as described in [<a href="https://www.gutenberg.org/files/31246/31246-pdf.pdf">5</a>, page 343]:</p>
+
+
+
+<blockquote class="wp-block-quote justify-text"><p>Laplace went in state to beg Napoleon to accept a copy of his work, and the following account of the interview is well authenticated, and so characteristic of all the parties concerned that I quote it in full. Someone had told Napoleon that the book contained no mention of the name of God; Napoleon, who was fond of putting embarrassing questions, received it with the remark, “M. Laplace, they tell me you have written this large book on the system of the universe, and have never even mentioned its Creator.” Laplace, who, though the most supple of politicians, was as stiff as a martyr on every point of his philosophy, drew himself up and answered bluntly, “Je n’avais pas besoin de cette hypothèse-là.” Napoleon, greatly amused, told this reply to Lagrange, who exclaimed, “Ah! c’est une belle hypothèse; ça explique beaucoup de choses.”</p><cite>W. W. Rouse Ball, A Short Account of the History of Mathematics, 1888.</cite></blockquote>
+
+
+
+<h2>References</h2>
+
+
+
+<p class="justify-text">[1] Pierre-Simon Laplace. <a href="http://gallica.bnf.fr/ark:/12148/bpt6k77596b/f32">Mémoire sur la probabilité des causes par les événements</a>, Mémoires de l’Académie royale des sciences de Paris (Savants étrangers), t. VI. p. 621, 27-65, 1774.<br/>[2] Norman Bleistein, Richard A. Handelsman. Asymptotic Expansions of Integrals. Dover<br/>Publications, 1986.[3] Stephen M. Stigler. <a href="https://www.jstor.org/stable/pdf/2245475.pdf">Laplace’s 1774 memoir on inverse probability</a>. <em>Statistical Science</em>, 1(3):359-378, 1986.<br/>[3] Luke Tierney, Robert E. Kass, Joseph B. Kadane. <a href="https://www.jstor.org/stable/pdf/2289652.pdf">Fully exponential Laplace approximations to expectations and variances of nonpositive functions</a>. <em>Journal of the American Statistical Association</em>, 84(407): 710-716, 1989.<br/>[4] Zhenming Shun, Peter McCullagh. <a href="https://www.jstor.org/stable/pdf/2345941.pdf">Laplace approximation of high dimensional integrals</a>. <em>Journal of the Royal Statistical Society: Series B (Methodological)</em> 57(4): 749-760, 1995.<br/>[5] W. W. Rouse Ball. <a href="https://www.gutenberg.org/files/31246/31246-pdf.pdf">A Short Account of the History of Mathematics</a>, 1888.</p></div>
+    </content>
+    <updated>2021-07-23T06:37:20Z</updated>
+    <published>2021-07-23T06:37:20Z</published>
+    <category term="Machine learning"/>
+    <category term="Optimization"/>
+    <category term="Tools"/>
+    <author>
+      <name>Francis Bach</name>
+    </author>
+    <source>
+      <id>https://francisbach.com</id>
+      <link href="https://francisbach.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://francisbach.com" rel="alternate" type="text/html"/>
+      <subtitle>Francis Bach</subtitle>
+      <title>Machine Learning Research Blog</title>
+      <updated>2021-07-23T09:38:59Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>https://eccc.weizmann.ac.il/report/2021/108</id>
@@ -35,7 +224,7 @@
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-23T09:20:36Z</updated>
+      <updated>2021-07-23T09:37:30Z</updated>
     </source>
   </entry>
 
@@ -72,7 +261,7 @@ of the new parameter.</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-23T09:20:36Z</updated>
+      <updated>2021-07-23T09:37:30Z</updated>
     </source>
   </entry>
 
@@ -106,7 +295,7 @@ Along the way, we prove a direct product theorem and several equivalence theorem
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-23T09:20:36Z</updated>
+      <updated>2021-07-23T09:37:30Z</updated>
     </source>
   </entry>
 
@@ -265,7 +454,7 @@ Again, we congratulate the winners—the human winners. What will the full impli
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-07-23T09:20:47Z</updated>
+      <updated>2021-07-23T09:37:40Z</updated>
     </source>
   </entry>
 
@@ -293,7 +482,7 @@ For the sake of completeness, we also show a syntactic size lower bound against 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-23T09:20:36Z</updated>
+      <updated>2021-07-23T09:37:30Z</updated>
     </source>
   </entry>
 
@@ -987,7 +1176,7 @@ separation of $ACC^0$ from $GapL$.
       <link href="https://blog.simons.berkeley.edu" rel="alternate" type="text/html"/>
       <subtitle>What's New at the Simons Institute for the Theory of Computing.</subtitle>
       <title>Calvin Café: The Simons Institute Blog</title>
-      <updated>2021-07-23T09:21:39Z</updated>
+      <updated>2021-07-23T09:38:25Z</updated>
     </source>
   </entry>
 
@@ -1048,7 +1237,7 @@ separation of $ACC^0$ from $GapL$.
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-23T09:20:36Z</updated>
+      <updated>2021-07-23T09:37:30Z</updated>
     </source>
   </entry>
 
@@ -1084,7 +1273,7 @@ The efficiency of the classical FFT follows from using the 2-to-1 squaring map t
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-23T09:20:36Z</updated>
+      <updated>2021-07-23T09:37:30Z</updated>
     </source>
   </entry>
 
@@ -1109,7 +1298,7 @@ The efficiency of the classical FFT follows from using the 2-to-1 squaring map t
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2021-07-23T09:21:50Z</updated>
+      <updated>2021-07-23T09:38:32Z</updated>
     </source>
   </entry>
 
@@ -1156,7 +1345,7 @@ Email: simonsen@di.ku.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-07-23T09:20:51Z</updated>
+      <updated>2021-07-23T09:37:44Z</updated>
     </source>
   </entry>
 
@@ -1338,7 +1527,7 @@ And of course, we have been concerned about the present course of the pandemic a
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-07-23T09:20:47Z</updated>
+      <updated>2021-07-23T09:37:39Z</updated>
     </source>
   </entry>
 
@@ -1368,7 +1557,7 @@ And of course, we have been concerned about the present course of the pandemic a
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-23T09:20:36Z</updated>
+      <updated>2021-07-23T09:37:30Z</updated>
     </source>
   </entry>
 
@@ -1402,7 +1591,7 @@ Recently, Dinur, Harsha, Venkat, and Yuen [DHVY17] highlighted the GHZ game as a
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-23T09:20:36Z</updated>
+      <updated>2021-07-23T09:37:30Z</updated>
     </source>
   </entry>
 
@@ -1430,7 +1619,7 @@ Recently, Dinur, Harsha, Venkat, and Yuen [DHVY17] highlighted the GHZ game as a
       <link href="https://sarielhp.org/blog" rel="alternate" type="text/html"/>
       <subtitle>Sariel's blog</subtitle>
       <title>Vanity of Vanities, all is Vanity</title>
-      <updated>2021-07-23T09:20:24Z</updated>
+      <updated>2021-07-23T09:37:25Z</updated>
     </source>
   </entry>
 
@@ -1473,7 +1662,7 @@ Recently, Dinur, Harsha, Venkat, and Yuen [DHVY17] highlighted the GHZ game as a
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-07-23T09:20:12Z</updated>
+      <updated>2021-07-23T09:37:09Z</updated>
     </source>
   </entry>
 
@@ -1673,7 +1862,7 @@ We see our results as a significant step towards establishing hazard-free comput
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-23T09:20:36Z</updated>
+      <updated>2021-07-23T09:37:30Z</updated>
     </source>
   </entry>
 
@@ -1732,7 +1921,7 @@ We see our results as a significant step towards establishing hazard-free comput
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-07-23T09:20:36Z</updated>
+      <updated>2021-07-23T09:37:30Z</updated>
     </source>
   </entry>
 
@@ -1837,47 +2026,6 @@ Applying these results, we prove the first exponential lower bound for graph iso
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
       <updated>2021-07-23T06:20:31Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>https://11011110.github.io/blog/2021/07/09/spanners-unit-ball</id>
-    <link href="https://11011110.github.io/blog/2021/07/09/spanners-unit-ball.html" rel="alternate" type="text/html"/>
-    <title>Spanners for unit ball graphs in doubling spaces</title>
-    <summary>My student Hadi Khodabandeh had a paper with me on spanners earlier this year at SoCG, in which we showed that the greedy spanner algorithm for points in the Euclidean plane produces graphs with few crossings and small separators. Now we have another spanner preprint: “Optimal spanners for unit ball graphs in doubling metrics”, arXiv:2106.15234.</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>My student Hadi Khodabandeh had a paper with me on spanners earlier this year at SoCG, in which we showed that <a href="https://11011110.github.io/blog/2020/02/17/spanners-have-sparse.html">the greedy spanner algorithm for points in the Euclidean plane produces graphs with few crossings and small separators</a>. Now we have another spanner preprint: <a href="https://arxiv.org/abs/2106.15234">“Optimal spanners for unit ball graphs in doubling metrics”, arXiv:2106.15234</a>.</p>
-
-<p><a href="https://en.wikipedia.org/wiki/Doubling_space">Doubling metrics</a> are a generalization of Euclidean spaces. Like Euclidean spaces, they have a dimension, the <em>doubling dimension</em>, but it might not be an integer. Even the doubling dimension of the Euclidean plane itself is \(\log_2 7\approx 2.807355\); this means that every circular disk of radius \(r\) in the plane can be covered by seven closed disks of radius \(r/2\).</p>
-
-<p style="text-align: center;"><img alt="Seven disks of radius $$r/2$$ cover a single disk of radius $$r$$" src="https://11011110.github.io/blog/assets/2021/doubling-dim.svg"/></p>
-
-<p>Analogously, the <em>doubling constant</em> of a metric space (if it exists) is the smallest number \(c\) such that every closed metric ball (the set of points within some radius \(r\) of a fixed point) can be covered by \(c\) balls of half the radius. The <em>doubling dimension</em> is the binary logarithm of the doubling constant. A metric space is a <em>doubling metric</em> or <em>doubling space</em> if it has a doubling constant and doubling dimension. This is true for all Euclidean spaces: for instance, if you cover a ball with a grid of hypercubes, sized small enough that their long diagonal has length at most the radius of the ball, you obtain doubling constant at most \(\lceil 2\sqrt{d}\rceil^d\), although it seems difficult to compute the precise doubling constant in general.</p>
-
-<p style="text-align: center;"><img alt="Nine disks of radius $$r/2$$ cover a square grid that covers a single disk of radius $$r$$" src="https://11011110.github.io/blog/assets/2021/grid-doubling.svg"/></p>
-
-<p>The hyperbolic plane provides a natural example of a space that is not a doubling space: arbitrarily large-radius disks require arbitrarily many half-radius disks to cover them.</p>
-
-<p>Many results in computational geometry can be generalized to doubling metrics, but not always, and sometimes with difficulty. That includes results on spanners, as we consider in our paper. A spanner of a weighted graph is a subgraph whose shortest path distances approximate the distances in the full graph, and often for spanners of metric spaces one uses the complete graph, weighted by the metric distance between each pair of points. But here, we are using a different graph, the unit ball graph. The unit ball graph, for points in a continuous space, has an edge whenever two unit balls centered at two of the points have a nonempty intersection, and it can be extended to discrete point sets by instead including an edge whenever two points are at distance at most 2 (or, as in our paper, distance at most 1; scaling doesn’t really change anything). The weights are the same as in the complete graph. If a spanner accurately approximates all edge weights, it approximates all paths.</p>
-
-<p>The unit ball graph has fewer edges to approximate than the complete graph. But that actually makes it harder to approximate, because by the same token there are fewer edges that can be used in the spanner. Despite that, the greedy spanner algorithm still produces a spanner, but one of its key properties is lost when going from Euclidean to doubling spaces: Euclidean greedy spanners have bounded degree, but greedy spanners in doubling spaces do not. Instead, our paper provides different spanner algorithms that apply to unit ball graphs, approximate paths in these graphs arbitrarily well, have bounded degree, have total weight a constant times that of the minimum spanning tree, and can be constructed efficiently in a distributed model of computing. I think the details are too technical to go into here, so see the paper for more.</p>
-
-<p>(<a href="https://mathstodon.xyz/@11011110/106551534535329957">Discuss on Mastodon</a>)</p></div>
-    </content>
-    <updated>2021-07-09T09:06:00Z</updated>
-    <published>2021-07-09T09:06:00Z</published>
-    <author>
-      <name>David Eppstein</name>
-    </author>
-    <source>
-      <id>https://11011110.github.io/blog/feed.xml</id>
-      <author>
-        <name>David Eppstein</name>
-      </author>
-      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
-      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
-      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
-      <title>11011110</title>
-      <updated>2021-07-16T01:38:05Z</updated>
     </source>
   </entry>
 </feed>
