@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-08-06T06:22:54Z</updated>
+  <updated>2021-08-06T06:39:59Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,143 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2021/08/05/predicting-weighted-ranks</id>
+    <link href="https://11011110.github.io/blog/2021/08/05/predicting-weighted-ranks.html" rel="alternate" type="text/html"/>
+    <title>Predicting weighted ranks</title>
+    <summary>This week’s events have included Olympic sport climbing, for the first time. The NBC livestream of the women’s qualification suffered a bit of an embarrassment, though, as the computer display of the results incorrectly showed some competitors as being guaranteed to qualify when they were not. (Rest of post contains spoilers; don’t click if you don’t want to know about the outcomes of the event.)</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>This week’s events have included Olympic sport climbing, for the first time. The NBC livestream of the women’s qualification suffered a bit of an embarrassment, though, as the computer display of the results incorrectly showed some competitors as being guaranteed to qualify when they were not. (Rest of post contains spoilers; don’t click if you don’t want to know about the outcomes of the event.)</p>
+
+<p>For example, the screenshot below shows Viktoriia Meshkova as a qualifier, with one more climb to go, but she was actually eliminated after the last climb. The commentators noticed the problem and had to tell the audience not to pay attention to that part of the display. What went wrong, and how could it have been done correctly?</p>
+
+<p style="text-align: center;"><img alt="Ranking with one climb to go in the 2021 Olympic women's sport climbing qualifying event" src="https://11011110.github.io/blog/assets/2021/rank-product/5.jpg" width="80%"/></p>
+
+<h1 id="background">Background</h1>
+
+<p>The important things to know about this event are:</p>
+
+<ul>
+  <li>
+    <p>It involves three disciplines, speed, bouldering, and lead, in that order. One discipline finishes before the next one starts (in fact there is a long rest period between each two disciplines).</p>
+  </li>
+  <li>
+    <p>The scores from each discipline are turned into orderings, giving each of the competitors a number from 1 to 20, before combining them into a single outcome.
+Each of 20 competitors gets a rank from 1 to 20 in each of the three disciplines.</p>
+  </li>
+  <li>
+    <p>These numbers are multiplied and the eight competitors with the <a href="https://11011110.github.io/blog/2020/07/16/comparing-multi-sport.html">smallest product of ranks</a> advance to the final round.</p>
+  </li>
+  <li>
+    <p>In lead climbing, the ranks are based on how high each competitor climbs, with ties broken by time, so any competitor who has not yet climbed can slot into the ranking in any position.</p>
+  </li>
+</ul>
+
+<p>In screens like the one shown above, the livestream showed the standings of the competitor, ordered by their product of ranks: the product of two ranks for competitors who had not yet climbed and the product of all three current ranks for competitors who had already climbed. It predicted qualification for competitors who had already climbed and were in the top eight in this ordering.This seems reasonable, at first glance: their ordering among the people who have already climbed is set, and the people who have not yet climbed can only go down in the ordering, so they will stay in the top eight.</p>
+
+<p>But their ordering among competitors who had already climbed is <em>not</em> set. In the example shown above, before Janja Garnbret climbed, Meshkova was ahead of two other climbers, Aleksandra Miroslaw and Anouck Jaubert, both of whom had done well in speed and badly in lead. Garnbret climbed better than Meshkova, bumping Meshkova’s lead ranking down from fourth to fifth. That hurt Meshkova’s combined score a lot more than it hurt Miroslaw’s and Jaubert’s, because Miroslaw and Jaubert already had very high ranks in lead. At the end of the competition, Meshkova was behind Miroslaw and Jaubert, and out of the competition.</p>
+
+<h1 id="analysis">Analysis</h1>
+
+<p>We can formulate this as an algorithms problem: Suppose we have \(n\) competitors, numbered \(1\dots n\), each with a weight \(w_i\) (their combined score from the previous disciplines). We have selected an ordering on a set \(X\) of the competitors, while the remaining set \(Y\) have yet to be ordered. The eventual ordering on \(X\cup Y\) must be consistent with the ordering we already know on \(X\). If competitor \(i\) ends up in position \(p_i\), they get a combined score \(w_i\cdot p_i\) and a combined rank based on sorting these combined scores. (To keep the terminology from being confused, I’ll stick to “ordering” for the result of a single discipline, and “ranking” for the combined result of the whole competition.) What we want to know, for each competitor number \(i\), is: what is the maximum possible combined rank \(r_i\)? Before formulating an algorithm for this problem, let’s do some analysis to find simplifying assumptions that can make the algorithm fast.</p>
+
+<p>For the climbing competition, \(n=20\) and we only care whether \(r_i\le 8\) or \(r_i&gt;8\): is competitor \(i\) guaranteed a spot in the final or not? More generally, we can ask the same question for any \(n\) and any threshold on the combined rank. We can also ask this question regardless of whether competitor \(i\) has already competed (that is, whether \(i\in X\)): if not, it’s safe to assume that they will end up last in the ordering, because that’s the slot that will give them the maximum combined rank.</p>
+
+<p>For each competitor \(j\) in the set \(Y\) of not-yet-ordered competitors, it’s always safe to assume that \(j\) will slot in somewhere above \(i\) in the final ordering. Slotting in immediately above \(i\) is always worse for \(i\) than slotting in anywhere below \(i\), because it hurts the ranking for \(i\) more than it hurts anyone else. Therefore, it can only cause \(i\) to go down among the combined rankings of competitors who are already ordered. Once we make this assumption, we know the final position \(p_i\) of competitor \(i\) in our ordering, and therefore we also know the final combined score \(w_i\cdot p_i\). This assumption lets us determine which final scores beat \(i\), and (because their orderings are also fixed by this assumption) determines which of the competitors ordered later than \(i\) in \(X\) end up beating \(i\). What remains to be determined is which of the competitors ordered earlier than \(i\) in \(X\) might beat \(i\), and which of the competitors in \(Y\) might <span style="white-space: nowrap;">beat \(i\).</span></p>
+
+<p>We don’t know how many competitors in \(Y\) beat \(i\), but we can guess; there are only \(\vert Y\vert\lt n\) possibilities to try. Suppose that we guess that this number is \(k\). If our guess is correct, then we can safely assume that these \(k\) better competitors are the ones in \(Y\) with the \(k\) smallest weights. Any other outcome that puts \(k\) competitors in \(Y\) ahead of \(i\) can be swapped to an outcome that puts these \(k\) competitors ahead, without changing the ranks of any competitors <span style="white-space: nowrap;">in \(X\).</span></p>
+
+<p>Once we know which \(k\) competitors in \(Y\) beat \(i\), we also know how good a position \(p_j\) each of these competitors will need to attain, to beat \(i\). We can assign these competitors to these positions, breaking ties by moving some up into higher positions, determining where they all slot into the overall ordering. Among all assignments of positions to these competitors that puts them ahead of \(i\), this is the one that hurts the other competitors of \(i\) the least. Once this is done, we can safely assign all of the remaining competitors in \(Y\) to an ordering that slots them in just ahead of \(i\), again hurting \(i\) while causing the least hurt to the competitors <span style="white-space: nowrap;">of \(i\).</span></p>
+
+<p>With the ordering of competitors completely determined by the choice of \(k\), all we need to do is try all choices of \(k\) and test which ones put the largest number of competitors ahead <span style="white-space: nowrap;">of \(i\)!</span></p>
+
+<p>There is a complication here with tiebreaks that I am not handling. If two competitors get the same combined score, the one who is ahead in two of the three disciplines gets the higher combined rank. If three competitors get the same combined score, and they have a cyclic ordering on tiebreaks, I don’t know what happens, and I suspect the rules don’t cover that situation. To simplify things I will just assume that all tiebreaks go against the candidate (so we might not guarantee qualification until the ties are resolved).</p>
+
+<h1 id="algorithm">Algorithm</h1>
+
+<p>Based on these simplifications, our algorithm for computing the maximum combined rank \(r_i\) of competitor \(i\) performs the following steps:</p>
+
+<ul>
+  <li>
+    <p>If \(i\) is not already in \(X\), add it to \(X\) with a position after all of the other competitors <span style="white-space: nowrap;">in \(X\).</span></p>
+  </li>
+  <li>
+    <p>Loop through all choices of \(k\) in \(0\dots\vert Y\vert\). For each choice:</p>
+
+    <ul>
+      <li>
+        <p>Determine, for each \(j\) in the \(k\) smallest-weight competitors in \(Y\), the position \(p_j\) that \(j\) would need to obtain to <span style="white-space: nowrap;">beat \(i\)</span></p>
+      </li>
+      <li>
+        <p>While any two of these competitors have the same value for \(p_j\), decrement one of these two values. If this causes any value to become non-positive, continue the outer loop with the next choice <span style="white-space: nowrap;">of \(k\).</span></p>
+      </li>
+      <li>
+        <p>Place the competitors in \(Y\) that are not among the \(k\) smallest immediately above \(i\) in the ordering</p>
+      </li>
+      <li>
+        <p>Place the \(k\) smallest-weight competitors into positions \(p_j\), preserving the ordering of the remaining competitors.</p>
+      </li>
+      <li>
+        <p>In the resulting ordering, determine how many competitors <span style="white-space: nowrap;">beat \(i\)</span></p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Return the maximum number of competitors beating \(i\) in all of the orderings that have been examined</p>
+  </li>
+</ul>
+
+<p>With some care it should be possible to do all of this in time \(O(nk)\). <a href="https://11011110.github.io/blog/assets/2021/rank-product/qualify.py">My implementation</a> is slower because I was more interested in getting it to work than in optimizing it, and for \(n=20\) it is blazingly fast regardless.</p>
+
+<h1 id="outcomes">Outcomes</h1>
+
+<p>With all that in mind, and assuming that (somehow) I’ve implemented this correctly, let’s look at what this algorithm predicts for the actual data.</p>
+
+<p style="text-align: center;"><img alt="Ranking with five climbs to go in the 2021 Olympic women's sport climbing qualifying event" src="https://11011110.github.io/blog/assets/2021/rank-product/2.jpg" width="80%"/></p>
+
+<p>At this stage of the qualifications, five competitors are left to climb. NBC predicted that Seo, Raboutou, and Pilz had already qualified, and my implementation agrees for Seo and Raboutou (both can finish at worst 8th) but it was incorrect for Pilz, who could drop to 9th if Miroslaw miraculously finished 2nd and Garnbret 3rd. More surprising to me, Garnbret was still not an automatic qualifier: if she finished 20th, enough other competitors could better her score to put her into 9th place.</p>
+
+<p style="text-align: center;"><img alt="Ranking with three climbs to go in the 2021 Olympic women's sport climbing qualifying event" src="https://11011110.github.io/blog/assets/2021/rank-product/3.jpg" width="80%"/></p>
+
+<p>After two more climbs, the faulty NBC algorithm claims that five climbers have qualified. My program agrees for Seo (worst rank 6), Nonaka (worst rank 5), Raboutou (worst rank 7), but still not Pilz (worst rank 9) or Jaubert (worst rank 10). My code now thinks Garnbret has locked in a rank of at worst 7th, qualifying without even climbing yet.</p>
+
+<p style="text-align: center;"><img alt="Ranking with two climbs to go in the 2021 Olympic women's sport climbing qualifying event" src="https://11011110.github.io/blog/assets/2021/rank-product/4.jpg" width="80%"/></p>
+
+<p>Shauna Coxsey, climbing with an injured knee, has climbed into the middle of the pack, falling off the top ten ranking, and her place has been taken by Kyra Condie. Garnbret is now at worst 6th and should have been marked as qualified. Noguchi is not quite guaranteed yet, with a scenario in which she could rank 9th. Seo is now at worst 5th, Nonaka at worst 4th, Raboutou at worst 5th, and Pilz at worst 8th (now guaranteeing her spot). But Jaubert and Miroslaw each could end 9th; at most one of Jaubert, Miroslaw, or Nonaka will be eliminated, but we can’t yet guarantee any of their spots.</p>
+
+<p style="text-align: center;"><img alt="Ranking with one climb to go in the 2021 Olympic women's sport climbing qualifying event" src="https://11011110.github.io/blog/assets/2021/rank-product/5.jpg" width="80%"/></p>
+
+<p>Until now, all of the “Q” markings shown on the livestream, while mathematically incorrect in many cases, were at least correct in hindsight: the people marked that way did end up qualifying. This one, though, a repeat of the first image in this post, gets it wrong in practice as well as in theory. Meshkova is marked as qualifying, but did not. Coxsey has moved back into the top ten. Miroslaw and Jaubert could still have ended up 9th (under different scenarios, obviously) and should not have been marked as qualifying. Seo is at worst 4th, Nonaka is at most 3rd, Noguch is at most 4th, Raboutou is at most 5th, and Pilz is at most 6th.</p>
+
+<p>And the final ranking:</p>
+
+<p style="text-align: center;"><img alt="Final ranking in the 2021 Olympic women's sport climbing qualifying event, top ten" src="https://11011110.github.io/blog/assets/2021/rank-product/6a.jpg" width="80%"/></p>
+
+<p style="text-align: center;"><img alt="Final ranking in the 2021 Olympic women's sport climbing qualifying event, bottom ten" src="https://11011110.github.io/blog/assets/2021/rank-product/6a.jpg" width="80%"/></p>
+
+<h1 id="the-future">The future</h1>
+
+<p>I think the moral of the story is that this ranking system is too hard to understand and a little too random (with players trading places too much depending on what other players do). To some extent this is unavoidable (a version of <a href="https://en.wikipedia.org/wiki/Arrow%27s_impossibility_theorem">Arrow’s impossibility theorem for rank aggregation</a>), but the scuttlebutt seems to be that this system will be replaced for future competitions. Which, sadly, makes all of this algorithm design a little redundant…</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/106707759220927820">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2021-08-05T23:23:00Z</updated>
+    <published>2021-08-05T23:23:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2021-08-06T06:27:14Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>tag:blogger.com,1999:blog-3722233.post-5445216218770736629</id>
@@ -104,7 +241,7 @@
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-08-06T06:20:42Z</updated>
+      <updated>2021-08-06T06:37:34Z</updated>
     </source>
   </entry>
 
@@ -471,7 +608,7 @@ We admit the tabletop suggestion is far from electrifying, but has anyone come u
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-08-06T06:20:48Z</updated>
+      <updated>2021-08-06T06:37:40Z</updated>
     </source>
   </entry>
 
@@ -498,7 +635,7 @@ Email: sfifellowship@santafe.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-08-06T06:20:53Z</updated>
+      <updated>2021-08-06T06:37:44Z</updated>
     </source>
   </entry>
 
@@ -768,7 +905,7 @@ Email: sfifellowship@santafe.edu</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-08-06T06:20:42Z</updated>
+      <updated>2021-08-06T06:37:33Z</updated>
     </source>
   </entry>
 
@@ -794,7 +931,7 @@ We show that every $n$-vertex, $m$-edge, $d$-degenerate graph can be made a sum 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-06T06:20:38Z</updated>
+      <updated>2021-08-06T06:37:29Z</updated>
     </source>
   </entry>
 
@@ -834,7 +971,7 @@ Our upper bounds also yield upper bounds on the approximate rank, approximate no
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-06T06:20:38Z</updated>
+      <updated>2021-08-06T06:37:29Z</updated>
     </source>
   </entry>
 
@@ -921,7 +1058,7 @@ Our upper bounds also yield upper bounds on the approximate rank, approximate no
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2021-08-01T01:12:48Z</updated>
+      <updated>2021-08-06T06:27:14Z</updated>
     </source>
   </entry>
 
@@ -1059,7 +1196,7 @@ I have hinted at some other issues in chess but stopped short of addressing them
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-08-06T06:20:49Z</updated>
+      <updated>2021-08-06T06:37:41Z</updated>
     </source>
   </entry>
 
@@ -1137,7 +1274,7 @@ I have hinted at some other issues in chess but stopped short of addressing them
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2021-08-06T06:22:17Z</updated>
+      <updated>2021-08-06T06:39:05Z</updated>
     </source>
   </entry>
 
@@ -1165,7 +1302,7 @@ Email: klim@bgu.ac.il</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-08-06T06:20:52Z</updated>
+      <updated>2021-08-06T06:37:44Z</updated>
     </source>
   </entry>
 
@@ -1195,7 +1332,7 @@ Turning to $k$-SUB-SAT for $k \ge 3$, while known algorithms for solving a syste
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-06T06:20:38Z</updated>
+      <updated>2021-08-06T06:37:29Z</updated>
     </source>
   </entry>
 
@@ -1282,7 +1419,7 @@ Turning to $k$-SUB-SAT for $k \ge 3$, while known algorithms for solving a syste
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2021-08-06T06:21:18Z</updated>
+      <updated>2021-08-06T06:38:36Z</updated>
     </source>
   </entry>
 
@@ -1409,7 +1546,7 @@ Email: dan.alistarh@ist.ac.at</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-08-06T06:20:53Z</updated>
+      <updated>2021-08-06T06:37:44Z</updated>
     </source>
   </entry>
 
@@ -1470,7 +1607,7 @@ Email: dan.alistarh@ist.ac.at</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-06T06:20:38Z</updated>
+      <updated>2021-08-06T06:37:29Z</updated>
     </source>
   </entry>
 
@@ -1512,7 +1649,7 @@ Email: dan.alistarh@ist.ac.at</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-06T06:20:38Z</updated>
+      <updated>2021-08-06T06:37:29Z</updated>
     </source>
   </entry>
 
@@ -1813,7 +1950,7 @@ Besides highlighting the power of QRAT system, this work also presents the first
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-06T06:20:38Z</updated>
+      <updated>2021-08-06T06:37:29Z</updated>
     </source>
   </entry>
 
@@ -1840,7 +1977,7 @@ Email: applications.taa@univie.ac.at</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-08-06T06:20:53Z</updated>
+      <updated>2021-08-06T06:37:44Z</updated>
     </source>
   </entry>
 
@@ -1864,7 +2001,7 @@ Email: applications.taa@univie.ac.at</p></div>
       <link href="https://adamsheffer.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Discrete geometry and other typos</subtitle>
       <title>Some Plane Truths</title>
-      <updated>2021-08-06T06:21:42Z</updated>
+      <updated>2021-08-06T06:38:51Z</updated>
     </source>
   </entry>
 
@@ -1987,7 +2124,7 @@ Email: applications.taa@univie.ac.at</p></div>
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2021-08-06T06:22:17Z</updated>
+      <updated>2021-08-06T06:39:04Z</updated>
     </source>
   </entry>
 
@@ -2176,7 +2313,7 @@ Email: applications.taa@univie.ac.at</p></div>
       <link href="https://francisbach.com" rel="alternate" type="text/html"/>
       <subtitle>Francis Bach</subtitle>
       <title>Machine Learning Research Blog</title>
-      <updated>2021-08-06T06:22:48Z</updated>
+      <updated>2021-08-06T06:39:55Z</updated>
     </source>
   </entry>
 
@@ -2204,7 +2341,7 @@ Email: applications.taa@univie.ac.at</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-06T06:20:38Z</updated>
+      <updated>2021-08-06T06:37:29Z</updated>
     </source>
   </entry>
 
@@ -2241,7 +2378,7 @@ of the new parameter.</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-06T06:20:38Z</updated>
+      <updated>2021-08-06T06:37:29Z</updated>
     </source>
   </entry>
 
@@ -2275,7 +2412,7 @@ Along the way, we prove a direct product theorem and several equivalence theorem
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-06T06:20:38Z</updated>
+      <updated>2021-08-06T06:37:29Z</updated>
     </source>
   </entry>
 
@@ -2435,7 +2572,7 @@ Again, we congratulate the winners—the human winners. What will the full impli
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-08-06T06:20:49Z</updated>
+      <updated>2021-08-06T06:37:41Z</updated>
     </source>
   </entry>
 
@@ -2463,45 +2600,7 @@ For the sake of completeness, we also show a syntactic size lower bound against 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-06T06:20:38Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-US">
-    <id>https://www.scottaaronson.com/blog/?p=5561</id>
-    <link href="https://www.scottaaronson.com/blog/?p=5561" rel="alternate" type="text/html"/>
-    <link href="https://www.scottaaronson.com/blog/?p=5561#comments" rel="replies" type="text/html"/>
-    <link href="https://www.scottaaronson.com/blog/?feed=atom&amp;p=5561" rel="replies" type="application/atom+xml"/>
-    <title xml:lang="en-US">Slowly emerging from blog-hibervacation</title>
-    <summary xml:lang="en-US">Alright everyone: Victor Galitski has an impassioned rant against out-of-control quantum computing hype, which I enjoyed and enthusiastically recommend, although I wished Galitski had engaged a bit more with the strongest arguments for optimism (e.g., the recent sampling-based supremacy experiments, the extrapolations that show gate fidelities crossing the fault-tolerance threshold within the next decade). Even […]</summary>
-    <content type="xhtml" xml:lang="en-US"><div xmlns="http://www.w3.org/1999/xhtml"><p>Alright everyone:</p>
-
-
-
-<ol><li>Victor Galitski has an <a href="https://www.linkedin.com/pulse/quantum-computing-hype-bad-science-victor-galitski-1c?trk=public_post-content_share-article_title">impassioned rant against out-of-control quantum computing hype</a>, which I enjoyed and enthusiastically recommend, although I wished Galitski had engaged a bit more with the strongest arguments for optimism (e.g., the recent sampling-based supremacy experiments, the extrapolations that show gate fidelities crossing the fault-tolerance threshold within the next decade).  Even if I’ve been saying similar things on this blog for 15 years, I clearly haven’t been doing so in a style that works for everyone.  Quantum information needs as many people as possible who will tell the truth as best they see it, unencumbered by any competing interests, and has nothing legitimate to fear from that.  The modern intersection of quantum theory and computer science has raised profound scientific questions that will be with us for decades to come.  It’s a lily that need not be gilded with hype.<br/></li><li>Last month Limaye, Srinivasan, and Tavenas posted <a href="https://eccc.weizmann.ac.il/report/2021/081/">an exciting preprint to ECCC</a>, which apparently proves the first (slightly) superpolynomial lower bound on the size of constant-depth arithmetic circuits, over fields of characteristic 0.  Assuming it’s correct, this is another small victory in the generations-long war against the P vs. NP problem.<br/></li><li>I’m grateful to the Texas Democratic legislators who fled the state to prevent the legislature, a couple miles from my house, having a quorum to enact new voting restrictions, and who thereby drew national attention to the enormity of what’s at stake.  It should go without saying that, if a minority gets to rule indefinitely by forcing through laws to suppress the votes of a majority that would otherwise unseat it, thereby giving itself the power to force through more such laws, etc., then we no longer live in a democracy but in a banana republic.  And there’s no symmetry to the situation: no matter how terrified you (or I) might feel about wokeists and their denunciation campaigns, the Democrats have no comparable effort to suppress Republican votes.  Alas, I don’t know of any solutions beyond the obvious one, of trying to deal the conspiracy-addled grievance party crushing defeats in 2022 and 2024.<br/></li><li><strong><span class="has-inline-color has-vivid-red-color">Added:</span></strong> <a href="https://www.youtube.com/watch?v=DEYUt1tJlck">Here’s the video</a> of my recent Astral Codex Ten ask-me-anything session.</li></ol>
-
-
-
-<p/></div>
-    </content>
-    <updated>2021-07-21T20:57:08Z</updated>
-    <published>2021-07-21T20:57:08Z</published>
-    <category scheme="https://www.scottaaronson.com/blog" term="Announcements"/>
-    <category scheme="https://www.scottaaronson.com/blog" term="Complexity"/>
-    <category scheme="https://www.scottaaronson.com/blog" term="Quantum"/>
-    <category scheme="https://www.scottaaronson.com/blog" term="Speaking Truth to Parallelism"/>
-    <category scheme="https://www.scottaaronson.com/blog" term="The Fate of Humanity"/>
-    <author>
-      <name>Scott</name>
-      <uri>http://www.scottaaronson.com</uri>
-    </author>
-    <source>
-      <id>https://www.scottaaronson.com/blog/?feed=atom</id>
-      <link href="https://www.scottaaronson.com/blog" rel="alternate" type="text/html"/>
-      <link href="https://www.scottaaronson.com/blog/?feed=atom" rel="self" type="application/atom+xml"/>
-      <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
-      <title xml:lang="en-US">Shtetl-Optimized</title>
-      <updated>2021-08-04T01:58:51Z</updated>
+      <updated>2021-08-06T06:37:29Z</updated>
     </source>
   </entry>
 </feed>
