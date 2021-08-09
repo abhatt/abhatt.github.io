@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-08-09T20:40:17Z</updated>
+  <updated>2021-08-09T21:22:41Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -19,7 +19,7 @@
     <link href="http://www.blogger.com/feeds/8890204/posts/default/480455417739937086" rel="self" type="application/atom+xml"/>
     <link href="http://mybiasedcoin.blogspot.com/2021/08/queues-with-small-advice.html" rel="alternate" type="text/html"/>
     <title>Queues with Small Advice</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>I have had papers rejected, with comments of the form that the results seem too easy, and are at the level of a homework assignment.  Generally, I think these reviewers miss the point.  The fact that the results seem easy may be because the point isn't the derivation but the conception and framing of the problem.  I actually think that generally it's an interesting subclass of good papers that can be and are turned into homework assignments.</p><p>A new-ish paper of mine, Queues with Small Advice, was recently accepted to the very new SIAM Conference on Applied and Computational Discrete Algorithms (<a href="https://www.siam.org/conferences/cm/conference/acda21">ACDA21</a>), which took place July 19-21.  This conference focuses on algorithms with a close tie to applications.  Some people unfamiliar with theory conferences might think that algorithms work would naturally be tied to applications, but I've generally found that algorithmic work tied to applications is more negatively reviewed in theory conferences.  Indeed, that type of work is much more likely to receive comments of the form that the results seem too easy, and are at the level of a homework assignment.  So perhaps this new conference will fill an important role and hole in the current slate of theory conferences. </p><p>In any case, I actually do think this paper is in some ways easy (in that the analysis is readily approachable with standard tools), and parts of it would, I believe, make great homework assignment.  The goal was to show the potential power of using even very simple advice, such as from machine-learning algorithms, in queueing systems.  This seems to me to be a very understudied topic, and fits into the recent growing them of <a href="https://arxiv.org/abs/2006.09123">Algorithms with Predictions</a>.  (The paper was rejected previously from a conference, where the most negative review said "Very accessible and well written paper, which certainly provides motivation to consider problems of this type." but also said "The mathematical analysis in this paper is fairly standard, and in that sense not novel... the paper is interesting, but not advancing sufficiently the state of the art.")  </p><p>The paper focuses on the case of 1 bit of advice -- essentially, is the job "short" or "long".  I think this type is advice is a good approach to look at for queueing -- it corresponds naturally to putting a job at the front of the queue, or the back.  And it may be easier for machine-learning algorithms to generate accurately.  Simple is often good in practice.  </p><p>Rather than describe the paper further, I'll go ahead and turn it directly into a collection of homework problems.  Feel free to use them or variations you come up with;  hopefully, the students won't find the paper for answers. I personally would be thrilled if one outcome of this paper was that prediction-based problems of this form made their way into problem sets.  (Although, serious question:  who still teaches queueing theory any more?)  </p><p><b>Section 1:  One-Bit Advice (Single Queue)</b></p><p>a)  Consider the standard M/M/1 queue, with Poisson arrivals at rate λ, and exponentially distributed service times of mean 1;  the expected time a job spends in the queue in equilibrium is 1/(1-λ).  Now suppose each job comes with one bit advice;  if the job has service time greater than T, the bit is 1, and if it is smaller than T, the bit is 0.  A "big" job goes to the end of the queue, a "small" job goes to the front.  (Assume the queue is non-preemptive.)  Find the expected time for a job in this queue in equilibrium, as a function of T and λ.</p><p>b)  What is the optimal value for T (as a function of λ)? </p><p>c)  Repeat parts a and b, but this time with a preemptive queue.  Does preemption help or hurt performance?</p><p>Harder variation:  The above questions, but with an M/G/1 queue (that is, for a general, given service distribution);  derive a formula for the expected time in the system, where the formula may involve terms based on the service distribution.</p><p>Easier variation:  Write a simulation, experimentally determine the best threshold, and the improvements from one bit of advice.  Different service time distributions can be tried.  </p><p><b>Section 2:  One-Bit Advice with Predictions (Single Queue)</b></p><p>Where would possibly get a bit of advice in real life?  Perhaps from a machine learning predictor.  But in that case, the advice might turn out to be wrong.  What if our bit of advice is just right most of the time?</p><p>a)  Consider the (non-preemptive) M/M/1 queue variation from Section 1 part a above, but now the advice is correct with some probability p.  Find the expected time for a job in this queue in equilibrium, as a function of p, T, and λ.</p><p>b)  Repeat part a with a preemptive queue.</p><p>Harder variations:  The above questions, but have the probability the advice is correct depend on the size of the job.  A particularly fun example is when the "predicted service time" for a job with true time x is exponentially distributed with mean x, and the prediction bit is 1 if the predicted time is larger than T, and 0 otherwise.  Also, one can again consider general service times.  </p><p>Easier variation:  Again, write a simulation and derive experimental results/insights.  </p><p><b>Section 3:  One-Bit Advice with Prediction (Power of 2 Choices)</b>  <i>[harder, grad student level;  needs to know fluid limit models;  I'd stick with sections 1 and 2!]</i></p><p>a)  Derive fluid limit equations for a collection of N queues, where there are two types of jobs:  "large" jobs arrive as a Poisson stream of rate λ₁N and have exponentially distributed service times with mean μ₁ and "small" jobs arrive as a Poisson stream of rate λ₂N and have exponentially distributed service times of rate μ₂.  Each job comes with a bit of advice determining whether it is large or small, but large jobs are mislabelled with probability p₁ and small jobs are mislabelled with probability p₂.  An incoming job selects a queue using "the power of two choices" -- it is up to you to describe how a job determines what is the better of the two choices (there are multiple possibilities) and how jobs are processed within a queue (non-preemptive is suggested).   </p><p>[Hint:  the queue state can be represented by the number of jobs that are labelled short that are waiting, the number of jobs that are labelled long that are waiting, and the type of the job currently being serviced.]  </p><p>b)  Compare fluid limit results to simulations for 1000 queues to see if your equations seem accurate.  </p><p><br/></p></div>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>I have had papers rejected, with comments of the form that the results seem too easy, and are at the level of a homework assignment.  Generally, I think these reviewers miss the point.  The fact that the results seem easy may be because the point isn't the derivation but the conception and framing of the problem.  I actually think that generally it's an interesting subclass of good papers that can be and are turned into homework assignments.</p><p>A new-ish paper of mine, Queues with Small Advice, was recently accepted to the very new SIAM Conference on Applied and Computational Discrete Algorithms (<a href="https://www.siam.org/conferences/cm/conference/acda21">ACDA21</a>), which took place July 19-21.  This conference focuses on algorithms with a close tie to applications.  Some people unfamiliar with theory conferences might think that algorithms work would naturally be tied to applications, but I've generally found that algorithmic work tied to applications is more negatively reviewed in theory conferences.  Indeed, that type of work is much more likely to receive comments of the form that the results seem too easy, and are at the level of a homework assignment.  So perhaps this new conference will fill an important role and hole in the current slate of theory conferences. </p><p>In any case, I actually do think this paper is in some ways easy (in that the analysis is readily approachable with standard tools), and parts of it would, I believe, make a great homework assignment.  The goal was to show the potential power of using even very simple advice, such as from machine-learning algorithms, in queueing systems.  This seems to me to be a very understudied topic, and fits into the recently growing theme of <a href="https://arxiv.org/abs/2006.09123">Algorithms with Predictions</a>.  (The paper was rejected previously from a conference, where the most negative review said "Very accessible and well written paper, which certainly provides motivation to consider problems of this type." but also said "The mathematical analysis in this paper is fairly standard, and in that sense not novel... the paper is interesting, but not advancing sufficiently the state of the art.")  </p><p>The paper focuses on the case of 1 bit of advice -- essentially, is the job "short" or "long".  I think this type is advice is a good approach to look at for queueing -- it corresponds naturally to putting a job at the front of the queue, or the back.  And it may be easier for machine-learning algorithms to generate accurately.  Simple is often good in practice.  </p><p>Rather than describe the paper further, I'll go ahead and turn it directly into a collection of homework problems.  Feel free to use them or variations you come up with;  hopefully, the students won't find the paper for answers. I personally would be thrilled if one outcome of this paper was that prediction-based problems of this form made their way into problem sets.  (Although, serious question:  who still teaches queueing theory any more?)  </p><p><b>Section 1:  One-Bit Advice (Single Queue)</b></p><p>a)  Consider the standard M/M/1 queue, with Poisson arrivals at rate λ, and exponentially distributed service times of mean 1;  the expected time a job spends in the queue in equilibrium is 1/(1-λ).  Now suppose each job comes with one bit advice;  if the job has service time greater than T, the bit is 1, and if it is smaller than T, the bit is 0.  A "big" job goes to the end of the queue, a "small" job goes to the front.  (Assume the queue is non-preemptive.)  Find the expected time for a job in this queue in equilibrium, as a function of T and λ.</p><p>b)  What is the optimal value for T (as a function of λ)? </p><p>c)  Repeat parts a and b, but this time with a preemptive queue.  Does preemption help or hurt performance?</p><p>Harder variation:  The above questions, but with an M/G/1 queue (that is, for a general, given service distribution);  derive a formula for the expected time in the system, where the formula may involve terms based on the service distribution.</p><p>Easier variation:  Write a simulation, experimentally determine the best threshold, and the improvements from one bit of advice.  Different service time distributions can be tried.  </p><p><b>Section 2:  One-Bit Advice with Predictions (Single Queue)</b></p><p>Where would possibly get a bit of advice in real life?  Perhaps from a machine learning predictor.  But in that case, the advice might turn out to be wrong.  What if our bit of advice is just right most of the time?</p><p>a)  Consider the (non-preemptive) M/M/1 queue variation from Section 1 part a above, but now the advice is correct with some probability p.  Find the expected time for a job in this queue in equilibrium, as a function of p, T, and λ.</p><p>b)  Repeat part a with a preemptive queue.</p><p>Harder variations:  The above questions, but have the probability the advice is correct depend on the size of the job.  A particularly fun example is when the "predicted service time" for a job with true time x is exponentially distributed with mean x, and the prediction bit is 1 if the predicted time is larger than T, and 0 otherwise.  Also, one can again consider general service times.  </p><p>Easier variation:  Again, write a simulation and derive experimental results/insights.  </p><p><b>Section 3:  One-Bit Advice with Prediction (Power of 2 Choices)</b>  <i>[harder, grad student level;  needs to know fluid limit models;  I'd stick with sections 1 and 2!]</i></p><p>a)  Derive fluid limit equations for a collection of N queues, where there are two types of jobs:  "large" jobs arrive as a Poisson stream of rate λ₁N and have exponentially distributed service times with mean μ₁ and "small" jobs arrive as a Poisson stream of rate λ₂N and have exponentially distributed service times of mean μ₂.  Each job comes with a bit of advice determining whether it is large or small, but large jobs are mislabelled with probability p₁ and small jobs are mislabelled with probability p₂.  An incoming job selects a queue using "the power of two choices" -- it is up to you to describe how a job determines what is the better of the two choices (there are multiple possibilities) and how jobs are processed within a queue (non-preemptive is suggested).   </p><p>[Hint:  the queue state can be represented by the number of jobs that are labelled short that are waiting, the number of jobs that are labelled long that are waiting, and the type of the job currently being serviced.]  </p><p>b)  Compare fluid limit results to simulations for 1000 queues to see if your equations seem accurate.  </p><p><br/></p></div>
     </content>
     <updated>2021-08-09T20:01:00Z</updated>
     <published>2021-08-09T20:01:00Z</published>
@@ -77,7 +77,7 @@ algorithms, networking, information theory -- <br/>
 and related items.</div>
       </subtitle>
       <title>My Biased Coin</title>
-      <updated>2021-08-09T20:02:17Z</updated>
+      <updated>2021-08-09T21:01:31Z</updated>
     </source>
   </entry>
 
@@ -332,7 +332,7 @@ Note that with \(\varepsilon \gg 1\), we get \(\alpha \) close to \(\varepsilon\
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2021-08-09T20:39:23Z</updated>
+      <updated>2021-08-09T21:22:03Z</updated>
     </source>
   </entry>
 
@@ -362,7 +362,7 @@ Note that with \(\varepsilon \gg 1\), we get \(\alpha \) close to \(\varepsilon\
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-09T20:37:28Z</updated>
+      <updated>2021-08-09T21:20:31Z</updated>
     </source>
   </entry>
 
@@ -693,7 +693,7 @@ almost all $n$, and we confirm the conjecture in many of the remaining cases.
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2021-08-09T20:39:23Z</updated>
+      <updated>2021-08-09T21:22:03Z</updated>
     </source>
   </entry>
 
@@ -755,7 +755,7 @@ almost all $n$, and we confirm the conjecture in many of the remaining cases.
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2021-08-09T20:39:33Z</updated>
+      <updated>2021-08-09T21:22:07Z</updated>
     </source>
   </entry>
 
@@ -989,7 +989,7 @@ Each of 20 competitors gets a rank from 1 to 20 in each of the three disciplines
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-08-09T20:37:33Z</updated>
+      <updated>2021-08-09T21:20:37Z</updated>
     </source>
   </entry>
 
@@ -1134,7 +1134,7 @@ We admit the tabletop suggestion is far from electrifying, but has anyone come u
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-08-09T20:37:39Z</updated>
+      <updated>2021-08-09T21:20:43Z</updated>
     </source>
   </entry>
 
@@ -1161,7 +1161,7 @@ Email: sfifellowship@santafe.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-08-09T20:37:44Z</updated>
+      <updated>2021-08-09T21:20:47Z</updated>
     </source>
   </entry>
 
@@ -1431,7 +1431,7 @@ Email: sfifellowship@santafe.edu</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-08-09T20:37:33Z</updated>
+      <updated>2021-08-09T21:20:36Z</updated>
     </source>
   </entry>
 
@@ -1457,7 +1457,7 @@ We show that every $n$-vertex, $m$-edge, $d$-degenerate graph can be made a sum 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-09T20:37:28Z</updated>
+      <updated>2021-08-09T21:20:31Z</updated>
     </source>
   </entry>
 
@@ -1497,7 +1497,7 @@ Our upper bounds also yield upper bounds on the approximate rank, approximate no
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-09T20:37:28Z</updated>
+      <updated>2021-08-09T21:20:31Z</updated>
     </source>
   </entry>
 
@@ -1722,7 +1722,7 @@ I have hinted at some other issues in chess but stopped short of addressing them
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-08-09T20:37:40Z</updated>
+      <updated>2021-08-09T21:20:44Z</updated>
     </source>
   </entry>
 
@@ -1800,7 +1800,7 @@ I have hinted at some other issues in chess but stopped short of addressing them
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2021-08-09T20:39:32Z</updated>
+      <updated>2021-08-09T21:22:06Z</updated>
     </source>
   </entry>
 
@@ -1828,7 +1828,7 @@ Email: klim@bgu.ac.il</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-08-09T20:37:44Z</updated>
+      <updated>2021-08-09T21:20:47Z</updated>
     </source>
   </entry>
 
@@ -1858,7 +1858,7 @@ Turning to $k$-SUB-SAT for $k \ge 3$, while known algorithms for solving a syste
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-09T20:37:28Z</updated>
+      <updated>2021-08-09T21:20:31Z</updated>
     </source>
   </entry>
 
@@ -1945,7 +1945,7 @@ Turning to $k$-SUB-SAT for $k \ge 3$, while known algorithms for solving a syste
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2021-08-09T20:38:37Z</updated>
+      <updated>2021-08-09T21:21:34Z</updated>
     </source>
   </entry>
 
@@ -2072,7 +2072,7 @@ Email: dan.alistarh@ist.ac.at</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-08-09T20:37:44Z</updated>
+      <updated>2021-08-09T21:20:47Z</updated>
     </source>
   </entry>
 
@@ -2133,7 +2133,7 @@ Email: dan.alistarh@ist.ac.at</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-09T20:37:28Z</updated>
+      <updated>2021-08-09T21:20:31Z</updated>
     </source>
   </entry>
 
@@ -2175,7 +2175,7 @@ Email: dan.alistarh@ist.ac.at</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-09T20:37:28Z</updated>
+      <updated>2021-08-09T21:20:31Z</updated>
     </source>
   </entry>
 
@@ -2476,7 +2476,7 @@ Besides highlighting the power of QRAT system, this work also presents the first
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-09T20:37:28Z</updated>
+      <updated>2021-08-09T21:20:31Z</updated>
     </source>
   </entry>
 </feed>
