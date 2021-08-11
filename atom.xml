@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-08-11T14:39:54Z</updated>
+  <updated>2021-08-11T15:23:27Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,361 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://windowsontheory.org/?p=8163</id>
+    <link href="https://windowsontheory.org/2021/08/11/replica-method-for-the-machine-learning-theorist-part-1-of-2/" rel="alternate" type="text/html"/>
+    <title>Replica Method for the Machine Learning Theorist: Part 1 of 2</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Blake Bordelon, Haozhe Shan, Abdul Canatar, Boaz Barak, Cengiz Pehlevan [Boaz’s note: Blake and Haozhe were students in the ML theory seminar this spring; in that seminar we touched on the replica method in the lecture on inference and statistical physics but here Blake and Haozhe (with a little help from the rest of us) … <a class="more-link" href="https://windowsontheory.org/2021/08/11/replica-method-for-the-machine-learning-theorist-part-1-of-2/">Continue reading <span class="screen-reader-text">Replica Method for the Machine Learning Theorist: Part 1 of 2</span></a></div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><h4>Blake Bordelon, Haozhe Shan, Abdul Canatar, Boaz Barak, Cengiz Pehlevan</h4>
+
+
+
+<p><em>[Boaz’s note: Blake and Haozhe were students in <a href="https://boazbk.github.io/mltheoryseminar/cs229br.html#plan">the ML theory seminar</a> this spring; in that seminar we touched on the replica method in the <a href="https://windowsontheory.org/2021/04/02/inference-and-statistical-physics/">lecture on inference and statistical physics</a> but here Blake and Haozhe (with a little help from the rest of us) give a great overview of the method and its relations to ML. See also <a href="https://windowsontheory.org/category/ml-theory-seminar/">all seminar posts</a>.]</em></p>
+
+
+
+<p>See also: <a href="https://boazbarak.org/Papers/replica.pdf">PDF version of both parts</a> and part 2.</p>
+
+
+
+<h2>I. Analysis of Optimization Problems with Statistical Physics</h2>
+
+
+
+<p>In computer science and machine learning, we are often interested in solving optimization problems of the form</p>
+
+
+
+<p><img alt="\min_{x \in \mathcal{S}} H(x,\mathcal D)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmin_%7Bx+%5Cin+%5Cmathcal%7BS%7D%7D+H%28x%2C%5Cmathcal+D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>where <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is an objective function which depends on our decision variables <img alt="x \in \mathcal S" class="latex" src="https://s0.wp.com/latex.php?latex=x+%5Cin+%5Cmathcal+S&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> as well as on a set of problem-specific parameters <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Frequently, we encounter problems relevant to machine learning, where <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is a random variable. The replica method is a useful tool to analyze <em>large problems</em> and their <em>typical</em> behavior over the distribution of <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>Here are a few examples of problems that fit this form:</p>
+
+
+
+<ol><li>In supervised learning, <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> may be a training loss, <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> a set of neural network weights and <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> the data points and their labels</li><li>We may want to find the most efficient way to visit all nodes on a graph. In this case <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> describes nodes and edges of the graph, <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is a representation of the set of chosen edges, and <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> can be the cost of <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> if <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> encodes a valid path and <img alt="\infty" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cinfty&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> (or a very large number ) if it doesn’t encode a valid path.</li><li>Satisfiability: <img alt="x \in \{0,1\}^N" class="latex" src="https://s0.wp.com/latex.php?latex=x+%5Cin+%5C%7B0%2C1%5C%7D%5EN&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is a collection booleans which must satisfy a collection of constraints. In this case the logical constraints (clauses) are the parameters <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. <img alt="H(x)" class="latex" src="https://s0.wp.com/latex.php?latex=H%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> can be the number of constraints violated by <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</li><li>Recovery of structure in noisy data: <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is our guess of the structure and <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> are instances of the observed noisy data. For example PCA attempts to identify the directions of maximal variation in the data. With the replica method, we could ask how the accuracy of the estimated top eigenvector degrades with noise.</li></ol>
+
+
+
+<h2>II. The Goal of the Replica Method</h2>
+
+
+
+<p>The <strong>replica method</strong> is a way to calculate the value of some statistic (<strong>observable</strong> in physics-speak) <img alt="O(x)" class="latex" src="https://s0.wp.com/latex.php?latex=O%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> of <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> where <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is a “typical” minimizer of <img alt="H(x,\mathcal{D})" class="latex" src="https://s0.wp.com/latex.php?latex=H%28x%2C%5Cmathcal%7BD%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and <img alt="\mathcal{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BD%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is a “typical” value for the parameters (which are also known in physics-speak as the <strong>disorder</strong>).</p>
+
+
+
+<p>In Example 1 (supervised learning), the observable may be the generalization error of a chosen algorithm (e.g. a linear classifier) on a given dataset. For Example 2 (path), this could be the cost of the best path. For Example 3 (satisfiability), the observable might be whether or not a solution exists at all for the problem. In Example 4 (noisy data), the observable might be the quality of decoded data (distance from ground truth under some measure).</p>
+
+
+
+<p>An observable like generalization error obviously depends on <img alt="\mathcal{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BD%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, the problem instance. However, can we say something more general about this <em>type of problem</em>? In particular, if <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> obeys some probability distribution, is it possible to characterize the the typical observable over different problem instances <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>?</p>
+
+
+
+<p>For instance, in Example 1, we can draw all of our training data from a distribution. For each random sample of data points <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, we find the set of <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> which minimize <img alt="H(x, \mathcal D)" class="latex" src="https://s0.wp.com/latex.php?latex=H%28x%2C+%5Cmathcal+D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and compute a generalization error. We then repeat this procedure many times and average the results. Sometimes, there are multiple <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> that minimize <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> for a given sample of <img alt="\mathcal{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BD%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>; this requires averaging the observable over all global minima for each <img alt="\mathcal{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BD%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> first, before averaging over different <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>To give away a “spolier”, towards the end of this note, we will see how to use the replica method to give accurate predictions of performance for noisy least square fitting and spiked matrix recovery.</p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/BKjGG3O.png"/></figure>
+
+
+
+<p><em>Generalization gap in least squares ridge regression, figure taken from <a href="https://arxiv.org/abs/2006.13198">Canatar, Bordelon, and Pehlevan</a></em></p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/Jrth8N3.png"/></figure>
+
+
+
+<p><em>Performance (agreement with planted signal) as function of signal strength for spiked matrix recovery, as the dimension grows, the experiment has stronger agreement with theory. See also <a href="https://meisong541.github.io/jekyll/update/2019/08/04/Replica_method_1.html">Song Mei’s exposition</a></em></p>
+
+
+
+<h3>A. What do we actually do?</h3>
+
+
+
+<p>Now that we are motivated, let’s see what quantities the replica method attempts to obtain. In general, given some observable <img alt="O(x,\mathcal D)" class="latex" src="https://s0.wp.com/latex.php?latex=O%28x%2C%5Cmathcal+D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, the average of <img alt="O" class="latex" src="https://s0.wp.com/latex.php?latex=O&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> over a minimizer <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> chosen at random from the set <img alt="\text{arg} \min H(x,\mathcal{D})" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7Barg%7D+%5Cmin+H%28x%2C%5Cmathcal%7BD%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, and take the average of this quantity over the choice of the disorder <img alt="\mathcal{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BD%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.<br/>In other words, we want to compute the following quantity:</p>
+
+
+
+<p><img alt="\text{Desired quantity } = \mathbb{E}_{\mathcal{D}} \mathbb{E}_{x \in \text{arg}\min H(x,\mathcal{D})} \left[ O(x, \mathcal{D}) \right]" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BDesired+quantity+%7D+%3D+%5Cmathbb%7BE%7D_%7B%5Cmathcal%7BD%7D%7D+%5Cmathbb%7BE%7D_%7Bx+%5Cin+%5Ctext%7Barg%7D%5Cmin+H%28x%2C%5Cmathcal%7BD%7D%29%7D+%5Cleft%5B+O%28x%2C+%5Cmathcal%7BD%7D%29+%5Cright%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>The above equation has two types of expectation- over the disorder <img alt="D" class="latex" src="https://s0.wp.com/latex.php?latex=D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, and over the minimizers <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.<br/>The physics convention is to</p>
+
+
+
+<ul><li>use <img alt="\left&lt; f \right&gt;_{\mathcal D}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft%3C+f+%5Cright%3E_%7B%5Cmathcal+D%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> for the expectation of a function <img alt="f(\mathcal{D})" class="latex" src="https://s0.wp.com/latex.php?latex=f%28%5Cmathcal%7BD%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> over the disorder <img alt="\mathcal{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BD%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></li><li>use <img alt="\int g(x) \mu(x) dx" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cint+g%28x%29+%5Cmu%28x%29+dx&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> for the expectation of a function <img alt="g(x)" class="latex" src="https://s0.wp.com/latex.php?latex=g%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> over <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> chosen according to some measure <img alt="\mu" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmu&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</li></ul>
+
+
+
+<p>Using this notation, we can write the above as</p>
+
+
+
+<p><img alt="\text{Desired quantity } = \left&lt; \int p^*(x;\mathcal D) O(x,\mathcal D) dx \right&gt;_{\mathcal D}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BDesired+quantity+%7D+%3D+%5Cleft%3C+%5Cint+p%5E%2A%28x%3B%5Cmathcal+D%29+O%28x%2C%5Cmathcal+D%29+dx+%5Cright%3E_%7B%5Cmathcal+D%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>where <img alt="\left&lt; \right&gt;_{\mathcal D}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft%3C+%5Cright%3E_%7B%5Cmathcal+D%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> denotes an average over the probability measure for problem parameters <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, and <img alt="p^*(x;\mathcal D)" class="latex" src="https://s0.wp.com/latex.php?latex=p%5E%2A%28x%3B%5Cmathcal+D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is a uniform distribution over the set of <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> that minimize <img alt="H(x,\mathcal{D})" class="latex" src="https://s0.wp.com/latex.php?latex=H%28x%2C%5Cmathcal%7BD%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> with zero probability mass placed on sub-optimal points.</p>
+
+
+
+<p>The ultimate goal of the replica method is to express</p>
+
+
+
+<p><img alt="\text{Desired quantity } = \text{solution of optimization on constant number of variables}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BDesired+quantity+%7D+%3D+%5Ctext%7Bsolution+of+optimization+on+constant+number+of+variables%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>but it will take some time to get there.</p>
+
+
+
+<h3>B. The concept of “self-averaging” and concentration</h3>
+
+
+
+<p>Above, we glossed over an important distinction between the “typical” value of <img alt="f(\mathcal D) = \int p^*(x; \mathcal D) O(x,\mathcal D) dx" class="latex" src="https://s0.wp.com/latex.php?latex=f%28%5Cmathcal+D%29+%3D+%5Cint+p%5E%2A%28x%3B+%5Cmathcal+D%29+O%28x%2C%5Cmathcal+D%29+dx&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and the *average* value of <img alt="f(\mathcal D)" class="latex" src="https://s0.wp.com/latex.php?latex=f%28%5Cmathcal+D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. This is OK only when we have <em>concentration</em> in the sense that with high probability over the choice of <img alt="\mathcal{D}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BD%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, <img alt="f(\mathcal{D})" class="latex" src="https://s0.wp.com/latex.php?latex=f%28%5Cmathcal%7BD%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is close to its expected value. We define this as the property that with probability at least <img alt="1-\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=1-%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, the quantity <img alt="f(\mathcal{D})" class="latex" src="https://s0.wp.com/latex.php?latex=f%28%5Cmathcal%7BD%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is within a <img alt="1\pm \epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=1%5Cpm+%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> multiplicative factor of its expectation, whwere <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is some quantity that goes to zero as the system size grows. A quantity <img alt="f(\cdot)" class="latex" src="https://s0.wp.com/latex.php?latex=f%28%5Ccdot%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> that concentrates in this sense is called <strong>self averaging</strong>.</p>
+
+
+
+<p>For example, suppose that <img alt="X= \sum_{i=1}^n X_i" class="latex" src="https://s0.wp.com/latex.php?latex=X%3D+%5Csum_%7Bi%3D1%7D%5En+X_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> where each <img alt="X_i" class="latex" src="https://s0.wp.com/latex.php?latex=X_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> equals <img alt="1" class="latex" src="https://s0.wp.com/latex.php?latex=1&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> with probabilty <img alt="1/2" class="latex" src="https://s0.wp.com/latex.php?latex=1%2F2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and <img alt="0" class="latex" src="https://s0.wp.com/latex.php?latex=0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> with probability <img alt="1/2" class="latex" src="https://s0.wp.com/latex.php?latex=1%2F2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> independently. Standard Chernoff bounds show that with high probability <img alt="X \in [n/2 \pm O(\sqrt{n})]" class="latex" src="https://s0.wp.com/latex.php?latex=X+%5Cin+%5Bn%2F2+%5Cpm+O%28%5Csqrt%7Bn%7D%29%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> or <img alt="\tfrac{X}{\mathbb{E} X} \in \left(1 + O(\tfrac{1}{\sqrt n})\right)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctfrac%7BX%7D%7B%5Cmathbb%7BE%7D+X%7D+%5Cin+%5Cleft%281+%2B+O%28%5Ctfrac%7B1%7D%7B%5Csqrt+n%7D%29%5Cright%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Hence <img alt="X" class="latex" src="https://s0.wp.com/latex.php?latex=X&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is a self averaging quantity.</p>
+
+
+
+<p>In contrast the random variable <img alt="Y=2^X" class="latex" src="https://s0.wp.com/latex.php?latex=Y%3D2%5EX&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is not self averaging. Since <img alt="Y = \prod_{i=1}^n 2^{X_i}" class="latex" src="https://s0.wp.com/latex.php?latex=Y+%3D+%5Cprod_%7Bi%3D1%7D%5En+2%5E%7BX_i%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and these random variables are independent, we know that <img alt="\mathbb{E} Y = \prod_{i=1}^n \mathbb{E} 2^{X_i} = \left(\tfrac{1}{2} 2^1 + \tfrac{1}{2} 2^0 \right)^n = (3/2)^n" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D+Y+%3D+%5Cprod_%7Bi%3D1%7D%5En+%5Cmathbb%7BE%7D+2%5E%7BX_i%7D+%3D+%5Cleft%28%5Ctfrac%7B1%7D%7B2%7D+2%5E1+%2B+%5Ctfrac%7B1%7D%7B2%7D+2%5E0+%5Cright%29%5En+%3D+%283%2F2%29%5En&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. However, with high probability a typical value of <img alt="Y" class="latex" src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> will be of the form <img alt="2^{n/2 \pm O(\sqrt{n})} = \sqrt{2}^{n \pm O(\sqrt n)}" class="latex" src="https://s0.wp.com/latex.php?latex=2%5E%7Bn%2F2+%5Cpm+O%28%5Csqrt%7Bn%7D%29%7D+%3D+%5Csqrt%7B2%7D%5E%7Bn+%5Cpm+O%28%5Csqrt+n%29%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Since <img alt="\sqrt{2} &lt; 3/2" class="latex" src="https://s0.wp.com/latex.php?latex=%5Csqrt%7B2%7D+%3C+3%2F2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> we see that the typical value of <img alt="Y" class="latex" src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is exponentially smaller than the expected value of <img alt="Y" class="latex" src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>The example above is part of a more general pattern. Often even if a variable <img alt="Y" class="latex" src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is not self averaging, the variable <img alt="X = \log Y" class="latex" src="https://s0.wp.com/latex.php?latex=X+%3D+%5Clog+Y&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> will be self-averaging. Hence if we are interested in the typical value of <img alt="Y" class="latex" src="https://s0.wp.com/latex.php?latex=Y&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, the quantity <img alt="\exp\left( \mathbb{E} [\log Y] \right)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cexp%5Cleft%28+%5Cmathbb%7BE%7D+%5B%5Clog+Y%5D+%5Cright%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is more representative than the quantity <img alt="\mathbb{E}[Y]" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D%5BY%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<h3>C. When is using the replica method a good idea?</h3>
+
+
+
+<p>Suppose that we want to compute a quantity of the form above. When is it a good idea to use the replica method to do so?<br/>Generally, we would want it to satisfy the following conditions:</p>
+
+
+
+<ol><li>The learning problem is high dimensional with a large budget of data. The replica method describes a <em>thermodynamic limit</em> where the system size and data budget are taken to infinity with some fixed ratio between the two quantities. Such a limit is obviously never achieved in reality, but in practice sufficiently large learning problems can be accurately modeled by the method.</li><li>The loss or the constraints are convenient functions of <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Typically <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> will be a low degree polynomial or a sum of local functions (each depending on small number of variables) in <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</li><li>Averages over the disorder in <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> are tractable analytically. That is, we can compute marginals of the distribution over <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</li><li>The statistic that we are interested in is self-averaging.</li></ol>
+
+
+
+<p>If the above conditions aren’t met, it is unlikely that this problem will gain much analytical insight from the replica method.</p>
+
+
+
+<h2>III. The Main Conceptual Steps Behind Replica Calculations</h2>
+
+
+
+<p>We now describe the conceptual steps that are involved in calculating a quantity using the replica method.<br/>They are also outlined in this figure:</p>
+
+
+
+<figure class="wp-block-image"><img alt="" src="https://i.imgur.com/eVOI8EA.png"/></figure>
+
+
+
+<h3>Step 1:”Softening” Constraints with the Gibbs Measure</h3>
+
+
+
+<p>The uniform measure on minimizers <img alt="p^*(x;\mathcal D)" class="latex" src="https://s0.wp.com/latex.php?latex=p%5E%2A%28x%3B%5Cmathcal+D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is often difficult to work with. To aid progress, we can think of it as a special case of what is known as the <a href="https://en.wikipedia.org/wiki/Gibbs_measure">Gibbs measure</a>, defined as<br/><img alt="p_\beta(x;\mathcal D)dx= \frac{1}{Z(\mathcal D)}\exp \left( -\beta H(x,\mathcal{D})\right)dx" class="latex" src="https://s0.wp.com/latex.php?latex=p_%5Cbeta%28x%3B%5Cmathcal+D%29dx%3D+%5Cfrac%7B1%7D%7BZ%28%5Cmathcal+D%29%7D%5Cexp+%5Cleft%28+-%5Cbeta+H%28x%2C%5Cmathcal%7BD%7D%29%5Cright%29dx&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>where <img alt="Z(\mathcal D) = \int \exp\left(-\beta {H}(x, \mathcal D) \right)dx" class="latex" src="https://s0.wp.com/latex.php?latex=Z%28%5Cmathcal+D%29+%3D+%5Cint+%5Cexp%5Cleft%28-%5Cbeta+%7BH%7D%28x%2C+%5Cmathcal+D%29+%5Cright%29dx&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is the normalization factor, or <strong>partition function</strong>. <img alt="\beta" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbeta&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is called the <strong>inverse temperature</strong>, a name from thermodynamics. It is easy to see that when <img alt="\beta\to\infty" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbeta%5Cto%5Cinfty&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> (i.e., when the temperature tends to the absolute zero), the Gibbs measure converges to a uniform distribution on the minimizers of <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>: <img alt="p_{\beta} \to p^*" class="latex" src="https://s0.wp.com/latex.php?latex=p_%7B%5Cbeta%7D+%5Cto+p%5E%2A&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>Hence we can write</p>
+
+
+
+<p><img alt="\text{Desired quantity } = \left&lt; \int p^*(x;\mathcal D) O(x,\mathcal D) dx \right&gt;{\mathcal D} = \left&lt; \lim_{\beta \rightarrow \infty} \int p_\beta(x;\mathcal D) O(x,\mathcal D) dx \right&gt;_{\mathcal D}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BDesired+quantity+%7D+%3D+%5Cleft%3C+%5Cint+p%5E%2A%28x%3B%5Cmathcal+D%29+O%28x%2C%5Cmathcal+D%29+dx+%5Cright%3E%7B%5Cmathcal+D%7D+%3D+%5Cleft%3C+%5Clim_%7B%5Cbeta+%5Crightarrow+%5Cinfty%7D+%5Cint+p_%5Cbeta%28x%3B%5Cmathcal+D%29+O%28x%2C%5Cmathcal+D%29+dx+%5Cright%3E_%7B%5Cmathcal+D%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>Physicists often exchange the order of limits and expectations at will, which generally makes sense in this setting, and so assume</p>
+
+
+
+<p><img alt="\text{Desired quantity } = \lim_{\beta \rightarrow \infty} \left&lt; \int p_\beta(x;\mathcal D) O(x,\mathcal D) dx \right&gt;_{\mathcal D}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BDesired+quantity+%7D+%3D+%5Clim_%7B%5Cbeta+%5Crightarrow+%5Cinfty%7D+%5Cleft%3C+%5Cint+p_%5Cbeta%28x%3B%5Cmathcal+D%29+O%28x%2C%5Cmathcal+D%29+dx+%5Cright%3E_%7B%5Cmathcal+D%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>Thus general approach taken in the replica method is to derive an expression for the average observable for any <img alt="\beta" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbeta&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and then take the <img alt="\beta \rightarrow \infty" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbeta+%5Crightarrow+%5Cinfty&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> limit. The quantity <img alt="\int p_\beta(x;\mathcal D) O(x,\mathcal D) dx" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cint+p_%5Cbeta%28x%3B%5Cmathcal+D%29+O%28x%2C%5Cmathcal+D%29+dx&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is also known as the <em>thermal average</em> of <img alt="O" class="latex" src="https://s0.wp.com/latex.php?latex=O&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, since it is taken with respect to the Gibbs distribution at some positive temperature.</p>
+
+
+
+<p>To compute the thermal average of <img alt="O" class="latex" src="https://s0.wp.com/latex.php?latex=O&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, we define the following <em>augmented partition function</em>:</p>
+
+
+
+<p><img alt="Z(\mathcal D, J) = \int_{S} \exp\left( -\beta H(x,\mathcal D) + J O(x; \mathcal D) \right) dx." class="latex" src="https://s0.wp.com/latex.php?latex=Z%28%5Cmathcal+D%2C+J%29+%3D+%5Cint_%7BS%7D+%5Cexp%5Cleft%28+-%5Cbeta+H%28x%2C%5Cmathcal+D%29+%2B+J+O%28x%3B+%5Cmathcal+D%29+%5Cright%29+dx.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>One can then check that</p>
+
+
+
+<p><img alt="\frac{d}{dJ} \log Z(\mathcal{D}, J)\Big|_{J=0}= \frac{1}{Z} \int O(x,\mathcal D) \exp(- \beta H(x,\mathcal D) ) dx = \int p\beta(x;\mathcal D) O(x,\mathcal D) dx" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cfrac%7Bd%7D%7BdJ%7D+%5Clog+Z%28%5Cmathcal%7BD%7D%2C+J%29%5CBig%7C_%7BJ%3D0%7D%3D+%5Cfrac%7B1%7D%7BZ%7D+%5Cint+O%28x%2C%5Cmathcal+D%29+%5Cexp%28-+%5Cbeta+H%28x%2C%5Cmathcal+D%29+%29+dx+%3D+%5Cint+p%5Cbeta%28x%3B%5Cmathcal+D%29+O%28x%2C%5Cmathcal+D%29+dx&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>Hence our desired quantity can be obtained as</p>
+
+
+
+<p><img alt="\text{Desired quantity } = \lim_{\beta \to \infty} \frac{\partial}{\partial J} \left&lt; \log Z(\mathcal D, J) \right&gt;_{\mathcal D}(0)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BDesired+quantity+%7D+%3D+%5Clim_%7B%5Cbeta+%5Cto+%5Cinfty%7D+%5Cfrac%7B%5Cpartial%7D%7B%5Cpartial+J%7D+%5Cleft%3C+%5Clog+Z%28%5Cmathcal+D%2C+J%29+%5Cright%3E_%7B%5Cmathcal+D%7D%280%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>or (assuming we can again exchange limits at will):</p>
+
+
+
+<p><img alt="\text{Desired quantity } = \lim_{\epsilon \to 0} \tfrac{1}{\epsilon}\left[ \lim_{\beta \to \infty} \left&lt; \log Z(\mathcal D, \epsilon) \right&gt;{\mathcal D} - \lim_{\beta \to \infty} \left&lt; \log Z(\mathcal D, 0) \right&gt;_{\mathcal D}\right]" class="latex" src="https://s0.wp.com/latex.php?latex=%5Ctext%7BDesired+quantity+%7D+%3D+%5Clim_%7B%5Cepsilon+%5Cto+0%7D+%5Ctfrac%7B1%7D%7B%5Cepsilon%7D%5Cleft%5B+%5Clim_%7B%5Cbeta+%5Cto+%5Cinfty%7D+%5Cleft%3C+%5Clog+Z%28%5Cmathcal+D%2C+%5Cepsilon%29+%5Cright%3E%7B%5Cmathcal+D%7D+-+%5Clim_%7B%5Cbeta+%5Cto+%5Cinfty%7D+%5Cleft%3C+%5Clog+Z%28%5Cmathcal+D%2C+0%29+%5Cright%3E_%7B%5Cmathcal+D%7D%5Cright%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>We see that ultimately computing the desired quantity reduces to computing quantities of the form</p>
+
+
+
+<p><img alt="\left&lt; \log Z'(\mathcal{D}) \right&gt;_{\mathcal D}\;\; (\star)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft%3C+%5Clog+Z%27%28%5Cmathcal%7BD%7D%29+%5Cright%3E_%7B%5Cmathcal+D%7D%5C%3B%5C%3B+%28%5Cstar%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>for the original or modified partition function <img alt="Z'" class="latex" src="https://s0.wp.com/latex.php?latex=Z%27&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Hence our focus from now on will be on computing (<img alt="\star" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cstar&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>).<br/>Averaging over <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is known as “configurational average” or <strong>quenched average</strong>. All together, we obtain the observable, first thermal averaged to get <img alt="O^*(\mathcal D)" class="latex" src="https://s0.wp.com/latex.php?latex=O%5E%2A%28%5Cmathcal+D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> (averaged over <img alt="p^*(x;\mathcal D)" class="latex" src="https://s0.wp.com/latex.php?latex=p%5E%2A%28x%3B%5Cmathcal+D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>) and then quenched averaged over <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><img alt="&#x26A0;" class="wp-smiley" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/26a0.png" style="height: 1em;"/> <em>What Concentrates?</em>: It is not just an algebraic convenience to average <img alt="\log Z" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clog+Z&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> instead of averaging <img alt="Z" class="latex" src="https://s0.wp.com/latex.php?latex=Z&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> itself. When the system size <img alt="N" class="latex" src="https://s0.wp.com/latex.php?latex=N&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is large, <img alt="\frac{1}{N} \log Z" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7BN%7D+%5Clog+Z&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> concentrates around its average. Thus, the typical behavior of the system can be understood by studying the quenched average <img alt="\frac{1}{N} \left&lt; \log Z \right&gt;" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7BN%7D+%5Cleft%3C+%5Clog+Z+%5Cright%3E&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> The partition function <img alt="Z" class="latex" src="https://s0.wp.com/latex.php?latex=Z&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> itself often does not concentrate and in general the values <img alt="\frac{1}{N} \log \left&lt; Z \right&gt;" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7BN%7D+%5Clog+%5Cleft%3C+Z+%5Cright%3E&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> (known as the “annealed average”) and <img alt="\frac{1}{N}\left&lt; \log Z \right&gt;" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B1%7D%7BN%7D%5Cleft%3C+%5Clog+Z+%5Cright%3E&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> (known as the “quenched average”) could differ subtantially. For more information, please consult <a href="https://web.stanford.edu/~montanar/RESEARCH/book.html">Mezard and Montanari’s</a> excellent book, Chapter 5.</p></blockquote>
+
+
+
+<h3>Step 2: The Replica Trick</h3>
+
+
+
+<p>Hereafter, we use <img alt="\langle \cdot \rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clangle+%5Ccdot+%5Crangle&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to denote the average and drop the dependence of <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and <img alt="J" class="latex" src="https://s0.wp.com/latex.php?latex=J&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. To compute <img alt="\left&lt; \log Z(\mathcal D, J) \right&gt;{\mathcal D}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft%3C+%5Clog+Z%28%5Cmathcal+D%2C+J%29+%5Cright%3E%7B%5Cmathcal+D%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, we use an identity <img alt="\left&lt; \log Z \right&gt; = \lim_{n \to 0} \frac{1}{n} \log \left&lt; Z^n \right&gt;." class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft%3C+%5Clog+Z+%5Cright%3E+%3D+%5Clim_%7Bn+%5Cto+0%7D+%5Cfrac%7B1%7D%7Bn%7D+%5Clog+%5Cleft%3C+Z%5En+%5Cright%3E.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>For the limit to make sense, <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> should be any real number. However, the expression for <img alt="Z^n" class="latex" src="https://s0.wp.com/latex.php?latex=Z%5En&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is only easily computable for natural numbers. <img alt="&#x26A0;" class="wp-smiley" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/26a0.png" style="height: 1em;"/> This step is non-rigorous: we will obtain an expression for <img alt="\log \langle Z^n \rangle" class="latex" src="https://s0.wp.com/latex.php?latex=%5Clog+%5Clangle+Z%5En+%5Crangle&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> for natural number <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, and then take the <img alt="n \rightarrow 0" class="latex" src="https://s0.wp.com/latex.php?latex=n+%5Crightarrow+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> limit after the fact.</p>
+
+
+
+<p>Recall that under the Gibbs distribution <img alt="p_\beta(\mathcal D)" class="latex" src="https://s0.wp.com/latex.php?latex=p_%5Cbeta%28%5Cmathcal+D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, the probability density on state <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is equal to <img alt="\exp(-\beta H(x,\mathcal D) )/Z(\mathcal D)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cexp%28-%5Cbeta+H%28x%2C%5Cmathcal+D%29+%29%2FZ%28%5Cmathcal+D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. Denote by <img alt="p_\beta(\mathcal D)^n" class="latex" src="https://s0.wp.com/latex.php?latex=p_%5Cbeta%28%5Cmathcal+D%29%5En&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> the probability distribution over a tuple <img alt="\vec{x} = (x^{(1)},\ldots,x^{(n)})" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvec%7Bx%7D+%3D+%28x%5E%7B%281%29%7D%2C%5Cldots%2Cx%5E%7B%28n%29%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> of <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> independent samples (also known as <strong>replicas</strong>) chosen from <img alt="p_\beta(\mathcal D)" class="latex" src="https://s0.wp.com/latex.php?latex=p_%5Cbeta%28%5Cmathcal+D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>Since the partition function <img alt="Z" class="latex" src="https://s0.wp.com/latex.php?latex=Z&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is an integral (or sum in the discrete case) of the form <img alt="\int \exp(-\beta H(x;\mathcal D)) dx" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cint+%5Cexp%28-%5Cbeta+H%28x%3B%5Cmathcal+D%29%29+dx&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, we can write <img alt="Z(\mathcal D)^n" class="latex" src="https://s0.wp.com/latex.php?latex=Z%28%5Cmathcal+D%29%5En&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> as the integral of <img alt="\prod_{a=1}^n \exp(-\beta H(x^{(a)};\mathcal D))= \exp\left( - \beta \sum_{a=1}^n H(x^{(a)}, \mathcal D)\right)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cprod_%7Ba%3D1%7D%5En+%5Cexp%28-%5Cbeta+H%28x%5E%7B%28a%29%7D%3B%5Cmathcal+D%29%29%3D+%5Cexp%5Cleft%28+-+%5Cbeta+%5Csum_%7Ba%3D1%7D%5En+H%28x%5E%7B%28a%29%7D%2C+%5Cmathcal+D%29%5Cright%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> where <img alt="x^{(1)},\ldots,x^{(n)}" class="latex" src="https://s0.wp.com/latex.php?latex=x%5E%7B%281%29%7D%2C%5Cldots%2Cx%5E%7B%28n%29%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> are independent variables.</p>
+
+
+
+<p>Now since each <img alt="x^{(a)}" class="latex" src="https://s0.wp.com/latex.php?latex=x%5E%7B%28a%29%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is weighed with a factor of <img alt="\exp(-\beta H(x^{(a)});\mathcal D)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cexp%28-%5Cbeta+H%28x%5E%7B%28a%29%7D%29%3B%5Cmathcal+D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, this expression can be shown as equal to taking expectation of some exponential function <img alt="\exp( \sum_{a=1}^n G(x^{(a)}; \mathcal D))" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cexp%28+%5Csum_%7Ba%3D1%7D%5En+G%28x%5E%7B%28a%29%7D%3B+%5Cmathcal+D%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> over a tuple <img alt="(x^{(1)},\ldots,x^{(n)})" class="latex" src="https://s0.wp.com/latex.php?latex=%28x%5E%7B%281%29%7D%2C%5Cldots%2Cx%5E%7B%28n%29%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> of <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> independent samples of <strong>replicas</strong> all coming from the same Gibbs distribution <img alt="p_\beta(\mathcal D)" class="latex" src="https://s0.wp.com/latex.php?latex=p_%5Cbeta%28%5Cmathcal+D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> corresponding to the same instance <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.<br/>(The discussion on <img alt="G" class="latex" src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is just for intuition – we will not care about the particular form of this <img alt="G" class="latex" src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, since soon average it over <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.)</p>
+
+
+
+<p>Hence</p>
+
+
+
+<p><img alt="\left&lt; Z^n \right&gt; = \left&lt; \int_{\vec{x} \sim p_*(\mathcal D)^n} \exp\left( - \sum_{a=1}^n G(x^{(a)}, \mathcal D) dx \right) \right&gt;_{\mathcal D}." class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft%3C+Z%5En+%5Cright%3E+%3D+%5Cleft%3C+%5Cint_%7B%5Cvec%7Bx%7D+%5Csim+p_%2A%28%5Cmathcal+D%29%5En%7D+%5Cexp%5Cleft%28+-+%5Csum_%7Ba%3D1%7D%5En+G%28x%5E%7B%28a%29%7D%2C+%5Cmathcal+D%29+dx+%5Cright%29+%5Cright%3E_%7B%5Cmathcal+D%7D.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<h3>Step 3: The Order Parameters</h3>
+
+
+
+<p>The above expression is an expectation of an integral, and so we can switch the order of summation, and write it also as</p>
+
+
+
+<p><img alt="\left&lt; Z^n \right&gt; = \int_{\vec{x} \sim p_*(\mathcal D)^n} \left&lt; \exp\left( - \sum_{a=1}^n G(x^{(a)}, \mathcal D) \right) \right&gt;_{\mathcal D} dx." class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft%3C+Z%5En+%5Cright%3E+%3D+%5Cint_%7B%5Cvec%7Bx%7D+%5Csim+p_%2A%28%5Cmathcal+D%29%5En%7D+%5Cleft%3C+%5Cexp%5Cleft%28+-+%5Csum_%7Ba%3D1%7D%5En+G%28x%5E%7B%28a%29%7D%2C+%5Cmathcal+D%29+%5Cright%29+%5Cright%3E_%7B%5Cmathcal+D%7D+dx.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>It turns out that for natural energy functions (for example when <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is quadratic in <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> such as when it corresponds to Mean Squared Error loss), for any tuple of <img alt="x^{(1)},\ldots,x^{(n)}" class="latex" src="https://s0.wp.com/latex.php?latex=x%5E%7B%281%29%7D%2C%5Cldots%2Cx%5E%7B%28n%29%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, the expectation over <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> of <img alt="\exp\left( - \beta \sum_{a=1}^n H(x^{(a)}, \mathcal D) \right)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cexp%5Cleft%28+-+%5Cbeta+%5Csum_%7Ba%3D1%7D%5En+H%28x%5E%7B%28a%29%7D%2C+%5Cmathcal+D%29+%5Cright%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> only depends on the angles between the <img alt="x^(a)" class="latex" src="https://s0.wp.com/latex.php?latex=x%5E%28a%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>‘s.<br/>That is, rather than depending on all of these <img alt="N" class="latex" src="https://s0.wp.com/latex.php?latex=N&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>-dimensional vectors, it only depends on the <img alt="n^2" class="latex" src="https://s0.wp.com/latex.php?latex=n%5E2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> coefficients <img alt="Q_{ab} =\frac{1}{N} x^{(a)}\cdot x^{(b)}" class="latex" src="https://s0.wp.com/latex.php?latex=Q_%7Bab%7D+%3D%5Cfrac%7B1%7D%7BN%7D+x%5E%7B%28a%29%7D%5Ccdot+x%5E%7B%28b%29%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. The <img alt="n\times n" class="latex" src="https://s0.wp.com/latex.php?latex=n%5Ctimes+n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> matrix Q is known as the <strong>overlap matrix</strong> or <strong>order parameters</strong> and one can often find a nice analytical function <img alt="\mathcal{F}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> whose values are bounded (independently of <img alt="N" class="latex" src="https://s0.wp.com/latex.php?latex=N&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>) such that</p>
+
+
+
+<p><img alt="\left&lt; \exp\left( - \sum_{a=1}^n G(x^{(a)}, \mathcal D) \right) \right&gt;_{\mathcal D} = \exp(-nN \mathcal{F}(Q))" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft%3C+%5Cexp%5Cleft%28+-+%5Csum_%7Ba%3D1%7D%5En+G%28x%5E%7B%28a%29%7D%2C+%5Cmathcal+D%29+%5Cright%29+%5Cright%3E_%7B%5Cmathcal+D%7D+%3D+%5Cexp%28-nN+%5Cmathcal%7BF%7D%28Q%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>Hence we can replace the integral over <img alt="x^{(1)},\ldots,x^{(n)}" class="latex" src="https://s0.wp.com/latex.php?latex=x%5E%7B%281%29%7D%2C%5Cldots%2Cx%5E%7B%28n%29%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> with an integral over <img alt="Q" class="latex" src="https://s0.wp.com/latex.php?latex=Q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and write</p>
+
+
+
+<p><img alt="\left&lt; Z^n \right&gt; = \int dQ \exp\left(- n N \mathcal F(Q) \right)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cleft%3C+Z%5En+%5Cright%3E+%3D+%5Cint+dQ+%5Cexp%5Cleft%28-+n+N+%5Cmathcal+F%28Q%29+%5Cright%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>where the measure <img alt="dQ" class="latex" src="https://s0.wp.com/latex.php?latex=dQ&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is the one induced by the overlap distribution of a tuple <img alt="\vec{x} \sim p_\beta(\mathcal D)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cvec%7Bx%7D+%5Csim+p_%5Cbeta%28%5Cmathcal+D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> taken for a random choice of the parameters <img alt="\mathcal D" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</p>
+
+
+
+<p>Since <img alt="Q" class="latex" src="https://s0.wp.com/latex.php?latex=Q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> only ranges over a small (<img alt="n^2" class="latex" src="https://s0.wp.com/latex.php?latex=n%5E2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> dimensional set), at the large <img alt="N" class="latex" src="https://s0.wp.com/latex.php?latex=N&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> limit, the integral is dominated by the maximum of its integrand (“method of steepest descent” / “saddle point method”). Let <img alt="Q^*" class="latex" src="https://s0.wp.com/latex.php?latex=Q%5E%2A&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> be the global minimum of <img alt="\mathcal F" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+F&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> (within some space of matrices). We have</p>
+
+
+
+<p><img alt="\lim_{N \rightarrow \infty}\left&lt; Z^n \right&gt; = \exp(-n N \mathcal F(Q^* ))." class="latex" src="https://s0.wp.com/latex.php?latex=%5Clim_%7BN+%5Crightarrow+%5Cinfty%7D%5Cleft%3C+Z%5En+%5Cright%3E+%3D+%5Cexp%28-n+N+%5Cmathcal+F%28Q%5E%2A+%29%29.&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/></p>
+
+
+
+<p>Once we arrive at this expression, the configurational average of <img alt="-\log Z" class="latex" src="https://s0.wp.com/latex.php?latex=-%5Clog+Z&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is simply <img alt="N \mathcal F(Q^*)" class="latex" src="https://s0.wp.com/latex.php?latex=N+%5Cmathcal+F%28Q%5E%2A%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. These steps constitute the replica method. The ability to compute the configurational average by creating an appropriate <img alt="Q" class="latex" src="https://s0.wp.com/latex.php?latex=Q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is one of the factors determining whether the replica method can be used. For example, in the supervised learning example, <img alt="H" class="latex" src="https://s0.wp.com/latex.php?latex=H&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is almost always assumed to be quadratic in <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>; cross-entropy loss, for instance, is generally not amendable.</p>
+
+
+
+<blockquote class="wp-block-quote"><p><img alt="&#x26A0;" class="wp-smiley" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/26a0.png" style="height: 1em;"/> <em>Bad Math Warning</em>: there are three limits, <img alt="\beta \rightarrow \infty" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cbeta+%5Crightarrow+%5Cinfty&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, <img alt="N \rightarrow \infty" class="latex" src="https://s0.wp.com/latex.php?latex=N+%5Crightarrow+%5Cinfty&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, and <img alt="n \rightarrow 0" class="latex" src="https://s0.wp.com/latex.php?latex=n+%5Crightarrow+0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. In replica calculations, we assume that we take take these limits in whichever order that is arithmetically convenient.</p></blockquote>
+
+
+
+<p><strong>Coming up:</strong> In part two of this blog post, we will explain the replica symmetric assumption (or “Ansatz” in Physics-speak) on the order parameters <img alt="Q" class="latex" src="https://s0.wp.com/latex.php?latex=Q&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and then demonstrate how to use the replica method for two simple examples: <em>least squares regression</em> and <em>spiked matrix model</em>.</p></div>
+    </content>
+    <updated>2021-08-11T15:00:11Z</updated>
+    <published>2021-08-11T15:00:11Z</published>
+    <category term="ML Theory seminar"/>
+    <author>
+      <name>Boaz Barak</name>
+    </author>
+    <source>
+      <id>https://windowsontheory.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://windowsontheory.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://windowsontheory.org" rel="alternate" type="text/html"/>
+      <link href="https://windowsontheory.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>A Research Blog</subtitle>
+      <title>Windows On Theory</title>
+      <updated>2021-08-11T15:21:42Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>tag:blogger.com,1999:blog-27705661.post-7046389272941836220</id>
@@ -222,7 +577,7 @@ Do you have your own issues with these claimed proofs? Or, do you see other case
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-08-11T14:37:57Z</updated>
+      <updated>2021-08-11T15:20:49Z</updated>
     </source>
   </entry>
 
@@ -392,7 +747,7 @@ We first define and investigate the basic complexity-theoretic properties of min
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-11T14:37:41Z</updated>
+      <updated>2021-08-11T15:20:35Z</updated>
     </source>
   </entry>
 
@@ -1339,7 +1694,7 @@ Note that with \(\varepsilon \gg 1\), we get \(\alpha \) close to \(\varepsilon\
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2021-08-11T14:39:05Z</updated>
+      <updated>2021-08-11T15:22:32Z</updated>
     </source>
   </entry>
 
@@ -1369,7 +1724,7 @@ Note that with \(\varepsilon \gg 1\), we get \(\alpha \) close to \(\varepsilon\
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-08-11T14:37:41Z</updated>
+      <updated>2021-08-11T15:20:35Z</updated>
     </source>
   </entry>
 
@@ -1498,7 +1853,7 @@ Note that with \(\varepsilon \gg 1\), we get \(\alpha \) close to \(\varepsilon\
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2021-08-11T14:39:05Z</updated>
+      <updated>2021-08-11T15:22:32Z</updated>
     </source>
   </entry>
 
@@ -1794,7 +2149,7 @@ Each of 20 competitors gets a rank from 1 to 20 in each of the three disciplines
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-08-11T14:37:45Z</updated>
+      <updated>2021-08-11T15:20:39Z</updated>
     </source>
   </entry>
 
@@ -1940,7 +2295,7 @@ We admit the tabletop suggestion is far from electrifying, but has anyone come u
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-08-11T14:37:57Z</updated>
+      <updated>2021-08-11T15:20:49Z</updated>
     </source>
   </entry>
 
@@ -1967,7 +2322,7 @@ Email: sfifellowship@santafe.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-08-11T14:38:02Z</updated>
+      <updated>2021-08-11T15:21:02Z</updated>
     </source>
   </entry>
 
@@ -2176,68 +2531,6 @@ Email: sfifellowship@santafe.edu</p></div>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
       <updated>2021-08-11T11:00:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://gilkalai.wordpress.com/?p=21845</id>
-    <link href="https://gilkalai.wordpress.com/2021/08/01/mathematical-news-to-cheer-you-up/" rel="alternate" type="text/html"/>
-    <title>Mathematical news to cheer you up</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">1.  Anna Kiesenhofer, a PhD mathematician researching PDEs at Ecole Polytechnique Federale Lausanne (EPFL), won the gold medal in the women’s bicycle road race at the Olympics. Here are two trivia question: a) Which hero of a recent post over … <a href="https://gilkalai.wordpress.com/2021/08/01/mathematical-news-to-cheer-you-up/">Continue reading <span class="meta-nav">→</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><h3><img alt="Anna-Kiesenhofer-Olympics-2021-930x620" class="alignnone  wp-image-21856" height="395" src="https://gilkalai.files.wordpress.com/2021/08/anna-kiesenhofer-olympics-2021-930x620-1.webp" width="592"/></h3>
-<h3>1.  <span class="d2edcug0 hpfvmrgz qv66sw1b c1et5uql lr9zc1uh a8c37x1j keod5gw0 nxhoafnm aigsh9s9 d3f4x2em fe6kdd0r mau55g9w c8b282yb iv3no6db jq4qci2q a3bd9o3v knj5qynh oo9gr5id hzawbc8m" dir="auto">Anna Kiesenhofer, a PhD mathematician researching PDEs at Ecole Polytechnique Federale Lausanne (EPFL), won the gold medal in the women’s bicycle road race at the Olympics.</span></h3>
-<p>Here are two trivia question: a) Which hero of a recent post over here is related to <span class="d2edcug0 hpfvmrgz qv66sw1b c1et5uql lr9zc1uh a8c37x1j keod5gw0 nxhoafnm aigsh9s9 d3f4x2em fe6kdd0r mau55g9w c8b282yb iv3no6db jq4qci2q a3bd9o3v knj5qynh oo9gr5id hzawbc8m" dir="auto">Kiesenhofer’s mathematical side? b) Name another famous connection between EPFL-mathematics and sport. <br/></span></p>
-<h3>2. János Nagy and Péter Pál Pach <a href="https://arxiv.org/abs/2107.03956">proved the Alon-Jaeger-Tarsi conjecture via group ring identities</a></h3>
-<blockquote>
-<p><em>The abstract says it all: In this paper we resolve the Alon-Jaeger-Tarsi conjecture for sufficiently large primes. Namely, we show that for any finite field <span class="MathJax" id="MathJax-Element-1-Frame"><span class="math" id="MathJax-Span-1"><span class="mrow" id="MathJax-Span-2"><span class="texatom" id="MathJax-Span-3"><span class="mrow" id="MathJax-Span-4"><span class="mi" id="MathJax-Span-5">F</span></span></span></span></span></span> of size <span class="MathJax" id="MathJax-Element-2-Frame"><span class="math" id="MathJax-Span-6"><span class="mrow" id="MathJax-Span-7"><span class="mn" id="MathJax-Span-8">61</span><span class="mo" id="MathJax-Span-9">&lt;</span><span class="texatom" id="MathJax-Span-10"><span class="mrow" id="MathJax-Span-11"><span class="mo" id="MathJax-Span-12">|</span></span></span><span class="texatom" id="MathJax-Span-13"><span class="mrow" id="MathJax-Span-14"><span class="mi" id="MathJax-Span-15">F</span></span></span><span class="texatom" id="MathJax-Span-16"><span class="mrow" id="MathJax-Span-17"><span class="mo" id="MathJax-Span-18">|</span></span></span><span class="mo" id="MathJax-Span-19">≠</span><span class="mn" id="MathJax-Span-20">79</span></span></span></span> and any nonsingular matrix <span class="MathJax" id="MathJax-Element-3-Frame"><span class="math" id="MathJax-Span-21"><span class="mrow" id="MathJax-Span-22"><span class="mi" id="MathJax-Span-23">M</span></span></span></span> over <span class="MathJax" id="MathJax-Element-4-Frame"><span class="math" id="MathJax-Span-24"><span class="mrow" id="MathJax-Span-25"><span class="texatom" id="MathJax-Span-26"><span class="mrow" id="MathJax-Span-27"><span class="mi" id="MathJax-Span-28">F</span></span></span></span></span></span> there exists a vector <span class="MathJax" id="MathJax-Element-5-Frame"><span class="math" id="MathJax-Span-29"><span class="mrow" id="MathJax-Span-30"><span class="mi" id="MathJax-Span-31">x</span></span></span></span> such that neither <span class="MathJax" id="MathJax-Element-6-Frame"><span class="math" id="MathJax-Span-32"><span class="mrow" id="MathJax-Span-33"><span class="mi" id="MathJax-Span-34">x</span></span></span></span> nor <span class="MathJax" id="MathJax-Element-7-Frame"><span class="math" id="MathJax-Span-35"><span class="mrow" id="MathJax-Span-36"><span class="mi" id="MathJax-Span-37">A</span><span class="mi" id="MathJax-Span-38">x</span></span></span></span> has a 0 component.</em></p>
-</blockquote>
-<h3>3. Michael Simkin asymptotically solved <a href="https://arxiv.org/abs/2107.13460">the <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/>-queens problem!</a> (We mentioned this classic problem and earlier progress by Zur Luria<a href="https://gilkalai.wordpress.com/2018/05/10/zur-luria-on-the-n-queens-problem/"> in this post</a>.)</h3>
-<blockquote>
-<p><em>Abstract: The <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/>-queens problem is to determine <img alt="{\mathcal Q}(n)" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal+Q%7D%28n%29&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/>, the number of ways to place <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/> mutually non-threatening queens on an <img alt="n \times n" class="latex" src="https://s0.wp.com/latex.php?latex=n+%5Ctimes+n&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/> board. We show that there exists a constant α=1.942±3×10<sup>-3</sup> such that <img alt="{\mathcal Q}(n)" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal+Q%7D%28n%29&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/><img alt="=((1 \pm o(1))n e ^{-\alpha})^n" class="latex" src="https://s0.wp.com/latex.php?latex=%3D%28%281+%5Cpm+o%281%29%29n+e+%5E%7B-%5Calpha%7D%29%5En&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/>. The constant α is characterized as the solution to a convex optimization problem in <img alt="{\mathcal P}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathcal+P%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/>([−1/2,1/2]<sup>2</sup>), the space of Borel probability measures on the square. The chief innovation is the introduction of limit objects for <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/>-queens configurations, which we call “queenons”. These are a convex set in <img alt="\mathcal P" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal+P&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/>([−1/2,1/2]<sup>2</sup>). We define an entropy function that counts the number of <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/>-queens configurations that approximate a given queenon. The upper bound uses the entropy method. For the lower bound we describe a randomized algorithm that constructs a configuration near a prespecified queen on and whose entropy matches that found in the upper bound. The enumeration of <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/>-queens configurations is then obtained by maximizing the (concave) entropy function in the space of queenons. Along the way we prove a large deviations principle for n-queens configurations that can be used to study their typical structure.</em></p>
-</blockquote>
-<p><img alt="sun" class="alignnone size-full wp-image-21875" height="1200" src="https://gilkalai.files.wordpress.com/2021/08/sun.jpeg" width="1600"/></p>
-<p>Intermission: the sun over Tel Aviv sea</p>
-<h3 class="title mathjax">4. Boris Bukh demonstrated <a href="https://arxiv.org/abs/2107.04167">Extremal graphs without exponentially-small bicliques</a></h3>
-<blockquote>
-<p><em>Abstract: The Turán problem asks for the largest number of edges in an $latex <span class="MathJax" id="MathJax-Element-1-Frame"><span class="math" id="MathJax-Span-1"><span class="mrow" id="MathJax-Span-2"><span class="mi" id="MathJax-Span-3">n$</span></span></span></span>-vertex graph not containing a fixed forbidden subgraph <span class="MathJax" id="MathJax-Element-2-Frame"><span class="math" id="MathJax-Span-4"><span class="mrow" id="MathJax-Span-5"><span class="mi" id="MathJax-Span-6">F</span></span></span></span>. We construct a new family of graphs not containing<span class="MathJax" id="MathJax-Element-3-Frame"><span class="math" id="MathJax-Span-7"><span class="mrow" id="MathJax-Span-8"><span class="msubsup" id="MathJax-Span-9"><span class="mi" id="MathJax-Span-10"/><span class="texatom" id="MathJax-Span-11"><span class="mrow" id="MathJax-Span-12"><span class="mi" id="MathJax-Span-13"/><span class="mo" id="MathJax-Span-14"/><span class="mi" id="MathJax-Span-15"> <img alt="K_{s,t}" class="latex" src="https://s0.wp.com/latex.php?latex=K_%7Bs%2Ct%7D&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/></span></span></span></span></span></span></span>, for <span class="MathJax" id="MathJax-Element-4-Frame"><span class="math" id="MathJax-Span-16"><span class="mrow" id="MathJax-Span-17"><span class="mi" id="MathJax-Span-18"/><span class="mo" id="MathJax-Span-19"/><span class="msubsup" id="MathJax-Span-20"><span class="mi" id="MathJax-Span-21"/><span class="mi" id="MathJax-Span-22"><img alt="t=C^s" class="latex" src="https://s0.wp.com/latex.php?latex=t%3DC%5Es&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/></span></span></span></span></span>, with  <img alt="\Omega (n^{2-1/s})" class="latex" src="https://s0.wp.com/latex.php?latex=%5COmega+%28n%5E%7B2-1%2Fs%7D%29&amp;bg=ffffff&amp;fg=333333&amp;s=0&amp;c=20201002"/> edges matching the upper bound of Kövári, Sós and Turán. </em></p>
-</blockquote>
-<h3 class="title mathjax">5. Michael Capalbo, <a href="https://link.springer.com/content/pdf/10.1007/s00493-020-3989-0.pdf">Explicit 𝑁-vertex graphs with maximum degree 𝐾 and diameter [1+𝑜(1)]log<sub>𝐾-1</sub> 𝑁 for each 𝐾-1 a prime power</a>,</h3>
-<blockquote>
-<p><em>Abstract:   Here we first present the solution of a long-standing open question–the explicit construction of an infinite family of N-vertex cubic graphs that have diameter [1+o(1)]log<sub>2</sub> N. We then extend the techniques to construct, for each K of the form 2<sup>s</sup>+1 or K=p<sup>s</sup>+1; s an integer and p a prime, an infinite family of K-regular graphs on N vertices with diameter [1+o(1)]log<sub>K−1</sub> N.</em></p>
-</blockquote>
-<p>I missed this breakthrough in STOC 2019 but now it appeared in Combinatorica, and Nati told me about it.</p>
-<h3 class="title mathjax">6.  A beautiful survey article: <a href="https://arxiv.org/abs/2107.06371">Intersection Problems in Extremal Combinatorics: Theorems, Techniques and Questions Old and New</a>, by David Ellis,</h3>
-<blockquote>
-<p><em>Abstract: The study of intersection problems in Extremal Combinatorics dates back perhaps to 1938, when Paul Erdős, Chao Ko and Richard Rado proved the (first) `Erdős-Ko-Rado theorem’ on the maximum possible size of an intersecting family of <span class="MathJax" id="MathJax-Element-1-Frame"><span class="math" id="MathJax-Span-1"><span class="mrow" id="MathJax-Span-2"><span class="mi" id="MathJax-Span-3">k</span></span></span></span>-element subsets of a finite set. Since then, a plethora of results of a similar flavour have been proved, for a range of different mathematical structures, using a wide variety of different methods. Structures studied in this context have included families of vector subspaces, families of graphs, subsets of finite groups with given group actions, and of course uniform hypergraphs with stronger or weaker intersection conditions imposed. The methods used have included purely combinatorial ones such as shifting/compressions, algebraic methods (including linear-algebraic, Fourier analytic and representation-theoretic), and more recently, analytic, probabilistic and regularity-type methods. As well as being natural problems in their own right, intersection problems have connections with many other parts of Combinatorics and with Theoretical Computer Science (and indeed with many other parts of Mathematics), both through the results themselves, and the methods used. In this survey paper, we discuss both old and new results (and both old and new methods), in the field of intersection problems. Many interesting open problems remain; we will discuss several. For expositional and pedagogical purposes, we also take this opportunity to give slightly streamlined versions of proofs (due to others) of several classical results in the area. This survey is intended to be useful to PhD students, as well as to more established researchers. It is a personal perspective on the field, and is not intended to be exhaustive; we apologise for any omissions. It is an expanded version of a paper that will appear in the Proceedings of the 29th British Combinatorial Conference.</em></p>
-</blockquote>
-<h3 class="title mathjax">7.  <a href="http://ecajournal.haifa.ac.il/Volume2022/ECA2022_S3I7.pdf">An interview with me</a>; interviewer Toufik Mansour.</h3>
-<p> </p>
-<div class="authors"> </div>
-<div> </div>
-
-
-<p/></div>
-    </content>
-    <updated>2021-08-01T19:25:52Z</updated>
-    <published>2021-08-01T19:25:52Z</published>
-    <category term="Combinatorics"/>
-    <category term="Sport"/>
-    <category term="Uncategorized"/>
-    <category term="Updates"/>
-    <author>
-      <name>Gil Kalai</name>
-    </author>
-    <source>
-      <id>https://gilkalai.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://gilkalai.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://gilkalai.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://gilkalai.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Gil Kalai's blog</subtitle>
-      <title>Combinatorics and more</title>
-      <updated>2021-08-11T14:37:45Z</updated>
     </source>
   </entry>
 </feed>
