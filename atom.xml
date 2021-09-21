@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-09-21T14:22:35Z</updated>
+  <updated>2021-09-21T15:22:10Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,93 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>http://benjamin-recht.github.io/2021/09/21/models-are-wrong/</id>
+    <link href="http://benjamin-recht.github.io/2021/09/21/models-are-wrong/" rel="alternate" type="text/html"/>
+    <title>All Statistical Models Are Wrong. Are Any Useful?</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Though I singled out a mask study <a href="https://www.argmin.net/2021/09/13/effect-size/">in the last post</a>, I’ve had a growing discomfort with statistical modeling and significance more generally. Statistical models explicitly describe the probability of outcomes of experiments in terms of specific variables of individuals from a population. Such statistical models bring with them a host of assumptions and powers. But when are they appropriate for deducing significance of the outcomes of experiments? Here, I’ll argue that they are almost never appropriate in most settings, and, moreover, they can result in confidence intervals that rarely contain the correct parameters.</p>
+
+<p>Note that in order to sample from some population, we need not assume that the population is <em>itself</em> random. An experimenter can choose to sample one individual from a larger pool at random even when the pool is a deterministic collection. Similarly, the experimenter can randomly assign each member of the pool to a group for experimentation even when the pool is deterministic. We need not build a statistical model of our population in order to study it experimentally.</p>
+
+<p>But the convention in much scientific practice entangles the randomness used in survey and experiment design with the randomness of the natural world. The dominant convention in experimental sciences is to assert the existence of a probability distribution from which all observations in an experiment are samples. That is, most analyses begin with the assumption that the population is itself a stochastic entity whose statistical properties can be accurately modeled. Such probabilistic modeling is immediately problematic. We are forced to confront the notion of probability itself. What does the probability of an event mean? Is a Bayesian or Frequentist viewpoint more correct? What does it mean to sample a natural process?</p>
+
+<p>My perspective on the pitfalls of probabilistic modeling has been heavily influenced by the writings of David Freedman. Freedman advocates for a pragmatic approach to statistical modeling. “<a href="https://www.stat.berkeley.edu/~stark/Preprints/611.pdf">Probability is just a property of a mathematical model intended to describe some features of the natural world. For the model to be useful, it must be shown to be in good correspondence with the system it describes.</a>” This is the less pithy, but more prescriptive version of Box’s famous and tiresome aphorism “All models are wrong, but some are useful.”</p>
+
+<p>Model building and validation requires deep domain knowledge for a task at hand. One of my favorite models is Ohm’s law, which states that the current that flows across a conductive material is proportional to the voltage drop across the resistor. Due to thermal noise, the actual model is</p>
+
+\[\small{
+  \text{current} = \text{material constant} \times \text{voltage} + \text{noise}}\]
+
+<p>And the noise is Gaussian white noise. This model has been extensively tested and is a foundation of all circuit design. Remarkably, this simple formula describes complex electronic behavior. Physics is full of amazing examples of statistical models that accurately predict the outcome of experiments to a dozen significant figures.</p>
+
+<p>But in biology, medicine, social science, and economics, our models are much less accurate and less grounded in natural laws. Most of the time, models are selected because they are convenient, not because they are plausible, well motivated from phenomenological principles, or even empirically validated. Freedman built a cottage industry around pointing out how poorly motivated many of the common statistical models are.</p>
+
+<p>A particular example called out by Freedman is the <a href="https://www.jstor.org/stable/27645896">ubiquitous logistic regression model</a>. Freedman observed that in a variety of randomized control trials, experimenters would “correct” the estimates of their randomized controlled trials by “controlling for fixed effects” with logistic regression. Controlling for fixed effects is pernicious jargon that means “set up a regression problem with all of the variables that one thinks make their effect size look too small, and then solve the regression as an attempt to remove the influence of these variables.” It is most common in observational studies, but many insist it is appropriate in the context of randomized controlled trials as well. This convention of correction persists in the present, and I highlighted similar corrections in my last post. Freedman argues that such corrections are misguided, especially in the context of randomized trials.</p>
+
+<p>To understand the motivation for using logistic in the first place, I need to tell you what an odds ratio is. Experiments are often interested in estimating an odds ratio of particular outcomes. The odds of an outcome is the number of individuals with a positive outcome divided by the number of individuals with a negative outcome. If the odds of winning a lottery are one million to one, that means that for every person that wins, one million people lose.</p>
+
+<p>In the context of randomized experiments, let’s suppose that when given a treatment, M out of N individuals will have a favorable outcome, and without treatment only Q out of N will have a positive outcome Then the odds ratio is simply the ratio of the odds of the outcome with and without treatment</p>
+
+\[\small{
+\frac{M}{N-M} \cdot \frac{N-Q}{Q}\,.}\]
+
+<p>When the odds ratio is large, we deem a treatment to be highly effective.</p>
+
+<p>Logistic regression posits that individuals have a vector of features $Z$ that influence the odds of the effectiveness of treatment. Specifically, if $Y$ is the indicator of the desired outcome and $X$ is indicator of treatment, the logistic regression model asserts the log of the odds the outcome is a linear function of the treatment and the selected features. Since the model assumes the population is random, we can write the fraction of individuals with a positive outcome as probability. With this identification, the assumption of logistic regression is</p>
+
+\[\small{
+\log  \frac{p(Y=1 | X,Z ) }{ 1-p(Y=1 | X,Z) } = \beta X + \gamma^\top Z + \alpha \,.}\]
+
+<p>This model is convenient if we are interested in odds ratios. In the logistic model, no matter what the covariate $Z$, the odds ratio is</p>
+
+\[\small{
+\frac{p(Y=1 | X=1,Z ) } {1-p(Y=1| X=1,Z) }  \cdot \frac{1-p(Y=1 | X=0, Z)}{p(Y=1 | X=0, Z)} = e^\beta\,.}\]
+
+<p>Hence, if we can estimate beta, we can estimate the odds ratio. And if we can estimate the variance of beta, we can compute confidence intervals over our odds ratio estimates.</p>
+
+<p>But all of this assumes that the model is correct! If the logistic model is not correct, then our confidence intervals are meaningless. Or at least, they are not confidence intervals around any true notion of odds ratios.</p>
+
+<p>It’s almost always reasonable to be suspicious of this logistic model. It is first asserting that the odds ratio is a constant for a fixed covariate $Z$. That is, all subjects experience the same proportional effect of treatment. Even less realistically, the model asserts that the outcome is positive for an individual $i$ with treatment value $X_i$ and covariate value $Z_i$ if</p>
+
+\[\small{
+  U_i  \leq \alpha + \beta X_i + \gamma^\top Z_i\,,}\]
+
+<p>where $U_i$ is a random variable sampled from the logistic distribution. The model assumes the $U_i$ are independent of the treatment and the covariates, the $U_i$ are independent across all of the individuals, and the $U_i$ have a common logistic distribution. The only thing that differs between treatment and control is the value of the threshold on the left hand side. These are a lot of assumptions, and they are seldom verified or tested in papers where logistic regression is applied.</p>
+
+<p>The question remains: does this matter? Do these modeling assumptions actually affect our inferences about effect size? Freedman provides an elegant argument demonstrating that logistic regression always overestimates the true odds ratio, and sometimes can do so quite poorly. He also shows that simply computing a plugin estimator of the odds ratio with no covariate adjustment at all is consistent in randomized controlled trials. That is, there is no need to adjust for covariates in randomized controlled trials if you want an accurate estimate of the odds ratio. Furthermore, covariate adjustments can lead to significant overestimation of the treatment’s effect size.</p>
+
+<p>Rather than going through Freedman’s theoretical argument, it’s a bit more evocative to give an example. The following is gleaned from a helpful discussion with Joel Middleton. Suppose you sample 10000 children from a larger population where each child in the population has an equal chance of liking and disliking vegetables. We propose a treatment of bribing kids with a cookie to eat their veggies, and randomly assign this treatment to half of the subjects. Left untreated, veggie haters have a 20% probability of finishing their veggies, but veggie lovers have an 80% probability of eating their greens. When bribed with a cookie, veggie haters and veggie lovers have 25% and 85% of eating their vegetables, respectively.</p>
+
+<p>An average child in the study has a probability of 50% of eating their veggies if in control and 55% if in treatment. The log odds ratio is thus</p>
+
+\[\small{
+  \log \frac{.55}{1−.55}−\log\frac{.5}{1−.5} \approx 0.2\,.}\]
+
+<p>Now, when you instead run logistic regression, the coefficient of the treatment variable is larger than 0.2. Indeed, <a href="https://nbviewer.jupyter.org/url/argmin.net/code/logistic_logodds_example.ipynb">when I try this in python</a>, running 1000 synthetic experiments, I find that the median point estimate is 0.32, which is, as promised, larger than the true log odds. Even more worrisome is the 95% confidence interval contains 0.2 only 38% of the time. Clearly, the confidence intervals are not accurate when the model is wrong.</p>
+
+<p>When the true effect size is large, this discrepancy between the logistic regression estimate and the true log odds might not be that big a deal: your error bars are wrong, but the effect size is estimated in the correct direction. But the results of such logistic regression analyzes are regularly quoted as estimates of odds ratios (For example, look at any  observational study of vaccine effectiveness). The precision of these estimates is unfortunately lacking and misleading.</p>
+
+<p>Even if the model <em>was</em> true, the same argument shows that the coefficient of the treatment variable overestimates the log-odds. This is demonstrated in the <a href="https://nbviewer.jupyter.org/url/argmin.net/code/logistic_logodds_example.ipynb">second example in the python notebook</a>. Even when the model is true, the coefficient of the treatment variable is an overestimate of the true log odds. If the model was true, one could at least say they had constructed a reasonable estimate of the change in odds for an individual under treatment. But if the model is wrong, there’s nothing we can say at all other than we have overestimated the effect size and our error bars might not contain the true odds with any certainty.</p>
+
+<p>So what is the remedy here? The thing is, we already know the answer: if we randomized the assignment, we can estimate log odds by counting the number of positive outcomes under treatment and control, and then just plugging these values into the odds ratio. If you do this, you find an estimate whose median is precisely equal to the true log odds. No covariate adjustment is required.</p>
+
+<p>This is merely one example showing why it is critical to decouple the randomness used to probe a system from the randomness inherent in its system itself. Statistical models are not necessary for statistical inference, but randomness itself is amazingly… let’s say… <em>useful</em> for understanding natural phenomena. I will spend the next few blogs reminding myself and you faithful blog readers that proper experiments, machine learning predictions, and statistical summarizations can all be designed without statistical models of populations. Perhaps the mathematical formalizations of randomized algorithms can suggest paths to reform conventional experimental formalism.</p></div>
+    </summary>
+    <updated>2021-09-21T00:00:00Z</updated>
+    <published>2021-09-21T00:00:00Z</published>
+    <source>
+      <id>http://benjamin-recht.github.io/</id>
+      <author>
+        <name>Ben Recht</name>
+      </author>
+      <link href="http://benjamin-recht.github.io/" rel="alternate" type="text/html"/>
+      <link href="http://benjamin-recht.github.io/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Musings on systems, information, learning, and optimization.</subtitle>
+      <title>arg min blog</title>
+      <updated>2021-09-21T15:21:39Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>https://decentralizedthoughts.github.io/2021-09-20-optimal-communication-complexity-of-authenticated-byzantine-agreement/</id>
@@ -387,7 +474,7 @@ Email: deand@bgu.ac.il</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-09-21T14:20:46Z</updated>
+      <updated>2021-09-21T15:20:39Z</updated>
     </source>
   </entry>
 
@@ -667,7 +754,7 @@ But that just caused him to bicker more<br/>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-09-21T14:20:34Z</updated>
+      <updated>2021-09-21T15:20:28Z</updated>
     </source>
   </entry>
 
@@ -725,7 +812,7 @@ Again I wish him a wonderful unbirthday day.</p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-09-21T14:20:41Z</updated>
+      <updated>2021-09-21T15:20:36Z</updated>
     </source>
   </entry>
 
@@ -806,7 +893,7 @@ Again I wish him a wonderful unbirthday day.</p>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-09-21T14:20:35Z</updated>
+      <updated>2021-09-21T15:20:29Z</updated>
     </source>
   </entry>
 
@@ -868,7 +955,7 @@ Email: hr.recruitmentcampaign@sydney.edu.au</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-09-21T14:20:46Z</updated>
+      <updated>2021-09-21T15:20:39Z</updated>
     </source>
   </entry>
 
@@ -1057,7 +1144,7 @@ with only a vague hope of waivers for some journals and not even that for one of
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-09-21T14:20:26Z</updated>
+      <updated>2021-09-21T15:20:24Z</updated>
     </source>
   </entry>
 
@@ -1082,7 +1169,7 @@ with only a vague hope of waivers for some journals and not even that for one of
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2021-09-21T14:21:50Z</updated>
+      <updated>2021-09-21T15:21:33Z</updated>
     </source>
   </entry>
 
@@ -1199,7 +1286,7 @@ Is this type of snitching a viable adjunct to law enforcement for speeding? Coul
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-09-21T14:20:41Z</updated>
+      <updated>2021-09-21T15:20:35Z</updated>
     </source>
   </entry>
 
@@ -1227,7 +1314,7 @@ Our second result concerns the relation between linear LDC and LCC. We prove the
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-09-21T14:20:26Z</updated>
+      <updated>2021-09-21T15:20:24Z</updated>
     </source>
   </entry>
 
@@ -1254,7 +1341,7 @@ Email: shanghai.faculty.recruitment@nyu.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-09-21T14:20:46Z</updated>
+      <updated>2021-09-21T15:20:39Z</updated>
     </source>
   </entry>
 
@@ -1280,7 +1367,7 @@ Email: shanghai.faculty.recruitment@nyu.edu</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-09-21T14:20:26Z</updated>
+      <updated>2021-09-21T15:20:24Z</updated>
     </source>
   </entry>
 
@@ -1335,7 +1422,7 @@ Email: shanghai.faculty.recruitment@nyu.edu</p></div>
       <link href="http://benjamin-recht.github.io/feed.xml" rel="self" type="application/atom+xml"/>
       <subtitle>Musings on systems, information, learning, and optimization.</subtitle>
       <title>arg min blog</title>
-      <updated>2021-09-21T03:21:39Z</updated>
+      <updated>2021-09-21T15:21:39Z</updated>
     </source>
   </entry>
 
@@ -1394,7 +1481,7 @@ Email: shanghai.faculty.recruitment@nyu.edu</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-09-21T14:20:26Z</updated>
+      <updated>2021-09-21T15:20:24Z</updated>
     </source>
   </entry>
 
@@ -1436,7 +1523,7 @@ Note that the query complexity of the first task is higher than the sample compl
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-09-21T14:20:26Z</updated>
+      <updated>2021-09-21T15:20:24Z</updated>
     </source>
   </entry>
 
@@ -1458,7 +1545,7 @@ Note that the query complexity of the first task is higher than the sample compl
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-09-21T14:20:26Z</updated>
+      <updated>2021-09-21T15:20:24Z</updated>
     </source>
   </entry>
 
@@ -1504,7 +1591,7 @@ Note that the query complexity of the first task is higher than the sample compl
       <link href="https://dstheory.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://dstheory.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Foundation of Data Science – Virtual Talk Series</title>
-      <updated>2021-09-21T14:22:25Z</updated>
+      <updated>2021-09-21T15:22:02Z</updated>
     </source>
   </entry>
 
@@ -1528,7 +1615,7 @@ Note that the query complexity of the first task is higher than the sample compl
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-09-21T14:20:26Z</updated>
+      <updated>2021-09-21T15:20:24Z</updated>
     </source>
   </entry>
 
@@ -1556,7 +1643,7 @@ Streaming algorithms: we present upper and lower bounds for the communication co
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-09-21T14:20:26Z</updated>
+      <updated>2021-09-21T15:20:24Z</updated>
     </source>
   </entry>
 
@@ -1622,7 +1709,7 @@ Email: smweinberg@princeton.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-09-21T14:20:46Z</updated>
+      <updated>2021-09-21T15:20:39Z</updated>
     </source>
   </entry>
 
@@ -1660,7 +1747,7 @@ Email: smweinberg@princeton.edu</p></div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2021-09-21T14:21:26Z</updated>
+      <updated>2021-09-21T15:21:05Z</updated>
     </source>
   </entry>
 
@@ -1690,7 +1777,7 @@ Email: smweinberg@princeton.edu</p></div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-09-21T14:20:10Z</updated>
+      <updated>2021-09-21T15:20:09Z</updated>
     </source>
   </entry>
 
@@ -1718,42 +1805,7 @@ Email: smweinberg@princeton.edu</p></div>
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2021-09-21T14:22:31Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://windowsontheory.org/?p=8199</id>
-    <link href="https://windowsontheory.org/2021/09/07/summer-course-on-algorithmic-fairness/" rel="alternate" type="text/html"/>
-    <title>Summer course on algorithmic fairness</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">[Guest post by Guy Rothblum] During the week of July 11-15, 2022, Cynthia Dwork and Guy Rothblum will be teaching a graduate course on algorithmic fairness at IPAM:Graduate Summer School on Algorithmic Fairness (ucla.edu)The first 3 days will focus on theory, and the last two days will transition towards practice and will feature lectures by domain … <a class="more-link" href="https://windowsontheory.org/2021/09/07/summer-course-on-algorithmic-fairness/">Continue reading <span class="screen-reader-text">Summer course on algorithmic fairness</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>[Guest post by Guy Rothblum]</p>
-
-
-
-<p>During the week of July 11-15, 2022, Cynthia Dwork and Guy Rothblum will be teaching a graduate course on algorithmic fairness at IPAM:<a href="http://www.ipam.ucla.edu/programs/summer-schools/graduate-summer-school-on-algorithmic-fairness-workshop-on-sex-and-gender-bias-in-data/" rel="noreferrer noopener" target="_blank">Graduate Summer School on Algorithmic Fairness (ucla.edu)</a><br/>The first 3 days will focus on theory, and the last two days will transition towards practice and will feature lectures by domain experts in machine learning, medicine and economics. Participants will need to apply <a href="http://helper.ipam.ucla.edu/wordpress_includes/signup/wp_eventsignup.aspx?pc=gss2022" rel="noreferrer noopener" target="_blank">here</a>. The application closes on <strong>March 11, 2022</strong>. See the website and the application link for further details.</p>
-
-
-
-<p/></div>
-    </content>
-    <updated>2021-09-08T02:52:44Z</updated>
-    <published>2021-09-08T02:52:44Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>Boaz Barak</name>
-    </author>
-    <source>
-      <id>https://windowsontheory.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://windowsontheory.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://windowsontheory.org" rel="alternate" type="text/html"/>
-      <link href="https://windowsontheory.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>A Research Blog</subtitle>
-      <title>Windows On Theory</title>
-      <updated>2021-09-21T14:21:14Z</updated>
+      <updated>2021-09-21T15:22:09Z</updated>
     </source>
   </entry>
 </feed>
