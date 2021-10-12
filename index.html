@@ -243,7 +243,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at October 12, 2021 12:39 PM UTC</span>.
+Last updated <span class="datestr">at October 12, 2021 01:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -251,6 +251,107 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://lucatrevisan.wordpress.com/?p=4566">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/trevisan.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://lucatrevisan.wordpress.com/2021/10/12/the-khot-naor-approximation-algorithm-for-3-xor/">The Khot-Naor Approximation Algorithm for 3-XOR</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://lucatrevisan.wordpress.com" title="in   theory">Luca Trevisan</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p>Today I would like to discuss the Khot-Naor approximation algorithm for the 3-XOR problem, and an open question related to it.</p>
+<p><span id="more-4566"></span></p>
+<p>In 3-XOR, we have a system of linear equations modulo 2, with three variables per equation, that might look something like</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cbegin%7Barray%7D%7Bll%7D+x_1+%2B+x_2+%2B+x_4+%26+%5Cequiv+0+%5Cpmod+2%5C%5C+x_1+%2B+x_5+%2B+x_6+%26+%5Cequiv+1+%5Cpmod+2%5C%5C+x_2+%2B+x_3+%2B+x_4+%26+%5Cequiv+1+%5Cpmod+2%5C%5C+x_5+%2B+x_3+%2B+x_6+%26+%5Cequiv+1+%5Cpmod+2+%5Cend%7Barray%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \begin{array}{ll} x_1 + x_2 + x_4 &amp; \equiv 0 \pmod 2\\ x_1 + x_5 + x_6 &amp; \equiv 1 \pmod 2\\ x_2 + x_3 + x_4 &amp; \equiv 1 \pmod 2\\ x_5 + x_3 + x_6 &amp; \equiv 1 \pmod 2 \end{array} " class="latex" /></p>
+<p>The above system is not satisfiable (if we add up the left-hand sides we get 0, if we add up the right-hand sides we get 1), but it is possible to satisfy <img src="https://s0.wp.com/latex.php?latex=%7B3%2F4%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{3/4}" class="latex" /> of the equations, for example by setting all the variables to 1. In Max 3-XOR problem (which we will simply refer to as “3-XOR” from now on), given a system of equations mod 2 with three variables per equation, we want to find an assignment that satisfies as many equations as possible.</p>
+<p>Either setting all the variables to zero or setting all the variables to one will satisfy half of the equations, and the interesting question is how much better than 1/2 it is possible to do on a given instance. \href{https://web.math.princeton.edu/~naor/homepage Like the approximation algorithm for sparsest cut in Abelian Cayley graphs implied by the result of Bauer et al. that was the subject of the last two posts, the result of Khot and Naor <em>does not</em> prove a bound on the integrality gap of a relaxation of the problem.</p>
+<p>I will describe the Khot-Naor algorithm and describe how it manages to use convex optimization to provide an approximation algorithm, but without establishing an integrality gap bound. I thank my student Lucas Pesenti for explaining the algorithm to me and for thinking together about this problem.</p>
+<p>If our 3-XOR instance has <img src="https://s0.wp.com/latex.php?latex=%7Bm%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{m}" class="latex" /> equations and <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" /> variables, then the problem of maximizing the number of satisfied equations can be rewritten as</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac+m2+%2B+%5Cmax_%7Bx+%5Cin+%5C%7B+-1+%2C+%2B1+%5C%7D%5En%7D+%5C+%5Csum_%7Bi%2Cj%2Ck%7D+c_%7Bi%2Cj%2Ck%7D+x_i+x_j+x_k+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \frac m2 + \max_{x \in \{ -1 , +1 \}^n} \ \sum_{i,j,k} c_{i,j,k} x_i x_j x_k " class="latex" /></p>
+<p> so that our goal is to approximate the combinatorial optimization problem</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cmax_%7Bx+%5Cin+%5C%7B+-1+%2C+%2B1+%5C%7D%5En%7D+%5C+%5Csum_%7Bi%2Cj%2Ck%7D+c_%7Bi%2Cj%2Ck%7D+x_i+x_j+x_k+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \max_{x \in \{ -1 , +1 \}^n} \ \sum_{i,j,k} c_{i,j,k} x_i x_j x_k " class="latex" /></p>
+<p> Up to a constant factor loss in the approximation guarantee, Khot and Naor show that the above is equivalent to <a name="tensornorm"></a></p>
+<p><a name="tensornorm"></a></p><a name="tensornorm">
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+++%5Cmax_%7Bx%2Cy%2Cz+%5Cin+%5C%7B+-1+%2C+%2B1+%5C%7D%5En%7D+%5C+%5Csum_%7Bi%2Cj%2Ck%7D+T_%7Bi%2Cj%2Ck%7D+x_i+y_j+z_k+%5C+%5C+%5C+%5C+%5C+%281%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle   \max_{x,y,z \in \{ -1 , +1 \}^n} \ \sum_{i,j,k} T_{i,j,k} x_i y_j z_k \ \ \ \ \ (1)" class="latex" /></p>
+</a><p><a name="tensornorm"></a><a name="tensornorm"></a> where <img src="https://s0.wp.com/latex.php?latex=%7BT_%7Bi%2Cj%2Ck%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{T_{i,j,k}}" class="latex" /> is a symmetric 3-tensor with entries in <img src="https://s0.wp.com/latex.php?latex=%7B%5C%7B+-1%2C0%2C1%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\{ -1,0,1\}}" class="latex" /> and with <img src="https://s0.wp.com/latex.php?latex=%7BO%28m%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{O(m)}" class="latex" /> non-zero entries.</p>
+<p>Before continuing, let us recall that if <img src="https://s0.wp.com/latex.php?latex=%7BM%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{M}" class="latex" /> is an <img src="https://s0.wp.com/latex.php?latex=%7Bn+%5Ctimes+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n \times n}" class="latex" /> matrix, then its <img src="https://s0.wp.com/latex.php?latex=%7B%5Cell_%5Cinfty%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\ell_\infty}" class="latex" />-to-<img src="https://s0.wp.com/latex.php?latex=%7B%5Cell_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\ell_1}" class="latex" /> operator norm has the characterization</p>
+<p><a name="inftoone"></a></p>
+<p><a name="inftoone"></a></p><a name="inftoone">
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7C%7C+M+%7C%7C_%7B%5Cinfty+%5Crightarrow+1+%7D+%3D+%5Cmax_%7Bx%2Cy+%5Cin+%5B-1%2C1%5D%5En%7D+x%5ET+M+y+%3D+%5Cmax_%7Bx%2Cy+%5Cin+%5C%7B+-1%2C1+%5C%7D%5En%7D+x%5ET+M+y+%5C+%5C+%5C+%5C+%5C+%282%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  || M ||_{\infty \rightarrow 1 } = \max_{x,y \in [-1,1]^n} x^T M y = \max_{x,y \in \{ -1,1 \}^n} x^T M y \ \ \ \ \ (2)" class="latex" /></p>
+</a><p><a name="inftoone"></a><a name="inftoone"></a></p>
+<p>We could also define the “Grothendieck norm” <img src="https://s0.wp.com/latex.php?latex=%7B%7C%7C+M+%7C%7C_%7BGrot%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{|| M ||_{Grot}}" class="latex" /> of a matrix as the following natural semidefinite programming relaxation of the <img src="https://s0.wp.com/latex.php?latex=%7B%5Cell_%5Cinfty%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\ell_\infty}" class="latex" />-to-<img src="https://s0.wp.com/latex.php?latex=%7B%5Cell_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\ell_1}" class="latex" /> norm:</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cbegin%7Barray%7D%7Blll%7D+%5Cmax+%26+%5Csum_%7Bi%2Cj%7D+M_%7Bi%2Cj%7D+%5Clangle+x_i+%2C+y_j%5Crangle+%5C%5C+%7B%5Crm+s.t.%7D%5C%5C+%26+%7C%7C+x_i+%7C%7C%5E2+%3D+1+%26+i+%3D+1%2C%5Cldots%2Cn%5C%5C+%26+%7C%7Cy_j+%7C%7C%5E2+%3D+1+%26+i+%3D+j%2C%5Cldots%2Cn+%5Cend%7Barray%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \begin{array}{lll} \max &amp; \sum_{i,j} M_{i,j} \langle x_i , y_j\rangle \\ {\rm s.t.}\\ &amp; || x_i ||^2 = 1 &amp; i = 1,\ldots,n\\ &amp; ||y_j ||^2 = 1 &amp; i = j,\ldots,n \end{array} " class="latex" /></p>
+<p> where the <img src="https://s0.wp.com/latex.php?latex=%7Bx_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x_i}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7By_j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{y_j}" class="latex" /> are arbitrary vectors. The Grothendieck inequality is</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7C%7C+M%7C%7C_%7B%5Cinfty+%5Crightarrow+1+%7D+%5Cleq+%7C%7C+M+%7C%7C_%7BGrot%7D+%5Cleq+O%281%29+%5Ccdot+%7C%7C+M+%7C%7C_%7B%5Cinfty+%5Crightarrow+1+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  || M||_{\infty \rightarrow 1 } \leq || M ||_{Grot} \leq O(1) \cdot || M ||_{\infty \rightarrow 1 }" class="latex" /></p>
+<p> where the <img src="https://s0.wp.com/latex.php?latex=%7BO%281%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{O(1)}" class="latex" /> is an absolute constant, known to be less than <img src="https://s0.wp.com/latex.php?latex=%7B1.8%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{1.8}" class="latex" />. Furthermore, the above inequality has a constructive proof, and it leads to a polynomial time constant factor approximation for the problem of finding values <img src="https://s0.wp.com/latex.php?latex=%7Bx_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x_i}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7By_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{y_i}" class="latex" /> in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cpm+1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\pm 1}" class="latex" /> that maximize <a href="https://lucatrevisan.wordpress.com/feed/#inftoone">(2)</a>.</p>
+<p>Basically, we can see problem <a href="https://lucatrevisan.wordpress.com/feed/#tensornorm">(1)</a> as the natural generalization of <a href="https://lucatrevisan.wordpress.com/feed/#inftoone">(2)</a> to tensors, and one would like to see a semidefinite programming relaxation of <a href="https://lucatrevisan.wordpress.com/feed/#tensornorm">(1)</a> achieving something resembling the Grothendieck inequality, but with a loss of something like <img src="https://s0.wp.com/latex.php?latex=%7B%5Ctilde+O%28%5Csqrt+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\tilde O(\sqrt n)}" class="latex" />. As I mentioned above, this remains an open question, as far as I know.</p>
+<p>The idea of Khot and Naor is the following. Suppose that we are given an instance <img src="https://s0.wp.com/latex.php?latex=%7BT%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{T}" class="latex" /> of problem <a href="https://lucatrevisan.wordpress.com/feed/#tensornorm">(1)</a>, and suppose that <img src="https://s0.wp.com/latex.php?latex=%7Bx%5E%2A%2Cy%5E%2A%2Cz%5E%2A%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x^*,y^*,z^*}" class="latex" /> is an optimal solution, and let us call</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cepsilon+%3D+%5Csum_%7Bi%2Cj%2Ck%7D+T_%7Bi%2Cj%2Ck%7D+x%5E%2A_i+y%5E%2A_j+z%5E%2A_k+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \epsilon = \sum_{i,j,k} T_{i,j,k} x^*_i y^*_j z^*_k " class="latex" /></p>
+<p> the value of the optimum (the algorithm will not need to know or guess <img src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\epsilon}" class="latex" />).</p>
+<p>The key step is now to see that if we pick a <em>random</em> <img src="https://s0.wp.com/latex.php?latex=%7Bx+%5Cin+%5C%7B-1%2C1%5C%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x \in \{-1,1\}^n}" class="latex" />, there is at least a <img src="https://s0.wp.com/latex.php?latex=%7B1%2Fn%5E%7BO%281%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{1/n^{O(1)}}" class="latex" /> probability that</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_%7Bi%2Cj%2Ck%7D+T_%7Bi%2Cj%2Ck%7D+x_i+y%5E%2A_j+z%5E%2A_k+%5Cgeq+%5Cepsilon+%5Ccdot+%5COmega+%5Cleft%28%5Csqrt%7B%5Cfrac%7B%5Clog+n%7D%7Bn%7D%7D+%5Cright%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \sum_{i,j,k} T_{i,j,k} x_i y^*_j z^*_k \geq \epsilon \cdot \Omega \left(\sqrt{\frac{\log n}{n}} \right) " class="latex" /></p>
+<p> This is a bit difficult, but it is really easy to see that with <img src="https://s0.wp.com/latex.php?latex=%7B1%2Fn%5E%7BO%281%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{1/n^{O(1)}}" class="latex" /> probability we have <a name="main"></a></p>
+<p><a name="main"></a></p><a name="main">
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+++%5Csum_%7Bi%2Cj%2Ck%7D+T_%7Bi%2Cj%2Ck%7D+x_i+y%5E%2A_j+z%5E%2A_k+%5Cgeq+%5Cepsilon+%5Ccdot+%5COmega+%5Cleft%28%5Csqrt%7B%5Cfrac%7B1%7D%7Bn%7D%7D+%5Cright%29+%5C+%5C+%5C+%5C+%5C+%283%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle   \sum_{i,j,k} T_{i,j,k} x_i y^*_j z^*_k \geq \epsilon \cdot \Omega \left(\sqrt{\frac{1}{n}} \right) \ \ \ \ \ (3)" class="latex" /></p>
+</a><p><a name="main"></a><a name="main"></a> and we can do that by seeing that by defining a vector <img src="https://s0.wp.com/latex.php?latex=%7Bw%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{w}" class="latex" /> such that <img src="https://s0.wp.com/latex.php?latex=%7Bw_i+%3D+%5Csum_%7Bj%2Ck%7D+T_%7Bi%2Cj%2Ck%7D+y%5E%2A_j+z%5E%2A_k%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{w_i = \sum_{j,k} T_{i,j,k} y^*_j z^*_k}" class="latex" />, so that</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Clangle+x%2C+w+%5Crangle+%3D+%5Csum_%7Bi%2Cj%2Ck%7D+T_%7Bi%2Cj%2Ck%7D+x_i+y%5E%2A_j+z%5E%2A_k&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \langle x, w \rangle = \sum_{i,j,k} T_{i,j,k} x_i y^*_j z^*_k" class="latex" /></p>
+<p> So we have</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Clangle+x%5E%2A%2Cw+%5Crangle+%3D+%5Cepsilon+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \langle x^*,w \rangle = \epsilon " class="latex" /></p>
+<p> which, using Cauchy-Schwarz, gives</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7C%7C+w%7C%7C%5E2+%5Cgeq+%5Cepsilon%5E2+%2Fn+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  || w||^2 \geq \epsilon^2 /n " class="latex" /></p>
+<p> Now, for a random <img src="https://s0.wp.com/latex.php?latex=%7Bx%5Csim+%5C%7B+-1%2C1%5C%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x\sim \{ -1,1\}^n}" class="latex" />, we have</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cmathop%7B%5Cmathbb+E%7D+%5Clangle+x%2Cw+%5Crangle%5E2+%3D+%7C%7C+w%7C%7C%5E2+%5Cgeq+%5Cepsilon%5E2+%2Fn+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \mathop{\mathbb E} \langle x,w \rangle^2 = || w||^2 \geq \epsilon^2 /n " class="latex" /></p>
+<p> and</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cmathop%7B%5Cmathbb+E%7D+%5Clangle+x%2Cw+%5Crangle%5E4+%5Cleq+n%5E%7BO%281%29%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \mathop{\mathbb E} \langle x,w \rangle^4 \leq n^{O(1)} " class="latex" /></p>
+<p> so by Paley–Zygmund we have, let’s say</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cmathop%7B%5Cmathbb+P%7D+%5Cleft%5B+%5Clangle+x%2Cw+%5Crangle%5E2+%5Cgeq+%5Cfrac+%7B%5Cepsilon%5E2%7D%7B2n%7D+%5Cright%5D+%5Cgeq+%5Cfrac+1+%7Bn%5E%7BO%281%29%7D%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \mathop{\mathbb P} \left[ \langle x,w \rangle^2 \geq \frac {\epsilon^2}{2n} \right] \geq \frac 1 {n^{O(1)}} " class="latex" /></p>
+<p> which, together with the definition of <img src="https://s0.wp.com/latex.php?latex=%7Bw%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{w}" class="latex" /> and the fact that the distribution of <img src="https://s0.wp.com/latex.php?latex=%7B%5Clangle+x%2C+w%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\langle x, w\rangle}" class="latex" /> is symmetric around zero, gives us the claim <a href="https://lucatrevisan.wordpress.com/feed/#main">(3)</a>.</p>
+<p>Now suppose that we have been lucky and that we have found such an <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x}" class="latex" />. We define the matrix</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++X_%7Bj%2Ck%7D+%3D+%5Csum_i+T_%7Bi%2Cj%2Ck%7D+x_i+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  X_{j,k} = \sum_i T_{i,j,k} x_i " class="latex" /></p>
+<p> and we see that our claim can be written as</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++y%5E%7B%2AT%7D+X+z%5E%2A+%5Cgeq+%5Cepsilon+%5Ccdot+%5COmega+%5Cleft%28%5Csqrt%7B%5Cfrac%7B1%7D%7Bn%7D%7D+%5Cright%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  y^{*T} X z^* \geq \epsilon \cdot \Omega \left(\sqrt{\frac{1}{n}} \right) " class="latex" /></p>
+<p> At this point we just apply the algorithm implied by the Grothendieck inequality to the matrix <img src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X}" class="latex" />, and we find <img src="https://s0.wp.com/latex.php?latex=%7By%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{y}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7Bz%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{z}" class="latex" /> in <img src="https://s0.wp.com/latex.php?latex=%7B%5C%7B+-1%2C1+%5C%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\{ -1,1 \}^n}" class="latex" /> such that</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++y%5ET+X+z+%5Cgeq+%5Cepsilon+%5Ccdot+%5COmega+%5Cleft%28%5Csqrt%7B%5Cfrac%7B1%7D%7Bn%7D%7D+%5Cright%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  y^T X z \geq \epsilon \cdot \Omega \left(\sqrt{\frac{1}{n}} \right)" class="latex" /></p>
+<p> meaning that</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_%7Bi%2Cj%2Ck%7D+T_%7Bi%2Cj%2Ck%7D+x_i+y_j+z_k+%5Cgeq+%5Cepsilon+%5Ccdot+%5COmega+%5Cleft%28%5Csqrt%7B%5Cfrac%7B1%7D%7Bn%7D%7D%5Cright%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \sum_{i,j,k} T_{i,j,k} x_i y_j z_k \geq \epsilon \cdot \Omega \left(\sqrt{\frac{1}{n}}\right) " class="latex" /></p>
+<p>Summarizing, our algorithm is to pick a random vector <img src="https://s0.wp.com/latex.php?latex=%7Bx%5Csim+%5C%7B-1%2C1%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x\sim \{-1,1\}}" class="latex" /> and to find a constant-factor approximation for the problem <a name="xfixed"></a></p>
+<p><a name="xfixed"></a></p><a name="xfixed">
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+++%5Cmax_%7By%2Cz+%5Cin+%5C%7B-1%2C1%5C%7D%5En%7D+%5C+%5Csum_%7Bi%2Cj%2Ck%7D+T_%7Bi%2Cj%2Ck%7D+x_iy_jz_k+%5C+%5C+%5C+%5C+%5C+%284%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle   \max_{y,z \in \{-1,1\}^n} \ \sum_{i,j,k} T_{i,j,k} x_iy_jz_k \ \ \ \ \ (4)" class="latex" /></p>
+</a><p><a name="xfixed"></a><a name="xfixed"></a> using semidefinite programming. We do that <img src="https://s0.wp.com/latex.php?latex=%7Bn%5E%7BO%281%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n^{O(1)}}" class="latex" /> times, and take the best solution.</p>
+<p>The analysis can be turned into an upper bound certificate in the following way. For the (suboptimal) analysis using Paley-Zygmund, we only need the entries of the random <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x}" class="latex" /> to be 4-wise independent, and there are distributions on <img src="https://s0.wp.com/latex.php?latex=%7B%5C%7B-1%2C1%5C%7D%5En%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\{-1,1\}^n}" class="latex" /> where the entries are unbiased and 4-wise independent, and such that the sample space is of size polynomial in <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" />. Thus, one could write an SDP relaxation of <a href="https://lucatrevisan.wordpress.com/feed/#xfixed">(4)</a> for each <img src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x}" class="latex" /> in the support of such a distribution, and then take the maximum of these SDPs, multiply it by <img src="https://s0.wp.com/latex.php?latex=%7BO%28%5Csqrt+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{O(\sqrt n)}" class="latex" />, and it would be a certified upper bound. Such an upper bound, however, would not come from a relaxation of the 3-XOR problem, and I find it really strange that it is not clear how to turn these ideas into a proof that, say, the standard degree-4 sum-of-squares semidefinite programming relaxation of 3-XOR has an integrality gap at most <img src="https://s0.wp.com/latex.php?latex=%7B%5Ctilde+O%28%5Csqrt+n%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\tilde O(\sqrt n)}" class="latex" />.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by luca <a href="https://lucatrevisan.wordpress.com/2021/10/12/the-khot-naor-approximation-algorithm-for-3-xor/"><span class="datestr">at October 12, 2021 12:55 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -658,7 +759,7 @@ estimate a higher order structure like triangle. }
 
 
 
-<p>A week ago, I considered it obvious that if, using a classical spoofer, you could beat the USTC experiment on a metric like total variation distance from the ideal distribution, then you would’ve completely destroyed USTC’s claim of quantum supremacy.  The reason I believed *that*, in turn, is a proposition that I hadn’t given a name but needs one, so let me call it <strong>Hypothesis H</strong>:</p>
+<p>A week ago, I considered it obvious that if, using a classical spoofer, you could beat the USTC experiment on a metric like total variation distance from the ideal distribution, then you would’ve completely destroyed USTC’s claim of quantum supremacy.  The reason I believed <em>that</em>, in turn, is a proposition that I hadn’t given a name but needs one, so let me call it <strong>Hypothesis H</strong>:</p>
 
 
 
@@ -666,7 +767,7 @@ estimate a higher order structure like triangle. }
 
 
 
-<p>Hypothesis H had important downstream consequences.  Google’s algorithm, by the Google team’s own admission, does not reproduce the high-order correlations.  Furthermore, importantly, because of limitations on both samples and classical computation time, Google’s paper calculates the total variation distance from the ideal distribution only on the marginal distribution on roughly 14 out of 144 modes.  On that marginal distribution, Google’s algorithm does do better than the experiment in total variation distance.  Google presents a claimed extrapolation to the full 144 modes, but eyeballing the graphs, it was far from clear to me what would happen: like, maybe the spoofing algorithm would continue to win, but maybe the experiment would turn around and win; who knows?</p>
+<p>Hypothesis H had important downstream consequences.  Google’s algorithm, by the Google team’s own admission, does not reproduce the high-order correlations.  Furthermore, because of limitations on both samples and classical computation time, Google’s paper calculates the total variation distance from the ideal distribution only on the marginal distribution on roughly 14 out of 144 modes.  On that marginal distribution, Google’s algorithm does do better than the experiment in total variation distance.  Google presents a claimed extrapolation to the full 144 modes, but eyeballing the graphs, it was far from clear to me what would happen: like, maybe the spoofing algorithm would continue to win, but maybe the experiment would turn around and win; who knows?</p>
 
 
 
@@ -674,7 +775,7 @@ estimate a higher order structure like triangle. }
 
 
 
-<ol><li>the experiment’s success in reproducing the high-order correlations,</li><li>the admitted failure of Google’s algorithm in reproducing the high-order correlations, and</li><li>the seeming impossibility of doing well on BosonSampling *without* reproducing the high-order correlations (Hypothesis H).</li></ol>
+<ol><li>the experiment’s success in reproducing the high-order correlations,</li><li>the admitted failure of Google’s algorithm in reproducing the high-order correlations, and</li><li>the seeming impossibility of doing well on BosonSampling <em>without</em> reproducing the high-order correlations (Hypothesis H).</li></ol>
 
 
 
@@ -718,7 +819,7 @@ estimate a higher order structure like triangle. }
 
 
 
-<p>USTC could add: from the very beginning, the whole point of quantum supremacy experiments was to demonstrate a clear speedup on <em>some</em> benchmark — we never particularly cared which one!  That horse is out of the barn as soon as we’re talking about quantum supremacy at all — something the Google group, which itself reported the first quantum supremacy experiment in Fall 2019, again for a completely artificial benchmark — knows as well as anyone else.  (The Google team even has experience with adjusting benchmarks: when, for example, <a href="https://arxiv.org/abs/2103.03074">Pan and Zhang</a> pointed out that Linear XEB as originally specified is pretty easy to spoof for random 2D circuits, the most cogent rejoinder was: OK, fine then, then add an extra check that the returned samples are sufficiently different from one another, which kills Pan and Zhang’s spoofing strategy.)  In that case, then, why isn’t a benchmark tailored to the high-order correlations as good as variation distance or linear cross-entropy or any other benchmark?</p>
+<p>USTC could add: from the very beginning, the whole point of quantum supremacy experiments was to demonstrate a clear speedup on <em>some</em> benchmark — we never particularly cared which one!  That horse is out of the barn as soon as we’re talking about quantum supremacy at all — something the Google group, which itself reported the first quantum supremacy experiment in Fall 2019, again for a completely artificial benchmark — knows as well as anyone else.  (The Google team even has experience with adjusting benchmarks: when, for example, <a href="https://arxiv.org/abs/2103.03074">Pan and Zhang</a> pointed out that Linear XEB as originally specified is pretty easy to spoof for random 2D circuits, the most cogent rejoinder was: OK, fine then, add an extra check that the returned samples are sufficiently different from one another, which kills Pan and Zhang’s spoofing strategy.)  In that case, then, why isn’t a benchmark tailored to the high-order correlations as good as variation distance or linear cross-entropy or any other benchmark?</p>
 
 
 
@@ -742,7 +843,7 @@ estimate a higher order structure like triangle. }
 
 
 
-<p>With BosonSampling, by contrast, we have various metrics with which to judge performance, but so far, for none of those metrics do we have a plausible hypothesis that says “<em>here’s</em> the best that any polynomial-time classical algorithm can possibly hope to do, and it’s completely plausible even for a noisy current or planned BosonSampling experiment to do better than that.”</p>
+<p>With BosonSampling, by contrast, we have various metrics with which to judge performance, but so far, for none of those metrics do we have a plausible hypothesis that says “<em>here’s</em> the best that any polynomial-time classical algorithm can possibly hope to do, and it’s completely plausible that even a noisy current or planned BosonSampling experiment can do better than that.”</p>
 
 
 
@@ -2851,52 +2952,6 @@ We also note two alternative interpretations of our model and results. If we int
 
 <p class="date">
 <a href="http://benjamin-recht.github.io/2021/09/28/rct/"><span class="datestr">at September 28, 2021 12:00 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://eccc.weizmann.ac.il/report/2021/140">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eccc.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="https://eccc.weizmann.ac.il/report/2021/140">TR21-140 |  Tight Computational Indistinguishability Bound of Product Distributions | 
-
-	Nathan Geier</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://eccc.weizmann.ac.il/" title="ECCC - Reports">ECCC papers</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-Assume that $X_0,X_1$ (respectively $Y_0,Y_1$) are $d_X$ (respectively $d_Y$) indistinguishable for circuits of a given size. It is well known that the product distributions $X_0Y_0,\,X_1Y_1$ are $d_X+d_Y$ indistinguishable for slightly smaller circuits. However, in probability theory where unbounded adversaries are considered through statistical distance, it is folklore knowledge that in fact $X_0Y_0$ and $X_1Y_1$ are $d_X+d_Y-d_X\cdot d_Y$ indistinguishable, and also that this bound is tight.
-
-We formulate and prove the computational analog of this tight bound. Our proof is entirely different from the proof in the statistical case, which is non-constructive. As a corollary, we show that if $X$ and $Y$ are $d$ indistinguishable, then $k$ independent copies of $X$ and $k$ independent copies of $Y$ are almost $1-(1-d)^k$ indistinguishable for smaller circuits, as against $d\cdot k$ using the looser bound. Our bounds are useful in settings where only weak (i.e. non-negligible) indistinguishability is guaranteed. We demonstrate this in the context of cryptography, showing that our bounds yield simple analysis for amplification of weak oblivious transfer protocols.</div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="https://eccc.weizmann.ac.il/report/2021/140"><span class="datestr">at September 27, 2021 06:01 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
