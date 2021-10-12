@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-10-12T14:38:56Z</updated>
+  <updated>2021-10-12T15:22:35Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -22,7 +22,8 @@
 <p>In 3-XOR, we have a system of linear equations modulo 2, with three variables per equation, that might look something like</p>
 <p align="center"><img alt="\displaystyle  \begin{array}{ll} x_1 + x_2 + x_4 &amp; \equiv 0 \pmod 2\\ x_1 + x_5 + x_6 &amp; \equiv 1 \pmod 2\\ x_2 + x_3 + x_4 &amp; \equiv 1 \pmod 2\\ x_5 + x_3 + x_6 &amp; \equiv 1 \pmod 2 \end{array} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cbegin%7Barray%7D%7Bll%7D+x_1+%2B+x_2+%2B+x_4+%26+%5Cequiv+0+%5Cpmod+2%5C%5C+x_1+%2B+x_5+%2B+x_6+%26+%5Cequiv+1+%5Cpmod+2%5C%5C+x_2+%2B+x_3+%2B+x_4+%26+%5Cequiv+1+%5Cpmod+2%5C%5C+x_5+%2B+x_3+%2B+x_6+%26+%5Cequiv+1+%5Cpmod+2+%5Cend%7Barray%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
 <p>The above system is not satisfiable (if we add up the left-hand sides we get 0, if we add up the right-hand sides we get 1), but it is possible to satisfy <img alt="{3/4}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B3%2F4%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> of the equations, for example by setting all the variables to 1. In Max 3-XOR problem (which we will simply refer to as “3-XOR” from now on), given a system of equations mod 2 with three variables per equation, we want to find an assignment that satisfies as many equations as possible.</p>
-<p>Either setting all the variables to zero or setting all the variables to one will satisfy half of the equations, and the interesting question is how much better than 1/2 it is possible to do on a given instance. \href{https://web.math.princeton.edu/~naor/homepage Like the approximation algorithm for sparsest cut in Abelian Cayley graphs implied by the result of Bauer et al. that was the subject of the last two posts, the result of Khot and Naor <em>does not</em> prove a bound on the integrality gap of a relaxation of the problem.</p>
+<p>Either setting all the variables to zero or setting all the variables to one will satisfy half of the equations, and the interesting question is how much better than 1/2 it is possible to do on a given instance. <a href="https://epubs.siam.org/doi/abs/10.1137/070691140">Khot and Naor</a> provide an algorithm that, given an instance in which it is possible to satisfy an <img alt="{1/2 + \epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2F2+%2B+%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> fraction of equations, finds a solution that satisfies at least <img alt="{1/2 + \epsilon \cdot O \left( \sqrt{\frac {\log n} n} \right)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2F2+%2B+%5Cepsilon+%5Ccdot+O+%5Cleft%28+%5Csqrt%7B%5Cfrac+%7B%5Clog+n%7D+n%7D+%5Cright%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> fraction of equations, where <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the number of variables. The algorithm is randomized, it runs in polynomial time, and it succeeds with high probability. I believe that it is still the state of the art in terms of worst-case approximation guarantee.</p>
+<p>Like the approximation algorithm for sparsest cut in Abelian Cayley graphs implied by the result of Bauer et al. that was the subject of the last two posts, the result of Khot and Naor <em>does not</em> prove a bound on the integrality gap of a relaxation of the problem.</p>
 <p>I will describe the Khot-Naor algorithm and describe how it manages to use convex optimization to provide an approximation algorithm, but without establishing an integrality gap bound. I thank my student Lucas Pesenti for explaining the algorithm to me and for thinking together about this problem.</p>
 <p>If our 3-XOR instance has <img alt="{m}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bm%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> equations and <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> variables, then the problem of maximizing the number of satisfied equations can be rewritten as</p>
 <p align="center"><img alt="\displaystyle  \frac m2 + \max_{x \in \{ -1 , +1 \}^n} \ \sum_{i,j,k} c_{i,j,k} x_i x_j x_k " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac+m2+%2B+%5Cmax_%7Bx+%5Cin+%5C%7B+-1+%2C+%2B1+%5C%7D%5En%7D+%5C+%5Csum_%7Bi%2Cj%2Ck%7D+c_%7Bi%2Cj%2Ck%7D+x_i+x_j+x_k+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
@@ -96,7 +97,7 @@
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-10-12T14:37:09Z</updated>
+      <updated>2021-10-12T15:20:12Z</updated>
     </source>
   </entry>
 
@@ -123,7 +124,7 @@ Email: r.johnson@qmul.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-12T14:37:40Z</updated>
+      <updated>2021-10-12T15:20:42Z</updated>
     </source>
   </entry>
 
@@ -150,7 +151,7 @@ Email: hiring@cs.williams.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-12T14:37:40Z</updated>
+      <updated>2021-10-12T15:20:42Z</updated>
     </source>
   </entry>
 
@@ -529,7 +530,7 @@ estimate a higher order structure like triangle. }
       <link href="https://thmatters.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://thmatters.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theory Matters</title>
-      <updated>2021-10-12T14:37:50Z</updated>
+      <updated>2021-10-12T15:21:11Z</updated>
     </source>
   </entry>
 
@@ -679,7 +680,7 @@ estimate a higher order structure like triangle. }
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-10-12T14:37:09Z</updated>
+      <updated>2021-10-12T15:20:12Z</updated>
     </source>
   </entry>
 
@@ -802,7 +803,7 @@ One day we will see a more computationally-oriented Nobel Prize, but how soon? U
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-10-12T14:37:36Z</updated>
+      <updated>2021-10-12T15:20:38Z</updated>
     </source>
   </entry>
 
@@ -830,7 +831,7 @@ Email: jobs@ideas-ncbr.pl</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-12T14:37:40Z</updated>
+      <updated>2021-10-12T15:20:42Z</updated>
     </source>
   </entry>
 
@@ -904,7 +905,7 @@ Email: jobs@ideas-ncbr.pl</p></div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-10-12T14:37:08Z</updated>
+      <updated>2021-10-12T15:20:12Z</updated>
     </source>
   </entry>
 
@@ -931,7 +932,7 @@ Email: atri@buffalo.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-12T14:37:40Z</updated>
+      <updated>2021-10-12T15:20:42Z</updated>
     </source>
   </entry>
 
@@ -958,7 +959,7 @@ Email: pooya.farshim@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-12T14:37:40Z</updated>
+      <updated>2021-10-12T15:20:42Z</updated>
     </source>
   </entry>
 
@@ -1040,7 +1041,7 @@ Email: pooya.farshim@gmail.com</p></div>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-10-12T14:38:20Z</updated>
+      <updated>2021-10-12T15:21:43Z</updated>
     </source>
   </entry>
 
@@ -1114,7 +1115,7 @@ Email: pooya.farshim@gmail.com</p></div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-10-12T14:37:09Z</updated>
+      <updated>2021-10-12T15:20:13Z</updated>
     </source>
   </entry>
 
@@ -1141,7 +1142,7 @@ Email: cssearch@pdx.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-12T14:37:40Z</updated>
+      <updated>2021-10-12T15:20:42Z</updated>
     </source>
   </entry>
 
@@ -1271,7 +1272,7 @@ Email: cssearch@pdx.edu</p></div>
       <link href="https://nisheethvishnoi.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://nisheethvishnoi.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Algorithms, Nature, and Society</title>
-      <updated>2021-10-12T14:38:39Z</updated>
+      <updated>2021-10-12T15:22:10Z</updated>
     </source>
   </entry>
 
@@ -1298,7 +1299,7 @@ Email: selbaum@virginia.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-12T14:37:40Z</updated>
+      <updated>2021-10-12T15:20:42Z</updated>
     </source>
   </entry>
 
@@ -1449,7 +1450,7 @@ Email: postdoc-advice@irif.fr</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-12T14:37:40Z</updated>
+      <updated>2021-10-12T15:20:42Z</updated>
     </source>
   </entry>
 
@@ -1477,7 +1478,7 @@ Prior to this, Tao answered this question when the underlying quasirandom group 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-10-12T14:37:27Z</updated>
+      <updated>2021-10-12T15:20:28Z</updated>
     </source>
   </entry>
 
@@ -1578,7 +1579,7 @@ Prior to this, Tao answered this question when the underlying quasirandom group 
       <link href="https://blog.simons.berkeley.edu" rel="alternate" type="text/html"/>
       <subtitle>What's New at the Simons Institute for the Theory of Computing.</subtitle>
       <title>Calvin Café: The Simons Institute Blog</title>
-      <updated>2021-10-12T14:38:19Z</updated>
+      <updated>2021-10-12T15:21:41Z</updated>
     </source>
   </entry>
 
@@ -1605,7 +1606,7 @@ Email: mateus.oliveira@uib.no</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-12T14:37:40Z</updated>
+      <updated>2021-10-12T15:20:42Z</updated>
     </source>
   </entry>
 
@@ -1632,7 +1633,7 @@ Email: mateus.oliveira@uib.no</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-12T14:37:40Z</updated>
+      <updated>2021-10-12T15:20:42Z</updated>
     </source>
   </entry>
 
@@ -1940,7 +1941,7 @@ Here is the answer to the puzzle in the previous <a href="https://rjlipton.wpcom
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-10-12T14:37:37Z</updated>
+      <updated>2021-10-12T15:20:38Z</updated>
     </source>
   </entry>
 
@@ -2002,7 +2003,7 @@ We also note two alternative interpretations of our model and results. If we int
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-10-12T14:37:27Z</updated>
+      <updated>2021-10-12T15:20:28Z</updated>
     </source>
   </entry>
 
