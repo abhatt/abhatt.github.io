@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-10-14T05:39:09Z</updated>
+  <updated>2021-10-14T06:22:01Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,116 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2021/10/13/relevant-neighbors</id>
+    <link href="https://11011110.github.io/blog/2021/10/13/relevant-neighbors.html" rel="alternate" type="text/html"/>
+    <title>Relevant neighbors</title>
+    <summary>I have a new preprint, “Finding Relevant Points for Nearest-Neighbor Classification”, arXiv:2110.06163, to appear in January at the SIAM Symposium on Simplicity in Algorithms (SOSA22). It’s about points in Euclidean spaces of dimension three or more, but I thought it would make a good warm-up to discuss here the one-dimensional version of the same problem, solved (together with the 2d version) by Bremner, Demaine, Erickson, Iacono, Langerman, Morin, and Toussaint in their paper “Output-sensitive algorithms for computing nearest-neighbour decision boundaries”, Discrete Comput. Geom. 2005.</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>I have a new preprint, <a href="https://arxiv.org/abs/2110.06163">“Finding Relevant Points for Nearest-Neighbor Classification”, arXiv:2110.06163</a>, to appear in January at the <a href="https://www.siam.org/conferences/cm/conference/sosa22">SIAM Symposium on Simplicity in Algorithms (SOSA22)</a>. It’s about points in Euclidean spaces of dimension three or more, but I thought it would make a good warm-up to discuss here the one-dimensional version of the same problem, solved (together with the 2d version) by Bremner, Demaine, Erickson, Iacono, Langerman, Morin, and Toussaint in their paper <a href="http://dx.doi.org/10.1007/s00454-004-1152-0">“Output-sensitive algorithms for computing nearest-neighbour decision boundaries”, <em>Discrete Comput. Geom.</em> 2005</a>.</p>
+
+<p>So in this problem, you have a collection of real-valued data points with known discrete classifications (say, a finite set of colors), and you want to guess the color of new points whose color is not already given. Nearest neighbor classification means simply that, to guess the color of \(x\), you find the closest known point \(y\) and guess that \(x\) has the same color as \(y\). One easy way to do this would be to store the known points in a sorted list and use binary search. There’s lots more to say about this (for instance its use in combination with <a href="https://en.wikipedia.org/wiki/Random_projection">random projections</a> for high-dimensional approximate nearest neighbors) but for today I want to focus on the size of this sorted list. We can store a list that is potentially much smaller, but always produces the same results, by keeping only points that have a neighbor with a different classification.</p>
+
+<p style="text-align: center;"><img alt="One-dimensional nearest neighbor classification on a full data set and the data set trimmed to its relevant points" src="https://11011110.github.io/blog/assets/2021/1d-nnc.svg"/></p>
+
+<p>These points with differently-classified neighbors are the “relevant points” of the preprint title. Another way of describing them is that a point is relevant if deleting it would change the classification of some other (unknown) points in space that might later be queried. Among the set of decision boundaries, the ones separating parts of space with different classifications are the ones defined by relevant points. So if we store a nearest-neighbor data structure with only relevant points, we will get the same answer as if we store all known points. But because we’re storing fewer points, it will take less memory and less time (especially if the reduced memory allows it to fit into cache).</p>
+
+<p>If you have the points given to you in sorted order, then it’s easy enough to scan through them in that order, keeping track of which pairs have different classifications, and produce a filtered sequence of the relevant ones. Here it is in Python (with apologies for the low-contrast syntax coloring):</p>
+
+<figure class="highlight"><pre><code class="language-python"><span class="k">def</span> <span class="nf">relevant</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span><span class="n">classify</span><span class="p">):</span>
+    <span class="s">"""Filter points whose classification differs from a neighbor.
+    Arguments are a sequence of points, and a function to classify
+    each point. The return value is an iterator for the filtered sequence."""</span>
+    <span class="n">prevpoint</span> <span class="o">=</span> <span class="n">prevclass</span> <span class="o">=</span> <span class="n">prevlisted</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+        <span class="n">xclass</span> <span class="o">=</span> <span class="n">classify</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">prevlisted</span> <span class="o">!=</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">xclass</span> <span class="o">!=</span> <span class="n">prevclass</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">prevlisted</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">prevpoint</span>
+            <span class="k">yield</span> <span class="n">x</span>
+            <span class="n">prevlisted</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">prevlisted</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">prevpoint</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="n">prevclass</span> <span class="o">=</span> <span class="n">xclass</span></code></pre></figure>
+
+<p>However, as Bremner et al observed, sorting an input to make it usable by this scan does more work than necessary, because we don’t need the sorted ordering of all the other points between the relevant ones. Instead, we can use an idea resembling <a href="https://en.wikipedia.org/wiki/Quickselect">quickselect</a>, where we modify the quicksort algorithm to stop recursing in subproblems where sorting is unnecessary. For finding relevant points, these subproblems are the homogeneous ones, in which all points have the same classification as each other. Bremner et al combined this idea with a version of quicksort that always partitions its subproblems at the exact median, in order to achieve a good worst-case time bound, but if we’re happy with expected analysis we can use the same random-pivoting idea as the more usual form of quicksort:</p>
+
+<figure class="highlight"><pre><code class="language-python"><span class="k">def</span> <span class="nf">quickrelevant</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span><span class="n">classify</span><span class="p">):</span>
+    <span class="s">"""Same output as relevant(sorted(list(seq)),classify).
+    We assume the input sequence is sortable and has no repeat values."""</span>
+
+    <span class="k">def</span> <span class="nf">supersequence</span><span class="p">():</span>
+        <span class="s">"""Generate sorted supersequence of relevant points by quicksort-like
+        recursive subdivision, stopping at homogeneous subproblems.
+        We include the endpoints of each subproblem, even though some might
+        not be relevant, so the results should be cleaned up using relevant().
+        We use an explicit stack to handle the recursion, avoiding the need
+        to pass yielded outputs back through a call stack."""</span>
+
+        <span class="n">liststack</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">seq</span><span class="p">)]</span>
+        <span class="k">while</span> <span class="n">liststack</span><span class="p">:</span>
+            <span class="n">L</span> <span class="o">=</span> <span class="n">liststack</span><span class="p">.</span><span class="n">pop</span><span class="p">()</span>
+        
+            <span class="c1"># Base cases of recursion: lists of zero or one item
+</span>            <span class="k">if</span> <span class="ow">not</span> <span class="n">L</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">L</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">continue</span>
+            
+            <span class="c1"># Test whether L is homogeneous
+</span>            <span class="c1"># and if so only generate its extreme values
+</span>            <span class="n">homogeneous</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">firstclass</span> <span class="o">=</span> <span class="n">classify</span><span class="p">(</span><span class="n">L</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">firstclass</span> <span class="o">!=</span> <span class="n">classify</span><span class="p">(</span><span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                    <span class="n">homogeneous</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">homogeneous</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="nb">min</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="nb">max</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+                <span class="k">continue</span>
+            
+            <span class="c1"># Divide and conquer with random pivot
+</span>            <span class="n">pivot</span> <span class="o">=</span> <span class="n">L</span><span class="p">[</span><span class="n">random</span><span class="p">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">L</span><span class="p">))]</span>
+            <span class="n">low</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">high</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">L</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">pivot</span><span class="p">:</span>
+                    <span class="n">low</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">high</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">liststack</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">high</span><span class="p">)</span>
+            <span class="n">liststack</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">low</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">relevant</span><span class="p">(</span><span class="n">supersequence</span><span class="p">(),</span><span class="n">classify</span><span class="p">)</span></code></pre></figure>
+
+<p>The time complexity of this algorithm can be analyzed much like <a href="https://11011110.github.io/blog/2007/10/09/blum-style-analysis-of.html">the analysis of quickselect</a>, by observing that the time is proportional to the number of comparisons with pivots, computing the probability that each possible comparison happens, and summing. In quicksort, two distinct elements at distance \(d\) from each other in the final sorted output are compared whenever one of them is the first to be chosen as a pivot in the interval between them, which happens with probability exactly \(2/(d+1)\). In quickrelevant, this same probability holds for pairs that are separated by one of the decision boundaries. But pairs of elements that are within the same homogeneous block are less likely to be compared, because of the possibility that the recursion will stop before it separates or compares them.</p>
+
+<p>If a pair of elements lies within a single block, has distance \(d\) separating them, and is $e$ units from both ends of the block, then it will only be compared if one of the two elements is first to be chosen in at least one of the two intervals of length \(d+e\) extending from the two elements towards an end of their block. This happens with probability at most \(4/(d+e)\), because there are two ways of choosing which element to pick first as the pivot and two ways of choosing which extended interval it is first in.</p>
+
+<p>If we sum up these probabilities, for pairs involving a single element that is \(e\) units from its nearest block boundary among a set of \(n\) elements, we get \(O\bigl(\log(n/e)\bigr)\) as the expected contribution to the total time for that one element. If we sum the contributions from the elements within a block, for a block of length \(\ell_i\), we get a total expected contribution from that block of \(O\bigl(\ell_i\log(n/\ell_i)\bigr)\). And if we have \(k\) relevant points and \(O(k)\) blocks, and we sum over all blocks, the total time is maximized when all the blocks are of equal size, \(\Theta(n/k)\), for which we get total time \(O(n\log k)\).</p>
+
+<p>For quicksort and quickselect, it’s possible to be more careful in the analysis, derive exact formulas for the probability of making each comparison, and from them get an analysis of the expected number of comparisons that does not use \(O\)-notation for its leading term; see my linked post on the quickselect analysis. Probably it’s possible here too but it looks messier. Maybe it would make a good undergraduate research project. One thing to be careful of is that the comparisons are not over in the homogeneous case; finding the min and max simultaneously, in a block of length \(\ell_i\), takes roughly \(3\ell_i/2\) comparisons. But that should only be a lower-order term compared to the \(O(n\log k)\) leading term of the analysis.</p></div>
+    </content>
+    <updated>2021-10-13T23:05:00Z</updated>
+    <published>2021-10-13T23:05:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2021-10-14T06:16:40Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://cstheory-jobs.org/2021/10/13/postdoc-in-theory-of-machine-learning-at-harvard-university-apply-by-december-1-2021/</id>
@@ -34,7 +144,7 @@ Email: theory-postdoc-apply@seas.harvard.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-14T05:37:49Z</updated>
+      <updated>2021-10-14T06:20:47Z</updated>
     </source>
   </entry>
 
@@ -63,7 +173,7 @@ Email: theory-postdoc-apply@seas.harvard.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-14T05:37:49Z</updated>
+      <updated>2021-10-14T06:20:47Z</updated>
     </source>
   </entry>
 
@@ -91,7 +201,7 @@ Email: theory-postdoc-apply@seas.harvard.edu</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-10-14T05:37:30Z</updated>
+      <updated>2021-10-14T06:20:32Z</updated>
     </source>
   </entry>
 
@@ -116,7 +226,7 @@ Email: theory-postdoc-apply@seas.harvard.edu</p></div>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2021-10-14T05:38:32Z</updated>
+      <updated>2021-10-14T06:21:31Z</updated>
     </source>
   </entry>
 
@@ -840,7 +950,7 @@ inducing high load in a few bins.
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-10-14T05:37:09Z</updated>
+      <updated>2021-10-14T06:20:14Z</updated>
     </source>
   </entry>
 
@@ -867,7 +977,7 @@ Email: r.johnson@qmul.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-14T05:37:49Z</updated>
+      <updated>2021-10-14T06:20:47Z</updated>
     </source>
   </entry>
 
@@ -894,7 +1004,7 @@ Email: hiring@cs.williams.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-14T05:37:49Z</updated>
+      <updated>2021-10-14T06:20:47Z</updated>
     </source>
   </entry>
 
@@ -1100,7 +1210,7 @@ Email: hiring@cs.williams.edu</p></div>
       <link href="https://thmatters.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://thmatters.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theory Matters</title>
-      <updated>2021-10-14T05:37:59Z</updated>
+      <updated>2021-10-14T06:20:56Z</updated>
     </source>
   </entry>
 
@@ -1250,7 +1360,7 @@ Email: hiring@cs.williams.edu</p></div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-10-14T05:37:09Z</updated>
+      <updated>2021-10-14T06:20:13Z</updated>
     </source>
   </entry>
 
@@ -1373,7 +1483,7 @@ One day we will see a more computationally-oriented Nobel Prize, but how soon? U
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-10-14T05:37:45Z</updated>
+      <updated>2021-10-14T06:20:40Z</updated>
     </source>
   </entry>
 
@@ -1401,7 +1511,7 @@ Email: jobs@ideas-ncbr.pl</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-14T05:37:49Z</updated>
+      <updated>2021-10-14T06:20:47Z</updated>
     </source>
   </entry>
 
@@ -1475,7 +1585,7 @@ Email: jobs@ideas-ncbr.pl</p></div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-10-14T05:37:09Z</updated>
+      <updated>2021-10-14T06:20:13Z</updated>
     </source>
   </entry>
 
@@ -1502,7 +1612,7 @@ Email: atri@buffalo.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-14T05:37:49Z</updated>
+      <updated>2021-10-14T06:20:47Z</updated>
     </source>
   </entry>
 
@@ -1529,7 +1639,7 @@ Email: pooya.farshim@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-14T05:37:49Z</updated>
+      <updated>2021-10-14T06:20:47Z</updated>
     </source>
   </entry>
 
@@ -1611,7 +1721,7 @@ Email: pooya.farshim@gmail.com</p></div>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-10-14T05:38:29Z</updated>
+      <updated>2021-10-14T06:21:26Z</updated>
     </source>
   </entry>
 
@@ -1685,7 +1795,7 @@ Email: pooya.farshim@gmail.com</p></div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-10-14T05:37:09Z</updated>
+      <updated>2021-10-14T06:20:14Z</updated>
     </source>
   </entry>
 
@@ -1712,7 +1822,7 @@ Email: cssearch@pdx.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-14T05:37:49Z</updated>
+      <updated>2021-10-14T06:20:47Z</updated>
     </source>
   </entry>
 
@@ -1842,34 +1952,7 @@ Email: cssearch@pdx.edu</p></div>
       <link href="https://nisheethvishnoi.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://nisheethvishnoi.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Algorithms, Nature, and Society</title>
-      <updated>2021-10-14T05:38:44Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-jobs.org/2021/10/04/five-tenure-track-faculty-positions-in-cs-at-the-university-of-virginia-at-university-of-virginia-apply-by-december-1-2021/</id>
-    <link href="https://cstheory-jobs.org/2021/10/04/five-tenure-track-faculty-positions-in-cs-at-the-university-of-virginia-at-university-of-virginia-apply-by-december-1-2021/" rel="alternate" type="text/html"/>
-    <title>Five Tenure-Track Faculty Positions in CS at the University of Virginia at University of Virginia  (apply by December 1, 2021)</title>
-    <summary>Computer Science Department at the University of Virginia seeks 5 tenured or tenure-track faculty at all ranks, with Theory as one of our core targeted areas. Review of applications begins 12/1/2021. Website: https://uva.wd1.myworkdayjobs.com/en-US/UVAJobs/job/Charlottesville-VA/Open-Rank-Faculty-Position-in-Computer-Science_R0028993 Email: selbaum@virginia.edu</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Computer Science Department at the University of Virginia seeks 5 tenured or tenure-track faculty at all ranks, with Theory as one of our core targeted areas. Review of applications begins 12/1/2021.</p>
-<p>Website: <a href="https://uva.wd1.myworkdayjobs.com/en-US/UVAJobs/job/Charlottesville-VA/Open-Rank-Faculty-Position-in-Computer-Science_R0028993">https://uva.wd1.myworkdayjobs.com/en-US/UVAJobs/job/Charlottesville-VA/Open-Rank-Faculty-Position-in-Computer-Science_R0028993</a><br/>
-Email: selbaum@virginia.edu</p></div>
-    </content>
-    <updated>2021-10-04T18:40:21Z</updated>
-    <published>2021-10-04T18:40:21Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-jobs.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-jobs.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-jobs.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-14T05:37:49Z</updated>
+      <updated>2021-10-14T06:21:43Z</updated>
     </source>
   </entry>
 </feed>
