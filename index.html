@@ -243,7 +243,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at October 18, 2021 05:39 PM UTC</span>.
+Last updated <span class="datestr">at October 18, 2021 06:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -380,6 +380,171 @@ We argue that these results strengthen the case for uniform certification in QBF
 
 <p class="date">
 <a href="https://eccc.weizmann.ac.il/report/2021/144"><span class="datestr">at October 17, 2021 03:56 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://gradientscience.org/copriors/">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/madry.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://gradientscience.org/copriors/">Combining Diverse Feature Priors</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://gradientscience.org/" title="gradient science">Gradient Science</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><a style="float: left; width: 45%;" href="https://arxiv.org/abs/2110.08220" class="bbutton">
+<i class="fas fa-file-pdf"></i>
+    Paper
+</a>
+<a style="float: left; width: 45%;" href="https://github.com/madrylab/copriors" class="bbutton">
+<i class="fab fa-github"></i>
+   Code
+</a>
+<br /></p>
+
+<p><i>
+    In <a href="https://arxiv.org/abs/2110.08220">our new paper</a>, we take a closer look at the design space of so-called feature priors—i.e., priors that bias the features that a model relies on. We show that models trained with diverse sets of such priors have less overlapping failure modes and can correct each other’s mistakes.
+</i></p>
+
+<p>At the core of deep learning’s success is its ability to automatically learn useful features from raw data, e.g., image pixels. Consequently, the set of such learned features has a large impact on the deep learning model’s ability to generalize, especially when the deployment conditions deviate from the training environment. For example, a model that relies heavily on the background of an image may have trouble recognizing a cow on a beach if during training it was mostly encountering cows on grass.</p>
+
+<p>So, how can one control the features that a model relies on? This is often accomplished by changing the model’s architecture or training methodology. For example, by choosing to use a convolutional neural network a model designer biases that model towards learning a hierarchy of spatial features. Similarly, by employing data augmentation during training, one biases the model towards features that are invariant to the particular augmentations used. In fact, researchers have recently explored explicitly manipulating the set of features that a model learns, via, for example, <a href="https://arxiv.org/abs/1811.12231">suppressing texture information</a> by training on stylized inputs or by <a href="https://arxiv.org/abs/1706.06083">training with worst-case input perturbations</a> to <a href="https://arxiv.org/abs/1906.00945">avoid brittle features</a>.</p>
+
+<p>Now, all of these design choices can be thought of as imposing feature priors, i.e., biasing a model towards learning a particular type of features. The question thus becomes: how can we explore and leverage this space of feature priors in a more systematic and purposeful manner?</p>
+
+<h2 id="feature-priors-as-distinct-perspectives-on-data">Feature Priors as Distinct Perspectives on Data</h2>
+<p>The core idea is to view different feature priors as distinct perspectives on the data. That is, since different sets of features are likely to generalize differently across inputs, by considering multiple such sets in tandem we can obtain a more holistic (and thus, hopefully, reliable) view on our data.</p>
+
+<p><strong>Setting up our case study:</strong> Let us focus our attention on two concrete feature priors: shape and texture. These two priors arise naturally in the context of image classification and will serve as the basis of our study. We impose these priors through deliberate construction of the dataset and architecture:</p>
+
+<ul>
+  <li><strong>Shape-based priors</strong>:  We remove texture information from the images with the help of an edge detection algorithm. We use for this purpose two canonical edge detection algorithms from the computer vision literature: <a href="https://en.wikipedia.org/wiki/Canny_edge_detector">Canny</a> and <a href="https://en.wikipedia.org/wiki/Sobel_operator">Sobel</a>.</li>
+  <li><strong>Texture-based priors</strong>: We use a variant of the <a href="https://arxiv.org/abs/1904.00760">BagNet</a> model, which limits the model’s receptive field to prevent the model from relying on global structures like shape.</li>
+</ul>
+
+<div>
+    <div class="quarterblock">
+        <div class="block">
+            <img src="https://gradientscience.org/assets/copriors/original.png" />
+            <span style="text-align: center;">Original</span>
+        </div>
+    </div>
+    <div class="quarterblock">
+        <div class="block">
+            <img src="https://gradientscience.org/assets/copriors/sobel.png" />
+            <span style="text-align: center;">Sobel</span>
+
+        </div>
+    </div>
+    <div class="quarterblock">
+        <div class="block">
+            <img src="https://gradientscience.org/assets/copriors/canny.png" />
+            <span style="text-align: center;">Canny</span>
+        </div>
+    </div>
+    <div class="quarterblock">
+        <div class="block">
+            <img src="https://gradientscience.org/assets/copriors/bagnet.png" />
+            <span style="text-align: center;">BagNet</span>
+
+        </div>
+    </div>
+</div>
+
+<div class="footnote">
+Visualizing different feature priors. Sobel and Canny suppress texture through edge detection while BagNet suppresses shape by limiting the receptive field.
+</div>
+
+<p>Intuitively, these priors should correspond to very different sets of features. But are the views offered by these priors truly complementary? A simple way to measure this is to quantify the overlap of the failure modes of the models trained with the respective priors. Specifically, we measure the correlation of predicting the correct label for each pair of such models. We perform this analysis on a subset of CIFAR-10.</p>
+
+<p><img src="https://gradientscience.org/assets/copriors/cifar_corr_table.png" class="bigimg" id="pipeline" /></p>
+<div class="footnote"> Correlation of predictions between pairs of models with different priors on a subset of CIFAR-10. The shape-biased and texture-biased models have the least correlated predictions.
+</div>
+
+<p>It looks like these results match our intuition! Indeed, models corresponding to the same feature priors (but different random initialization) are relatively well correlated with each other. This also includes the case when we use two <em>different</em> shape biases. On the other hand, when we consider a pairing of a shape-biased model and a texture-biased model the predictions are the least correlated, that is, they make different mistakes on the test set.</p>
+
+<h2 id="combining-feature-priors">Combining feature priors</h2>
+
+<p>Since shape- and texture-biased models make different types of mistakes, can we leverage their diversity to improve our predictions?</p>
+
+<h3 id="ensembles">Ensembles</h3>
+<p>A natural way to examine that question is combining these models in an ensemble. This ensemble, for a given test input, evaluates both models on that input and then outputs the one prediction that is assigned the highest probability by the respective model. It turns out that, indeed, such an ensemble is significantly more accurate when we combine in this way models with different priors (as opposed to combining two models trained with the same prior, but with different initializations). Clearly, prediction diversity matters!</p>
+
+<div id="anno"> 
+<canvas width="100%" id="ensemble_bar" height="35%"></canvas>
+</div>
+<div class="footnote"> The maximum accuracy achieved when using a single model, an ensemble with two models with the same prior, and an ensemble with two models with different priors on the CIFAR-10 subset. 
+</div>
+
+<h3 id="co-training">Co-Training</h3>
+<p>So far, we demonstrated that models with diverse feature priors have less overlapping failure modes, and can be combined via ensembling for improved generalization performance. However, is that all? In particular, are there ways of incorporating prior diversity during training (as opposed to ensembling post hoc) in order to improve the learning process itself?</p>
+
+<p>To answer this question, we focus on <a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.664.3543">self-training</a>, a methodology often employed when the labeled data is insufficient to learn a well-generalizing model alone, but a large pool of unlabeled data is available. The key idea in self-training is to use a model trained on the labeled data to produce “pseudo-labels” for the unlabeled data and then use these labels for further training. This setting is particularly challenging since: (a) the (original) labelled data points are typically too few to learn reliable prediction rules, and (b) any incorrect prediction rules learned will be reinforced via pseudo-labelling (so-called <a href="https://arxiv.org/abs/1908.02983">“confirmation bias”</a>).</p>
+
+<p>From this perspective, our goal is to jointly train models with different feature priors to mitigate the propagation of such incorrect prediction rules. We will do so by leveraging the well-established framework of <a href="https://www.cs.cmu.edu/~avrim/Papers/cotrain.pdf">co-training</a>, a framework designed for learning from data with multiple independent sets of features. In the context of our study, we can instantiate this framework as follows.</p>
+
+<p>First, we train one model for each prior using the labeled data. Then, we use each of these models to pseudo-label the unlabelled data and add the examples which are assigned the highest predicted probability to a joint pseudo-labelled data pool. We then use these examples to train both models further and keep repeating this process until we eventually use all the unlabeled data for training. In the end, we combine these models into a single classifier by training a standard model from scratch on the combined pseudo-labels.</p>
+
+<p>The intuition behind this process is that by jointly training models which rely on different features, these models can learn from each other’s predictions. If one model produces incorrect pseudo-labels, we can hope that the other model will correct them by relying on alternative prediction rules.</p>
+
+<p>So, how well does this approach work? To evaluate it, we extract from the CIFAR-10 dataset a small, labeled part (100 examples per class) and treat the rest of this dataset unlabeled. We then compare how different training methods—specifically, self-training a model with a single prior, and co-training models with different priors—perform in this setting. (For an additional baseline, we also consider ensembling two such models with different priors together.)</p>
+
+<div id="anno"> 
+<canvas width="100%" id="summary_bar" height="35%"></canvas>
+</div>
+<div class="footnote"> Test accuracy of models in pre-trained, self-trained, and co-trained settings. We consider: a single model alone, combining multiple models with the same prior, and combining models with diverse priors.  
+</div>
+
+<p>Overall, we find that co-training with shape- and texture-based priors can significantly improve the test accuracy of the final model compared to self-training with any of the priors alone. In fact, co-training models with diverse priors also improves significantly upon simply combining self-trained models in an ensemble. So these models are indeed able to take advantage of each other’s predictions during training.</p>
+
+<h2 id="priors-and-spurious-correlations">Priors and Spurious Correlations</h2>
+<p>So far, we were focused on a setting where the training and test data were all sourced from the same distribution. However, a major challenge for the real-world model deployment are spurious correlations: associations which are predictive on the training data but not valid for the actual task. For example, an image classification model may predict <a href="https://gradientscience.org/background/">an object’s class based on its location</a>, or <a href="https://www.medrxiv.org/content/10.1101/2020.09.13.20193565v2.full">rely on artifacts of the data collection process</a>.</p>
+
+<p>How can we train models that avoid picking up such spurious correlations? For this problem to be tractable in the first place, we need to rely on some information beyond the training data. Here, we will assume that we have access to an unlabelled dataset where this correlation does not hold (e.g., cows do not always appear on grass and thus the correlation “grass”-&gt;”cow” is not always predictive). This is a rather mild assumption in settings where we can easily collect unlabelled data from a variety of sources—if a correlation is spurious, it is less likely to be uniformly present.</p>
+
+<p>As a concrete example, let us consider a simple gender classification task based on the CelebA dataset. In this task, we will introduce a spurious correlation into the labeled data by only collecting photographs of blond females and non-blond males. This makes hair color a good predictor of gender for the labeled dataset, but will not generalize well beyond that as such correlation does not hold in the real world.</p>
+
+<p>Our goal here will be to harness an unbiased, yet unlabelled dataset, to learn a model that avoids this correlation. We will again attempt to do so by co-training models with diverse feature priors: shape and texture. Notice that since the spurious correlation is color-based, shape-biased models are likely to ignore it. As a result, we anticipate that the prediction of the shape-biased and texture-biased models will differ on inputs where hair color disagrees with gender. Thus, during co-training, these models are intuitively providing each other with counter-examples and are thus likely to steer each other away from incorrect prediction rules.</p>
+
+<div id="anno"> 
+<canvas width="100%" id="spurious_bar" height="35%"></canvas>
+</div>
+<div class="footnote"> Accuracy of models with different feature priors on the (unbiased) CelebA test set. We consider the setting of using only the (biased) labeled data, as well as self-training and co-training using the (unbiased) unlabeled dataset. (For co-training, the combined model is a standard model trained on the combined pseudo-labels of the co-trained Canny and BagNet models.) 
+</div>
+
+<p>We find that this is indeed the case! When we co-train a texture-biased model with a shape-biased one, the texture-biased model improves substantially, relying less on the hair color. Moreover, the shape-biased model also improves through co-training. This indicates that even though the texture-biased model relies heavily on the spurious correlation, it also captures non-spurious associations that, through pseudo-labeling, are useful for the shape-based model too.</p>
+
+<h2 id="outlook-exploring-the-design-space-of-priors">Outlook: Exploring the Design Space of Priors</h2>
+<p>In this post, we described how models trained with diverse feature priors can be leveraged during training to learn more reliable prediction rules (e.g., in the presence of spurious correlations). However, we view our exploration as only the first step in systematically exploring the design space of feature priors. We believe that this direction will yield an important building block of reliable training and deployment pipelines.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="https://gradientscience.org/copriors/"><span class="datestr">at October 17, 2021 12:00 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -2988,48 +3153,6 @@ The classic FLM lower bound says that in Synchrony, Byzantine Agreement is impos
 
 <p class="date">
 <a href="https://decentralizedthoughts.github.io/2021-10-04-crusader-agreement-with-dollars-slash-leq-1-slash-3$-error-is-impossible-for-$n-slash-leq-3f$-if-the-adversary-can-simulate/"><span class="datestr">at October 04, 2021 02:46 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="tag:blogger.com,1999:blog-3722233.post-989853369577969981">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/gasarch.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="http://blog.computationalcomplexity.org/2021/10/how-have-computers-changed-society.html">How have computers changed society? Harry Lewis (with co-authors) have a book out on that.</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://blog.computationalcomplexity.org/" title="Computational Complexity">Computational Complexity</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p> (Disclosure - Harry Lewis was my PhD advisor.)</p><p><br /></p><p>It seems like just a few weeks ago I I blogged about a book of Harry Lewis's that was recently available (see <a href="https://blog.computationalcomplexity.org/2021/08/what-are-most-important-46-papers-in.html">here</a>).  And now I am blogging about another one. Writing two books in two years seems hard! I can only think of one other computer scientist who has done that recently (see <a href="https://www.amazon.com/Mathematical-Muffin-Morsels-Problem-Mathematics-ebook/dp/B08BJ4G2Z1/ref=sr_1_2?dchild=1&amp;keywords=gasarch&amp;qid=1626492618&amp;sr=8-2">here</a> and <a href="https://www.amazon.com/Problems-Point-Exploring-Computer-Science/dp/9813279729/ref=sr_1_2?dchild=1&amp;keywords=gasarch+point&amp;qid=1626492655&amp;sr=8-2">here</a>).</p><p><br /></p><p>In 2008 Abelson, Ledeen, and Lewis wrote </p><p><i>Blown to Bits: Your Life, Liberty, and Happiness after the Digital Explosion</i></p><p>which I reviewed in SIGACT news, see <a href="https://www.cs.umd.edu/users/gasarch/BLOGPAPERS/bitsbook.pdf">here</a></p><p><br /></p><p>Both computers and society have changed since 2008. Hence an update was needed. </p><p>In 2021 Adelson, Ledeen, Lewis, and Seltzer wrote a second edition.</p><p><br /></p><p>Should you buy the new version if you bought the old version? </p><p>1) Not my problem- I got them both for free since I reviewed them. </p><p>2) Not your problem- The second edition is available free-on-line <a href="https://www.bitsbook.com/thebook/">here</a>. Is that a link to some dark corner of the dark web? No, its the formal webpage about the book. So the book is available free-on-line legally, if you care (and even if you don't care). </p><p>3) If you like paper, the book is on amazon. (If you don't like paper, the book is still on amazon). </p><p><br /></p><p>I reviewed it in SIGACT news. A non-paywalled link: <a href="https://www.cs.umd.edu/~gasarch/BLOGPAPERS/b2bits2.pdf">here</a> (is that link legal? I have no idea.) </p><p>In this post I'll just mention two things that changed since the last book</p><p>1) Shared Music and pirating were an issue back in 2008.  It does not seem to be anymore since there is now a variety of services that seem to make pirating not worth it: itunes, streaming services, and some bands give it away for free and ask you to pay what its worth. Movies are still struggling with this issue. </p><p>2) AI systems that reinforce existing bias is a new problem.</p><p><br /></p><p><br /></p></div>
-
-
-
-
-
-
-
-<p class="date">
-by gasarch (noreply@blogger.com) <a href="http://blog.computationalcomplexity.org/2021/10/how-have-computers-changed-society.html"><span class="datestr">at October 04, 2021 04:19 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
