@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-10-22T20:38:57Z</updated>
+  <updated>2021-10-22T21:22:06Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,164 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>https://rjlipton.wpcomstaging.com/?p=19240</id>
+    <link href="https://rjlipton.wpcomstaging.com/2021/10/22/an-annoying-problem/" rel="alternate" type="text/html"/>
+    <title>An Annoying Problem</title>
+    <summary>It’s the stupid questions that have some of the most surprising and interesting answers — Cory Doctorow ACM Turing Award source Robert Tarjan is well known to most—a Turing award winner in 1986 with John Hopcroft. Bob is a professor of Computer Science at Princeton University, and one of the world experts on linear time […]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>
+<font color="#0044cc"><br/>
+<em>It’s the stupid questions that have some of the most surprising and interesting answers — Cory Doctorow</em><br/>
+<font color="#000000"/></font></p><font color="#0044cc"><font color="#000000">
+<table class="image alignright">
+<tbody>
+<tr>
+<td>
+<a href="https://rjlipton.wpcomstaging.com/2021/10/22/an-annoying-problem/bt/" rel="attachment wp-att-19242"><img alt="" class="alignright wp-image-19242" height="180" src="https://i1.wp.com/rjlipton.wpcomstaging.com/wp-content/uploads/2021/10/bt.jpg?resize=120%2C180&amp;ssl=1" width="120"/></a>
+</td>
+</tr>
+<tr>
+<td class="caption alignright"><font size="-2">ACM Turing Award <a href="https://amturing.acm.org/photo/tarjan_1092048.cfm">source</a></font></td>
+</tr>
+</tbody>
+</table>
+<p>
+Robert Tarjan is well known to most—a Turing award winner in 1986 with <a href="https://amturing.acm.org/award_winners/tarjan_1092048.cfm">John Hopcroft</a>. Bob is a professor of Computer Science at Princeton University, and one of the world experts on linear time graph algorithms. I always thought if some NP-complete graph problem had a linear time algorithm, then P=NP would have long been solved by Bob. </p>
+<p>
+Today we talk about a problem that hasn’t been solved by Bob.</p>
+<p>
+The problem I mean was <em>quasi-</em>solved by Bob. That is, he gave a quasi-polynomial time algorithm. The problem is <em>group isomorphism</em> (GpI). Laci Babai discusses its relation as a special case of <em>graph isomorphism</em> (GI) in section 13.2 of his famous 2016 <a href="https://arxiv.org/pdf/1512.03547.pdf">paper</a> giving a quasi-polynomial time algorithm for GI. He says that the annoyance of GpI should temper expectations for getting GI into polynomial time, because:</p>
+<blockquote><p><b> </b> <em> [I]n spite of considerable effort and the availability of powerful algebraic machinery, Group Isomorphism is still not known to be in <img alt="{\mathsf{P}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf%7BP%7D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/>. </em>
+</p></blockquote>
+<p>
+</p><p/><h2> Bob’s Least Result </h2><p/>
+<p/><p>
+Bob has many great and deep results. For example, Donald Knuth <a href="https://www.informit.com/articles/article.aspx?p=2213858">described</a> Bob’s strong connected component algorithm for directed graphs in these words:</p>
+<blockquote><p><b> </b> <em> The data structures that he devised for this problem fit together in an amazingly beautiful way, so that the quantities you need to look at while exploring a directed graph are always magically at your fingertips. </em>
+</p></blockquote>
+<p/><p>
+Here is Ken’s slight editing of Wikipedia’s <a href="https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm">presentation</a>:</p>
+<p><code><br/>
+<font size="-1"><br/>
+Input: Graph G = (V,E) whose nodes have fields int index, int lowlink, bool onStack<br/>
+Output: The set of subsets of V denoting the strongly connected components</font></code></p><font size="-1">
+<p>Stack S := empty stack;<br/>
+int index := 0;  //global variable with invariant: index = smallest unused index</p>
+<p>proc strongconnect(v):<br/>
+   v.index := index; v.lowlink := index; index++;<br/>
+   S.push(v); v.onStack := true;<br/>
+   for each w such that (v,w) is in E: </p>
+<p>      if w.index is undefined then:  //w not yet visited so recurse on it </p>
+<p>         strongconnect(w);<br/>
+         v.lowlink = min{v.lowlink,w.lowlink}  //lowest-indexed node reached</p>
+<p>      else if w.onStack then: </p>
+<p>         v.lowlink = min(v.lowlink, w.index);<br/>
+         //clever: w.index was lowest unused index at the time </p>
+<p>      else:<br/>
+         pass;   //(v,w) goes to already-found component, so ignore.<br/>
+      end if;<br/>
+   end for </p>
+<p>   if v.lowlink == v.index then: //we've completed a component so pop and output it<br/>
+      repeat:<br/>
+         Node w = S.pop();<br/>
+         w.onStack = false;<br/>
+         output w as part of the current strongly connected component;<br/>
+      until w == v;<br/>
+   end if;<br/>
+end proc;</p>
+</font><p><font size="-1">for each v in V do:<br/>
+   if v.index is undefined then:<br/>
+      strongconnect(v);<br/>
+   end if;<br/>
+end for;<br/>
+</font><br/>
+</p>
+<p/><h2> The Annoying Problem </h2><p/>
+<p/><p>
+Just over ten years ago we talked about: How do we tell if two groups are isomorphic? Precisely on October 8, 2011 we talked about <a href="https://rjlipton.wpcomstaging.com/2011/10/08/an-annoying-open-problem/">group isomorphism</a>. We called it an annoying problem. It remains annoying. </p>
+<p>
+In the group isomorphism problem (GpI), we are given two finite groups <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{H}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BH%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> of order <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> in terms of their multiplication tables and must decide if <img alt="{G \cong H}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG+%5Ccong+H%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>.</p>
+<p>
+Bob Tarjan famously noted that this could be done <img alt="{n^{\log_2 n + O(1)}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%5E%7B%5Clog_2+n+%2B+O%281%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> time. He never published this result and just orally told others about it. The insight was that every group of order <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> had a generator set of size at most <img alt="{\log_2 n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clog_2+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. Since his insight the group isomorphism problem remains roughly the same complexity. The best is the <a href="https://rjlipton.wpcomstaging.com/2013/05/11/advances-on-group-isomorphism/">improvement</a> due to David Rosenbaum. His algorithm is still of order <img alt="{n^{c \log n}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%5E%7Bc+%5Clog+n%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. See <a href="https://arxiv.org/pdf/1304.3935.pdf">here</a> for details. </p>
+<blockquote><p><b>Theorem 1</b> <em> General group isomorphism is in <img alt="{n^{(1/2) log_p n+O(1)}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%5E%7B%281%2F2%29+log_p+n%2BO%281%29%7D%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> deterministic time where <img alt="{p}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bp%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the smallest prime dividing the order of the group. </em>
+</p></blockquote>
+<p/><p>
+Better than Bob’s insight, but still not polynomial time. </p>
+<p>
+</p><p/><h2> Order Restriction </h2><p/>
+<p/><p>
+The results to date on GpI have relied mainly on basic group theory. Bob’s result uses an elementary fact about finite groups. David uses the same insight and adds a deep fact about isomorphism type problems. Neither use any of the “millions” of theorems known about finite groups. </p>
+<p>
+I wondered if there is some hope to start to exploit more of the papers on group structure? The trouble I think is that these results are quite difficult for those not in group theory to understand. But perhaps there is some hope. What do you think?</p>
+<p>
+I still wonder if there is a polynomial time algorithm for the general group isomorphism problem? Can we eliminate the <img alt="{\log n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clog+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> exponent somehow? This lead us to note the following simple theorem:</p>
+<blockquote><p><b>Theorem 2</b> <em> Let <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{H}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BH%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> be finite groups of order <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> that is square free.Then <img alt="{G \cong H}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG+%5Ccong+H%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> can be determined in time polynomial in <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> time. </em>
+</p></blockquote>
+<p/><p>
+That is, <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> has no prime <img alt="{p}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bp%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> so that <img alt="{p^2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bp%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> divides <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>.</p>
+<p>
+</p><p/><h2> But Wait… </h2><p/>
+<p/><p>
+As I worked on this I found a nice <a href="https://arxiv.org/pdf/1806.08872.pdf">paper</a> by Heiko Dietrich and James Wilson, titled “Polynomial Time Isomorphism Tests Of Black-Box Type Groups Of Most Orders.” They reference another <a href="https://arxiv.org/pdf/1810.03467.pdf">paper</a> that proved a stronger theorem than our above one:</p>
+<blockquote><p><b>Theorem 3</b> <em> There is an algorithm that given groups <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{H}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BH%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> of permutations on finitely many points, decides whether they are of cube-free order, and if so, decides that <img alt="{G \cong H}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG+%5Ccong+H%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> or constructs an isomorphism <img alt="{G \rightarrow H}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG+%5Crightarrow+H%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/>. The algorithm runs in time polynomial in the input size. </em>
+</p></blockquote>
+<p>
+</p><p/><h2> Proof of Our Theorem </h2><p/>
+<p>
+</p><blockquote><p><b>Definition 4</b> <em> A finite group <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> is <b>metacyclic</b> provided it has a normal subgroup <img alt="{N}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BN%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> so that <img alt="{N}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BN%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{G/N}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%2FN%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> are both cyclic. </em>
+</p></blockquote>
+<p/><p>
+Every finite group of square-free order (i.e. the order is not divisible by the square of a natural number) is metacyclic.</p>
+<p>
+<em>Proof:</em>  We claim that <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{H}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BH%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> are both metacyclic. This follows from the <a href="https://en.wikipedia.org/wiki/Metacyclic_group">fact</a> that their order is square free. But then we know that both <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{H}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BH%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> are generated by at most two elements—see <a href="https://math.stackexchange.com/questions/1734406/prove-metacyclic-group-is-generated-by-two-elements">this</a>. This yields an isomorphism algorithm based on the above generator trick. <img alt="\Box" class="latex" src="https://s0.wp.com/latex.php?latex=%5CBox&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
+<p>
+Their stronger proof uses quite a bit more group theory. But our simple proof may give you some intuition why the restriction on the order of the group helps.</p>
+<p>
+</p><p/><h2> Open Problems </h2><p/>
+<p>
+The above result fits well with the belief that the worst case for isomorphism is when the order of the groups is a power of a prime. Some possible conjectures are:</p>
+<ul>
+<li>
+Can we generalize “<img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is square free” to “<img alt="{p^4}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bp%5E4%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> does not divide <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>“? Or to “<img alt="{p^{5}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bp%5E%7B5%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> does not divide <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>?” And so on? <p/>
+</li><li>
+Let <img alt="{Z(G)=1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BZ%28G%29%3D1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{|Aut(G)| \le |G|^{O(1)}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7CAut%28G%29%7C+%5Cle+%7CG%7C%5E%7BO%281%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. Then GpI is in polynomial time.
+</li></ul>
+<blockquote><p><b>Definition 5</b> <em> A finite group <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> is <b>metabelian</b> provided it has a normal subgroup <img alt="{N}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BN%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> so that <img alt="{N}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BN%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{G/N}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%2FN%7D&amp;bg=e8e8e8&amp;fg=000000&amp;s=0&amp;c=20201002"/> are both abelian. </em>
+</p></blockquote>
+<ul>
+<li>
+What if we replace metacyclic by metabelian?
+</li></ul></font></font></div>
+    </content>
+    <updated>2021-10-22T20:53:18Z</updated>
+    <published>2021-10-22T20:53:18Z</published>
+    <category term="algorithms"/>
+    <category term="All Posts"/>
+    <category term="graph isomorphism"/>
+    <category term="History"/>
+    <category term="Ideas"/>
+    <category term="Oldies"/>
+    <category term="Open Problems"/>
+    <category term="P=NP"/>
+    <category term="Results"/>
+    <category term="Algorithms"/>
+    <category term="group isomorphism"/>
+    <category term="polynomial time"/>
+    <category term="Robert Tarjan"/>
+    <author>
+      <name>rjlipton</name>
+    </author>
+    <source>
+      <id>https://rjlipton.wpcomstaging.com</id>
+      <logo>https://s0.wp.com/i/webclip.png</logo>
+      <link href="https://rjlipton.wpcomstaging.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
+      <subtitle>a personal view of the theory of computation</subtitle>
+      <title>Gödel's Lost Letter and P=NP</title>
+      <updated>2021-10-22T21:20:39Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-US">
     <id>https://scottaaronson.blog/?p=6088</id>
@@ -112,7 +270,7 @@
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-10-22T20:37:07Z</updated>
+      <updated>2021-10-22T21:20:08Z</updated>
     </source>
   </entry>
 
@@ -139,7 +297,7 @@ Email: postdoc.algoridam@listes.irif.fr.</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-22T20:37:43Z</updated>
+      <updated>2021-10-22T21:20:49Z</updated>
     </source>
   </entry>
 
@@ -196,7 +354,7 @@ Email: postdoc.algoridam@listes.irif.fr.</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-10-22T20:37:56Z</updated>
+      <updated>2021-10-22T21:21:03Z</updated>
     </source>
   </entry>
 
@@ -426,7 +584,7 @@ and related items.</div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-10-22T20:37:08Z</updated>
+      <updated>2021-10-22T21:20:08Z</updated>
     </source>
   </entry>
 
@@ -453,7 +611,7 @@ Email: cmusco@nyu.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-22T20:37:43Z</updated>
+      <updated>2021-10-22T21:20:48Z</updated>
     </source>
   </entry>
 
@@ -480,7 +638,7 @@ Email: nitin.vaidya@georgetown.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-22T20:37:43Z</updated>
+      <updated>2021-10-22T21:20:49Z</updated>
     </source>
   </entry>
 
@@ -595,7 +753,7 @@ We study both interactive and non-interactive sample-based proof systems, showin
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-10-22T20:37:28Z</updated>
+      <updated>2021-10-22T21:20:24Z</updated>
     </source>
   </entry>
 
@@ -622,7 +780,8 @@ We study both interactive and non-interactive sample-based proof systems, showin
 <p>
 Kasper Müller is a mathematics and data science writer for <a href="https://medium.com/">Medium</a>, where he contributes primarily to the blogs <a href="https://www.cantorsparadise.com/">Cantor’s Paradise</a> and <a href="https://towardsdatascience.com/">Towards Data Science</a>. He wrote a nice <a href="https://www.cantorsparadise.com/the-beautiful-gamma-function-and-the-genius-who-discovered-it-8778437565dc">article</a> last April titled, “The Beautiful Gamma Function and the Genius Who Discovered It.”</p>
 <p>
-Today we discuss the relevance of the gamma function to statistics and use statistics to suggest a new kind of estimate for it.</p>
+Today we discuss the relevance of the gamma function to statistics and use statistics to suggest a new kind of estimate for it.<br/>
+<span id="more-19219"/></p>
 <p>
 The “Genius” that Müller refers to is Leonhard Euler. Euler proved that for all integers <img alt="{n \geq 0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn+%5Cgeq+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, </p>
 <p align="center"><img alt="\displaystyle  n! = \int_0^1 (-\ln s)^n ds = \int_0^\infty t^n e^{-t} dt, " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++n%21+%3D+%5Cint_0%5E1+%28-%5Cln+s%29%5En+ds+%3D+%5Cint_0%5E%5Cinfty+t%5En+e%5E%7B-t%7D+dt%2C+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
@@ -721,7 +880,7 @@ Can vectors of Gaussian variables be leveraged to say further interesting things
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-10-22T20:37:38Z</updated>
+      <updated>2021-10-22T21:20:39Z</updated>
     </source>
   </entry>
 
@@ -745,7 +904,7 @@ Can vectors of Gaussian variables be leveraged to say further interesting things
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-10-22T20:37:28Z</updated>
+      <updated>2021-10-22T21:20:24Z</updated>
     </source>
   </entry>
 
@@ -783,7 +942,7 @@ Can vectors of Gaussian variables be leveraged to say further interesting things
       <link href="https://dstheory.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://dstheory.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Foundation of Data Science – Virtual Talk Series</title>
-      <updated>2021-10-22T20:38:50Z</updated>
+      <updated>2021-10-22T21:22:00Z</updated>
     </source>
   </entry>
 
@@ -810,7 +969,7 @@ Email: tcs-postdoc-inquiries@lists.eecs.berkeley.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-22T20:37:43Z</updated>
+      <updated>2021-10-22T21:20:48Z</updated>
     </source>
   </entry>
 
@@ -837,7 +996,7 @@ Email: rountev.1@osu.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-22T20:37:43Z</updated>
+      <updated>2021-10-22T21:20:49Z</updated>
     </source>
   </entry>
 
@@ -904,7 +1063,7 @@ We argue that these results strengthen the case for uniform certification in QBF
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-10-22T20:37:28Z</updated>
+      <updated>2021-10-22T21:20:24Z</updated>
     </source>
   </entry>
 
@@ -1216,7 +1375,7 @@ Email: eecsjoin@yorku.ca</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-22T20:37:43Z</updated>
+      <updated>2021-10-22T21:20:49Z</updated>
     </source>
   </entry>
 
@@ -1263,7 +1422,7 @@ Email: quics-coordinator@umiacs.umd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-22T20:37:43Z</updated>
+      <updated>2021-10-22T21:20:49Z</updated>
     </source>
   </entry>
 
@@ -1290,7 +1449,7 @@ Email: cs@csueastbay.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-22T20:37:43Z</updated>
+      <updated>2021-10-22T21:20:49Z</updated>
     </source>
   </entry>
 
@@ -2231,7 +2390,7 @@ Email: theory-postdoc-apply@seas.harvard.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-22T20:37:43Z</updated>
+      <updated>2021-10-22T21:20:48Z</updated>
     </source>
   </entry>
 
@@ -2260,7 +2419,7 @@ Email: theory-postdoc-apply@seas.harvard.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-22T20:37:43Z</updated>
+      <updated>2021-10-22T21:20:48Z</updated>
     </source>
   </entry>
 
@@ -2288,7 +2447,7 @@ Email: theory-postdoc-apply@seas.harvard.edu</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-10-22T20:37:28Z</updated>
+      <updated>2021-10-22T21:20:24Z</updated>
     </source>
   </entry>
 
@@ -2313,7 +2472,7 @@ Email: theory-postdoc-apply@seas.harvard.edu</p></div>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2021-10-22T20:38:25Z</updated>
+      <updated>2021-10-22T21:21:32Z</updated>
     </source>
   </entry>
 
@@ -2464,7 +2623,7 @@ Email: theory-postdoc-apply@seas.harvard.edu</p></div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-10-22T20:37:07Z</updated>
+      <updated>2021-10-22T21:20:08Z</updated>
     </source>
   </entry>
 
@@ -2671,7 +2830,7 @@ Email: theory-postdoc-apply@seas.harvard.edu</p></div>
       <link href="https://thmatters.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://thmatters.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theory Matters</title>
-      <updated>2021-10-22T20:37:52Z</updated>
+      <updated>2021-10-22T21:20:59Z</updated>
     </source>
   </entry>
 
@@ -2709,119 +2868,6 @@ Email: theory-postdoc-apply@seas.harvard.edu</p></div>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
       <updated>2021-10-22T14:03:51Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://lucatrevisan.wordpress.com/?p=4564</id>
-    <link href="https://lucatrevisan.wordpress.com/2021/10/08/arv-on-abelian-cayley-graphs/" rel="alternate" type="text/html"/>
-    <title>ARV on Abelian Cayley Graphs</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Continuing from the previous post, we are going to prove the following result: let be a -regular Cayley graph of an Abelian group, be the normalized edge expansion of , be the value of the ARV semidefinite programming relaxation of … <a href="https://lucatrevisan.wordpress.com/2021/10/08/arv-on-abelian-cayley-graphs/">Continue reading <span class="meta-nav">→</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Continuing from <a href="https://lucatrevisan.wordpress.com/2021/10/07/buser-inequalities-in-graphs/">the previous post</a>, we are going to prove the following result: let <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> be a <img alt="{d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>-regular Cayley graph of an Abelian group, <img alt="{\phi(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cphi%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> be the normalized edge expansion of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, <img alt="{ARV(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BARV%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> be the value of the ARV semidefinite programming relaxation of sparsest cut on <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> (we will define it below), and <img alt="{\lambda_2(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clambda_2%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> be the second smallest normalized Laplacian eigenvalue of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. Then we have <a name="main"/></p>
-<p><a name="main"/></p><a name="main">
-<p align="center"><img alt="\displaystyle   \lambda_2 (G) \leq O(d) \cdot (ARV (G))^2 \ \ \ \ \ (1)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+++%5Clambda_2+%28G%29+%5Cleq+O%28d%29+%5Ccdot+%28ARV+%28G%29%29%5E2+%5C+%5C+%5C+%5C+%5C+%281%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-</a><p><a name="main"/><a name="main"/> which, together with the fact that <img alt="{ARV(G) \leq 2 \phi(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BARV%28G%29+%5Cleq+2+%5Cphi%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{\phi(G) \leq \sqrt{2 \lambda_2}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cphi%28G%29+%5Cleq+%5Csqrt%7B2+%5Clambda_2%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, implies the Buser inequality <a name="buser"/></p>
-<p><a name="buser"/></p><a name="buser">
-<p align="center"><img alt="\displaystyle   \lambda_2 (G) \leq O(d) \cdot \phi^2 (G) \ \ \ \ \ (2)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+++%5Clambda_2+%28G%29+%5Cleq+O%28d%29+%5Ccdot+%5Cphi%5E2+%28G%29+%5C+%5C+%5C+%5C+%5C+%282%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-</a><p><a name="buser"/><a name="buser"/> and the approximation bound <a name="arvapx"/></p>
-<p><a name="arvapx"/></p><a name="arvapx">
-<p align="center"><img alt="\displaystyle   \phi(G) \leq O(\sqrt d) \cdot ARV(G) \ \ \ \ \ (3)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+++%5Cphi%28G%29+%5Cleq+O%28%5Csqrt+d%29+%5Ccdot+ARV%28G%29+%5C+%5C+%5C+%5C+%5C+%283%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-</a><p><a name="arvapx"/><a name="arvapx"/> The proof of <a href="https://lucatrevisan.wordpress.com/feed/#main">(1)</a>, due to Shayan Oveis Gharan and myself, is very similar to the proof by Bauer et al. of <a href="https://lucatrevisan.wordpress.com/feed/#buser">(2)</a>.</p>
-<p><span id="more-4564"/></p>
-<p><b>1. Ideas </b></p>
-<p>For a positive integer parameter <img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, call <img alt="{G^t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> the multigraph whose adjacency matrix is <img alt="{A^t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BA%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, where <img alt="{A}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BA%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the adjacency matrix of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. So <img alt="{G^t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is a <img alt="{d^t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bd%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>-regular graph, and each edge in <img alt="{G^t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> corresponds to a length-<img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> walk in <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. Our proof boils down to showing <a name="rw"/></p>
-<p><a name="rw"/></p><a name="rw">
-<p align="center"><img alt="\displaystyle   ARV(G^t) \leq O(\sqrt{dt}) \cdot ARV(G) \ \ \ \ \ (4)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+++ARV%28G%5Et%29+%5Cleq+O%28%5Csqrt%7Bdt%7D%29+%5Ccdot+ARV%28G%29+%5C+%5C+%5C+%5C+%5C+%284%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-</a><p><a name="rw"/><a name="rw"/> which gives <a href="https://lucatrevisan.wordpress.com/feed/#main">(1)</a> after we note that</p>
-<p align="center"><img alt="\displaystyle  \lambda_2 (G^t) = 1 - (1 - \lambda_2(G))^t " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Clambda_2+%28G%5Et%29+%3D+1+-+%281+-+%5Clambda_2%28G%29%29%5Et+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> and</p>
-<p align="center"><img alt="\displaystyle  ARV(G^t) \geq \lambda_2 (G^t) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++ARV%28G%5Et%29+%5Cgeq+%5Clambda_2+%28G%5Et%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> and we combine the above inequalities with <img alt="{t := 1/\lambda_2 (G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt+%3A%3D+1%2F%5Clambda_2+%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>:</p>
-<p align="center"><img alt="\displaystyle  \Omega(1) \leq 1 - (1 - \lambda_2(G))^t = \lambda_2 (G^t) \leq ARV(G^t) \leq O(\sqrt{dt}) \cdot ARV(G) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5COmega%281%29+%5Cleq+1+-+%281+-+%5Clambda_2%28G%29%29%5Et+%3D+%5Clambda_2+%28G%5Et%29+%5Cleq+ARV%28G%5Et%29+%5Cleq+O%28%5Csqrt%7Bdt%7D%29+%5Ccdot+ARV%28G%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> The reader will see that our argument could also prove (roughly as done by Bauer et al.) that <img alt="{\phi(G^t) \leq O(\sqrt d) \cdot \phi(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cphi%28G%5Et%29+%5Cleq+O%28%5Csqrt+d%29+%5Ccdot+%5Cphi%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, simply by reasoning about distributions of cuts instead of reasoning about ARV solutions, which would give <a href="https://lucatrevisan.wordpress.com/feed/#buser">(2)</a> more directly. By reasoning about ARV solutions, however, we are also able to establish <a href="https://lucatrevisan.wordpress.com/feed/#arvapx">(3)</a>, which we think is independently interesting.</p>
-<p>It remains to prove <a href="https://lucatrevisan.wordpress.com/feed/#rw">(4)</a>. I will provide a completely self-contained proof, including the definition of Cayley graphs and of the ARV relaxation, but, first, here is a summary for the reader already familiar with this material: we take an optimal solution of ARV for <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, and bound how well it does for <img alt="{G^t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. We need to understand how much bigger is the fraction of edges cut by the solution in <img alt="{G^t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> compared to the fraction of edges cut in <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>; a random edge in <img alt="{G^t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is obtained by randomly sampling <img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> generators and adding them together, which is roughly like sampling <img alt="{t/d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%2Fd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> times each generator, each time with a random sign. Because of cancellations, we expect that the sum of these <img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> random generators can be obtained by summing roughly <img alt="{\sqrt{t/d}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Csqrt%7Bt%2Fd%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> copies of each of the <img alt="{d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> generators, or <img alt="{\sqrt{td}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Csqrt%7Btd%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> generators in total. So a random edge of <img alt="{G^t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> corresponds roughly to <img alt="{\sqrt{td}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Csqrt%7Btd%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> edges of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, and this is by how much, at most, the fraction of cut edges can grow.</p>
-<p><b>2. Definitions </b></p>
-<p>Now we present more details and definition. Recall that if <img alt="{\Gamma}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5CGamma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is a group, for which we use additive notation, and <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is a set or multiset of group elements, then the Cayley graph <img alt="{Cay(\Gamma,S)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BCay%28%5CGamma%2CS%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the graph that has a vertex for every group element and an edge <img alt="{(x,x+s)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%28x%2Cx%2Bs%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> for every group element <img alt="{x\in \Gamma}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%5Cin+%5CGamma%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and every element <img alt="{s\in S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs%5Cin+S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. We restrict ourselves to undirected graphs, so we will always assume that if <img alt="{s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is an element of <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, then <img alt="{-s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B-s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is also an element of <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> (with the same multiplicity, if <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> if a multiset). Note that the resulting undirected graph is <img alt="{|S|}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7CS%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>-regular.</p>
-<p>Several families of graphs can be seen to be Cayley graphs, including cycles, cliques, balanced complete bipartite graphs, hypercubes, toruses, and so on. All the above examples are actually Cayley graphs of <em>Abelian</em> groups. Several interesting families of graphs, for example several families of expanders, are Cayley graphs of non-Abelian groups, but the result of this post will apply only to Abelian groups.</p>
-<p>To define the ARV relaxation, let us take it slowly and start from the definition of the sparsest cut problem. The edge expansion problem <img alt="{\phi(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cphi%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is closely related to the <em>sparsest cut</em> problem, which can be defined as</p>
-<p align="center"><img alt="\displaystyle  \sigma(G) := \min_{x \in \{0,1\}^V} \ \ \frac{x^T L_G x}{x^T L_K x } " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csigma%28G%29+%3A%3D+%5Cmin_%7Bx+%5Cin+%5C%7B0%2C1%5C%7D%5EV%7D+%5C+%5C+%5Cfrac%7Bx%5ET+L_G+x%7D%7Bx%5ET+L_K+x+%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> where <img alt="{L_G = I - A/d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BL_G+%3D+I+-+A%2Fd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the normalized Laplacian of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{L_K = I - J/n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BL_K+%3D+I+-+J%2Fn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the normalized Laplacian of the clique on <img alt="{n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> vertices. We wrote it this way to emphasize the similarity with the computation of the second smallest normalized Laplacian eigenvalue, which can be written as</p>
-<p align="center"><img alt="\displaystyle  \lambda_2 (G) = \min_{x \in R^V : \ x \perp {\bf 1}} \ \ \frac {x^T L_G x}{x^Tx } = \min_{x\in R^V} \frac {x^T L_G x}{x^T L_K x} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Clambda_2+%28G%29+%3D+%5Cmin_%7Bx+%5Cin+R%5EV+%3A+%5C+x+%5Cperp+%7B%5Cbf+1%7D%7D+%5C+%5C+%5Cfrac+%7Bx%5ET+L_G+x%7D%7Bx%5ETx+%7D+%3D+%5Cmin_%7Bx%5Cin+R%5EV%7D+%5Cfrac+%7Bx%5ET+L_G+x%7D%7Bx%5ET+L_K+x%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> where the second equality is perhaps not obvious but is easily proved (all the solutions <img alt="{x\perp {\bf 1}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%5Cperp+%7B%5Cbf+1%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> have the same cost function on both sides, and the last expression is shift invariant, so there is no loss in optimizing over all <img alt="{{\mathbb R}^V}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7B%5Cmathbb+R%7D%5EV%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> or just in the space <img alt="{\perp {\bf 1}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cperp+%7B%5Cbf+1%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>). We see that the computation of <img alt="{\lambda_2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clambda_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is just a relaxation of the sparsest cut problem, and so we have</p>
-<p align="center"><img alt="\displaystyle  \lambda_2(G) \leq \sigma(G) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Clambda_2%28G%29+%5Cleq+%5Csigma%28G%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> We can write the sparsest cut problem in a less algebraic version as</p>
-<p align="center"><img alt="\displaystyle  \sigma(G) = \min_{S\subseteq V} \ \ \frac{ cut(S)}{\frac dn \cdot |V| \cdot |V-S| } " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csigma%28G%29+%3D+%5Cmin_%7BS%5Csubseteq+V%7D+%5C+%5C+%5Cfrac%7B+cut%28S%29%7D%7B%5Cfrac+dn+%5Ccdot+%7CV%7C+%5Ccdot+%7CV-S%7C+%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> and recall that</p>
-<p align="center"><img alt="\displaystyle  \phi(G) = \min_{S\subseteq V: |S| \leq \frac {|V|} 2} \ \ \frac{ cut(S)}{d |S|} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cphi%28G%29+%3D+%5Cmin_%7BS%5Csubseteq+V%3A+%7CS%7C+%5Cleq+%5Cfrac+%7B%7CV%7C%7D+2%7D+%5C+%5C+%5Cfrac%7B+cut%28S%29%7D%7Bd+%7CS%7C%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> The cost function for <img alt="{\sigma(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Csigma%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> does not change if we switch <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> with <img alt="{V-S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BV-S%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, so <img alt="{\sigma(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Csigma%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> could be defined equivalently as an optimization problem over subsets <img alt="{S\subseteq V: |S| \leq |V|/2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%5Csubseteq+V%3A+%7CS%7C+%5Cleq+%7CV%7C%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, and at this point <img alt="{\sigma(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Csigma%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{\phi(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cphi%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> are the same problem except for an extra factor of <img alt="{|V-S|/n}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%7CV-S%7C%2Fn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> in the denominator of <img alt="{\sigma(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Csigma%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. Such a factor is always between <img alt="{1/2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, so we have:</p>
-<p align="center"><img alt="\displaystyle  \phi(G) \leq \sigma(G)\leq 2 \phi(G) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cphi%28G%29+%5Cleq+%5Csigma%28G%29%5Cleq+2+%5Cphi%28G%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> (Note that all these definitions have given us a particularly convoluted proof that <img alt="{\lambda_2(G) \leq 2 \phi(G)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clambda_2%28G%29+%5Cleq+2+%5Cphi%28G%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>.)</p>
-<p>Yet another way to characterize <img alt="{\lambda_2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clambda_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is as</p>
-<p align="center"><img alt="\displaystyle  \lambda_2 (G) = \min_{x\in R^V} \frac {x^T L_G x}{x^T L_K x} = \min_{X \succeq {\bf 0}} \frac{L_G \bullet X}{L_K\bullet X} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Clambda_2+%28G%29+%3D+%5Cmin_%7Bx%5Cin+R%5EV%7D+%5Cfrac+%7Bx%5ET+L_G+x%7D%7Bx%5ET+L_K+x%7D+%3D+%5Cmin_%7BX+%5Csucceq+%7B%5Cbf+0%7D%7D+%5Cfrac%7BL_G+%5Cbullet+X%7D%7BL_K%5Cbullet+X%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> Where <img alt="{A\bullet B = \sum_{i,j} A_{i,j} B_{i,j}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BA%5Cbullet+B+%3D+%5Csum_%7Bi%2Cj%7D+A_%7Bi%2Cj%7D+B_%7Bi%2Cj%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the Frobenius inner product between matrices. This is also something that is not obvious but that it is not difficult to prove, the main point being that if we write a PSD matrix <img alt="{X}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> as <img alt="{\sum_i x_ix_i^T}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Csum_i+x_ix_i%5ET%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, then</p>
-<p align="center"><img alt="\displaystyle  \frac{L_G \bullet X}{L_K\bullet X} = \frac{\sum_i x_i^T L_G x_i}{\sum_i x_i^T L_Kx_i} \geq \min_i \frac{ x_i^T L_G x_i}{x_i^T L_Kx_i} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac%7BL_G+%5Cbullet+X%7D%7BL_K%5Cbullet+X%7D+%3D+%5Cfrac%7B%5Csum_i+x_i%5ET+L_G+x_i%7D%7B%5Csum_i+x_i%5ET+L_Kx_i%7D+%5Cgeq+%5Cmin_i+%5Cfrac%7B+x_i%5ET+L_G+x_i%7D%7Bx_i%5ET+L_Kx_i%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> and so there is no loss in passing from an optimization over all PSD matrices versus all rank-1 PSD matrices.</p>
-<p>We can rewrite <img alt="{\lambda_2 \min_{X \succeq {\bf 0}} \frac{L_G \bullet X}{L_K\bullet X} }" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clambda_2+%5Cmin_%7BX+%5Csucceq+%7B%5Cbf+0%7D%7D+%5Cfrac%7BL_G+%5Cbullet+X%7D%7BL_K%5Cbullet+X%7D+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> in terms of the Cholesky decomposition of <img alt="{X}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> as</p>
-<p align="center"><img alt="\displaystyle  \begin{array}{llr} \min &amp; \frac {\sum_{(u,v)\in E} || x_u - x_v||^2 }{\frac dn \sum_{u &lt; v} ||x_u - x_v ||^2 } \\ \mbox{s.t}\\ &amp; x_v \in {\mathbb R}^m &amp; \ \ \forall v\in V\\ &amp; m\geq 1 \end{array} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cbegin%7Barray%7D%7Bllr%7D+%5Cmin+%26+%5Cfrac+%7B%5Csum_%7B%28u%2Cv%29%5Cin+E%7D+%7C%7C+x_u+-+x_v%7C%7C%5E2+%7D%7B%5Cfrac+dn+%5Csum_%7Bu+%3C+v%7D+%7C%7Cx_u+-+x_v+%7C%7C%5E2+%7D+%5C%5C+%5Cmbox%7Bs.t%7D%5C%5C+%26+x_v+%5Cin+%7B%5Cmathbb+R%7D%5Em+%26+%5C+%5C+%5Cforall+v%5Cin+V%5C%5C+%26+m%5Cgeq+1+%5Cend%7Barray%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> where the correspondence between PSD matrices <img alt="{X}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and vectors <img alt="{\{ x_v \}_{v\in V}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5C%7B+x_v+%5C%7D_%7Bv%5Cin+V%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is that we have <img alt="{X_{u,v} = \langle x_u,x_v \rangle}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BX_%7Bu%2Cv%7D+%3D+%5Clangle+x_u%2Cx_v+%5Crangle%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> (that is, <img alt="{\{ x_v \}_{v\in V}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5C%7B+x_v+%5C%7D_%7Bv%5Cin+V%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the Cholesky decomposition of <img alt="{X}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{X}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the Gram matrix of the <img alt="{\{ x_v \}_{v\in V}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5C%7B+x_v+%5C%7D_%7Bv%5Cin+V%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>). An integral solution of the sparsest cut problem corresponds to choosing rank <img alt="{m=1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bm%3D1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and solutions in which each 1-dimensional <img alt="{x_v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx_v%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is either 1 or 0, corresponding on whether <img alt="{v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is in the set <img alt="{S}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BS%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> or not. The ARV relaxation is</p>
-<p align="center"><img alt="\displaystyle  \begin{array}{llr} \min &amp; \frac {\sum_{(u,v)\in E} || x_u - x_v||^2 }{\frac dn \sum_{u &lt; v} ||x_u - x_v ||^2 } \\ \mbox{s.t}\\ &amp; ||x_u - x_v||^2 \leq ||x_u - x_z||^2 + ||x_z - x_v||^2 &amp;\ \ \forall u,v,z \in V\\ &amp; x_v \in {\mathbb R}^m &amp; \forall v\in V\\ &amp; m\geq 1 \end{array} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cbegin%7Barray%7D%7Bllr%7D+%5Cmin+%26+%5Cfrac+%7B%5Csum_%7B%28u%2Cv%29%5Cin+E%7D+%7C%7C+x_u+-+x_v%7C%7C%5E2+%7D%7B%5Cfrac+dn+%5Csum_%7Bu+%3C+v%7D+%7C%7Cx_u+-+x_v+%7C%7C%5E2+%7D+%5C%5C+%5Cmbox%7Bs.t%7D%5C%5C+%26+%7C%7Cx_u+-+x_v%7C%7C%5E2+%5Cleq+%7C%7Cx_u+-+x_z%7C%7C%5E2+%2B+%7C%7Cx_z+-+x_v%7C%7C%5E2+%26%5C+%5C+%5Cforall+u%2Cv%2Cz+%5Cin+V%5C%5C+%26+x_v+%5Cin+%7B%5Cmathbb+R%7D%5Em+%26+%5Cforall+v%5Cin+V%5C%5C+%26+m%5Cgeq+1+%5Cend%7Barray%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> which is a relaxation of sparsest cut because the “triangle inequality” constraints that we introduced are satisfied by 1-dimensional 0/1 solutions. Thus we have</p>
-<p align="center"><img alt="\displaystyle  \lambda_2 (G) \leq ARV(G) \leq \phi(G) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Clambda_2+%28G%29+%5Cleq+ARV%28G%29+%5Cleq+%5Cphi%28G%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p><b>3. The Argument </b></p>
-<p>Let us take any solution for ARV, and let us symmetrize it so that the symmetrized solution <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> satisfies</p>
-<p align="center"><img alt="\displaystyle  || x_u - x_{u + s} ||^2 = || x_v - x_{v+s} ||^2 \ \ \forall s\in S \ \forall u,v\in V " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7C%7C+x_u+-+x_%7Bu+%2B+s%7D+%7C%7C%5E2+%3D+%7C%7C+x_v+-+x_%7Bv%2Bs%7D+%7C%7C%5E2+%5C+%5C+%5Cforall+s%5Cin+S+%5C+%5Cforall+u%2Cv%5Cin+V+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> That is, make sure that the contribution of each edge to the numerator of the cost function depends only on the generator that defines the edge, and not on the pair of endpoints.</p>
-<p>It is easier to see that this symmetrization is possible if we view our solution as a PSD matrix <img alt="{X}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. In this case, for every group element <img alt="{g}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bg%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, we can let <img alt="{X_g}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BX_g%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> be the solution (with the same cost) obtained by permuting rows and columns according to the mapping <img alt="{v \rightarrow g+ v}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bv+%5Crightarrow+g%2B+v%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>; then we can consider the solution <img alt="{\frac 1n \sum_{g\in V} X_g}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cfrac+1n+%5Csum_%7Bg%5Cin+V%7D+X_g%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, which satisfies the required symmetry condition.</p>
-<p>Because of this condition, the cost function applied to <img alt="{\{ x_v \}_{v\in V}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5C%7B+x_v+%5C%7D_%7Bv%5Cin+V%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> in <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is</p>
-<p align="center"><img alt="\displaystyle  \frac { \frac n2 \cdot \sum_{s\in S} || x_s - x_0 ||^2}{ \frac dn \sum_{u &lt; v} ||x_u - x_v ||^2 }" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac+%7B+%5Cfrac+n2+%5Ccdot+%5Csum_%7Bs%5Cin+S%7D+%7C%7C+x_s+-+x_0+%7C%7C%5E2%7D%7B+%5Cfrac+dn+%5Csum_%7Bu+%3C+v%7D+%7C%7Cx_u+-+x_v+%7C%7C%5E2+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> and the cost function applied to <img alt="{\{ x_v \}_{v\in V}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5C%7B+x_v+%5C%7D_%7Bv%5Cin+V%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> in <img alt="{G^t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is</p>
-<p align="center"><img alt="\displaystyle  \frac { \frac n2 \cdot \sum_{s_1,\ldots,s_t\in S^t} || x_{s_1 + \cdots + s_t} - x_0 ||^2}{ \frac {d^t} n \sum_{u &lt; v} ||x_u - x_v ||^2 }" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac+%7B+%5Cfrac+n2+%5Ccdot+%5Csum_%7Bs_1%2C%5Cldots%2Cs_t%5Cin+S%5Et%7D+%7C%7C+x_%7Bs_1+%2B+%5Ccdots+%2B+s_t%7D+-+x_0+%7C%7C%5E2%7D%7B+%5Cfrac+%7Bd%5Et%7D+n+%5Csum_%7Bu+%3C+v%7D+%7C%7Cx_u+-+x_v+%7C%7C%5E2+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> meaning that our goal is now simply to prove</p>
-<p align="center"><img alt="\displaystyle  \frac 1{d^t} \sum_{(s_1,\ldots,s_t)\in S^t} || x_{s_1 + \cdots + s_k} - x_0 ||^2 \leq O(\sqrt {dt}) \cdot \frac 1d \sum_{s\in S} || x_s - x_0 ||^2 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cfrac+1%7Bd%5Et%7D+%5Csum_%7B%28s_1%2C%5Cldots%2Cs_t%29%5Cin+S%5Et%7D+%7C%7C+x_%7Bs_1+%2B+%5Ccdots+%2B+s_k%7D+-+x_0+%7C%7C%5E2+%5Cleq+O%28%5Csqrt+%7Bdt%7D%29+%5Ccdot+%5Cfrac+1d+%5Csum_%7Bs%5Cin+S%7D+%7C%7C+x_s+-+x_0+%7C%7C%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> or, if we take a probabilistic view</p>
-<p align="center"><img alt="\displaystyle  E_{(s_1,\ldots,s_t) \sim S^t} || x_{s_1 + \cdots + s_k} - x_0 ||^2 \leq O(\sqrt {dt}) \cdot \mathop{\mathbb E}_{s\sim S} || x_s - x_0 ||^2 \ " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++E_%7B%28s_1%2C%5Cldots%2Cs_t%29+%5Csim+S%5Et%7D+%7C%7C+x_%7Bs_1+%2B+%5Ccdots+%2B+s_k%7D+-+x_0+%7C%7C%5E2+%5Cleq+O%28%5Csqrt+%7Bdt%7D%29+%5Ccdot+%5Cmathop%7B%5Cmathbb+E%7D_%7Bs%5Csim+S%7D+%7C%7C+x_s+-+x_0+%7C%7C%5E2+%5C+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> If we let <img alt="{c_s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bc_s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> be the number of times that generator <img alt="{s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> appears in the sum <img alt="{s_1 + \ldots + s_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_1+%2B+%5Cldots+%2B+s_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, counting cancellations (so that, if <img alt="{s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> appears 4 times and <img alt="{-s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B-s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> appears 6 times we let <img alt="{c_s = 0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bc_s+%3D+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{c_{-s} = 2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bc_%7B-s%7D+%3D+2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>) we have</p>
-<p align="center"><img alt="\displaystyle  s_1 + \ldots + s_ t = \sum_{s\in S} c_s \cdot s " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++s_1+%2B+%5Cldots+%2B+s_+t+%3D+%5Csum_%7Bs%5Cin+S%7D+c_s+%5Ccdot+s+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> where multiplying an integer by a generator means adding the generator to itself that many times. Using the triangle inequality and the symmetrization we have</p>
-<p align="center"><img alt="\displaystyle  || x_{s_1 + \ldots + s_t} - x_0 ||^2 \leq \sum_{s\in S} c_s \cdot || x_s - x_0 ||^2 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7C%7C+x_%7Bs_1+%2B+%5Cldots+%2B+s_t%7D+-+x_0+%7C%7C%5E2+%5Cleq+%5Csum_%7Bs%5Cin+S%7D+c_s+%5Ccdot+%7C%7C+x_s+-+x_0+%7C%7C%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> The next observation is that, for every <img alt="{s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>,</p>
-<p align="center"><img alt="\displaystyle  \mathop{\mathbb E} c_s \leq O(\sqrt {t/d}) " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cmathop%7B%5Cmathbb+E%7D+c_s+%5Cleq+O%28%5Csqrt+%7Bt%2Fd%7D%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> where the expectation is over the choice of <img alt="{s_1,\ldots,s_t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_1%2C%5Cldots%2Cs_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. This is because <img alt="{c_s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bc_s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> can be seen as <img alt="{\min \{ 0 , X_1 + \ldots X_t \}}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cmin+%5C%7B+0+%2C+X_1+%2B+%5Cldots+X_t+%5C%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, where we define <img alt="{X_i = +1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BX_i+%3D+%2B1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> if <img alt="{s_i = s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_i+%3D+s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, <img alt="{X_i = -1}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BX_i+%3D+-1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> if <img alt="{s_i = -s}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bs_i+%3D+-s%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and <img alt="{X_i = 0}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BX_i+%3D+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> otherwise. We have</p>
-<p align="center"><img alt="\displaystyle  \mathop{\mathbb E} c_s = \mathop{\mathbb E} \min \{ 0 , X_1 + \ldots X_t \} \leq \mathop{\mathbb E} | X_1 + \ldots + X_t | \leq \sqrt {\mathop{\mathbb E} (X_1 + \ldots + X_t)^2} = \sqrt{2t/d} " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cmathop%7B%5Cmathbb+E%7D+c_s+%3D+%5Cmathop%7B%5Cmathbb+E%7D+%5Cmin+%5C%7B+0+%2C+X_1+%2B+%5Cldots+X_t+%5C%7D+%5Cleq+%5Cmathop%7B%5Cmathbb+E%7D+%7C+X_1+%2B+%5Cldots+%2B+X_t+%7C+%5Cleq+%5Csqrt+%7B%5Cmathop%7B%5Cmathbb+E%7D+%28X_1+%2B+%5Cldots+%2B+X_t%29%5E2%7D+%3D+%5Csqrt%7B2t%2Fd%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p> Combining everything, we have</p>
-<p align="center"><img alt="\displaystyle  E_{(s_1,\ldots,s_t) \sim S^t} || x_{s_1 + \cdots + s_k} - x_0 ||^2 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++E_%7B%28s_1%2C%5Cldots%2Cs_t%29+%5Csim+S%5Et%7D+%7C%7C+x_%7Bs_1+%2B+%5Ccdots+%2B+s_k%7D+-+x_0+%7C%7C%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p align="center"><img alt="\displaystyle  \leq \sum_{s\in S} \mathop{\mathbb E} c_s || x_s - x_0 ||^2" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cleq+%5Csum_%7Bs%5Cin+S%7D+%5Cmathop%7B%5Cmathbb+E%7D+c_s+%7C%7C+x_s+-+x_0+%7C%7C%5E2&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p align="center"><img alt="\displaystyle  \leq O\left( \sqrt {\frac td} \right) \cdot \sum_{s\in S} || x_s - x_0 ||^2" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cleq+O%5Cleft%28+%5Csqrt+%7B%5Cfrac+td%7D+%5Cright%29+%5Ccdot+%5Csum_%7Bs%5Cin+S%7D+%7C%7C+x_s+-+x_0+%7C%7C%5E2&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p align="center"><img alt="\displaystyle  = O(\sqrt{dt}) \mathop{\mathbb E}_{s\sim S} || x_s - x_0 ||^2 " class="latex" src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%3D+O%28%5Csqrt%7Bdt%7D%29+%5Cmathop%7B%5Cmathbb+E%7D_%7Bs%5Csim+S%7D+%7C%7C+x_s+-+x_0+%7C%7C%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/></p>
-<p>So every solution of ARV for <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is also a solution for <img alt="{G^t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> with a cost that increases at most by a <img alt="{O(\sqrt {dt})}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Csqrt+%7Bdt%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> factor, which proves <a href="https://lucatrevisan.wordpress.com/feed/#rw">(4)</a> as promised.</p>
-<p><b>4. A Couple of Interesting Questions </b></p>
-<p>We showed that ARV has integrality gap at most <img alt="{O(\sqrt d)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Csqrt+d%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> for every <img alt="{d}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bd%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>-regular Abelian Cayley graph, but we did not demonstrate a rounding algorithm able to achieve an <img alt="{O(\sqrt d)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Csqrt+d%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> approximation ratio.</p>
-<p>If we follow the argument, starting from an ARV solution of cost <img alt="{\epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, choosing <img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> of the order of <img alt="{1/d\epsilon^2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2Fd%5Cepsilon%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> we see that <img alt="{G^t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> has an ARV solution (the same as before) of cost at most, say, <img alt="{1/2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, and so <img alt="{\lambda_2(G^t) \leq 1/2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clambda_2%28G%5Et%29+%5Cleq+1%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, implying that <img alt="{\lambda_2(G) \leq O(1/t)}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Clambda_2%28G%29+%5Cleq+O%281%2Ft%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> and so Fiedler’s algorithm according to a Laplacian eigenvalue finds a cut of sparsity at most <img alt="{O(\sqrt{1/t}) = O(\sqrt d \cdot \epsilon )}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Csqrt%7B1%2Ft%7D%29+%3D+O%28%5Csqrt+d+%5Ccdot+%5Cepsilon+%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>.</p>
-<p>We can also see that if <img alt="{X}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is the matrix corresponding to an ARV solution of value <img alt="{\epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> for <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, then one of the eigenvectors <img alt="{x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bx%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> of <img alt="{X}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> must be a test vector of Rayleigh quotient at most <img alt="{1/2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2F2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> for the Laplacian <img alt="{G^t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, where <img alt="{t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> is order of <img alt="{1/d\epsilon^2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2Fd%5Cepsilon%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>. However it is not clear how to get, from such a vector, a test vector for the Laplacian of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> of Rayleigh quotient at most <img alt="{O(\sqrt {1/t} )}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BO%28%5Csqrt+%7B1%2Ft%7D+%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> for the Laplacian of <img alt="{G}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BG%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, though one such vector should be <img alt="{A^k x}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BA%5Ek+x%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> for a properly chosen <img alt="{k}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> in the range <img alt="{1,\ldots, t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B1%2C%5Cldots%2C+t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>.</p>
-<p>If this actually work, then the following, or something like that, would be a rounding algorithm: given a PSD solution <img alt="{X}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/> of ARV of cost <img alt="{\epsilon}" class="latex" src="https://s0.wp.com/latex.php?latex=%7B%5Cepsilon%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, consider PSD matrices of the form <img alt="{A^t X A^t}" class="latex" src="https://s0.wp.com/latex.php?latex=%7BA%5Et+X+A%5Et%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, which do not necessarily satisfy the triangle inequalities any more, for <img alt="{t = 1,\ldots, 1/d\epsilon^2}" class="latex" src="https://s0.wp.com/latex.php?latex=%7Bt+%3D+1%2C%5Cldots%2C+1%2Fd%5Cepsilon%5E2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002"/>, and try to round them using a random hyperplane. Would this make sense for other classes of graphs?</p>
-<p>It is plausible that sparsest cut in Abelian Cayley graphs has actually a constant-factor approximation in polynomial or quasi-polynomial time, and maybe either that ARV achieves constant-factor approximation.</p></div>
-    </content>
-    <updated>2021-10-08T14:58:37Z</updated>
-    <published>2021-10-08T14:58:37Z</published>
-    <category term="math"/>
-    <category term="theory"/>
-    <category term="ARV"/>
-    <category term="Cayley graphs"/>
-    <category term="sparsest cut"/>
-    <author>
-      <name>luca</name>
-    </author>
-    <source>
-      <id>https://lucatrevisan.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://lucatrevisan.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://lucatrevisan.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://lucatrevisan.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
-      <title>in   theory</title>
-      <updated>2021-10-22T20:37:07Z</updated>
     </source>
   </entry>
 </feed>
