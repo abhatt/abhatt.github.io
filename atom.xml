@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-10-25T17:39:02Z</updated>
+  <updated>2021-10-25T18:22:05Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,185 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://differentialprivacy.org/how-to-deploy-ml-with-dp/</id>
+    <link href="https://differentialprivacy.org/how-to-deploy-ml-with-dp/" rel="alternate" type="text/html"/>
+    <title>How to deploy machine learning with differential privacy?</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>In many applications of machine learning, such as machine learning for medical diagnosis, we would like to have machine learning algorithms that do not memorize sensitive information about the training set, such as the specific medical histories of individual patients. Differential privacy is a notion that allows quantifying the degree of privacy protection provided by an algorithm on the underlying (sensitive) data set it operates on. Through the lens of differential privacy, we can design machine learning algorithms that responsibly train models on private data.</p>
+
+<h2 id="why-do-we-need-private-machine-learning-algorithms">Why do we need private machine learning algorithms?</h2>
+
+<p>Machine learning algorithms work by studying a lot of data and updating their parameters to encode the relationships in that data. Ideally, we would like the parameters of these machine learning models to encode general patterns (e.g., ‘‘patients who smoke are more likely to have heart disease’’) rather than facts about specific training examples (e.g., “Jane Smith has heart disease”). Unfortunately, machine learning algorithms do not learn to ignore these specifics by default. If we want to use machine learning to solve an important task, like making a cancer diagnosis model, then when we publish that machine learning model (for example, by making an open source cancer diagnosis model for doctors all over the world to use) we might also inadvertently reveal information about the training set. A malicious attacker might be able to inspect the published model’s predictions and learn private information about Jane Smith. For instance, the adversary could mount a membership inference attack to know whether or not Jane Smith contributed her data to the model’s training set [SSS17]. The adversary could also build on membership inference attacks to extract training data by repeatedly guessing possible training points until they result in a sufficiently strong membership signal from the model’s prediction [CTW20]. In many instances, the model itself may be represented by a few of the data samples (e.g., Support Vector Machine in its dual form).</p>
+
+<p>A common misconception is that if a model generalizes (i.e., performs well on the test examples), then it preserves privacy. As mentioned earlier, this is far from being true. One of the main reasons being that generalization is an average case behavior of a model (over the distribution of data samples), whereas privacy must be provided for everyone, including outliers (which may deviate from our distributional assumptions).</p>
+
+<p>Over the years, researchers have proposed various approaches towards protecting privacy in learning algorithms (k-anonymity [SS98], l-diversity [MKG07], m-invariance [XT07], t-closeness [LLV07] etc.). Unfortunately, [GKS08] all these approaches are vulnerable to what are called composition attacks, that use auxiliary information to violate the privacy protection. Famously, this strategy allowed researchers to de-anonymize part of a movie ratings dataset released to participants of the Netflix Prize when the individuals had also shared their movie ratings publicly on the Internet Movie Database (IMDb) [NS08]. If Jane Smith had assigned the same ratings to movies A, B and C in the Netflix Prize dataset and publicly on IMDb at similar times, then researchers could link data corresponding to Jane across both datasets. This would in turn give them the means to recover ratings that were included in the Netflix Prize but not on IMDb. This example shows how difficult it is to define and guarantee privacy because it is hard to estimate the scope of knowledge—about individuals—available to adversaries. While the dataset released by Netflix has since been taken down, it is difficult to ensure that all of its copies have been deleted. In recent years, data sample instance encoding based methods like InstaHide [HSL20], and NeuraCrypt [YEO21] have been demonstrated to be vulnerable to such composition attacks as well.</p>
+
+<p>As a result, the research community has converged on differential privacy [DMNS06], which provides the following semantic guarantee, as opposed to ad-hoc approaches: An adversary learns almost the same information about an individual whether or not they are present in or absent from the training data set. In particular, it provides a condition on the algorithm, independent from who might be attacking it, or the specifics of the data set instantiation.  Put another way, differential privacy is a framework for evaluating the guarantees provided by a system that was designed to protect privacy. Such systems can be applied directly to “raw” data which potentially still contains sensitive information, altogether removing the need for procedures that sanitize or anonymize data and are prone to the failures described previously. That said, minimizing data collection in the first place remains a good practice to limit other forms of privacy risk.</p>
+
+<h2 id="designing-private-machine-learning-algorithms-via-differential-privacy">Designing Private Machine Learning Algorithms via Differential Privacy</h2>
+
+<p>Differential privacy [DMNS06] is a semantic notion of privacy that addresses a lot of the limitations of previous approaches like k-anonymity. The basic idea is to randomize part of the mechanism’s behavior to provide privacy. In our case, the mechanism considered is a learning algorithm, but the differential privacy framework can be applied to study any algorithm.</p>
+
+<p>The intuition for why we introduce randomness into the learning algorithm is that it obscures the contribution of an individual, but does not obscure important statistical patterns. Without randomness, we would be able to ask questions like: “What parameters does the learning algorithm choose when we train it on this specific dataset?” With randomness in the learning algorithm, we instead ask questions like: “What is the probability that the learning algorithm will choose parameters in this set of possible parameters, when we train it on this specific dataset?”</p>
+
+<p>We use a version of differential privacy which requires (in our use case of machine learning) that the probability of learning any particular set of parameters stays roughly the same if we change a single data record in the training set. A data record can be a single training example from an individual, or the collection of all the training examples provided by an individual. The former is often referred to as example level/item level privacy, and the latter is referred to as user level differential privacy. While user level privacy provides stronger semantics, it may be harder to achieve. For a more thorough discussion about the taxonomy of these notions, see [DNPR10, JTT18, HR12, HR13]. In this document, for the ease of exposition of the technical results, we focus on the example level notion. This could mean to add a training example, remove a training example, or change the values within one training example. The intuition is that if a single patient (Jane Smith) does not affect the outcome of learning much, then that patient’s records cannot be memorized and her privacy is respected. In the rest of this post, how much a single record can affect the outcome of learning is called the sensitivity of an algorithm.</p>
+
+<p>The guarantee of differential privacy is that the adversary is not able to distinguish the answers produced by the randomized algorithm based on the data of two of the three users from the answers returned by the same algorithm based on the data of all three users. We also refer to the degree of indistinguishability as the privacy loss. Smaller privacy loss corresponds to a stronger privacy guarantee.</p>
+
+<p>It is often thought that privacy is a fundamental bottleneck in obtaining good prediction accuracy/generalization for machine learning algorithms. In fact, recent research has shown that in many instances it actually helps in designing algorithms with strong generalization ability. Some of the examples where DP has resulted in designing better learning algorithms are Online linear predictions [KV05] and online PCA [DTTZ13]. Notably, [DFH15] formally showed that generalization for any DP learning algorithm comes for free. More concretely, if a DP learning algorithm has good training accuracy, it is guaranteed to have good test accuracy.
+This is true because differential privacy itself acts as a very strong form of regularization.</p>
+
+<p>One might argue that the generalization guarantee which a DP algorithm can achieve may be sub-par to that of its non-private baselines. For a large class of learning tasks, one can show that asymptotically DP does not introduce any further error beyond the inherent statistical error [SSTT21]. [ACG16,BFTT19] highlights that in the presence of enough data, a DP algorithm can get arbitrarily close to the inherent statistical error, even under strong privacy parameters.</p>
+
+<h2 id="private-empirical-risk-minimization">Private Empirical Risk Minimization</h2>
+
+<p>Before we go into the design of specific differentially private learning algorithms, we first formalize the problem setup, and standardize some notation. Consider a training data set \(D={(x_1,y_1),…,(x_n,y_n)}\) drawn i.i.d. from some fixed (unknown) distribution \(\Pi\), with the feature vector being \(x_i\) and label/response being \(y_i\). We define the training loss at any model \(\theta\) as \(L_{train} (\theta, D) = \frac{1}{n} \sum_{i=1}^{n} l(\theta; (x_i, y_i))\), and the corresponding test loss as \(L_{test} (\theta) = E_{(x,y) \sim \Pi} l(\theta;(x,y)) \).
+We will design DP algorithms to output models that approximately minimize the test loss while having access only to the training loss.</p>
+
+<p>In the literature, there are a variety of approaches towards designing these DP learning algorithms [CMS11, KST12, BST14, PAE16, BTT18]. One can categorize them broadly as: i) algorithms that assume that the individual loss function \(l(\theta;\cdot) \) is convex in the model parameter  to ensure differential privacy, ii) algorithms that are differentially private even when the loss function is non-convex in nature (e.g., deep learning models), and iii) model agnostic algorithms, that do not require any information about the representation of the model \(\theta\), or the loss function \(l(\theta;\cdot) \). In our current discussion, we will only focus on designing algorithms for (ii), and (iii). This is because it turns out that the best known algorithms for (ii) are already competitive to algorithms that are specific for (i) [INS19].</p>
+
+<h2 id="private-algorithms-for-training-deep-learning-models">Private Algorithms for Training Deep Learning Models</h2>
+
+<p>The first approach, due to SCS13, BST14, and ACG16, is named differentially private stochastic gradient descent (DP-SGD). It proposes to modify the model updates computed by the most common optimizer used in deep learning: stochastic gradient descent (SGD). Typically, stochastic gradient descent trains iteratively. At each iteration, a small number of training examples (a “minibatch”) are sampled from the training set. The optimizer computes the average model error on these examples, and then differentiates this average error with respect to each of the model parameters to obtain a gradient vector. Finally, the model parameters (\(\theta_t\)) are updated by subtracting this gradient (\(\nabla_t\)) multiplied by a small constant \(\eta\) (the learning rate controls how quickly the optimizer updates the model’s parameters). At a high level, two modifications are made by DP-SGD to obtain differential privacy: gradients, which are computed on a per-example basis (rather than averaged over multiple examples), are first clipped to control their sensitivity, and, second, spherical Gaussian noise \(b_t\) is added to their sum to obtain the indistinguishability needed for DP. Succinctly, the update step can be written as follows: \(\theta_{t+1} \leftarrow \theta_t - \eta \cdot (\nabla_t + b_t)\).</p>
+
+<p>Let us take the example of a hospital training a model to predict whether patients will be readmitted after being released. To train the model, the hospital uses information from patient records, such as demographic variables and admission variables (e.g., age, ethnicity, insurance type, type of Intensive Care Unit admitted to) but also time-varying vitals and labs (e.g., heart rate, blood pressure, white blood cell counts) [JPS16]. The modifications made by DP-SGD ensure that if (1) Jane Smith’s individual patient record contained unusual features, e.g., her insurance provider was uncommon for people of her age or her heart rate followed an unusual pattern, the resulting signal will have a bounded impact on our model updates, and (2) the model’s final parameters would be essentially identical should Jane Smith have chosen to not contribute (i.e., opt-out) her patient record to the training set. Stronger differential privacy is achieved when one is able to introduce more noise (i.e., sample noise with larger standard deviation) and train for as few iterations as possible.</p>
+
+<p>Two main components in the above DP-SGD algorithm that distinguishes itself from traditional SGD are: i) per-example clipping and ii) Gaussian noise addition. In addition, for the analysis to hold, DP-SGD requires that sub-sampling of mini batches is uniform at random from the training data set. While this is not a requirement of DP-SGD per se, in practice many implementations of SGD do not satisfy this requirement and instead analyze different permutations of the data at each epoch of training.</p>
+
+<p>While gradient clipping is common in deep learning, often used as a form of regularization, it differs from that in DP-SGD as follows: The average gradient over the minibatch is clipped, as opposed to clipping the gradient of individual examples (i.e., \(l(\theta_t;(x,y)) \) before averaging. It is an ongoing research direction to both understand the effect of per-example clipping in DP-SGD in model training [SSTT21], and also effective ways to mitigate its impact both in terms of accuracy [PTS21], and training time [ZHS19].</p>
+
+<p>In standard stochastic gradient descent, subsampling is usually used either as a way to speed up the training process [CAR16], or as a a form of regularization [RCR15]. In DP-SGD, the randomness in the subsampling of the minibatch is used to guarantee DP. The technical component for this sort of privacy analysis is called privacy amplification by subsampling [KLNRS08,BBG18]. Since the sampling randomness is used to guarantee DP, it is crucial that the uniformity in the sampling step is of cryptographic strength. Another, (possibly) counterintuitive feature of DP-SGD is that for best privacy/utility trade-off it is in general better to have larger batch sizes. In fact, full-batch DP-gradient descent may provide the best privacy/utility trade-offs, albeit at the expense of computational feasibility.</p>
+
+<p>For a fixed DP guarantee, the magnitude of the Gaussian noise that gets added to the gradient updates in each step in DP-SGD is proportional to \(\sqrt{the\ number\ of\ steps}\) the model is trained for. As a result, it is important to tune the number of training steps for best privacy/utility trade-offs.</p>
+
+<p>In the <a href="https://github.com/tensorflow/privacy/blob/master/tutorials/mnist_dpsgd_tutorial.py">following tutorial</a>, we provide a small code snippet to train a model with DP-SGD.</p>
+
+<h2 id="model-agnostic-private-learning">Model Agnostic Private Learning</h2>
+
+<p>The Sample and Aggregate framework [NRS07] is a generic method to add differential privacy to a non-private algorithm without caring about the internal workings of it, a.k.a. model agnostic. In the context of machine learning, one can state the main idea as follows: Consider a multi-class classification problem. Take the training data, and split into k disjoint subsets of equal size. Train independent models \(\theta_1, \theta_2, …, \theta_k \) on the disjoint subsets. In order to predict on an test example x, first, compute a private histogram over the set of k predictions \(\theta_1(x), \theta_2(x), …, \theta_k(x) \). Then, select and output the bin in the histogram based on the highest count, after adding a small amount of Laplace/Gaussian noise to the counts. In the context of DP learning, this particular approach was used in two different lines of work: i) PATE [PAE16], and ii) Model agnostic private learning [BTT18]. While the latter focussed on obtaining theoretical privacy/utility trade-offs for a class of learning tasks (e.g., agnostic PAC learning), the PATE approach focuses on practical deployment. Both these lines of work make one common observation. If the predictions from \(\theta_1(x), \theta_2(x), …, \theta_k(x) \) are fairly consistent, then the privacy cost in terms of DP is very small. Hence, one can run a large number of prediction queries, without violating DP constraints. In the following, we describe the PATE approach in detail.</p>
+
+<p>The private aggregation of teacher ensembles (PATE) demonstrated in particular that this approach allows one to learn deep neural networks with differential privacy. It proposes to have an ensemble of models trained without privacy predict with differential privacy by having these models predict in aggregate rather than revealing their individual predictions. In PATE, we start by partitioning the private dataset into smaller subsets of data. These subsets are partitions, so there is no overlap between the data included in any pair of partitions. If Jane Smith’s record was in our private dataset, then it is included in one of the partitions only. That is, only one of the teachers has analyzed Jane Smith’s record during training. We train a ML model, called a teacher, on each of these partitions. We now have an ensemble of teacher models that were trained independently, but without any guarantees of privacy. How do we use this ensemble to make predictions that respect privacy? In PATE, we add noise while aggregating the predictions made individually by each teacher to form a single common prediction. We count the number of teachers who voted for each class, and then perturb that count by adding random noise sampled from the Laplace or Gaussian distribution. Each label predicted by the noisy aggregation mechanism comes with rigorous differential privacy guarantees that bound the privacy budget spent to label that input. Again, stronger differential privacy is achieved when we are able to introduce more noise in the aggregation and are able to answer as few queries as possible. Let us now come back to our running example. Imagine that we’d like to use the output of PATE to know if Jane likes a particular movie. The only teacher trained on the partition containing Jane Smith’s data—has now learned that a record similar to Jane’s is characteristic of an individual who likes similar movies, and as a consequence changes its prediction on a test input which is similar to Jane’s to predict the movie rating assigned by Jane. However, because the teacher only contributes a single vote to the aggregation, and that the aggregation injects noise, we won’t be able to know whether the teacher changed its prediction to the movie rating assigned by Jane because the teacher indeed trained on Jane’s data or because the noise injected during the aggregation “flipped” that teacher’s vote. The random noise added to vote counts prevents the outcome of aggregation from reflecting the votes of any individual teachers to protect privacy.</p>
+
+<h2 id="practically-deploying-differential-privacy-in-machine-learning">Practically deploying differential privacy in machine learning</h2>
+
+<p>The two approaches we introduced have the advantage of being conceptually simple to understand. Fortunately, there also exist several open-source implementations of these approaches. For instance, DP-SGD is implemented in TensorFlow Privacy, Objax, and Opacus. This means that one is able to take an existing TensorFlow, JAX, or PyTorch pipeline for training a machine learning model and replace a non-private optimizer with DP-SGD. An example implementation of PATE is also available in TensorFlow Privacy. So what are the concrete potential obstacles to deploying machine learning with differential privacy?</p>
+
+<p>The first obstacle is the accuracy of privacy-preserving models. Datasets are often sampled from distribution with heavy tails. For instance, in a medical application, there are typically (and fortunately) fewer patients with a given medical condition than patients without that condition. This means that there are fewer training examples for patients with each medical condition to learn from. Because differential privacy prevents us from learning patterns which are not found generally across the training data, it limits our ability to learn from these patients for which we have very few examples of [SPG]. More generally, there is often a trade-off between the accuracy of a model and the strength of the differential privacy guarantee it was trained with: the smaller the privacy budget is, the larger the impact on accuracy typically is. That said, this tension is not always inevitable and there are instances where privacy and accuracy are synergical because differential privacy implies generalization [DFH15] (but not vice versa).</p>
+
+<p>The second obstacle to deploying differentially private machine learning can be the computational overhead. For instance, in DP-SGD one must compute per-example gradients rather than average gradients. This often means that optimizations implemented in machine learning frameworks to exploit matrix algebra supported by underlying hardware accelerators (e.g., GPUs) are harder to take advantage of. In another example, PATE requires that one train multiple models (the teachers) rather than a single model so this can also introduce overhead in the training procedure. Fortunately, this cost is mostly mitigated in recent implementations of private learning algorithms, in particular in Objax and Opacus.</p>
+
+<p>The third obstacle to deploying differential privacy, in machine learning but more generally in any form of data analysis, is the choice of privacy budget. The smaller the budget, the stronger the guarantee is. This means one can compare two analyses and say which one is “more private”. However, this also means that it is unclear what is “small enough” of a privacy budget. This is particularly problematic given that applications of differential privacy to machine learning often require a privacy budget that provides little theoretical guarantees in order to train a model whose accuracy is large enough to warrant a useful deployment. Thus, it may be interesting for practitioners to evaluate the privacy of their machine learning algorithm by attacking it themselves. Whereas the theoretical analysis of an algorithm’s differential privacy guarantees provides a worst-case guarantee limiting how much private information the algorithm can leak against any adversary, implementing a specific attack can be useful to know how successful a particular adversary or class of adversaries would be. This helps interpret the theoretical guarantee but may not be treated as a direct substitute for it. Open-source implementations of such attacks are increasingly available: e.g., for membership inference <a href="https://github.com/tensorflow/privacy/tree/master/tensorflow_privacy/privacy/privacy_tests/membership_inference_attack">here</a> and <a href="https://github.com/cchoquette/membership-inference">here</a>.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>In the above, we discussed some of the algorithmic approaches towards differentially private model training which have been effective both in theoretical and practical settings. Since it is a rapidly growing field, we could not cover all the important aspects of the research space. Some prominent ones include: i) Choice of the best hyperparameters in the training of DP models.In order to ensure that the overall algorithm preserves differential privacy, one needs to ensure that the choice of hyperparameters itself preserves DP. Recent research has provided algorithms for selecting the best hyperparameters in a differentially private fashion [LT19]. ii) Choice of network architecture: it is not always true that the best known model architectures for non-private model training are indeed the best for training with differential privacy. In particular, we know that the number of model parameters may have adverse effects on the privacy/utility trade-offs [BST14]. Hence, choosing the right model architecture is important for providing a good privacy/utility trade-off [PTS21]. (iii) Training in the federated/distributed setting: in the above exposition, we assumed that the training data lies in a single centralized location. However, in settings like Federated Learning (FL) [MMRHA17], the data records can be highly distributed, e.g., across various mobile devices. Running DP-SGD in the FL setting, which is required for FL to provide privacy guarantees for the training data, raises a series of challenges [KMA19] which are often facilitated by distributed private learning algorithms designed specifically for FL settings [BKMTT20, KMSTTZ21]. Some of the specific challenges in the context of FL include, limited and non-uniform availability of clients (holding individual data records) and unknown (and variable) size of the training data [BKMTT18]. On the other hand, PATE style algorithms lend themselves naturally to the distributed setting once combined with existing cryptographic primitives, as demonstrated by the CaPC protocol [CDD21]. It is an active area of research to address these above challenges.</p>
+
+<h2 id="acknowledgements">Acknowledgements</h2>
+
+<p>The authors would like to thank Thomas Steinke and Andreas Terzis for detailed feedback and edit suggestions. Parts of this blog post previously appeared on <a href="https://differentialprivacy.org/www.cleverhans.io">www.cleverhans.io</a>.</p>
+
+<h2 id="citations">Citations</h2>
+
+<p>[ACG16] Abadi, M., Chu, A., Goodfellow, I., McMahan, H. B., Mironov, I., Talwar, K., &amp; Zhang, L. (2016, October). Deep learning with differential privacy. In Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security (pp. 308-318). ACM.</p>
+
+<p>[BBG18] Balle, B., Barthe, G., &amp; Gaboardi, M. (2018). Privacy amplification by subsampling: Tight analyses via couplings and divergences. arXiv preprint arXiv:1807.01647.</p>
+
+<p>[BKMTT18] Balle, B., Kairouz P., McMahan M., Thakkar O. &amp; Thakurta A. (2020). Privacy amplification via random check-ins. In NeurIPS.</p>
+
+<p>[MMRHA17] McMahan, B., Moore, E., Ramage, D., Hampson, S., &amp; y Arcas, B. A. (2017, April). Communication-efficient learning of deep networks from decentralized data. In Artificial intelligence and statistics (pp. 1273-1282). PMLR.</p>
+
+<p>[KMSTTZ18] Kairouz P., McMahan M., Song S., Thakkar O., Thakurta A., &amp; Xu Z. (2021). Practical and Private (Deep) Learning without Sampling or Shuffling. In ICML.</p>
+
+<p>[BFTT19] Bassily, R., Feldman, V., Talwar, K., &amp; Thakurta, A. Private Stochastic Convex Optimization with Optimal Rates. In NeurIPS 2019.</p>
+
+<p>[BST14] Raef Bassily, Adam Smith, and Abhradeep Thakurta. Private empirical risk minimization: Efficient algorithms and tight error bounds. In Proceedings of the 55th Annual IEEE Symposium on Foundations of Computer Science.</p>
+
+<p>[BTT18] Bassily, R., Thakurta, A. G., &amp; Thakkar, O. D. (2018). Model-agnostic private learning. Advances in Neural Information Processing Systems.</p>
+
+<p>[CDD21] Choquette-Choo, C. A., Dullerud, N., Dziedzic, A., Zhang, Y., Jha, S., Papernot, N., &amp; Wang, X. (2021). CaPC Learning: Confidential and Private Collaborative Learning. arXiv preprint arXiv:2102.05188.</p>
+
+<p>[CMS11] Chaudhuri, K., Monteleoni, C., &amp; Sarwate, A. D. (2011). Differentially private empirical risk minimization. Journal of Machine Learning Research, 12(3).</p>
+
+<p>[CTW20] Carlini, N., Tramer, F., Wallace, E., Jagielski, M., Herbert-Voss, A., Lee, K., … &amp; Raffel, C. (2020). Extracting training data from large language models. arXiv preprint arXiv:2012.07805.</p>
+
+<p>[DFH15] Dwork, C., Feldman, V., Hardt, M., Pitassi, T., Reingold, O., &amp; Roth, A. (2015). Generalization in adaptive data analysis and holdout reuse. arXiv preprint arXiv:1506.02629.</p>
+
+<p>[DMNS06] Dwork, C., McSherry, F., Nissim, K., &amp; Smith, A. (2006, March). Calibrating noise to sensitivity in private data analysis. In Theory of Cryptography Conference (pp. 265-284). Springer, Berlin, Heidelberg.</p>
+
+<p>[DNPR10] Dwork, C., Naor, M., Pitassi, T., &amp; Rothblum, G. N. (2010, June). Differential privacy under continual observation. In Proceedings of the forty-second ACM symposium on Theory of computing (pp. 715-724).</p>
+
+<p>[DTTZ14] Dwork, C., Talwar, K., Thakurta, A., &amp; Zhang, L. (2014, May). Analyze gauss: optimal bounds for privacy-preserving principal component analysis. In Proceedings of the forty-sixth annual ACM symposium on Theory of computing (pp. 11-20).</p>
+
+<p>[HSL20] Huang, Y., Song, Z., Li, K., &amp; Arora, S. (2020, November). Instahide: Instance-hiding schemes for private distributed learning. In International Conference on Machine Learning (pp. 4507-4518). PMLR.</p>
+
+<p>[HR12] Hardt, M., &amp; Roth, A. (2012, May). Beating randomized response on incoherent matrices. In Proceedings of the forty-fourth annual ACM symposium on Theory of computing (pp. 1255-1268).</p>
+
+<p>[HR13] Hardt, M., &amp; Roth, A. (2013, June). Beyond worst-case analysis in private singular vector computation. In Proceedings of the forty-fifth annual ACM symposium on Theory of computing (pp. 331-340).</p>
+
+<p>[JPS16] Johnson, A., Pollard, T., Shen, L. et al. MIMIC-III, a freely accessible critical care database. Sci Data 3, 160035 (2016). https://doi.org/10.1038/sdata.2016.35</p>
+
+<p>[JTT18] Jain, P., Thakkar, O. D., &amp; Thakurta, A. (2018, July). Differentially private matrix completion revisited. In International Conference on Machine Learning (pp. 2215-2224). PMLR.</p>
+
+<p>[INS19] Iyengar, R., Near, J. P., Song, D., Thakkar, O., Thakurta, A., &amp; Wang, L. (2019, May). Towards practical differentially private convex optimization. In 2019 IEEE Symposium on Security and Privacy (SP) (pp. 299-316). IEEE.</p>
+
+<p>[KST12] Kifer, D., Smith, A., &amp; Thakurta, A. (2012, June). Private convex empirical risk minimization and high-dimensional regression. In Conference on Learning Theory (pp. 25-1). JMLR Workshop and Conference Proceedings.</p>
+
+<p>[KMA19] Kairouz, P., McMahan, H. B., Avent, B., Bellet, A., Bennis, M., Bhagoji, A. N., … &amp; Zhao, S. (2019). Advances and open problems in federated learning. arXiv preprint arXiv:1912.04977.</p>
+
+<p>[KV05] Kalai, Adam, and Santosh Vempala. “Efficient algorithms for online decision problems.” Journal of Computer and System Sciences 71.3 (2005): 291-307.</p>
+
+<p>[KLNRS08] Raskhodnikova, S., Smith, A., Lee, H. K., Nissim, K., &amp; Kasiviswanathan, S. P. (2008). What can we learn privately. In Proceedings of the 54th Annual Symposium on Foundations of Computer Science (pp. 531-540).</p>
+
+<p>[LLV07] Li, N., Li, T., &amp; Venkatasubramanian, S. (2007, April). t-closeness: Privacy beyond k-anonymity and l-diversity. In 2007 IEEE 23rd International Conference on Data Engineering (pp. 106-115). IEEE.</p>
+
+<p>[LT19] Liu, J., &amp; Talwar, K. (2019, June). Private selection from private candidates. In Proceedings of the 51st Annual ACM SIGACT Symposium on Theory of Computing (pp. 298-309).</p>
+
+<p>[M17] Mironov, I. (2017, August). Renyi differential privacy. In Computer Security Foundations Symposium (CSF), 2017 IEEE 30th (pp. 263-275). IEEE.</p>
+
+<p>[MKG07] Machanavajjhala, Ashwin; Kifer, Daniel; Gehrke, Johannes; Venkitasubramaniam, Muthuramakrishnan (March 2007). “L-diversity: Privacy Beyond K-anonymity”. ACM Transactions on Knowledge Discovery from Data.</p>
+
+<p>[NRS07] Nissim, K., Raskhodnikova, S., &amp; Smith, A. (2007, June). Smooth sensitivity and sampling in private data analysis. In Proceedings of the thirty-ninth annual ACM symposium on Theory of computing (pp. 75-84).</p>
+
+<p>[NS08] Narayanan, A., &amp; Shmatikov, V. (2008, May). Robust de-anonymization of large sparse datasets. In Security and Privacy, 2008. SP 2008. IEEE Symposium on (pp. 111-125). IEEE.</p>
+
+<p>[PAE16] Papernot, N., Abadi, M., Erlingsson, U., Goodfellow, I., &amp; Talwar, K. (2016). Semi-supervised knowledge transfer for deep learning from private training data. ICLR 2017.</p>
+
+<p>[PTS21] Papernot, N., Thakurta, A., Song, S., Chien, S., &amp; Erlingsson, U. (2020). Tempered sigmoid activations for deep learning with differential privacy. AAAI 2021.</p>
+
+<p>[RCR15] Rudi, A., Camoriano, R., &amp; Rosasco, L. (2015, December). Less is More: Nyström Computational Regularization. In NIPS (pp. 1657-1665).</p>
+
+<p>[SCS13] Shuang Song, Kamalika Chaudhuri, and Anand D Sarwate. Stochastic gradient descent with differentially private updates. In Proceedings of the 2013 IEEE Global Conference on Signal and Information Processing, GlobalSIP ’13, pages 245–248, Washington, DC, USA, 2013. IEEE Computer Society.</p>
+
+<p>[SPG] Chasing Your Long Tails: Differentially Private Prediction in Health Care Settings. Vinith Suriyakumar, Nicolas Papernot, Anna Goldenberg, Marzyeh Ghassemi. Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency.</p>
+
+<p>[SS98] Samarati, Pierangela; Sweeney, Latanya (1998). “Protecting privacy when disclosing information: k-anonymity and its enforcement through generalization and suppression” (PDF). Harvard Data Privacy Lab. Retrieved April 12, 2017</p>
+
+<p>[SSS17] Shokri, R., Stronati, M., Song, C., &amp; Shmatikov, V. (2017, May). Membership inference attacks against machine learning models. In Security and Privacy (SP), 2017 IEEE Symposium on (pp. 3-18). IEEE.</p>
+
+<p>[SSTT21] Song, S., Thakkar, O., &amp; Thakurta, A. (2020). Evading the Curse of Dimensionality in Unconstrained Private GLMs. In AISTATS 2021.</p>
+
+<p>[XT07] Xiao X, Tao Y (2007) M-invariance: towards privacy preserving re-publication of dynamic datasets. In: SIGMOD conference, Beijing, China, pp 689–700</p>
+
+<p>[YEO21] Yala, A., Esfahanizadeh, H., Oliveira, R. G. D., Duffy, K. R., Ghobadi, M., Jaakkola, T. S., … &amp; Medard, M. (2021). NeuraCrypt: Hiding Private Health Data via Random Neural Networks for Public Training. arXiv preprint arXiv:2106.02484.</p>
+
+<p>[ZHS19] Jingzhao Zhang, Tianxing He, Suvrit Sra, and Ali Jadbabaie. Why gradient clipping accelerates training: A theoretical justification for adaptivity. In International Conference on Learning Representations, 2019.</p></div>
+    </summary>
+    <updated>2021-10-25T18:00:00Z</updated>
+    <published>2021-10-25T18:00:00Z</published>
+    <author>
+      <name>Abhradeep Thakurta</name>
+    </author>
+    <source>
+      <id>https://differentialprivacy.org</id>
+      <link href="https://differentialprivacy.org" rel="alternate" type="text/html"/>
+      <link href="https://differentialprivacy.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Website for the differential privacy research community</subtitle>
+      <title>Differential Privacy</title>
+      <updated>2021-10-25T18:22:02Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>tag:blogger.com,1999:blog-8890204.post-8628666819453099327</id>
@@ -77,7 +256,7 @@ algorithms, networking, information theory -- <br/>
 and related items.</div>
       </subtitle>
       <title>My Biased Coin</title>
-      <updated>2021-10-25T15:00:59Z</updated>
+      <updated>2021-10-25T18:10:44Z</updated>
     </source>
   </entry>
 
@@ -104,7 +283,7 @@ Email: recruiting@ttic.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-25T17:37:41Z</updated>
+      <updated>2021-10-25T18:20:39Z</updated>
     </source>
   </entry>
 
@@ -164,7 +343,7 @@ Email: recruiting@ttic.edu</p></div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2021-10-25T17:38:04Z</updated>
+      <updated>2021-10-25T18:21:09Z</updated>
     </source>
   </entry>
 
@@ -191,7 +370,7 @@ Email: cmusco@cs.umass.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-25T17:37:41Z</updated>
+      <updated>2021-10-25T18:20:39Z</updated>
     </source>
   </entry>
 
@@ -314,7 +493,7 @@ As our main result, we construct an explicit extractor for sumset sources in the
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-10-25T17:37:26Z</updated>
+      <updated>2021-10-25T18:20:26Z</updated>
     </source>
   </entry>
 
@@ -785,7 +964,7 @@ Email: cs_faculty_affairs@sfu.ca</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-25T17:37:41Z</updated>
+      <updated>2021-10-25T18:20:39Z</updated>
     </source>
   </entry>
 
@@ -819,7 +998,7 @@ Email: cs_faculty_affairs@sfu.ca</p></div>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-10-25T17:38:22Z</updated>
+      <updated>2021-10-25T18:21:26Z</updated>
     </source>
   </entry>
 
@@ -977,7 +1156,7 @@ What if we replace metacyclic by metabelian?
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-10-25T17:37:36Z</updated>
+      <updated>2021-10-25T18:20:35Z</updated>
     </source>
   </entry>
 
@@ -1082,7 +1261,7 @@ What if we replace metacyclic by metabelian?
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-10-25T17:37:10Z</updated>
+      <updated>2021-10-25T18:20:08Z</updated>
     </source>
   </entry>
 
@@ -1109,7 +1288,7 @@ Email: postdoc.algoridam@listes.irif.fr.</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-25T17:37:41Z</updated>
+      <updated>2021-10-25T18:20:39Z</updated>
     </source>
   </entry>
 
@@ -1166,7 +1345,7 @@ Email: postdoc.algoridam@listes.irif.fr.</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-10-25T17:37:55Z</updated>
+      <updated>2021-10-25T18:20:59Z</updated>
     </source>
   </entry>
 
@@ -1236,7 +1415,7 @@ algorithms, networking, information theory -- <br/>
 and related items.</div>
       </subtitle>
       <title>My Biased Coin</title>
-      <updated>2021-10-25T15:00:59Z</updated>
+      <updated>2021-10-25T18:10:44Z</updated>
     </source>
   </entry>
 
@@ -1396,7 +1575,7 @@ and related items.</div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-10-25T17:37:10Z</updated>
+      <updated>2021-10-25T18:20:08Z</updated>
     </source>
   </entry>
 
@@ -1423,7 +1602,7 @@ Email: cmusco@nyu.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-25T17:37:41Z</updated>
+      <updated>2021-10-25T18:20:39Z</updated>
     </source>
   </entry>
 
@@ -1450,7 +1629,7 @@ Email: nitin.vaidya@georgetown.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-25T17:37:41Z</updated>
+      <updated>2021-10-25T18:20:39Z</updated>
     </source>
   </entry>
 
@@ -1565,7 +1744,7 @@ We study both interactive and non-interactive sample-based proof systems, showin
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-10-25T17:37:26Z</updated>
+      <updated>2021-10-25T18:20:26Z</updated>
     </source>
   </entry>
 
@@ -1692,7 +1871,7 @@ Can vectors of Gaussian variables be leveraged to say further interesting things
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-10-25T17:37:37Z</updated>
+      <updated>2021-10-25T18:20:35Z</updated>
     </source>
   </entry>
 
@@ -1716,7 +1895,7 @@ Can vectors of Gaussian variables be leveraged to say further interesting things
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-10-25T17:37:26Z</updated>
+      <updated>2021-10-25T18:20:26Z</updated>
     </source>
   </entry>
 
@@ -1754,7 +1933,7 @@ Can vectors of Gaussian variables be leveraged to say further interesting things
       <link href="https://dstheory.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://dstheory.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Foundation of Data Science – Virtual Talk Series</title>
-      <updated>2021-10-25T17:38:52Z</updated>
+      <updated>2021-10-25T18:21:57Z</updated>
     </source>
   </entry>
 
@@ -1781,7 +1960,7 @@ Email: tcs-postdoc-inquiries@lists.eecs.berkeley.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-25T17:37:41Z</updated>
+      <updated>2021-10-25T18:20:39Z</updated>
     </source>
   </entry>
 
@@ -1808,7 +1987,7 @@ Email: rountev.1@osu.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-10-25T17:37:41Z</updated>
+      <updated>2021-10-25T18:20:39Z</updated>
     </source>
   </entry>
 
@@ -1875,170 +2054,7 @@ We argue that these results strengthen the case for uniform certification in QBF
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-10-25T17:37:26Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>https://gradientscience.org/copriors/</id>
-    <link href="https://gradientscience.org/copriors/" rel="alternate" type="text/html"/>
-    <title>Combining Diverse Feature Priors</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
-
-
-
-
-
-
-
-
-<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
-<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
-<!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
-
-
-<!-- <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> -->
-<!-- chart.js -->
-
-
-<p><a class="bbutton" href="https://arxiv.org/abs/2110.08220" style="float: left; width: 45%;">
-<i class="fas fa-file-pdf"/>
-    Paper
-</a>
-<a class="bbutton" href="https://github.com/madrylab/copriors" style="float: left; width: 45%;">
-<i class="fab fa-github"/>
-   Code
-</a>
-<br/></p>
-
-<p><i>
-    In <a href="https://arxiv.org/abs/2110.08220">our new paper</a>, we take a closer look at the design space of so-called feature priors—i.e., priors that bias the features that a model relies on. We show that models trained with diverse sets of such priors have less overlapping failure modes and can correct each other’s mistakes.
-</i></p>
-
-<p>At the core of deep learning’s success is its ability to automatically learn useful features from raw data, e.g., image pixels. Consequently, the set of such learned features has a large impact on the deep learning model’s ability to generalize, especially when the deployment conditions deviate from the training environment. For example, a model that relies heavily on the background of an image may have trouble recognizing a cow on a beach if during training it was mostly encountering cows on grass.</p>
-
-<p>So, how can one control the features that a model relies on? This is often accomplished by changing the model’s architecture or training methodology. For example, by choosing to use a convolutional neural network a model designer biases that model towards learning a hierarchy of spatial features. Similarly, by employing data augmentation during training, one biases the model towards features that are invariant to the particular augmentations used. In fact, researchers have recently explored explicitly manipulating the set of features that a model learns, via, for example, <a href="https://arxiv.org/abs/1811.12231">suppressing texture information</a> by training on stylized inputs or by <a href="https://arxiv.org/abs/1706.06083">training with worst-case input perturbations</a> to <a href="https://arxiv.org/abs/1906.00945">avoid brittle features</a>.</p>
-
-<p>Now, all of these design choices can be thought of as imposing feature priors, i.e., biasing a model towards learning a particular type of features. The question thus becomes: how can we explore and leverage this space of feature priors in a more systematic and purposeful manner?</p>
-
-<h2 id="feature-priors-as-distinct-perspectives-on-data">Feature Priors as Distinct Perspectives on Data</h2>
-<p>The core idea is to view different feature priors as distinct perspectives on the data. That is, since different sets of features are likely to generalize differently across inputs, by considering multiple such sets in tandem we can obtain a more holistic (and thus, hopefully, reliable) view on our data.</p>
-
-<p><strong>Setting up our case study:</strong> Let us focus our attention on two concrete feature priors: shape and texture. These two priors arise naturally in the context of image classification and will serve as the basis of our study. We impose these priors through deliberate construction of the dataset and architecture:</p>
-
-<ul>
-  <li><strong>Shape-based priors</strong>:  We remove texture information from the images with the help of an edge detection algorithm. We use for this purpose two canonical edge detection algorithms from the computer vision literature: <a href="https://en.wikipedia.org/wiki/Canny_edge_detector">Canny</a> and <a href="https://en.wikipedia.org/wiki/Sobel_operator">Sobel</a>.</li>
-  <li><strong>Texture-based priors</strong>: We use a variant of the <a href="https://arxiv.org/abs/1904.00760">BagNet</a> model, which limits the model’s receptive field to prevent the model from relying on global structures like shape.</li>
-</ul>
-
-<div>
-    <div class="quarterblock">
-        <div class="block">
-            <img src="https://gradientscience.org/assets/copriors/original.png"/>
-            <span style="text-align: center;">Original</span>
-        </div>
-    </div>
-    <div class="quarterblock">
-        <div class="block">
-            <img src="https://gradientscience.org/assets/copriors/sobel.png"/>
-            <span style="text-align: center;">Sobel</span>
-
-        </div>
-    </div>
-    <div class="quarterblock">
-        <div class="block">
-            <img src="https://gradientscience.org/assets/copriors/canny.png"/>
-            <span style="text-align: center;">Canny</span>
-        </div>
-    </div>
-    <div class="quarterblock">
-        <div class="block">
-            <img src="https://gradientscience.org/assets/copriors/bagnet.png"/>
-            <span style="text-align: center;">BagNet</span>
-
-        </div>
-    </div>
-</div>
-
-<div class="footnote">
-Visualizing different feature priors. Sobel and Canny suppress texture through edge detection while BagNet suppresses shape by limiting the receptive field.
-</div>
-
-<p>Intuitively, these priors should correspond to very different sets of features. But are the views offered by these priors truly complementary? A simple way to measure this is to quantify the overlap of the failure modes of the models trained with the respective priors. Specifically, we measure the correlation of predicting the correct label for each pair of such models. We perform this analysis on a subset of CIFAR-10.</p>
-
-<p><img class="bigimg" id="pipeline" src="https://gradientscience.org/assets/copriors/cifar_corr_table.png"/></p>
-<div class="footnote"> Correlation of predictions between pairs of models with different priors on a subset of CIFAR-10. The shape-biased and texture-biased models have the least correlated predictions.
-</div>
-
-<p>It looks like these results match our intuition! Indeed, models corresponding to the same feature priors (but different random initialization) are relatively well correlated with each other. This also includes the case when we use two <em>different</em> shape biases. On the other hand, when we consider a pairing of a shape-biased model and a texture-biased model the predictions are the least correlated, that is, they make different mistakes on the test set.</p>
-
-<h2 id="combining-feature-priors">Combining feature priors</h2>
-
-<p>Since shape- and texture-biased models make different types of mistakes, can we leverage their diversity to improve our predictions?</p>
-
-<h3 id="ensembles">Ensembles</h3>
-<p>A natural way to examine that question is combining these models in an ensemble. This ensemble, for a given test input, evaluates both models on that input and then outputs the one prediction that is assigned the highest probability by the respective model. It turns out that, indeed, such an ensemble is significantly more accurate when we combine in this way models with different priors (as opposed to combining two models trained with the same prior, but with different initializations). Clearly, prediction diversity matters!</p>
-
-<div id="anno"> 
-<canvas height="35%" id="ensemble_bar" width="100%"/>
-</div>
-<div class="footnote"> The maximum accuracy achieved when using a single model, an ensemble with two models with the same prior, and an ensemble with two models with different priors on the CIFAR-10 subset. 
-</div>
-
-<h3 id="co-training">Co-Training</h3>
-<p>So far, we demonstrated that models with diverse feature priors have less overlapping failure modes, and can be combined via ensembling for improved generalization performance. However, is that all? In particular, are there ways of incorporating prior diversity during training (as opposed to ensembling post hoc) in order to improve the learning process itself?</p>
-
-<p>To answer this question, we focus on <a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.664.3543">self-training</a>, a methodology often employed when the labeled data is insufficient to learn a well-generalizing model alone, but a large pool of unlabeled data is available. The key idea in self-training is to use a model trained on the labeled data to produce “pseudo-labels” for the unlabeled data and then use these labels for further training. This setting is particularly challenging since: (a) the (original) labelled data points are typically too few to learn reliable prediction rules, and (b) any incorrect prediction rules learned will be reinforced via pseudo-labelling (so-called <a href="https://arxiv.org/abs/1908.02983">“confirmation bias”</a>).</p>
-
-<p>From this perspective, our goal is to jointly train models with different feature priors to mitigate the propagation of such incorrect prediction rules. We will do so by leveraging the well-established framework of <a href="https://www.cs.cmu.edu/~avrim/Papers/cotrain.pdf">co-training</a>, a framework designed for learning from data with multiple independent sets of features. In the context of our study, we can instantiate this framework as follows.</p>
-
-<p>First, we train one model for each prior using the labeled data. Then, we use each of these models to pseudo-label the unlabelled data and add the examples which are assigned the highest predicted probability to a joint pseudo-labelled data pool. We then use these examples to train both models further and keep repeating this process until we eventually use all the unlabeled data for training. In the end, we combine these models into a single classifier by training a standard model from scratch on the combined pseudo-labels.</p>
-
-<p>The intuition behind this process is that by jointly training models which rely on different features, these models can learn from each other’s predictions. If one model produces incorrect pseudo-labels, we can hope that the other model will correct them by relying on alternative prediction rules.</p>
-
-<p>So, how well does this approach work? To evaluate it, we extract from the CIFAR-10 dataset a small, labeled part (100 examples per class) and treat the rest of this dataset unlabeled. We then compare how different training methods—specifically, self-training a model with a single prior, and co-training models with different priors—perform in this setting. (For an additional baseline, we also consider ensembling two such models with different priors together.)</p>
-
-<div id="anno"> 
-<canvas height="35%" id="summary_bar" width="100%"/>
-</div>
-<div class="footnote"> Test accuracy of models in pre-trained, self-trained, and co-trained settings. We consider: a single model alone, combining multiple models with the same prior, and combining models with diverse priors.  
-</div>
-
-<p>Overall, we find that co-training with shape- and texture-based priors can significantly improve the test accuracy of the final model compared to self-training with any of the priors alone. In fact, co-training models with diverse priors also improves significantly upon simply combining self-trained models in an ensemble. So these models are indeed able to take advantage of each other’s predictions during training.</p>
-
-<h2 id="priors-and-spurious-correlations">Priors and Spurious Correlations</h2>
-<p>So far, we were focused on a setting where the training and test data were all sourced from the same distribution. However, a major challenge for the real-world model deployment are spurious correlations: associations which are predictive on the training data but not valid for the actual task. For example, an image classification model may predict <a href="https://gradientscience.org/background/">an object’s class based on its location</a>, or <a href="https://www.medrxiv.org/content/10.1101/2020.09.13.20193565v2.full">rely on artifacts of the data collection process</a>.</p>
-
-<p>How can we train models that avoid picking up such spurious correlations? For this problem to be tractable in the first place, we need to rely on some information beyond the training data. Here, we will assume that we have access to an unlabelled dataset where this correlation does not hold (e.g., cows do not always appear on grass and thus the correlation “grass”-&gt;”cow” is not always predictive). This is a rather mild assumption in settings where we can easily collect unlabelled data from a variety of sources—if a correlation is spurious, it is less likely to be uniformly present.</p>
-
-<p>As a concrete example, let us consider a simple gender classification task based on the CelebA dataset. In this task, we will introduce a spurious correlation into the labeled data by only collecting photographs of blond females and non-blond males. This makes hair color a good predictor of gender for the labeled dataset, but will not generalize well beyond that as such correlation does not hold in the real world.</p>
-
-<p>Our goal here will be to harness an unbiased, yet unlabelled dataset, to learn a model that avoids this correlation. We will again attempt to do so by co-training models with diverse feature priors: shape and texture. Notice that since the spurious correlation is color-based, shape-biased models are likely to ignore it. As a result, we anticipate that the prediction of the shape-biased and texture-biased models will differ on inputs where hair color disagrees with gender. Thus, during co-training, these models are intuitively providing each other with counter-examples and are thus likely to steer each other away from incorrect prediction rules.</p>
-
-<div id="anno"> 
-<canvas height="35%" id="spurious_bar" width="100%"/>
-</div>
-<div class="footnote"> Accuracy of models with different feature priors on the (unbiased) CelebA test set. We consider the setting of using only the (biased) labeled data, as well as self-training and co-training using the (unbiased) unlabeled dataset. (For co-training, the combined model is a standard model trained on the combined pseudo-labels of the co-trained Canny and BagNet models.) 
-</div>
-
-<p>We find that this is indeed the case! When we co-train a texture-biased model with a shape-biased one, the texture-biased model improves substantially, relying less on the hair color. Moreover, the shape-biased model also improves through co-training. This indicates that even though the texture-biased model relies heavily on the spurious correlation, it also captures non-spurious associations that, through pseudo-labeling, are useful for the shape-based model too.</p>
-
-<h2 id="outlook-exploring-the-design-space-of-priors">Outlook: Exploring the Design Space of Priors</h2>
-<p>In this post, we described how models trained with diverse feature priors can be leveraged during training to learn more reliable prediction rules (e.g., in the presence of spurious correlations). However, we view our exploration as only the first step in systematically exploring the design space of feature priors. We believe that this direction will yield an important building block of reliable training and deployment pipelines.</p></div>
-    </summary>
-    <updated>2021-10-17T00:00:00Z</updated>
-    <published>2021-10-17T00:00:00Z</published>
-    <source>
-      <id>https://gradientscience.org/</id>
-      <author>
-        <name>Gradient Science</name>
-      </author>
-      <link href="https://gradientscience.org/" rel="alternate" type="text/html"/>
-      <link href="https://gradientscience.org/feed.xml" rel="self" type="application/atom+xml"/>
-      <subtitle>Research highlights and perspectives on machine learning and optimization from MadryLab.</subtitle>
-      <title>gradient science</title>
-      <updated>2021-10-24T23:03:15Z</updated>
+      <updated>2021-10-25T18:20:26Z</updated>
     </source>
   </entry>
 </feed>
