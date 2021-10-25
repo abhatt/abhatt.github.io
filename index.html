@@ -155,7 +155,7 @@ Stay up to date
 <a class="feedlink" href="https://mittheory.wordpress.com/feed/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="https://mittheory.wordpress.com" title="Not so Great Ideas in Theoretical Computer Science">MIT CSAIL student blog</a>
 <br>
-<a class="feedlink" href="http://mybiasedcoin.blogspot.com/feeds/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
+<a class="feedlink" href="http://www.blogger.com/feeds/8890204/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://mybiasedcoin.blogspot.com/" title="My Biased Coin">Michael Mitzenmacher</a>
 <br>
 <a class="feedlink" href="http://blog.mrtz.org/feed.xml" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
@@ -243,7 +243,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at October 25, 2021 02:39 PM UTC</span>.
+Last updated <span class="datestr">at October 25, 2021 03:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -251,6 +251,89 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="tag:blogger.com,1999:blog-8890204.post-8628666819453099327">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/mitzenmacher.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="http://mybiasedcoin.blogspot.com/2021/10/how-to-send-real-number-using-single.html">How to send a real number using a single bit (and some shared randomness)</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://mybiasedcoin.blogspot.com/" title="My Biased Coin">Michael Mitzenmacher</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>In this post, we'll look at the natural problem of how to communicate an estimate of a real value in [0,1], using just 1 bit.  The post is based on <a href="https://arxiv.org/abs/2010.02331" target="_blank">this paper</a> (by Ran Ben-Basat of UCL and Shay Vargaftik of VMware Research and myself -- they helped also with the post) that appeared in ICALP last year. </p><p>This question is motivated by various aggregation problems;  multiple sending devices may measure a value, and wish to send the value to an aggregator who will compute something from the received values, such as the average.  In our problem, the senders have a real value x in [0,1] to send, but are constrained to send just a single bit.  Variations of this problem have come up in recent work on distributed/federated learning, where clients compute a gradient vector and send it to a centralized parameter server to update a learning model;  we may want to compress the vector to a small number of bits, or even 1 bit, per coordinate.  (We'll have more to say on the federated learning problem in a future post.)  Of course, it's also just an interesting randomized algorithm problem that seems interesting in its own right.  </p><p>A natural way to look at the problem is as a variation on rounding.  Given a value x in [0,1], one natural approach if limited to one bit is to deterministically round it to X.  But what should the receiver do when they receive the (rounded) bit value X?  It depends on what one's optimization goal is, but to minimize the maximum possible error, the receiver should have their estimate x' take on the value 3/4 when X is 1, 1/4 otherwise.  Note though that deterministic rounding this way is biased -- the expectation E[x'] does not equal x.  Randomized rounding, where the sender sends 1 with probability x and 0 otherwise, and the receiver uses the received bit X as the estimate x', has the property that E[x'] = x.  Unbiased estimators are arguably more natural for many estimation problems.  Here the measure of performance would be the maximum variance for the estimate over all inputs x, so for randomized rounding the cost is 1/4 (when x = 1/2).  </p><p>Can one do better than these schemes?  It turns out that you can, if you have available shared randomness.  An approach that has been known in the engineering world (where it has been used in signal processing) is subtractive dithering:  </p><p>We assume that the sender and receiver have access to shared randomness ℎ∼𝑈[−1/2,1/2].  Given a value x, the sender sends 1 if x+h≥1/2, 0 otherwise.  The receiver estimates x' = X - h.  We leave as an exercise that this is unbiased, which can be shown by deriving the stronger fact that x' is distributed as 𝑈[𝑥−1/2,𝑥+1/2] , and thus Var[𝑥']=1/12.</p><p>Subtractive dithering ignores that generating a shared real number may be more costly or problematic than generating a finite number of shared bits.  So one of the results of our paper is developing a "finite shared random bits" unbiased estimator, that corresponds to randomized rounding with no shared bits and converges to subtractive dithering as the number of shared random bits goes to infinity.  (The approach does allow for generating a private random real value.)  </p><p>Also in our paper, we study biased schemes, aiming to minimize the worst-case expected mean-squared error (where the expectation is over randomness used in the algorithm).  For example, it's very odd in the setting of subtractive dithering that one can obtain estimates smaller than 0 or greater than 1, when the input is restricted to [0,1], but that's a price we pay for having an unbiased estimator.  For  a biased estimator, you might naturally truncate the result from subtractive dithering;  by truncating to [z,1-z] for an appropriate z &gt; 0, you can indeed slightly improve over the worst-case mean-squared error of 1/16 for deterministic rounding.</p><p>We then studied various algorithmic improvements to obtain better biased schemes.  We were able to progress by looking at limited shared randomness, namely finding the best algorithm with s shared bits.  For example, consider the case of just 1 shared random bit h in {0,1}.  The receiver receives 1 bit X from the sender, and thus can have four possible estimates x' depending on X and h.  If the 4 possible estimate values are v0, v1, v2, v3 (all between 0 and 1), then it is possible to show the largest possible expected squared error occurs at one of the five inputs 0, 1, (v0+v1)/2, (v1+v2)/2, (v2+v3)/2.   We can then write a quadratic program to find the values that minimizes the worst-case expected squared error.  The end result is the following rounding algorithm:  given 1 shared random bit h in {0,1} and the value x, let X = 1 if x ≥ 0.4 + 0.2h, and 0 otherwise;  then let the estimate x' = 0.1 + 0.2h + 0.6X.  This has a worst-case expected mean-squared error of 1/20, beating deterministic rounding and truncated subtractive dithering.  Using some additional arguments we can handle more shared random bits;  at 8 bits we improve the worst-case expected squared error to about 0.04599, which is quite close to our lower bound of about 0.0459, and this is better than anything we could come up with analytically.  The optimal solution is still not known (an open question for future work!).  </p><p>Overall there are many variants of the rounding problem, and few tight bounds currently.  So even for simple-seeming problems like rounding, there are still interesting things to do.  </p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Michael Mitzenmacher (noreply@blogger.com) <a href="http://mybiasedcoin.blogspot.com/2021/10/how-to-send-real-number-using-single.html"><span class="datestr">at October 25, 2021 03:00 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://cstheory-jobs.org/2021/10/25/three-year-and-tenure-track-positions-at-ttic-apply-by-december-1-2021/">
+<div class="entryheader">
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://cstheory-jobs.org/2021/10/25/three-year-and-tenure-track-positions-at-ttic-apply-by-december-1-2021/">Three-year and tenure-track positions at TTIC (apply by December 1, 2021)</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://cstheory-jobs.org" title="Theoretical Computer Science Jobs">CCI: jobs</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p>TTIC invites applications for the following faculty positions: research assistant professor (3-year term), tenure-track assistant professor, full or associate professor, and visiting professor. Applicants for research assistant professor positions (RAPs) are encouraged to simultaneously apply for the TTIC RAP program and the Simons-Berkeley Research Fellowship.</p>
+<p>Website: <a href="https://www.ttic.edu/faculty-hiring/">https://www.ttic.edu/faculty-hiring/</a><br />
+Email: recruiting@ttic.edu</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by shacharlovett <a href="https://cstheory-jobs.org/2021/10/25/three-year-and-tenure-track-positions-at-ttic-apply-by-december-1-2021/"><span class="datestr">at October 25, 2021 02:46 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2731,130 +2814,6 @@ Visualizing different feature priors. Sobel and Canny suppress texture through e
 
 <p class="date">
 <a href="https://gradientscience.org/copriors/"><span class="datestr">at October 17, 2021 12:00 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://decentralizedthoughts.github.io/2021-10-16-the-ideal-state-machine-model-multiple-clients-and-linearizability/">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/ittai.jpg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="https://decentralizedthoughts.github.io/2021-10-16-the-ideal-state-machine-model-multiple-clients-and-linearizability/">The Ideal State Machine Model: Multiple Clients and Linearizability</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://decentralizedthoughts.github.io" title="Decentralized Thoughts">Decentralized Thoughts</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-We introduced state machines and state machine replication in an earlier post. In this post, we elaborate on the exact notion of safety and liveness that can be obtained by an ideal state machine when there are multiple clients. First, these definitions highlight the challenges of serving multiple clients. Second,...</div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="https://decentralizedthoughts.github.io/2021-10-16-the-ideal-state-machine-model-multiple-clients-and-linearizability/"><span class="datestr">at October 16, 2021 07:45 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://11011110.github.io/blog/2021/10/15/linkage">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eppstein.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="https://11011110.github.io/blog/2021/10/15/linkage.html">Linkage</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<ul>
-  <li>
-    <p>I was interested to see a familiar-looking graph drawing as one of the answers to <a href="https://fractalkitty.com/2021/10/02/mathober-2021-begins/">the prompt “multiplicity” for the first entry in Mathober 2021</a> (<a href="https://mathstodon.xyz/@11011110/107030908468774953">\(\mathbb{M}\)</a>). It’s a multigraph formed by a triangle with tripled edges, and looks a lot like <a href="https://commons.wikimedia.org/wiki/File:Multigraph-edge-coloring.svg">the drawing I made</a> for <a href="https://en.wikipedia.org/wiki/Shannon_multigraph">the Wikipedia Shannon multigraph article</a>, prettied up by making an infinitely recessing sequence of these drawings rather than just one. Good choice for multiplicity.</p>
-  </li>
-  <li>
-    <p><a href="https://gilkalai.wordpress.com/2021/10/03/to-cheer-you-up-in-difficult-times-32-annika-heckels-guest-post-how-does-the-chromatic-number-of-a-random-graph-vary/">Non-concentration of the chromatic number of random graphs</a> (<a href="https://mathstodon.xyz/@11011110/107040518830792599">\(\mathbb{M}\)</a>). Uniformly random graphs, \(G(n,1/2)\) in the Erdős–Rényi–Gilbert model, turn out to have chromatic numbers that, for infinitely many \(n\), are spread over roughly \(\sqrt{n}\) values. But there are weird fluctuations so that, conjecturally, for some \(n\) the concentration is much tighter, more like \(n^{1/4}\).</p>
-  </li>
-  <li>
-    <p><a href="https://www.insidehighered.com/news/2021/10/04/tenure-under-threat-georgia">University System of Georgia moves to gut tenure</a> (<a href="https://mathstodon.xyz/@11011110/107047579890149970">\(\mathbb{M}\)</a>). The proposed new policy includes procedures for removal of tenure under certain enumerated grounds, including failure to perform their jobs (this is pretty normal) but then adds a massive escape clause in which the board of regents can remove tenured faculty at any time as long as their reason for doing so is not one of the enumerated ones.</p>
-  </li>
-  <li>
-    <p><a href="http://hyperbolic-crochet.blogspot.com/2010/07/story-about-origins-of-model-of.html">The first physical models of the hyperbolic plane, made in 1868 by Beltrami</a> (<a href="https://mathstodon.xyz/@11011110/107052024179327595">\(\mathbb{M}\)</a>, <a href="http://www.open.ac.uk/blogs/is/?p=731">via</a>), blog post by Daina Taimiņa from 2010. Maybe you could make something like this by wrapping and stretching a disk of wet paper in a roll around a pseudosphere (https://en.wikipedia.org/wiki/Pseudosphere)? The rolled-up photo of Beltrami’s model suggests that he did that. The via link shows this as a tangent to a story about triangulated polygons, frieze patterns, and the Farey tessellation.</p>
-  </li>
-  <li>
-    <p><a href="https://www.youtube.com/watch?v=QFj-hF8XDQ0">Why do bees make rhombic dodecahedrons</a> (<a href="https://mathstodon.xyz/@11011110/107058516442920053">\(\mathbb{M}\)</a>)? Nice video from Matt Parker (Stand-up Maths) on why bees usually end the cells of their honeycombs with rhombic dodecahedron faces, why this isn’t the optimal solution to fitting two layers of cells together (in terms of minimum wax usage), and why it isn’t reasonable to expect bees to find exact optima for this problem. If I have to quibble with something, though, it’s his plural. It’s not wrong, but see <a href="https://books.google.com/ngrams/graph?content=dodecahedrons%2Cdodecahedra">Google ngrams</a>.</p>
-  </li>
-  <li>
-    <p><a href="https://www.quantamagazine.org/mathematicians-prove-melting-ice-stays-smooth-20211006/">Mathematicians prove melting ice stays smooth</a> (<a href="https://mathstodon.xyz/@11011110/107064697896988128">\(\mathbb{M}\)</a>, <a href="https://en.wikipedia.org/wiki/Stefan_problem">see also</a>). The headline is a little overstated: you’re probably familiar with thin necks of ice melting to sharp points at the instant they separate. But these singularities are instantaneous: mathematical models of ice stay smooth for all but a measure-zero set of times. Original paper: “<a href="https://arxiv.org/abs/2103.13379">The singular set in the Stefan problem</a>”, Alessio Figalli, Xavier Ros-Oton, and Joaquim Serra.</p>
-  </li>
-  <li>
-    <p><a href="https://mathstodon.xyz/@JordiGH/107061930434927745">Discussion of the recent meme telling programmers and mathematicians that summation notation and for loops are the same thing</a>. They’re not quite the same, though: summations don’t have an order of evaluation. But which is easier for people who don’t already know what they are to search and find out about? And why do programmers get angry at non-programming notational conventions?</p>
-  </li>
-  <li>
-    <p><a href="http://eugeniacheng.com/wp-content/uploads/2017/02/cheng-morality.pdf">Mathematics, morally</a> (<a href="https://mathstodon.xyz/@11011110/107078314739030894">\(\mathbb{M}\)</a>, <a href="https://news.ycombinator.com/item?id=28816050">via</a>), Eugenia Cheng, 2004. Somehow I hadn’t run across this  before. It argues that much philosophy of mathematics is irrelevant to practice (“You can’t tell from somebody’s mathematics if they are a fictionalist, a rationalist, a platonist, a realist, an operationalist, a logicist, a formalist, structuralist, nominalist, intuitionist.”) and instead considerations of the right way of handling certain topics are more central.</p>
-  </li>
-  <li>
-    <p>The SIGACT Committee for the Advancement of Theoretical Computer Science is collecting information on women in theoretical computer science (<a href="https://mathstodon.xyz/@11011110/107084102339408082">\(\mathbb{M}\)</a>). If this is you, please see <a href="https://thmatters.wordpress.com/2021/10/08/soliciting-information-about-women-in-tcs/">their announcement</a> for details of how to be counted.</p>
-  </li>
-  <li>
-    <p><a href="https://pratt.duke.edu/about/news/rudin-squirrel-award">Cynthia Rudin wins major award with silly name</a> (<a href="https://mathstodon.xyz/@11011110/107089557928657710">\(\mathbb{M}\)</a>), for her work on machine learning systems that learn to predict behavior using simple, interpretable, and transparent formulas.</p>
-  </li>
-  <li>
-    <p>According to the <a href="https://www.siam.org/conferences/cm/conference/soda22">SODA web site</a>, SIAM has decided that their conferences will be hybrid through July (<a href="https://mathstodon.xyz/@11011110/107090556997921608">\(\mathbb{M}\)</a>). So if (like me) you wanted to participate in SODA/SOSA/ALENEX/APOCS, but were worried about planning a trip to Virginia with another predicted winter wave of Covid, now you can stay home and conference safely. Or, if you feel hybrid conferences are problematic and organizers should do one or the other but not both, now you have another reason to be annoyed.</p>
-  </li>
-  <li>
-    <p>Rarely is the question asked: <a href="https://blogs.ams.org/beyondreviews/2021/10/14/are-math-papers-getting-longer/">Are math papers getting longer?</a> (<a href="https://mathstodon.xyz/@11011110/107104144047349269">\(\mathbb{M}\)</a>). Following earlier work by Nick Trefethen, Edward Dunne provides some data suggesting that (for certain journals, at least, and not the ones with page limits) the answer is yes. I’m not convinced by the suggested explanation that it’s because they are taking more effort to explain “connections with other work”, though: is that really a big enough fraction of most papers?</p>
-  </li>
-  <li>
-    <p>I haven’t been using my office desktop Mac much because I haven’t been into my office much, so it took me a while to pay attention to the fact that much of its networking had recently broken. <a href="https://eclecticlight.co/2021/09/21/el-capitan-and-older-mac-os-x-are-about-to-have-a-security-certificate-problem/">Here’s why</a> (<a href="https://mathstodon.xyz/@11011110/107107828546240163">\(\mathbb{M}\)</a>). It was still running OS X El Capitan (10.11.6) and a crucial top-level certificate expired. The machine is too old (late 2009) for the latest OS X but it looks like I can and should upgrade to High Sierra, 10.13. So much for getting anything else accomplished today…</p>
-  </li>
-</ul></div>
-
-
-
-
-
-
-
-<p class="date">
-by David Eppstein <a href="https://11011110.github.io/blog/2021/10/15/linkage.html"><span class="datestr">at October 15, 2021 03:43 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
