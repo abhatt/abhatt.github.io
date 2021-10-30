@@ -86,7 +86,7 @@ Stay up to date
 <a class="feedlink" href="" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a class="message" title="404: not found">Center for Computational Intractability</a>
 <br>
-<a class="feedlink" href="http://www.blogger.com/feeds/3722233/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
+<a class="feedlink" href="http://blog.computationalcomplexity.org/feeds/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://blog.computationalcomplexity.org/" title="Computational Complexity">Computational Complexity</a>
 <br>
 <a class="feedlink" href="https://11011110.github.io/blog/feed.xml" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
@@ -243,7 +243,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at October 30, 2021 07:39 PM UTC</span>.
+Last updated <span class="datestr">at October 30, 2021 08:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -251,6 +251,67 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://11011110.github.io/blog/2021/10/30/two-counterexamples-covering">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/eppstein.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://11011110.github.io/blog/2021/10/30/two-counterexamples-covering.html">Two counterexamples for covering points by two polygons</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>One of our students made a seminar presentation this week on the problem of covering
+a given set of \(n\) points by two scaled and translated copies of a given convex <span style="white-space: nowrap;">\(k\)-gon,</span> minimizing the scale factor, based on a 2016 conference paper on the problem published by someone else. The presentation was good but the paper turns out to be wrong in several ways. I think it should not be difficult to find the paper if you look, but I’m avoiding naming it here: it’s uncited, so it hasn’t done much damage to the literature, its author’s other papers are not as far as I know problematic, the author appears to want to forget the paper (there was no journal version and it is not included in their online publication list), and I want to focus on the geometric nature of the mistakes rather than on pointing fingers.</p>
+
+<p>The algorithm of the paper starts by (correctly) computing the optimal cover of the given points by a single copy of the polygon. This is a low-dimensional linear program, but one with \(O(nk)\) constraints, one for each pair of a side of the polygon and an input point to be covered. The paper makes the observation that the only pairs that matter are the ones that match each side to the extreme point in a perpendicular direction, and it uses a nice divide-and-conquer method to find these extreme points in time \(O(n\log k)\), which turns out to be the bottleneck of the algorithm.</p>
+
+<p>It then tries to use this one-copy cover to speed up the two-copy cover, and this is where things go wrong. It claims that if the one-copy cover has five or more of its sides touched by input points, then the optimal two-copy cover has the same scale factor: there are so many touching points that three or more of them would all have to be in the same copy of the two-copy cover, and would force it to have the same size as the one-copy cover. This is false.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2021/6fixture-can-shrink.svg" alt="Even when a regular hexagon is touched on six sides by the points that it covers, it may be possible to cover the same points by two smaller regular hexagons" /></p>
+
+<p>It claims that, when four or fewer sides of the one-copy cover are touched by input points, then for the optimal two-copy cover, one of the two copies will be touched on two sides with the same slopes. If true this would greatly simplify the search for the optimal partition into two subsets and the optimal scale factor for that partition. But it is false: there exist instances where the slopes of sides touched on the two-copy cover are completely disjoint from the slopes touched on the one-copy cover.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2021/4fixture-can-shrink.svg" alt="Even when an octagon is touched on four sides by the points that it covers, the smallest two scaled and translated octagons that cover the same points may not be touched on any of the same sides" /></p>
+
+<p>I think what is going on here is a more general phenomenon relating to linear programming, rather than to this specific geometric optimization problem. Suppose you have a linear program with \(k\) variables (here, three variables for the scale factor and translation vector of the single-copy cover), and to keep things simple let’s say that it has a unique optimal solution. That solution will be determined by a basis, a minimal subset of inequalities with the same solution. The basis inequalities become tight equalities rather than inequalities, and if you know which ones they are then you can just solve these \(k\) linear equations in the \(k\) unknowns. However, more than \(k\) inequalities may be  tight, and there may be more than one basis. With some additional assumptions that are automatically satisfied here you can choose any <span style="white-space: nowrap;">\(k\)-tuple</span> of tight inequalities, solve linear equations, and get the same solution. But that does <em>not</em> mean that every <span style="white-space: nowrap;">\(k\)-tuple</span> of tight inequalities is a basis, and it does not mean that these tight inequalities stay tight for all subsets of the constraints.</p>
+
+<p>Turning this idea back into geometry, in each of these figures, the inequalities come from pairs of a point and a polygon side. Each inequality states that its point must be contained in the halfspace bounded by its side, and it is tight when the point lies on the side. Any translated and scaled copy of a polygon is determined by points that touch any three of its sides. But forming a basis, for the problem of covering points with the smallest possible copy, is a stronger property. A set of three sides and (maybe fewer than three) touching points forms a basis only when the normal vectors to those sides do not span an angle less <span style="white-space: nowrap;">than \(\pi\).</span></p>
+
+<p>For instance, for the hexagons of the first illustration, triples of consecutive sides have normal vectors that span only an angle <span style="white-space: nowrap;">of \(2\pi/3\),</span> too small to form a basis. Other triples of sides have normal vectors that are more spread out and do form a basis. The blue one-copy hexagon containing all of the points is optimal, because all six of its sides are touched, and many triples of those touched sides are non-consecutive. But when we split the points into the two yellow hexagons, each yellow hexagon contains the points that touch only a consecutive triple of blue sides, not a basis. Because they are not a basis, those three points (and the other points that are grouped along with them) can be contained in a smaller hexagon than the blue one. (Exercise: find a basis for one of the yellow hexagons, showing that at least for this partition into two subsets the scale factor is optimal.)</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/107192319455242081">Discuss on Mastodon</a>)</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by David Eppstein <a href="https://11011110.github.io/blog/2021/10/30/two-counterexamples-covering.html"><span class="datestr">at October 30, 2021 12:34 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2544,48 +2605,6 @@ by luca <a href="https://lucatrevisan.wordpress.com/2021/10/21/postdoc-positions
 
 <p class="date">
 by Boaz Barak <a href="https://windowsontheory.org/2021/10/20/opportunities-at-harvard/"><span class="datestr">at October 20, 2021 08:01 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="tag:blogger.com,1999:blog-8890204.post-3394824620518911343">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/mitzenmacher.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="http://mybiasedcoin.blogspot.com/2021/10/networkingtheory-postdoc-at-harvard.html">Networking+Theory Postdoc at Harvard</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://mybiasedcoin.blogspot.com/" title="My Biased Coin">Michael Mitzenmacher</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p>The last couple of years one aspect of research I've greatly enjoyed is getting back into networking, which is really due to my excellent (and patient) collaborators Ran Ben Basat (now at UCL, was a postdoc at Harvard) and Minlan Yu (at Harvard).  Minlan and I are working to establish a larger-scale Networking+Theory (hopefully broadening to an even larger Systems+Theory) group at Harvard, working on algorithmic problems in the context of real (or at least very real-ish) systems.  We have funding, and are looking for a postdoc, the basic description is below.  Ideally we're looking for people comfortable with the theory side and the systems side.  The website link for applying is <a href="https://academicpositions.harvard.edu/postings/10748">https://academicpositions.harvard.edu/postings/10748</a> .  We have preliminary website for the group at <a href="https://projects.iq.harvard.edu/theosys">https://projects.iq.harvard.edu/theosys</a> (it's just a start, Minlan and I are both on sabbatical, but you can see some of our publications).  We look forward to finding another member of the team!</p><p><span style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;"><span style="font-family: Avenir-Heavy, Helvetica, Arial, sans-serif; font-weight: bolder;">Networking + Theory Postdoctoral Position</span></span><br style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;" /><br style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;" /><span style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;">The John A. Paulson School of Engineering and Applied Sciences at Harvard University (SEAS) seeks applicants for a postdoctoral position in networking and theory. The postdoc is intended for one year but there will be funding to potentially extend it to a second year. The postdoc will receive a generous salary as well as an allocation for research and travel expenses.</span><br style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;" /><br style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;" /><span style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;">We are looking for junior scientists who are especially interested in working at the intersection of networking and algorithmic theory, in areas such as programmable network architectures, data center network management, cloud computing, and algorithms for the Internet.  Example topics of interest include but are not limited to the design and analysis of sketches and filters for use in real systems, network security, network compression methods, and optimizing network performance for machine learning applications.  The ideal candidate will be interested in both building real systems and either developing algorithms and data structures or using existing, underutilized results from the theoretical literature in system design.  </span><br style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;" /><br style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;" /><span style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;">The postdoc is intended to work with closely with Minlan Yu and Michael Mitzenmacher, and others involved in the group focused on Systems + Theory work that they are developing, as well as possibly other Harvard faculty.   </span><br style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;" /><br style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;" /><span style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;">Candidates should have backgrounds in networking and/or theoretical computer science.  Candidates should demonstrate experience in working at the intersection of these areas, or otherwise demonstrate how they will be able to contribute at the intersection. The candidate will be expected to publish scholarly papers, attend internal, domestic, and international conferences and meetings, and take on a mentorship role for undergraduate and graduate students.  </span><br style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;" /><br style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;" /><span style="background-color: white; color: #212529; font-family: AvenirLTStd55Roman, Helvetica, Arial, sans-serif; font-size: 14px;">Harvard SEAS is dedicated to building a diverse community that is welcoming for everyone, regardless of disability, gender identity and expression, physical appearance, race, religion, or sexual orientation.  We strongly encourage applications from members of underrepresented groups.</span></p><p><br /></p><div><br /></div></div>
-
-
-
-
-
-
-
-<p class="date">
-by Michael Mitzenmacher (noreply@blogger.com) <a href="http://mybiasedcoin.blogspot.com/2021/10/networkingtheory-postdoc-at-harvard.html"><span class="datestr">at October 20, 2021 06:13 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
