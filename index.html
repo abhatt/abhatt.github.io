@@ -243,7 +243,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at November 03, 2021 06:39 AM UTC</span>.
+Last updated <span class="datestr">at November 03, 2021 07:22 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -329,6 +329,131 @@ Email: ericvigoda@gmail.com</p></div>
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-jobs.org/2021/11/02/postdoc-at-uc-santa-barbara-apply-by-january-10-2022/"><span class="datestr">at November 02, 2021 10:56 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://11011110.github.io/blog/2021/11/02/gilbert-tessellations-cellular">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/eppstein.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://11011110.github.io/blog/2021/11/02/gilbert-tessellations-cellular.html">Gilbert tessellations from a cellular automaton</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>A <a href="https://en.wikipedia.org/wiki/Gilbert_tessellation">Gilbert tessellation</a> is what you get from choosing a random set of points-with-slopes in the plane, growing line segments in both directions with the chosen slope from each chosen point, at constant speed, and stopping the growth when each line segment runs into something else. The slopes can be in uniformly random directions but one standard variant of the Gilbert tessellation uses only horizontal and vertical slopes.</p>
+
+<p style="text-align: center;"><a href="https://commons.wikimedia.org/wiki/File:Gilbert_tessellation_axis.svg"><img src="https://11011110.github.io/blog/assets/2018/Gilbert-rectangles.svg" alt="Axis-aligned Gilbert tessellation subdivides the plane into rectangles, by Claudio Rocchini" /></a></p>
+
+<p>My paper “<a href="https://arxiv.org/abs/0911.2890">Growth and decay in life-like cellular automata</a>” observed that the Life-like cellular automaton rule B017/S1, when started with a sufficiently sparse random set of live cells, forms lines of replicators that look sort of like one of these axis-parallel Gilbert tessellations, as I discussed in <a href="https://11011110.github.io/blog/2018/12/27/motorcycle-graphs-eventual.html">a previous post on sparse Life</a>.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2018/b017s1.png" alt="Replicator chaos in B017/S1" /></p>
+
+<p>But it’s a bit messy: you also get stable or oscillating blobs of live cells, and replicators can sometimes make large gaps big enough for something else to get across them, rather than forming the impenetrable barriers that the segments of a true Gilbert tessellation would do. So I wondered: how easy is it to get Gilbert tessellations with less mess, in a cellular automaton?</p>
+
+<p>Very easy, if you’re willing to make an automaton that hardcodes into its rules the construction process of a Gilbert tessellation. For instance, make an automaton on an infinite square grid with three states, empty, horizontal, and vertical. Horizontal cells always stay horizontal, and vertical cells always stay vertical. Empty cells with exactly one non-empty neighbor that is either a horizontally-adjacent horizontal cell or a vertically-adjacent vertical cell take on the same state as that neighbor, and otherwise stay empty. Then any horizontal cells will grow into horizontal walls, and vertical cells will grow into vertical walls, at constant speed, until running into other non-empty cells, just as the Gilbert tessellation definition demands. If you start with a sparse random set of non-empty cells of both types, you should get a Gilbert tessellation, more or less by definition. But controlling horizontal versus vertical growth by different cell states rather than by the pattern of live cells seems kind of a cheat. It makes creating Gilbert tessellations the only thing this three-state automaton can do, rather than an emergent behavior of the automaton. And it isn’t even symmetric under 90-degree rotations (although it does have a symmetry that combines rotation with state-swapping). Is there an automaton with only two states, and natural symmetric rules that can do other things but that when seeded randomly generates non-messy Gilbert tessellations?</p>
+
+<p>Yes! I don’t know of a Life-like rule that does this (<a href="https://en.wikipedia.org/wiki/Life_without_Death">Life without death</a> does make nice impenetrable walls but with too much other stuff). But I think the rule below fits the bill. It’s the first thing I tried, at least, so I didn’t have to do any fine adjustments of the rules to make it work.</p>
+
+<p>Here’s the rule:</p>
+
+<ul>
+  <li>
+    <p>The cells form a square grid with the <a href="https://en.wikipedia.org/wiki/Moore_neighborhood">Moore 8-cell neighborhood</a>.</p>
+  </li>
+  <li>
+    <p>There are two states of cells, live and dead.</p>
+  </li>
+  <li>
+    <p>A dead cell becomes live only under two conditions:</p>
+
+    <ol>
+      <li>
+        <p>It has exactly two live neighbors (among its eight possible neighbors) that are orthogonally adjacent to each other.</p>
+      </li>
+      <li>
+        <p>It has exactly four live neighbors at the corners of a rectangle (necessarily in two orthogonally adjacent pairs, because we don’t count squares as being rectangles).</p>
+      </li>
+    </ol>
+  </li>
+  <li>
+    <p>All live cells immediately die.</p>
+  </li>
+</ul>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2021/gilbert/rule.svg" alt="Rules for the Gilbert cellular automaton" /></p>
+
+<p>Or, in <a href="http://golly.sourceforge.net/">Golly</a> rule format:</p>
+
+<pre>@RULE Gilbert
+@TABLE
+n_states:2
+neighborhood:Moore
+symmetries:rotate8reflect
+var a={0,1}
+var b={0,1}
+var c={0,1}
+var d={0,1}
+var e={0,1}
+var f={0,1}
+var g={0,1}
+var h={0,1}
+0,1,1,0,0,0,0,0,0,1
+0,1,1,0,1,1,0,0,0,1
+1,a,b,c,d,e,f,g,h,0</pre>
+
+<p>Then an initial pattern of two orthogonally adjacent live cells (a “domino”) will in the next step form two side-by-side dominos, in the step after that three dominos (with the center one in the initial location), and so on, building a wall two cells wide that alternates between dominos and dead cells, and oscillates with period two.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2021/gilbert/wall.svg" alt="Wall of alternating dominos in the Gilbert cellular automaton" /></p>
+
+<p>Here’s what it looks like when I selected a large rectangle, randomly filled it with 2% live cells, and ran it in Golly. The red lines in this image are walls like the one above.</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2021/gilbert/wide.png" alt="Gilbert cellular automaton on a sparse random field" /></p>
+
+<p>Of course, at the edges of the randomly filled rectangle, the walls shoot off to infinity with no more obstructions. Here’s a closeup, showing the detailed pattern of the walls and how they meet:</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2021/gilbert/crop.png" alt="Close-up of Gilbert cellular automaton on a sparse random field" /></p>
+
+<p>It looks a lot like a Gilbert tessellation to me! Even starting with a 50% random fill produces the same sort of pattern at a finer scale:</p>
+
+<p style="text-align: center;"><img src="https://11011110.github.io/blog/assets/2021/gilbert/5050.png" alt="Gilbert cellular automaton on a 50/50 random field" /></p>
+
+<p>But rather than just going by intuitive visual appearance here’s some analysis showing that, if the plane is filled with live cells with some small probability \(p\), and then this rule is run on the result, then as \(p\to0\) the probability of seeing something that looks like a Gilbert tessellation in the neighborhood of any cell will tend to one. By “neighborhood” I mean everything within distance \(r\), where \(r\) should be chosen as a function of \(p\) that grows faster than linearly in \(1/p\) (so that we have nontrivial probability of seeing something other than just empty space) but slower than \((1/p)^{4/3}\).</p>
+
+<p>The reason we need to limit the radius of the neighborhoods is that, in a large enough neighborhood, you will likely see something that deviates from a Gilbert tessellation. In the runs above, for instance, there are some right-angle corners where two line segments both meet and stop, or points where it appears that walls met head-to-head, but this should’t happen in a Gilbert tessellation (or more precisely it happens with probability zero). There are two natural ways of getting a corner: you could start with an L-tromino of live cells, or two growing walls could coincidentally run into each other. But the expected number of triples of nearby live cells within the neighborhood is \(O(p^3r^2)\), and the expected number of pairs of dominos whose walls would meet at the same point is \(O(p^4r^3)\). It might also be the case that three or more initial live cells produce more exotic behavior; if so, the expected number of things like this that happen within the neighborhood is still \(O(p^3r^2)\). With our assumption on the growth rate of \(r\) relative to \(p\), these expected numbers, and therefore the probability of seeing any of these situations within the neighborhood, is negligible. For the same reason they have low probability of occurring close enough to the neighborhood to impinge on it before the Gilbert tessellation within the neighborhood forms.</p>
+
+<p>So with high probability, in neighborhoods of radius \(r\), you’ll only see single live cells and double live cells in the initial state, and the pairs of double cells won’t be horizontally, vertically, or diagonally aligned with each other. Some of the double live cells will be dominos, with density \(\Theta(p^2)\). The only thing that can happen with such a state is that dominos start building walls which grow until they hit each other, exactly as described by a Gilbert tessellation. Once the Gilbert tessellation has been set up, it appears indestructible: the alternating live cells along the wall prevent any births into the layers of dead cells on either side, and if a wall is perturbed at its end it quickly grows back. However, proving this indestructability rigorously would require a more careful case analysis.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/107211819080878015">Discuss on Mastodon</a>)</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by David Eppstein <a href="https://11011110.github.io/blog/2021/11/02/gilbert-tessellations-cellular.html"><span class="datestr">at November 02, 2021 09:35 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -2620,78 +2745,6 @@ by Scott <a href="https://scottaaronson.blog/?p=6086"><span class="datestr">at O
 
 <p class="date">
 by luca <a href="https://lucatrevisan.wordpress.com/2021/10/21/postdoc-positions/"><span class="datestr">at October 21, 2021 05:04 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://windowsontheory.org/?p=8209">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/wot.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://windowsontheory.org/2021/10/20/opportunities-at-harvard/">Opportunities at Harvard!</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://windowsontheory.org" title="Windows On Theory">Windows on Theory</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p>Computer Science at Harvard, and in particular theoretical computer science and machine learning, is growing fast, see my 21-Tweet thread:</p>
-
-
-
-<figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
-<div class="embed-twitter"><blockquote class="twitter-tweet"><p lang="en" dir="ltr">1/21 Banner year for Harvard CS! <br /><br />New hires include Sham Kakade <a href="https://twitter.com/ShamKakade6?ref_src=twsrc%5Etfw">@ShamKakade6</a> and Fernanda Viegas <a href="https://twitter.com/viegasf?ref_src=twsrc%5Etfw">@viegasf</a> (joining <a href="https://twitter.com/wattenberg?ref_src=twsrc%5Etfw">@wattenberg</a>), as well as David Alvarez-Melis, Anurag Anshu <a href="https://twitter.com/AnuragAnshu4?ref_src=twsrc%5Etfw">@AnuragAnshu4</a>, Sitan Chen, and Jonathan Frankle <a href="https://twitter.com/jefrankle?ref_src=twsrc%5Etfw">@jefrankle</a> <a href="https://t.co/mDR4bi0kSD">https://t.co/mDR4bi0kSD</a> <a href="https://t.co/bXwMbQK7s8">pic.twitter.com/bXwMbQK7s8</a></p>— Boaz Barak (@boazbaraktcs) <a href="https://twitter.com/boazbaraktcs/status/1450171218070495238?ref_src=twsrc%5Etfw">October 18, 2021</a></blockquote></div>
-</div></figure>
-
-
-
-<p>Please consider applying for <a href="https://www.seas.harvard.edu/computer-science/graduate-programs/how-apply"><strong>graduate studies in computer science</strong></a> (or encourage others to apply if like me, your grad-school days are behind you). </p>
-
-
-
-<p>In recent years, I’ve taken a special interest in the <a href="https://mltheory.org/"><strong>theory of machine learning</strong></a>, and there are <a href="https://mltheory.org/#opportunities"><strong>several opportunities at Harvard</strong></a> in this area. In particular, I’ve been collaborating with people both in and outside CS, including incoming CS faculty <a href="https://homes.cs.washington.edu/~sham/"><strong>Sham Kakade</strong></a>, as well as <a href="http://www.demba-ba.org/" target="_blank" rel="noreferrer noopener"><strong>Demba Ba</strong></a> (Electrical Engineering and Bioengineering), <a href="http://lucasjanson.fas.harvard.edu/" target="_blank" rel="noreferrer noopener"><strong>Lucas Janson</strong></a> (Statistics), and  <a href="https://pehlevan.seas.harvard.edu/" target="_blank" rel="noreferrer noopener"><strong>Cengiz Pehlevan</strong></a> (Applied Mathematics). I’m very much open to co-advising students outside computer science as well. </p>
-
-
-
-<p>Students interested in <a href="https://quantum.harvard.edu/"><strong>quantum computation and information</strong></a> can apply to any of our programs (including computer science, physics, and others) as well as to the new <a href="https://gsas.harvard.edu/programs-of-study/all/quantum-science-and-engineering"><strong>quantum science and engineering degree</strong></a>. There are a number of Harvard faculty interested in <a href="https://quantum.harvard.edu/hqi-members">quantum computing</a>  including new incoming faculty member <a href="https://people.eecs.berkeley.edu/~anuraganshu/"><strong>Anurag Anshu</strong></a>. In this area as well I am open to co-advising, including students outside CS.</p>
-
-
-
-<p>If you are applying to graduate studies and are potentially interested in working with me, you can indicate this in the application form and statement of interest. This is the best way to ensure that I read your application (and in particular better than emailing me separately: for fairness sake I read all the applications together in batch, regardless of whether the candidate emailed me or not).</p>
-
-
-
-<p>We are also looking for <strong>postdocs</strong>! We have the general <strong>Rabin postdoc position</strong>, as well as specific positions in <strong>privacy</strong>, <strong>fairness</strong>, and <strong>theory of machine learning</strong>, all <a href="https://academicpositions.harvard.edu/postings/10730"><strong>described in the following ad</strong></a>. There is also a separate <a href="http://mybiasedcoin.blogspot.com/2021/10/networkingtheory-postdoc-at-harvard.html"><strong>networking+theory</strong></a> postdoc position. Several other machine-learning theory related postdocs are linked in our <a href="https://mltheory.org/#opportunities"><strong>ML theory opportunities page</strong></a>. See also the <strong><a href="https://quantum.harvard.edu/external-candidates">quantum initiative postdoctoral fellowship</a></strong>. There may be more CS, ML and quantum related opportunities that I am missing. If I hear of more relevant opportunities then I will post them here and/or <a href="https://twitter.com/boazbaraktcs"><strong>on Twitter</strong></a>. </p>
-
-
-
-<p>Finally, Harvard welcomes applications from candidates of all backgrounds, regardless of disability, gender identity and expression, physical appearance, race, religion, or sexual orientation. I would like to <strong>especially encourage</strong> applications from <strong>members of under-represented groups</strong>. Computer Science, and in particular the areas I work in, have a significant diversity problem. We are trying at Harvard to create an environment that is welcoming and inclusive for people from all backgrounds. I am sincerely grateful and appreciative of people placing their trust in us by applying, and we will do our best to live up to that trust.</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by Boaz Barak <a href="https://windowsontheory.org/2021/10/20/opportunities-at-harvard/"><span class="datestr">at October 20, 2021 08:01 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>

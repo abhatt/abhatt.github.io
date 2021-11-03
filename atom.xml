@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-11-03T06:39:10Z</updated>
+  <updated>2021-11-03T07:22:53Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -31,7 +31,7 @@
       <link href="https://adamsheffer.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Discrete geometry and other typos</subtitle>
       <title>Some Plane Truths</title>
-      <updated>2021-11-03T06:38:19Z</updated>
+      <updated>2021-11-03T07:21:54Z</updated>
     </source>
   </entry>
 
@@ -59,7 +59,115 @@ Email: ericvigoda@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-11-03T06:37:39Z</updated>
+      <updated>2021-11-03T07:21:04Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2021/11/02/gilbert-tessellations-cellular</id>
+    <link href="https://11011110.github.io/blog/2021/11/02/gilbert-tessellations-cellular.html" rel="alternate" type="text/html"/>
+    <title>Gilbert tessellations from a cellular automaton</title>
+    <summary>A Gilbert tessellation is what you get from choosing a random set of points-with-slopes in the plane, growing line segments in both directions with the chosen slope from each chosen point, at constant speed, and stopping the growth when each line segment runs into something else. The slopes can be in uniformly random directions but one standard variant of the Gilbert tessellation uses only horizontal and vertical slopes.</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>A <a href="https://en.wikipedia.org/wiki/Gilbert_tessellation">Gilbert tessellation</a> is what you get from choosing a random set of points-with-slopes in the plane, growing line segments in both directions with the chosen slope from each chosen point, at constant speed, and stopping the growth when each line segment runs into something else. The slopes can be in uniformly random directions but one standard variant of the Gilbert tessellation uses only horizontal and vertical slopes.</p>
+
+<p style="text-align: center;"><a href="https://commons.wikimedia.org/wiki/File:Gilbert_tessellation_axis.svg"><img alt="Axis-aligned Gilbert tessellation subdivides the plane into rectangles, by Claudio Rocchini" src="https://11011110.github.io/blog/assets/2018/Gilbert-rectangles.svg"/></a></p>
+
+<p>My paper “<a href="https://arxiv.org/abs/0911.2890">Growth and decay in life-like cellular automata</a>” observed that the Life-like cellular automaton rule B017/S1, when started with a sufficiently sparse random set of live cells, forms lines of replicators that look sort of like one of these axis-parallel Gilbert tessellations, as I discussed in <a href="https://11011110.github.io/blog/2018/12/27/motorcycle-graphs-eventual.html">a previous post on sparse Life</a>.</p>
+
+<p style="text-align: center;"><img alt="Replicator chaos in B017/S1" src="https://11011110.github.io/blog/assets/2018/b017s1.png"/></p>
+
+<p>But it’s a bit messy: you also get stable or oscillating blobs of live cells, and replicators can sometimes make large gaps big enough for something else to get across them, rather than forming the impenetrable barriers that the segments of a true Gilbert tessellation would do. So I wondered: how easy is it to get Gilbert tessellations with less mess, in a cellular automaton?</p>
+
+<p>Very easy, if you’re willing to make an automaton that hardcodes into its rules the construction process of a Gilbert tessellation. For instance, make an automaton on an infinite square grid with three states, empty, horizontal, and vertical. Horizontal cells always stay horizontal, and vertical cells always stay vertical. Empty cells with exactly one non-empty neighbor that is either a horizontally-adjacent horizontal cell or a vertically-adjacent vertical cell take on the same state as that neighbor, and otherwise stay empty. Then any horizontal cells will grow into horizontal walls, and vertical cells will grow into vertical walls, at constant speed, until running into other non-empty cells, just as the Gilbert tessellation definition demands. If you start with a sparse random set of non-empty cells of both types, you should get a Gilbert tessellation, more or less by definition. But controlling horizontal versus vertical growth by different cell states rather than by the pattern of live cells seems kind of a cheat. It makes creating Gilbert tessellations the only thing this three-state automaton can do, rather than an emergent behavior of the automaton. And it isn’t even symmetric under 90-degree rotations (although it does have a symmetry that combines rotation with state-swapping). Is there an automaton with only two states, and natural symmetric rules that can do other things but that when seeded randomly generates non-messy Gilbert tessellations?</p>
+
+<p>Yes! I don’t know of a Life-like rule that does this (<a href="https://en.wikipedia.org/wiki/Life_without_Death">Life without death</a> does make nice impenetrable walls but with too much other stuff). But I think the rule below fits the bill. It’s the first thing I tried, at least, so I didn’t have to do any fine adjustments of the rules to make it work.</p>
+
+<p>Here’s the rule:</p>
+
+<ul>
+  <li>
+    <p>The cells form a square grid with the <a href="https://en.wikipedia.org/wiki/Moore_neighborhood">Moore 8-cell neighborhood</a>.</p>
+  </li>
+  <li>
+    <p>There are two states of cells, live and dead.</p>
+  </li>
+  <li>
+    <p>A dead cell becomes live only under two conditions:</p>
+
+    <ol>
+      <li>
+        <p>It has exactly two live neighbors (among its eight possible neighbors) that are orthogonally adjacent to each other.</p>
+      </li>
+      <li>
+        <p>It has exactly four live neighbors at the corners of a rectangle (necessarily in two orthogonally adjacent pairs, because we don’t count squares as being rectangles).</p>
+      </li>
+    </ol>
+  </li>
+  <li>
+    <p>All live cells immediately die.</p>
+  </li>
+</ul>
+
+<p style="text-align: center;"><img alt="Rules for the Gilbert cellular automaton" src="https://11011110.github.io/blog/assets/2021/gilbert/rule.svg"/></p>
+
+<p>Or, in <a href="http://golly.sourceforge.net/">Golly</a> rule format:</p>
+
+<pre>@RULE Gilbert
+@TABLE
+n_states:2
+neighborhood:Moore
+symmetries:rotate8reflect
+var a={0,1}
+var b={0,1}
+var c={0,1}
+var d={0,1}
+var e={0,1}
+var f={0,1}
+var g={0,1}
+var h={0,1}
+0,1,1,0,0,0,0,0,0,1
+0,1,1,0,1,1,0,0,0,1
+1,a,b,c,d,e,f,g,h,0</pre>
+
+<p>Then an initial pattern of two orthogonally adjacent live cells (a “domino”) will in the next step form two side-by-side dominos, in the step after that three dominos (with the center one in the initial location), and so on, building a wall two cells wide that alternates between dominos and dead cells, and oscillates with period two.</p>
+
+<p style="text-align: center;"><img alt="Wall of alternating dominos in the Gilbert cellular automaton" src="https://11011110.github.io/blog/assets/2021/gilbert/wall.svg"/></p>
+
+<p>Here’s what it looks like when I selected a large rectangle, randomly filled it with 2% live cells, and ran it in Golly. The red lines in this image are walls like the one above.</p>
+
+<p style="text-align: center;"><img alt="Gilbert cellular automaton on a sparse random field" src="https://11011110.github.io/blog/assets/2021/gilbert/wide.png"/></p>
+
+<p>Of course, at the edges of the randomly filled rectangle, the walls shoot off to infinity with no more obstructions. Here’s a closeup, showing the detailed pattern of the walls and how they meet:</p>
+
+<p style="text-align: center;"><img alt="Close-up of Gilbert cellular automaton on a sparse random field" src="https://11011110.github.io/blog/assets/2021/gilbert/crop.png"/></p>
+
+<p>It looks a lot like a Gilbert tessellation to me! Even starting with a 50% random fill produces the same sort of pattern at a finer scale:</p>
+
+<p style="text-align: center;"><img alt="Gilbert cellular automaton on a 50/50 random field" src="https://11011110.github.io/blog/assets/2021/gilbert/5050.png"/></p>
+
+<p>But rather than just going by intuitive visual appearance here’s some analysis showing that, if the plane is filled with live cells with some small probability \(p\), and then this rule is run on the result, then as \(p\to0\) the probability of seeing something that looks like a Gilbert tessellation in the neighborhood of any cell will tend to one. By “neighborhood” I mean everything within distance \(r\), where \(r\) should be chosen as a function of \(p\) that grows faster than linearly in \(1/p\) (so that we have nontrivial probability of seeing something other than just empty space) but slower than \((1/p)^{4/3}\).</p>
+
+<p>The reason we need to limit the radius of the neighborhoods is that, in a large enough neighborhood, you will likely see something that deviates from a Gilbert tessellation. In the runs above, for instance, there are some right-angle corners where two line segments both meet and stop, or points where it appears that walls met head-to-head, but this should’t happen in a Gilbert tessellation (or more precisely it happens with probability zero). There are two natural ways of getting a corner: you could start with an L-tromino of live cells, or two growing walls could coincidentally run into each other. But the expected number of triples of nearby live cells within the neighborhood is \(O(p^3r^2)\), and the expected number of pairs of dominos whose walls would meet at the same point is \(O(p^4r^3)\). It might also be the case that three or more initial live cells produce more exotic behavior; if so, the expected number of things like this that happen within the neighborhood is still \(O(p^3r^2)\). With our assumption on the growth rate of \(r\) relative to \(p\), these expected numbers, and therefore the probability of seeing any of these situations within the neighborhood, is negligible. For the same reason they have low probability of occurring close enough to the neighborhood to impinge on it before the Gilbert tessellation within the neighborhood forms.</p>
+
+<p>So with high probability, in neighborhoods of radius \(r\), you’ll only see single live cells and double live cells in the initial state, and the pairs of double cells won’t be horizontally, vertically, or diagonally aligned with each other. Some of the double live cells will be dominos, with density \(\Theta(p^2)\). The only thing that can happen with such a state is that dominos start building walls which grow until they hit each other, exactly as described by a Gilbert tessellation. Once the Gilbert tessellation has been set up, it appears indestructible: the alternating live cells along the wall prevent any births into the layers of dead cells on either side, and if a wall is perturbed at its end it quickly grows back. However, proving this indestructability rigorously would require a more careful case analysis.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/107211819080878015">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2021-11-02T21:35:00Z</updated>
+    <published>2021-11-02T21:35:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2021-11-03T06:56:50Z</updated>
     </source>
   </entry>
 
@@ -232,7 +340,7 @@ Smith also has many activities promoting STEM, including her <a href="http://www
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-11-03T06:37:35Z</updated>
+      <updated>2021-11-03T07:21:01Z</updated>
     </source>
   </entry>
 
@@ -717,7 +825,7 @@ I mean it as a statement and maybe a joke, but I decided to email various people
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2021-11-01T02:11:11Z</updated>
+      <updated>2021-11-03T06:56:50Z</updated>
     </source>
   </entry>
 
@@ -744,7 +852,7 @@ Email: Ulle Endriss</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-11-03T06:37:39Z</updated>
+      <updated>2021-11-03T07:21:04Z</updated>
     </source>
   </entry>
 
@@ -771,7 +879,7 @@ Email: <a href="https://recruit.ap.uci.edu/JPF07189">https://recruit.ap.uci.edu/
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-11-03T06:37:39Z</updated>
+      <updated>2021-11-03T07:21:04Z</updated>
     </source>
   </entry>
 
@@ -815,7 +923,7 @@ a given set of \(n\) points by two scaled and translated copies of a given conve
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2021-11-01T02:11:11Z</updated>
+      <updated>2021-11-03T06:56:50Z</updated>
     </source>
   </entry>
 
@@ -842,7 +950,7 @@ Email: monika.henzinger@univie.ac.at</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-11-03T06:37:39Z</updated>
+      <updated>2021-11-03T07:21:04Z</updated>
     </source>
   </entry>
 
@@ -869,7 +977,7 @@ Email: l.trevisan@unibocconi.it</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-11-03T06:37:39Z</updated>
+      <updated>2021-11-03T07:21:04Z</updated>
     </source>
   </entry>
 
@@ -917,7 +1025,7 @@ Email: margaret.hall@imperial.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-11-03T06:37:39Z</updated>
+      <updated>2021-11-03T07:21:04Z</updated>
     </source>
   </entry>
 
@@ -946,7 +1054,7 @@ Email: khoury-hr@northeastern.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-11-03T06:37:39Z</updated>
+      <updated>2021-11-03T07:21:04Z</updated>
     </source>
   </entry>
 
@@ -977,7 +1085,7 @@ Email: cs-recruiting@uwaterloo.ca</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-11-03T06:37:39Z</updated>
+      <updated>2021-11-03T07:21:04Z</updated>
     </source>
   </entry>
 
@@ -1041,7 +1149,7 @@ Email: info@thenetworkcenter.nl</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-11-03T06:37:39Z</updated>
+      <updated>2021-11-03T07:21:04Z</updated>
     </source>
   </entry>
 
@@ -1068,7 +1176,7 @@ Email: awirth@unimelb.edu.au</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-11-03T06:37:39Z</updated>
+      <updated>2021-11-03T07:21:04Z</updated>
     </source>
   </entry>
 
@@ -1404,7 +1512,7 @@ and related items.</div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2021-11-03T06:38:04Z</updated>
+      <updated>2021-11-03T07:21:34Z</updated>
     </source>
   </entry>
 
@@ -1501,7 +1609,7 @@ David Eppstein, Marc van Kreveld, and Wolfgang Mulzer</p>
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2021-11-01T02:11:11Z</updated>
+      <updated>2021-11-03T06:56:50Z</updated>
     </source>
   </entry>
 
@@ -1527,7 +1635,7 @@ As our main result, we construct an explicit extractor for sumset sources in the
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-11-03T06:37:24Z</updated>
+      <updated>2021-11-03T07:20:43Z</updated>
     </source>
   </entry>
 
@@ -1561,7 +1669,7 @@ As our main result, we construct an explicit extractor for sumset sources in the
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2021-11-03T06:38:22Z</updated>
+      <updated>2021-11-03T07:21:57Z</updated>
     </source>
   </entry>
 
@@ -1720,7 +1828,7 @@ What if we replace metacyclic by metabelian?
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-11-03T06:37:34Z</updated>
+      <updated>2021-11-03T07:20:59Z</updated>
     </source>
   </entry>
 
@@ -1829,64 +1937,7 @@ What if we replace metacyclic by metabelian?
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-11-03T06:37:08Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://windowsontheory.org/?p=8209</id>
-    <link href="https://windowsontheory.org/2021/10/20/opportunities-at-harvard/" rel="alternate" type="text/html"/>
-    <title>Opportunities at Harvard!</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Computer Science at Harvard, and in particular theoretical computer science and machine learning, is growing fast, see my 21-Tweet thread: Please consider applying for graduate studies in computer science (or encourage others to apply if like me, your grad-school days are behind you). In recent years, I’ve taken a special interest in the theory of … <a class="more-link" href="https://windowsontheory.org/2021/10/20/opportunities-at-harvard/">Continue reading <span class="screen-reader-text">Opportunities at Harvard!</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Computer Science at Harvard, and in particular theoretical computer science and machine learning, is growing fast, see my 21-Tweet thread:</p>
-
-
-
-<figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
-<div class="embed-twitter"><blockquote class="twitter-tweet"><p dir="ltr" lang="en">1/21 Banner year for Harvard CS! <br/><br/>New hires include Sham Kakade <a href="https://twitter.com/ShamKakade6?ref_src=twsrc%5Etfw">@ShamKakade6</a> and Fernanda Viegas <a href="https://twitter.com/viegasf?ref_src=twsrc%5Etfw">@viegasf</a> (joining <a href="https://twitter.com/wattenberg?ref_src=twsrc%5Etfw">@wattenberg</a>), as well as David Alvarez-Melis, Anurag Anshu <a href="https://twitter.com/AnuragAnshu4?ref_src=twsrc%5Etfw">@AnuragAnshu4</a>, Sitan Chen, and Jonathan Frankle <a href="https://twitter.com/jefrankle?ref_src=twsrc%5Etfw">@jefrankle</a> <a href="https://t.co/mDR4bi0kSD">https://t.co/mDR4bi0kSD</a> <a href="https://t.co/bXwMbQK7s8">pic.twitter.com/bXwMbQK7s8</a></p>— Boaz Barak (@boazbaraktcs) <a href="https://twitter.com/boazbaraktcs/status/1450171218070495238?ref_src=twsrc%5Etfw">October 18, 2021</a></blockquote></div>
-</div></figure>
-
-
-
-<p>Please consider applying for <a href="https://www.seas.harvard.edu/computer-science/graduate-programs/how-apply"><strong>graduate studies in computer science</strong></a> (or encourage others to apply if like me, your grad-school days are behind you). </p>
-
-
-
-<p>In recent years, I’ve taken a special interest in the <a href="https://mltheory.org/"><strong>theory of machine learning</strong></a>, and there are <a href="https://mltheory.org/#opportunities"><strong>several opportunities at Harvard</strong></a> in this area. In particular, I’ve been collaborating with people both in and outside CS, including incoming CS faculty <a href="https://homes.cs.washington.edu/~sham/"><strong>Sham Kakade</strong></a>, as well as <a href="http://www.demba-ba.org/" rel="noreferrer noopener" target="_blank"><strong>Demba Ba</strong></a> (Electrical Engineering and Bioengineering), <a href="http://lucasjanson.fas.harvard.edu/" rel="noreferrer noopener" target="_blank"><strong>Lucas Janson</strong></a> (Statistics), and  <a href="https://pehlevan.seas.harvard.edu/" rel="noreferrer noopener" target="_blank"><strong>Cengiz Pehlevan</strong></a> (Applied Mathematics). I’m very much open to co-advising students outside computer science as well. </p>
-
-
-
-<p>Students interested in <a href="https://quantum.harvard.edu/"><strong>quantum computation and information</strong></a> can apply to any of our programs (including computer science, physics, and others) as well as to the new <a href="https://gsas.harvard.edu/programs-of-study/all/quantum-science-and-engineering"><strong>quantum science and engineering degree</strong></a>. There are a number of Harvard faculty interested in <a href="https://quantum.harvard.edu/hqi-members">quantum computing</a>  including new incoming faculty member <a href="https://people.eecs.berkeley.edu/~anuraganshu/"><strong>Anurag Anshu</strong></a>. In this area as well I am open to co-advising, including students outside CS.</p>
-
-
-
-<p>If you are applying to graduate studies and are potentially interested in working with me, you can indicate this in the application form and statement of interest. This is the best way to ensure that I read your application (and in particular better than emailing me separately: for fairness sake I read all the applications together in batch, regardless of whether the candidate emailed me or not).</p>
-
-
-
-<p>We are also looking for <strong>postdocs</strong>! We have the general <strong>Rabin postdoc position</strong>, as well as specific positions in <strong>privacy</strong>, <strong>fairness</strong>, and <strong>theory of machine learning</strong>, all <a href="https://academicpositions.harvard.edu/postings/10730"><strong>described in the following ad</strong></a>. There is also a separate <a href="http://mybiasedcoin.blogspot.com/2021/10/networkingtheory-postdoc-at-harvard.html"><strong>networking+theory</strong></a> postdoc position. Several other machine-learning theory related postdocs are linked in our <a href="https://mltheory.org/#opportunities"><strong>ML theory opportunities page</strong></a>. See also the <strong><a href="https://quantum.harvard.edu/external-candidates">quantum initiative postdoctoral fellowship</a></strong>. There may be more CS, ML and quantum related opportunities that I am missing. If I hear of more relevant opportunities then I will post them here and/or <a href="https://twitter.com/boazbaraktcs"><strong>on Twitter</strong></a>. </p>
-
-
-
-<p>Finally, Harvard welcomes applications from candidates of all backgrounds, regardless of disability, gender identity and expression, physical appearance, race, religion, or sexual orientation. I would like to <strong>especially encourage</strong> applications from <strong>members of under-represented groups</strong>. Computer Science, and in particular the areas I work in, have a significant diversity problem. We are trying at Harvard to create an environment that is welcoming and inclusive for people from all backgrounds. I am sincerely grateful and appreciative of people placing their trust in us by applying, and we will do our best to live up to that trust.</p></div>
-    </content>
-    <updated>2021-10-20T20:01:28Z</updated>
-    <published>2021-10-20T20:01:28Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>Boaz Barak</name>
-    </author>
-    <source>
-      <id>https://windowsontheory.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://windowsontheory.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://windowsontheory.org" rel="alternate" type="text/html"/>
-      <link href="https://windowsontheory.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>A Research Blog</subtitle>
-      <title>Windows On Theory</title>
-      <updated>2021-11-03T06:37:55Z</updated>
+      <updated>2021-11-03T07:20:10Z</updated>
     </source>
   </entry>
 </feed>
