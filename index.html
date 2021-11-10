@@ -243,7 +243,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at November 10, 2021 11:39 AM UTC</span>.
+Last updated <span class="datestr">at November 10, 2021 12:22 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -251,6 +251,188 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://lucatrevisan.wordpress.com/?p=4588">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/trevisan.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://lucatrevisan.wordpress.com/2021/11/10/online-optimization-post-7-matrix-multiplicative-weights-update/">Online Optimization Post 7: Matrix Multiplicative Weights Update</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://lucatrevisan.wordpress.com" title="in   theory">Luca Trevisan</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p>This is the seventh in a series of posts on online optimization, where we alternate one post explaining a result from the theory of online convex optimization and one post explaining an “application” in computational complexity or combinatorics. The first two posts were about the technique of <a href="https://lucatrevisan.wordpress.com/2019/04/24/online-optimization-post-1-multiplicative-weights/">Multiplicative Weights Updates</a> and its application to <a href="https://lucatrevisan.wordpress.com/2019/04/25/online-optimization-post-2-constructing-pseudorandom-sets/">“derandomizing” probabilistic arguments</a> based on combining a Chernoff bound and a union bound. The third and fourth post were about the <a href="https://lucatrevisan.wordpress.com/2019/05/06/online-optimization-post-3-follow-the-regularized-leader/">Follow-the-Regularized-Leader</a> framework, which unifies multiplicative weights and gradient descent, and a <a href="https://lucatrevisan.wordpress.com/2019/05/16/online-optimization-post-4-regularity-lemmas/">“gradient descent view” of the Frieze-Kannan Weak Regularity Lemma</a>. The fifth and sixth post were about the <a href="https://lucatrevisan.wordpress.com/2019/05/20/online-optimization-post-5-bregman-projections-and-mirror-descent/">constrained version of the Follow-the-Regularized-Leader</a> framework, and the <a href="https://lucatrevisan.wordpress.com/2021/10/20/online-optimization-post-6-the-impagliazzo-hard-core-set-lemma/">Impagliazzo Hard-Core Set Lemma</a>. Today we shall see the technique of Matrix Multiplicative Weights Updates.</p>
+<p><b>1. Matrix Multiplicative Weights Update </b></p>
+<p>In this post we consider the following generalization, introduced and studied by <a href="https://dl.acm.org/doi/10.1145/1250790.1250823">Arora and Kale</a>, of the “learning from expert advice” setting and the multiplicative weights update method. In the “experts” model, we have a repeated game in which, at each time step <img src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{t}" class="latex" />, we have the option of following the advice of one of <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" /> experts; if we follow the advice of expert <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{i}" class="latex" /> at time <img src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{t}" class="latex" />, we incur a loss of <img src="https://s0.wp.com/latex.php?latex=%7B%5Cell_t+%28i%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\ell_t (i)}" class="latex" />, which is unknown to us (although, at time <img src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{t}" class="latex" /> we know the loss functions <img src="https://s0.wp.com/latex.php?latex=%7B%5Cell_1%28%5Ccdot%29%2C%5Cldots%2C%5Cell_%7Bt-1%7D%28%5Ccdot%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\ell_1(\cdot),\ldots,\ell_{t-1}(\cdot)}" class="latex" />). We are allowed to choose a probabilistic strategy, whereby we follow the advice of expert <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{i}" class="latex" /> with probability <img src="https://s0.wp.com/latex.php?latex=%7Bx_t%28i%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x_t(i)}" class="latex" />, so that our expected loss at time <img src="https://s0.wp.com/latex.php?latex=%7Bt%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{t}" class="latex" /> is <img src="https://s0.wp.com/latex.php?latex=%7B%5Csum_%7Bi%3D1%7D%5En+x_t%28i%29+%5Cell_t%28i%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\sum_{i=1}^n x_t(i) \ell_t(i)}" class="latex" />.</p>
+<p>In the matrix version, instead of choosing an expert <img src="https://s0.wp.com/latex.php?latex=%7Bi%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{i}" class="latex" /> we are allowed to choose a unit <img src="https://s0.wp.com/latex.php?latex=%7Bn%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n}" class="latex" />-dimensional vector <img src="https://s0.wp.com/latex.php?latex=%7Bv_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{v_t}" class="latex" />, and the loss incurred in choosing the vector <img src="https://s0.wp.com/latex.php?latex=%7Bv_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{v_t}" class="latex" /> is <img src="https://s0.wp.com/latex.php?latex=%7Bv_t+%5ET+L_t+v_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{v_t ^T L_t v_t}" class="latex" />, where <img src="https://s0.wp.com/latex.php?latex=%7BL_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{L_t}" class="latex" /> is an unknown symmetric <img src="https://s0.wp.com/latex.php?latex=%7Bn%5Ctimes+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{n\times n}" class="latex" /> matrix. We are also allowed to choose a probabilistic strategy, so that with probability <img src="https://s0.wp.com/latex.php?latex=%7Bx_t%28j%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{x_t(j)}" class="latex" /> we choose the unit vector <img src="https://s0.wp.com/latex.php?latex=%7Bv_t%5E%7B%28j%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{v_t^{(j)}}" class="latex" />, and we incur the expected loss</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_j+x_t+%28j%29+%5Ccdot+%28v_t%5E%7B%28j%29%7D%29%5ET+L_t+v_t%5E%7B%28j%29%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \sum_j x_t (j) \cdot (v_t^{(j)})^T L_t v_t^{(j)} " class="latex" /></p>
+<p><span id="more-4588"></span></p>
+<p>The above expression can also be written as</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++X_t+%5Cbullet+L_t+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  X_t \bullet L_t " class="latex" /></p>
+<p> where <img src="https://s0.wp.com/latex.php?latex=%7BX_t+%3D+%5Csum_j+x_t%28j%29+v_t%5E%7B%28j%29%7D%28v_t%5E%7B%28j%29%7D%29%5ET%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X_t = \sum_j x_t(j) v_t^{(j)}(v_t^{(j)})^T}" class="latex" /> and we used the Frobenius inner product among square matrices defined as <img src="https://s0.wp.com/latex.php?latex=%7BA+%5Cbullet+B+%3D+%5Csum_%7Bi%2Cj%7D+A_%7Bi%2Cj%7D+B_%7Bi%2Cj%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{A \bullet B = \sum_{i,j} A_{i,j} B_{i,j}}" class="latex" />. The matrices <img src="https://s0.wp.com/latex.php?latex=%7BX_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X_t}" class="latex" /> that can be obtained as convex combinations of rank-1 matrices of the form <img src="https://s0.wp.com/latex.php?latex=%7Bvv%5ET%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{vv^T}" class="latex" /> where <img src="https://s0.wp.com/latex.php?latex=%7Bv%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{v}" class="latex" /> is a unit vector are called <em>density matrices</em> and can be characterized as the set of positive semidefinite matrices whose trace is 1.</p>
+<p>It is possible to see the above game as the “quantum version” of the experts settings. A choice of a unit vector <img src="https://s0.wp.com/latex.php?latex=%7Bv_t%5E%7B%28j%29%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{v_t^{(j)}}" class="latex" /> is a <em>pure quantum state</em>, a probability distribution of pure quantum states, described by a density matrix, is a <em>mixed quantum state</em>. If <img src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X}" class="latex" /> is a density matrix describing a mixed quantum state, <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{L}" class="latex" /> is a symmetric matrix, and <img src="https://s0.wp.com/latex.php?latex=%7BL+%3D+%5Csum_i+%5Clambda_i+w_i+w_i%5ET%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{L = \sum_i \lambda_i w_i w_i^T}" class="latex" /> is the spectral decomposition of <img src="https://s0.wp.com/latex.php?latex=%7BL%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{L}" class="latex" /> in terms of its eigenvalues <img src="https://s0.wp.com/latex.php?latex=%7B%5Clambda_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\lambda_i}" class="latex" /> and orthonormal eigenvectors <img src="https://s0.wp.com/latex.php?latex=%7Bw_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{w_i}" class="latex" />, then <img src="https://s0.wp.com/latex.php?latex=%7BX+%5Cbullet+L%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X \bullet L}" class="latex" /> is the expected outcome of a measurement of <img src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X}" class="latex" /> in the basis <img src="https://s0.wp.com/latex.php?latex=%7Bw_1%2C%5Cldots%2Cw_n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{w_1,\ldots,w_n}" class="latex" />, and such that <img src="https://s0.wp.com/latex.php?latex=%7B%5Clambda_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\lambda_i}" class="latex" /> is the value of the measurement if the outcome is <img src="https://s0.wp.com/latex.php?latex=%7Bw_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{w_i}" class="latex" />.</p>
+<p>If you have no idea what the above paragraph means, that is perfectly ok because this view will not be particularly helpful in motivating the algorithm and analysis that we will describe. (Here I am reminded of the joke about the way people from Naples give directions: “How do I get to the post office?”, “Well, you see that road over there? After the a couple of blocks there is a pharmacy, where my uncle used to work, though now he is retired.” “Ok?” “Now, if you turn left after the pharmacy, after a while you get to a square with a big fountain and the church of St. Anthony where my niece got married. It was a beautiful ceremony, but the food at the reception was not great.” “Yes, I know that square”, “Good, don’t go there, the post office is not that way. Now, if you instead take that other road over there …”)</p>
+<p>The main point of the above game, and of the Matrix Multiplicative Weights Update (MMWU) algorithm that plays it with bounded regret, is that it provides useful generalizations of the standard “experts” game and of the Multiplicative Weights Update (MWU) algorithm. For example, as we have already seen, MWU can provide a “derandomization” of the Chernoff bound; we will see that MMWU provides a derandomization of the <em>matrix</em> Chernoff bound. MWU can be used to approximate certain Linear Programming problems; MMWU can be used to approximate certain <em>Semidefinite Programming</em> problems.</p>
+<p>To define and analyze the MMWU algorithm, we need to introduce certain operations on matrices. We will always work with real-valued symmetric matrices, but everything generalizes to complex-valued Hermitian matrices. If <img src="https://s0.wp.com/latex.php?latex=%7BM+%3D+%5Csum_i+%5Clambda_i+w_i+w_i%5ET%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{M = \sum_i \lambda_i w_i w_i^T}" class="latex" /> is a symmetric matrix, <img src="https://s0.wp.com/latex.php?latex=%7B%5Clambda_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\lambda_i}" class="latex" /> are the eigenvalues of <img src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X}" class="latex" />, and <img src="https://s0.wp.com/latex.php?latex=%7Bw_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{w_i}" class="latex" /> are corresponding orthonormal eigenvectors, then we will define a number of operations and functions on <img src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X}" class="latex" /> that operate on the eigenvalues while leaving the eigenvectors unchanged.</p>
+<p>The first operation is <em>matrix exponentiation</em>: we define</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++e%5EX+%3A%3D+%5Csum_i+e%5E%7B%5Clambda_i%7D+w_i+w_i%5ET+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  e^X := \sum_i e^{\lambda_i} w_i w_i^T " class="latex" /></p>
+<p> The operation always defines a positive definite matrix, and the resulting matrix satisfies a “Taylor expansion”</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++e%5EX+%3D+%5Csum_%7Bk%3D0%7D%5E%5Cinfty+%5Cfrac1+%7Bk%21%7D+X%5Ek+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  e^X = \sum_{k=0}^\infty \frac1 {k!} X^k " class="latex" /></p>
+<p> Indeed, it is more common to use the above expansion as the definition of the matrix exponential, and then derive the expression in terms of eigenvalues.</p>
+<p>We also have the useful bounds</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++e%5EX+%5Csucceq+I+%2B+X&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  e^X \succeq I + X" class="latex" /></p>
+<p> which is true for every <img src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X}" class="latex" /> and</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++e%5EX+%5Cpreceq+I+%2B+X+%2BX%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  e^X \preceq I + X +X^2 " class="latex" /></p>
+<p> which is true for all <img src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X}" class="latex" /> such that <img src="https://s0.wp.com/latex.php?latex=%7BX+%5Cpreceq+I%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X \preceq I}" class="latex" />.</p>
+<p>Analogously, if <img src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X}" class="latex" /> is positive definite, we can define</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Clog+X+%3A%3D+%5Csum_i+%28%5Clog+%5Clambda_i%29+%5Ccdot+w_i+w_i%5ET+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \log X := \sum_i (\log \lambda_i) \cdot w_i w_i^T " class="latex" /></p>
+<p>and we have a number of identities like <img src="https://s0.wp.com/latex.php?latex=%7B%5Clog+e%5EX+%3D+X%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\log e^X = X}" class="latex" />, <img src="https://s0.wp.com/latex.php?latex=%7B%5Clog+X%5Ek+%3D+k+%5Clog+X%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\log X^k = k \log X}" class="latex" />, <img src="https://s0.wp.com/latex.php?latex=%7Be%5E%7Bk+X%7D+%3D+e%5Ek+%5Ccdot+X%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{e^{k X} = e^k \cdot X}" class="latex" />, where <img src="https://s0.wp.com/latex.php?latex=%7Bk%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{k}" class="latex" /> is a scalar. We should be careful, however, not to take the analogy with real numbers too far: for example, if <img src="https://s0.wp.com/latex.php?latex=%7BA%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{A}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7BB%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{B}" class="latex" /> are two symmetric matrices, in general it is not trues that <img src="https://s0.wp.com/latex.php?latex=%7Be%5E%7BA%2BB%7D+%3D+e%5EA+%5Ccdot+e%5EB%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{e^{A+B} = e^A \cdot e^B}" class="latex" />, in fact the above expression is actually always false except when <img src="https://s0.wp.com/latex.php?latex=%7BA%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{A}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7BB%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{B}" class="latex" /> commute, in which case it is trivially true. We have, however, the following extremely useful fact.</p>
+<blockquote><p><b>Theorem 1 (Golden-Thompson Inequality)</b> <em> </em></p>
+<p><em></em></p><em>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7B%5Crm+tr%7D%28e%5E%7BA%2BB%7D%29+%5Cleq+%7B%5Crm+tr%7D%28e%5EA+%5Ccdot+e%5EB%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  {\rm tr}(e^{A+B}) \leq {\rm tr}(e^A \cdot e^B) " class="latex" /></p>
+</em><p><em></em><em> </em></p></blockquote>
+<p>The Golden-Thompson inequality will be all we need to generalize to this matrix setting everything we have proved about multiplicative weights. See <a href="https://terrytao.wordpress.com/2010/07/15/the-golden-thompson-inequality/">this post by Terry Tao</a> for a proof.</p>
+<p>The <em>Von Neumann entropy</em> of a density matrix <img src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X}" class="latex" /> with eigenvalues <img src="https://s0.wp.com/latex.php?latex=%7B%5Clambda_1%2C%5Ccdots%2C%5Clambda_n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\lambda_1,\cdots,\lambda_n}" class="latex" /> is defined as</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++S%28X%29+%3D+%5Csum_i+%5Clambda_i+%5Clog+%5Cfrac+1+%7B%5Clambda_i%7D+%3D+-+%7B%5Crm+tr%7D%28X%5Clog+X%29+%3D+-+X+%5Cbullet+%5Clog+X+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  S(X) = \sum_i \lambda_i \log \frac 1 {\lambda_i} = - {\rm tr}(X\log X) = - X \bullet \log X " class="latex" /></p>
+<p> that is, if we view <img src="https://s0.wp.com/latex.php?latex=%7BX+%3D+%5Csum_i+%5Clambda_i+v_i+v_i%5ET%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X = \sum_i \lambda_i v_i v_i^T}" class="latex" /> as the mixed quantum state in which the pure state <img src="https://s0.wp.com/latex.php?latex=%7Bv_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{v_i}" class="latex" /> has probability <img src="https://s0.wp.com/latex.php?latex=%7B%5Clambda_i%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\lambda_i}" class="latex" />, then <img src="https://s0.wp.com/latex.php?latex=%7BS%28X%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S(X)}" class="latex" /> is the entropy of the distribution over the pure states. Again, this is not a particularly helpful point of view, and in fact we will be interested in defining <img src="https://s0.wp.com/latex.php?latex=%7BS%28X%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{S(X)}" class="latex" /> not just for density matrices <img src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X}" class="latex" /> but for arbitrary positive definite matrices, and even positive semidefinite (with the convention that <img src="https://s0.wp.com/latex.php?latex=%7B0+%5Clog+0+%3D+0%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{0 \log 0 = 0}" class="latex" />, which is used also in the standard definition of entropy of a distribution).</p>
+<p>We will be interested in using Von Neumann entropy as a regularizer, and hence we will want to know what is its Bregman divergence. Some calculations show that the Bregman divergence of the Von Neumann entropy, which is called the quantum relative entropy, is</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++S%28X_1%7C%7C+X_2%29+%3D+%7B%5Crm+tr%7D+%28X_1+%5Ccdot+%28+%5Clog+X_1+-+%5Clog+X_2%29%29+%2B+%7B%5Crm+tr%7D%28X_2%29+-+%7B%5Crm+tr%7D%28X_1%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  S(X_1|| X_2) = {\rm tr} (X_1 \cdot ( \log X_1 - \log X_2)) + {\rm tr}(X_2) - {\rm tr}(X_1) " class="latex" /></p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%3D+X_1+%5Cbullet%28%5Clog+X_1+-+%5Clog+X_2%29+%2B+I+%5Cbullet+%28X_2+-+X_1%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  = X_1 \bullet(\log X_1 - \log X_2) + I \bullet (X_2 - X_1) " class="latex" /></p>
+<p> If <img src="https://s0.wp.com/latex.php?latex=%7BX_1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X_1}" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7BX_2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X_2}" class="latex" /> are density matrices, the terms <img src="https://s0.wp.com/latex.php?latex=%7B%7B%5Crm+tr%7D%28X_2%29+-+%7B%5Crm+tr%7D%28X_1%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{{\rm tr}(X_2) - {\rm tr}(X_1)}" class="latex" /> cancel out; the above definition is valid for arbitrary positive definite matrices.</p>
+<p>We will have to study the minima of various functions that take a matrix as an input, so it is good to understand how to compute the gradient of such functions. For example what is the gradient of the function <img src="https://s0.wp.com/latex.php?latex=%7B%7B%5Crm+tr%7D%28X%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{{\rm tr}(X)}" class="latex" />? Working through the definition we see that <img src="https://s0.wp.com/latex.php?latex=%7B%5Cnabla+%7B%5Crm+tr%7D%28X%29+%3D+I%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\nabla {\rm tr}(X) = I}" class="latex" />, and indeed we always have that the gradient of the function <img src="https://s0.wp.com/latex.php?latex=%7BX+%5Crightarrow+A%5Cbullet+X%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X \rightarrow A\bullet X}" class="latex" /> is <img src="https://s0.wp.com/latex.php?latex=%7BA%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{A}" class="latex" /> everywhere. Somewhat less obvious is the calculation of the gradient of the Von Neumann entropy, which is</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cnabla+%28X+%5Cbullet+%5Clog+X%29+%3D+I+%2B+%5Clog+X+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \nabla (X \bullet \log X) = I + \log X " class="latex" /></p>
+<p><b>2. Analysis in the Constrained FTRL Framework </b></p>
+<p>Suppose that we play that we described above using agile mirror descent and using negative Von Neumann entropy (appropriately scaled) as a regularizer. That is, for some <img src="https://s0.wp.com/latex.php?latex=%7Bc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{c}" class="latex" /> that we will choose later, we use the regularizer</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++R%28X%29+%3D+c+X+%5Cbullet+%5Clog+X&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  R(X) = c X \bullet \log X" class="latex" /></p>
+<p> which has the Bregman divergence</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++D%28X_1%2CX_2%29+%3D+c+S%28X_1+%7C%7C+X_2%29+%3D+c+X_1+%5Cbullet+%28%5Clog+X_1+-+%5Clog+X_2%29+%2B+cI+%5Cbullet+%28X_2+-+X_1%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  D(X_1,X_2) = c S(X_1 || X_2) = c X_1 \bullet (\log X_1 - \log X_2) + cI \bullet (X_2 - X_1) " class="latex" /></p>
+<p> and our feasible set is the set of density matrices</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5CDelta+%3A%3D+%5C%7B+X%5Cin+%7B%5Cmathbb+R%7D%5E%7Bn%5Ctimes+n%7D+%3A+X+%5Csucceq+%7B%5Cbf+0%7D+%5Cwedge+%7B%5Crm+tr%7D%28X%29+%3D+1+%5C%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \Delta := \{ X\in {\mathbb R}^{n\times n} : X \succeq {\bf 0} \wedge {\rm tr}(X) = 1 \} " class="latex" /></p>
+<p> To bound the regret, we just have to plug the above definitions into the machinery that we developed <a href="https://lucatrevisan.wordpress.com/2019/05/20/online-optimization-post-5-bregman-projections-and-mirror-descent/">in our fifth post</a>.</p>
+<p>At time 1, we play the identity matrix scaled by n, which is a density matrix of maximum Von Neumann entropy <img src="https://s0.wp.com/latex.php?latex=%7B%5Clog+n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\log n}" class="latex" />:</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++X_1+%3A%3D+%5Carg%5Cmin_%7BX+%5Cin+%5CDelta%7D+R%28X%29+%3D+%5Cfrac+1n+I+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  X_1 := \arg\min_{X \in \Delta} R(X) = \frac 1n I " class="latex" /></p>
+<p> At time <img src="https://s0.wp.com/latex.php?latex=%7Bt%2B1%5Cgeq+2%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{t+1\geq 2}" class="latex" />, we play the matrix <img src="https://s0.wp.com/latex.php?latex=%7BX_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X_t}" class="latex" /> obtained as</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Chat+X_%7Bt%2B1%7D+%3D+%5Carg%5Cmin_%7BX%7D+D%28X%2CX_%7Bt%7D%29+%2B+X%5Cbullet+L_%7Bt%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \hat X_{t+1} = \arg\min_{X} D(X,X_{t}) + X\bullet L_{t} " class="latex" /></p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++X_%7Bt%2B1%7D+%3D+%5Carg%5Cmin_%7BX%5Cin+%5CDelta%7D+D%28X%2C%5Chat+X_%7Bt%2B1%7D%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  X_{t+1} = \arg\min_{X\in \Delta} D(X,\hat X_{t+1}) " class="latex" /></p>
+<p> and recall that we proved that, after <img src="https://s0.wp.com/latex.php?latex=%7BT%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{T}" class="latex" /> steps,</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++Regret_T%28X%29+%5Cleq+D%28X%2CX_1%29+%2B+%5Csum_%7Bt%3D1%7D%5ET+D%28X_t%2C%5Chat+X_%7Bt%2B1%7D%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  Regret_T(X) \leq D(X,X_1) + \sum_{t=1}^T D(X_t,\hat X_{t+1}) " class="latex" /></p>
+<p>If <img src="https://s0.wp.com/latex.php?latex=%7BX%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X}" class="latex" /> is a density matrix with eigenvalues <img src="https://s0.wp.com/latex.php?latex=%7B%5Clambda_1%2C%5Cldots%2C%5Clambda_n%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\lambda_1,\ldots,\lambda_n}" class="latex" />, then the first term is</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++D+%5Cleft%28+X%2C+%5Cfrac+1n+I+%5Cright%29+%3D+c+X+%5Cbullet+%28%5Clog+X+-+%5Clog+n%5E%7B-1%7D+I%29+%3D+c+%5Csum_i+%5Clambda_i+%5Clog+%5Cfrac+n%7B%5Clambda_i%7D+%3D+c+%5Clog+n+-+c+%5Csum_i+%5Clambda_i+%5Cfrac+1+%7B%5Clambda_i%7D+%5Cleq+c%5Clog+n+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  D \left( X, \frac 1n I \right) = c X \bullet (\log X - \log n^{-1} I) = c \sum_i \lambda_i \log \frac n{\lambda_i} = c \log n - c \sum_i \lambda_i \frac 1 {\lambda_i} \leq c\log n " class="latex" /></p>
+<p> To complete the analysis we have to understand <img src="https://s0.wp.com/latex.php?latex=%7B%5Chat+X_%7Bt%2B1%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\hat X_{t+1}}" class="latex" />. We need to compute the gradient <img src="https://s0.wp.com/latex.php?latex=%7BX+%5Crightarrow+D%28X%2CX_%7Bt%7D%29+%2B+X%5Cbullet+L_%7Bt%7D+%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X \rightarrow D(X,X_{t}) + X\bullet L_{t} }" class="latex" /> and set it to zero. The gradient of <img src="https://s0.wp.com/latex.php?latex=%7BX%5Cbullet+L_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X\bullet L_t}" class="latex" /> is just <img src="https://s0.wp.com/latex.php?latex=%7BL_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{L_t}" class="latex" />. The gradient of <img src="https://s0.wp.com/latex.php?latex=%7BD%28X%2CX_%7Bt%7D%29%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{D(X,X_{t})}" class="latex" /> is</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Cnabla+D%28X%2CX_t%29+%3D+c+%5Cnabla+X+%5Cbullet+%5Clog+X+-+c+%5Cnabla+X+%5Cbullet+%5Clog+X_t+-+%5Cnabla+c+X+%5Cbullet+I+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \nabla D(X,X_t) = c \nabla X \bullet \log X - c \nabla X \bullet \log X_t - \nabla c X \bullet I " class="latex" /></p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%3D+cI+%2B+c+%5Clog+X+-+c+%5Clog+X_t+-+cI+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  = cI + c \log X - c \log X_t - cI " class="latex" /></p>
+<p> Meaning that we want to solve for</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++c+%5Clog+X+-+c%5Clog+X_t+%2B+L_t+%3D+0+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  c \log X - c\log X_t + L_t = 0 " class="latex" /></p>
+<p> and <img src="https://s0.wp.com/latex.php?latex=%7B%5Chat+X_%7Bt%2B1%7D%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\hat X_{t+1}}" class="latex" /> satisfies</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+%5Clog+X_t+-+%5Clog+%5Chat+X_%7Bt%2B1%7D+%3D+%5Cfrac+1c+L_t+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle \log X_t - \log \hat X_{t+1} = \frac 1c L_t " class="latex" /></p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Chat+X_%7Bt%2B1%7D+%3D+e%5E%7B%5Clog+X_t+-+%5Cfrac+1c+L_t+%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \hat X_{t+1} = e^{\log X_t - \frac 1c L_t } " class="latex" /></p>
+<p> and we can write</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++D%28X_t%2C%5Chat+X_%7Bt%2B1%7D+%29+%3D+c+%5Ccdot+%5Cleft%28+X_t+%5Cbullet+%28%5Clog+X_t+-+%5Clog+%5Chat+X_%7Bt%2B1%7D%29%5Cright%29+%2B+c+%7B%5Crm+tr%7D%28+%5Chat+X_%7Bt%2B1%7D+%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  D(X_t,\hat X_{t+1} ) = c \cdot \left( X_t \bullet (\log X_t - \log \hat X_{t+1})\right) + c {\rm tr}( \hat X_{t+1} )" class="latex" /></p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%3D+c+%5Ccdot+X_t+%5Cbullet+%5Cfrac+1c+L_t+%2B+c+%5Ccdot+%7B%5Crm+tr%7D%28e%5E%7B%5Clog+X_t+-+%5Cfrac+1c+L_t%7D%29+%2B+c+%7B%5Crm+tr%7D+%5Chat+X_%7Bt%2B1%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  = c \cdot X_t \bullet \frac 1c L_t + c \cdot {\rm tr}(e^{\log X_t - \frac 1c L_t}) + c {\rm tr} \hat X_{t+1} " class="latex" /></p>
+<p> Then we can use Golden-Thompson and the fact that <img src="https://s0.wp.com/latex.php?latex=%7Be%5E-%5Cfrac+1c+L_t+%5Cpreceq+I+-+%5Cfrac+1c+L_t+%2B+%5Cfrac+1%7Bc%5E2%7D+L%5E2_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{e^-\frac 1c L_t \preceq I - \frac 1c L_t + \frac 1{c^2} L^2_t}" class="latex" />, which holds if <img src="https://s0.wp.com/latex.php?latex=%7BL_t+%5Cpreceq+cI%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{L_t \preceq cI}" class="latex" />, to write</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%7B%5Crm+tr%7D%28e%5E%7B%5Clog+X_t+-+%5Cfrac+1c+L_t%7D%29+%5Cleq+%7B%5Crm+tr%7D%28e%5E%7B%5Clog+X_t%7D+%5Ccdot+e%5E%7B-%5Cfrac+1c+L_t%7D+%29+%3D+X_t+%5Cbullet+e%5E%7B-%5Cfrac+1c+L_t%7D+%5Cleq+X_t+%5Cbullet+%5Cleft%28+I+-+%5Cfrac+1c+L_t+%2B+%5Cfrac+1%7Bc%5E2%7D+L%5E2_t+%5Cright%29+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  {\rm tr}(e^{\log X_t - \frac 1c L_t}) \leq {\rm tr}(e^{\log X_t} \cdot e^{-\frac 1c L_t} ) = X_t \bullet e^{-\frac 1c L_t} \leq X_t \bullet \left( I - \frac 1c L_t + \frac 1{c^2} L^2_t \right) " class="latex" /></p>
+<p> Combining everything together we have</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++D%28X_t%2C%5Chat+X_%7Bt%2B1%7D+%29+%5Cleq+%5Cfrac+1c+X_t+%5Cbullet+L_t%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  D(X_t,\hat X_{t+1} ) \leq \frac 1c X_t \bullet L_t^2 " class="latex" /></p>
+<p> and so, provided <img src="https://s0.wp.com/latex.php?latex=%7B%5Clambda_%7B%5Cmax%7D+%28L_t%29+%5Cleq+c%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\lambda_{\max} (L_t) \leq c}" class="latex" />,</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++Regret_T+%5Cleq+c+%5Clog+n+%2B+%5Cfrac+1c+%5Csum_%7Bt%3D1%7D%5ET+X_t+%5Cbullet+L_t%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  Regret_T \leq c \log n + \frac 1c \sum_{t=1}^T X_t \bullet L_t^2 " class="latex" /></p>
+<p> This is the best bound we can hope for, and it matches Theorem 1 in <a href="https://lucatrevisan.wordpress.com/2019/04/24/online-optimization-post-1-multiplicative-weights/">our first post</a> about the Xultiplicative Weights Update algorithm.</p>
+<p>If we have <img src="https://s0.wp.com/latex.php?latex=%7BL_t+%5Cpreceq+I%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{L_t \preceq I}" class="latex" />, we can simplify it to</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++Regret_T+%5Cleq+c+%5Clog+n+%2B+%5Cfrac+T+c+%3D+2+%5Csqrt%7BT+%5Clog+n%7D+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  Regret_T \leq c \log n + \frac T c = 2 \sqrt{T \log n} " class="latex" /></p>
+<p> where the last step comes from optimizing <img src="https://s0.wp.com/latex.php?latex=%7Bc%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{c}" class="latex" />.</p>
+<p>We can also write, under the condition <img src="https://s0.wp.com/latex.php?latex=%7BL_t+%5Cpreceq+c+I%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{L_t \preceq c I}" class="latex" />,</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++Regret_T+%28X%29+%5Cleq+c+%5Clog+n+%2B+%5Cfrac+1c+%5Csum_%7Bt%3D1%7D%5ET+%28X_t+%5Cbullet+%7CL_t%7C+%29%7C%7CL_t%7C%7C+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  Regret_T (X) \leq c \log n + \frac 1c \sum_{t=1}^T (X_t \bullet |L_t| )||L_t|| " class="latex" /></p>
+<p> where <img src="https://s0.wp.com/latex.php?latex=%7B%7CL_t%7C%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{|L_t|}" class="latex" /> is the “absolute value” of the matrix <img src="https://s0.wp.com/latex.php?latex=%7BL_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{L_t}" class="latex" /> defined in the following way: if <img src="https://s0.wp.com/latex.php?latex=%7BX+%3D+%5Csum_i+%5Clambda_i+v_i+v_i%5ET%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X = \sum_i \lambda_i v_i v_i^T}" class="latex" /> is a symmetric matrix, then its absolute value is <img src="https://s0.wp.com/latex.php?latex=%7B%7CX%7C+%3D+%5Csum_i+%7C%5Clambda_i%7C+%5Ccdot+v_i+v_i%5ET%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{|X| = \sum_i |\lambda_i| \cdot v_i v_i^T}" class="latex" />. Allen-Zhu, Liao and Orecchia state the analysis in this way in their <a href="https://arxiv.org/abs/1506.04838">on generalizations of Matrix Multiplicative Weights</a>.</p>
+<p>Our next post will discuss applications at length, but for now let us gain a bit of intuition about the usefulness of these regret bounds. Recall that, for every symmetric matrix <img src="https://s0.wp.com/latex.php?latex=%7BM%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{M}" class="latex" />, we have</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Clambda_%7B%5Cmin%7D+%28M%29+%3D+%5Cmin_%7BX+%5Crm%5C+density%5C+matrix%7D+%5C+%5C+X+%5Cbullet+M+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \lambda_{\min} (M) = \min_{X \rm\ density\ matrix} \ \ X \bullet M " class="latex" /></p>
+<p> and so the regret bound can be reintepreted in the following way: if we let <img src="https://s0.wp.com/latex.php?latex=%7BL_1%2C%5Cldots%2CL_T%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{L_1,\ldots,L_T}" class="latex" /> be the loss functions used in a game played against a MMWU algorithm, and the algorithm selects density matrices <img src="https://s0.wp.com/latex.php?latex=%7BX_1%2C%5Cldots%2CX_T%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{X_1,\ldots,X_T}" class="latex" />, then</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_%7Bt%3D1%7D%5ET+X_t+%5Cbullet+L_t+-+%5Cmin_%7BX+%5Crm+%5C+density+%5C+matrix%7D+%5C+%5C+X+%5Cbullet+%5Csum_%7Bt%3D1%7D%5ET+L_t+%5Cleq+c+%5Clog+n+%2B+%5Cfrac+1c+%5Csum_%7Bt%3D1%7D%5ET+X_t+%5Cbullet+L_t%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \sum_{t=1}^T X_t \bullet L_t - \min_{X \rm \ density \ matrix} \ \ X \bullet \sum_{t=1}^T L_t \leq c \log n + \frac 1c \sum_{t=1}^T X_t \bullet L_t^2 " class="latex" /></p>
+<p> that is,</p>
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle++%5Csum_%7Bt%3D1%7D%5ET+X_t+%5Cbullet+L_t+-+%5Clambda_%7B%5Cmin%7D+%5Cleft%28+%5Csum_%7Bt%3D1%7D%5ET+L_t+%5Cright%29+%5Cleq+c+%5Clog+n+%2B+%5Cfrac+1c+%5Csum_%7Bt%3D1%7D%5ET+X_t+%5Cbullet+L_t%5E2+&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle  \sum_{t=1}^T X_t \bullet L_t - \lambda_{\min} \left( \sum_{t=1}^T L_t \right) \leq c \log n + \frac 1c \sum_{t=1}^T X_t \bullet L_t^2 " class="latex" /></p>
+<p> provided that <img src="https://s0.wp.com/latex.php?latex=%7BL_t+%5Cpreceq+cI%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{L_t \preceq cI}" class="latex" />. For example, switching <img src="https://s0.wp.com/latex.php?latex=%7BL_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{L_t}" class="latex" /> with <img src="https://s0.wp.com/latex.php?latex=%7B-L_t%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{-L_t}" class="latex" />, we have <a name="main"></a></p>
+<p><a name="main"></a></p><a name="main">
+<p align="center"><img src="https://s0.wp.com/latex.php?latex=%5Cdisplaystyle+++%5Clambda_%7B%5Cmax%7D+%5Cleft%28+%5Csum_%7Bt%3D1%7D%5ET+L_t+%5Cright%29+%5Cleq+%5Csum_%7Bt%3D1%7D%5ET+X_t+%5Cbullet+L_t+%2B+%5Cfrac+1c+%5Csum_%7Bt%3D1%7D%5ET+X_t+%5Cbullet+L_t%5E2+%2B+c%5Clog+n+%5C+%5C+%5C+%5C+%5C+%281%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\displaystyle   \lambda_{\max} \left( \sum_{t=1}^T L_t \right) \leq \sum_{t=1}^T X_t \bullet L_t + \frac 1c \sum_{t=1}^T X_t \bullet L_t^2 + c\log n \ \ \ \ \ (1)" class="latex" /></p>
+</a><p><a name="main"></a><a name="main"></a> provided that <img src="https://s0.wp.com/latex.php?latex=%7BL_t+%5Csucceq+-cI%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{L_t \succeq -cI}" class="latex" />, which means that if we can choose a sequence of loss matrices that make the MMWU have small loss at each step, then we are guaranteed that the sum of such matrices cannot have any large eigenvalue.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by luca <a href="https://lucatrevisan.wordpress.com/2021/11/10/online-optimization-post-7-matrix-multiplicative-weights-update/"><span class="datestr">at November 10, 2021 12:11 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://eccc.weizmann.ac.il/report/2021/154">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/eccc.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-us"><a class="entryheader" href="https://eccc.weizmann.ac.il/report/2021/154">TR21-154 |  Explicit Binary Tree Codes with Sub-Logarithmic Size Alphabet | 
+
+	Gil Cohen, 
+
+	Inbar Ben Yaacov, 
+
+	Tal Yankovitz</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://eccc.weizmann.ac.il/" title="ECCC - Reports">ECCC papers</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+Since they were first introduced by Schulman (STOC 1993), the construction of tree codes remained an elusive open problem. The state-of-the-art construction by Cohen, Haeupler and Schulman (STOC 2018) has constant distance and $(\log n)^{e}$ colors for some constant $e &gt; 1$ that depends on the distance, where $n$ is the depth of the tree. Insisting on a constant number of colors at the expense of having vanishing distance, Gelles, Haeupler, Kol, Ron-Zewi, and Wigderson (SODA 2016) constructed a distance $\Omega(\frac1{\log n})$ tree code.
+
+In this work we improve upon these prior works and construct a distance-$\delta$ tree code with $(\log{n})^{O(\sqrt{\delta})}$ colors. This is the first construction of a constant distance tree code with sub-logarithmic number of colors. Moreover, as a direct corollary we obtain a tree code with a constant number of colors and distance $\Omega\left(\frac1{(\log\log{n})^{2}}\right)$, exponentially improving upon the above-mentioned work by Gelles et al.</div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="https://eccc.weizmann.ac.il/report/2021/154"><span class="datestr">at November 10, 2021 11:16 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2675,89 +2857,6 @@ Email: zsong@adobe.com</p></div>
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-jobs.org/2021/11/05/summer-research-intern-at-adobe-research-apply-by-december-31-2021/"><span class="datestr">at November 05, 2021 04:50 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://cstheory-jobs.org/2021/11/04/faculty-at-university-of-haifa-at-oranim-college-apply-by-december-31-2021/">
-<div class="entryheader">
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://cstheory-jobs.org/2021/11/04/faculty-at-university-of-haifa-at-oranim-college-apply-by-december-31-2021/">Faculty at University of Haifa at Oranim College (apply by December 31, 2021)</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://cstheory-jobs.org" title="Theoretical Computer Science Jobs">CCI: jobs</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p>The Department of Mathematics-Physics-Computer Science of the University of Haifa at Oranim College invites applications for a tenure-track faculty position in all areas of Computer Science, to begin October 1st 2022.</p>
-<p>Website: <a href="https://mathphys.haifa.ac.il/en/announcements/">https://mathphys.haifa.ac.il/en/announcements/</a><br />
-Email: ackerman@sci.haifa.ac.il</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by shacharlovett <a href="https://cstheory-jobs.org/2021/11/04/faculty-at-university-of-haifa-at-oranim-college-apply-by-december-31-2021/"><span class="datestr">at November 04, 2021 01:48 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="tag:blogger.com,1999:blog-8890204.post-3367673395710171015">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/mitzenmacher.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="http://mybiasedcoin.blogspot.com/2021/11/hotnets-presentation-zero-cpu.html">HotNets Presentation : Zero-CPU Collection with Direct Telemetry Access</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://mybiasedcoin.blogspot.com/" title="My Biased Coin">Michael Mitzenmacher</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p>HotNets has asked that we let people know that the 2021 presentations <a href="https://www.youtube.com/channel/UCZZ5nf4RNDIIe4nifI8grwQ/videos">are available here</a>.  I'm using that an excuse to highlight our paper on Zero-CPU Collection with Direct Telemetry Access (<a href="https://arxiv.org/abs/2110.05438">arxiv version here</a>), but really I want to highlight the talk by graduate student Jonatan Langlet (Queen Mary University of London) who, as is the nature of graduate students, did all of the real work, and who really did a great job on <a href="https://www.youtube.com/watch?v=_M8AbF_f8Kk&amp;t=2s">the talk (direct link)</a>.  If you guessed from my involvement this involves hashing in some way, your maximum likelihood estimate turns out to be correct.</p><p>I think our work fits the HotNets call, which asks for new approaches and preliminary work.  Specifically, the call for the HotNets workshop says this:</p><p></p><blockquote><p>We invite researchers and practitioners to submit short position papers. We encourage papers that identify fundamental open questions, advocate a new approach, offer a constructive critique of the state of networking research, re-frame or debunk existing work, report unexpected early results from a deployment, report on promising but unproven ideas, or propose new evaluation methods. Novel ideas need not be supported by full evaluations; well-reasoned arguments or preliminary evaluations can support the possibility of the paper’s claims.</p><p>We seek early-stage work, where the authors can benefit from community feedback. An ideal submission has the potential to open a line of inquiry for the community that results in multiple conference papers in related venues (SIGCOMM, NSDI, CoNEXT, SOSP, OSDI, MobiCom, MobiSys, etc.), rather than a single follow-on conference paper. The program committee will explicitly favor early work and papers likely to stimulate reflection and discussion over “conference papers in miniature”.</p></blockquote><p>There are similar other "Hot" workshops in other areas, and it was about <a href="http://mybiasedcoin.blogspot.com/2007/08/hottheory-workshop.html">14 years ago that I asked whether CS theory should have a HotTheory workshop</a>.  There's been a proliferation of new conferences and workshops in theory since then, but none of them really seem to have this flavor.  So maybe it's worth asking again whether a HotTheory workshop would make sense?  Or do existing theory events meet the theory community needs?</p><p></p><p><br /></p></div>
-
-
-
-
-
-
-
-<p class="date">
-by Michael Mitzenmacher (noreply@blogger.com) <a href="http://mybiasedcoin.blogspot.com/2021/11/hotnets-presentation-zero-cpu.html"><span class="datestr">at November 04, 2021 01:01 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
