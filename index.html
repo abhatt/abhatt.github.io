@@ -228,10 +228,10 @@ Stay up to date
 <a href="http://arxiv.org/" title="cs.CC updates on arXiv.org">arXiv.org: Computational complexity</a>
 <br>
 <a class="feedlink" href="http://export.arxiv.org/rss/cs.CG" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
-<a href="http://arxiv.org/" title="cs.CG updates on arXiv.org">arXiv.org: Computational geometry</a>
+<a href="http://arxiv.org/" class="message" title="duplicate subscription: http://export.arxiv.org/rss/cs.DS">arXiv.org: Computational geometry</a>
 <br>
 <a class="feedlink" href="http://export.arxiv.org/rss/cs.DS" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
-<a href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<a href="http://arxiv.org/" class="message" title="duplicate subscription: http://export.arxiv.org/rss/cs.CC">arXiv.org: Data structures and Algorithms</a>
 <br>
 <a class="feedlink" href="http://bit-player.org/feed/atom/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://bit-player.org" title="bit-player">bit-player</a>
@@ -243,7 +243,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at November 15, 2021 01:39 AM UTC</span>.
+Last updated <span class="datestr">at November 15, 2021 02:22 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -328,6 +328,76 @@ Email: theory.waterloo@gmail.com</p></div>
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-jobs.org/2021/11/14/postdoc-at-university-of-waterloo-apply-by-december-31-2021/"><span class="datestr">at November 14, 2021 08:59 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://11011110.github.io/blog/2021/11/14/random-independent-sets">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/eppstein.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://11011110.github.io/blog/2021/11/14/random-independent-sets.html">Random independent sets in bounded-treewidth graphs</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>This week my student Daniel Frishberg posted our new preprint “Rapid mixing of the hardcore Glauber dynamics and other Markov chains in bounded-treewidth graphs”, <a href="https://arxiv.org/abs/2111.03898">arXiv:2111.03898</a>. Despite the somewhat-technical title and content, it’s on an easy-to-explain problem, of generating random combinatorial objects (like independent sets in graphs) using random walks. Start with an undirected graph and an empty subset of its vertices, and then repeatedly choose a random vertex, flipping whether it is in or out of the subset whenever the resulting subset remains independent. How many of these steps does it take until the resulting random distribution on independent sets is nearly uniform?</p>
+
+<p>In general, this can take exponentially many steps, but our paper proves that in graphs of bounded <a href="https://en.wikipedia.org/wiki/Treewidth">treewidth</a> it is only polynomial. Our proof’s exponent depends on the treewidth, but maybe a better proof can get the dependence on treewidth out of the exponent and into the constant factor of the polynomial instead. However, if all you want to do is generate a random independent sets, this is not the right way to do it. The point of the paper is less about fast algorithms and more about the connectivity of the space of independent sets. So if you do want a fast algorithm for random generation, what should you do?</p>
+
+<p>This is, unfortunately, an area where some care is required and much of the literature does not take the required care. Problematic issues include:</p>
+
+<ul>
+  <li>
+    <p>What is the model of computation for arithmetic operations? Much of the literature for the design and analysis of graph algorithms assumes without much attention that all arithmetic operations take unit time. This is a reasonable assumption for small numbers (of at most polynomial magnitude), as occur in many algorithms including the random walk above. In those cases it is a close match to the kind of operation that can be done in a single instruction on a modern CPU. It is not a reasonable assumption for counting algorithms dealing with numbers of exponential magnitude. Counting is an important subproblem for exact random generation, so we need large numbers. Typically, the number of independent sets is linear in the input size, the number of bits required to store this number is linear, and the amount of time needed to perform a single operation on a number this large should again be assumed to involve a bignum-package subroutine. The slow steps are multiplications, which can by <a href="https://www.jstor.org/stable/10.4007/annals.2021.193.2.4">recent results of Harvey and van der Hoeven</a> be assumed to take \(O(n\log n)\) time.</p>
+  </li>
+  <li>
+    <p>What is the model for generating random numbers? If random numbers are generated as bits, this only allows the direct generation of random choices with probabilities that are <a href="https://en.wikipedia.org/wiki/Dyadic_rational">dyadic rational</a>. For independent sets, we need other probabilities. <a href="https://en.wikipedia.org/wiki/Rejection_sampling">Rejection sampling</a> leads to an algorithm whose running time is itself a random variable, so we need to use expected time or high-probability bounds instead of worst-case time analysis.</p>
+  </li>
+  <li>
+    <p>How is the input presented? For the random-walk method, it is just a graph, but for other algorithms taking advantage of low treewidth we need a good <a href="https://en.wikipedia.org/wiki/Tree_decomposition">tree decomposition</a>, and finding one is nontrivial. We should either state explicitly that a tree decomposition is given and that its width rather than the graph width controls the algorithm’s runtime, or factor in the time to find a decomposition and the width of decomposition that we find.</p>
+  </li>
+</ul>
+
+<p>With that all said, how might we go about computing a random independent set for a given \(n\)-vertex graph of treewidth \(w\), achieving the best theoretical performance?</p>
+
+<p>First, we should find an approximate tree decomposition. There are many known algorithms for this problem, but I think the right choice is the one from the recent paper “An improvement of Reed’s treewidth approximation”, Belbasi and Fürer, WALCOM 2021, <a href="https://arxiv.org/abs/2010.03105">arXiv:2010.03105</a>. It finds a tree decomposition of width at most \(5w\), in time \(O(2^{8.8w}n\log n)\). There are other algorithms with a linear dependence on \(n\), but much worse dependence on \(w\), and the \(n\log n\) part of the bound will be dominated by later steps. We can also bootstrap this decomposition, using dynamic programming on it to find a better decomposition, but I think this is too expensive for the savings it produces.</p>
+
+<p>Second, we should count independent sets. Root the tree decomposition, so that we can talk about the subtree descending from any bag and the subgraph of the given graph that it corresponds to. Then for each bag of the decomposition (in bottom-up order), and each independent subset of the bag, we want to count the number of independent sets in the corresponding subgraph that intersect the bag in the given subset. These independent sets are formed by combining choices of independent sets in child nodes. Therefore, we need to find the numbers of independent sets in each child node that are consistent with the choice of subset at the parent, and multiply them together. Each subset of a bag contributes to exactly one such computation at its parent, so the total number of arithmetic operations for this computation is the product of the number of bags and the number of subsets per bag. With bignum arithmetic, the total time for computing all of these counts is \(O(2^{5w}n^2\log n)\). Our new preprint cites a paper for this subproblem that isn’t sufficiently careful about bignum arithmetic, but still somehow ends up with a slower cubic total time bound; I think they’re just being sloppy and overcounting somehow.</p>
+
+<p>Third, we can then reverse the counting process and step downward through the tree decomposition choosing how the random independent set intersects each bag. When we do this for a bag, we already know the intersection of the independent set with the parent bag. Therefore, all we have to do is choose among the subsets of the child bag that are consistent with that already-made choice, using probabilities that are proportional to the numbers of independent sets that can be formed for each consistent subset. We know these numbers because we already computed them in the second stage. So it’s just a single random choice per bag, which (because it involves bignum probabilities that are not dyadic rational) can reasonably be assumed to take a random amount of time whose expectation is linear. For the overall algorithm, the total expected time is \(O(n^2)\). Also, this stage of the algorithm can be repeated over and over, generating new random independent sets, without having to generate new tree decompositions or new counts.</p>
+
+<p>Putting it all together, it appears that the total time for randomly generating independent sets, using dynamic programming on the tree decomposition to count these sets, and assuming fast bignum arithmetic, is \(O(2^{O(w)}n^2\log n)\) for the preprocessing stages of the algorithm, and then \(O(n^2)\) for each successive generated set.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/107278583702646630">Discuss on Mastodon</a>)</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by David Eppstein <a href="https://11011110.github.io/blog/2021/11/14/random-independent-sets.html"><span class="datestr">at November 14, 2021 04:41 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -2729,66 +2799,6 @@ Email: simon.apers@inria.fr</p></div>
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-jobs.org/2021/11/09/postdoc-positions-in-quantum-algorithms-at-irif-cnrs-paris-apply-by-december-15-2021/"><span class="datestr">at November 09, 2021 02:43 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://eccc.weizmann.ac.il/report/2021/153">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eccc.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="https://eccc.weizmann.ac.il/report/2021/153">TR21-153 |  On Hardness Assumptions Needed for &amp;quot;Extreme High-End&amp;quot; PRGs and Fast Derandomization | 
-
-	Ronen Shaltiel, 
-
-	Emanuele Viola</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://eccc.weizmann.ac.il/" title="ECCC - Reports">ECCC papers</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-The hardness vs.~randomness paradigm aims to explicitly construct pseudorandom generators $G:\{0,1\}^r \to \{0,1\}^m$ that fool circuits of size $m$, assuming the existence of explicit hard functions. A ``high-end PRG'' with seed length $r=O(\log m)$ (implying BPP=P) was achieved in a seminal work of Impagliazzo and Wigderson (STOC 1997), assuming \textsc{the high-end hardness assumption}: there exist constants $0&lt;\beta &lt; 1&lt; B$, and functions computable in time $2^{B \cdot n}$ that cannot be computed by circuits of size $2^{\beta \cdot n}$.
-
-Recently, motivated by fast derandomization of randomized algorithms, Doron et al.~(FOCS 2020) and Chen and Tell (STOC 2021), construct ``extreme high-end PRGs'' with seed length $r=(1+o(1))\cdot \log m$, under qualitatively stronger assumptions.
-
-We study whether extreme high-end PRGs can be constructed from the corresponding hardness assumption in which $\beta=1-o(1)$ and $B=1+o(1)$, which we call \textsc{the extreme high-end hardness assumption}. We give a partial negative answer:
-
-\begin{itemize}
-\item The construction of Doron et al. composes a PEG (pseudo-entropy generator) with an extractor.  The PEG is constructed starting from a function that is hard for MA-type circuits.  We show that black-box PEG constructions from \textsc{the extreme high-end hardness assumption} must have large seed length (and so cannot be used to obtain extreme high-end PRGs by applying an extractor).
-
-To prove this, we establish a new property of (general) black-box PRG constructions from hard functions: it is possible to fix many output bits of the construction while fixing few bits of the hard function. This property distinguishes PRG constructions from typical extractor constructions, and this may explain why it is difficult to design PRG constructions.
-
-\item The construction of Chen and Tell composes two PRGs: $G_1:\{0,1\}^{(1+o(1)) \cdot \log m} \to \{0,1\}^{r_2=m^{\Omega(1)}}$ and $G_2:\{0,1\}^{r_2} \to \{0,1\}^m$.  The first PRG is constructed from \textsc{the extreme high-end hardness assumption}, and the second PRG needs to run in time $m^{1+o(1)}$, and is constructed assuming one way functions. We show that in black-box proofs of hardness amplification to $\frac{1}{2}+1/m$, reductions must make $\Omega(m)$ queries, even in the extreme high-end. Known PRG constructions from hard functions are black-box and use (or imply) hardness amplification, and so cannot be used to construct a PRG $G_2$ from \textsc{the extreme high-end hardness assumption}.
-
-The new feature of our hardness amplification result is that it applies even to the extreme high-end setting of parameters, whereas past work does not. Our techniques also improve recent lower bounds of Ron-Zewi, Shaltiel and Varma (ITCS 2021) on the number of queries of local list-decoding algorithms.
-\end{itemize}</div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="https://eccc.weizmann.ac.il/report/2021/153"><span class="datestr">at November 09, 2021 11:08 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
