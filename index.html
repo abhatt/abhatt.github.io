@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at December 20, 2021 06:38 AM UTC</span>.
+Last updated <span class="datestr">at December 20, 2021 07:22 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -289,6 +289,72 @@ Email: farid.alizadeh@rutgers.edu</p></div>
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-jobs.org/2021/12/20/assistant-professor-at-rutgers-university-rutgers-business-school-apply-by-january-1-2022/"><span class="datestr">at December 20, 2021 04:38 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://11011110.github.io/blog/2021/12/19/recursive-bijective-numbering">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/eppstein.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://11011110.github.io/blog/2021/12/19/recursive-bijective-numbering.html">Recursive bijective numbering</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>Ordinary radix systems for representing numbers, like binary or decimal, use fixed finite sets of digits. The same is true for <a href="https://en.wikipedia.org/wiki/Bijective_numeration">bijective numeration</a>, used for columns of spreadsheets. In bijective numbering, every string of digits represents a unique number, shorter strings represent smaller numbers, and strings of equal length have the usual order. In spreadsheets, the digits are letters A–Z, one-letter strings represent numbers \(1\) through \(26\), two-letter strings represent \(27\) through \(26+26^2=702\), etc. Instead, <a href="https://en.wikipedia.org/wiki/Mixed_radix">mixed radix</a> systems like the <a href="https://en.wikipedia.org/wiki/Factorial_number_system">factorial number system</a> have position-varying digit sets.  In factorial numbering, the \(i\)th digit can range from \(0\) to \(i-1\), with place value \((i-1)!\). The value of a digit string is the sum of digits times place values. One could combine these ideas and get a bijective factorial number system, in which strings of at most \(i\) digits can represent numbers up to the <a href="https://oeis.org/A007489">sum of the first \(i\) factorials</a>. But in all of these mixed radix systems, the digits are not drawn from a finite set. Maybe we need another numbering system just to describe each digit of a mixed-radix number? This leads to the idea of a <em>recursive</em> numbering system, where the digits of a mixed-radix system are themselves numbers in the same system.</p>
+
+<p>An example might clarify this idea. Let’s start with a recursive numbering system based on binary. Like other mixed-radix systems, we’ll number the digit positions starting with \(i=0\) at the right. Each position has a place value, the product of the numbers of choices for earlier digits, and the value of a sequence of digits is the sum of digits times place value. We’ll start with two choices of digit in position \(0\), like binary, and in later positions we’ll use the values we’ve already constructed as allowable digits.</p>
+<ul>
+  <li>In position \(i=0\), the two available digits given in the base case are \(0\) and \(1\), allowing us to represent only the numbers \(0\) and \(1\) as one-digit strings.</li>
+  <li>In position \(i=1\), there are still only two digits available, the two numbers \(0\) and \(1\) that have shorter representations. In this position, they have place value \(2\), allowing any number from \(0\) to \(3\) to be represented as a two-digit string.</li>
+  <li>In position \(i=2\), we now have four digits available, the numbers from \(0\) to \(3\). These have place value \(4\), allowing any number from \(0\) to \(15\) to be represented with three digits.</li>
+</ul>
+
+<p>At each successive level of this structure, the number of available digits and place values will be equal. Each new digit squares the range of representable numbers. In any position \(i&gt;0\), we will have \(2^{2^{i-1}}\) digits available, with place value \(2^{2^{i-1}}\), allowing any number from \(0\) to \(2^{2^{i}}-1\) to be represented. In some sense, though, we haven’t done anything very interesting yet. Like binary, we just get powers of two. The recursive-binary representation of a number can be obtained in a trivial way from its binary representation, by partitioning the bits into groups of 1, 1, 2, 4, 8, … bits.</p>
+
+<p>Instead, a bijective numbering system leads to more interesting results when handled recursively. For recursive bijective numbering, we can start with a much simpler base case, the empty string, which can be interpreted in any bijective numbering system as representing the number \(0\). With this base case, we can define a bijective numbering system in which the available digits in position \(i\) (starting from \(i=0\) in the rightmost digit) are the numbers that can be represented by strings of length at most \(i\):</p>
+<ul>
+  <li>In position \(i=0\), there is only one available digit, the number \(0\) (already represented by the empty string), producing only one single-digit value, representing the number \(1\).</li>
+  <li>In position \(i=1\), there are two available digits, the numbers \(0\) and \(1\) that we have already represented, so there are two two-digit sequences possible, representing two more numbers \(2\) and \(3\).</li>
+  <li>In position \(i=2\), there are four available digits, providing eight three-digit sequences that can represent the numbers \(4\) through \(11\).</li>
+</ul>
+
+<p>If we let \(n_i\) denote the number of values that can be obtained by strings of exactly \(i\) digits, then we obtain a recurrence \(n_0=1\) (the zero-length strings represent only one value, zero) and \(n_i=n_{i-1}\sum_{j&lt;i}n_j\) (there are \(n_{i-1}\) choices for the string up to its last digit, and \(\sum_{j&lt;i}n_j\) choices for the last digit). This recurrence has the sequence of values <a href="http://oeis.org/A001697">1, 1, 2, 8, 96, 10368, 108615168, …</a> and its partial sums <a href="http://oeis.org/A001696">1, 2, 4, 12, 108, 10476, 108625644, …</a> give the total number of values that can be represented by strings of up to \(i\) digits.</p>
+
+<p>The same idea can be represented graphically. Given a number represented by this recursive bijective numbering system, draw an ordered tree, where an \(i\)-digit number is represented by a tree whose root has \(i\) children, one for each digit, and where each digit is represented in the same way by a subtree. Conversely, if we have an ordered tree, we can think of it as representing a recursive bijective number, whose digits are computed recursively from the children of the root. In our recursive bijective numbers, we required that each digit be representable as a string of length at most its position; translating this requirement into tree terminology, each node that is the \(i\)th child of its parent (again starting with \(i=0\) on the right) must have degree at most \(i\).</p>
+
+<p style="text-align: center;"><img width="60%" alt="Equivalence between recursive bijective numbering and tree enumeration" src="https://11011110.github.io/blog/assets/2021/recursive-bijective.svg" /></p>
+
+<p>It follows that the sequences of numbers of representable values for \(i\)-digit strings and for \(\le i\)-digit strings, above, also give the numbers of ordered trees that obey this degree constraint, with root degree \(i\) or \(\le i\), respectively.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by David Eppstein <a href="https://11011110.github.io/blog/2021/12/19/recursive-bijective-numbering.html"><span class="datestr">at December 19, 2021 09:12 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -2507,64 +2573,6 @@ Finally, we establish a strong connection between JCH and the long standing open
 
 <p class="date">
 by Omer Reingold <a href="https://theorydish.blog/2021/12/11/csr-2022/"><span class="datestr">at December 11, 2021 09:25 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://gilkalai.wordpress.com/?p=22268">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/kalai.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://gilkalai.wordpress.com/2021/12/11/to-cheer-you-up-in-difficult-times-34-ringel-circle-problem-solved-by-james-davies-chaya-keller-linda-kleist-shakhar-smorodinsky-and-bartosz-walczak/">To cheer you up in difficult times 34: Ringel Circle Problem solved by James Davies, Chaya Keller, Linda Kleist, Shakhar Smorodinsky, and Bartosz Walczak</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://gilkalai.wordpress.com" title="Combinatorics and more">Gil Kalai</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p>Gerhard Ringel considered in 1959 the following:</p>
-<blockquote>
-<p>Consider a finite family of circles such that every point in the plane is included in at most two circles. What is the minimum number of colors needed to color the circles so that tangent circles are colored with different colors?</p>
-</blockquote>
-<p><strong>Ringel 1959 circle problem</strong> is the question if this minimum number of colors is bounded.</p>
-<p>I mentioned the problem in a post about <a href="https://gilkalai.wordpress.com/2018/04/13/coloring-problems-for-arrangements-of-circles-and-pseudocircles/">eight coloring problems for arrangements of circles and pseudocircles</a>, three years ago. (For another recently solved conjecture by Ringel see <a href="https://gilkalai.wordpress.com/2020/01/27/ringel-conjecture-solved-congratulations-to-richard-montgomery-alexey-pokrovskiy-and-benny-sudakov/">this post</a>.)</p>
-<p>In a <a href="https://arxiv.org/abs/2112.05042">recent arXiv paper</a> James Davies, Chaya Keller, Linda Kleist, Shakhar Smorodinsky, and Bartosz Walczak solved the problem and showed that any finite number of colors does not suffices. In fact the proved considerably more. The paper is</p>
-<h3><a href="https://arxiv.org/abs/2112.05042">A solution to Ringel circle problem,</a></h3>
-<p>and here is the abstract</p>
-<p><strong>Abstract:</strong> We construct families of circles in the plane such that their tangency graphs have arbitrarily large girth and chromatic number. This provides a strong negative answer to Ringel’s circle problem (1959). The proof relies on a (multidimensional) version of Gallai’s theorem with polynomial constraints, which we derive from the Hales-Jewett theorem and which may be of independent interest.</p>
-<p>Congratulations to the authors.</p>
-<p><img width="570" alt="Rin2" src="https://gilkalai.files.wordpress.com/2021/12/rin2.png" class="alignnone size-full wp-image-22275" height="396" /></p>
-<p><img width="566" alt="Rin3" src="https://gilkalai.files.wordpress.com/2021/12/rin3.png" class="alignnone size-full wp-image-22276" height="363" /></p>
-<p><img width="568" alt="Rin4" src="https://gilkalai.files.wordpress.com/2021/12/rin4.png" class="alignnone size-full wp-image-22277" height="613" /></p>
-
-
-<p></p></div>
-
-
-
-
-
-
-
-<p class="date">
-by Gil Kalai <a href="https://gilkalai.wordpress.com/2021/12/11/to-cheer-you-up-in-difficult-times-34-ringel-circle-problem-solved-by-james-davies-chaya-keller-linda-kleist-shakhar-smorodinsky-and-bartosz-walczak/"><span class="datestr">at December 11, 2021 04:12 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
