@@ -231,10 +231,10 @@ Stay up to date
 <a href="http://arxiv.org/" title="cs.CC updates on arXiv.org">arXiv.org: Computational complexity</a>
 <br>
 <a class="feedlink" href="http://export.arxiv.org/rss/cs.CG" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
-<a href="http://arxiv.org/" title="cs.CG updates on arXiv.org">arXiv.org: Computational geometry</a>
+<a href="http://arxiv.org/" class="message" title="duplicate subscription: http://export.arxiv.org/rss/cs.DS">arXiv.org: Computational geometry</a>
 <br>
 <a class="feedlink" href="http://export.arxiv.org/rss/cs.DS" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
-<a href="http://arxiv.org/" title="cs.DS updates on arXiv.org">arXiv.org: Data structures and Algorithms</a>
+<a href="http://arxiv.org/" class="message" title="duplicate subscription: http://export.arxiv.org/rss/cs.CC">arXiv.org: Data structures and Algorithms</a>
 <br>
 <a class="feedlink" href="http://bit-player.org/feed/atom/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://bit-player.org" title="bit-player">bit-player</a>
@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at December 20, 2021 01:39 AM UTC</span>.
+Last updated <span class="datestr">at December 20, 2021 02:21 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -1426,7 +1426,51 @@ by Lance Fortnow (noreply@blogger.com) <a href="http://blog.computationalcomplex
 
 
 
-<p>Of course, one can prove the correctness of backpropagation using the chain rule in various ways, but the simple proof “backpropagation uses the standard chain rule at every step” is incomplete. Also, it is certainly possible to compute derivatives (gradients) on a neural network directly using the chain rule similarly to <a href="https://theorydish.blog/feed/#eq-2">(2)</a>, but in neural network training one typically wants to calculate the derivatives of a single output variable w.r.t. a large number of input variables, in which case backpropagation allows a more efficient implementation than using the standard chain rule directly.</p></div>
+<p>Of course, one can prove the correctness of backpropagation using the chain rule in various ways, but the simple proof “backpropagation uses the standard chain rule at every step” is incomplete. Also, it is certainly possible to compute derivatives (gradients) on a neural network directly using the chain rule similarly to <a href="https://theorydish.blog/feed/#eq-2">(2)</a>, but in neural network training one typically wants to calculate the derivatives of a single output variable w.r.t. a large number of input variables, in which case backpropagation allows a more efficient implementation than using the standard chain rule directly.</p>
+
+
+
+<h2 id="the-real-chain-rule-in-actual-backpropagation">The real chain rule in actual backpropagation</h2>
+
+
+
+<p>When implementing the backpropagation algorithm, it is more convenient and efficient to add in the two terms (or any number of terms in general) on the right-hand-side of <a href="https://theorydish.blog/feed/#eq-3">(3)</a> at <em>different</em> steps of the algorithm. This is described in Barak’s <a href="https://windowsontheory.org/2020/11/03/yet-another-backpropagation-tutorial/">tutorial</a>, which also has an actual Python implementation! In contrast to the failure of naively explaining equation <a href="https://theorydish.blog/feed/#eq-3">(3)</a> as the chain rule, there is a way to explain this implementation using the chain rule directly.</p>
+
+
+
+<p>To describe the implementation, suppose <img src="https://s0.wp.com/latex.php?latex=b_1%2C%5Cldots%2Cb_n&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_1,\ldots,b_n" class="latex" /> are all the variables, including input variables <img src="https://s0.wp.com/latex.php?latex=b_1%2C%5Cldots%2Cb_m&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_1,\ldots,b_m" class="latex" />, intermediate variables <img src="https://s0.wp.com/latex.php?latex=b_%7Bm%2B1%7D%2C%5Cldots%2Cb_%7Bn-1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_{m+1},\ldots,b_{n-1}" class="latex" />, and the only output variable <img src="https://s0.wp.com/latex.php?latex=c+%3D+b_n&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="c = b_n" class="latex" />. Assume the variables are arranged in topological order: for every <img src="https://s0.wp.com/latex.php?latex=i+%3D+m%2B1%2C%5Cldots%2Cn&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="i = m+1,\ldots,n" class="latex" />, variable <img src="https://s0.wp.com/latex.php?latex=b_i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_i" class="latex" /> is locally a function of variables <img src="https://s0.wp.com/latex.php?latex=b_j&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_j" class="latex" /> with <img src="https://s0.wp.com/latex.php?latex=j+%3C+i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="j &lt; i" class="latex" />. We can write this as <img src="https://s0.wp.com/latex.php?latex=b_i+%3D+b_i%28b_1%2C%5Cldots%2Cb_%7Bi-1%7D%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_i = b_i(b_1,\ldots,b_{i-1})" class="latex" />. Note that some variables <img src="https://s0.wp.com/latex.php?latex=b_j&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_j" class="latex" /> with <img src="https://s0.wp.com/latex.php?latex=j+%3C+i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="j &lt; i" class="latex" /> may not have an edge to <img src="https://s0.wp.com/latex.php?latex=b_i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_i" class="latex" />, in which case <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B%5Cpartial+b_i%7D%7B%5Cpartial+b_j%7D+%3D+0&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\frac{\partial b_i}{\partial b_j} = 0" class="latex" />.</p>
+
+
+
+<p>For each variable <img src="https://s0.wp.com/latex.php?latex=b_i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_i" class="latex" />, backpropagation stores in <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf+%7Bgrad%7D%7D_i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf {grad}}_i" class="latex" /> a “temporary derivative/gradient” w.r.t. <img src="https://s0.wp.com/latex.php?latex=b_i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_i" class="latex" />. Initially, <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf+%7Bgrad%7D%7D_n+%3D+1&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf {grad}}_n = 1" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf+%7Bgrad%7D%7D_i+%3D+0&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf {grad}}_i = 0" class="latex" /> for <img src="https://s0.wp.com/latex.php?latex=i+%3C+n&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="i &lt; n" class="latex" />. The backpropagation algorithm iterates over <img src="https://s0.wp.com/latex.php?latex=i+%3D+n%2Cn-1%2C%5Cldots%2Cm%2B1&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="i = n,n-1,\ldots,m+1" class="latex" /> and performs the following updates in each iteration:</p>
+
+
+
+<p class="has-text-align-center" id="eq-4"><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D%7B%5Cmathsf+%7Bgrad%7D%7D_j+%5Cgets+%7B%5Cmathsf+%7Bgrad%7D%7D_j+%2B+%7B%5Cmathsf+%7Bgrad%7D%7D_i+%5Ccdot+%5Cfrac%7B%5Cpartial+b_i%7D%7B%5Cpartial+b_j%7D+%2C%5C+%5Ctextnormal%7Bfor+all%7D%5C+j+%3D+1%2C%5Cldots%2Ci-1.+%26%26+%284%29+%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\begin{aligned}{\mathsf {grad}}_j \gets {\mathsf {grad}}_j + {\mathsf {grad}}_i \cdot \frac{\partial b_i}{\partial b_j} ,\ \textnormal{for all}\ j = 1,\ldots,i-1. &amp;&amp; (4) \end{aligned}" class="latex" /></p>
+
+
+
+<p>Of course, it suffices to update <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf+%7Bgrad%7D%7D_j&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf {grad}}_j" class="latex" /> only when there is an edge from <img src="https://s0.wp.com/latex.php?latex=b_j&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_j" class="latex" /> to <img src="https://s0.wp.com/latex.php?latex=b_i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_i" class="latex" />, because otherwise <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B%5Cpartial+b_i%7D%7B%5Cpartial+b_j%7D+%3D+0&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\frac{\partial b_i}{\partial b_j} = 0" class="latex" /> and the update does not change <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf+%7Bgrad%7D%7D_j&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf {grad}}_j" class="latex" />.</p>
+
+
+
+<p>The update rule <a href="https://theorydish.blog/feed/#eq-4">(4)</a> can be explained as a direct application of the chain rule as follows. If we know the values of <img src="https://s0.wp.com/latex.php?latex=b_1%2C%5Cldots%2Cb_i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_1,\ldots,b_i" class="latex" />, we can evaluate the remaining variables <img src="https://s0.wp.com/latex.php?latex=b_%7Bi%2B1%7D%2C%5Cldots%2Cb_n&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_{i+1},\ldots,b_n" class="latex" /> one by one, so in this sense, the output variable <img src="https://s0.wp.com/latex.php?latex=c+%3D+b_n&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="c = b_n" class="latex" /> is a function <img src="https://s0.wp.com/latex.php?latex=c_i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="c_i" class="latex" /> of <img src="https://s0.wp.com/latex.php?latex=b_1%2C%5Cldots%2Cb_i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_1,\ldots,b_i" class="latex" />. Using the function <img src="https://s0.wp.com/latex.php?latex=b_i+%3D+b_i%28b_1%2C%5Cldots%2Cb_%7Bi-1%7D%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="b_i = b_i(b_1,\ldots,b_{i-1})" class="latex" />, we can relate functions <img src="https://s0.wp.com/latex.php?latex=c_i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="c_i" class="latex" /> and <img src="https://s0.wp.com/latex.php?latex=c_%7Bi-1%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="c_{i-1}" class="latex" /> as follows:</p>
+
+
+
+<p class="has-text-align-center"><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7Dc_%7Bi-1%7D%28b_1%2C%5Cldots%2Cb_%7Bi-1%7D%29+%3D+c_i%28b_1%2C%5Cldots%2Cb_%7Bi-1%7D%2C+b_i%28b_1%2C%5Cldots%2Cb_%7Bi-1%7D%29%29.%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\begin{aligned}c_{i-1}(b_1,\ldots,b_{i-1}) = c_i(b_1,\ldots,b_{i-1}, b_i(b_1,\ldots,b_{i-1})).\end{aligned}" class="latex" /></p>
+
+
+
+<p>By the chain rule,</p>
+
+
+
+<p class="has-text-align-center" id="eq-5"><img src="https://s0.wp.com/latex.php?latex=%5Cbegin%7Baligned%7D%5Cfrac%7B%5Cpartial+c_%7Bi-1%7D%7D%7B%5Cpartial+b_j%7D+%3D+%5Cfrac%7B%5Cpartial+c_i%7D%7B%5Cpartial+b_j%7D+%2B+%5Cfrac%7B%5Cpartial+c_i%7D%7B%5Cpartial+b_i%7D+%5Ccdot+%5Cfrac%7B%5Cpartial+b_i%7D%7B%5Cpartial+b_j%7D%2C%5C+%5Ctext%7Bfor+all%7D%5C+j+%3D+1%2C%5Cldots%2C+i-1.+%26%26+%285%29+%5Cend%7Baligned%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\begin{aligned}\frac{\partial c_{i-1}}{\partial b_j} = \frac{\partial c_i}{\partial b_j} + \frac{\partial c_i}{\partial b_i} \cdot \frac{\partial b_i}{\partial b_j},\ \text{for all}\ j = 1,\ldots, i-1. &amp;&amp; (5) \end{aligned}" class="latex" /></p>
+
+
+
+<p>The correspondence between <a href="https://theorydish.blog/feed/#eq-4">(4)</a> and <a href="https://theorydish.blog/feed/#eq-5">(5)</a> completes the explanation: if <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf+%7Bgrad%7D%7D_j+%3D+%5Cfrac%7B%5Cpartial+c_i%7D%7B%5Cpartial+b_j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf {grad}}_j = \frac{\partial c_i}{\partial b_j}" class="latex" /> for every <img src="https://s0.wp.com/latex.php?latex=j+%5Cle+i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="j \le i" class="latex" /> before the update, we have <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf+%7Bgrad%7D%7D_j+%3D+%5Cfrac%7B%5Cpartial+c_%7Bi-1%7D%7D%7B%5Cpartial+b_j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf {grad}}_j = \frac{\partial c_{i-1}}{\partial b_j}" class="latex" /> for every <img src="https://s0.wp.com/latex.php?latex=j+%3C+i&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="j &lt; i" class="latex" /> after the update. By induction, after the final iteration with <img src="https://s0.wp.com/latex.php?latex=i+%3D+m%2B1&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="i = m+1" class="latex" />, <img src="https://s0.wp.com/latex.php?latex=%7B%5Cmathsf+%7Bgrad%7D%7D_j&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="{\mathsf {grad}}_j" class="latex" /> contains the desired value <img src="https://s0.wp.com/latex.php?latex=%5Cfrac%7B%5Cpartial+c_m%7D%7B%5Cpartial+b_j%7D&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="\frac{\partial c_m}{\partial b_j}" class="latex" /> for every <img src="https://s0.wp.com/latex.php?latex=j+%3D+1%2C%5Cldots%2Cm&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="j = 1,\ldots,m" class="latex" />, where <img src="https://s0.wp.com/latex.php?latex=c+%3D+c_%7Bm%7D%28b_1%2C%5Cldots%2Cb_m%29&amp;bg=ffffff&amp;fg=000000&amp;s=0&amp;c=20201002" alt="c = c_{m}(b_1,\ldots,b_m)" class="latex" /> is exactly the function whose derivatives we want to compute.</p></div>
 
 
 
