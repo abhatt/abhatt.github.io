@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2021-12-23T23:38:51Z</updated>
+  <updated>2021-12-24T00:22:07Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,56 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2021/12/23/raytracing-diamonds</id>
+    <link href="https://11011110.github.io/blog/2021/12/23/raytracing-diamonds.html" rel="alternate" type="text/html"/>
+    <title>Raytracing diamonds</title>
+    <summary>This comes from a question posed to me and others in 2019 by Stefan Langerman, a computational geometer who also happens to be a diamond dealer. The classic brilliant cut shape of diamonds has a flat “table” face on the top (visible) side of the gem, and many other smaller facets on the sides (“crown”) and back (“pavilion”), with angles chosen so that most of the light that enters through the table is reflected back out through the table, making the diamond look bright. Can we simulate this reflection process efficiently, without having to trace all the reflections of all (or a sufficiently dense sample of all) possible light rays?</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>This comes from a question posed to me and others in 2019 by <a href="https://en.wikipedia.org/wiki/Stefan_Langerman">Stefan Langerman</a>, a computational geometer who also happens to be a diamond dealer. The classic <a href="https://en.wikipedia.org/wiki/Brilliant_(diamond_cut)">brilliant cut</a> shape of diamonds has a flat “table” face on the top (visible) side of the gem, and many other smaller facets on the sides (“crown”) and back (“pavilion”), with angles chosen so that most of the light that enters through the table is reflected back out through the table, making the diamond look bright. Can we simulate this reflection process efficiently, without having to trace all the reflections of all (or a sufficiently dense sample of all) possible light rays?</p>
+
+<p>This appears to be an interesting problem even for a very simple abstraction of the diamond’s shape: a two-dimensional isosceles triangle, with the base of the triangle as its table and the two equal sides as its pavilion. What you need to know about light reflections in gems is the <a href="https://en.wikipedia.org/wiki/Critical_angle_(optics)">critical angle</a>, determined from the high <a href="https://en.wikipedia.org/wiki/Refractive_index">refractive index</a> of diamonds and other gems. Inside the gem, rays that hit a face at an angle shallower than the critical angle; rays that hit more steeply than the critical angle will escape. Any light ray hitting the table will always enter the gem, and will be refracted so that it enters along a ray steeper than the critical angle. It will then bounce around within the gem until it happens to hit a face steeply enough to escape. The question is to predict where this escape ray escapes, more quickly than the obvious algorithm of calculating explicitly the entire sequence of reflections that it performs? Or if not, can we at least provide good bounds on the lengths of these reflection sequences?</p>
+
+<p>Three of the simplest cases involve the isosceles triangles for which the triangle <a href="https://en.wikipedia.org/wiki/Edge_tessellation">tiles the plane by copies reflected across its edges</a>, the equilateral triangle, isosceles right triangle, and 30-30-120 isosceles triangle. The path of a reflected light ray within such a triangle are combinatorially equivalent to the path of a straight line through this triangulation: they pass through the same types of edges, at the same angles.</p>
+
+<p style="text-align: center;"><img alt="Reflection through many faces in a 30-30-120 gem" src="https://11011110.github.io/blog/assets/2021/30-30-120.svg" width="80%"/></p>
+
+<p>For all three of these triangle shapes, a line that enters the gem through any edgethe table can only pass through a constant number of tiles in the tiling, before passing through another edge with the same angle, at which it must necessarily leave the gem (if it has not done so already). For instance, the red line shown, if it enters at its bottom left endpoint on the table of a green triangle, will exit after at most three reflections, through the parallel table of a blue triangle. The constant in the number of reflections here is absolute, not depending on the critical angle.</p>
+
+<p>The next simplest case is the isosceles triangle with apex angle \(2\pi/5\). This triangle does not tile the plane, but we can still form a partial tiling by “unrolling” the path of reflections through the triangle into a line through a sequence of reflected triangles. In order to avoid exiting through one of the sides (by passing through it more perpendicularly than the entrance angle) and in order to miss the closest two copies of the table that are parallel to the entrance, there is only one passage that can be followed in the unrolled triangulation, the one shown by the red ray in the figure. Because this passage is perpendicular to one of the reflected sides of the triangle, a ray that is more perpendicular to the table than to this side can only continue for \(O(1)\) steps through this passage before hitting an exit. Here, though, the critical angle comes into play: critical angles that are closer to a right angle will allow larger (but constant) numbers of reflections.</p>
+
+<p style="text-align: center;"><img alt="Reflection in a 2pi/5 isosceles triangle" src="https://11011110.github.io/blog/assets/2021/pentagonal-isosceles-reflections.svg" width="40%"/></p>
+
+<p>Isosceles triangles with apex \(\pi/4\) are even messier. When a ray entering the table exits by a side, or exits by the table without first bouncing off the table, it always does so within $O(1)$ steps. The trickier cases are when a ray entering through the table misses the opposite table in the octagon formed by reflected copies of the triangle, and passes through a sequence of diagonal or horizontal reflections into other octagons before escaping. In the case that there are no horizontal reflections, only diagonal ones, we just need to divide the vertical distance that the ray needs to travel to hit the next row of vertical edges by the slope of the ray, and round. The case that there is at least one horizontal reflection (shown) is a little more compicated, but again appears to involve a finite calculation. So it seems that with a little more calculation it is still possible to determine algorithmically what happens in this case, in constant time rather than having to simulate the unbounded number of bounces triangle-by-triangle.</p>
+
+<p style="text-align: center;"><img alt="Reflection in a pi/4 isosceles triangle" src="https://11011110.github.io/blog/assets/2021/octagonal-reflex.svg"/></p>
+
+<p>All of these triangles have angles that are rational multiples of \(2\pi\). For reflections within polygons of this type, the reflected line will only pass through a constant number of slopes. The rays of a single slope that hit a given line of the polygon can be describes as an interval, and the mapping on rays that takes each ray starting on one of the sides with one of these slopes to the start of its next reflection is a special kind of mapping studied in the theory of dynamical systems, an <a href="https://en.wikipedia.org/wiki/Interval_exchange_transformation">interval exchange transformation</a>. So from a geometric question on ray-tracing, we are led to a more abstract question: given an interval exchange transformation, and a starting point in that transformation, how easy is it to determine the number of times one would need to repeat the transformation to return back to the same interval?</p>
+
+<p>I have no real progress to report on any of these questions, in part because the continuous nature of these problems lead to difficult numerical issues. Instead, I have a new arXiv preprint <a href="https://arxiv.org/abs/2112.11607">“The Complexity of Iterated Reversible Computation” (arXiv:2112.11607
+)</a> on related but more combinatorial problems. Suppose one has an invertible mapping \(f\) on a finite (but exponentially large) set of states, that is easy to compute, such as an interval exchange transformation on integers rather than real numbers. Suppose also that you want to repeat this mapping for a given initial state \(x\) and a large number \(n\) of steps. Is there anything you can do to compute the result \(f^{(n)}(x)\) of this iterated mapping, more efficiently than the obvious method of just computing \(x\), \(f(x)\), \(f(f(x))\), one step at a time? One property that appears highly relevant here is that these mappings are reversible: they are one-to-one, and more strongly the inverse mapping is also an interval exchange transformation. In contrast, it is easy to find mappings that are not reversible and for which computing iterated values is \(\mathsf{PSPACE}\)-complete: consider, for instance, the state transition map of a space-bounded Turing machine.</p>
+
+<p>For some similar systems, we do know of effective methods in practice if not in theory. For Conway’s Game of Life, for instance, it appears to be \(\mathsf{PSPACE}\)-complete to compute what happens to an initial state after \(n\) steps (although I’m not sure this exact claim has been published in the literature), but <a href="https://en.wikipedia.org/wiki/Hashlife">hashlife</a> (as implemented in <a href="http://golly.sourceforge.net/">Golly</a>) can run many complicated and large patterns in an amount of runtime substantially less than the number of generated steps. The Game of Life is not reversible, but some other interesting cellular automata with similar behavior such as <a href="https://en.wikipedia.org/wiki/Critters_(cellular_automaton)">Critters</a> are. Can we say anything about the computational complexity of simulating Critters or other reversible rules? My new paper addresses these questions by formulating a complexity class that includes computing \(f^{(n)}(x)\) for reversible cellular automaton simulation, integer interval exchange transformations, and others. It sandwiches this class between \(\mathsf{P}^{\mathsf{PH}}\) and \(\mathsf{PSPACE}\), and finds complete problems for it including the simulation of reversible cellular automata and of piecewise linear tranformations. The complete cellular automata include the two-dimensional billiard ball model, already known for its ability to simulate reversible circuits, and a new one-dimensional automata that can simulate some two-dimensional automata including the billiard ball model. Because Critters can in turn simulate the billiard ball model, it is also complete in the same sense. But I wasn’t able to prove completeness for integer interval exchange transformations, let alone say anything useful about the non-integer transformations needed to understand diamond reflections.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/107498938838238948">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2021-12-23T15:42:00Z</updated>
+    <published>2021-12-23T15:42:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2021-12-23T23:55:09Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>tag:blogger.com,1999:blog-3722233.post-7781625779470350536</id>
@@ -72,7 +122,7 @@ Email: igorcarb@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-12-23T23:37:36Z</updated>
+      <updated>2021-12-24T00:20:37Z</updated>
     </source>
   </entry>
 
@@ -99,7 +149,7 @@ Email: ulle.endriss@uva.nl</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-12-23T23:37:36Z</updated>
+      <updated>2021-12-24T00:20:37Z</updated>
     </source>
   </entry>
 
@@ -626,7 +676,7 @@ Email: forster@cs.sbg.ac.at</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-12-23T23:37:36Z</updated>
+      <updated>2021-12-24T00:20:37Z</updated>
     </source>
   </entry>
 
@@ -723,7 +773,7 @@ Email: forster@cs.sbg.ac.at</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-12-23T23:37:26Z</updated>
+      <updated>2021-12-24T00:20:27Z</updated>
     </source>
   </entry>
 
@@ -750,7 +800,7 @@ Email: jn@di.ku.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-12-23T23:37:36Z</updated>
+      <updated>2021-12-24T00:20:37Z</updated>
     </source>
   </entry>
 
@@ -780,7 +830,7 @@ Email: hilamiz@cs.technion.ac.il</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-12-23T23:37:36Z</updated>
+      <updated>2021-12-24T00:20:37Z</updated>
     </source>
   </entry>
 
@@ -847,7 +897,7 @@ Email: hilamiz@cs.technion.ac.il</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-12-23T23:37:49Z</updated>
+      <updated>2021-12-24T00:20:51Z</updated>
     </source>
   </entry>
 
@@ -874,7 +924,7 @@ Email: fmontesi@imada.sdu.dk)</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-12-23T23:37:36Z</updated>
+      <updated>2021-12-24T00:20:37Z</updated>
     </source>
   </entry>
 
@@ -901,7 +951,7 @@ Email: farid.alizadeh@rutgers.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-12-23T23:37:36Z</updated>
+      <updated>2021-12-24T00:20:37Z</updated>
     </source>
   </entry>
 
@@ -952,7 +1002,7 @@ Email: farid.alizadeh@rutgers.edu</p></div>
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2021-12-20T07:19:43Z</updated>
+      <updated>2021-12-23T23:55:09Z</updated>
     </source>
   </entry>
 
@@ -1181,7 +1231,7 @@ Ken adds that his impression from holiday shopping in Barnes and Noble is that t
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2021-12-23T23:37:32Z</updated>
+      <updated>2021-12-24T00:20:34Z</updated>
     </source>
   </entry>
 
@@ -1209,7 +1259,7 @@ Email: a.gibbs@imperial.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-12-23T23:37:36Z</updated>
+      <updated>2021-12-24T00:20:37Z</updated>
     </source>
   </entry>
 
@@ -1236,7 +1286,7 @@ Email: sachdeva@cs.toronto.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-12-23T23:37:36Z</updated>
+      <updated>2021-12-24T00:20:37Z</updated>
     </source>
   </entry>
 
@@ -1263,7 +1313,7 @@ Email: nickhar@cs.ubc.ca</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2021-12-23T23:37:36Z</updated>
+      <updated>2021-12-24T00:20:37Z</updated>
     </source>
   </entry>
 
@@ -1423,7 +1473,7 @@ Email: nickhar@cs.ubc.ca</p></div>
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2021-12-23T23:38:26Z</updated>
+      <updated>2021-12-24T00:21:39Z</updated>
     </source>
   </entry>
 
@@ -1461,7 +1511,7 @@ Email: nickhar@cs.ubc.ca</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2021-12-23T23:37:26Z</updated>
+      <updated>2021-12-24T00:20:28Z</updated>
     </source>
   </entry>
 
@@ -1542,7 +1592,7 @@ Email: nickhar@cs.ubc.ca</p></div>
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2021-12-20T07:19:43Z</updated>
+      <updated>2021-12-23T23:55:09Z</updated>
     </source>
   </entry>
 
@@ -1570,7 +1620,7 @@ Email: nickhar@cs.ubc.ca</p></div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2021-12-23T23:37:07Z</updated>
+      <updated>2021-12-24T00:20:07Z</updated>
     </source>
   </entry>
 
@@ -1625,7 +1675,7 @@ Email: nickhar@cs.ubc.ca</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2021-12-23T23:37:49Z</updated>
+      <updated>2021-12-24T00:20:51Z</updated>
     </source>
   </entry>
 
@@ -1797,7 +1847,7 @@ Email: nickhar@cs.ubc.ca</p></div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2021-12-23T23:37:57Z</updated>
+      <updated>2021-12-24T00:21:05Z</updated>
     </source>
   </entry>
 
@@ -1830,45 +1880,7 @@ Email: nickhar@cs.ubc.ca</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2021-12-23T23:37:21Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://agtb.wordpress.com/?p=3536</id>
-    <link href="https://agtb.wordpress.com/2021/12/13/2022-acm-sigecom-test-of-time-award/" rel="alternate" type="text/html"/>
-    <title>2022 ACM SIGecom Test of Time Award</title>
-    <summary>The SIGecom Test of Time Award recognizes the author or authors of an influential paper or series of papers that has significantly impacted research or applications exemplifying the interplay of economics and computation.To be eligible, a paper or series of papers must be on a topic in the intersection of economics and computation, and must […]</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The SIGecom Test of Time Award recognizes the author or authors<em> of an influential paper or series of papers that has significantly impacted research or applications exemplifying the interplay of economics and computation</em>.To be eligible, a paper or series of papers must be on a topic in the intersection of economics and computation, and must have been first published in an archival journal or conference proceedings no less than ten years and no more than twenty-five years before the year the award is conferred. <em>The 2022 ToT award will be given for papers published no earlier than 1997 and no later than 2012</em>.</p>
-
-
-
-<p>Nominations are due by February 28th, 2022 (Anywhere on Earth) and may be made by any member of ACM SIGecom (self-nomination is not allowed). A nomination also requires two or three endorsement letters that can speak to the lasting contribution, significance, and impact of the work. A new requirement this year is that the nominator must solicit and submit the endorsement letters to the Award Committee by the deadline. Full details are here: <a href="https://sigecom.org/award-tot-details.html" rel="noreferrer noopener" target="_blank">https://sigecom.org/award-tot-details.html</a>  It is expected that at least one of the nominated authors, if selected for the award, will attend the next ACM Conference on Economics and Computation to accept the award and give a presentation on the work. EC’22 is planned for July 11–15, 2022 and tentatively be held in Boulder, Colorado; the winner will have the option of presenting virtually, even if the conference is held in person.</p>
-
-
-
-<p>The Award Committee welcomes questions from anyone considering or intending to submit a nomination. The committee may be contacted by email at <a href="mailto:sigecom-awards-tot@acm.org" rel="noreferrer noopener" target="_blank">sigecom-awards-tot@acm.org</a> </p>
-
-
-
-<p>The 2022 Test of Time Award Committee: Yeon-Koo Che, Columbia University; Noam Nisan, The Hebrew University of Jerusalem; David Parkes (chair), Harvard University</p></div>
-    </content>
-    <updated>2021-12-13T10:01:35Z</updated>
-    <published>2021-12-13T10:01:35Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>Noam Nisan</name>
-    </author>
-    <source>
-      <id>https://agtb.wordpress.com</id>
-      <logo>https://secure.gravatar.com/blavatar/52ef314e11e379febf97d1a97547f4cd?s=96&amp;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fbuttonw-com.png</logo>
-      <link href="https://agtb.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://agtb.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://agtb.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://agtb.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Computation, Economics, and Game Theory</subtitle>
-      <title>Turing's Invisible Hand</title>
-      <updated>2021-12-23T23:37:28Z</updated>
+      <updated>2021-12-24T00:20:22Z</updated>
     </source>
   </entry>
 </feed>
