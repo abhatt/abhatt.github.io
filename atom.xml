@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2022-01-06T10:39:09Z</updated>
+  <updated>2022-01-06T11:21:53Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,210 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>http://offconvex.github.io/2022/01/06/gf-gd/</id>
+    <link href="http://offconvex.github.io/2022/01/06/gf-gd/" rel="alternate" type="text/html"/>
+    <title>Does Gradient Flow Over Neural Networks Really Represent Gradient Descent?</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><h2 id="tldr">TL;DR</h2>
+
+<p>A lot was said in this blog (cf. <a href="http://www.offconvex.org/2019/06/03/trajectories/">post by Sanjeev</a>) about the importance of studying trajectories of gradient descent (<strong><em>GD</em></strong>) for understanding deep learning.
+Researchers often conduct such studies by considering <em>gradient flow</em> (<strong><em>GF</em></strong>), equivalent to GD with infinitesimally small step size.
+Much was learned from analyzing GF over neural networks (<strong><em>NNs</em></strong>), but to what extent <strong><em>do results for GF apply to GD with practical step size?</em></strong>
+This is an open question in deep learning theory.
+My student Omer Elkabetz and I investigated it in a recent NeurIPS 2021 spotlight <a href="https://openreview.net/forum?id=iX0TSH45eOd">paper</a>.
+In a nutshell, we found that, although in general an exponentially small step size is required for guaranteeing that GD is well represented by GF, specifically over NNs, a much larger step size can suffice.
+This allows <strong><em>immediate translation of analyses for GF over NNs to results for GD</em></strong>.
+The translation bears potential to shed light on both optimization and generalization (implicit regularization) in deep learning, and indeed, we exemplify its use for proving what is, to our knowledge, the <strong><em>first guarantee of random near-zero initialization almost surely leading GD over a deep (three or more layer) NN of fixed size to efficiently converge to global minimum</em></strong>.
+The remainder of this post provides more details; for the full story see our <a href="https://openreview.net/forum?id=iX0TSH45eOd">paper</a>.</p>
+
+<h2 id="gf-a-continuous-surrogate-for-gd">GF: a continuous surrogate for GD</h2>
+
+<p>Let $f : \mathbb{R}^d \to \mathbb{R}$ be an objective function (e.g. training loss of deep NN) that we would like to minimize via GD with step size $\eta &gt; 0$: 
+[
+\boldsymbol\theta_{k + 1} = \boldsymbol\theta_k - \eta \nabla f ( \boldsymbol\theta_k ) ~ ~ ~ \text{for} ~ k = 0 , 1 , 2 , …
+\qquad \color{green}{\text{(GD)}}
+]
+We may imagine a continuous curve $\boldsymbol\theta : [ 0 , \infty ) \to \mathbb{R}^d$ that passes through the $k$’th GD iterate at time $t = k \eta$.
+This would imply $\boldsymbol\theta ( t + \eta ) = \boldsymbol\theta ( t ) - \eta \nabla f ( \boldsymbol\theta ( t ) )$, which we can write as $\frac{1}{\eta} ( \boldsymbol\theta ( t + \eta ) - \boldsymbol\theta ( t ) ) = - \nabla f ( \boldsymbol\theta ( t ) )$.
+In the limit of infinitesimally small step size ($\eta \to 0$), we obtain the following characterization for $\boldsymbol\theta ( \cdot )$:
+[
+\frac{d}{dt} \boldsymbol\theta ( t ) = - \nabla f ( \boldsymbol\theta ( t ) ) ~ ~ ~ \text{for} ~ t \geq 0 
+.
+\qquad \color{blue}{\text{(GF)}}
+]
+This differential equation is known as GF, and represents a continuous surrogate for GD.</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/gf-gd-illustration.png" style="width: 540px;"/>
+<br/>
+<i><b>Figure 1:</b> 
+Illustration of GD and its continuous surrogate GF.
+</i>
+</div>
+<p><br/></p>
+
+<p>GF brings forth the possibility of employing a vast array of continuous mathematical machinery for studying GD.
+It is for this reason that GF has become a popular model in deep learning theory (see our <a href="https://openreview.net/forum?id=iX0TSH45eOd">paper</a> for a long list of works analyzing GF over NNs).
+There is only one problem: GF assumes infinitesimal step size for GD!
+This is of course impractical, leading to the following open question $-$ the topic of our <a href="https://openreview.net/forum?id=iX0TSH45eOd">work</a>:</p>
+
+<blockquote>
+  <p><strong>Open Question:</strong>
+Does GF over NNs represent GD with practical step size?</p>
+</blockquote>
+
+<h2 id="gd-as-numerical-integrator-for-gf">GD as numerical integrator for GF</h2>
+
+<p>The question of proximity between GF and GD (with positive step size) is closely related to an area of numerical analysis known as <em>numerical integration</em>.
+There, the motivation is the other way around $-$ given a differential equation $\frac{d}{dt} \boldsymbol\theta ( t ) = \boldsymbol g ( \boldsymbol\theta ( t ) )$ induced by some vector field $\boldsymbol g : \mathbb{R}^d \to \mathbb{R}^d$, the interest lies on a continuous solution $\boldsymbol\theta : [ 0 , \infty ) \to \mathbb{R}^d$, and numerical (discrete) integration algorithms are used for obtaining approximations.
+A classic numerical integrator, known as <em>Euler’s method</em>, is given by $\boldsymbol\theta_{k + 1} = \boldsymbol\theta_k + \eta \boldsymbol g ( \boldsymbol\theta_k )$ for $k = 0 , 1 , 2 , …$, where $\eta &gt; 0$ is a predetermined step size.
+With Euler’s method, the goal is for the $k$’th iterate to approximate the sought-after continuous solution at time $k \eta$, meaning $\boldsymbol\theta_k \approx \boldsymbol\theta ( k \eta )$.
+Notice that when the vector field $\boldsymbol g ( \cdot )$ is chosen to be minus the gradient of an objective function $f : \mathbb{R}^d \to \mathbb{R}$, i.e. $\boldsymbol g ( \cdot ) = - \nabla f ( \cdot )$, the given differential equation is no other than GF, and its numerical integration via Euler’s method yields no other than GD!
+We can therefore employ known results from numerical integration to bound the distance between GF and GD!</p>
+
+<h2 id="gf-matches-gd-if-its-trajectory-is-roughly-convex">GF matches GD if its trajectory is roughly convex</h2>
+
+<p>There exist classic results bounding the approximation error of Euler’s method, but these are too coarse for our purposes.
+Instead, we invoke a modern result known as “Fundamental Theorem” (cf. <a href="https://link.springer.com/book/10.1007/978-3-540-78862-1">Hairer et al. 1993</a>), which implies the following:</p>
+
+<blockquote>
+  <p><strong>Theorem 1:</strong>
+The distance between the GF trajectory $\boldsymbol\theta ( \cdot )$ at time $t$, and iterate $k = t / \eta$ of GD, is upper bounded as:</p>
+
+  <p>[ 
+| \boldsymbol\theta ( t ) - \boldsymbol\theta_{k = t / \eta} | \leq \mathcal{O} \Big( e^{- \smallint_0^{~ t} \lambda_- ( t’ ) dt’} t \eta \Big)
+, 
+]
+where $\lambda_- ( t’ ) := \min \left( \lambda_{min} \left( \nabla^2 f ( \boldsymbol\theta ( t’ ) ) \right) , 0 \right)$, i.e. $\lambda_- ( t’ )$ is defined to be the negative part of the minimal eigenvalue of the Hessian on the GF trajectory at time $t’$.</p>
+</blockquote>
+
+<p>As expected, by using a sufficiently small step size $\eta$, we may ensure that GD is arbitrarily close to GF for arbitrarily long.
+How small does $\eta$ need to be?
+For the theorem to guarantee that GD follows GF up to time $t$, we must have $\eta \in \mathcal{O} \big( e^{\smallint_0^{~ t} \lambda_- ( t’ ) dt’} / t \big)$.
+In particular, $\eta$ must be exponential in $\smallint_0^{~ t} \lambda_- ( t’ ) dt’$, i.e. in the integral of (the negative part of) the minimal Hessian eigenvalue along the GF trajectory (up to time $t$).
+If the optimized objective $f ( \cdot )$ is convex then Hessian eigenvalues are everywhere non-negative, and therefore $\lambda_- ( \cdot ) \equiv 0$, which means that a moderately small $\eta$ (namely, $\eta \in \mathcal{O} ( 1 / t )$) suffices.
+If on the other hand $f ( \cdot )$ is non-convex then Hessian eigenvalues may be negative, meaning $\lambda_- ( \cdot )$ may be negative, which in turn implies that $\eta$ may have to be exponentially small.
+We prove in our <a href="https://openreview.net/forum?id=iX0TSH45eOd">paper</a> that there indeed exist cases where an exponentially small step size is unavoidable:</p>
+
+<blockquote>
+  <p><strong>Proposition 1:</strong>
+For any $m &gt; 0$, there exist (non-convex) objectives on which the GF trajectory at time $t$ is <strong>not</strong> approximated by GD if $\eta \notin \mathcal{O} ( e^{- m t} )$.</p>
+</blockquote>
+
+<p>Despite this negative result, not all hope is lost.
+It might be that even though a given objective function is non-convex, specifically over GF trajectories it is “roughly convex,” in the sense that along these trajectories the minimal eigenvalue of the Hessian is “almost non-negative.”
+This would mean that $\lambda_- ( \cdot )$ is almost non-negative, in which case (by Theorem 1) a moderately small step size suffices in order for GD to track GF!</p>
+
+<h2 id="trajectories-of-gf-over-nns-are-roughly-convex">Trajectories of GF over NNs are roughly convex</h2>
+
+<p>Being interested in the match between GF and GD over NNs, we analyzed the geometry of GF trajectories on training losses of NNs with homogeneous activations (e.g. linear, ReLU, leaky ReLU).
+The following theorem (informally stated) was proven:</p>
+
+<blockquote>
+  <p><strong>Theorem 2:</strong>
+For a training loss of a NN with homogeneous activations, the minimal Hessian eigenvalue is arbitrarily negative across space, but along GF trajectories initialized near zero it is almost non-negative.</p>
+</blockquote>
+
+<p>Combined with Theorem 1, this theorem suggests that over NNs (with homogeneous activations), in the common regime of near-zero initialization, a moderately small step size for GD suffices in order for it to be well represented by GF!
+We verify this prospect empirically, demonstrating that in basic deep learning settings, reducing the step size for GD often leads to only slight changes in its trajectory.</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/gf-gd-experiment.png" style="width: 600px;"/>
+<br/>
+<i><b>Figure 2:</b> 
+Experiment with NN comparing every iteration of GD with step size $\eta_0 := 0.001$, to every $r$'th iteration of GD with step size $\eta_0 / r$, where $r = 2 , 5 , 10 , 20$.
+Left plot shows training loss values; right one shows distance (in weight space) of GD with step size $\eta_0$ from initialization, against its distance from runs with smaller step size.
+Takeaway: reducing step size barely made a difference, suggesting GD was already close to the continuous (GF) limit.
+</i>
+</div>
+
+<h2 id="translating-analyses-of-gf-to-results-for-gd">Translating analyses of GF to results for GD</h2>
+
+<p>Theorems 1 and 2 together form a tool for automatically translating analyses of GF over NNs to results for GD with practical step size.
+This means that a vast array of continuous mathematical machinery available for analyzing GF can now be leveraged for formally studying practical NN training!
+Since analyses of GF over NNs often establish convergence to global minimum and/or characterize the solution found (again, see our <a href="https://openreview.net/forum?id=iX0TSH45eOd">paper</a> for long list of examples), the translation we developed bears potential to shed new light on both optimization and generalization (implicit regularization) in deep learning.
+To demonstrate this point, we analyze GF over arbitrarily deep linear NNs with scalar output, and prove the following result:</p>
+
+<blockquote>
+  <p><strong>Proposition 2:</strong>
+GF over an arbitrarily deep linear NN with scalar output converges to global minimum almost surely (i.e. with probability one) under a random near-zero initialization.</p>
+</blockquote>
+
+<p>Applying our translation yields an analogous result for GD with practical step size:</p>
+
+<blockquote>
+  <p><strong>Theorem 3:</strong>
+GD over an arbitrarily deep linear NN with scalar output efficiently converges to global minimum almost surely under a random near-zero initialization.</p>
+</blockquote>
+
+<p>To the best of our knowledge, this is the first guarantee of random near-zero initialization <strong><em>almost surely</em></strong> leading GD over a deep (three or more layer) NN of fixed size to efficiently converge to global minimum!</p>
+
+<h2 id="what-about-large-step-size-momentum-stochasticity">What about large step size, momentum, stochasticity?</h2>
+
+<p>An emerging belief (see our <a href="https://openreview.net/forum?id=iX0TSH45eOd">paper</a> for several supporting references) is that for GD over NNs, large step size can be beneficial in terms of generalization.
+While the large step size regime isn’t necessarily captured by standard GF, recent works (e.g. <a href="https://openreview.net/pdf?id=3q5IqUrkcF">Barrett &amp; Dherin 2021</a>, <a href="https://openreview.net/pdf?id=q8qLAbQBupm">Kunin et al. 2021</a>) argue that it is captured by certain modifications of GF.
+Modifications were also proposed for capturing other aspects of NN training, for example momentum (cf. <a href="https://jmlr.org/papers/volume17/15-084/15-084.pdf">Su et al. 2016</a>, <a href="https://arxiv.org/pdf/1603.04245.pdf">Wibisono et al. 2016</a>, <a href="http://proceedings.mlr.press/v80/franca18a/franca18a.pdf">Franca et al. 2018</a>, <a href="https://jmlr.org/papers/volume22/20-195/20-195.pdf">Wilson et al. 2021</a>) and stochasticity (see, e.g., <a href="https://jmlr.org/papers/volume20/17-526/17-526.pdf">Li et al. 2017</a>, <a href="https://openreview.net/pdf?id=rq_Qr0c1Hyo">Smith et al. 2021</a>, <a href="https://openreview.net/pdf?id=goEdyJ_nVQI">Li et al. 2021</a>).
+Extending our GF-to-GD translation machinery to account for modifications as above would be very interesting in my opinion.
+All in all, I believe that in the years to come, the vast knowledge on continuous dynamical systems, and GF in particular, will unravel many mysteries behind deep learning.</p>
+
+<p><a href="http://www.cohennadav.com/"><strong><em>Nadav Cohen</em></strong></a></p>
+
+<p><br/>
+<strong><em>Thanks:</em></strong>
+<em>I’d like to thank many people with whom I’ve had illuminating discussions on GF vs. GD over NNs.
+These include <a href="https://noahgol.github.io/">Noah Golowich</a>, <a href="https://weihu.me/">Wei Hu</a>, <a href="https://www.cs.princeton.edu/~zl4/">Zhiyuan Li</a> and Kaifeng Lyu.
+Special thanks to <a href="https://www.dam.brown.edu/people/menon/">Govind Menon</a>, who drew my attention to the connection to numerical integration, and of course to <a href="https://www.cs.princeton.edu/~arora/">Sanjeev</a>, who has been a companion and guide in promoting the “trajectory approach” to deep learning.</em></p></div>
+    </summary>
+    <updated>2022-01-06T12:00:00Z</updated>
+    <published>2022-01-06T12:00:00Z</published>
+    <source>
+      <id>http://offconvex.github.io/</id>
+      <author>
+        <name>Off the Convex Path</name>
+      </author>
+      <link href="http://offconvex.github.io/" rel="alternate" type="text/html"/>
+      <link href="http://offconvex.github.io/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Algorithms off the convex path.</subtitle>
+      <title>Off the convex path</title>
+      <updated>2022-01-06T11:21:17Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en">
+    <id>http://emanueleviola.wordpress.com/?p=981</id>
+    <link href="https://emanueleviola.wordpress.com/2022/01/06/the-story-of-stuff-and-installing-linux-on-a-32-bit-computer-from-15-years-ago/" rel="alternate" type="text/html"/>
+    <title>The story of stuff,  and installing Linux on a 32-bit computer from 15 years ago</title>
+    <summary>If you haven’t seen it, now is the time to drop everything you are doing and watch The story of stuff. Computer scientists like myself will latch onto the scene where the old computer which looks like a washing machine is thrashed because a tiny component doesn’t fit anymore. In this spirit, I am happy […]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>If you haven’t seen it, now is the time to drop everything you are doing and watch <em><a href="https://www.youtube.com/watch?v=9GorqroigqM">The story of stuff</a></em>. Computer scientists like myself will latch onto the scene where the old computer which looks like a washing machine is thrashed because a tiny component doesn’t fit anymore.  In this spirit, I am happy to announce that after substantial challenges I was able to install Linux on a 32-bit laptop from about 15 years ago.  First I tried Ubuntu, but I was saddened to learn that they dropped support for 32-bit platforms.  Luckily, Debian still supports it for a number of years, and I went for it.  The incidents I had during the installation include missing non-free firmware for the wifi which I had to fetch and stick in random places in the USB stick, and an inexplicable failure of the base installation which can be fixed by mounting the USB stick during it.</p>
+
+
+
+<p>When you say these things, you get the familiar shoulder movement which means “In the same time you spent doing this I can write a grant proposal and make enough money to buy two new machines.”  While this is true, it does not mean it is the right thing to do.  We should strive to prolong the life of computers and their components indefinitely, instead of taking pride in showing off the latest gadget purchase.  I am writing this post from an Ubuntu system installed on a 2008 desktop.</p>
+
+
+
+<p>Uncharacteristically, I see a bright future in this domain.  We can store drivers for every hardware configuration ever assembled, and create easy-to-use installation packages.  Moreover, all of this can be automated, while we still are at the stage where human intervention is required.  And one thing that gives me a lot of hope and continues to impress me is the amazing network of people that are willing to help each other to get computers to work, especially when they run free software.  You can have the most technical question and quickly get — for free — the most caring and expert advice, say by posting on <a href="https://stackexchange.com/">stackexachange</a>.</p></div>
+    </content>
+    <updated>2022-01-06T11:16:27Z</updated>
+    <published>2022-01-06T11:16:27Z</published>
+    <category term="Uncategorized"/>
+    <category term="Utopia"/>
+    <author>
+      <name>Manu</name>
+    </author>
+    <source>
+      <id>https://emanueleviola.wordpress.com</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://emanueleviola.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://emanueleviola.wordpress.com" rel="alternate" type="text/html"/>
+      <link href="https://emanueleviola.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>by Manu</subtitle>
+      <title>Thoughts</title>
+      <updated>2022-01-06T11:20:58Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://lucatrevisan.wordpress.com/?p=4602</id>
@@ -59,7 +263,7 @@
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2022-01-06T10:37:07Z</updated>
+      <updated>2022-01-06T11:20:08Z</updated>
     </source>
   </entry>
 
@@ -270,7 +474,7 @@ and using <font size="+1"><tt>\ctrlp</tt></font> the same way as <font size="+1"
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-01-06T10:37:33Z</updated>
+      <updated>2022-01-06T11:20:35Z</updated>
     </source>
   </entry>
 
@@ -623,7 +827,7 @@ Email: nherrera@eng.ucsd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-06T10:37:36Z</updated>
+      <updated>2022-01-06T11:20:37Z</updated>
     </source>
   </entry>
 
@@ -653,7 +857,7 @@ We then investigate separation results for $viol_C(x) - \varepsilon$. In particu
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-06T10:37:22Z</updated>
+      <updated>2022-01-06T11:20:24Z</updated>
     </source>
   </entry>
 
@@ -681,7 +885,7 @@ Email: dcsdiva@nus.edu.sg</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-06T10:37:36Z</updated>
+      <updated>2022-01-06T11:20:37Z</updated>
     </source>
   </entry>
 
@@ -708,7 +912,7 @@ Email: [guillaume.hanrot,nicolas.trotignon]@ens-lyon.fr</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-06T10:37:36Z</updated>
+      <updated>2022-01-06T11:20:37Z</updated>
     </source>
   </entry>
 
@@ -755,7 +959,7 @@ Email: [guillaume.hanrot,nicolas.trotignon]@ens-lyon.fr</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2022-01-06T10:37:50Z</updated>
+      <updated>2022-01-06T11:20:50Z</updated>
     </source>
   </entry>
 
@@ -922,7 +1126,7 @@ On the lower bound side, we lift the lower bound result of regular MRes ([Beyers
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-06T10:37:22Z</updated>
+      <updated>2022-01-06T11:20:24Z</updated>
     </source>
   </entry>
 
@@ -946,7 +1150,7 @@ On the lower bound side, we lift the lower bound result of regular MRes ([Beyers
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-06T10:37:22Z</updated>
+      <updated>2022-01-06T11:20:24Z</updated>
     </source>
   </entry>
 
@@ -1155,7 +1359,7 @@ What do you think about P=NP? Could the solvers win much more than the one milli
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-01-06T10:37:33Z</updated>
+      <updated>2022-01-06T11:20:35Z</updated>
     </source>
   </entry>
 
@@ -1276,7 +1480,7 @@ What do you think about P=NP? Could the solvers win much more than the one milli
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-06T10:37:22Z</updated>
+      <updated>2022-01-06T11:20:24Z</updated>
     </source>
   </entry>
 
@@ -1302,7 +1506,7 @@ Indeed, complexity theory contains numerous extremely appealing problems that re
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-06T10:37:22Z</updated>
+      <updated>2022-01-06T11:20:23Z</updated>
     </source>
   </entry>
 
@@ -1330,7 +1534,7 @@ Email: ilya.volkoivich@bc.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-06T10:37:36Z</updated>
+      <updated>2022-01-06T11:20:37Z</updated>
     </source>
   </entry>
 
@@ -1360,7 +1564,7 @@ In more detail, for every Boolean circuit $C=C(x,w)$, we construct an $O(\log |C
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-06T10:37:22Z</updated>
+      <updated>2022-01-06T11:20:23Z</updated>
     </source>
   </entry>
 
@@ -1433,7 +1637,7 @@ Jorg Rambau talked about a counterexample to the “Generalized Baues Conjecture
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2022-01-06T10:37:26Z</updated>
+      <updated>2022-01-06T11:20:28Z</updated>
     </source>
   </entry>
 
@@ -1554,7 +1758,7 @@ Email: igorcarb@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-06T10:37:36Z</updated>
+      <updated>2022-01-06T11:20:37Z</updated>
     </source>
   </entry>
 
@@ -1581,7 +1785,7 @@ Email: ulle.endriss@uva.nl</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-06T10:37:36Z</updated>
+      <updated>2022-01-06T11:20:37Z</updated>
     </source>
   </entry>
 
@@ -1608,7 +1812,7 @@ Email: forster@cs.sbg.ac.at</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-06T10:37:36Z</updated>
+      <updated>2022-01-06T11:20:37Z</updated>
     </source>
   </entry>
 
@@ -1705,7 +1909,7 @@ Email: forster@cs.sbg.ac.at</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2022-01-06T10:37:26Z</updated>
+      <updated>2022-01-06T11:20:28Z</updated>
     </source>
   </entry>
 
@@ -1732,7 +1936,7 @@ Email: jn@di.ku.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-06T10:37:36Z</updated>
+      <updated>2022-01-06T11:20:37Z</updated>
     </source>
   </entry>
 
@@ -1762,7 +1966,7 @@ Email: hilamiz@cs.technion.ac.il</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-06T10:37:36Z</updated>
+      <updated>2022-01-06T11:20:37Z</updated>
     </source>
   </entry>
 
@@ -1829,7 +2033,7 @@ Email: hilamiz@cs.technion.ac.il</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2022-01-06T10:37:50Z</updated>
+      <updated>2022-01-06T11:20:50Z</updated>
     </source>
   </entry>
 
@@ -1856,169 +2060,7 @@ Email: fmontesi@imada.sdu.dk)</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-06T10:37:36Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>https://11011110.github.io/blog/2021/12/19/recursive-bijective-numbering</id>
-    <link href="https://11011110.github.io/blog/2021/12/19/recursive-bijective-numbering.html" rel="alternate" type="text/html"/>
-    <title>Recursive bijective numbering</title>
-    <summary>Ordinary radix systems for representing numbers, like binary or decimal, use fixed finite sets of digits. The same is true for bijective numeration, used for columns of spreadsheets. In bijective numbering, every string of digits represents a unique number, shorter strings represent smaller numbers, and strings of equal length have the usual order. In spreadsheets, the digits are letters A–Z, one-letter strings represent numbers \(1\) through \(26\), two-letter strings represent \(27\) through \(26+26^2=702\), etc. Instead, mixed radix systems like the factorial number system have position-varying digit sets. In factorial numbering, the \(i\)th digit can range from \(0\) to \(i-1\), with place value \((i-1)!\). The value of a digit string is the sum of digits times place values. One could combine these ideas and get a bijective factorial number system, in which strings of at most \(i\) digits can represent numbers up to the sum of the first \(i\) factorials. But in all of these mixed radix systems, the digits are not drawn from a finite set. Maybe we need another numbering system just to describe each digit of a mixed-radix number? This leads to the idea of a recursive numbering system, where the digits of a mixed-radix system are themselves numbers in the same system.</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Ordinary radix systems for representing numbers, like binary or decimal, use fixed finite sets of digits. The same is true for <a href="https://en.wikipedia.org/wiki/Bijective_numeration">bijective numeration</a>, used for columns of spreadsheets. In bijective numbering, every string of digits represents a unique number, shorter strings represent smaller numbers, and strings of equal length have the usual order. In spreadsheets, the digits are letters A–Z, one-letter strings represent numbers \(1\) through \(26\), two-letter strings represent \(27\) through \(26+26^2=702\), etc. Instead, <a href="https://en.wikipedia.org/wiki/Mixed_radix">mixed radix</a> systems like the <a href="https://en.wikipedia.org/wiki/Factorial_number_system">factorial number system</a> have position-varying digit sets.  In factorial numbering, the \(i\)th digit can range from \(0\) to \(i-1\), with place value \((i-1)!\). The value of a digit string is the sum of digits times place values. One could combine these ideas and get a bijective factorial number system, in which strings of at most \(i\) digits can represent numbers up to the <a href="https://oeis.org/A007489">sum of the first \(i\) factorials</a>. But in all of these mixed radix systems, the digits are not drawn from a finite set. Maybe we need another numbering system just to describe each digit of a mixed-radix number? This leads to the idea of a <em>recursive</em> numbering system, where the digits of a mixed-radix system are themselves numbers in the same system.</p>
-
-<p>An example might clarify this idea. Let’s start with a recursive numbering system based on binary. Like other mixed-radix systems, we’ll number the digit positions starting with \(i=0\) at the right. Each position has a place value, the product of the numbers of choices for earlier digits, and the value of a sequence of digits is the sum of digits times place value. We’ll start with two choices of digit in position \(0\), like binary, and in later positions we’ll use the values we’ve already constructed as allowable digits.</p>
-<ul>
-  <li>In position \(i=0\), the two available digits given in the base case are \(0\) and \(1\), allowing us to represent only the numbers \(0\) and \(1\) as one-digit strings.</li>
-  <li>In position \(i=1\), there are still only two digits available, the two numbers \(0\) and \(1\) that have shorter representations. In this position, they have place value \(2\), allowing any number from \(0\) to \(3\) to be represented as a two-digit string.</li>
-  <li>In position \(i=2\), we now have four digits available, the numbers from \(0\) to \(3\). These have place value \(4\), allowing any number from \(0\) to \(15\) to be represented with three digits.</li>
-</ul>
-
-<p>At each successive level of this structure, the number of available digits and place values will be equal. Each new digit squares the range of representable numbers. In any position \(i&gt;0\), we will have \(2^{2^{i-1}}\) digits available, with place value \(2^{2^{i-1}}\), allowing any number from \(0\) to \(2^{2^{i}}-1\) to be represented. In some sense, though, we haven’t done anything very interesting yet. Like binary, we just get powers of two. The recursive-binary representation of a number can be obtained in a trivial way from its binary representation, by partitioning the bits into groups of 1, 1, 2, 4, 8, … bits.</p>
-
-<p>Instead, a bijective numbering system leads to more interesting results when handled recursively. For recursive bijective numbering, we can start with a much simpler base case, the empty string, which can be interpreted in any bijective numbering system as representing the number \(0\). With this base case, we can define a bijective numbering system in which the available digits in position \(i\) (starting from \(i=0\) in the rightmost digit) are the numbers that can be represented by strings of length at most \(i\):</p>
-<ul>
-  <li>In position \(i=0\), there is only one available digit, the number \(0\) (already represented by the empty string), producing only one single-digit value, representing the number \(1\).</li>
-  <li>In position \(i=1\), there are two available digits, the numbers \(0\) and \(1\) that we have already represented, so there are two two-digit sequences possible, representing two more numbers \(2\) and \(3\).</li>
-  <li>In position \(i=2\), there are four available digits, providing eight three-digit sequences that can represent the numbers \(4\) through \(11\).</li>
-</ul>
-
-<p>If we let \(n_i\) denote the number of values that can be obtained by strings of exactly \(i\) digits, then we obtain a recurrence \(n_0=1\) (the zero-length strings represent only one value, zero) and \(n_i=n_{i-1}\sum_{j&lt;i}n_j\) (there are \(n_{i-1}\) choices for the string up to its last digit, and \(\sum_{j&lt;i}n_j\) choices for the last digit). This recurrence has the sequence of values <a href="http://oeis.org/A001697">1, 1, 2, 8, 96, 10368, 108615168, …</a> and its partial sums <a href="http://oeis.org/A001696">1, 2, 4, 12, 108, 10476, 108625644, …</a> give the total number of values that can be represented by strings of up to \(i\) digits.</p>
-
-<p>The same idea can be represented graphically. Given a number represented by this recursive bijective numbering system, draw an ordered tree, where an \(i\)-digit number is represented by a tree whose root has \(i\) children, one for each digit, and where each digit is represented in the same way by a subtree. Conversely, if we have an ordered tree, we can think of it as representing a recursive bijective number, whose digits are computed recursively from the children of the root. In our recursive bijective numbers, we required that each digit be representable as a string of length at most its position; translating this requirement into tree terminology, each node that is the \(i\)th child of its parent (again starting with \(i=0\) on the right) must have degree at most \(i\).</p>
-
-<p style="text-align: center;"><img alt="Equivalence between recursive bijective numbering and tree enumeration" src="https://11011110.github.io/blog/assets/2021/recursive-bijective.svg" width="60%"/></p>
-
-<p>It follows that the sequences of numbers of representable values for \(i\)-digit strings and for \(\le i\)-digit strings, above, also give the numbers of ordered trees that obey this degree constraint, with root degree \(i\) or \(\le i\), respectively.</p>
-
-<p>(<a href="https://mathstodon.xyz/@11011110/107478037784682149">Discuss on Mastodon</a>)</p></div>
-    </content>
-    <updated>2021-12-19T21:12:00Z</updated>
-    <published>2021-12-19T21:12:00Z</published>
-    <author>
-      <name>David Eppstein</name>
-    </author>
-    <source>
-      <id>https://11011110.github.io/blog/feed.xml</id>
-      <author>
-        <name>David Eppstein</name>
-      </author>
-      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
-      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
-      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
-      <title>11011110</title>
-      <updated>2022-01-01T01:27:24Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-US">
-    <id>https://scottaaronson.blog/?p=6173</id>
-    <link href="https://scottaaronson.blog/?p=6173" rel="alternate" type="text/html"/>
-    <link href="https://scottaaronson.blog/?p=6173#comments" rel="replies" type="text/html"/>
-    <link href="https://scottaaronson.blog/?feed=atom&amp;p=6173" rel="replies" type="application/atom+xml"/>
-    <title xml:lang="en-US">My values, howled into the wind</title>
-    <summary xml:lang="en-US">I’m about to leave for a family vacation—our first such since before the pandemic, one planned and paid for literally the day before the news of Omicron broke. On the negative side, staring at the case-count graphs that are just now going vertical, I estimate a ~25% chance that at least one of us will […]</summary>
-    <content type="xhtml" xml:lang="en-US"><div xmlns="http://www.w3.org/1999/xhtml"><p>I’m about to leave for a family vacation—our first such since before the pandemic, one planned and paid for literally the day before the news of Omicron broke.  On the negative side, staring at the case-count graphs that are just now going vertical, I estimate a ~25% chance that at least one of us will get Omicron on this trip.  On the positive side, I estimate a ~60% chance that in the next 6 months, at least one of us would’ve gotten Omicron or some other variant even <em>without</em> this trip—so maybe it’s just as well if we get it now, when we’re vaxxed to the maxx and ready and school and university are out.</p>
-
-
-
-<p>If, however, I <em>do</em> end this trip dead in an ICU, I wouldn’t want to do so without having clearly set out my values for posterity.  So with that in mind: in the comments of my <a href="https://scottaaronson.blog/?p=6146">previous post</a>, someone asked me why I identify as a liberal or a progressive, if I passionately support educational practices like tracking, ability grouping, acceleration, and (especially) <em>encouraging kids to learn advanced math whenever they’re ready for it</em>.  (Indeed, that might be my single stablest political view, having been held, for recognizably similar reasons, since I was about 5.)</p>
-
-
-
-<p>Incidentally, that previous post was guest-written by my colleagues Edith Cohen and Boaz Barak, and linked to an <a href="https://sites.google.com/view/k12mathmatters/home">open letter</a> that now has almost 1500 signatories.  Our goal was, and is, to fight the imminent dumbing-down of precollege math education in the United States, spearheaded by the so-called “California Mathematics Framework.”  In our joint efforts, we’ve been careful with every word—making sure to maintain the assent of our entire list of signatories, to attract broad support, to stay narrowly focused on the issue at hand, and to bend over backwards to concede much as we could.  Perhaps because of those cautions, we—amazingly—got some actual traction, reaching people in government (such as Rep. Ro Khanna, D – Silicon Valley) and technology leaders, and forcing the “no one’s allowed to take Algebra in 8th grade” faction to respond to us.</p>
-
-
-
-<p>This was disorienting to me.  On this blog, I’m used just to howling into the wind, having some agree, some disagree, some take to Twitter to denounce me, but in any case, having no effect of any kind on the real world.  </p>
-
-
-
-<p>So let me return to howling into the wind.  And return to the question of what I “am” in ideology-space, which doesn’t have an obvious answer.</p>
-
-
-
-<p>It’s like, what do you call someone who’s absolutely terrified about global warming, and who thinks the best response would’ve been (and actually, still is) a historic surge in nuclear energy, possibly with geoengineering to tide us over?</p>
-
-
-
-<p>… who wants to end world hunger … and do it using GMO crops?</p>
-
-
-
-<p>… who wants to smash systems of entrenched privilege in college admissions … and believes that the SAT and other standardized tests are the best tools ever invented for that purpose?</p>
-
-
-
-<p>… who feels a personal distaste for free markets, for the triviality of what they so often elevate and the depth of what they let languish, but tolerates them because they’ve done more than anything else to lift up the world’s poor?</p>
-
-
-
-<p>… who’s happiest when telling the truth for the cause of social justice … but who, if told to <em>lie</em> for the cause of social justice, will probably choose silence or even, if pushed hard enough, truth?</p>
-
-
-
-<p>… who wants to legalize marijuana and psychedelics, and <em>also</em> legalize all the promising treatments currently languishing in FDA approval hell?</p>
-
-
-
-<p>… who feels little attraction to the truth-claims of the world’s ancient religions, <em>except</em> insofar as they sometimes serve as prophylactics against newer and now even more virulent religions?</p>
-
-
-
-<p>… who thinks the covid response of the CDC, FDA, and other authorities was a historic disgrace—not because it infringed on the personal liberties of antivaxxers or anything like that, but on the contrary, because it was weak, timid, bureaucratic, and slow, where it should’ve been like that of a general at war?</p>
-
-
-
-<p>… who thinks the Nazi Holocaust was <em>even worse</em> than the mainstream holds it to be, because in addition to the staggering, one-lifetime-isn’t-enough-to-internalize-it human tragedy, the Holocaust <em>also</em> sent up into smoke whatever cultural process had just produced Einstein, von Neumann, Bohr, Szilard, Born, Meitner, Wigner, Haber, Pauli, Cantor, Hausdorff, Ulam, Tarski, Erdös, and Noether, and with it, one of the wellsprings of our technological civilization?</p>
-
-
-
-<p>… who supports free speech, to the point of proudly tolerating views that <em>really, actually</em> disgust them at their workplace, university, or online forum?</p>
-
-
-
-<p>… who believes in patriotism, the police, the rule of law, to the extent that they don’t understand why all the enablers of the January 6 insurrection, up to and including Trump, aren’t currently facing trial for treason against the United States?</p>
-
-
-
-<p>… who’s (of course) disgusted to the core by Trump and everything he represents, but who’s <em>also</em> disgusted by the elite virtue-signalling hypocrisy that made the rise of a Trump-like backlash figure predictable?</p>
-
-
-
-<p>… who not only supports abortion rights, but also looks forward to a near future when parents, if they choose, are free to use embryo selection to make their children happier, smarter, healthier, and free of life-crippling diseases (unless the “bioethicists” destroy that future, as a previous generation of Deep Thinkers destroyed our nuclear future)?</p>
-
-
-
-<p>… who, when reading about the 1960s Sexual Revolution, instinctively sides with free-loving hippies and against the scolds … even if today’s scolds are themselves former hippies, or intellectual descendants thereof, who now clothe their denunciations of other people’s gross, creepy sexual desires in the garb of feminism and social justice?</p>
-
-
-
-<p>What, finally, do you call someone whose image of an ideal world might include a young Black woman wearing a hijab, an old Orthodox man with black hat and sidecurls, a broad-shouldered white guy from the backwoods of Alabama, and a trans woman with purple hair, face tattoos and a nose ring … all of them standing in front of a blackboard and arguing about what would happen if Alice and Bob jumped into opposite ends of a wormhole?</p>
-
-
-
-<p>Do you call such a person “liberal,” “progressive,” “center-left,” “centrist,” “Pinkerite,” “technocratic,” “neoliberal,” “libertarian-ish,” “classical liberal”?  Why not simply call them “correct”? <img alt="&#x1F642;" class="wp-smiley" src="https://s.w.org/images/core/emoji/13.1.0/72x72/1f642.png" style="height: 1em;"/></p></div>
-    </content>
-    <updated>2021-12-19T20:49:20Z</updated>
-    <published>2021-12-19T20:49:20Z</published>
-    <category scheme="https://scottaaronson.blog" term="Announcements"/>
-    <category scheme="https://scottaaronson.blog" term="Embarrassing Myself"/>
-    <category scheme="https://scottaaronson.blog" term="Obviously I'm Not Defending Aaronson"/>
-    <category scheme="https://scottaaronson.blog" term="Rage Against Doofosity"/>
-    <category scheme="https://scottaaronson.blog" term="The Fate of Humanity"/>
-    <author>
-      <name>Scott</name>
-      <uri>http://www.scottaaronson.com</uri>
-    </author>
-    <source>
-      <id>https://scottaaronson.blog/?feed=atom</id>
-      <icon>https://scottaaronson.blog/wp-content/uploads/2021/10/cropped-Jacket-32x32.gif</icon>
-      <link href="https://scottaaronson.blog" rel="alternate" type="text/html"/>
-      <link href="https://scottaaronson.blog/?feed=atom" rel="self" type="application/atom+xml"/>
-      <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
-      <title xml:lang="en-US">Shtetl-Optimized</title>
-      <updated>2022-01-03T17:58:27Z</updated>
+      <updated>2022-01-06T11:20:37Z</updated>
     </source>
   </entry>
 </feed>
