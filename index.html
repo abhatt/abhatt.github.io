@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at January 10, 2022 11:22 PM UTC</span>.
+Last updated <span class="datestr">at January 10, 2022 11:39 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -254,6 +254,124 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://differentialprivacy.org/synth-data-0/">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/dp.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://differentialprivacy.org/synth-data-0/">What is Synthetic Data?</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://differentialprivacy.org" title="Differential Privacy">DifferentialPrivacy.org</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>The concept of synthetic data seems to be having “a moment” in the privacy world as a promising approach to sharing data while protecting privacy.  Strictly speaking, any time you make up data, you have produced a synthetic dataset, but more specifically</p>
+
+<blockquote>
+  <p>a <strong>synthetic dataset</strong> is a stand-in for some original dataset that has the same format, and accurately reflects the statistical properties of the original dataset, but contains only “fake” records.</p>
+</blockquote>
+
+<p>Intuitively, a synthetic dataset can be used as if it were the real data—we can stare at it, compute summary statistics from it, train models from it, and do everything we normally do with data—but because the records do not correspond to “real” people, we don’t have to worry about protecting privacy.</p>
+
+<p>To be sure, synthetic data is a very appealing concept, but</p>
+
+<blockquote>
+  <p>simply making data “synthetic” does not guarantee privacy in any meaningful sense of the word,</p>
+</blockquote>
+
+<p>and we need to be careful about what it actually means to generate <strong>private synthetic data.</strong></p>
+
+<p>In this post I will briefly describe <strong>differentially private synthetic data</strong>, why we need it, and what we know about producing it.  The post will serve as a warmup to some more technical posts that will follow later, describing general approaches and state-of-the-art algorithms for producing synthetic data.</p>
+
+<h3 id="what-is-synthetic-data">What is synthetic data?</h3>
+
+<p>Given a dataset \(X\), a synthetic dataset \(Y\) is a new dataset that has the same <em>structure</em> as \(X\), but whose elements are “fake.”  For example, if \(X\) is a highly stylized version of the data collected in the US decennial census, then each element of \(X\) would be a tuple of the form (age, census_block, sex, race, ethnicity) corresponding to the data of a real person who filled out a census card.  A synthetic dataset should also contain such tuples, but they no longer need to correspond to real people.</p>
+
+<p>An example of a synthetic dataset for the census would be a dataset consisting of 300,000,000 individuals, all living at one location in rural Mississippi, and all of whom are white, non-hispanic females aged 81.  And therein lies the challenge.  Of course we want a synthetic dataset not to merely have the same <em>structure</em> as the original data, but also to preserve the <em>statistical properties</em> of the original data.  A synthetic dataset for the census should put roughly the right number of individuals of the right types in the right places to reflect the actual population of the US.</p>
+
+<blockquote>
+  <p>Thus, to generate synthetic data, we have to know something about the original data, which creates opportunities to leak sensitive information.</p>
+</blockquote>
+
+<h4 id="synthetic-data-from-generative-modeling">Synthetic data from generative modeling</h4>
+
+<p>Ensuring that a synthetic dataset really only reflects the statistical properties of the real data, and doesn’t encode sensitive information about the individuals in the real dataset, is quite difficult.  I could go on forever about strawman proposals that would generate records that appear to be “fake” but really just encode the original dataset in obvious ways.  Just so you believe I could do it, suppose for every real record, we get a fake record by adding 10 years to that individual’s age.  But what people typically mean when they talk about generating synthetic data, and what the synthetic data products being sold by companies typically do, is train a generative model for the dataset \(X\) and obtain the synthetic dataset \(Y\) by sampling from that model.  The hope is that samples from the generative model look like the original dataset in aggregate, but the actual people in the sample have nothing to do with the real people in the original dataset.  For example, a generative model from the US population will lead to more people living in California than in Montana, but ideally wouldn’t simply spit out the data of the actual residents of California.</p>
+
+<h4 id="generative-models-dont-magically-protect-privacy">Generative models don’t magically protect privacy</h4>
+
+<p>Simply training a generative model on \(X\) doesn’t actually mean we’ve hidden anything about \(X\) or the people in it.  For an extreme example, suppose the records in \(X\) are \(x_1,\dots,x_n\) and our generative model is arbitrarily expressive and determines that the best model for the data is just the uniform distribution on the set \(x_1,\dots,x_n\).  Then if our synthetic dataset consists of \(n\) iid samples from the generative model, our synthetic dataset will simply contain one or more copies of the real data for a large fraction (about 70%) of the people in the original dataset.</p>
+
+<h4 id="reconstruction-attacks-say-hello">Reconstruction attacks say hello</h4>
+
+<p>My example was admittedly a strawman, and when we train a generative model we typically expect it to produce new examples that aren’t in the original training dataset.  Maybe by training generative models in the right way, we can ensure that the generative model only captures statistics about the dataset, without revealing information about the individuals in the dataset?  Let’s not forget that</p>
+<blockquote>
+  <p>a synthetic dataset is just one of many possible ways to release statistical information about a dataset, and we know from the theory of reconstruction attacks that <strong>any</strong> mechanism that accurately preserves too many statistics inevitably destroys privacy.</p>
+</blockquote>
+
+<p>Specifically, there is a rich and fairly comprehensive theory of <strong>reconstruction attacks</strong>, whose <a href="https://differentialprivacy.org/reconstruction-theory/">theory</a> and <a href="https://differentialprivacy.org/diffix-attack/">practice</a> we detailed in earlier posts.  This theory says that any synthetic dataset that preserves answers to every statistic of the form “How many elements of the dataset satisfies property P?” with any meaningful notion of accuracy, is spectacularly non-private, in the sense that an attacker can reconstruct nearly all of the private information in the original dataset.  Viewed through this lens, synthetic data becomes something of a red herring.  The important question is which subset of statistics we want to preserve and how to preserve them without compromising privacy.</p>
+
+<h3 id="differentially-private-synthetic-data">Differentially private synthetic data</h3>
+
+<p>Making a dataset “synthetic” may not be a magic bullet, but it’s still a useful goal.  Fortunately, we already have a good working definition of what it means for an algorithm to protect the privacy of the individuals in the dataset—<strong>differential privacy</strong>.  So perhaps we can design a differentially private algorithm that takes the original dataset \(X\) and outputs a synthetic dataset \(Y\) that preserves many of the properties of \(X\) accurately (but still within the limits imposed by reconstruction attacks)?  In fact, the answer turns out to be a resounding yes!</p>
+<blockquote>
+  <p>There is a differentially private algorithm that takes a dataset \(X\) and outputs a synthetic dataset \(Y\) that preserves an <strong>exponential</strong> number of statistical properties of \(X\) <a href="https://arxiv.org/abs/1109.2229">[BLR08]</a>.</p>
+</blockquote>
+
+<p>This statement is intentionally quite informal, but intutively this result says that we can hope to do amazing things, like generate a synthetic dataset that satisfies the strong guarantee of differential privacy while still approximately preserving impressively complex statistics of the dataset, such as the marginal distribution of every set of three attributes, or the prediction error of every linear classifier.</p>
+
+<p>So what’s the problem?  Well, primarily it’s computational complexity. This algorithm, and the many beautiful algorithms it inspired, all have exponential worst-case running time.  Specifically, if each element of the dataset contains \(d\) bits, then the worst-case running time is at least as large as \(2^d\).  Unfortunately, this turns out to be an inherent bottleneck for any algorithm that generates synthetic data.</p>
+<blockquote>
+  <p>Any private algorithm that takes a dataset \(X\) and outputs a synthetic dataset \(Y\) that preserves even just the correlations between each pair of features must have worst-case running time that grows exponentially in the number of features, under widely believed complexity assumptions. <a href="https://eccc.weizmann.ac.il/report/2010/017/">[UV11]</a></p>
+</blockquote>
+
+<p>While there are inherent limits of the accuracy of all differentially private algorithms (see <a href="https://privacytools.seas.harvard.edu/publications/exposed-survey-attacks-private-data">[DSSU17]</a>), and there are significant barriers to making differentially private algorithms practical,</p>
+<blockquote>
+  <p>computational complexity is the main barrier that is specific to differentially private algorithms for generating synthetic data.<sup id="fnref:1"><a href="https://differentialprivacy.org/feed.xml#fn:1" class="footnote" rel="footnote">1</a></sup></p>
+</blockquote>
+
+<h4 id="where-do-we-go-from-here">Where do we go from here?</h4>
+
+<p>Despite the computational bottlenecks, there has stll been a lot of amazing progress on differentially private synthetic data.  And, despite my criticism of generative modeling in isolation as a means of generating synthetic data, most of these approaches are indeed based on <em>differentially private generative models</em> such as sparse graphical models or GANs, and leverage the fact that these types of models can typically be fit efficiently to realistic data, despite their worst-case hardness.  In the next few posts, we will try to describe the landscape of the most promising approaches that we currently have available.</p>
+
+<hr />
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p>See <a href="https://arxiv.org/abs/2110.13239">[AACGKLSSTZ21]</a> for an interesting example of a <em>statistical</em> limitation that is specific to differentially private algorithms that generate synthetic data. <a href="https://differentialprivacy.org/feed.xml#fnref:1" class="reversefootnote">↩</a></p>
+    </li>
+  </ol>
+</div></div>
+
+
+
+
+
+
+
+<p class="date">
+by Jonathan Ullman <a href="https://differentialprivacy.org/synth-data-0/"><span class="datestr">at January 10, 2022 11:00 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2859,88 +2977,6 @@ Email: jn@di.ku.dk</p></div>
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-jobs.org/2021/12/21/postdocs-in-tcs-at-university-of-copenhagen-apply-by-february-6-2022/"><span class="datestr">at December 21, 2021 01:34 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://windowsontheory.org/?p=8276">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/wot.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://windowsontheory.org/2021/12/20/mini-course-on-what-is-computation-from-turing-machines-to-blackholes-and-neurons-guest-post-by-chi-ning-chou/">Mini course on “What is Computation? From Turing Machines to Blackholes and Neurons” – guest post by Chi-Ning Chou</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://windowsontheory.org" title="Windows On Theory">Windows on Theory</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p><em>[Cross posted on <a href="https://cnchou.github.io/2021/12/20/mini-course/">Chi-Ning’s blog</a>,  the course is open also to non-Harvard people. <a href="https://cnchou.github.io/">Chi-Ning</a> is my amazing grad student, who has worked on several aspects related to the course, including quantum computation and neurally-plausible computation. He assembled <a href="https://cnchou.github.io/mini-course/">a great collection of guest speakers</a> and so this course looks like it will be very exciting. . –Boaz]</em></p>
-
-
-
-<p>In the following January, Harvard GSAS kindly supports me to offer a <a href="https://cnchou.github.io/mini-course" target="_blank" rel="noreferrer noopener">mini-course on <em>“What is Computation? From Turing Machines to Blackholes and Neurons”</em></a>. In this blog post, I’m going to share the motivation for teaching this mini-course and give an overview on what you will learn if you are interested in participating!</p>
-
-
-
-<p>Computation is not an exotic word for people living in the 21st century. In high school, kids have to learn and do all sorts of computations in arithmetics (and some even start to write computer programs!). For scientists, computational methods become more and more common and sometimes even completely change the paradigm of a field. There are computers of different forms hiding in our daily life ranging from your smartphones to the toy of your pets. Also, from time to time we see excitement on the news about the development of quantum computing and artificial intelligence. Computation has become central in human civilization, however, do we really understand what computation is?</p>
-
-
-
-<p>Let me first convince you why asking and attempting to answer this question is important.</p>
-
-
-
-<p>Traditionally, at least on Wikipedia, computation is defined as <em>“any type of calculation that includes both arithmetical and non-arithmetical steps and which follows a well-defined model (e.g. an algorithm)”</em>. Indeed, for computer scientists and mathematicians, computation is about solving <em>computational problems</em> via an abstract mathematical model known as <em>Turing machine</em>. In particular, the <em>Church-Turing Thesis</em>, which can be viewed as Newton’s laws in computer science, asserts that all effective computational methods in the world can be captured by Turing machines. That is to say, in the mathematical world, computation is something axiomatized and can be studied and understood parallel to the empirical world.</p>
-
-
-
-<p>On the other hand, for the majority of people, computation is something more concrete and has a physical realization such as a digital computer. The rise of computer science in the past few decades is certainly owing to the great technological success of building up modern computers. The fascinating advances of technology seem to close the gap between theory and reality (similar to Newton’s laws!). Nevertheless, in the frontier of scientific research, the recent surging developments of quantum computing and artificial neural networks started to challenge our understanding in computation – the ways they compute are so different from the traditional Turing machines and we don’t really know why and how they work so well!</p>
-
-
-
-<p>In my opinion, we need to revisit the notion of computation in order to attack these mysteries. Specifically, the approach should be interdisciplinary.</p>
-
-
-
-<p>As computer scientists are used to think of computations as composing different <em>resources</em> and <em>subroutines</em>, the computations in physics and biology tend to be rather <em>holistic</em> and <em>open-ended</em>. When talking about computations, people from different fields often think a bit differently. Such distinctions across fields should not be barriers or problems, instead, it could potentially serve as seeds to enrich our understanding in the essence of computation.</p>
-
-
-
-<p>This mini-course is an invitation to rethink about what computation is through different angles. We will focus on but not limit to three perspectives including mathematics, physics, and biology. Through theories, examples, and experiments, we are going to see the similarities and differences between these disciplines. Six guest speakers coming from a diverse background (from computer science and physics to neuroscience and modern art) will join us and provide lots of examples and stories from their home field. The aim of this mini-course is to remind people of the diverse nature of computation and envision the possibilities of future interdisciplinary research.</p>
-
-
-
-<p>There will be three modules and each contains three 50-minute interactive lectures and 1-3 guest talk(s). The first module focuses on the mathematical foundation of computations in which the students will learn the concept of Turing machines, computability, reductions, and most importantly, the underlying philosophy. The second module is about the computations in the physical world where we will launch from classical mechanics, to statistical mechanics, quantum mechanics, and gravity. The third module looks into the computations in biology, ranging from genomes, evolution, to neuroscience. The mini-course will end with a panel discussion with all the guest speakers and students.</p>
-
-
-
-<p>Please visit the <a href="http://cnchou.github.io/mini-course/" target="_blank" rel="noreferrer noopener">course website</a> for more information and hope to see you in January!</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by Boaz Barak <a href="https://windowsontheory.org/2021/12/20/mini-course-on-what-is-computation-from-turing-machines-to-blackholes-and-neurons-guest-post-by-chi-ning-chou/"><span class="datestr">at December 20, 2021 06:23 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
