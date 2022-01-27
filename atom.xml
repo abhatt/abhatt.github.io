@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2022-01-27T16:39:07Z</updated>
+  <updated>2022-01-27T17:39:26Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,245 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://differentialprivacy.org/synth-data-1/</id>
+    <link href="https://differentialprivacy.org/synth-data-1/" rel="alternate" type="text/html"/>
+    <title>A simple recipe for private synthetic data generation</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>In the <a href="https://differentialprivacy.org/synth-data-0/">last blog post</a>, we covered the potential pitfalls of synthetic data without formal privacy guarantees, and motivated the need for differentially private synthetic data mechanisms.  In this blog post, we will describe the <strong>select-measure-generate</strong> paradigm, which is a simple and effective template for designing synthetic data mechanisms.  The three steps underlying the select-measure-generate paradigm are illustrated and explained below.</p>
+
+<p><img alt="" src="https://differentialprivacy.org/images/select-measure-reconstruct.png"/></p>
+
+<ol>
+  <li><strong>Select</strong> a collection of queries to measure — typically low-dimensional marginals.</li>
+  <li><strong>Measure</strong> the selected queries privately using a noise-addition mechanism.</li>
+  <li><strong>Generate</strong> synthetic data that best explains the noisy measurements.<sup id="fnref:0"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:0" rel="footnote">1</a></sup></li>
+</ol>
+
+<p>Mechanisms in this class differ primarily in their methodology for selecting queries and their algorithm for generating synthetic data from noisy measurements.  The focus of this blog post is the final <strong>Generate</strong> step.  Specifically, we will explore different ways in which one can model data distributions for the purpose of generating synthetic data, outlining the qualitative pros and cons of each method. We will then introduce the <strong><a href="https://github.com/ryan112358/private-pgm" target="_blank">Marginal-Based Inference (MBI)</a></strong> repository that provides methods that, given some set of noisy measurements, enables users to generate synthetic data in a generic and scalable way.</p>
+
+<p>Separating the Generate subroutine from the existing synthetic data generation mechanisms greatly simplifies the design space of new differentially private mechanisms.  It allows the mechanism designer to focus on <em>selecting the queries</em> to maximize utility of the synthetic data, rather than <em>how to generate synthetic data</em> that explain the noisy measurements well.  Both are challenging technical problems that require different techniques to solve, and MBI provides principled solutions to the latter problem, while exposing an interface that can be readily adopted by mechanism designers.</p>
+
+<h1 id="the-generate-subproblem-a-unifying-view">The Generate Subproblem: A Unifying View</h1>
+
+<p>In this section we will introduce the main optimization problem that underlies several methods for the Generate subproblem, and provide a high-level overview of how each method attempts to solve this optimization problem. Let \( y = \mathcal{M}(D) \) be the noisy measurements obtained from running a privacy mechanism on a discrete dataset \( D \).  Our goal is to post-process these noise measurements to obtain synthetic data that explains them well.  In particular, we wish to minimize over the space of all <em>datasets</em> for one that maximizes the likelihood of the observations \( y \).<sup id="fnref:1"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:1" rel="footnote">2</a></sup></p>
+
+<p>\[ \hat{D} \in \text{arg} \max_{D \in \mathcal{D}} \log \mathbb{P}[\mathcal{M}(D) = y] \]</p>
+
+<p>This is a high-dimensional discrete optimization problem, and is generally intractable to solve in practice, even in low-dimensional settings.  It is common to consider the relaxed problem that instead optimizes over the set of <em>probability distributions</em> \( \mathcal{S} \):</p>
+
+<p>\[ \hat{P} \in \text{arg} \max_{P \in \mathcal{S}} \log \mathbb{P}[\mathcal{M}(P) = y] \label{eq1} \tag{1} \]</p>
+
+<p>More generally, we can consider any objective function that measures how well \( P \) explains \( y \).  The log-likelihood is a natural choice, although other choices are also possible and used in practice.  In the special-but-common case where the mechanism is an instance of the Gaussian mechanism, we have \( \mathcal{M}(D) = f(D) + \mathcal{N}(0, \sigma^2)^k \) and \( \log \mathbb{P}[\mathcal{M}(P) = y] \propto - || f(P) - y ||_2^2 \).  If \( f \) is a linear function of \( P \), then Problem \ref{eq1} is simply a quadratic program.  In the subsequent subsections, we will describe different approaches to solve or approximately solve Problem \ref{eq1}.</p>
+
+<blockquote>
+  <p><strong>Remark 1</strong>: The distribution learned from solving Problem \ref{eq1} will resemble the true data with respect to the statistics measured by \( \mathcal{M} \).  It may or may not accurately preserve other statistics — that is data dependent.</p>
+</blockquote>
+
+<blockquote>
+  <p><strong>Remark 2</strong>: The most common statistics to measure are <strong>low-dimensional marginals</strong>.  A marginal for a subset of attributes counts the number of records in the dataset that match each setting of possible values. They are appealing statistics to measure because:</p>
+  <ul>
+    <li>They capture low-dimensional structure common in real world data distributions.</li>
+    <li>Each cell in a marginal is a count, a statistic that is fairly robust to noise.</li>
+    <li>One individual can only contribute to a single cell of a marginal, so all cells have low sensitivity and can be measured simultaneously with low privacy cost.</li>
+  </ul>
+</blockquote>
+
+<h3 id="direct">Direct</h3>
+
+<p>We can attempt to solve Problem \ref{eq1} directly by utilizing any algorithm for convex optimization over the probability simplex, such as multiplicative weights.  This method works well in low-dimensional regimes, although quickly becomes intractable for higher-dimensional domains, where it is generally intractable to even enumerate all the entries of a single distribution \( P \), let alone optimize over the space of all distributions.</p>
+
+<p>Until recently, variants of the direct method were the only general-purpose solutions available for this problem, and as a result, many mechanisms struggled to scale to high-dimensional domains.  Recently, several methods have been proposed that attempt to overcome the curse of dimensionality inherent in the direct approach, which scale by imposing additional assumptions on the mechanism \( \mathcal{M} \) and/or by relaxing the optimization problem.  A common theme is to restrict attention to a subset of joint distributions which have tractable representations.     The sections below describe these more scalable methods, including the different (implicit) assumptions each method makes, as well as the consequences of those assumptions.</p>
+
+<h3 id="probabilistic-graphical-models-pgm">Probabilistic Graphical Models (PGM)</h3>
+
+<p>The first method we describe is <a href="https://arxiv.org/abs/1901.09136" target="\_blank">PGM</a>, which was a key component of the first-place solution in the 2018 NIST Differential Privacy <a href="https://www.nist.gov/ctl/pscr/open-innovation-prize-challenges/past-prize-challenges/2018-differential-privacy-synthetic" target="\_blank">Synthetic Data Competition</a> and in both the first and second-place solutions in the follow-up <a href="https://www.nist.gov/ctl/pscr/open-innovation-prize-challenges/current-and-upcoming-prize-challenges/2020-differential" target="\_blank">Temporal Map Competition</a>.</p>
+
+<p>PGM scales by restricting attention to distributions that can be represented as a graphical model \( P_{\theta} \).  The key observation of PGM is that when \( \mathcal{M} \) only depends on \( P \) through its low-dimensional marginals, then one of the optimizers of Problem \ref{eq1} is a graphical model with parameters \( \theta \).  In this case, Problem \ref{eq1} is under-determined and typically has infinitely many solutions.  It turns out that the solution found by PGM has maximum entropy among all solutions to the problem — a very natural way to break ties among equally good solutions. Remarkably, these facts are true for any dataset — they do not require the underlying data to be generated from a graphical model with the same structure <a href="https://arxiv.org/abs/2108.04978" target="\_blank">[MMS21]</a>.</p>
+
+<p>The parameter vector \( \theta \) is often much smaller than \( P \), and we can efficiently optimize it, bypassing the curse of dimensionality in this special case.  The size of \( \theta \) and in turn the complexity of PGM depends on the mechanism \( \mathcal{M} \), and in the worst case is the same as the Direct method.<sup id="fnref:6"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:6" rel="footnote">3</a></sup>  However, in many common cases of practical interest, the complexity of PGM is exponentially better than that of Direct, in which case we can efficiently solve the optimization problem above, finding \( \theta \) and thus a tractable representation of \( \hat{P} \).  The complexity ultimately depends on the size of the junction tree derived from the mechanism \( \mathcal{M} \), and understanding this relationship requires some expertise in graphical models.  However, if we utilize this understanding to design \( \mathcal{M} \), we can avoid this worst-case behavior, as <a href="https://arxiv.org/abs/2108.04978" target="\_blank">MST</a> and <a href="http://vldb.org/pvldb/vol14/p2190-cai.pdf" target="\_blank">PrivMRF</a> do.</p>
+
+<h3 id="relaxed-tabular">Relaxed Tabular</h3>
+
+<p>An alternative approach was proposed in the recent <a href="https://arxiv.org/abs/2103.06641" target="\_blank">RAP</a> paper.  The key idea is to restrict attention to “pseudo-distributions” that can be represented in a relaxed tabular format.  The format is similar to the one-hot encoding of a discrete dataset, although the entries need not be \( 0 \) or \( 1 \), which enables gradient-based optimization to be performed on the cells in this table.  The number of rows is a tunable knob that can be set to trade off expressive capacity with computational efficiency.  With a sufficiently large knob size, the true minimizer of the original problem can be expressed in this way, but there is no guarantee that gradient-based optimization will converge to it because this representation introduces non-convexity.  Moreover, the search space of this method includes “spurious” distributions, so even the global optimum of relaxed problem would not necessarily solve the original problem.<sup id="fnref:9"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:9" rel="footnote">4</a></sup>  Despite these drawbacks, this method appears to work well in practice.</p>
+
+<h3 id="generative-networks">Generative Networks</h3>
+
+<p>Among the iterative methods introduced by <a href="https://arxiv.org/abs/2106.07153" target="\_blank">[LVW21]</a> is GEM (Generative networks with the exponential mechanism), an approach inspired by generative adversarial networks. They propose representing any dataset as mixture of product distributions over attributes in the data domain. They implicitly encode such distributions using a generative neural network with a softmax layer. In concrete terms, given some Gaussian noise \( \mathbf{z} \sim \mathcal{N}(0, I) \), their <strong>Generate</strong> step outputs \( f_\theta(\mathbf{z}) \) where \( f \) is some feedforward neural network parametrized by \( \theta \). \( f_\theta(\mathbf{z}) \) represents a collection of marginal distributions for each individual attribute in the domain, which can be used to directly answer any k-way marginal query. Alternatively, one can sample directly from \( f_\theta(\mathbf{z}) \) if the goal is generate synthetic tabular data.</p>
+
+<p>Note that the size of \( \mathbf{z} \) can be arbitrarily large, meaning that this generative network approach can theoretically be scaled up to capture any distribution \( P \). Moreover, <a href="https://arxiv.org/abs/2106.07153">[LVW21]</a> show that one can achieve strong performance in practical settings even when \( \mathbf{z} \) is small, making such generative network approaches to scale in terms of both computation and memory. Howevever, as is commonly found in deep learning methods, this optimization problem is nonconvex.</p>
+
+<h3 id="local-consistency">Local Consistency</h3>
+
+<p>Finally, <a href="https://arxiv.org/abs/2106.07153" target="\_blank">GUM</a> and <a href="https://arxiv.org/abs/2109.06153" target="\_blank">APPGM</a> do not search over any space of distributions, but instead impose <em>local consistency</em> constraints on the noisy measurements.  These methods relax Problem \ref{eq1} to optimize over the space of pseudo-marginals, rather than distributions.  The pseudo-marginals are required to be internally consistent, but there is no guarantee that there is a distribution which realizes those pseudo-marginals.  As a result, the solution found by these methods need not be feasible in Problem \ref{eq1}.  Nevertheless, we can attempt to generate synthetic data using heuristics to translate these locally consistent pseudo-marginals into synthetic tabular data.  This approach was used by team DPSyn in both NIST competitions.</p>
+
+<h3 id="summary">Summary</h3>
+
+<p>A qualitative comparison between the discussed methods is given in the table below.<sup id="fnref:7"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:7" rel="footnote">5</a></sup></p>
+
+<blockquote>
+  <p><strong>Remark 3</strong>: Among the alternatives discussed here, only Direct and PGM can be expected to solve Problem \ref{eq1}.    The alternatives fail to solve Problem \ref{eq1} in general, either from non-convexity, or from introducing spurious distributions to the search space.  This distinguishing feature of PGM comes at a cost: the complexity can be much higher than the alternatives, and in the worst-case, will not be feasible to run.  In such cases, one of the approximations must be used instead.</p>
+</blockquote>
+
+<table>
+  <tbody>
+    <tr>
+      <td> </td>
+      <td><strong>Direct</strong></td>
+      <td><strong>PGM</strong></td>
+      <td><strong>Relaxed Tabular</strong></td>
+      <td><strong>Generative Networks</strong></td>
+      <td><strong>Local Consistency</strong></td>
+    </tr>
+    <tr>
+      <td>Search space includes optimum</td>
+      <td><span style="color: green;">Yes</span></td>
+      <td><span style="color: green;">Yes</span></td>
+      <td><span style="color: green;">Yes</span></td>
+      <td><span style="color: green;">Yes</span></td>
+      <td><span style="color: green;">Yes</span></td>
+    </tr>
+    <tr>
+      <td>Search space excludes spurious distributions</td>
+      <td><span style="color: green;">Yes</span></td>
+      <td><span style="color: green;">Yes</span></td>
+      <td><span style="color: red;">No</span></td>
+      <td><span style="color: green;">Yes</span></td>
+      <td><span style="color: red;">No</span></td>
+    </tr>
+    <tr>
+      <td>Convexity preserving</td>
+      <td><span style="color: green;">Yes</span></td>
+      <td><span style="color: green;">Yes</span></td>
+      <td><span style="color: red;">No</span></td>
+      <td><span style="color: red;">No</span></td>
+      <td><span style="color: green;">Yes</span></td>
+    </tr>
+    <tr>
+      <td>Solves Problem \ref{eq1}</td>
+      <td><span style="color: green;">Yes</span></td>
+      <td><span style="color: green;">Yes</span></td>
+      <td><span style="color: red;">No</span></td>
+      <td><span style="color: red;">No</span></td>
+      <td><span style="color: red;">No</span></td>
+    </tr>
+    <tr>
+      <td>Factors influencing scalability</td>
+      <td><span style="color: red;">Size of Entire Domain</span></td>
+      <td><span style="color: orange;">Size of Junction Tree</span></td>
+      <td><span style="color: green;">Size of Largest Marginal</span></td>
+      <td><span style="color: green;">Size of Largest Marginal</span></td>
+      <td><span style="color: green;">Size of Largest Marginal</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="generating-synthetic-data-with-mbi">Generating Synthetic Data with MBI</h1>
+
+<p>Now that we have introduced the techniques underlying the Generate step, we will show how to utilize the implementations in the MBI repository to develop end-to-end mechanisms for differentially private synthetic data.</p>
+
+<h2 id="preparing-noisy-measurements">Preparing Noisy Measurements</h2>
+
+<p>The input to any method for Generate is a collection of noisy measurements.  We show below how to prepare these measurements in a format compatible with the methods for Generate implemented in the MBI repository.  The measurements are represented as a list, where each element of the list is a noisy marginal (represented as a numpy array), along with relevant metadata including the attributes in the marginal and the amount of noise used to answer it.  In the code snippet below, the selected marginals are hard-coded, but in general this list can be modified to tailor the synthetic data towards a different set of marginals.</p>
+
+<figure class="highlight"><pre><code class="language-python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
+<span class="kn">from</span> <span class="nn">mbi</span> <span class="kn">import</span> <span class="n">Dataset</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">'adult.csv'</span><span class="p">,</span> <span class="s">'adult-domain.json'</span><span class="p">)</span>
+
+<span class="c1"># SELECT the marginals we'd like to measure
+</span><span class="n">marginals</span> <span class="o">=</span> <span class="p">[(</span><span class="s">'marital-status'</span><span class="p">,</span> <span class="s">'sex'</span><span class="p">),</span>
+             <span class="p">(</span><span class="s">'education-num'</span><span class="p">,</span> <span class="s">'race'</span><span class="p">),</span>
+             <span class="p">(</span><span class="s">'sex'</span><span class="p">,</span> <span class="s">'hours-per-week'</span><span class="p">),</span>
+             <span class="p">(</span><span class="s">'workclass'</span><span class="p">,),</span>
+             <span class="p">(</span><span class="s">'marital-status'</span><span class="p">,</span> <span class="s">'occupation'</span><span class="p">,</span> <span class="s">'income&gt;50K'</span><span class="p">)]</span>
+
+<span class="c1"># MEASURE the marginals and log the noisy answers
+</span><span class="n">sigma</span> <span class="o">=</span> <span class="mi">50</span> 
+<span class="n">measurements</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="n">marginals</span><span class="p">:</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">project</span><span class="p">(</span><span class="n">M</span><span class="p">).</span><span class="n">datavector</span><span class="p">()</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">x</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="n">sparse</span><span class="p">.</span><span class="n">eye</span><span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">measurements</span><span class="p">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span> <span class="p">)</span></code></pre></figure>
+
+<p>The above code snippet is a 5-fold composition of Gaussian mechanisms with \( \sigma = 50 \), and hence the entire mechanism is \( \frac{5}{2 \sigma^2} = \frac{1}{1000} \)-zCDP.</p>
+
+<h2 id="generating-synthetic-data-from-measurements">Generating Synthetic Data from Measurements</h2>
+
+<p>Given measurements represented in the format above, we can readily generate synthetic data using one of several methods.  For example, the code snippet below generates synthetic data that approximately matches the noisy measurements:</p>
+
+<figure class="highlight"><pre><code class="language-python"><span class="kn">from</span> <span class="nn">mbi</span> <span class="kn">import</span> <span class="n">FactoredInference</span> <span class="c1"># PGM
+</span><span class="kn">from</span> <span class="nn">mbi</span> <span class="kn">import</span> <span class="n">MixtureInference</span>  <span class="c1"># Relaxed Tabular + Softmax
+</span><span class="kn">from</span> <span class="nn">mbi</span> <span class="kn">import</span> <span class="n">LocalInference</span>    <span class="c1"># Local Consistency
+</span><span class="kn">from</span> <span class="nn">mbi</span> <span class="kn">import</span> <span class="n">PublicInference</span>   <span class="c1"># Not Discussed
+</span>
+<span class="c1"># GENERATE synthetic data using PGM 
+</span><span class="n">engine</span> <span class="o">=</span> <span class="n">FactoredInference</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">iters</span><span class="o">=</span><span class="mi">2500</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">engine</span><span class="p">.</span><span class="n">estimate</span><span class="p">(</span><span class="n">measurements</span><span class="p">)</span>
+<span class="n">synth</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">synthetic_data</span><span class="p">()</span></code></pre></figure>
+
+<p>To generate synthetic data, we have to simply instantiate one of the inference engines imported.  In the code snippet above, we use the FactoredInference engine, which corresponds to the PGM method.  The other inference engines share the same interface, and can be used instead if desired.</p>
+
+<blockquote>
+  <p><strong>Remark 4</strong>: By utilizing the inference engines implemented in MBI, end-to-end synthetic data mechanisms can be written with remarkably little code.  This simple example required less than 25 lines of code, and <a href="https://github.com/ryan112358/private-pgm/tree/master/mechanisms" target="\_blank">more complex mechanisms</a> can usually be written in a single file with less than 200 lines of code.  As a result, future research can focus on the measurement selection subproblem, and new ideas can more rapidly be evaluated and iterated on.</p>
+</blockquote>
+
+<p>We evaluated the quality of the synthetic data generated by measuring the error of the measured marginals.  Interestingly, the synthetic data has lower error than the noisy marginals, with reductions in error up to 30% for the larger marginals, and around 3% for the smaller ones.</p>
+
+<p><img alt="" src="https://differentialprivacy.org/images/smr1.png"/></p>
+
+<blockquote>
+  <p><strong>Remark 5:</strong> It is not surprising that the synthetic data enjoys lower error than the noisy marginals.  Problem \ref{eq1} can be seen as a <em>projection problem</em>, and there is substantial theoretical <a href="https://arxiv.org/abs/1212.0297" target="\_blank">[NTZ12]</a> and empirical [<a href="https://dl.acm.org/doi/abs/10.1145/2783258.2783366" target="\_blank">LWK15</a>, <a href="https://systems.cs.columbia.edu/private-systems-class/papers/Abowd2019Census.pdf" target="\_blank">AAGK+19</a>] evidence that solving this problem reduces error.  Intuitively, the benefit arises due to the inconsistencies in the noisy observations that are resolved through the optimization procedure.</p>
+</blockquote>
+
+<p>We can also use the synthetic data to estimate marginals we didn’t measure with the Gaussian mechanism.  These estimates may or may not be accurate, it depends on the data and the marginal being estimated.  For example, the error on the (sex, income&gt;50K) marginal is around 0.02, while the error on the (education-num, occupation) marginal is about 0.5.</p>
+
+<p><img alt="" src="https://differentialprivacy.org/images/smr2.png"/></p>
+<blockquote>
+  <p><strong>Remark 6:</strong> The fact that the synthetic data is not accurate for some marginals is not a limitation of the method used for Generate, but rather an artifact of what marginals were selected.  Thus, it is clear that selecting the right marginals to measure plays a crucial role in the quality of the synthetic data. This is an important open problem that will be the topic of a future blog post.</p>
+</blockquote>
+
+<h1 id="coming-up-next">Coming up Next</h1>
+
+<p>In this blog post, we focused on the <strong>Generate</strong> step of the select-measure-generate paradigm.  For the next blog post in this series, we will focus on state-of-the-art approaches to the <strong>Select</strong> sub-problem.  If you have any comments, questions, or remarks, please feel free to share them in the comments section below.  If you would like to try generating synthetic data with MBI, check out this <a href="https://colab.research.google.com/drive/1c8gT5m_GWfQoa_mx8eXh4sPD48Y0z3ML?usp=sharing">jupyter notebook</a> on Google Colab!</p>
+
+<hr/>
+<div class="footnotes">
+  <ol>
+    <li id="fn:0">
+      <p>The Generate step is a post-processing of already privatized noisy marginals, and therefore the privacy analysis only needs to reason about the first two steps. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:0">↩</a></p>
+    </li>
+    <li id="fn:1">
+      <p>Here we assume that \( \mathcal{M} \) is a mechanism with a discrete output space.  In practice, this is always the case because any mechanism implemented on a finite computer must have a discrete output space.  For continuous output spaces, interpret the objective function as a log density rather than a log probability. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:1">↩</a></p>
+    </li>
+    <li id="fn:6">
+      <p>For example, this worst-case behavior is realized if <strong>all</strong> 2-way marginals are measured.  While this can be seen as a limitation of PGM, <a href="http://people.seas.harvard.edu/~salil/research/synthetic-Feb2010.pdf">it is known</a> that generating synthetic data that preserves all 2-way marginals is computationally hard in the worst-case. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:6">↩</a></p>
+    </li>
+    <li id="fn:9">
+      <p>This idea was refined into <a href="https://arxiv.org/abs/2106.07153" target="\_blank">RAP<sup>softmax</sup></a> in follow-up-work, which overcomes the latter issue, but does not resolve the non-convexity issue. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:9">↩</a></p>
+    </li>
+    <li id="fn:7">
+      <p>These approximations were all developed concurrently, and systematic empirical comparisons between them (and PGM) have not been done to date.  Some experimental comparisons can be found in <a href="https://arxiv.org/abs/2106.07153" target="\_blank">[LVW21]</a> and <a href="https://arxiv.org/abs/2109.06153">[MPSM21]</a>. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:7">↩</a></p>
+    </li>
+  </ol>
+</div></div>
+    </summary>
+    <updated>2022-01-27T17:00:00Z</updated>
+    <published>2022-01-27T17:00:00Z</published>
+    <author>
+      <name>Terrance Liu</name>
+    </author>
+    <source>
+      <id>https://differentialprivacy.org</id>
+      <link href="https://differentialprivacy.org" rel="alternate" type="text/html"/>
+      <link href="https://differentialprivacy.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Website for the differential privacy research community</subtitle>
+      <title>Differential Privacy</title>
+      <updated>2022-01-27T17:39:23Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://cstheory-jobs.org/2022/01/27/research-fellow-postdoc-at-national-university-of-singapore-apply-by-july-31-2022/</id>
@@ -34,7 +273,7 @@ Email: prashant@comp.nus.edu.sg</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-27T16:37:47Z</updated>
+      <updated>2022-01-27T17:37:36Z</updated>
     </source>
   </entry>
 
@@ -59,7 +298,7 @@ Email: prashant@comp.nus.edu.sg</p></div>
       <link href="https://thmatters.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://thmatters.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theory Matters</title>
-      <updated>2022-01-27T16:37:56Z</updated>
+      <updated>2022-01-27T17:37:45Z</updated>
     </source>
   </entry>
 
@@ -177,7 +416,7 @@ The next is the list:</p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-01-27T16:37:43Z</updated>
+      <updated>2022-01-27T17:37:32Z</updated>
     </source>
   </entry>
 
@@ -574,7 +813,7 @@ Email: csc-chair-search@uvic.ca</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-27T16:37:47Z</updated>
+      <updated>2022-01-27T17:37:36Z</updated>
     </source>
   </entry>
 
@@ -598,7 +837,7 @@ Email: csc-chair-search@uvic.ca</p></div>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2022-01-27T16:38:36Z</updated>
+      <updated>2022-01-27T17:38:44Z</updated>
     </source>
   </entry>
 
@@ -663,7 +902,7 @@ Ken will update us on the latest views of these and other issues. </p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-01-27T16:37:44Z</updated>
+      <updated>2022-01-27T17:37:32Z</updated>
     </source>
   </entry>
 
@@ -734,7 +973,7 @@ Ken will update us on the latest views of these and other issues. </p>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-27T16:37:33Z</updated>
+      <updated>2022-01-27T17:37:22Z</updated>
     </source>
   </entry>
 
@@ -761,7 +1000,7 @@ Email: fellowship@hse.ru</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-27T16:37:47Z</updated>
+      <updated>2022-01-27T17:37:36Z</updated>
     </source>
   </entry>
 
@@ -870,7 +1109,7 @@ Given that spaces do not count, here is the <a href="https://puzzleaday.wordpres
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-01-27T16:37:44Z</updated>
+      <updated>2022-01-27T17:37:32Z</updated>
     </source>
   </entry>
 
@@ -897,7 +1136,7 @@ Email: hguo at inf.ed.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-27T16:37:47Z</updated>
+      <updated>2022-01-27T17:37:36Z</updated>
     </source>
   </entry>
 
@@ -1009,7 +1248,7 @@ Email: monika.henzinger@univie.ac.at</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-27T16:37:47Z</updated>
+      <updated>2022-01-27T17:37:36Z</updated>
     </source>
   </entry>
 
@@ -1036,7 +1275,7 @@ Email: grigory@grigory.us</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-27T16:37:47Z</updated>
+      <updated>2022-01-27T17:37:36Z</updated>
     </source>
   </entry>
 
@@ -1064,7 +1303,7 @@ Our proof of the above result builds on the results of Marinari, Möller and Mor
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-27T16:37:33Z</updated>
+      <updated>2022-01-27T17:37:22Z</updated>
     </source>
   </entry>
 
@@ -1111,7 +1350,7 @@ This is post <b>7*11*13</b> = <b>1001</b>.  The passcode—which should not be n
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-01-27T16:37:43Z</updated>
+      <updated>2022-01-27T17:37:32Z</updated>
     </source>
   </entry>
 
@@ -1409,7 +1648,7 @@ A meta open-problem: Which was the most <em>pliable</em> problem at the time thi
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-01-27T16:37:44Z</updated>
+      <updated>2022-01-27T17:37:32Z</updated>
     </source>
   </entry>
 
@@ -1436,7 +1675,7 @@ Email: recruit@cs.stonybrook.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-27T16:37:47Z</updated>
+      <updated>2022-01-27T17:37:36Z</updated>
     </source>
   </entry>
 
@@ -1462,7 +1701,7 @@ Email: recruit@cs.stonybrook.edu</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-27T16:37:33Z</updated>
+      <updated>2022-01-27T17:37:22Z</updated>
     </source>
   </entry>
 
@@ -1486,7 +1725,7 @@ Email: recruit@cs.stonybrook.edu</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-27T16:37:33Z</updated>
+      <updated>2022-01-27T17:37:22Z</updated>
     </source>
   </entry>
 
@@ -1513,7 +1752,7 @@ Email: gene@umd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-27T16:37:47Z</updated>
+      <updated>2022-01-27T17:37:36Z</updated>
     </source>
   </entry>
 
@@ -1544,7 +1783,7 @@ Email: gene@umd.edu</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2022-01-27T16:38:00Z</updated>
+      <updated>2022-01-27T17:37:49Z</updated>
     </source>
   </entry>
 
@@ -1578,7 +1817,7 @@ We use this connection to obtain lower-bounds against a natural family of secret
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-27T16:37:33Z</updated>
+      <updated>2022-01-27T17:37:22Z</updated>
     </source>
   </entry>
 
@@ -1735,7 +1974,7 @@ Framework and Evaluation Criteria Committee</a>.</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-27T16:37:33Z</updated>
+      <updated>2022-01-27T17:37:22Z</updated>
     </source>
   </entry>
 
@@ -1924,7 +2163,7 @@ Framework and Evaluation Criteria Committee</a>.</p></div>
       <link href="https://differentialprivacy.org/feed.xml" rel="self" type="application/atom+xml"/>
       <subtitle>Website for the differential privacy research community</subtitle>
       <title>Differential Privacy</title>
-      <updated>2022-01-26T22:52:58Z</updated>
+      <updated>2022-01-27T17:39:24Z</updated>
     </source>
   </entry>
 
@@ -1951,7 +2190,7 @@ Email: rahul@comp.nus.edu.sg</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-27T16:37:47Z</updated>
+      <updated>2022-01-27T17:37:36Z</updated>
     </source>
   </entry>
 
@@ -1989,42 +2228,6 @@ Email: rahul@comp.nus.edu.sg</p></div>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
       <updated>2022-01-27T15:59:22Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://gilkalai.wordpress.com/?p=22386</id>
-    <link href="https://gilkalai.wordpress.com/2022/01/10/reflections-on-the-occasion-of-ron-adins-and-yuval-roichmans-birthdays-and-fpsac-2021/" rel="alternate" type="text/html"/>
-    <title>Reflections: On the Occasion of Ron Adin’s and Yuval Roichman’s Birthdays, and FPSAC 2021</title>
-    <summary>Two hybrid conferences, Bar-Ilan University:Monday, January 10,2022 10:00-16:00 (Israel time) Reflections: On the occasion of Ron Adin’s and Yuval Roichman’s 60th Birthdays. FPSAC 2021 Starting  Monday, January 10,2022 16:30 (Israel time). Ending Thursday, January 20, 2022.</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><h3>Two hybrid conferences, Bar-Ilan University:<br/>Monday, January 10,2022 10:00-16:00 (Israel time) <br/><a href="https://u.math.biu.ac.il/~vishneu/Conferences/Yuval-Ron-2021/index.html"><strong>Reflections: On the occasion of Ron Adin’s and Yuval Roichman’s 60th Birthdays.</strong></a><br/><br/><a href="https://fpsac2021.math.biu.ac.il/?page_id=100"><strong>FPSAC 2021</strong></a> Starting  Monday, January 10,2022 16:30 (Israel time). Ending Thursday, January 20, 2022. </h3>
-
-
-<p/>
-
-
-
-<p/></div>
-    </content>
-    <updated>2022-01-09T21:42:15Z</updated>
-    <published>2022-01-09T21:42:15Z</published>
-    <category term="Combinatorics"/>
-    <category term="Updates"/>
-    <category term="Ron Adin"/>
-    <category term="Yuval Roichman"/>
-    <author>
-      <name>Gil Kalai</name>
-    </author>
-    <source>
-      <id>https://gilkalai.wordpress.com</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://gilkalai.wordpress.com/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://gilkalai.wordpress.com" rel="alternate" type="text/html"/>
-      <link href="https://gilkalai.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Gil Kalai's blog</subtitle>
-      <title>Combinatorics and more</title>
-      <updated>2022-01-27T16:37:38Z</updated>
     </source>
   </entry>
 </feed>
