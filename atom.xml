@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2022-01-28T06:39:20Z</updated>
+  <updated>2022-01-28T07:39:17Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,60 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2022/01/27/open-algorithmic-problems</id>
+    <link href="https://11011110.github.io/blog/2022/01/27/open-algorithmic-problems.html" rel="alternate" type="text/html"/>
+    <title>Open algorithmic problems from a talk by Alon</title>
+    <summary>The UCI mathematics department had a departmental colloquium today given by Noga Alon, titled “The Polynomial Method and its Algorithmic Aspects”. One part of his talk that I found very interesting was a collection of easy-to-state combinatorial problems where the existence of a solution can be proved, but there is no known efficient (polynomial time) algorithm for finding the solution:</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The UCI mathematics department had a departmental colloquium today given by Noga Alon, titled “The Polynomial Method and its Algorithmic Aspects”. One part of his talk that I found very interesting was a collection of easy-to-state combinatorial problems where the existence of a solution can be proved, but there is no known efficient (polynomial time) algorithm for finding the solution:</p>
+
+<ul>
+  <li>
+    <p>Let \(p\) be a prime number, and suppose that we are given two inputs: a sequence \(A=a_1,a_2,\dots a_k\) of elements of \(\mathbb{Z}_p\), of length \(k\lt p\), not necessarily distinct from each other, and a set \(B\), also consisting of \(k\) elements of \(\mathbb{Z}_p\), distinct but not ordered. Can we pair them up by assigning an ordering \(b_1,b_2,\dots\) to the elements of \(B\) so that all of the sums \(a_i+b_i\) are distinct? For instance, if all of the \(A\)’s are equal, then any ordering of the \(B\)’s will work.</p>
+  </li>
+  <li>
+    <p>Let \(G\) be a bipartite graph that has a perfect matching. Assign “non-degrees” to the vertices on one side of the bipartition, numbers that should not be the degree of the vertex. Can we delete some subset of the vertices on the other side, so that in the remaining graph each vertex’s degree is different from its non-degree? For instance, if the non-degrees are all zero, then \(G\) itself will work (it has nonzero degree because it has a perfect matching). If the non-degrees are all non-zero, then we can delete all of the vertices on the other side of the bipartition.</p>
+  </li>
+  <li>
+    <p>Let \(G\) be a planar graph with degree three at every vertex, and suppose also that each edge of \(G\) has a list of three colors available to it. Can we assign colors from these lists to the edges so that each vertex touches edges of three different colors?</p>
+  </li>
+  <li>
+    <p>Let \(C_1\) and \(C_2\) be proper colorings of a large \(d\)-dimensional grid, using \(q\ge d+2\) colors, and let \(S_1\) and \(S_2\) be subsets of the vertices of the grid that are far apart from each other (I am not sure how far this needs to be but it seems to be \(d\pm O(1)\) or maybe \(q\pm O(1)\)). Can we find a proper coloring of the whole grid that blends between the two colorings, agreeing with each \(C_i\) on \(S_i\)? This one comes from a new paper by Alon, Raimundo Briceño, Nishant Chandgotia, Alexander Magazinov, and Yinon Spinka, <a href="https://doi.org/10.1017/S0963548320000395">“Mixing properties of colourings of the \(\mathbb{Z}^d\) lattice”, <em>Combinatorics, Probability and Computing</em> 2021</a>. Fewer colors will not always work.</p>
+  </li>
+</ul>
+
+<p>In all of these cases, the answer to the existence problem is yes, but we don’t know of an efficient algorithm for finding the structure that is supposed to exist. Instead, Alon proves the existence non-constructively, through a combinatorial <a href="https://en.wikipedia.org/wiki/Hilbert%27s_Nullstellensatz">Nullstellensatz</a> encoding the principle that low-degree polynomials don’t have many roots. For one-variable polynomials of degree \(d\), for instance, there cannot be more than \(d\) values at which the polynomial is zero. But the degree really has to be \(d\), and not merely at most \(d\), because the degree-zero constant-zero polynomial is zero everywhere.</p>
+
+<p>The analogous principle Alon uses for higher numbers of variables is the following: Let \(p\) be a polynomial of degree \(d\) in the variables \(x_1,x_2,\dots x_n\), over some field, and let \(t_i\) be the exponents of a nonzero monomial \(\prod_i x_i^{t_i}\) of degree \(d\) in \(p\). Additionally, let \(S_i\) be (not necessarily distinct) sets of \(t_i+1\) elements. Then we can choose an element \(s_i\) in each \(S_i\) such that \(p(s_1,s_2,\dots)\) is non-zero. Alon surveys this principle and its applications in his paper <a href="https://doi.org/10.1017/S0963548398003411">“Combinatorial Nullstellensatz”, <em>Combinatorics, Probability and Computing</em> 1999</a>.</p>
+
+<p>The hard parts about using this method to prove existence in combinatorial problems such as the ones above are finding the right polynomial and proving that it has a nonzero coefficient at the right monomial. The problem on reordering with distinct pairwise sums, for instance, comes from Alon’s paper <a href="https://doi.org/10.1007/BF02773567">“Additive Latin transversals”, <em>Israel J. Math.</em> 2000</a> and uses the polynomial</p>
+
+\[\prod_{i\lt j}(x_i-x_j)(a_i+x_i-a_j-x_j)\]
+
+<p>where each \(S_i=B\), the first terms in the product can only be nonzero if each \(x_i\) is chosen to be a distinct member of \(B\), and the second terms in the product can only be nonzero if the pairwise sums are different from each other. The coefficient of the monomial \(\prod x_i^{k-1}\) turns out to be (up to sign) exactly \(k!\), which is nonzero modulo \(p\) by the assumptions that \(p\) is prime and \(k\lt p\). The nonzero coefficients for the other two problems are not so easy to compute: they are the <a href="https://en.wikipedia.org/wiki/Permanent_(mathematics)">permanent</a> (number of perfect matchings) and the number of 3-edge-colorings of the given graphs. For the case of 3-edge-colorings, the fact that this number is nonzero is one of the equivalent forms of the 4-color theorem.</p>
+
+<p>The general problem of constructing a nonzero solution to an instance of the combinatorial Nullstellensatz whose polynomial is described by an arithmetic circuit is (according to Alon) as hard as inverting arbitrary one-way permutations, a standard cryptographic primitive. This suggests that a polynomial-time construction algorithm does not exist; if it did exist, it would break a lot of modern cryptography. On the other hand, proving that it does not exist would also prove \(\mathsf{P}\ne\mathsf{NP}\). Despite this relation to standard hard problems, there’s no strong reason for believing that any of the combinatorial problems outlined above is as hard as the general case, so maybe they might still have an efficient algorithm. If so, it would probably translate into an existence proof that is substantially different than the ones we already have for these problems.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/107698894668333119">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2022-01-27T23:08:00Z</updated>
+    <published>2022-01-27T23:08:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2022-01-28T07:26:43Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>https://differentialprivacy.org/synth-data-1/</id>
@@ -273,7 +327,7 @@ Email: prashant@comp.nus.edu.sg</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-28T06:37:41Z</updated>
+      <updated>2022-01-28T07:37:43Z</updated>
     </source>
   </entry>
 
@@ -606,7 +660,7 @@ focus on the circuit model.
       <link href="https://thmatters.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://thmatters.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theory Matters</title>
-      <updated>2022-01-28T06:38:00Z</updated>
+      <updated>2022-01-28T07:37:52Z</updated>
     </source>
   </entry>
 
@@ -724,7 +778,7 @@ The next is the list:</p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-01-28T06:37:37Z</updated>
+      <updated>2022-01-28T07:37:40Z</updated>
     </source>
   </entry>
 
@@ -844,7 +898,7 @@ Email: csc-chair-search@uvic.ca</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-28T06:37:41Z</updated>
+      <updated>2022-01-28T07:37:43Z</updated>
     </source>
   </entry>
 
@@ -868,7 +922,7 @@ Email: csc-chair-search@uvic.ca</p></div>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2022-01-28T06:38:34Z</updated>
+      <updated>2022-01-28T07:38:49Z</updated>
     </source>
   </entry>
 
@@ -933,7 +987,7 @@ Ken will update us on the latest views of these and other issues. </p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-01-28T06:37:38Z</updated>
+      <updated>2022-01-28T07:37:41Z</updated>
     </source>
   </entry>
 
@@ -1004,7 +1058,7 @@ Ken will update us on the latest views of these and other issues. </p>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-28T06:37:28Z</updated>
+      <updated>2022-01-28T07:37:29Z</updated>
     </source>
   </entry>
 
@@ -1031,7 +1085,7 @@ Email: fellowship@hse.ru</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-28T06:37:41Z</updated>
+      <updated>2022-01-28T07:37:43Z</updated>
     </source>
   </entry>
 
@@ -1140,7 +1194,7 @@ Given that spaces do not count, here is the <a href="https://puzzleaday.wordpres
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-01-28T06:37:38Z</updated>
+      <updated>2022-01-28T07:37:41Z</updated>
     </source>
   </entry>
 
@@ -1167,7 +1221,7 @@ Email: hguo at inf.ed.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-28T06:37:41Z</updated>
+      <updated>2022-01-28T07:37:43Z</updated>
     </source>
   </entry>
 
@@ -1279,7 +1333,7 @@ Email: monika.henzinger@univie.ac.at</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-28T06:37:41Z</updated>
+      <updated>2022-01-28T07:37:43Z</updated>
     </source>
   </entry>
 
@@ -1306,7 +1360,7 @@ Email: grigory@grigory.us</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-28T06:37:41Z</updated>
+      <updated>2022-01-28T07:37:43Z</updated>
     </source>
   </entry>
 
@@ -1334,7 +1388,7 @@ Our proof of the above result builds on the results of Marinari, Möller and Mor
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-28T06:37:28Z</updated>
+      <updated>2022-01-28T07:37:29Z</updated>
     </source>
   </entry>
 
@@ -1381,7 +1435,7 @@ This is post <b>7*11*13</b> = <b>1001</b>.  The passcode—which should not be n
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-01-28T06:37:37Z</updated>
+      <updated>2022-01-28T07:37:40Z</updated>
     </source>
   </entry>
 
@@ -1463,7 +1517,7 @@ This is post <b>7*11*13</b> = <b>1001</b>.  The passcode—which should not be n
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2022-01-16T07:04:30Z</updated>
+      <updated>2022-01-28T07:26:43Z</updated>
     </source>
   </entry>
 
@@ -1679,7 +1733,7 @@ A meta open-problem: Which was the most <em>pliable</em> problem at the time thi
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-01-28T06:37:38Z</updated>
+      <updated>2022-01-28T07:37:41Z</updated>
     </source>
   </entry>
 
@@ -1706,7 +1760,7 @@ Email: recruit@cs.stonybrook.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-28T06:37:41Z</updated>
+      <updated>2022-01-28T07:37:43Z</updated>
     </source>
   </entry>
 
@@ -1732,7 +1786,7 @@ Email: recruit@cs.stonybrook.edu</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-28T06:37:28Z</updated>
+      <updated>2022-01-28T07:37:29Z</updated>
     </source>
   </entry>
 
@@ -1756,7 +1810,7 @@ Email: recruit@cs.stonybrook.edu</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-28T06:37:28Z</updated>
+      <updated>2022-01-28T07:37:29Z</updated>
     </source>
   </entry>
 
@@ -1783,7 +1837,7 @@ Email: gene@umd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-28T06:37:41Z</updated>
+      <updated>2022-01-28T07:37:43Z</updated>
     </source>
   </entry>
 
@@ -1814,7 +1868,7 @@ Email: gene@umd.edu</p></div>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2022-01-28T06:38:04Z</updated>
+      <updated>2022-01-28T07:37:56Z</updated>
     </source>
   </entry>
 
@@ -1848,7 +1902,7 @@ We use this connection to obtain lower-bounds against a natural family of secret
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-28T06:37:28Z</updated>
+      <updated>2022-01-28T07:37:29Z</updated>
     </source>
   </entry>
 
@@ -2005,7 +2059,7 @@ Framework and Evaluation Criteria Committee</a>.</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-01-28T06:37:28Z</updated>
+      <updated>2022-01-28T07:37:29Z</updated>
     </source>
   </entry>
 
@@ -2195,33 +2249,6 @@ Framework and Evaluation Criteria Committee</a>.</p></div>
       <subtitle>Website for the differential privacy research community</subtitle>
       <title>Differential Privacy</title>
       <updated>2022-01-28T02:39:26Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-jobs.org/2022/01/10/faculty-at-national-university-of-singapore-apply-by-february-28-2022/</id>
-    <link href="https://cstheory-jobs.org/2022/01/10/faculty-at-national-university-of-singapore-apply-by-february-28-2022/" rel="alternate" type="text/html"/>
-    <title>Faculty at National University of Singapore (apply by February 28, 2022)</title>
-    <summary>The Department of Computer Science (CS) at the National University of Singapore (NUS) invites applications for a faculty position in quantum computing with joint appointment in the Centre for Quantum Technologies (CQT). Website: https://www.comp.nus.edu.sg/about/depts/cs/recruitment/faculty/ Email: rahul@comp.nus.edu.sg</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The Department of Computer Science (CS) at the National University of Singapore (NUS) invites applications for a faculty position in quantum computing with joint appointment in the Centre for Quantum Technologies (CQT).</p>
-<p>Website: <a href="https://www.comp.nus.edu.sg/about/depts/cs/recruitment/faculty/">https://www.comp.nus.edu.sg/about/depts/cs/recruitment/faculty/</a><br/>
-Email: rahul@comp.nus.edu.sg</p></div>
-    </content>
-    <updated>2022-01-10T03:08:31Z</updated>
-    <published>2022-01-10T03:08:31Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-jobs.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-jobs.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-jobs.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-01-28T06:37:41Z</updated>
     </source>
   </entry>
 </feed>
