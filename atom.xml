@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2022-02-14T07:39:03Z</updated>
+  <updated>2022-02-14T08:39:17Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,93 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://11011110.github.io/blog/2022/02/13/triangulation-thickens-grids</id>
+    <link href="https://11011110.github.io/blog/2022/02/13/triangulation-thickens-grids.html" rel="alternate" type="text/html"/>
+    <title>Triangulation thickens grids</title>
+    <summary>If you zigzag back and forth through the columns (or rows) of an ordinary two-dimensional grid graph, following a pattern dignified with the fancy name “boustrophedon”, you get a one-dimensional ordering of the vertices that can be used as the basis of a nice planar arc diagram of this graph.</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>If you zigzag back and forth through the columns (or rows) of an ordinary two-dimensional grid graph, following a pattern dignified with the fancy name “<a href="https://en.wikipedia.org/wiki/Boustrophedon">boustrophedon</a>”, you get a one-dimensional ordering of the vertices that can be used as the basis of a nice planar <a href="https://en.wikipedia.org/wiki/Arc_diagram">arc diagram</a> of this graph.</p>
+
+<p style="text-align: center;"><img alt="Boustrophedon layout of a 2d grid" src="https://11011110.github.io/blog/assets/2022/boustrophedon.svg" width="80%"/></p>
+
+<p>The same idea works in 3d. You can divide a 3d grid graph into 2d layers, zigzag within each layer, and then reverse the same zigzagging order in alternating layers, to get another nice one-dimensional ordering of the vertices. It doesn’t give a planar drawing (this graph is not planar), but it does allow it to be drawn without crossings on the four half-planes of a four-page <a href="https://en.wikipedia.org/wiki/Book_embedding">book embedding</a>. More generally, any \(d\)-dimensional grid graph can be drawn in the same way as a book embedding with \(2(d-1)\) pages.</p>
+
+<p style="text-align: center;"><img alt="Double boustrophedon layout of a 3d grid" src="https://11011110.github.io/blog/assets/2022/double-boustrophedon.svg" width="80%"/></p>
+
+<p>I’m a coauthor on a new preprint showing that this one-dimensional layout is very sensitive to the way you connect nearby vertices in the 3d grid. If you modify the grid just a little bit, triangulating it by adding a diagonal to each grid square, then the resulting graph no longer has a book embedding with a constant number of pages. Instead, for a triangulated \(n\times n\times n\) grid, \(\Theta(n^{1/3})\) pages are necessary (and sufficient). The preprint is “Three-dimensional graph products with unbounded stack-number”, with Robert Hickingbotham, Laura Merker, Sergey Norin, Michał T. Seweryn, and David R. Wood, <a href="https://arxiv.org/abs/2202.05327">arXiv:2202.05327</a>; the long coauthor list is because it comes from a collaboration that began at the Banff workshop on Graph Product Structure Theory last November.</p>
+
+<p>There are many other related results packed into the same preprint, but rather than summarizing them all I’d rather take a step back and look at the big picture. The result that triangulated grids have high book thickness turns out to follow from a sequence of connections that is closely analogous to results about the high width of 2d grids, and I think the analogies between these connections are very interesting. For 2d grids:</p>
+
+<ul>
+  <li>
+    <p>Two standard measures of one-dimensionality of graphs are <a href="https://en.wikipedia.org/wiki/Cutwidth">cutwidth</a> and <a href="https://en.wikipedia.org/wiki/Pathwidth">pathwidth</a>. Both can be defined in terms of continuous maps from the graph (considered as a one-dimensional topological space) to a line. A graph has cutwidth at most \(c\) if it has a map in which every point of the line belongs to the images of at most \(c\) edges, and pathwidth at most \(p\) if it has a map in which every point of the line belongs to the images of edges that have at most \(p\) distinct vertices as their left endpoints.</p>
+  </li>
+  <li>
+    <p>For a graph of maximum degree \(d\), at most \(d\) edges can share a left endpoint, so if the graph has cutwidth \(c\) it has pathwidth at least \(c/d\).</p>
+  </li>
+  <li>
+    <p>A complete graph with \(n\) vertices and \(\tbinom{n}{2}\) edges, mapped continuously to a line, always has a point covered by \(\Omega(n^2)\) edges, at the median vertex of the mapping.</p>
+  </li>
+  <li>
+    <p>For a 2d grid graph, we can associate each vertex with a subgraph consisting of the union of the row and column of the grid containing that vertex.</p>
+
+    <p style="text-align: center;"><img alt="Bramble associating each grid vertex with the union of its row and column" src="https://11011110.github.io/blog/assets/2022/grid-bramble.svg" width="50%"/></p>
+
+    <p>This family of subgraphs is a <a href="https://en.wikipedia.org/wiki/Bramble_(graph_theory)">bramble</a>, meaning that all of the subgraphs are connected and touch each other. In this case, they all touch at shared vertices, but brambles also allow subgraphs to touch across edges. In the bramble for an \(n\times n\) grid graph, each graph vertex or edge belongs to \(O(n)\) subgraphs.</p>
+  </li>
+  <li>
+    <p>We can map \(K_{n^2}\) continuously onto the grid, vertex-to-vertex, by mapping each edge of \(K_{n^2}\) onto a path through the two touching subgraphs for its endpoints. This map has low congestion: each grid vertex or edge is in the image of \(O(n)\) vertices or edges of \(K_{n^2}\).</p>
+  </li>
+  <li>
+    <p>Any map of the grid to a line can be composed with the map from \(K_{n^2}\) to the grid, giving a map of \(K_{n^2}\) onto the line. Because of the low congestion of the map to the grid, a point of the line that is covered by \(\Omega(n^2)\) edges of the complete graph must also be covered by \(\Omega(n)\) edges of the grid. Since this is true for all maps to a line, the grid has pathwidth and cutwidth \(\Omega(n)\).</p>
+  </li>
+</ul>
+
+<p>Now let’s do the same thing, stepped up a dimension!</p>
+
+<ul>
+  <li>
+    <p>Instead of graphs, let’s consider 2-dimensional simplicial complexes, systems of points, edges, and triangles. And instead of mapping them to a one-dimensional line, let’s map them (topologically, not necessarily linearly) to a two-dimensional plane. We’ll say that the mapping has high thickness if some point is covered by many triangles (corresponding to cutwidth), or by many vertex-disjoint triangles (corresponding to pathwidth).</p>
+  </li>
+  <li>
+    <p>For a graph of maximum  degree \(d\), at most \(\tbinom{d}{2}\) triangles can share a vertex, so a point covered by many triangles will be covered by many vertex-disjoint triangles. More importantly, this is where the book thickness comes in: an argument related to the <a href="https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93Szekeres_theorem">Erdős–Szekeres theorem</a> proves that, when a graph has a \(\theta\)-page book embedding, drawn with its vertices on a circle and its edges as chords of the circle, then at most \(\theta^3\) vertex-disjoint triangles in the graph can contain any point within the circle. So if every mapping into the plane produces a system of triangles of thickness \(t\), you also get book thickness \(\Omega(t^{1/3})\).</p>
+  </li>
+  <li>
+    <p>A complete simplicial complex with \(n\) vertices, \(\tbinom{n}{2}\) edges, and \(\tbinom{n}{3}\) triangles, mapped to the plane, always leads to a point covered by \(\Omega(n^3)\) triangles, by a result of Gromov. (This is closely related to the earlier work of Regina Liu on <a href="https://en.wikipedia.org/wiki/Simplicial_depth">simplicial depth</a> but we want to allow any continuous mapping to the plane, whereas simplicial depth involves mappings that are linear on each edge and triangle.)</p>
+  </li>
+  <li>
+    <p>For an \(n\times n\times n\) grid graph, with its squares triangulated to form a 2d complex \(C\), we can associate each vertex with a subcomplex of \(C\) consisting of the union of the 2d grid planes containing that vertex. This family of subcomplexes has connected pairwise unions and simply connected triplewise unions, analogous to the properties of a bramble for a graph.</p>
+  </li>
+  <li>
+    <p>We can map the complete simplicial complex onto the grid, vertex-to-vertex, by mapping each edge onto a path through the union of two subgraphs and each triangle onto a triangulated surface within the union of three subgraphs. This map has low congestion: each grid vertex, edge, or triangle is in the image of \(O(n^2)\) vertices, edges, or triangles of the complete complex.</p>
+  </li>
+  <li>
+    <p>Any map of the triangulated 3d grid onto the plane can be composed with the map from the complete 2-complex to the grid, giving a map of the complete complex onto the plane. Because of the low congestion of the map to the grid, a point of the plane that is covered by \(\Omega(n^3)\) triangles of the complete complex must also be covered by \(\Omega(n)\) triangles of the triangulated grid. Since this is true for all maps to a plane, the triangulated grid has book thickness \(\Omega(n^{1/3})\).</p>
+  </li>
+</ul>
+
+<p>For details, generalizations to triangulated products of trees and non-grid tessellations of space, matching upper bounds on book thickness, and more, please see the preprint.</p>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/107795266201400204">Discuss on Mastodon</a>)</p></div>
+    </content>
+    <updated>2022-02-13T22:54:00Z</updated>
+    <published>2022-02-13T22:54:00Z</published>
+    <author>
+      <name>David Eppstein</name>
+    </author>
+    <source>
+      <id>https://11011110.github.io/blog/feed.xml</id>
+      <author>
+        <name>David Eppstein</name>
+      </author>
+      <link href="https://11011110.github.io/blog/feed.xml" rel="self" type="application/atom+xml"/>
+      <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
+      <subtitle>Geometry, graphs, algorithms, and more</subtitle>
+      <title>11011110</title>
+      <updated>2022-02-14T07:54:58Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-US">
     <id>https://rjlipton.wpcomstaging.com/?p=19647</id>
@@ -107,7 +194,7 @@ Is this interesting at all? We have an application of the above lemma, which we 
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-02-14T07:37:31Z</updated>
+      <updated>2022-02-14T08:37:46Z</updated>
     </source>
   </entry>
 
@@ -602,7 +689,7 @@ $\textbf{Separation:}$ There is a language $L$ such that both $L$ and $\overline
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-02-14T07:37:21Z</updated>
+      <updated>2022-02-14T08:37:36Z</updated>
     </source>
   </entry>
 
@@ -643,7 +730,7 @@ $\textbf{Separation:}$ There is a language $L$ such that both $L$ and $\overline
       <link href="https://nisheethvishnoi.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://nisheethvishnoi.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Algorithms, Nature, and Society</title>
-      <updated>2022-02-14T07:38:36Z</updated>
+      <updated>2022-02-14T08:38:57Z</updated>
     </source>
   </entry>
 
@@ -751,7 +838,7 @@ We count 8 women of the 20 above: Bergeron, Croak, Czerwinski, Karlin, Nahrstedt
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-02-14T07:37:31Z</updated>
+      <updated>2022-02-14T08:37:47Z</updated>
     </source>
   </entry>
 
@@ -834,7 +921,7 @@ We count 8 women of the 20 above: Bergeron, Croak, Czerwinski, Karlin, Nahrstedt
       <link href="https://11011110.github.io/blog/" rel="alternate" type="text/html"/>
       <subtitle>Geometry, graphs, algorithms, and more</subtitle>
       <title>11011110</title>
-      <updated>2022-02-11T02:28:19Z</updated>
+      <updated>2022-02-14T07:54:58Z</updated>
     </source>
   </entry>
 
@@ -861,7 +948,7 @@ Email: iddo.tzameret@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-02-14T07:37:38Z</updated>
+      <updated>2022-02-14T08:37:50Z</updated>
     </source>
   </entry>
 
@@ -892,7 +979,7 @@ Email: monika.henzinger@univie.ac.at</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-02-14T07:37:38Z</updated>
+      <updated>2022-02-14T08:37:50Z</updated>
     </source>
   </entry>
 
@@ -942,7 +1029,7 @@ Email: monika.henzinger@univie.ac.at</p></div>
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2022-02-14T07:37:25Z</updated>
+      <updated>2022-02-14T08:37:40Z</updated>
     </source>
   </entry>
 
@@ -969,7 +1056,7 @@ Email: barnas@ucsd.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-02-14T07:37:38Z</updated>
+      <updated>2022-02-14T08:37:50Z</updated>
     </source>
   </entry>
 
@@ -999,7 +1086,7 @@ Email: barnas@ucsd.edu</p></div>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2022-02-14T07:38:16Z</updated>
+      <updated>2022-02-14T08:38:39Z</updated>
     </source>
   </entry>
 
@@ -1102,7 +1189,7 @@ Email: ambainis@lu.lv</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-02-14T07:37:38Z</updated>
+      <updated>2022-02-14T08:37:50Z</updated>
     </source>
   </entry>
 
@@ -1133,7 +1220,7 @@ Our proof uses a new, very efficient $\mathbf{PCP}$ for $\mathbf{PSPACE}$. We co
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-02-14T07:37:21Z</updated>
+      <updated>2022-02-14T08:37:36Z</updated>
     </source>
   </entry>
 
@@ -1247,7 +1334,7 @@ Specifically, we show that if, for infinitely many $n$'s, the set contains at le
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-02-14T07:37:21Z</updated>
+      <updated>2022-02-14T08:37:36Z</updated>
     </source>
   </entry>
 
@@ -1275,7 +1362,7 @@ Email: peter.jonsson@liu.se</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-02-14T07:37:38Z</updated>
+      <updated>2022-02-14T08:37:50Z</updated>
     </source>
   </entry>
 
@@ -1387,7 +1474,7 @@ Email: edouard.bonnet@ens-lyon.fr</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-02-14T07:37:34Z</updated>
+      <updated>2022-02-14T08:37:49Z</updated>
     </source>
   </entry>
 
@@ -1414,7 +1501,7 @@ Email: daniel.lucani@ece.au.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-02-14T07:37:38Z</updated>
+      <updated>2022-02-14T08:37:50Z</updated>
     </source>
   </entry>
 
@@ -1567,7 +1654,7 @@ Any thoughts? Can theory play a main role in the future? </p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-02-14T07:37:31Z</updated>
+      <updated>2022-02-14T08:37:46Z</updated>
     </source>
   </entry>
 
@@ -1634,7 +1721,7 @@ Any thoughts? Can theory play a main role in the future? </p>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2022-02-14T07:37:07Z</updated>
+      <updated>2022-02-14T08:37:09Z</updated>
     </source>
   </entry>
 
@@ -1662,7 +1749,7 @@ Email: ackerman@math.haifa.ac.il</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-02-14T07:37:38Z</updated>
+      <updated>2022-02-14T08:37:50Z</updated>
     </source>
   </entry>
 
@@ -1689,7 +1776,7 @@ Email: fedor.fomin@uib.no</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-02-14T07:37:38Z</updated>
+      <updated>2022-02-14T08:37:50Z</updated>
     </source>
   </entry>
 
@@ -1861,34 +1948,7 @@ Use our <i>data release</i>! Both pre-computed datamodels and the predictions of
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-02-14T07:37:21Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-jobs.org/2022/02/01/postdoc-at-boston-college-apply-by-february-21-2022/</id>
-    <link href="https://cstheory-jobs.org/2022/02/01/postdoc-at-boston-college-apply-by-february-21-2022/" rel="alternate" type="text/html"/>
-    <title>Postdoc at Boston College (apply by February 21, 2022)</title>
-    <summary>The Computer Science department at Boston College invites applications for a postdoctoral position in the area of graph algorithms (broadly defined, e.g. distributed graph algorithms, local algorithms, dynamic graph algorithms, streaming algorithms, MPC algorithms, and etc) under the supervision of Hsin-Hao Su. Website: https://sites.google.com/site/distributedhsinhao/postdoc-position-on-distributed-graph-algorithms Email: suhx@bc.edu</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>The Computer Science department at Boston College invites applications for a postdoctoral position in the area of graph algorithms (broadly defined, e.g. distributed graph algorithms, local algorithms, dynamic graph algorithms, streaming algorithms, MPC algorithms, and etc) under the supervision of Hsin-Hao Su.</p>
-<p>Website: <a href="https://sites.google.com/site/distributedhsinhao/postdoc-position-on-distributed-graph-algorithms">https://sites.google.com/site/distributedhsinhao/postdoc-position-on-distributed-graph-algorithms</a><br/>
-Email: suhx@bc.edu</p></div>
-    </content>
-    <updated>2022-02-01T19:10:53Z</updated>
-    <published>2022-02-01T19:10:53Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-jobs.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-jobs.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-jobs.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-02-14T07:37:38Z</updated>
+      <updated>2022-02-14T08:37:36Z</updated>
     </source>
   </entry>
 </feed>
