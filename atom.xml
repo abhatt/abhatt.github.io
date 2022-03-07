@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2022-03-07T21:39:22Z</updated>
+  <updated>2022-03-07T22:50:05Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,231 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>https://francisbach.com/?p=6414</id>
+    <link href="https://francisbach.com/von-neumann-entropy/" rel="alternate" type="text/html"/>
+    <title>Playing with positive definite matrices – II: entropy edition</title>
+    <summary>Symmetric positive semi-definite (PSD) matrices come up in a variety of places in machine learning, statistics, and optimization, and more generally in most domains of applied mathematics. When estimating or optimizing over the set of such matrices, several geometries can be used. The most direct one is to consider PSD matrices as a convex set...</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p class="justify-text">Symmetric positive semi-definite (PSD) matrices come up in a variety of places in machine learning, statistics, and optimization, and more generally in most domains of applied mathematics. When estimating or optimizing over the set of such matrices, several geometries can be used. The most direct one is to consider PSD matrices as a convex set in the vector space of all symmetric matrices and thus to inherit the Euclidean geometry. Like for the positive orthant (which corresponds to diagonal PSD matrices), this is not natural for a variety of reasons. In this post we will consider <a href="https://en.wikipedia.org/wiki/Bregman_divergence">Bregman divergences</a> to define our notion of geometry.</p>
+
+
+
+<p class="justify-text">A first natural and common geometry is to consider PSD matrices as <a href="https://en.wikipedia.org/wiki/Covariance_matrix">covariance matrices</a> (or their inverses, often referred to a precision or concentration matrices). They can thus be seen as parameters of zero-mean Gaussian random vectors, and classical notions from information theory, such as the Kullback-Leibler divergence, can be brought to bear to define a specific geometry. This happens to be equivalent to using the negative log determinant to define the Bregman divergence, and leads to the usual Stein divergence $$ – \log \det A + \log \det B \ – {\rm tr}[ – B^{\, -1} ( A \, – B) ] =  -\log \det (AB^{\, -1}) + {\rm tr}( A B^{\, -1}) + d, $$ which is the <a href="https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Kullback%E2%80%93Leibler_divergence">Kullback Leibler divergence</a> between two Gaussian random vectors with zero means and covariance matrices \(B\) and \(A\). </p>
+
+
+
+<p class="justify-text">In this blog post, we consider a different but related matrix function, which will be \(A \mapsto {\rm tr }  [ A \log A]\) instead of \(– {\rm tr} [ \log A ]\). This will have stronger links with the Shannon entropy of discrete random variables [1]. In particular, we will be able to extend two classical notions related to discrete entropy:</p>
+
+
+
+<ul class="justify-text"><li>The entropy function \(H(p) = \ – \sum_{i=1}^d p_i \log p_i\), defined on the simplex \(\Delta \subset \mathbb{R}^d\) (vectors with non-negative components that sum to one), is concave, while the associated Bregman divergence, here the usual <a href="https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence">Kullback-Leibler (KL) divergence</a>, is $$ \sum_{i=1}^d p_i \log \frac{p_i}{q_i}. $$ It is jointly convex in the vectors \(p\) and \(q\) (see this nice article [<a href="http://carma.newcastle.edu.au/resources/jon/Preprints/Books/CUP/CUPold/MaterialI/bregman.pdf">6</a>] for other jointly convex Bregman divergences). Note that the joint convexity is here a direct application of classical results regarding the convexity of the perspective of a convex function [<a href="http://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf">10</a>, section 3.2.6].</li><li>The Fenchel-Legendre conjugate of \(-H\) (with the simplex as domain) is $$\sup_{p \in \Delta} \ \ p^\top z\ – \sum_{i=1}^d p_i \log p_i = \log \Big( \sum_{i=1}^d \exp(z_i) \Big).$$ With the positive orthant as the domain, we have $$\sup_{p \in \mathbb{R}_+^d }\ \ p^\top z \ – \sum_{i=1}^d p_i \log p_i = \sum_{i=1}^d \exp(z_i-1) .$$ This has many consequences in probabilistic modelling, notably the duality between maximum likelihood and maximum entropy [1, <a href="http://people.eecs.berkeley.edu/~wainwrig/Papers/WaiJor08_FTML.pdf">7</a>].</li></ul>
+
+
+
+<p class="justify-text">The extension to matrices will have several interesting consequences:</p>
+
+
+
+<ul class="justify-text"><li>This defines a Bregman divergence that has interesting applications to mirror descent and smoothing techniques in optimization.</li><li>The non-trivial joint convexity of the associated Bregman divergence will lead to elegant methods for deriving concentration inequalities for symmetric matrices [<a href="http://arxiv.org/pdf/1501.01571">2</a>].</li><li>Application to covariance operators in infinite-dimensional spaces will lead to a whole range of information-theoretic results [<a href="http://arxiv.org/pdf/2202.08545.pdf">5</a>], but this is for next month!</li></ul>
+
+
+
+<h2 id="von-neumann-entropy-and-relative-entropy">Von Neumann entropy and relative entropy</h2>
+
+
+
+<p class="justify-text">Given a positive semi-definite symmetric matrix \(A \in \mathcal{S}_d\), the von Neumann entropy is defined as $$H(A) =\ – {\rm tr} [ A \log A],$$ as the trace of the matrix function \(– A \log A\), or equivalently as \(– \sum_{i=1}^d \! \lambda_i \log \lambda_i\) where \(\lambda_1,\dots,\lambda_d \geqslant 0\) are the \(d\) eigenvalues of \(A\) (note that we can have a zero eigenvalue and still be finite). </p>
+
+
+
+<p class="justify-text">From <a href="https://francisbach.com/matrix-monotony-and-convexity/">last month blog post</a>, we get that \(H\) is concave. We can then naturally define on the <a href="https://en.wikipedia.org/wiki/Spectrahedron">spectrahedron</a> (set of positive semi-definite matrices with unit trace), the <em>relative entropy</em>, which is the Bregman divergence associated with the function \(A \mapsto {\rm tr} [ A \log A]\), whose gradient is \(\log A + I \), leading to: $$D(A\| B) = {\rm tr} [ A \log A ] \, – {\rm tr} [ B \log B] \, – {\rm tr} \big[ ( A \, – B) ( \log B + I ) \big],$$ which is equal to $$ D(A\| B) = {\rm tr} \big[ A ( \log A \,  – \log B ) \big] – {\rm tr}(A) + {\rm tr}(B).$$ This time we have to be careful to avoid infinite values: it is finite if and only if the null space of \(B\) is included in the one of \(A\), or, equivalently if \(B^{\, -1/2} A^{1/2} B^{\, -1/2}\) is finite. Note that when \(A\) and \(B\) have unit traces, the term in \(– {\rm tr}(A) + {\rm tr}(B)\) goes away.</p>
+
+
+
+<p class="justify-text">As a Bregman divergence of a strictly convex function, \(D(A\|B)\) is non-negative and equal to zero if and only if \(A = B\).</p>
+
+
+
+<p class="justify-text">When \(A = {\rm Diag}(p)\) and \(B = {\rm Diag}(q)\) are diagonal, we get $$D(A\| B) = \sum_{i=1}^d \Big\{ p_i \log \frac{p_i}{q_i} \, – p_i + q_i \Big\},$$ and we recover the traditional relative entropy. </p>
+
+
+
+<p class="justify-text">Please refrain from writing \(D(A\| B) = {\rm tr} \big[ A \log ( A B^{\,-1} ) \big] – {\rm tr}(A) + {\rm tr}(B)\), which is not true unless \(A\) and \(B\) commute. See however below how using Kronecker products can make a similar equality always true.</p>
+
+
+
+<h2>A geometry on matrices</h2>
+
+
+
+<p class="justify-text">The von Neumann relative entropy (also referred to as matrix KL divergence) defines a new notion of geometry, which is different from the Euclidean geometry based on the squared Frobenius norm \(\| A – B \|_{\rm F}^2 = {\rm tr} [ ( A -B)^2]\). Below, we plot and compare balls for these various geometries. We first consider Euclidean balls, defined as $$\mbox{ Euclidean : } \  \big\{ B \in \mathcal{S}_d,  \| A – B \|_{\rm F}^2 \leqslant r \big\},$$ as well as the two KL balls (one for each side of the KL divergence): $$ \mbox{ Left KL : } \ \big\{ B \in \mathcal{S}_d,  D(B\|A)  \leqslant r \big\},$$ $$\mbox{ Right KL : } \big\{ B \in \mathcal{S}_d,  D(A\|B) \leqslant r \big\}.$$</p>
+
+
+
+<p class="justify-text"><strong>Diagonal matrices with unit trace (isomorphic to the simplex).</strong> We consider diagonal matrices \(A = {\rm Diag}(p)\) with \(p\) in the simplex. We compare the three balls below (in yellow), with \(r = 1/16\) for the three of them.</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-full"><img alt="" class="wp-image-6794" height="340" src="https://francisbach.com/wp-content/uploads/2022/03/simplex_geom.gif" width="1480"/></figure></div>
+
+
+
+<p class="justify-text">While the Euclidean balls have the same shapes at all positions, the KL balls adapt their shapes to their centers.</p>
+
+
+
+<p class="justify-text"><strong>Unit trace PSD matrices in dimension two (isomorphic to the Euclidean ball).</strong> We consider matrices \(A = \Big( \begin{array}{cc} x &amp; y \\[-.15cm] y &amp; \!\!\!1-x\!\end{array} \Big)\) with the PSD constraint being equivalent to \(y^2 \leqslant x(1-x)\), that is, \((x,y)\) is in the disk of center \((\frac{1}{2},0)\) and radius \(\frac{1}{2}\). We compare the three balls below (in yellow), with \(r = \frac{1}{32}\) for the Euclidean ball, and \(r =\frac{1}{16}\) for the KL balls, with a similar difference between geometries.</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-full"><img alt="" class="wp-image-6798" height="422" src="https://francisbach.com/wp-content/uploads/2022/03/ellipsoid_geom.gif" width="1486"/></figure></div>
+
+
+
+<h2 id="pinsker-inequality-1">Pinsker inequality</h2>
+
+
+
+<p class="justify-text">In order to use the relative entropy within mirror descent, we need an extension of the <a href="https://en.wikipedia.org/wiki/Pinsker%27s_inequality">Pinsker inequality</a> $$\sum_{i=1}^d p_i \log \frac{p_i}{q_i} \geqslant \frac{1}{2} \Big(\sum_{i=1}^d | p_i – q_i| \Big)^2,$$ which is, in optimization terms, the \(1\)-strong-concavity of the entropy with respect to the \(\ell_1\)-norm. It turns out that the natural extension is true, that is, for PSD matrices with unit trace, $$D(A\| B) =  {\rm tr} \big[ A ( \log A\,   – \log B ) \big] \geqslant \frac{1}{2} \| A \ – B \|_\ast^2,$$ where \(\| \cdot \|_\ast\) denotes the trace norm, a.k.a. the nuclear norm, that is, the \(\ell_1\)-norm of eigenvalues. See [<a href="http://www.cs.cmu.edu/~yaoliang/mynotes/sc.pdf">3</a>] for a nice and simple proof.</p>
+
+
+
+<p class="justify-text">This allows to use the relative entropy when optimizing over the spectrahedron using mirror descent [<a href="https://www2.isye.gatech.edu/~nemirovs/MLOptChapterI.pdf">11</a>]. Note that the diameter \(\sup_{A} {\rm tr} [ A \log A] \ –   \inf_{A} {\rm tr} [ A \log A] \) over PSD matrices with unit trace is equal to \(\log d\). Using duality, the relative entropy can also be used for smoothing the maximal eigenvalue of a matrix [<a href="https://link.springer.com/content/pdf/10.1007/s10107-006-0001-8.pdf">12</a>].</p>
+
+
+
+<h2 id="joint-convexity-of-matrix-relative-entropy">Joint convexity of matrix relative entropy</h2>
+
+
+
+<p class="justify-text">While the convexity with respect to \(A\) is straightforward, the relative entropy \(D(A \| B)\) is also <em>jointly</em> convex in \((A,B)\), which is crucial in the developments below. There exist several proofs, but one is particularly elegant [<a href="https://arxiv.org/pdf/quant-ph/0604206.pdf">4</a>] and will use the matrix-monotonicity that I presented in the <a href="https://francisbach.com/matrix-monotony-and-convexity/">last post</a>.</p>
+
+
+
+<p class="justify-text"><strong>Kronecker products.</strong> We need to make a clever use of <a href="https://en.wikipedia.org/wiki/Kronecker_product">Kronecker products</a>. Given two matrices \(A\) and \(B\) of any sizes, \(A \otimes B\) is the matrix defined by blocks \(A_{ij} B\), thus of size the products of the number of rows and columns of \(A\) and \(B\). In the derivations below, both \(A\) and \(B\) will be of size \(d \times d\), and thus \(A \otimes B\) is then of size \(d^2 \times d^2\). </p>
+
+
+
+<p class="justify-text">Kronecker products have very nice properties (they would probably deserve their own post!), such as (when dimensions are compatible), \((A \otimes B) ( C\otimes D) = (AC) \otimes (BD)\) or \((A \otimes B)^{\, -1} = A^{-1} \otimes B^{\, -1}\). What we will leverage is their use in characterizing linear operations on matrices. For a rectangular matrix \(X \in \mathbb{R}^{d_1 \times d_2}\), \({\rm vec}(X) \in \mathbb{R}^{d_1 d_2 \times 1}\) denotes the <em>vectorization</em> of \(X\) obtained by stacking all columns of \(X\) one after the other in a single column vector. Then, we have $$ (B^\top \otimes A){\rm vec}(X) = {\rm vec}(AXB)$$ for any \(A, X, B\) with compatible dimensions. </p>
+
+
+
+<p class="justify-text"><strong>Reformulation of relative entropy.</strong> We can now use Kronecker products to get: $$ {\rm tr} [A \log A] = {\rm tr}[ A^{1/2}( \log A) A^{1/2} ] = {\rm vec}(A^{1/2})^\top [ I \otimes \log A ] {\rm vec}(A^{1/2}),$$ and $$ {\rm tr} [A \log B] = {\rm tr} [ A^{1/2}( \log B) A^{1/2} ] = {\rm vec}(A^{1/2})^\top [    \log B \otimes I  ] {\rm vec}(A^{1/2}),$$ leading to $$D(A\|B) = {\rm vec}(A^{1/2})^\top \big[ I \otimes \log A \ – \log B \otimes I \big]  {\rm vec}(A^{1/2}) \, – {\rm tr}(A) + {\rm tr}(B).$$ The key element is then to use the identity for PSD matrices $$\log(C \otimes D) = \log C \otimes I + I \otimes \log D$$ (which can be shown using the fact that eigenvalue decomposition of a Kronecker product of symmetric matrices can be obtained from the decompositions of the factors), leading to $$D(A\|B) = {\rm vec}(A^{1/2})^\top \big[ \log ( I \otimes A) \ – \log (B \otimes I) \big]  {\rm vec}(A^{1/2})\, – {\rm tr}(A) + {\rm tr}(B).$$ It seems we have not achieved much, but now, the matrices \( I \otimes A\) and \(B \otimes I\) commute! Therefore, we can now write $$D(A\|B) = {\rm vec}(A^{1/2})^\top \Big[ \log \big( ( I \otimes A) (B \otimes I)^{-1} \big) \Big]  {\rm vec}(A^{1/2})- {\rm tr}(A) + {\rm tr}(B).$$ This can then be rewritten as $$D(A\|B)  =\, – {\rm vec}(A^{1/2})^\top \big[ \log ( B \otimes A^{-1}) \big] {\rm vec}(A^{1/2}) \, – {\rm tr}(A) + {\rm tr}(B).$$ </p>
+
+
+
+<p class="justify-text"><strong>Using matrix-convexity.</strong> We can now use the matrix-convexity of \(\lambda \mapsto \ – \log \lambda\), and the representation from <a href="http://francisbach.com/matrix-monotony-and-convexity/">last post</a> as $$ -\log \lambda = 1-\lambda + (\lambda-1)^2 \int_0^{+\infty} \!\!\frac{1}{\lambda +u} \frac{du}{(1+u)^2},$$ leading to $$D(A\|B) =  \int_0^{+\infty}  {\rm vec}(A^{1/2})^\top \Big[ ( B\otimes A^{-1} – I)^2 (B\otimes A^{-1} + u I)^{-1} \Big]  {\rm vec}(A^{1/2}) \frac{du}{(1+u)^2},$$ and then, by using  \(( B\otimes A^{-1} – I) ( I \otimes A^{1/2})  {\rm vec}(A^{1/2})  =  {\rm vec}(B-A)\), $$D(A\|B) =   \int_0^{+\infty}  {\rm vec}(A-B)^\top  (B\otimes I+ u I \otimes A)^{-1}   {\rm vec}(A-B)   \frac{du}{(1+u)^2}.$$ We can then use the joint convexity of the function \((C,D) \mapsto {\rm tr} \big[  C^\top D^{-1} C \big] \) to get the  joint convexity of \(D(A\|B)\).</p>
+
+
+
+<p class="justify-text">This extends to all matrix-convex functions beyond the logarithm, such as \(\lambda \mapsto (\lambda-1)^2\), \(\lambda \mapsto 1 \, – \lambda^{1/2}\) or \(\displaystyle \lambda \mapsto \frac{1}{\lambda}(\lambda-1)^2\), leading to other <a href="https://en.wikipedia.org/wiki/F-divergence">\(f\)-divergences</a> between matrices. See [<a href="http://arxiv.org/pdf/2202.08545.pdf">5</a>, Appendix A.4] for details.</p>
+
+
+
+<h2 id="lieb-concavity-theorems">Lieb concavity theorems</h2>
+
+
+
+<p class="justify-text">Now that \((A,B) \mapsto D(A\|B)\) is jointly convex on all PSD matrices (not only unit trace), for any fixed symmetric matrix \(M\), the function $$ \varphi: B \mapsto \sup_{ A \succcurlyeq 0} \ {\rm tr}(AM) + {\rm tr}(A) \ – D(A\|B), $$ as the partial maximization (with respect to \(B\)) of a jointly concave function of \((A,B)\), is concave. We can maximize in closed form with respect to \(A\) by computing the gradient \(M \ – \log A  + \log B\), leading to \(A = \exp( M + \log B)\), and $$\varphi(B) = {\rm tr} \exp ( M + \log B),$$ which defines a concave function. This is one version of the classical Lieb concavity theorems [<a href="http://sciencedirect.com/science/article/pii/000187087390011X/pdf?md5=09b7ceaa543358cef395fa6af8de62aa&amp;pid=1-s2.0-000187087390011X-main.pdf">8</a>]. </p>
+
+
+
+<p class="justify-text">As a consequence, we can obtain the “subadditivity of the matrix cumulant generative function”. That is, for any random <em>independent</em> symmetric matrices \(X_1,\dots,X_n\) of the same sizes, $$ \mathbb{E} \Big[  {\rm tr} \exp \big(   \sum_{i=1}^n X_i \big) \Big] \leqslant {\rm tr} \exp \big( \sum_{i=1}^n \log \big( \mathbb{E} [ \exp( X_i ) ] \big),$$ which can be shown by recursion using Jensen’s inequality for the function \(\varphi\) above with a well-chosen matrix \(M\). See [<a href="http://arxiv.org/pdf/1501.01571">2</a>] for details.</p>
+
+
+
+<p class="justify-text">We are now ready to consider concentration inequalities for random matrices.</p>
+
+
+
+<h2 id="application-to-concentration-inequalities">Application to concentration inequalities</h2>
+
+
+
+<p class="justify-text">We consider random independent random matrices \(X_1,\dots,X_n\) such that \(\mathbb{E} [ X_i ] = 0\) for all \(i \in \{1,\dots,n\}\). Let \(S = \frac{1}{n} \sum_{i=1}^n \! X_i\) (which has zero mean). Our goal is to provide upper bounds on \(\mathbb{E} \big[ \lambda_{\max}(S) \big]\) and \(\mathbb{P} \big[ \lambda_{\max}(S) \geqslant t \big]\). We follow the outstanding work and presentation of <a href="http://users.cms.caltech.edu/~jtropp/">Joel Tropp</a> [<a href="http://arxiv.org/pdf/1501.01571">2</a>]: using the proper matrix tools presented above, we can get for matrix-valued random variables the almost exact same proofs of the usual concentration inequalities for real-valued random <em>variables</em>, such as <a href="https://en.wikipedia.org/wiki/Hoeffding%27s_inequality">Hoeffding</a>, <a href="https://en.wikipedia.org/wiki/Bernstein_inequalities_(probability_theory)">Bernstein</a>, <a href="https://en.wikipedia.org/wiki/Azuma%27s_inequality">Azuma</a>, or Mac-Diarmid inequalities. </p>
+
+
+
+<p class="justify-text"><strong>Expectation. </strong>We have, for any \(u &gt; 0\), by homogeneity of the largest eigenvalue: $$  \mathbb{E} \big[ \lambda_{\max}(S) \big] = \frac{1}{u}  \mathbb{E} \big[ \lambda_{\max}(uS) \big] =  \frac{1}{u}  \mathbb{E} \big[  \log \exp ( \lambda_{\max}(uS) ) \big].$$ We can then use Jensen’s inequality for the logarithm to get (together with the fact the largest eigenvalue of the exponential is the exponential of the largest eigenvalue): $$  \mathbb{E} \big[ \lambda_{\max}(S) \big] \leqslant \frac{1}{u}  \log \mathbb{E} \big[ \exp ( \lambda_{\max}(uS) ) \big]=\frac{1}{u}  \log \mathbb{E} \big[ ( \lambda_{\max}( \exp ( uS) ) \big], $$ and finally that for a PSD matrix the trace is larger than the largest eigenvalue, to get $$  \mathbb{E} \big[ \lambda_{\max}(S) \big] \leqslant \frac{1}{u}  \log \mathbb{E} \big[ {\rm tr} \exp (  uS ) \big].$$ Experts in concentration inequalities have probably recognized the usual argument to bound the expectation of the maximum of \(d\) random <em>real-valued</em> (non necessarily independent) variables \(X_1,\dots,X_d\), as $$ \mathbb{E} \big[ \max \{Y_1,\dots,Y_d\} \big] \leqslant \frac{1}{u} \log \mathbb{E} \big[ \exp(uY_1)+ \cdots + \exp(u Y_d) \big].$$</p>
+
+
+
+<p class="justify-text"><strong>Tail bound.</strong> We have, using Markov’s inequality, for any \(u &gt; 0\): $$\mathbb{P} \big[ \lambda_{\max}(S) \geqslant t \big] = \mathbb{P} \big[ \exp(\lambda_{\max}(uS)) \geqslant \exp(ut) \big] \leqslant e^{-ut} \mathbb{E} \big[ \exp ( \lambda_{\max}(uS) ) \big],$$ thus leading to $$\mathbb{P} \big[ \lambda_{\max}(S) \geqslant t \big] \leqslant e^{-ut} \mathbb{E} \big[ {\rm tr} \exp (  uS ) \big].$$ The same experts have recognized $$ \mathbb{P} \big[ \max \{Y_1,\dots,Y_d\} \geqslant t \big] \leqslant  e^{-ut} \mathbb{E} \big[ \exp(uY_1)+ \cdots + \exp(u Y_d) \big].$$ </p>
+
+
+
+<p class="justify-text">We can now consider random matrices such that \(a I \preccurlyeq X_i \preccurlyeq b I\) almost surely for all \(i=1,\dots,n\) (and still with zero mean). We first need a lemma whose proof is given at the end of the post, with the exact same proof as for the uni-dimensional case.</p>
+
+
+
+<p class="justify-text"><strong>Lemma.</strong> If \(\mathbb{E} [ X ] = 0\) and \(a I \preccurlyeq X \preccurlyeq b I\) almost surely, then for all \(u &gt; 0\), $$ \mathbb{E} \big[ \exp( u X) \big] \preccurlyeq \exp\big( \frac{u^2}{8}(b-a)^2 \big) I.$$ </p>
+
+
+
+<p class="justify-text">Together with the consequence of Lieb’s result presented above and the matrix-monotonicity of the logarithm, we get: $$ \mathbb{E} \big[ {\rm tr} \exp (  uS ) \big] \leqslant {\rm tr} \exp \Big( n \big( \frac{u^2}{8n^2}(b-a)^2 I \big) \Big) = d  \exp \big(   \frac{u^2}{8n}(b-a)^2 \big).$$ We can then get immediately, by optimizing with respect to \(u\) (with optimal value \(u=4 n t /(b-a)^2\)), $$\mathbb{P} \big[ \lambda_{\max}(S) \geqslant t \big] \leqslant d \exp\big( – \frac{2 n t^2 }{(b-a)^2} \big),$$ and, with optimal value \(u= {2 \sqrt{2 n \log d }}/ { (b-a) }\): $$  \mathbb{E} \big[ \lambda_{\max}(S) \big] \leqslant \frac{b-a}{\sqrt{2n}} \sqrt{ \log d}.$$</p>
+
+
+
+<p class="justify-text">Note that these are the exact same results as when \(d=1\)! </p>
+
+
+
+<p class="justify-text"><strong>Extensions.</strong> As nicely detailed in [<a href="https://arxiv.org/pdf/1501.01571">2</a>], there are extensions to all classical concentration inequalities. Moreover, this can be applied to rectangular matrices, where the largest eigenvalue is replaced by the largest singular value. Finally, for those who like to work in infinite dimensions and cannot bear the explicit dependence in dimension, it is possible to derive results that depend only on a well-defined notion of “intrinsic dimension” (the associated results can then be used for the study of kernel methods, see [<a href="http://di.ens.fr/~fbach/ltfp_book.pdf">13</a>, chapter 9]).</p>
+
+
+
+<h2 id="conclusion">Conclusion</h2>
+
+
+
+<p class="justify-text">Now that we know everything about the matrix relative entropy and its convexity properties, we will explore next month a new link between eigenvalues of covariance operators and the regular Shannon entropy of the generating probability distribution [<a href="http://arxiv.org/pdf/2202.08545.pdf">5</a>], thus mixing my favorite recent mathematical topic with my probably all-time favorite one: positive definite kernels!</p>
+
+
+
+<h2 id="references">References</h2>
+
+
+
+<p class="justify-text">[1] Thomas M. Cover and Joy A. Thomas. <em>Elements of Information Theory</em>. John Wiley &amp; Sons, 1999.<br/>[2] Joel A. Tropp. <a href="https://arxiv.org/pdf/1501.01571">An introduction to matrix concentration inequalities</a>. <em>Foundations and Trends in Machine Learning</em>, 8(1-2):1–230, 2015.<br/>[3] Yao-Liang Yu. <a href="http://www.cs.cmu.edu/~yaoliang/mynotes/sc.pdf">The strong convexity of von Neumann’s entropy</a>. Unpublished note, 2013.<br/>[4] Mary Beth Ruskai. <a href="https://arxiv.org/pdf/quant-ph/0604206.pdf">Another short and </a><a href="https://arxiv.org/pdf/quant-ph/0604206.pdf" rel="noreferrer noopener" target="_blank">elementary</a><a href="https://arxiv.org/pdf/quant-ph/0604206.pdf"> proof of strong subadditivity of quantum entropy</a>. Reports on Mathematical Physics, 60(1):1–12, 2007.<br/>[5] Francis Bach. <a href="https://arxiv.org/pdf/2202.08545.pdf">Information Theory with Kernel Methods</a>. Technical Report, arXiv-2202.08545, 2022.<br/>[6] Heinz H. Bauschke, and Jonathan M. Borwein. <a href="https://carma.newcastle.edu.au/resources/jon/Preprints/Books/CUP/CUPold/MaterialI/bregman.pdf">Joint and separate convexity of the Bregman distance</a>. <em>Studies in Computational Mathematics</em>, 8:23-36, 2001.<br/>[7] Martin J. Wainwright and Michael I. Jordan. <a href="https://people.eecs.berkeley.edu/~wainwrig/Papers/WaiJor08_FTML.pdf">Graphical Models, Exponential Families, and Variational Inference</a>. <em>Foundations and Trends in Machine Learning</em>, 1 (1–2):1–305, 2008. <br/>[8] Elliott H. Lieb. <a href="https://www.sciencedirect.com/science/article/pii/000187087390011X/pdf?md5=09b7ceaa543358cef395fa6af8de62aa&amp;pid=1-s2.0-000187087390011X-main.pdf">Convex trace functions and the Wigner-Yanase-Dyson conjecture</a>.<br/><em>Advances in Mathematics</em>, 11(3):267–288, 1973.<br/>[9] Stéphane Boucheron, Gabor Lugosi, and Pascal Massart. <em>Concentration Inequalities: A Nonasymptotic Theory of Independence</em>. Oxford University Press, 2013. <br/>[10] Stephen Boyd, Lieven Vandenberghe. <em><a href="https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf">Convex Optimization</a></em>. Cambridge University Press, 2004.<br/>[11] Anatoli Juditsky, Arkadi Nemirovski. <a href="http://www2.isye.gatech.edu/~nemirovs/MLOptChapterI.pdf">First order methods for nonsmooth convex large-scale optimization, i: general purpose methods</a>. <em>Optimization for Machine Learning</em>, 121-148, 2012.<br/>[12] Yurii Nesterov. <a href="https://link.springer.com/content/pdf/10.1007/s10107-006-0001-8.pdf">Smoothing technique and its applications in Semidefinite Optimization</a>. <em>Mathematical Programming</em>, 110(2):245-259, 2007.<br/>[13] Francis Bach. <a href="https://www.di.ens.fr/~fbach/ltfp_book.pdf">Learning Theory From First Principles</a>. Book draft, 2021.</p>
+
+
+
+<h2 id="proof-of-lemma-on-matrix-cumulant-generating-functions">Proof of lemma on matrix cumulant generating functions</h2>
+
+
+
+<p class="justify-text"><strong>Lemma.</strong> If \(\mathbb{E} [ X ] = 0\) and \(a I \preccurlyeq X \preccurlyeq b I\) almost surely, then for all \(u &gt; 0\), $$ \mathbb{E} \big[ \exp( u X) \big] \preccurlyeq \exp\big( \frac{u^2}{8}(b-a)^2 I \big) =  \exp\big( \frac{u^2}{8}(b-a)^2 \big) I .$$ Note that we have \(a \leqslant 0 \leqslant b\).</p>
+
+
+
+<p class="justify-text"><strong>Proof</strong>. We follow the standard proof [9] for real-valued random variables, simply transferred to the matrix case. On the interval \([a,b]\), by convexity of the exponential function $$ \exp(u\lambda) \leqslant \exp(ub) \frac{\lambda-a}{b-a} + \exp(ua) \frac{b \, – \lambda}{b-a}.$$ Thus (check why we can do this), almost surely: $$ \exp(uX) \preccurlyeq \exp(ub) \frac{X-a I }{b-a} + \exp(ua) \frac{bI  – X}{b-a},$$ leading to \(\displaystyle \mathbb{E} [ \exp(uX) ]  \preccurlyeq   \frac{b \exp(ua)\ – a \exp(ub)}{b-a} I\). We can then show that \(\displaystyle \frac{b \exp(ua)\ – a \exp(ub)}{b-a}  \leqslant \exp \Big(  \frac{u^2}{8}(b-a)^2 \Big)\) to conclude the proof. We thus need to show that \(\displaystyle \psi(u) = \log \Big( \frac{b \exp(ua)\ – a \exp(ub)}{b-a}  \Big) \leqslant \frac{u^2}{8}(b-a)^2\) for all \(u \geqslant 0\). We can simply express \(\psi(u)\) as a rescaled logistic function as $$\psi(u) =  ua + \log \frac{b}{b-a} + \log\Big[ 1 + \exp\Big( u(b-a) + \log\frac{-a}{b-a} \Big) \Big].$$ We have \(\psi(0) = 0\), and $$\psi'(u) =  \frac{ba \exp(ua)\ – ab \exp(ub)}{b \exp(ua)\ – a \exp(ub)}, $$ thus \(\psi'(0) = 0\), and through the link with the logistic function, the second-order derivarive is less than \((b-a)^2 / 4\). This leads to the desired result by Taylor’s formula.</p>
+
+
+
+<p/>
+
+
+
+<p><br/></p></div>
+    </content>
+    <updated>2022-03-07T21:26:18Z</updated>
+    <published>2022-03-07T21:26:18Z</published>
+    <category term="Machine learning"/>
+    <category term="Optimization"/>
+    <category term="Tools"/>
+    <author>
+      <name>Francis Bach</name>
+    </author>
+    <source>
+      <id>https://francisbach.com</id>
+      <link href="https://francisbach.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://francisbach.com" rel="alternate" type="text/html"/>
+      <subtitle>Francis Bach</subtitle>
+      <title>Machine Learning Research Blog</title>
+      <updated>2022-03-07T22:49:53Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>https://decentralizedthoughts.github.io/2022-03-07-colordag-from-always-almost-to-almost-always-50-percent-selfish-mining-resilience/</id>
@@ -27,7 +252,7 @@
       <link href="https://decentralizedthoughts.github.io/feed.xml" rel="self" type="application/atom+xml"/>
       <subtitle>Decentralized thoughts about decentralization</subtitle>
       <title>Decentralized Thoughts</title>
-      <updated>2022-03-07T19:39:16Z</updated>
+      <updated>2022-03-07T22:49:49Z</updated>
     </source>
   </entry>
 
@@ -63,7 +288,7 @@ For the construction, we identify a fundamental connection between concept class
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-07T21:37:21Z</updated>
+      <updated>2022-03-07T22:47:11Z</updated>
     </source>
   </entry>
 
@@ -75,7 +300,7 @@ For the construction, we identify a fundamental connection between concept class
     <link href="http://www.blogger.com/feeds/3722233/posts/default/5954313589876443289" rel="self" type="application/atom+xml"/>
     <link href="http://blog.computationalcomplexity.org/2022/03/random-thoughts-on-russian-invasion-of.html" rel="alternate" type="text/html"/>
     <title>Random thoughts on the Russian Invasion of Ukraine</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p> 1) My first thought was: Doesn't Putin know that his army (and his society) is corrupt and people are promoted on loyalty rather than talent, hence the invasion is not going to work? But then note</p><p>a) He invaded Georgia (the country not the state)</p><p>b) He annexed Crimea</p><p>c) NATO agreeing on sanctions? They can't even agree on what to have for lunch.  </p><p>d) The above question ASSUMES that he will lose. This is not clear yet.</p><p>2) The US and other countries are imposing sanctions. Visa, MC, and Netflix have withdrawn from Russia. Will these cause Putin to stop, or will they just impose hardships on the citizens without having an affect? I ask non-rhetorically. Foreign Policy is hard, though I suspect Biden has hired experts and is listening to them. Doesn't mean they are right. </p><p>3) This seems like a case where its obvious that Putin is in the wrong so I was surprised to see some Pro-Putin arguments. To be fair, some were more that we should not get involved, which is not quite Pro Putin. Here are some and my thoughts on them.</p><p>a) Putin never called me a racist and never made my kids learn Critical Race Theory. I don't think I need to refute this one.</p><p>b) Putin is a strong leader and I admire strong leaders. Really? If  Biden was a strong leader who could push through the Build-Back-Better plan, would you admire that? You can't just admire strong leaders in the abstract, you have to see where they lead. (Same with admiring people who have principles.)</p><p>c) Putin stands for good Christian values. OH- so Putin likes to help the poor and does not approve of divorce or pre-marital sex. Oh, that NOT what you mean? Oh, you just mean that he does not like gay people. So-- that commonality is enough to justify invading a country?</p><p>d) How come the world does not like Putin's war based on lies and had no problem with W's war on Iraq that was based on lies? This is actually a good question. Being an academic by first impulse is to write a paper on it. There are differences between the invasion of Ukraine and Gulf War II, but still, lets assume that they really are somewhat equivalent. The person asking the question was probably AGAINST Gulf War II. Hence they should be against the invasion of Ukraine as well. So this is a good question about the America and NATO's Double standard and hypocrisy but is not a reason to be pro-Putin.</p><p>e) Russia had real concerns about security. The last time Russia was invaded was WW II (if I am wrong then please correct me in the comments). Even so, I've heard analogies made to America freaking out when Cuba had Nuclear missiles. There were no nukes in Ukraine. Ukraine was not going to join NATO anytime soon. I wonder if this was a pretense on Putin's part and not a real reason. </p><p>f) See <a href="https://www.dailykos.com/stories/2022/3/4/2083726/-This-week-in-QAnon-Chronicles-Ukraine-enters-the-conspiracy">here</a>. I give an excerpt (I am not making this up). </p><p>But as its Covid mission has become less clear, the group’s channels have turned to Russia’s invasion of Ukraine, where conspiracy-minded thinking has flourished. While some group members have admonished Russian President Vladimir Putin for the invasion, QAnon and anti-vaccine contingents within the groups have seized on a false conspiracy theory that the war is a cover for a military operation backed by former President Donald Trump in Ukraine.</p><p>The conspiracy theory, which is baseless and has roots in QAnon mythology, alleges that Trump and Putin are secretly working together to stop bioweapons from being made by Dr. Anthony Fauci in Ukraine and that shelling in Ukraine has targeted the secret laboratories. Fauci, director of the National Institute of Allergy and Infectious Diseases, has emerged in the past year as a main target for far-right conspiracy theories.</p><div><br/></div><p><br/></p></div>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p> 1) My first thought was: Doesn't Putin know that his army (and his society) is corrupt and people are promoted on loyalty rather than talent, hence the invasion is not going to work? But then note</p><p>a) He invaded Georgia (the country not the state)</p><p>b) He annexed Crimea</p><p>c) NATO agreeing on sanctions? They can't even agree on what to have for lunch.  </p><p>d) The above question ASSUMES that he will lose. This is not clear yet.</p><p>2) The US and other countries are imposing sanctions. Visa, MC, and Netflix have withdrawn from Russia. Will these cause Putin to stop, or will they just impose hardships on the citizens without having an affect? I ask non-rhetorically. Foreign Policy is hard, though I suspect Biden has hired experts and is listening to them. Doesn't mean they are right. </p><p>3) This seems like a case where its obvious that Putin is in the wrong so I was surprised to see some Pro-Putin arguments. To be fair, some were more that we should not get involved, which is not quite Pro Putin. Here are some and my thoughts on them.</p><p>a) Putin never called me a racist and never made my kids learn Critical Race Theory. This is meant as a GOTCHA comment. To take it seriously one would have to (1) examine what American's are learning in grade school, (2) examine what Russians are learning in grade school, (3) see which country is giving their students a more honest view of things (particularly history), and (4) decide that whichever school is teaching more honest material deserves are support. </p><p>b) Putin is a strong leader and I admire strong leaders. Really? If  Biden was a strong leader who could push through the Build-Back-Better plan, would you admire that? You can't just admire strong leaders in the abstract, you have to see where they lead. (Same with admiring people who have principles.)</p><p>c) Putin stands for good Christian values. OH- so Putin likes to help the poor and does not approve of divorce or pre-marital sex. Oh, that NOT what you mean? Oh, you just mean that he does not like gay people or abortion. OH, thats not correct- Russia has the second most number of abortions of any country (see <a href="https://www.worldblaze.in/countries-with-highest-abortion-rates/">here</a>) So the only issue where Russia shares your values is in not liking gay people. Is that enough  commonality is enough to justify invading a country? This does raise the serious question: who do you support in a war? The country that shrares your values? The country that didn't start it (sometimes hard to tell, though not in this case)? The country you have a treaty with? These are good and serious questions. </p><p>d) How come the world does not like Putin's war based on lies and had no problem with W's war on Iraq that was based on lies? This is actually a good question. Being an academic by first impulse is to write a paper on it. There are differences between the invasion of Ukraine and Gulf War II, but still, lets assume that they really are somewhat equivalent. The person asking the question was probably AGAINST Gulf War II. Hence they should be against the invasion of Ukraine as well. So this is a good question about the America and NATO's Double standard and hypocrisy but is not a reason to be pro-Putin. (I was emailed that there are many conflicts that American and NATO do not care about that are as bad as Putin's invasion.) </p><p>e) Russia had real concerns about security. The last time Russia was invaded was WW II (if I am wrong then please correct me in the comments). Even so, I've heard analogies made to America freaking out when Cuba had Nuclear missiles. There were no nukes in Ukraine. Ukraine was not going to join NATO anytime soon. I wonder if this was a pretense on Putin's part and not a real reason. </p><p>f) See <a href="https://www.dailykos.com/stories/2022/3/4/2083726/-This-week-in-QAnon-Chronicles-Ukraine-enters-the-conspiracy">here</a>. I give an excerpt (I am not making this up). </p><p>But as its Covid mission has become less clear, the group’s channels have turned to Russia’s invasion of Ukraine, where conspiracy-minded thinking has flourished. While some group members have admonished Russian President Vladimir Putin for the invasion, QAnon and anti-vaccine contingents within the groups have seized on a false conspiracy theory that the war is a cover for a military operation backed by former President Donald Trump in Ukraine.</p><p>The conspiracy theory, which is baseless and has roots in QAnon mythology, alleges that Trump and Putin are secretly working together to stop bioweapons from being made by Dr. Anthony Fauci in Ukraine and that shelling in Ukraine has targeted the secret laboratories. Fauci, director of the National Institute of Allergy and Infectious Diseases, has emerged in the past year as a main target for far-right conspiracy theories.</p><p>3) I was somewhat surprised when Hungary came out against Putin. But Putin's arrangments with his allies are transactional- there is no real love there. I was much more surprised when Switzerland came out against Putin. Switzerland has been neutral since 1515 (I think I read that some place). </p><div><br/></div><p><br/></p></div>
     </content>
     <updated>2022-03-07T00:07:00Z</updated>
     <published>2022-03-07T00:07:00Z</published>
@@ -100,7 +325,205 @@ For the construction, we identify a fundamental connection between concept class
       <link href="http://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2022-03-07T15:30:14Z</updated>
+      <updated>2022-03-07T21:58:28Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2203.02478</id>
+    <link href="http://arxiv.org/abs/2203.02478" rel="alternate" type="text/html"/>
+    <title>The Sherali-Adams Hierarchy for Promise CSPs through Tensors</title>
+    <feedworld_mtime>1646611200</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Ciardo:Lorenzo.html">Lorenzo Ciardo</a>, Stanislav Živný <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2203.02478">PDF</a><br/><b>Abstract: </b>We study applicability of the Sherali-Adams linear programming hierarchy for
+promise constraint satisfaction problems (PCSPs). We give a characterisation of
+when Sherali-Adams accepts a PCSP instance in terms of a homomorphism problem
+for an appropriate structure obtained as a tensor power of the original
+structure. Using this characterisation, we establish non-solvability of the
+approximate graph colouring problem via constantly many levels of
+Sherali-Adams.
+</p></div>
+    </summary>
+    <updated>2022-03-07T00:00:00Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2022-03-07T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2203.02432</id>
+    <link href="http://arxiv.org/abs/2203.02432" rel="alternate" type="text/html"/>
+    <title>Improving \textit{Tug-of-War} sketch using Control-Variates method</title>
+    <feedworld_mtime>1646611200</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Pratap:Rameshwar.html">Rameshwar Pratap</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/v/Verma:Bhisham_Dev.html">Bhisham Dev Verma</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Kulkarni:Raghav.html">Raghav Kulkarni</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2203.02432">PDF</a><br/><b>Abstract: </b>Computing space-efficient summary, or \textit{a.k.a. sketches}, of large
+data, is a central problem in the streaming algorithm. Such sketches are used
+to answer \textit{post-hoc} queries in several data analytics tasks. The
+algorithm for computing sketches typically requires to be fast, accurate, and
+space-efficient. A fundamental problem in the streaming algorithm framework is
+that of computing the frequency moments of data streams. The frequency moments
+of a sequence containing $f_i$ elements of type $i$, are the numbers
+$\mathbf{F}_k=\sum_{i=1}^n {f_i}^k,$ where $i\in [n]$. This is also called as
+$\ell_k$ norm of the frequency vector $(f_1, f_2, \ldots f_n).$ Another
+important problem is to compute the similarity between two data streams by
+computing the inner product of the corresponding frequency vectors. The seminal
+work of Alon, Matias, and Szegedy~\cite{AMS}, \textit{a.k.a. Tug-of-war} (or
+AMS) sketch gives a randomized sublinear space (and linear time) algorithm for
+computing the frequency moments, and the inner product between two frequency
+vectors corresponding to the data streams. However, the variance of these
+estimates typically tends to be large. In this work, we focus on minimizing the
+variance of these estimates. We use the techniques from the classical
+Control-Variate method~\cite{Lavenberg} which is primarily known for variance
+reduction in Monte-Carlo simulations, and as a result, we are able to obtain
+significant variance reduction, at the cost of a little computational overhead.
+We present a theoretical analysis of our proposal and complement it with
+supporting experiments on synthetic as well as real-world datasets.
+</p></div>
+    </summary>
+    <updated>2022-03-07T22:46:18Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2022-03-07T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2203.02314</id>
+    <link href="http://arxiv.org/abs/2203.02314" rel="alternate" type="text/html"/>
+    <title>Constructive Post-Quantum Reductions</title>
+    <feedworld_mtime>1646611200</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Bitansky:Nir.html">Nir Bitansky</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Brakerski:Zvika.html">Zvika Brakerski</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/k/Kalai:Yael_Tauman.html">Yael Tauman Kalai</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2203.02314">PDF</a><br/><b>Abstract: </b>Is it possible to convert classical cryptographic reductions into
+post-quantum ones? It is customary to argue that while this is problematic in
+the interactive setting, non-interactive reductions do carry over. However,
+when considering quantum auxiliary input, this conversion results in a
+non-constructive post-quantum reduction that requires duplicating the quantum
+auxiliary input, which is in general inefficient or even impossible. This
+violates the win-win premise of provable cryptography: an attack against a
+cryptographic primitive should lead to an algorithmic advantage.
+</p>
+<p>We initiate the study of constructive quantum reductions and present positive
+and negative results for converting large classes of classical reductions to
+the post-quantum setting in a constructive manner. We show that any
+non-interactive non-adaptive reduction from assumptions with a polynomial
+solution space (such as decision assumptions) can be made post-quantum
+constructive. In contrast, assumptions with super-polynomial solution space
+(such as general search assumptions) cannot be generally converted.
+</p>
+<p>Along the way, we make several additional contributions:
+</p>
+<p>1. We put forth a framework for reductions (or general interaction) with
+stateful solvers for a computational problem, that may change their internal
+state between consecutive calls. We show that such solvers can still be
+utilized. This framework and our results are meaningful even in the classical
+setting.
+</p>
+<p>2. A consequence of our negative result is that quantum auxiliary input that
+is useful against a problem with a super-polynomial solution space cannot be
+generically ``restored'' post-measurement. This shows that the novel rewinding
+technique of Chiesa et al. (FOCS 2021) is tight in the sense that it cannot be
+extended beyond a polynomial measurement space.
+</p></div>
+    </summary>
+    <updated>2022-03-07T22:37:30Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Computational Complexity"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.CC" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Computational Complexity (cs.CC) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.CC updates on arXiv.org</title>
+      <updated>2022-03-07T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2203.02252</id>
+    <link href="http://arxiv.org/abs/2203.02252" rel="alternate" type="text/html"/>
+    <title>Parametric/direct CAD integration</title>
+    <feedworld_mtime>1646611200</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/z/Zou:Qiang.html">Qiang Zou</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2203.02252">PDF</a><br/><b>Abstract: </b>In the history of computer-aided design (CAD), feature-based parametric
+modeling and boundary representation-based direct modeling are two of the most
+important CAD paradigms, developed respectively in the late 1980s and the late
+2000s. They have complementary advantages and limitations, thereby offering
+huge potential for improvement towards an integrated CAD modeling scheme. Some
+believe that their integration will be the key characteristic of next
+generation CAD software. This paper provides a brief review on current
+parametric/direct integration approaches. Their basic ideas, advantages, and
+disadvantages will be discussed. The main result reads that existing
+integration approaches are far from being completed if seamless
+parametric/direct integration is desired. It is hoped that, by outlining what
+has already been made possible and what still remains problematic, more
+researchers will be attracted to work on this very important research topic of
+parametric/direct integration.
+</p></div>
+    </summary>
+    <updated>2022-03-07T22:46:50Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Computational Geometry"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.CG" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Computational Geometry (cs.CG) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.CG updates on arXiv.org</title>
+      <updated>2022-03-07T01:30:00Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-us">
+    <id>http://arxiv.org/abs/2203.02073</id>
+    <link href="http://arxiv.org/abs/2203.02073" rel="alternate" type="text/html"/>
+    <title>Differentially Private Label Protection in Split Learning</title>
+    <feedworld_mtime>1646611200</feedworld_mtime>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/y/Yang:Xin.html">Xin Yang</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Sun:Jiankai.html">Jiankai Sun</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/y/Yao:Yuanshun.html">Yuanshun Yao</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/x/Xie:Junyuan.html">Junyuan Xie</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/w/Wang:Chong.html">Chong Wang</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2203.02073">PDF</a><br/><b>Abstract: </b>Split learning is a distributed training framework that allows multiple
+parties to jointly train a machine learning model over vertically partitioned
+data (partitioned by attributes). The idea is that only intermediate
+computation results, rather than private features and labels, are shared
+between parties so that raw training data remains private. Nevertheless, recent
+works showed that the plaintext implementation of split learning suffers from
+severe privacy risks that a semi-honest adversary can easily reconstruct
+labels. In this work, we propose \textsf{TPSL} (Transcript Private Split
+Learning), a generic gradient perturbation based split learning framework that
+provides provable differential privacy guarantee. Differential privacy is
+enforced on not only the model weights, but also the communicated messages in
+the distributed computation setting. Our experiments on large-scale real-world
+datasets demonstrate the robustness and effectiveness of \textsf{TPSL} against
+label leakage attacks. We also find that \textsf{TPSL} have a better
+utility-privacy trade-off than baselines.
+</p></div>
+    </summary>
+    <updated>2022-03-07T22:40:04Z</updated>
+    <author>
+      <name/>
+    </author>
+    <source>
+      <id>http://arxiv.org/</id>
+      <category term="Computer Science -- Data Structures and Algorithms"/>
+      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
+      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
+      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
+      <title>cs.DS updates on arXiv.org</title>
+      <updated>2022-03-07T01:30:00Z</updated>
     </source>
   </entry>
 
@@ -151,7 +574,7 @@ For the construction, we identify a fundamental connection between concept class
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2022-03-07T21:37:58Z</updated>
+      <updated>2022-03-07T22:48:12Z</updated>
     </source>
   </entry>
 
@@ -221,7 +644,7 @@ Applying a composition theorem of B{\l}asiok, Ivanov, Jin, Lee, Servedio and Vio
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-07T21:37:21Z</updated>
+      <updated>2022-03-07T22:47:11Z</updated>
     </source>
   </entry>
 
@@ -247,367 +670,7 @@ Our technical contribution includes combinatorial insights into structure of com
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-07T21:37:21Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2203.01857</id>
-    <link href="http://arxiv.org/abs/2203.01857" rel="alternate" type="text/html"/>
-    <title>Improved Approximation Algorithms and Lower Bounds for Search-Diversification Problems</title>
-    <feedworld_mtime>1646524800</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Abboud:Amir.html">Amir Abboud</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Cohen=Addad:Vincent.html">Vincent Cohen-Addad</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Lee:Euiwoong.html">Euiwoong Lee</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Manurangsi:Pasin.html">Pasin Manurangsi</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2203.01857">PDF</a><br/><b>Abstract: </b>We study several questions related to diversifying search results. We give
-improved approximation algorithms in each of the following problems, together
-with some lower bounds.
-</p>
-<p>- We give a polynomial-time approximation scheme (PTAS) for a diversified
-search ranking problem [Bansal et al., ICALP 2010] whose objective is to
-minimizes the discounted cumulative gain. Our PTAS runs in time
-$n^{2^{O(\log(1/\epsilon)/\epsilon)}} \cdot m^{O(1)}$ where $n$ denotes the
-number of elements in the databases. Complementing this, we show that no PTAS
-can run in time $f(\epsilon) \cdot (nm)^{2^{o(1/\epsilon)}}$ assuming Gap-ETH;
-therefore our running time is nearly tight. Both of our bounds answer open
-questions of Bansal et al.
-</p>
-<p>- We next consider the Max-Sum Dispersion problem, whose objective is to
-select $k$ out of $n$ elements that maximizes the dispersion, which is defined
-as the sum of the pairwise distances under a given metric. We give a
-quasipolynomial-time approximation scheme for the problem which runs in time
-$n^{O_{\epsilon}(\log n)}$. This improves upon previously known polynomial-time
-algorithms with approximate ratios 0.5 [Hassin et al., Oper. Res. Lett. 1997;
-Borodin et al., ACM Trans. Algorithms 2017]. Furthermore, we observe that known
-reductions rule out approximation schemes that run in
-$n^{\tilde{o}_\epsilon(\log n)}$ time assuming ETH.
-</p>
-<p>- We consider a generalization of Max-Sum Dispersion called Max-Sum
-Diversification. In addition to the sum of pairwise distance, the objective
-includes another function $f$. For monotone submodular $f$, we give a
-quasipolynomial-time algorithm with approximation ratio arbitrarily close to
-$(1 - 1/e)$. This improves upon the best polynomial-time algorithm which has
-approximation ratio $0.5$ by Borodin et al. Furthermore, the $(1 - 1/e)$ factor
-is tight as achieving better-than-$(1 - 1/e)$ approximation is NP-hard [Feige,
-J. ACM 1998].
-</p></div>
-    </summary>
-    <updated>2022-03-06T22:43:34Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2022-03-04T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2203.01794</id>
-    <link href="http://arxiv.org/abs/2203.01794" rel="alternate" type="text/html"/>
-    <title>Efficient Fr\'echet distance queries for segments</title>
-    <feedworld_mtime>1646524800</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Buchin:Maike.html">Maike Buchin</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/h/Hoog:Ivor_van_der.html">Ivor van der Hoog</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/o/Ophelders:Tim.html">Tim Ophelders</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Schlipf:Lena.html">Lena Schlipf</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Silveira:Rodrigo_I=.html">Rodrigo I. Silveira</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/s/Staals:Frank.html">Frank Staals</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2203.01794">PDF</a><br/><b>Abstract: </b>We study the problem of constructing a data structure that can store a
-two-dimensional polygonal curve $P$, such that for any query segment
-$\overline{ab}$ one can efficiently compute the Fr\'{e}chet distance between
-$P$ and $\overline{ab}$. First we present a data structure of size $O(n \log
-n)$ that can compute the Fr\'{e}chet distance between $P$ and a horizontal
-query segment $\overline{ab}$ in $O(\log n)$ time, where $n$ is the number of
-vertices of $P$. In comparison to prior work, this significantly reduces the
-required space. We extend the type of queries allowed, as we allow a query to
-be a horizontal segment $\overline{ab}$ together with two points $s, t \in P$
-(not necessarily vertices), and ask for the Fr\'{e}chet distance between
-$\overline{ab}$ and the curve of $P$ in between $s$ and $t$. Using
-$O(n\log^2n)$ storage, such queries take $O(\log^3 n)$ time, simplifying and
-significantly improving previous results. We then generalize our results to
-query segments of arbitrary orientation. We present an
-$O(nk^{3+\varepsilon}+n^2)$ size data structure, where $k \in [1..n]$ is a
-parameter the user can choose, and $\varepsilon &gt; 0$ is an arbitrarily small
-constant, such that given any segment $\overline{ab}$ and two points $s, t \in
-P$ we can compute the Fr\'{e}chet distance between $\overline{ab}$ and the
-curve of $P$ in between $s$ and $t$ in $O((n/k)\log^2n+\log^4 n)$ time. This is
-the first result that allows efficient exact Fr\'{e}chet distance queries for
-arbitrarily oriented segments.
-</p>
-<p>We also present two applications of our data structure: we show that we can
-compute a local $\delta$-simplification (with respect to the Fr\'{e}chet
-distance) of a polygonal curve in $O(n^{5/2+\varepsilon})$ time, and that we
-can efficiently find a translation of an arbitrary query segment
-$\overline{ab}$ that minimizes the Fr\'{e}chet distance with respect to a
-subcurve of $P$.
-</p></div>
-    </summary>
-    <updated>2022-03-06T22:46:32Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Computational Geometry"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.CG" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Computational Geometry (cs.CG) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.CG updates on arXiv.org</title>
-      <updated>2022-03-04T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2203.01741</id>
-    <link href="http://arxiv.org/abs/2203.01741" rel="alternate" type="text/html"/>
-    <title>High Multiplicity Scheduling on Uniform Machines in FPT-Time</title>
-    <feedworld_mtime>1646524800</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/b/Brinkop:Hauke.html">Hauke Brinkop</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/j/Jansen:Klaus.html">Klaus Jansen</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2203.01741">PDF</a><br/><b>Abstract: </b>In high-multiplicity scheduling, jobs of the same size are encoded in an
-efficient way, that is, for each size the number of jobs of that size is given
-instead of a list of jobs. Similarly, machines are encoded. We consider
-scheduling on uniform machines where a job of size $p_j$ takes time $p_j/s_i$
-on a machine of speed $s_i$. Classical (NP-hard) objectives are Makespan
-minimization ($C_{\max}$) and Santa Claus ($C_{\min}$). We show that both
-objectives can be solved in time $\mathcal O( p_{\max}^{\mathcal O(d^2)}
-\operatorname {poly} |I| )$ where $p_{\max}$ is the largest jobs size, $d$ the
-number of different job sizes and $|I|$ the encoding length of the instance.
-Our approach incorporates two structural theorems: The first allows us to
-replace machines of large speed by multiple machines of smaller speed. The
-second tells us that some fractional assignments can be used to reduce the
-instance significantly. Using only the first theorem, we show some additional
-results. For the problem Envy Minimization ($C_{\mathit{envy}}$), we propose an
-$\mathcal O(s_{\max} \cdot p_{\max}^{\mathcal O(d^3)} \operatorname{poly} |I|)$
-time algorithm (where $s_{\max}$ is the largest speed). For $C_{\max}$ and
-$C_{\min}$ in the Restricted Assignment setting, we give an $\mathcal O( (d
-p_{\max})^{\mathcal O(d^3)} \operatorname{poly} |I|)$ time algorithm. As far as
-we know, those running times are better than the running times of the
-algorithms known until today.
-</p></div>
-    </summary>
-    <updated>2022-03-06T22:39:43Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2022-03-04T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2203.01647</id>
-    <link href="http://arxiv.org/abs/2203.01647" rel="alternate" type="text/html"/>
-    <title>Parametric complexity analysis for a class of first-order Adagrad-like algorithms</title>
-    <feedworld_mtime>1646524800</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b>S. Gratton, S. Jerad, Ph. L. Toint <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2203.01647">PDF</a><br/><b>Abstract: </b>A class of algorithms for optimization in the presence of noise is presented,
-that does not require the evaluation of the objective function. This class
-generalizes the well-known Adagrad method. The complexity of this class is then
-analyzed as a function of its parameters, and it is shown that some methods of
-the class enjoy a better asymptotic convergence rate than previously known. A
-new class of algorithms is then derived with similar characteristics. Initial
-numerical experiments suggest that it may have some merits in practice.
-</p></div>
-    </summary>
-    <updated>2022-03-06T22:37:28Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Computational Complexity"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.CC" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Computational Complexity (cs.CC) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.CC updates on arXiv.org</title>
-      <updated>2022-03-04T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2203.01599</id>
-    <link href="http://arxiv.org/abs/2203.01599" rel="alternate" type="text/html"/>
-    <title>Uniform Approximations for Randomized Hadamard Transforms with Applications</title>
-    <feedworld_mtime>1646524800</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Cherapanamjeri:Yeshwanth.html">Yeshwanth Cherapanamjeri</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Nelson:Jelani.html">Jelani Nelson</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2203.01599">PDF</a><br/><b>Abstract: </b>Randomized Hadamard Transforms (RHTs) have emerged as a computationally
-efficient alternative to the use of dense unstructured random matrices across a
-range of domains in computer science and machine learning. For several
-applications such as dimensionality reduction and compressed sensing, the
-theoretical guarantees for methods based on RHTs are comparable to approaches
-using dense random matrices with i.i.d.\ entries. However, several such
-applications are in the low-dimensional regime where the number of rows sampled
-from the matrix is rather small. Prior arguments are not applicable to the
-high-dimensional regime often found in machine learning applications like
-kernel approximation. Given an ensemble of RHTs with Gaussian diagonals,
-$\{M^i\}_{i = 1}^m$, and any $1$-Lipschitz function, $f: \mathbb{R} \to
-\mathbb{R}$, we prove that the average of $f$ over the entries of $\{M^i v\}_{i
-= 1}^m$ converges to its expectation uniformly over $\| v \| \leq 1$ at a rate
-comparable to that obtained from using truly Gaussian matrices. We use our
-inequality to then derive improved guarantees for two applications in the
-high-dimensional regime: 1) kernel approximation and 2) distance estimation.
-For kernel approximation, we prove the first \emph{uniform} approximation
-guarantees for random features constructed through RHTs lending theoretical
-justification to their empirical success while for distance estimation, our
-convergence result implies data structures with improved runtime guarantees
-over previous work by the authors. We believe our general inequality is likely
-to find use in other applications.
-</p></div>
-    </summary>
-    <updated>2022-03-06T00:00:00Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Computational Geometry"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.CG" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Computational Geometry (cs.CG) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.CG updates on arXiv.org</title>
-      <updated>2022-03-04T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2203.01579</id>
-    <link href="http://arxiv.org/abs/2203.01579" rel="alternate" type="text/html"/>
-    <title>A Formalisation of Algorithms for Sorting Network</title>
-    <feedworld_mtime>1646524800</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/t/Th=eacute=ry:Laurent.html">Laurent Théry</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2203.01579">PDF</a><br/><b>Abstract: </b>This notes explains how standard algorithms that construct sorting networks
-have been formalised and proved correct in the Coq proof assistant using the
-SSReflect extension.
-</p></div>
-    </summary>
-    <updated>2022-03-06T22:43:23Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2022-03-04T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2203.01537</id>
-    <link href="http://arxiv.org/abs/2203.01537" rel="alternate" type="text/html"/>
-    <title>Private High-Dimensional Hypothesis Testing</title>
-    <feedworld_mtime>1646524800</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Narayanan:Shyam.html">Shyam Narayanan</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2203.01537">PDF</a><br/><b>Abstract: </b>We provide improved differentially private algorithms for identity testing of
-high-dimensional distributions. Specifically, for $d$-dimensional Gaussian
-distributions with known covariance $\Sigma$, we can test whether the
-distribution comes from $\mathcal{N}(\mu^*, \Sigma)$ for some fixed $\mu^*$ or
-from some $\mathcal{N}(\mu, \Sigma)$ with total variation distance at least
-$\alpha$ from $\mathcal{N}(\mu^*, \Sigma)$ with $(\varepsilon, 0)$-differential
-privacy, using only \[\tilde{O}\left(\frac{d^{1/2}}{\alpha^2} +
-\frac{d^{1/3}}{\alpha^{4/3} \cdot \varepsilon^{2/3}} + \frac{1}{\alpha \cdot
-\varepsilon}\right)\] samples if the algorithm is allowed to be computationally
-inefficient, and only \[\tilde{O}\left(\frac{d^{1/2}}{\alpha^2} +
-\frac{d^{1/4}}{\alpha \cdot \varepsilon}\right)\] samples for a computationally
-efficient algorithm. We also provide a matching lower bound showing that our
-computationally inefficient algorithm has optimal sample complexity. We also
-extend our algorithms to various related problems, including mean testing of
-Gaussians with bounded but unknown covariance, uniformity testing of product
-distributions over $\{\pm 1\}^d$, and tolerant testing.
-</p>
-<p>Our results improve over the previous best work of Canonne, Kamath, McMillan,
-Ullman, and Zakynthinou \cite{CanonneKMUZ20} for both computationally efficient
-and inefficient algorithms, and even our computationally efficient algorithm
-matches the optimal \emph{non-private} sample complexity of
-$O\left(\frac{\sqrt{d}}{\alpha^2}\right)$ in many standard parameter settings.
-In addition, our results show that, surprisingly, private identity testing of
-$d$-dimensional Gaussians can be done with fewer samples than private identity
-testing of discrete distributions over a domain of size $d$ \cite{AcharyaSZ18},
-which refutes a conjectured lower bound of Canonne et al. \cite{CanonneKMUZ20}.
-</p></div>
-    </summary>
-    <updated>2022-03-06T22:45:57Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2022-03-04T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2203.01440</id>
-    <link href="http://arxiv.org/abs/2203.01440" rel="alternate" type="text/html"/>
-    <title>Near-Optimal Correlation Clustering with Privacy</title>
-    <feedworld_mtime>1646524800</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/c/Cohen=Addad:Vincent.html">Vincent Cohen-Addad</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/f/Fan:Chenglin.html">Chenglin Fan</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/l/Lattanzi:Silvio.html">Silvio Lattanzi</a>, Slobodan Mitrović, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Norouzi=Fard:Ashkan.html">Ashkan Norouzi-Fard</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/p/Parotsidis:Nikos.html">Nikos Parotsidis</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/t/Tarnawski:Jakub.html">Jakub Tarnawski</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2203.01440">PDF</a><br/><b>Abstract: </b>Correlation clustering is a central problem in unsupervised learning, with
-applications spanning community detection, duplicate detection, automated
-labelling and many more. In the correlation clustering problem one receives as
-input a set of nodes and for each node a list of co-clustering preferences, and
-the goal is to output a clustering that minimizes the disagreement with the
-specified nodes' preferences. In this paper, we introduce a simple and
-computationally efficient algorithm for the correlation clustering problem with
-provable privacy guarantees. Our approximation guarantees are stronger than
-those shown in prior work and are optimal up to logarithmic factors.
-</p></div>
-    </summary>
-    <updated>2022-03-06T22:38:16Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2022-03-04T01:30:00Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>http://arxiv.org/abs/2203.01384</id>
-    <link href="http://arxiv.org/abs/2203.01384" rel="alternate" type="text/html"/>
-    <title>Descending Price Auctions with Bounded Number of Price Levels and Batched Prophet Inequality</title>
-    <feedworld_mtime>1646524800</feedworld_mtime>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><b>Authors: </b><a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/a/Alaei:Saeed.html">Saeed Alaei</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Makhdoumi:Ali.html">Ali Makhdoumi</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/m/Malekian:Azarakhsh.html">Azarakhsh Malekian</a>, <a href="http://www.informatik.uni-trier.de/~ley/db/indices/a-tree/n/Niazadeh:Rad.html">Rad Niazadeh</a> <br/><b>Download:</b> <a href="http://arxiv.org/pdf/2203.01384">PDF</a><br/><b>Abstract: </b>We consider descending price auctions for selling $m$ units of a good to unit
-demand i.i.d. buyers where there is an exogenous bound of $k$ on the number of
-price levels the auction clock can take. The auctioneer's problem is to choose
-price levels $p_1 &gt; p_2 &gt; \cdots &gt; p_{k}$ for the auction clock such that
-auction expected revenue is maximized. The prices levels are announced prior to
-the auction. We reduce this problem to a new variant of prophet inequality,
-which we call \emph{batched prophet inequality}, where a decision-maker chooses
-$k$ (decreasing) thresholds and then sequentially collects rewards (up to $m$)
-that are above the thresholds with ties broken uniformly at random. For the
-special case of $m=1$ (i.e., selling a single item), we show that the resulting
-descending auction with $k$ price levels achieves $1- 1/e^k$ of the
-unrestricted (without the bound of $k$) optimal revenue. That means a
-descending auction with just 4 price levels can achieve more than 98\% of the
-optimal revenue. We then extend our results for $m&gt;1$ and provide a closed-form
-bound on the competitive ratio of our auction as a function of the number of
-units $m$ and the number of price levels $k$.
-</p></div>
-    </summary>
-    <updated>2022-03-06T22:45:19Z</updated>
-    <author>
-      <name/>
-    </author>
-    <source>
-      <id>http://arxiv.org/</id>
-      <category term="Computer Science -- Data Structures and Algorithms"/>
-      <link href="http://arxiv.org/" rel="alternate" type="text/html"/>
-      <link href="http://export.arxiv.org/rss/cs.DS" rel="self" type="application/rdf+xml"/>
-      <subtitle>Computer Science -- Data Structures and Algorithms (cs.DS) updates on the arXiv.org e-print archive</subtitle>
-      <title>cs.DS updates on arXiv.org</title>
-      <updated>2022-03-04T01:30:00Z</updated>
+      <updated>2022-03-07T22:47:11Z</updated>
     </source>
   </entry>
 
@@ -665,7 +728,7 @@ I must also especially thank my dear wife Dr.Kathryn Farley for her tremendous s
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-03-07T21:37:31Z</updated>
+      <updated>2022-03-07T22:47:44Z</updated>
     </source>
   </entry>
 
@@ -713,7 +776,7 @@ I must also especially thank my dear wife Dr.Kathryn Farley for her tremendous s
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2022-03-07T21:37:25Z</updated>
+      <updated>2022-03-07T22:47:38Z</updated>
     </source>
   </entry>
 
@@ -775,7 +838,7 @@ Email: diptarka@comp.nus.edu.sg</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-07T21:37:34Z</updated>
+      <updated>2022-03-07T22:47:49Z</updated>
     </source>
   </entry>
 
@@ -801,7 +864,7 @@ Email: diptarka@comp.nus.edu.sg</p></div>
       <link href="https://adamsheffer.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Discrete geometry and other typos</subtitle>
       <title>Some Plane Truths</title>
-      <updated>2022-03-07T21:38:31Z</updated>
+      <updated>2022-03-07T22:48:59Z</updated>
     </source>
   </entry>
 
@@ -821,7 +884,7 @@ Email: diptarka@comp.nus.edu.sg</p></div>
       <link href="https://decentralizedthoughts.github.io/feed.xml" rel="self" type="application/atom+xml"/>
       <subtitle>Decentralized thoughts about decentralization</subtitle>
       <title>Decentralized Thoughts</title>
-      <updated>2022-03-07T19:39:16Z</updated>
+      <updated>2022-03-07T22:49:49Z</updated>
     </source>
   </entry>
 
@@ -848,7 +911,7 @@ Email: berufungen@tuhh.de</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-07T21:37:34Z</updated>
+      <updated>2022-03-07T22:47:49Z</updated>
     </source>
   </entry>
 
@@ -878,7 +941,7 @@ Email: c.schaffner@uva.nl</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-07T21:37:34Z</updated>
+      <updated>2022-03-07T22:47:49Z</updated>
     </source>
   </entry>
 
@@ -903,7 +966,7 @@ Email: c.schaffner@uva.nl</p></div>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2022-03-07T21:38:49Z</updated>
+      <updated>2022-03-07T22:49:12Z</updated>
     </source>
   </entry>
 
@@ -928,7 +991,7 @@ Email: c.schaffner@uva.nl</p></div>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2022-03-07T21:38:49Z</updated>
+      <updated>2022-03-07T22:49:12Z</updated>
     </source>
   </entry>
 
@@ -958,7 +1021,7 @@ Email: c.schaffner@uva.nl</p></div>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2022-03-07T21:38:39Z</updated>
+      <updated>2022-03-07T22:49:03Z</updated>
     </source>
   </entry>
 
@@ -995,7 +1058,7 @@ Email: c.schaffner@uva.nl</p></div>
       <link href="http://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2022-03-07T15:30:14Z</updated>
+      <updated>2022-03-07T21:58:28Z</updated>
     </source>
   </entry>
 
@@ -1039,7 +1102,7 @@ Email: c.schaffner@uva.nl</p></div>
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2022-03-07T21:37:07Z</updated>
+      <updated>2022-03-07T22:37:14Z</updated>
     </source>
   </entry>
 
@@ -1067,7 +1130,7 @@ We advance towards a better understating of this notion, showing that a k-incomp
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-07T21:37:21Z</updated>
+      <updated>2022-03-07T22:47:11Z</updated>
     </source>
   </entry>
 
@@ -1114,7 +1177,7 @@ We advance towards a better understating of this notion, showing that a k-incomp
       <link href="https://thmatters.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://thmatters.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theory Matters</title>
-      <updated>2022-03-07T21:37:53Z</updated>
+      <updated>2022-03-07T22:48:08Z</updated>
     </source>
   </entry>
 
@@ -1266,7 +1329,7 @@ We advance towards a better understating of this notion, showing that a k-incomp
       <link href="https://blog.simons.berkeley.edu" rel="alternate" type="text/html"/>
       <subtitle>What's New at the Simons Institute for the Theory of Computing.</subtitle>
       <title>Calvin Café: The Simons Institute Blog</title>
-      <updated>2022-03-07T21:38:37Z</updated>
+      <updated>2022-03-07T22:49:01Z</updated>
     </source>
   </entry>
 
@@ -1376,7 +1439,7 @@ To show this separation, we define a new polynomial family with an interesting c
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-07T21:37:21Z</updated>
+      <updated>2022-03-07T22:47:11Z</updated>
     </source>
   </entry>
 
@@ -1413,7 +1476,7 @@ To show this separation, we define a new polynomial family with an interesting c
       <link href="http://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2022-03-07T15:30:14Z</updated>
+      <updated>2022-03-07T21:58:28Z</updated>
     </source>
   </entry>
 
@@ -1437,7 +1500,7 @@ To show this separation, we define a new polynomial family with an interesting c
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-07T21:37:21Z</updated>
+      <updated>2022-03-07T22:47:11Z</updated>
     </source>
   </entry>
 
@@ -1463,7 +1526,7 @@ In this work we apply this prescription to the left-right Cayley complex that li
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-07T21:37:21Z</updated>
+      <updated>2022-03-07T22:47:11Z</updated>
     </source>
   </entry>
 
@@ -1522,7 +1585,7 @@ As of 2022, the domain for Byte redirects to an unrelated website selling <a hre
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-03-07T21:37:31Z</updated>
+      <updated>2022-03-07T22:47:44Z</updated>
     </source>
   </entry>
 
@@ -1550,7 +1613,7 @@ Email: erot@dtu.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-07T21:37:34Z</updated>
+      <updated>2022-03-07T22:47:49Z</updated>
     </source>
   </entry>
 
@@ -1577,7 +1640,165 @@ Email: erot@dtu.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-07T21:37:34Z</updated>
+      <updated>2022-03-07T22:47:49Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-US">
+    <id>https://scottaaronson.blog/?p=6318</id>
+    <link href="https://scottaaronson.blog/?p=6318" rel="alternate" type="text/html"/>
+    <link href="https://scottaaronson.blog/?p=6318#comments" rel="replies" type="text/html"/>
+    <link href="https://scottaaronson.blog/?feed=atom&amp;p=6318" rel="replies" type="application/atom+xml"/>
+    <title xml:lang="en-US">Nothing non-obvious to say…</title>
+    <summary xml:lang="en-US">… but these antiwar protesters in St. Petersburg know that they’re all going to be arrested and are doing it anyway. Meanwhile, I just spent an hour giving Lily, my 9-year-old, a crash course on geopolitics, including WWII, the Cold War, the formation of NATO, Article 5, nuclear deterrence, economic sanctions, the breakup of the […]</summary>
+    <content type="xhtml" xml:lang="en-US"><div xmlns="http://www.w3.org/1999/xhtml"><figure class="wp-block-image size-large"><img alt="" src="https://www.scottaaronson.com/protesters.jpg"/></figure>
+
+
+
+<p>… but these antiwar protesters in St. Petersburg know that they’re all going to be arrested and are doing it anyway.</p>
+
+
+
+<p>Meanwhile, I just spent an hour giving Lily, my 9-year-old, a crash course on geopolitics, including WWII, the Cold War, the formation of NATO, Article 5, nuclear deterrence, economic sanctions, the breakup of the USSR, Ukraine, the Baltic Republics, and the prospects now for WWIII. Her comment at the end was that from now on she’s going to refer to Putin as “Poopin,” in the hope that that shames him into changing course.</p>
+
+
+
+<p><font color="red"><strong>Update (March 1):</strong></font> A longtime <em>Shtetl-Optimized</em> reader has a friend who’s trying to raise funds to get her family out of Ukraine.  <a href="https://scottaaronson.blog/?p=6318#comment-1930775">See here</a> if you’d like to help.</p></div>
+    </content>
+    <updated>2022-02-25T02:14:16Z</updated>
+    <published>2022-02-25T02:14:16Z</published>
+    <category scheme="https://scottaaronson.blog" term="The Fate of Humanity"/>
+    <author>
+      <name>Scott</name>
+      <uri>http://www.scottaaronson.com</uri>
+    </author>
+    <source>
+      <id>https://scottaaronson.blog/?feed=atom</id>
+      <icon>https://scottaaronson.blog/wp-content/uploads/2021/10/cropped-Jacket-32x32.gif</icon>
+      <link href="https://scottaaronson.blog" rel="alternate" type="text/html"/>
+      <link href="https://scottaaronson.blog/?feed=atom" rel="self" type="application/atom+xml"/>
+      <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
+      <title xml:lang="en-US">Shtetl-Optimized</title>
+      <updated>2022-03-02T01:15:03Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>tag:blogger.com,1999:blog-3722233.post-6098480672803996666</id>
+    <link href="http://blog.computationalcomplexity.org/feeds/6098480672803996666/comments/default" rel="replies" type="application/atom+xml"/>
+    <link href="http://blog.computationalcomplexity.org/2022/02/i-will-be-on-instagramif-you-have-two_24.html#comment-form" rel="replies" type="text/html"/>
+    <link href="http://www.blogger.com/feeds/3722233/posts/default/6098480672803996666" rel="edit" type="application/atom+xml"/>
+    <link href="http://www.blogger.com/feeds/3722233/posts/default/6098480672803996666" rel="self" type="application/atom+xml"/>
+    <link href="http://blog.computationalcomplexity.org/2022/02/i-will-be-on-instagramif-you-have-two_24.html" rel="alternate" type="text/html"/>
+    <title>I will be on instagram/If you have two reals in a box- Answer (Guest Post by David Marcus)</title>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>I will be on instragram:</p><p>We,  Prof. Mohammad Hajiaghayi and Prof. William Gasarch plan to have an Instagram Live at @mhajiaghayi this SAT FEB 26, 1:30PM EDT (in English).</p><p> We talk about our lives as well as blogging, research, and how to inspire young minds. Please join if you can.</p><p>#PvsNP #blogging #youngminds #instagram</p><p><br/></p><p>-------------------------------------</p><p>This is the answer to the problem posted in the last post which was a guest post by David Marcus. This post is also a guest post by him. </p><p>We restate the problem:</p><p><br/></p><p>-------------------------------------------------</p><p>PICK THE LARGEST NUMBER:</p><p>There are two distinct reals in a box (how do they fit! aren't reals infinite!). They are called the first and second number. </p><p>You want to pick the larger one. You can pick one of the numbers at random and look at it</p><p>before deciding which one you want. </p><p>Is there a strategy that will win with probability &gt; 1/2.</p><p>CLARIFICATIONS:</p><p>1) We do not want a strategy that does well on average or in the long run. Even if the games is played just once, we want the probability of winning to be &gt; 1/2.</p><p>2) It must have prob of winning &gt; 1/2 for EVERY pair of reals.</p><p>3) Here is an example of a strategy that does NOT work: Pick the first number with prob 1/2. If its positive then keep it, else dump it. If the numbers are{1,2} this only works half the time.</p><p>-------------------------------------------------</p><p>There is a strategy. In fact, we give two.</p><p><br/></p><p>STRATEGY ONE</p><p>Before looking at any number, pick a number x on your own from the reals according to a distribution with full support (every open interval has prob greater than 0). Then pick a number from the box (prob 1/2-1/2), which we call y. If x&lt;y then keep y. If y\le x then take the other number.</p><p>If x is between the two numbers, then the strategy works. If not then the strategy does not hurt, so the prob in that case is 1/2. Hence you do better than 1/2. </p><p>STRATEGY TWO</p><p>Let f: R--&gt; (0,1) be strictly increasing. Pick a number from the box, call it y. Keep it with prob f(y).</p><p><br/></p><p><br/></p><p><br/></p></div>
+    </content>
+    <updated>2022-02-24T15:56:00Z</updated>
+    <published>2022-02-24T15:56:00Z</published>
+    <author>
+      <name>gasarch</name>
+      <email>noreply@blogger.com</email>
+      <uri>http://www.blogger.com/profile/03004932739846901628</uri>
+    </author>
+    <source>
+      <id>tag:blogger.com,1999:blog-3722233</id>
+      <category term="typecast"/>
+      <category term="focs metacomments"/>
+      <author>
+        <name>Lance Fortnow</name>
+        <email>noreply@blogger.com</email>
+        <uri>http://www.blogger.com/profile/06752030912874378610</uri>
+      </author>
+      <link href="http://blog.computationalcomplexity.org/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
+      <link href="http://www.blogger.com/feeds/3722233/posts/default" rel="self" type="application/atom+xml"/>
+      <link href="http://blog.computationalcomplexity.org/" rel="alternate" type="text/html"/>
+      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
+      <link href="http://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
+      <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
+      <title>Computational Complexity</title>
+      <updated>2022-03-07T21:58:28Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-US">
+    <id>https://rjlipton.wpcomstaging.com/?p=19673</id>
+    <link href="https://rjlipton.wpcomstaging.com/2022/02/23/simons-awards-for-2022/" rel="alternate" type="text/html"/>
+    <title>Simons Awards for 2022</title>
+    <summary>To receive this award from an organization I admire so much makes me totally happy and grateful—James Welch Jin-Yi Cai is one of the 2022 winners of the Simons awards in mathematics. Congrats to him. Jin-Yi is a dear and long time friend of ours. We are thrilled to see that he has been selected […]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>
+<i>To receive this award from an organization I admire so much makes me totally happy and grateful—James Welch</i></p>
+<p>
+Jin-Yi Cai is one of the 2022 winners of the Simons awards in mathematics. Congrats to him. </p>
+<p>
+Jin-Yi is a dear and long time friend of ours. We are thrilled to see that he has been selected for this high honor:  The Simons Fellows program extends academic leaves from one term to a full year, enabling recipients to focus solely on research for the long periods often necessary for significant advances. The foundation is proud to support the work of these distinguished scientists. </p>
+<p>
+<a href="https://rjlipton.wpcomstaging.com/2022/02/23/simons-awards-for-2022/cai/" rel="attachment wp-att-19679"><img alt="" class="aligncenter size-full wp-image-19679" height="190" src="https://i0.wp.com/rjlipton.wpcomstaging.com/wp-content/uploads/2022/02/cai.png?resize=150%2C190&amp;ssl=1" width="150"/></a></p>
+<p>
+<span id="more-19673"/></p>
+<p><b> The Mathematics Winners 2022 </b></p>
+<p/><p>
+The winners are clickable below:<br/>
+<a href="https://people.math.wisc.edu/~anderson/">David Anderson</a>	University of Wisconsin-Madison <br/>
+ <a href="http://comet.lehman.cuny.edu/behrstock/">Jason Behrstock</a>	Lehman College <br/>
+ <a href="https://pages.cs.wisc.edu/~jyc/">Jin-Yi Cai</a> University of Wisconsin-Madison <br/>
+ <a href="https://people.math.rochester.edu/faculty/xchen84/">Xuwen Chen</a>	University of Rochester <br/>
+ <a href="https://www.math.uh.edu/~climenha/">Vaughn Climenhaga</a>	University of Houston <br/>
+ <a href="https://www.math.mcgill.ca/darmon/">Henri Darmon</a>	McGill University <br/>
+ <a href="https://www-math.umd.edu/people/faculty/item/299-gforni.html">Giovanni Forni	</a> University of Maryland, College Park <br/>
+ <a href="https://personal.math.ubc.ca/~afraser/">Ailana Fraser</a>	University of British Columbia <br/>
+ <a href="https://users.math.yale.edu/users/goncharov/">Alexander Goncharov</a>Yale University <br/>
+ <a href="https://math.nd.edu/people/faculty/matthew-gursky/">Matthew Gursky<br/>
+ </a><a href="https://www.mathematics.pitt.edu/people/piotr-hajlasz">Piotr Hajlasz</a>	University of Pittsburgh <br/>
+ <a href="https://people.math.gatech.edu/~jhom6/">Jennifer Hom</a>	Georgia Institute of Technology <br/>
+ <a href="https://mathweb.ucsd.edu/~aioana/">Adrian Ioana</a>	University of California, San Diego <br/>
+ <a href="http://shell.cas.usf.edu/~jonoska/">Natasa Jonoska</a>	University of South Florida <br/>
+ <a href="https://en.wikipedia.org/wiki/Jeff_Kahn">Jeff Kahn	</a> Rutgers, The State University of New Jersey <br/>
+ <a href="https://en.wikipedia.org/wiki/Jeremy_Kahn">Jeremy Kahn</a>	Brown University <br/>
+ <a href="https://ls.wisc.edu/faculty-staff/ls-tenure/chanwoo-kim-l-s-tenured-faculty">Chanwoo Kim</a>	University of Wisconsin-Madison <br/>
+ <a href="https://people.brandeis.edu/~kleinboc/">Dmitry Kleinbock</a>	Brandeis University <br/>
+ <a href="https://pages.uoregon.edu/klesh/">Alexander Kleshchev</a>	University of Oregon <br/>
+ <a href="https://math.washington.edu/people/sandor-kovacs">Sandor Kovacs</a>	University of Washington <br/>
+ <a href="https://en.wikipedia.org/wiki/Michael_J._Larsen">Michael Larsen</a>	Indiana University <br/>
+ <a href="http://www.math.stonybrook.edu/~blaine/">Blaine Lawson	</a> Stony Brook University <br/>
+ <a href="https://mathweb.ucsd.edu/~mleok/">Melvin Leok</a>	University of California, San Diego <br/>
+ <a href="https://www.bc.edu/bc-web/schools/mcas/departments/math/people/faculty-directory/tao-li.html">Tao Li</a>	Boston College <br/>
+ <a href="https://math.indiana.edu/about/faculty/lindenstrauss-ayelet.html">Ayelet Lindenstrauss</a>	Indiana University <br/>
+ <a href="https://math.uoregon.edu/profile/lipshitz">Robert Lipshitz</a>	University of Oregon <br/>
+ <a href="https://en.wikipedia.org/wiki/Robert_McCann_(mathematician)">Robert McCann</a>	University of Toronto <br/>
+ <a href="https://math.jhu.edu/~eriehl/">Emily Riehl</a>	Johns Hopkins University <br/>
+ <a href="https://lsa.umich.edu/math/people/faculty/rudelson.html">Mark Rudelson</a>	University of Michigan <br/>
+ <a href="https://mathweb.ucsd.edu/~rsaab/">Rayan Saab</a>	University of California, San Diego <br/>
+ <a href="https://math.cornell.edu/laurent-saloff-coste">Laurent Saloff-Coste</a>	Cornell University <br/>
+ <a href="https://pi.math.cornell.edu/~mike/">Michael Stillman</a>	Cornell University <br/>
+ <a href="https://math.illinois.edu/directory/profile/vesna">Vesna Stojanoska</a>	University of Illinois at Urbana-Champaign <br/>
+ <a href="https://www.math.uci.edu/people/jeffrey-streets">Jeffrey Streets</a> University of California, Irvine <br/>
+ <a href="https://sites.math.rutgers.edu/~pht19/">Pham Tiep</a>	Rutgers, The State University of New Jersey <br/>
+ <a href="http://pi.math.cornell.edu/~ajt/">Alex Townsend</a>	Cornell University <br/>
+ <a href="https://www.urbanskimath.com">Mariusz Urbanski</a>	University of North Texas <br/>
+ <a href="https://math.unl.edu/azupan2">Alexander Zupan</a>	University of Nebraska-Lincoln </p>
+<p>
+Note that University of Wisconsin-Madison has three winners—pretty impressive.</p>
+<p>
+</p><p><b> Open Problems </b></p>
+<p/><p>
+Again congrats to all. We look forward to hearing about future results from them all. </p>
+<p/></div>
+    </content>
+    <updated>2022-02-23T17:19:34Z</updated>
+    <published>2022-02-23T17:19:34Z</published>
+    <category term="News"/>
+    <category term="People"/>
+    <author>
+      <name>rjlipton</name>
+    </author>
+    <source>
+      <id>https://rjlipton.wpcomstaging.com</id>
+      <logo>https://s0.wp.com/i/webclip.png</logo>
+      <link href="https://rjlipton.wpcomstaging.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
+      <subtitle>a personal view of the theory of computation</subtitle>
+      <title>Gödel's Lost Letter and P=NP</title>
+      <updated>2022-03-07T22:47:44Z</updated>
     </source>
   </entry>
 </feed>
