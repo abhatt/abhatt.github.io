@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2022-03-15T14:39:10Z</updated>
+  <updated>2022-03-15T15:38:58Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,229 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://differentialprivacy.org/dp-fine-tuning/</id>
+    <link href="https://differentialprivacy.org/dp-fine-tuning/" rel="alternate" type="text/html"/>
+    <title>Differentially private deep learning can be effective with self-supervised models</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Differential Privacy (DP) is a formal definition of privacy which guarantees that the outcome of a statistical procedure does not vary much regardless of whether an individual input is included or removed from the training dataset. 
+This guarantee is desirable when we are tasked to train machine learning models on private datasets that should not memorize individual inputs. 
+Past works have shown that differentially private models can be resilient to strong membership inference [<a href="https://proceedings.mlr.press/v37/kairouz15.html">1</a>, <a href="https://ieeexplore.ieee.org/abstract/document/9519424">34</a>, <a href="https://proceedings.neurips.cc/paper/2020/hash/fc4ddc15f9f4b4b06ef7844d6bb53abf-Abstract.html">35</a>] and data reconstruction attacks [<a href="https://www.usenix.org/conference/usenixsecurity19/presentation/carlini">2</a>, <a href="https://arxiv.org/abs/2201.12383">3</a>] when the privacy parameter is set to be sufficiently small. 
+See a <a href="https://differentialprivacy.org/how-to-deploy-ml-with-dp/">prior post</a> for more background on differentially private machine learning.</p>
+
+<p>Yet, in practice, most attempts at training differentially private deep learning models on moderately-sized datasets have resulted in large performance drops compared to when training without privacy-protection baked in. 
+These performance drops are oftentimes large enough to discourage the adoption of differential privacy protection into machine learning pipelines altogether.</p>
+
+<p>To provide a reference of the potential performance hit, the authors of [<a href="https://arxiv.org/abs/2102.12677">5</a>] trained a ResNet-20 from scratch on CIFAR-10 with a privacy budget of \(\epsilon=8\) that has test accuracy barely over 62% (see their Table 1). 
+Contrast this with the 8.75% error rate (91.25% accuracy) reported for training the same architecture without enforcing differential privacy [<a href="https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html">6</a>]. 
+While some works report private learning results better than the above, absent additional data, pre-training, or external knowledge, most improvements have been incremental, and the test accuracy for CIFAR-10 models trained under modest privacy leakage (\(\epsilon=3\)) has roughly settled to ~70% in the literature [<a href="https://arxiv.org/abs/2011.11660">4</a>].</p>
+
+<p>One reason behind the performance drop lies in sample efficiency — differentially private learning generally requires much more data than non-private learning to reach an acceptable level of performance. 
+This also means that learning the high-level features (e.g., syntactic structure in text, edge detectors for images) necessary to perform specific tasks with private data can be much more sample-costly.</p>
+
+<p>This blog post surveys results that leverage public self-supervised pre-training to obtain high-performing models through differentially private fine-tuning.
+The pre-train-fine-tune paradigm is straightforward to execute and results in high-performing models under modest privacy budgets for many standard computer vision and natural language processing tasks. 
+Moreover, existing results have shown that private fine-tuning consistently benefits from improvements in public pre-training.</p>
+
+<h2 id="self-supervised-pre-training">Self-Supervised Pre-Training</h2>
+
+<p>Self-supervised learning is a paradigm which leverages unlabeled data to learn representations that can be useful for a range of downstream tasks.
+Since self-supervised learning doesn’t target specific tasks itself, 
+the (pre-)training procedure doesn’t require labeled data — in many cases, mildly curated unlabeled data is sufficient for self-supervised pre-training to produce models for subsequent fine-tuning. 
+So far, there have been two broadly successful instantiations of this learning paradigm in computer vision [<a href="http://proceedings.mlr.press/v119/chen20j.html">9</a>] and natural language processing [<a href="https://www.cs.ubc.ca/~amuham01/LING530/papers/radford2018improving.pdf">7</a>, <a href="https://arxiv.org/abs/1810.04805">8</a>]. 
+We recap the two approaches below.<sup id="fnref:1"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:1" rel="footnote">1</a></sup></p>
+
+<p><strong>Contrastive pre-training for vision:</strong> 
+One class of self-supervised methods in computer vision (SimCLR, [<a href="http://proceedings.mlr.press/v119/chen20j.html">9</a>]) performs pre-training through contrastive learning. 
+Algorithms of this type produce embeddings for images with the goal of creating different embeddings for semantically different images and similar embeddings for similar ones. 
+Concretely, the algorithm used in SimCLR forces models to produce similar embeddings for an image and its augmented siblings (e.g., image rotated by some degrees), 
+and different embeddings for separate images (and their augmentations). 
+The SimCLR framework with large scale models and compute led to state-of-the-art (non-private) ImageNet fine-tuning results at the time of its writing.</p>
+
+<p><strong>Masked language modeling and autoregressive language modeling for text:</strong> 
+Masked Language Modeling (MLM) and Auto-regressive Language Modeling (ALM) are two self-supervised pre-training approaches. 
+While the former asks models to predict deliberately masked out tokens from a piece of text, the latter asks models to simply predict the next token in a sequence. 
+With large amounts of unlabeled text data, large and expressive Transformer models [<a href="https://proceedings.neurips.cc/paper/2017/hash/3f5ee243547dee91fbd053c1c4a845aa-Abstract.html">24</a>], and lots of compute, both approaches produce powerful models that are good starting points for downstream fine-tuning. 
+For instance, Bidirectional Encoder Representations from Transformers (BERT, [<a href="https://arxiv.org/abs/1810.04805">8</a>]), produced state-of-the-art (non-private) results (at the time) for a large collection of language understanding tasks when fine-tuned on each.</p>
+
+<h2 id="fine-tuning-self-supervised-models-with-dp-optimization">Fine-Tuning Self-Supervised Models With DP-Optimization</h2>
+<p>Self-supervised pre-training is appealing in the context of differentially private machine learning. 
+This is because (i) the mildly curated data needed for pre-training can usually be obtained cheaply from the public domain, and (ii) pre-trained models may contain useful domain knowledge that can reduce the sample complexity of subsequent private learning. 
+A paradigm for private learning that leverages self-supervised pre-training could follow two steps:</p>
+
+<ul>
+  <li>collect cheap and public (unlabeled) data from the task domain (e.g., vision, language, etc.) to pre-train a model with self-supervised learning, and</li>
+  <li>collect moderate amounts of task-specific private (labeled) data and fine-tune the pre-trained model under differential privacy to perform the task.<sup id="fnref:2"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:2" rel="footnote">2</a></sup></li>
+</ul>
+
+<p>To date, some of the best differentially private deep learning results in the literature have resulted from instantiating this paradigm [<a href="https://arxiv.org/abs/2011.11660">4</a>, <a href="https://arxiv.org/abs/2110.05679">11</a>, <a href="https://arxiv.org/abs/2110.06500">12</a>].
+Below, we review works which capitalize on self-supervised pre-training by differentially privately fine-tuning pre-trained models with an iterative gradient method like DP-SGD [<a href="https://dl.acm.org/doi/abs/10.1145/2976749.2978318">19</a>, <a href="https://ieeexplore.ieee.org/abstract/document/6736861">20</a>].<sup id="fnref:3"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:3" rel="footnote">3</a></sup>
+<img alt="" src="https://differentialprivacy.org/images/fine-tuning-paradigm.png"/></p>
+
+<p><strong>Private fine-tuning with SimCLR features:</strong> 
+The authors of [<a href="https://arxiv.org/abs/2011.11660">4</a>] fine-tuned a linear model on top of the embedding vectors produced by SimCLRv2 from the CIFAR-10 dataset. Under a privacy budget of \(\epsilon=2\), 
+these models reached an average test accuracy of 92.7%. This number can be further improved to ~94% with the use of larger and wider pre-trained models in the SimCLRv2 family.<sup id="fnref:4"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:4" rel="footnote">4</a></sup> 
+These test accuracies are very close to some standard non-private results attained by an off-the-shelf ResNet architecture [<a href="https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html">6</a>].</p>
+
+<p><strong>Privately fine-tuning BERT variants and GPT-2:</strong> 
+The authors of [<a href="https://arxiv.org/abs/2110.05679">11</a>, <a href="https://arxiv.org/abs/2110.06500">12</a>, <a href="http://proceedings.mlr.press/v139/yu21f.html">16</a>] showed that with appropriate hyper-parameters, fine-tuning BERT variants and GPT-2 with DP-optimization results in high-performing private models for text classification and language generation — even on datasets of modest sizes and under modest privacy budgets. 
+Notably, some of these models attain a task performance close to non-private models from previous years in the literature. 
+These results also exceed many non-private learning results from the pre-BERT and pre-GPT years.<sup id="fnref:5"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:5" rel="footnote">5</a></sup></p>
+
+<p>More interestingly, the authors showed that the larger (and thus better) the pre-trained model, the better the private fine-tuning performance gets. 
+This empirical observation in private fine-tuning of large Transformers is qualitatively different from what’s implied by the usual minimax optimal rates derived for vanilla private learning with convex loss functions under approximate differential privacy [<a href="https://ieeexplore.ieee.org/abstract/document/6979031">14</a>, <a href="https://proceedings.neurips.cc/paper/2019/hash/3bd8fdb090f1f5eb66a00c84dbc5ad51-Abstract.html">15</a>]. 
+This discrepancy between experimental results for training large models and the theory for learning with convex losses suggests there is more to be understood.<sup id="fnref:6"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:6" rel="footnote">6</a></sup></p>
+
+<p>Overall, for both vision and language tasks, private learning performance has consistently improved with the improvement in the quality of pre-training, 
+where the latter is measured by the non-private fine-tuning performance.<sup id="fnref:7"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:7" rel="footnote">7</a></sup></p>
+
+<p>
+  <img src="https://differentialprivacy.org/../images/figure1_classification.png" width="48%"/>
+  <img src="https://differentialprivacy.org/../images/figure1_generation.png" width="48%"/> 
+  Figure 1: Privately fine-tuning better (and larger) pre-trained models lead to consistently improving performance for text classification and language generation. 
+Left: text classification on MNLI [<a href="https://arxiv.org/abs/1704.05426">25</a>]. Right: language generation on E2E [<a href="https://arxiv.org/abs/1706.09254">26</a>].
+</p>
+
+<h2 id="conclusion-and-outlook">Conclusion and Outlook</h2>
+
+<p>We surveyed recent works in the literature that obtained highly performant private machine learning models leveraging self-supervised pre-training. 
+Common to these results is the trend that the performance of private learning consistently improved with the quality of public pre-training. 
+We therefore anticipate that the general paradigm may be useful in additional settings (e.g., federated learning) and tasks (e.g., private synthetic image generation), and lead to better private learning results.</p>
+
+<p>We have thus far assumed that the data for public pre-training can be cheaply obtained.
+This, however, does not imply that determining whether a particular source of data is appropriate for public pre-training is an easy problem.
+Using publicly available data is not necessarily risk-free in terms of privacy.
+For instance, the authors of [<a href="https://www.usenix.org/conference/usenixsecurity21/presentation/carlini-extracting">33</a>] were able to extract personally identifiable information from a GPT-2 model pre-trained on data scraped from the public internet.</p>
+
+<p>Self-supervised pre-training has led to progress in private deep learning, but leveraging pre-trained models alone will not address several fundamental challenges to differentially private learning.
+First and foremost, the datasets of machine learning tasks may be sampled from long-tailed distributions [<a href="https://proceedings.neurips.cc/paper/2020/hash/1e14bfe2714193e7af5abc64ecbd6b46-Abstract.html">21</a>]. 
+When privately trained on such datasets, a machine learning model may fail to acquire the learning signal necessary to perform accurate predictions for examples on the tail [<a href="https://dl.acm.org/doi/abs/10.1145/3442188.3445934">28</a>] or from underrepresented (sub)populations [<a href="https://proceedings.neurips.cc/paper/2019/hash/fc0de4e0396fff257ea362983c2dda5a-Abstract.html">29</a>]. 
+Second, many machine learning problems are in a domain where public data (even unlabeled data) may be sparse, e.g., medical imaging. 
+Developing refined versions of the pre-train-fine-tune approach for problems from these domains is an interesting avenue for future work.</p>
+
+<p>Lastly, differential privacy as one specific definition of privacy may not capture all that’s desired for privacy in reality. 
+For instance, while differentially private algorithms naturally give machine unlearning guarantees [<a href="https://ieeexplore.ieee.org/abstract/document/9519428">30</a>, <a href="https://ieeexplore.ieee.org/abstract/document/7163042">32</a>], tailored unlearning algorithms tend to have higher capacities of unlearning [<a href="https://proceedings.neurips.cc/paper/2021/hash/9627c45df543c816a3ddf2d8ea686a99-Abstract.html">31</a>].
+In addition, what constitutes a record in the differential privacy framework can oftentimes be unclear. 
+Inappropriately defined example boundaries can create correlated records which cause differential privacy guarantees to degrade [<a href="https://arxiv.org/abs/1603.01508">22</a>].
+Moreover, differential privacy guarantees won’t directly prevent the inference of private data outside the original context [<a href="https://heinonline.org/hol-cgi-bin/get_pdf.cgi?handle=hein.journals/washlr79&amp;section=16">23</a>]. 
+These are fundamental limitations of differential privacy which improvements to differentially private learning won’t touch on.</p>
+
+<h2 id="acknowledgements">Acknowledgements</h2>
+
+<p>The authors thank Nicolas Papernot and Gautam Kamath for detailed feedback and edit suggestions.</p>
+
+<hr/>
+
+<h2 id="references">References</h2>
+<p>[1] Rahman MA, Rahman T, Laganière R, Mohammed N, Wang Y. Membership Inference Attack against Differentially Private Deep Learning Model. Trans. Data Priv.. 2018 Apr 1;11(1):61-79.</p>
+
+<p>[2] Carlini N, Liu C, Erlingsson Ú, Kos J, Song D. The secret sharer: Evaluating and testing unintended memorization in neural networks. In 28th USENIX Security Symposium (USENIX Security 19) 2019 (pp. 267-284).</p>
+
+<p>[3] Guo C, Karrer B, Chaudhuri K, van der Maaten L. Bounding Training Data Reconstruction in Private (Deep) Learning. arXiv preprint arXiv:2201.12383. 2022 Jan 28.</p>
+
+<p>[4] Tramer F, Boneh D. Differentially private learning needs better features (or much more data). arXiv preprint arXiv:2011.11660. 2020 Nov 23.</p>
+
+<p>[5] Yu D, Zhang H, Chen W, Liu TY. Do not let privacy overbill utility: Gradient embedding perturbation for private learning. arXiv preprint arXiv:2102.12677. 2021 Feb 25.</p>
+
+<p>[6] He K, Zhang X, Ren S, Sun J. Deep residual learning for image recognition. InProceedings of the IEEE conference on computer vision and pattern recognition 2016 (pp. 770-778).</p>
+
+<p>[7] Radford A, Narasimhan K, Salimans T, Sutskever I. Improving language understanding by generative pre-training.</p>
+
+<p>[8] Devlin J, Chang MW, Lee K, Toutanova K. Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805. 2018 Oct 11.</p>
+
+<p>[9] Chen T, Kornblith S, Norouzi M, Hinton G. A simple framework for contrastive learning of visual representations. InInternational conference on machine learning 2020 Nov 21 (pp. 1597-1607). PMLR.</p>
+
+<p>[10] Li XL, Liang P. Prefix-tuning: Optimizing continuous prompts for generation. arXiv preprint arXiv:2101.00190. 2021 Jan 1.</p>
+
+<p>[11] Li X, Tramer F, Liang P, Hashimoto T. Large language models can be strong differentially private learners. arXiv preprint arXiv:2110.05679. 2021 Oct 12.</p>
+
+<p>[12] Yu D, Naik S, Backurs A, Gopi S, Inan HA, Kamath G, Kulkarni J, Lee YT, Manoel A, Wutschitz L, Yekhanin S. Differentially private fine-tuning of language models. arXiv preprint arXiv:2110.06500. 2021 Oct 13.</p>
+
+<p>[13] Liu Y, Ott M, Goyal N, Du J, Joshi M, Chen D, Levy O, Lewis M, Zettlemoyer L, Stoyanov V. Roberta: A robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692. 2019 Jul 26.</p>
+
+<p>[14] Bassily R, Smith A, Thakurta A. Private empirical risk minimization: Efficient algorithms and tight error bounds. In2014 IEEE 55th Annual Symposium on Foundations of Computer Science 2014 Oct 18 (pp. 464-473). IEEE.</p>
+
+<p>[15] Bassily R, Feldman V, Talwar K, Guha Thakurta A. Private stochastic convex optimization with optimal rates. Advances in Neural Information Processing Systems. 2019;32.</p>
+
+<p>[16] Yu D, Zhang H, Chen W, Yin J, Liu TY. Large scale private learning via low-rank reparametrization. InInternational Conference on Machine Learning 2021 Jul 1 (pp. 12208-12218). PMLR.</p>
+
+<p>[17] Radford A, Wu J, Child R, Luan D, Amodei D, Sutskever I. Language models are unsupervised multitask learners. OpenAI blog. 2019 Feb 24;1(8):9.</p>
+
+<p>[18] Bommasani R, Hudson DA, Adeli E, Altman R, Arora S, von Arx S, Bernstein MS, Bohg J, Bosselut A, Brunskill E, Brynjolfsson E, et al. On the opportunities and risks of foundation models. arXiv preprint arXiv:2108.07258. 2021 Aug 16.</p>
+
+<p>[19] Abadi M, Chu A, Goodfellow I, McMahan HB, Mironov I, Talwar K, Zhang L. Deep learning with differential privacy. InProceedings of the 2016 ACM SIGSAC conference on computer and communications security 2016 Oct 24 (pp. 308-318).</p>
+
+<p>[20] Song S, Chaudhuri K, Sarwate AD. Stochastic gradient descent with differentially private updates. In2013 IEEE Global Conference on Signal and Information Processing 2013 Dec 3 (pp. 245-248). IEEE.</p>
+
+<p>[21] Feldman V, Zhang C. What neural networks memorize and why: Discovering the long tail via influence estimation. Advances in Neural Information Processing Systems. 2020;33:2881-91.</p>
+
+<p>[22] Ghosh A, Kleinberg R. Inferential privacy guarantees for differentially private mechanisms. arXiv preprint arXiv:1603.01508. 2016 Mar 4.</p>
+
+<p>[23] Nissenbaum H. Privacy as contextual integrity. Wash. L. Rev.. 2004;79:119.</p>
+
+<p>[24] Vaswani A, Shazeer N, Parmar N, Uszkoreit J, Jones L, Gomez AN, Kaiser Ł, Polosukhin I. Attention is all you need. Advances in neural information processing systems. 2017;30.</p>
+
+<p>[25] Williams A, Nangia N, Bowman SR. A broad-coverage challenge corpus for sentence understanding through inference. arXiv preprint arXiv:1704.05426. 2017 Apr 18.</p>
+
+<p>[26] Novikova J, Dušek O, Rieser V. The E2E dataset: New challenges for end-to-end generation. arXiv preprint arXiv:1706.09254. 2017 Jun 28.</p>
+
+<p>[27] Papernot N, Chien S, Song S, Thakurta A, Erlingsson U. Making the shoe fit: Architectures, initializations, and tuning for learning with privacy.</p>
+
+<p>[28] Suriyakumar VM, Papernot N, Goldenberg A, Ghassemi M. Chasing your long tails: Differentially private prediction in health care settings. InProceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency 2021 Mar 3 (pp. 723-734).</p>
+
+<p>[29] Bagdasaryan E, Poursaeed O, Shmatikov V. Differential privacy has disparate impact on model accuracy. Advances in Neural Information Processing Systems. 2019;32.</p>
+
+<p>[30] Bourtoule L, Chandrasekaran V, Choquette-Choo CA, Jia H, Travers A, Zhang B, Lie D, Papernot N. Machine unlearning. In2021 IEEE Symposium on Security and Privacy (SP) 2021 May 24 (pp. 141-159). IEEE.</p>
+
+<p>[31] Sekhari A, Acharya J, Kamath G, Suresh AT. Remember what you want to forget: Algorithms for machine unlearning. Advances in Neural Information Processing Systems. 2021 Dec 6;34.</p>
+
+<p>[32] Cao Y, Yang J. Towards making systems forget with machine unlearning. In2015 IEEE Symposium on Security and Privacy 2015 May 17 (pp. 463-480). IEEE.</p>
+
+<p>[33] Carlini N, Tramer F, Wallace E, Jagielski M, Herbert-Voss A, Lee K, Roberts A, Brown T, Song D, Erlingsson U, Oprea A. Extracting training data from large language models. In30th USENIX Security Symposium (USENIX Security 21) 2021 (pp. 2633-2650).</p>
+
+<p>[34] Nasr M, Songi S, Thakurta A, Papemoti N, Carlin N. Adversary instantiation: Lower bounds for differentially private machine learning. In2021 IEEE Symposium on Security and Privacy (SP) 2021 May 24 (pp. 866-882). IEEE.</p>
+
+<p>[35] Jagielski M, Ullman J, Oprea A. Auditing differentially private machine learning: How private is private sgd?. Advances in Neural Information Processing Systems. 2020;33:22205-16.</p>
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p>Authors of [<a href="https://arxiv.org/abs/2108.07258">18</a>] framed these self-supervised models which are trained on broad data at scale that are adaptable to a wide range of downstream tasks as “foundation models.” <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:1">↩</a></p>
+    </li>
+    <li id="fn:2">
+      <p>The idea of privately fine-tuning a publicly pre-trained model certainly isn’t new. One of the first differentially private deep learning papers [<a href="https://arxiv.org/abs/1607.00133">19</a>] considered an experiment which fine-tuned convolutional nets on CIFAR-10 which were pre-trained on CIFAR-100. Results on privately fine-tuning <em>self-supervised</em> models are, on the other hand, more recent. Covering these results is our main focus here. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:2">↩</a></p>
+    </li>
+    <li id="fn:3">
+      <p>Blue and pink sphere avatars taken from [<a href="https://arxiv.org/abs/2108.07258">18</a>]. Credit to <a href="https://cs.stanford.edu/~dorarad/">Drew A. Hudson</a> for making these. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:3">↩</a></p>
+    </li>
+    <li id="fn:4">
+      <p>Unpublished result. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:4">↩</a></p>
+    </li>
+    <li id="fn:5">
+      <p>Hyper-parameters that work well for non-private learning typically aren’t those that work best for differentially private learning [<a href="https://openreview.net/pdf?id=rJg851rYwH">27</a>]. It’s crucial to use a large batch size, a small clipping norm, an appropriate learning rate, and a reasonably large number of training epochs to obtain the mentioned private learning results [<a href="https://arxiv.org/abs/2110.05679">11</a>]. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:5">↩</a></p>
+    </li>
+    <li id="fn:6">
+      <p>In practice, past works have presented mixed results on whether larger models would yield better performance. While some showed that using more filters in a convolutional network can degrade the performance of private learning after some threshold [<a href="https://openreview.net/pdf?id=rJg851rYwH">27</a>], others showed that a larger model can outperform a smaller model from a different model family [<a href="https://arxiv.org/abs/2011.11660">4</a>]. Note these results are conditioned on their particular hyperparameter choices. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:6">↩</a></p>
+    </li>
+    <li id="fn:7">
+      <p>Since the pre-training data for large language models are oftentimes collected through large scale web scraping (e.g., WebText), a common concern is that some training and test instances for downstream tasks may already appear in the pre-training data. Self-supervised pre-training therefore can give models an opportunity to “see” this data even before they are privately fine-tuned. Authors of [<a href="https://d4mucfpksywv.cloudfront.net/better-language-models/language_models_are_unsupervised_multitask_learners.pdf">17</a>] confirmed that there is a 1-6% overlap between the test set of many natural language processing tasks and the pre-training data they collected (WebText); these common tasks, however, don’t include those studied by authors of [<a href="https://arxiv.org/abs/2110.05679">11</a>]. The numbers suggest a possibility that existing private fine-tuning results in the literature could be slightly inflated compared to when the pre-training data didn’t contain any instance for any downstream task for which evaluation was performed. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:7">↩</a></p>
+    </li>
+  </ol>
+</div></div>
+    </summary>
+    <updated>2022-03-15T19:00:00Z</updated>
+    <published>2022-03-15T19:00:00Z</published>
+    <author>
+      <name>Tatsunori Hashimoto</name>
+    </author>
+    <source>
+      <id>https://differentialprivacy.org</id>
+      <link href="https://differentialprivacy.org" rel="alternate" type="text/html"/>
+      <link href="https://differentialprivacy.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Website for the differential privacy research community</subtitle>
+      <title>Differential Privacy</title>
+      <updated>2022-03-15T15:38:53Z</updated>
+    </source>
+  </entry>
 
   <entry>
     <id>tag:blogger.com,1999:blog-3722233.post-3121871012533153752</id>
@@ -44,7 +267,7 @@
       <link href="http://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2022-03-15T14:31:23Z</updated>
+      <updated>2022-03-15T15:20:21Z</updated>
     </source>
   </entry>
 
@@ -202,7 +425,7 @@ I think we would all still agree that the next trillion digits of <img alt="{\pi
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-03-15T14:37:40Z</updated>
+      <updated>2022-03-15T15:37:34Z</updated>
     </source>
   </entry>
 
@@ -336,7 +559,7 @@ The 3-player anti-correlation game was studied and motivated in several previous
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-15T14:37:31Z</updated>
+      <updated>2022-03-15T15:37:23Z</updated>
     </source>
   </entry>
 
@@ -858,7 +1081,7 @@ of an unsatisfiable system of polynomial equations over O(n log n) variables of 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-15T14:37:31Z</updated>
+      <updated>2022-03-15T15:37:23Z</updated>
     </source>
   </entry>
 
@@ -885,7 +1108,7 @@ Email: coheng@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-15T14:37:44Z</updated>
+      <updated>2022-03-15T15:37:38Z</updated>
     </source>
   </entry>
 
@@ -971,7 +1194,7 @@ Email: coheng@gmail.com</p></div>
       <link href="https://thmatters.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://thmatters.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theory Matters</title>
-      <updated>2022-03-15T14:37:55Z</updated>
+      <updated>2022-03-15T15:37:53Z</updated>
     </source>
   </entry>
 
@@ -1066,7 +1289,7 @@ Email: coheng@gmail.com</p></div>
       <link href="https://thmatters.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://thmatters.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theory Matters</title>
-      <updated>2022-03-15T14:37:55Z</updated>
+      <updated>2022-03-15T15:37:54Z</updated>
     </source>
   </entry>
 
@@ -1093,7 +1316,7 @@ Email: j.nederlof@uu.nl</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-15T14:37:44Z</updated>
+      <updated>2022-03-15T15:37:38Z</updated>
     </source>
   </entry>
 
@@ -1233,7 +1456,7 @@ Email: shayso@tauex.tau.ac.il</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-15T14:37:44Z</updated>
+      <updated>2022-03-15T15:37:38Z</updated>
     </source>
   </entry>
 
@@ -1260,7 +1483,7 @@ Email: opendp@g.harvard.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-15T14:37:43Z</updated>
+      <updated>2022-03-15T15:37:38Z</updated>
     </source>
   </entry>
 
@@ -1290,7 +1513,7 @@ $$\dim \mathrm{span}(\mathcal{F}) = \mathrm{poly}(1/\delta).$$</summary>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-15T14:37:31Z</updated>
+      <updated>2022-03-15T15:37:23Z</updated>
     </source>
   </entry>
 
@@ -1317,7 +1540,7 @@ Email: hiring@cs.williams.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-15T14:37:44Z</updated>
+      <updated>2022-03-15T15:37:38Z</updated>
     </source>
   </entry>
 
@@ -1346,7 +1569,7 @@ We further present generic constructions for formulas separating Q and QU, and f
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-15T14:37:31Z</updated>
+      <updated>2022-03-15T15:37:23Z</updated>
     </source>
   </entry>
 
@@ -1388,7 +1611,7 @@ We further present generic constructions for formulas separating Q and QU, and f
       <link href="https://dstheory.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://dstheory.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Foundation of Data Science – Virtual Talk Series</title>
-      <updated>2022-03-15T14:39:03Z</updated>
+      <updated>2022-03-15T15:38:47Z</updated>
     </source>
   </entry>
 
@@ -1435,7 +1658,7 @@ Email: maguilar@cs.utexas.edu</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-15T14:37:44Z</updated>
+      <updated>2022-03-15T15:37:38Z</updated>
     </source>
   </entry>
 
@@ -1462,7 +1685,7 @@ Email: jukka.suomela@aalto.fi</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-15T14:37:44Z</updated>
+      <updated>2022-03-15T15:37:38Z</updated>
     </source>
   </entry>
 
@@ -1812,7 +2035,7 @@ Email: jukka.suomela@aalto.fi</p></div>
       <link href="https://francisbach.com" rel="alternate" type="text/html"/>
       <subtitle>Francis Bach</subtitle>
       <title>Machine Learning Research Blog</title>
-      <updated>2022-03-15T14:39:06Z</updated>
+      <updated>2022-03-15T15:38:50Z</updated>
     </source>
   </entry>
 
@@ -1868,7 +2091,7 @@ For the construction, we identify a fundamental connection between concept class
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-15T14:37:31Z</updated>
+      <updated>2022-03-15T15:37:23Z</updated>
     </source>
   </entry>
 
@@ -1905,58 +2128,7 @@ For the construction, we identify a fundamental connection between concept class
       <link href="http://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2022-03-15T14:31:23Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://windowsontheory.org/?p=8290</id>
-    <link href="https://windowsontheory.org/2022/03/06/halg-2022-call-for-submissions-guest-post-by-keren-censor-hillel/" rel="alternate" type="text/html"/>
-    <title>HALG 2022 Call for submissions: Guest post by Keren Censor Hillel</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">The 7th Highlights of Algorithms conference (HALG 2022)London, June 1-3, 2022https://www.lse.ac.uk/HALG-2022 The Highlights of Algorithms conference is a forum for presenting the highlights of recent developments in algorithms and for discussing potential further advances in this area. The conference will provide a broad picture of the latest research in algorithms through a series of invited talks, … <a class="more-link" href="https://windowsontheory.org/2022/03/06/halg-2022-call-for-submissions-guest-post-by-keren-censor-hillel/">Continue reading <span class="screen-reader-text">HALG 2022 Call for submissions: Guest post by Keren Censor Hillel</span></a></div>
-    </summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><strong>The 7th Highlights of Algorithms conference (HALG 2022)</strong><br/>London, June 1-3, 2022<br/><a href="https://www.lse.ac.uk/HALG-2022" rel="noreferrer noopener" target="_blank">https://www.lse.ac.uk/HALG-2022</a></p>
-
-
-
-<p>The Highlights of Algorithms conference is a forum for presenting the highlights of recent developments in algorithms and for discussing potential further advances in this area. The conference will provide a broad picture of the latest research in algorithms through a series of invited talks, as well as the possibility for all researchers and students to present their recent results through a series of short talks and poster presentations. Attending the Highlights of Algorithms conference will also be an opportunity for networking and meeting leading researchers in algorithms.</p>
-
-
-
-<p><strong>Call For Submissions of Short Contributed Presentations:</strong></p>
-
-
-
-<p>The HALG 2022 conference seeks submissions for contributed presentations. Each presentation is expected to consist of a poster and a short talk (serving as an invitation to the poster). There will be no conference proceedings, hence presenting work already published at a different venue or journal (or to be submitted there) is welcome.</p>
-
-
-
-<p>If you would like to present your results at HALG 2022, please submit their details: the abstract, the paper and the speaker of the talk via EasyChair: <a href="https://easychair.org/conferences/?conf=halg2022" rel="noreferrer noopener" target="_blank">https://easychair.org/conferences/?conf=halg2022</a></p>
-
-
-
-<p>The abstract should include (when relevant) information where the results have been published/accepted (e.g., conference), and where they are publicly available (e.g., arXiv). All submissions will be reviewed by the program committee, giving priority to work accepted or published in 2021 or later.</p>
-
-
-
-<p>Submissions deadline: <strong>March 27, 2022.</strong><br/>Acceptance/rejection notifications will be sent in early April.</p></div>
-    </content>
-    <updated>2022-03-06T16:10:55Z</updated>
-    <published>2022-03-06T16:10:55Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>Boaz Barak</name>
-    </author>
-    <source>
-      <id>https://windowsontheory.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://windowsontheory.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://windowsontheory.org" rel="alternate" type="text/html"/>
-      <link href="https://windowsontheory.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>A Research Blog</subtitle>
-      <title>Windows On Theory</title>
-      <updated>2022-03-15T14:37:59Z</updated>
+      <updated>2022-03-15T15:20:21Z</updated>
     </source>
   </entry>
 </feed>
