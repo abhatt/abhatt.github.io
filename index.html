@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at March 30, 2022 03:39 PM UTC</span>.
+Last updated <span class="datestr">at March 30, 2022 04:38 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -254,6 +254,135 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://blog.simons.berkeley.edu/?p=636">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/simons.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-US"><a class="entryheader" href="https://blog.simons.berkeley.edu/2022/03/where-do-q-functions-come-from/">Where Do Q-Functions Come From?</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://blog.simons.berkeley.edu" title="Calvin Café: The Simons Institute Blog">Simons Institute blog</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en-US">
+<p>by <a href="https://meyn.ece.ufl.edu/" target="_blank" rel="noreferrer noopener">Sean Meyn</a> (University of Florida) and <a href="http://cs.bme.hu/~gergo/" target="_blank" rel="noreferrer noopener">Gergely Neu</a> (Pompeu Fabra University)</p>
+
+
+
+<p>One theoretical foundation of reinforcement learning is optimal control, usually rooted in the Markovian variety known as Markov decision processes (MDPs). The MDP model consists of a state process, an action (or input) process, and a one-step reward that is a function of state and action. The goal is to obtain a policy (function from states to actions) that is optimal in some predefined sense. Chris Watkins introduced the Q-function in the 1980s as part of a methodology for reinforcement learning. Given its importance for over three decades, it is not surprising that the question of the true meaning of <em>Q</em> was a hot topic for discussion during the Simons Institute’s Fall 2020 program on <a href="https://simons.berkeley.edu/programs/rl20" target="_blank" rel="noreferrer noopener">Theory of Reinforcement Learning</a>.</p>
+
+
+
+<p>This short note focuses on interactions at the start of the program, and research directions inspired in part by these interactions. To start with, <em>who is Q</em>? Was this code for one of Watkins’ friends at Cambridge? The question was posed early on, which led to an online investigation. The mystery was shattered through a response from Chris: we now know that the letter <em>Q</em> stands for <em>quality</em>, not Quinlyn or Quincy. To discuss further questions and potential answers requires some technicalities.</p>
+
+
+
+<p>The discounted-cost optimality criterion is a favorite metric for performance in computer science and operations research, and is the setting of the original Q-function formulation. The definition requires a state process <span class="math inline">\(\{X_k : k\ge 0\}\)</span> and an action (or input) process <span class="math inline">\(\{A_k : k\ge 0\}\)</span>, evolving on respective spaces (which are assumed discrete in this note). There is a controlled transition matrix <span class="math inline">\(P\)</span> that describes dynamics: <span class="math inline">\(X_{k+1}\)</span> is distributed according to <span class="math inline">\(P(\cdot|x,a)\)</span> when <span class="math inline">\(X_k=x\)</span> and <span class="math inline">\(A_k=a\)</span>, for any action sequence that is adapted to the state sequence.</p>
+
+
+
+<p>With <span class="math inline">\(\gamma\)</span> denoting the discount factor, the Q-function is the solution to a nonlinear fixed-point equation <span class="math inline">\(T^*Q = Q\)</span> in which <span class="math inline">\(T^*\)</span> is the Bellman operator: <span class="math display">\[\left(T^*Q\right)(x,a) = r(x,a) + \gamma \mathbb{E}_{X’\sim P(\cdot|x,a)}\left[\max_{a’} Q(X’,a’)\right]\]</span> This must hold for each state-action pair <span class="math inline">\((x,a)\)</span>, with the maximum over all possible actions. This is a version of the dynamic programming (DP) equation that has been with us for about seven decades.</p>
+
+
+
+<p>The magic of Q-learning, which is based on this DP equation, is that the maximum appears within an expectation. This makes possible the application of Monte Carlo methods to obtain an approximate solution based solely on observations of the actual system to be controlled, or through simulations.</p>
+
+
+
+<p>One core idea of modern reinforcement learning (RL) is to find approximate solutions of the DP equation within a function class (e.g., neural networks, as popularized by the deep Q-learning approach of Mnih et al., 2015). While success stories are well-known, useful theory is scarce: we don’t know if a solution exists to an approximate DP equation except in very special settings, and we don’t know if a good approximation will lead to good performance for the resulting policy. We don’t even know if the recursive algorithms that define Q-learning will be stable — estimates may diverge to infinity.</p>
+
+
+
+<p>There are many ways to read these negative results, and indeed many articles have been written around this subject. Our own reading is probably among the most radical: without understanding the issues around the existence of solutions to these DP equation approximations or their interpretation, we should search for alternative approximations of dynamic programming suitable for application in RL.</p>
+
+
+
+<p>These concerns were raised at Sean Meyn’s <a href="https://www.youtube.com/watch?v=nUaFu3WzW7o" target="_blank" rel="noreferrer noopener">boot camp lecture</a>, where he called on listeners to revisit an alternate foundation of optimal control: the linear programming (LP) approach introduced by Manne (1960) and further developed by Denardo (1970) and d’Epenoux (1963). The message was greeted with enthusiasm from some attendees, including Gergely Neu, who responded, “You have blown my mind!” He had been working on his own formulation of this idea, which became logistic Q-learning (more on this below).</p>
+
+
+
+<span id="more-636"></span>
+
+
+
+<p>The least-squares approach that is central to most traditional RL algorithms (such as DQN) is replaced by an LP, so that we move from <span class="math inline">\(L_2\)</span> to <span class="math inline">\(L_\infty\)</span> approximation. There is ample motivation for this point of view:</p>
+
+
+
+<ul><li>
+		<p>Lyapunov theory and the theory of inverse dynamic programming provide firm motivation: a good approximation of the DP equation in an <span class="math inline">\(L_\infty\)</span> sense implies strict bounds on closed-loop performance of the resulting policy. You can learn more about this theory in standard RL texts, and Meyn’s new RL monograph to appear this year.</p>
+	</li><li>
+		<p>The LP approach reframes the DP approximation as a numerical optimization problem rather than a root-finding problem. Existence of a solution is guaranteed under minimal assumptions, even when working with a restricted set of candidate solutions.</p>
+	</li></ul>
+
+
+
+<p>Despite these advantages, LP-based approaches were left out of the mainstream RL tool kit until recently. One reason may be a glaring gap in the framework: the classical LPs are phrased in terms of state-value functions and not Q-functions! This means it was not obvious how to bring in Monte Carlo methods for algorithm design.</p>
+
+
+
+<p>In 2020, we independently discovered the following LP that can be used to cast Q-learning as a constrained optimization problem — the so-called DPLP: <span class="math display">\[\begin{aligned} \mbox{minimize } \qquad &amp; \mathbb{E}_{X\sim\nu_0}\left[\max_{a} Q(X,a)\right] \\ \mbox{subject to } \qquad &amp; Q(x,a) \ge r(x,a) + \gamma \mathbb{E}_{X’\sim P(\cdot|x,a)}\left[\max_{a’} Q(X’,a’)\right]\end{aligned}\]</span> Without any constraints on the function class, the optimizer is the solution to the DP equation. The constraints amount to the DP inequality <span class="math inline">\(Q \ge T^* Q\)</span>, which tells us only <em>negative</em> deviations should be penalized! This is to be contrasted with the commonly used squared Bellman error criterion that penalizes deviations of both signs. In seeking an approximation within a function class <span class="math inline">\(\mathcal{F}\)</span>, it is not at all difficult to ensure a feasible solution exists, even when there is no theory to ensure that an approximate Bellman optimality operator has a fixed point.</p>
+
+
+
+<p>There are a variety of possible ways of turning <span> this</span> insight into practical algorithms. One path (taken by Bas-Serrano et al., 2021) is to replace the hard constraint in the LP with a smooth upper bound on the expected constraint violations, resulting in the following unconstrained minimization problem: <span class="math display">\[%  \mbox{minimize } \mathbb{E}_{X\sim\nu_0}[\max_a Q(X,a)] + \frac 1\eta \log 
+% \mathbb{E}_{(X,A)\sim\mu}[e^{\eta(r(X,A) + \gamma \mathbb{E}_{X’\sim P(\cdot|X,A)}[\max_{a’} Q(X’,a’)] – Q(X,A))}].
+\mbox{minimize} \;\;\;\;\;\;\,\, \mathbb{E}_{X\sim\nu_0}\left[\max_a Q(X,a)\right] + \frac 1\eta \log 
+\mathbb{E}_{(X,A)\sim\mu}\left[e^{\eta((T^*Q)(X,A) – Q(X,A))}\right].\]</span> Bas-Serrano et al. (2021) dubbed the above objective function the “logistic Bellman error” and have shown that it enjoys several favorable properties that make it an ideal objective for stochastic optimization. Interactions at the Simons Institute led to the development of another related algorithmic framework called “convex Q-learning,” in which the hard constraints in the LP are replaced with a different continuous approximation (Lu et al., 2021).</p>
+
+
+
+<p>It is straightforward to derive practical algorithms from both approaches by replacing the expectations with sample averages. This approach led to good empirical performance, along with the beginnings of theory for convergence and performance bounds.</p>
+
+
+
+<p>The LP approach had been simmering in the background over the prior decade: de Farias and Van Roy (2003) proposed an LP approach for approximate dynamic programming, and Mehta and Meyn (2009) contains foundations for convex Q-learning, including a variant of the DPLP for deterministic systems in continuous time.</p>
+
+
+
+<p>The new techniques bring challenges that must be overcome before these LP-based approaches can take on the world. One is that these optimization problems can be very poorly conditioned. Another is that the approximation may greatly underestimate the true Q-function when using a poor choice of function class for approximation. We remain optimistic: just like the RL community has successfully developed numerical recipes for addressing the much more severe issue of nonexistence of fixed points to the approximate Bellman operators, we believe that similar know-how can be developed for LP-based methods if theorists and practitioners join forces. Now that we understand where Q comes from, let us decide together where it will go next!</p>
+
+
+
+<p><em>Acknowledgment</em>. The authors owe a great debt to the Simons Institute for providing inspiration and interactions throughout the fall program. In particular, our joint work (Lu et al., 2021) was in large part an outcome of discussions at the meeting. The LP approach is one theme of the new textbook (Meyn, 2022), and the impact of the program is seen throughout the book.</p>
+
+
+
+<h2 class="unnumbered" id="references">References</h2>
+
+
+
+<ul><li> <p>A. S. Manne. Linear programming and sequential decisions. <em>Management Science</em> 6(3), pages 259–267, 1960.</p> </li><li> <p>E. V. Denardo. On linear programming in a Markov decision problem. <em>Management Science</em> 16(5), pages 281-288, 1970.</p> </li><li> <p>F. d’Epenoux. A probabilistic production and inventory problem. <em>Management Science</em> 10(1), pages 98-108, 1963.</p> </li><li> <p>D. P. de Farias and B. Van Roy. The linear programming approach to approximate dynamic programming. <em>Operations Research</em>, 51(6), pages 850–865, 2003.</p> </li><li> <p>J. Bas-Serrano, S. Curi, A. Krause, and G. Neu. Logistic Q-learning. In International Conference on Artificial Intelligence and Statistics, pages 3610-3618, 2021.</p> </li><li> <p>P. G. Mehta and S. P. Meyn. Q-learning and Pontryagin’s minimum principle. In Conference on Decision and Control, pages 3598–3605, Dec. 2009.</p> </li><li> <p>F. Lu, P. G. Mehta, S. P. Meyn, and G. Neu. Convex Q-learning. In American Control Conference, pages 4749–4756. IEEE, 2021.</p> </li><li> <p>S. Meyn. <em>Control Systems and Reinforcement Learning</em>. Cambridge University Press (to appear), Cambridge, 2022. Draft manuscript available at <a href="https://meyn.ece.ufl.edu/2021/08/01/control-systems-and-reinforcement-learning/" target="_blank" rel="noreferrer noopener">https://meyn.ece.ufl.edu/2021/08/01/control-systems-and-reinforcement-learning/</a></p> </li><li> <p>V. Mnih, K. Kavukcuoglu, D. Silver, A. A. Rusu, J. Veness, M. G. Bellemare, A. Graves, M. Riedmiller, A. K. Fidjeland, G. Ostrovski, S. Petersen, C. Beattie, A. Sadik, I. Antonoglou, H. King, D. Kumaran, D. Wierstra, S. Legg, and D. Hassabis. Human-level control through deep reinforcement learning. <em>Nature</em> 518 (7540), pages 529-533, 2015.</p> </li></ul></div>
+
+
+
+
+
+
+
+<p class="date">
+by Preeti Aroon <a href="https://blog.simons.berkeley.edu/2022/03/where-do-q-functions-come-from/"><span class="datestr">at March 30, 2022 04:00 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2808,116 +2937,6 @@ This post is part two of a two-part post on consensus protocols published by the
 
 <p class="date">
 by shuchic <a href="https://thmatters.wordpress.com/2022/03/11/call-for-nominations-knuth-prize/"><span class="datestr">at March 11, 2022 08:49 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://thmatters.wordpress.com/?p=1357">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/sigact.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://thmatters.wordpress.com/2022/03/11/call-for-nominations-godel-prize/">Call for nominations: Godel Prize</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://thmatters.wordpress.com" title="Theory Matters">Theory Matters</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p><strong>Deadline for nominations extended to March 31st 2022.</strong></p>
-
-
-
-<p><a href="https://urldefense.com/v3/__https://www.sigact.org/prizes/g**Adel.html__;w7Y!!IBzWLUs!EguPGLYWUarkIsJJaLrhDzTZKGjc97LX_FB94NzWMobXbrXlbTKzzky4VPAE-mxj$" target="_blank" rel="noreferrer noopener">https://www.sigact.org/prizes/g%C3%B6del.html</a></p>
-
-
-
-<p>The Gödel Prize for outstanding papers in the area of theoretical computer science is sponsored jointly by the European Association for Theoretical Computer Science (EATCS) and the Special Interest Group on Algorithms and Computation Theory of the Association for Computing Machinery (ACM SIGACT). This award is presented annually, with the presentation taking place alternately at the International Colloquium on Automata, Languages, and Programming (ICALP) and the ACM Symposium on Theory of Computing (STOC). The thirtieth Gödel Prize will be awarded at the forty-ninth International Colloquium on Automata, Languages and Programming (ICALP), which will be hybrid, happening both physically and virtually. The physical meeting will take place in Paris, France, July 4–8 2022.</p>
-
-
-
-<p>The Prize is named in honor of Kurt Gödel in recognition of his major contributions to mathematical logic and of his interest, discovered in a letter he wrote to John von Neumann shortly before von Neumann’s death, in what has become the famous “P versus NP” question. The Prize includes an award of USD 5,000.</p>
-
-
-
-<p><strong>Award Committee</strong></p>
-
-
-
-<p>The 2022 Award Committee consists of Samson Abramsky (Chair, University College London), Nikhil Bansal (University of Michigan), Irit Dinur (Weizmann Institute), Anca Muscholl (University of Bordeaux), Ronitt Rubinfeld (Massachusetts Institute of Technology), and David Zuckerman (University of Texas at Austin).</p>
-
-
-
-<p><strong>Eligibility</strong></p>
-
-
-
-<p>The 2022 Prize rules are given below and they supersede any different interpretation of the generic rule to be found on websites of both SIGACT and EATCS. Any research paper or series of papers by a single author or by a team of authors is deemed eligible if:</p>
-
-
-
-<p>• The main results were not published (in either preliminary or final form) in a journal or conference proceedings before January 1, 2009.</p>
-
-
-
-<p>• The paper was published in a recognized refereed journal no later than December 31, 2021.<br />The research work nominated for the award should be in the area of theoretical computer science. Nominations are encouraged from the broadest spectrum of the theoretical computer science community so as to ensure that potential award winning papers are not overlooked. The Award Committee shall have the ultimate authority to decide whether a particular paper is eligible for the Prize.</p>
-
-
-
-<p><strong>Nominations</strong></p>
-
-
-
-<p>Nominations for the award should be submitted by email to the Award Committee Chair: <a target="_blank" rel="noreferrer noopener">s.abramsky@ucl.ac.uk</a>. Please make sure that the Subject line of all nominations and related messages begin with “Goedel Prize 2022”. To be considered, nominations for the 2022 Prize must be received by March 31, 2022.</p>
-
-
-
-<p>A nomination package should include:</p>
-
-
-
-<p>• A printable copy (or copies) of the journal paper(s) being nominated, together with a complete citation (or citations) thereof.</p>
-
-
-
-<p>• A statement of the date(s) and venue(s) of the first conference or workshop publication(s) of the nominated work(s) or a statement that no such publication has occurred.</p>
-
-
-
-<p>• A brief summary of the technical content of the paper(s) and a brief explanation of its significance.</p>
-
-
-
-<p>• A support letter or letters signed by at least two members of the scientific community.<br />Additional support letters may also be received and are generally useful. The nominated paper(s) may be in any language. However, if a nominated publication is not in English, the nomination package must include an extended summary written in English.</p>
-
-
-
-<p>Those intending to submit a nomination should contact the Award Committee Chair by email well in advance. The Chair will answer questions about eligibility, encourage coordination among different nominators for the same paper(s), and also accept informal proposals of potential nominees or tentative offers to prepare formal nominations. The committee maintains a database of past nominations for eligible papers, but fresh nominations for the same papers (especially if they highlight new evidence of impact) are always welcome.</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by shuchic <a href="https://thmatters.wordpress.com/2022/03/11/call-for-nominations-godel-prize/"><span class="datestr">at March 11, 2022 08:47 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
