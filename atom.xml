@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2022-03-31T15:39:21Z</updated>
+  <updated>2022-03-31T16:39:05Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -50,7 +50,7 @@
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-31T15:37:29Z</updated>
+      <updated>2022-03-31T16:37:20Z</updated>
     </source>
   </entry>
 
@@ -77,7 +77,46 @@ Email: Aris.Filos-Ratsikas@liverpool.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-31T15:37:44Z</updated>
+      <updated>2022-03-31T16:37:32Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>http://benjamin-recht.github.io/2022/03/31/external-evaluations/</id>
+    <link href="http://benjamin-recht.github.io/2022/03/31/external-evaluations/" rel="alternate" type="text/html"/>
+    <title>There’s more to data than distributions.</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><em>This is first guest post by Deb. More to come!</em></p>
+
+<p>In “<a href="https://www.nejm.org/doi/full/10.1056/NEJMc2104626">The clinician and dataset shift in artificial intelligence</a>,” published in the New England Journal of Medicine, a set of physician-scientists describe how a popular sepsis-prediction system developed by the company Epic needed to be deactivated. “Changes in patients’ demographic characteristics associated with the coronavirus disease 2019 pandemic” supposedly caused spurious alerting arising from the system, rendering it of little value to clinicians. For the authors, this is a clear illustration of distribution shift, a change in training and test data that, in this case, made it difficult to distinguish between fevers and bacterial sepsis. They go into detail about what this means: distribution shift is a fundamental challenge in machine learning, and whenever we attempt to deploy machine learning in the real world without considering the way in which that real world environment can change (whether its changes in technology (e.g., software vendors), changes in population and setting (e.g., new demographics), or changes in behavior (e.g., new reimbursement incentives), then we fail to properly consider the ways in which the data can change or shift between train and test environments. If not considered, the model will inevitably fail.</p>
+
+<p>And why not? If the underlying test data diverges from the data used in the development of the model, we should expect disappointing results. But the distribution shift problem is so common that ML researchers and practitioners have started seeing it everywhere they look. In fact, in many cases, they will inappropriately characterize any failure of deployed ML models as a distribution shift. This both muddles our understanding of what exactly distribution shift means, and limits our vocabulary for the range of failures that can show up in deployment. In this blog post, I’ll use Epic’s sepsis-detector to illustrate some of the current confusion about distribution shift, and why the notion of “external validity”, a description of generalization problems used widely in other fields, is perhaps more relevant.</p>
+
+<p>The terminology of distribution shift is both too specific and not specific enough. A “change in distribution” could be characterized as anything from a variation in source to a re-sampling. <a href="https://rtg.cis.upenn.edu/cis700-2019/papers/dataset-shift/dataset-shift-terminology.pdf">These changes could involve changes to the input features (ie. covariate shift), changes to the labels (ie. prior probability shift) or both (ie. concept drift).</a></p>
+
+<p>The notion of “data distributions” themselves assumes data comes from an imagined data generating function. In that world of infinitely abundant independent data points samples from a bespoke probability distribution (ie. the “independent and identically distributed” i.i.d. assumption), describing data in terms of how it’s distributed makes a lot of sense. But as Breiman describes in <a href="http://www2.math.uu.se/~thulin/mm/breiman.pdf">“Statistical Modeling: The Two Cultures”</a>, that assumption doesn’t often hold for real world data. Very rarely does one actually know the data generating function, or even a reasonable proxy - real world data is disorganized, inconsistent, and unpredictable. As a result, the term “distribution” is vague enough to not address the additional specificity necessary to direct actions and interventions. When we talk about a hypothetical distribution shift, we talk about data changes but are not specific about which data changes happen and why they happen. We’re also constraining our discourse by just looking at changes in the data in the first place, when in fact, many other changes occur between development and deployment (such as changes in interactions with the model, changes in the interpretation of model results, etc.). Specifying the type of distribution shift is one solution, but more importantly, we need to understand specific distribution shifts as part of a broader phenomenon of external validity that we need to begin to articulate as a field.</p>
+
+<p>The most significant consequence of the myopic obsession with distributions is how it constrains ML evaluations. The benchmarking paradigm that dominates ML at the moment is a by-product of its obsession with detecting shifts in data - the evaluation of models on static data test sets are tied to assumptions about failures being due to shifts in data distribution and not much else. A myopic view on distribution shift confuses the discourse on how to evaluate models for deployment. <a href="https://www.nature.com/articles/s41591-021-01312-x">Several</a> <a href="https://www.bmj.com/content/374/bmj.n1872">studies</a> on <a href="https://www.nature.com/articles/s41746-020-00324-0">regulatory approvals</a> of ML-based tools in healthcare already demonstrate how over-emphasis on data distribution shift failures has led ML practitioners and even regulators within the healthcare space to inappropriately prioritize the use of <em>retrospective studies</em> (ie. evaluations on static collections of past data) rather than <em>prospective studies</em> (ie. examinations of the system within its context of use). Things like multi-site assessment, median evaluation sample size, demographic subgroup performance and
+“side-by-side comparison of clinicians’ performances with and without AI” are also exceedingly rare in the evaluation of ML-based healthcare tools, as they don’t fit our current narrow perception of what can go wrong when you throw an ML model into the real world. Of course distribution shift matters but the nature in which we focus on it to the exclusion of everything else is regrettable. For better regulation and evaluation methodology for machine learning deployments, we need to expand our thinking and align ourselves with the other fields attempting to understand performance gaps between the theory and practice of interventions.</p>
+
+<p>This broader notion of validity characterizes the accuracy of the claims being made in a specific context. The related notion of reliability has to do with reproducibility and the consistency of results (think of measurement precision), but validity is concerned with some notion of truthfulness and how close claims get to the target of describing the real relationship between inputs and outputs. There are various notions of validity discussed in measurement theory, evaluation science, program evaluation and experiment design literature, but there are common core concepts. For example, internal validity is about assessing a consistent causal relationship between the inputs and outputs within the experiment and construct validity is related to the evaluation of how well experimental variables represent the real world phenomena being observed. When discussing generalization issues, we are most interested in external validity, which analyzes if  the causal relationship between inputs and outputs observed in experiments holds for inputs and outputs outside the experimental setting.</p>
+
+<p>To understand how external validity differs from the current discourse on distribution shift, let’s go back to the sepsis monitoring example. <a href="https://jamanetwork.com/journals/jamainternalmedicine/article-abstract/2781307">“External Validation of a Widely Implemented Proprietary Sepsis Prediction Model in Hospitalized Patients,”</a>, published in JAMA, describes a retrospective study on the use of the sepsis tool between December 2018 and October 2019 (notably well before the pandemic began). They examined 27,697 patients undergoing 38,455 hospitalizations and found that the Epic Sepsis Model predicted the onset of sepsis with an area under the curve of 0.63, “which is substantially worse than the performance reported by its developer”. Furthermore, the tool “did not identify 1,709 patients with sepsis (67%) despite generating alerts… for 6,971 of all 38 455 hospitalized patients (18%), thus creating a large burden of alert fatigue.” These researchers rightfully describe these issues as “external validity” issues, and go into detail examining a range of problems far beyond the data-related “shifts” described in the “Clinician and Dataset Shift” oped. They don’t pretend that this doesn’t have to do with changes in the data - of course it does. Epic’s system evaluation was on data from 3 US health systems from 2013 to 2015, and that’s certainly a different dataset than University of Michigan’s 2018-2019 patient records. But they also comment on changes to the interactions doctors had with the model and how that modified outcomes, as well as other external validity factors that had very little to do with data at all, much less “data distribution shift.” Even when discussing substantive data changes, they are specific in characterizing what it is and breaking down the differences that occurred upon deployment at their hospital.</p>
+
+<p>As this study shows, machine learning needs some clean guidelines for evaluating external validity.
+To begin scaffolding such frameworks, we can learn from the social sciences. For example, Erin Hartman, a UC Berkeley colleague in political science, and her co-author Naoki Egami <a href="https://erinhartman.com/publication/elements/">propose a taxonomy that provides an interesting start to this discussion</a>. Their interest is in assessing external validity in scenarios where a population is given a policy treatment (eg. sending out voting reminders, updating the tax code, giving out free vaccines, etc.) and the impact of this treatment as measured within the experiment and also once implemented in the real world. If we consider the treatment to be an ML model’s integration into a broader system, we can begin to articulate what external validity could mean in the algorithmic context.  In my next blog post, I’ll try to work through Hartman and Egami’s framework and other specific proposals from other fields on how we could begin to taxonomize external validity issues, and see which of the external validity problems they describe are actually quite relevant to machine learning.</p></div>
+    </summary>
+    <updated>2022-03-31T00:00:00Z</updated>
+    <published>2022-03-31T00:00:00Z</published>
+    <source>
+      <id>http://benjamin-recht.github.io/</id>
+      <author>
+        <name>Ben Recht</name>
+      </author>
+      <link href="http://benjamin-recht.github.io/" rel="alternate" type="text/html"/>
+      <link href="http://benjamin-recht.github.io/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Musings on systems, information, learning, and optimization.</subtitle>
+      <title>arg min blog</title>
+      <updated>2022-03-31T16:38:33Z</updated>
     </source>
   </entry>
 
@@ -107,7 +146,7 @@ Email: Aris.Filos-Ratsikas@liverpool.ac.uk</p></div>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2022-03-31T15:38:41Z</updated>
+      <updated>2022-03-31T16:38:13Z</updated>
     </source>
   </entry>
 
@@ -218,7 +257,7 @@ Email: Aris.Filos-Ratsikas@liverpool.ac.uk</p></div>
       <link href="https://blog.simons.berkeley.edu" rel="alternate" type="text/html"/>
       <subtitle>What's New at the Simons Institute for the Theory of Computing.</subtitle>
       <title>Calvin Café: The Simons Institute Blog</title>
-      <updated>2022-03-31T15:38:39Z</updated>
+      <updated>2022-03-31T16:38:12Z</updated>
     </source>
   </entry>
 
@@ -858,7 +897,7 @@ Do these issues say anything about the difficulty of getting code right? We thin
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-03-31T15:37:39Z</updated>
+      <updated>2022-03-31T16:37:29Z</updated>
     </source>
   </entry>
 
@@ -913,7 +952,7 @@ Do these issues say anything about the difficulty of getting code right? We thin
       <link href="https://thmatters.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://thmatters.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theory Matters</title>
-      <updated>2022-03-31T15:38:03Z</updated>
+      <updated>2022-03-31T16:37:44Z</updated>
     </source>
   </entry>
 
@@ -988,7 +1027,7 @@ Do these issues say anything about the difficulty of getting code right? We thin
       <link href="https://dstheory.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://dstheory.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Foundation of Data Science – Virtual Talk Series</title>
-      <updated>2022-03-31T15:39:06Z</updated>
+      <updated>2022-03-31T16:38:50Z</updated>
     </source>
   </entry>
 
@@ -1015,7 +1054,7 @@ Email: g.russello@auckland.ac.nz</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-31T15:37:44Z</updated>
+      <updated>2022-03-31T16:37:32Z</updated>
     </source>
   </entry>
 
@@ -1045,7 +1084,7 @@ Email: g.russello@auckland.ac.nz</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-31T15:37:29Z</updated>
+      <updated>2022-03-31T16:37:20Z</updated>
     </source>
   </entry>
 
@@ -1074,7 +1113,7 @@ We complement our theoretical study with some initial experiments that confirm o
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-03-31T15:37:29Z</updated>
+      <updated>2022-03-31T16:37:20Z</updated>
     </source>
   </entry>
 
@@ -1109,7 +1148,7 @@ We complement our theoretical study with some initial experiments that confirm o
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2022-03-31T15:37:34Z</updated>
+      <updated>2022-03-31T16:37:23Z</updated>
     </source>
   </entry>
 
@@ -1201,7 +1240,7 @@ We complement our theoretical study with some initial experiments that confirm o
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2022-03-31T15:38:07Z</updated>
+      <updated>2022-03-31T16:37:48Z</updated>
     </source>
   </entry>
 
@@ -1228,7 +1267,7 @@ Email: algo@tuhh.de</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-31T15:37:44Z</updated>
+      <updated>2022-03-31T16:37:32Z</updated>
     </source>
   </entry>
 
@@ -1255,7 +1294,7 @@ Email: klimefrem@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-31T15:37:44Z</updated>
+      <updated>2022-03-31T16:37:32Z</updated>
     </source>
   </entry>
 
@@ -1284,7 +1323,7 @@ Email: klimefrem@gmail.com</p></div>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2022-03-31T15:38:41Z</updated>
+      <updated>2022-03-31T16:38:13Z</updated>
     </source>
   </entry>
 
@@ -1327,7 +1366,7 @@ Email: klimefrem@gmail.com</p></div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2022-03-31T15:38:22Z</updated>
+      <updated>2022-03-31T16:37:55Z</updated>
     </source>
   </entry>
 
@@ -1491,7 +1530,7 @@ Can Neil’s zeta-function calculations insulate against any attempt at recursiv
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-03-31T15:37:39Z</updated>
+      <updated>2022-03-31T16:37:28Z</updated>
     </source>
   </entry>
 
@@ -1518,7 +1557,7 @@ Email: odparek@sandia.gov</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-03-31T15:37:44Z</updated>
+      <updated>2022-03-31T16:37:32Z</updated>
     </source>
   </entry>
 
@@ -1831,43 +1870,6 @@ These are fundamental limitations of differential privacy which improvements to 
       <subtitle>Website for the differential privacy research community</subtitle>
       <title>Differential Privacy</title>
       <updated>2022-03-30T22:59:49Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-3722233.post-3121871012533153752</id>
-    <link href="http://blog.computationalcomplexity.org/feeds/3121871012533153752/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="http://blog.computationalcomplexity.org/2022/03/problem-x-wont-be-solved-in-my-lifetime.html#comment-form" rel="replies" type="text/html"/>
-    <link href="http://www.blogger.com/feeds/3722233/posts/default/3121871012533153752" rel="edit" type="application/atom+xml"/>
-    <link href="http://www.blogger.com/feeds/3722233/posts/default/3121871012533153752" rel="self" type="application/atom+xml"/>
-    <link href="http://blog.computationalcomplexity.org/2022/03/problem-x-wont-be-solved-in-my-lifetime.html" rel="alternate" type="text/html"/>
-    <title>Problem X won't be solved in MY lifetime- but what about...</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>1) In 1989 on the episde The Royale of Star Trek: The Next Generation (which takes place in the far future)  Captain Picard is working on Fermat's last theorem which he says quite explicitly is still open.</p><p>When I saw the episode I asked Larry Washington, a Number Theorist at Univ of MD, when he thought FLT would be solved. He said</p><p>                                      <i>It will be solved within the next 10 years.</i></p><p>And indeed- Wiles solved it in 1993-sort of. There was a flaw in the proof which he fixed in 1994 with the help of his former student Richard Taylor. Wiles published the correction to the flaw in 1995, so we will date it as having been solved in 1995. Larry Washington was correct.  And in an episode of Star Trek: Deep Space Nine in 1995 (episode name:Facets) Dax says that a previous host, Tobin Dax, had done the most creative work on FLT since Wiles. Maybe Tobin wrote this limerick:</p><p>A challenge for many long ages</p><p>Had baffled the savants and sages</p><p>Yet at last came the light</p><p>Seems that Fermat was right</p><p>To the margin add 200 pages.</p><p><br/></p><p>I asked Larry W when he thought Riemann would be solved. He said  </p><p>                   <i> In your lifetime but not in mine.</i></p><p>He is about 10 years older than I am and I think we are both in good health. This seems like a rather precise prediction so I am skeptical. But he did get FLT right...</p><p>2) In class I sometimes say things like </p><p><i>I do not think Quantum Computers will factor faster than classical in my lifetime. </i></p><p><i>I do not think P vs NP will be solved in my lifetime.</i></p><p><i>I can imagine P=BPP will be proven in my lifetime. (I said that 10 years ago. I am less imaginative now.) </i></p><p><i>I hope the muffin problem is solved in my lifetime (it was, see <a href="https://arxiv.org/abs/1907.08726">here</a>).</i></p><p>I didn't quite think about the difference in my age and the students until recently when I was working with Ilya Hajiaghayi (Mohammd H's 9 year old son) on cryptography and he said </p><p><i>In your recorded lecture you said you don't think quantum computers will be a threat to cryptography  in your lifetime. What about in my lifetime?</i></p><p>Indeed- his lifetime and mine are rather far apart. </p><p>I am reminded that one of the answers to my P vs NP poll made the point that while we have some sense of what will happen in the next 10 years, maybe even 20, math and life can change so much that conjectures beyond that are guesswork. Any  prediction for x years from now you should have confidence &lt; 1/ln(x) of it being true.</p><p><i><br/></i></p><p><i><br/></i></p><p><i><br/></i></p><p><br/></p></div>
-    </content>
-    <updated>2022-03-15T14:30:00Z</updated>
-    <published>2022-03-15T14:30:00Z</published>
-    <author>
-      <name>gasarch</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/03004932739846901628</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-3722233</id>
-      <category term="typecast"/>
-      <category term="focs metacomments"/>
-      <author>
-        <name>Lance Fortnow</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-      </author>
-      <link href="http://blog.computationalcomplexity.org/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="http://www.blogger.com/feeds/3722233/posts/default" rel="self" type="application/atom+xml"/>
-      <link href="http://blog.computationalcomplexity.org/" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="http://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
-      <title>Computational Complexity</title>
-      <updated>2022-03-29T23:22:06Z</updated>
     </source>
   </entry>
 </feed>
