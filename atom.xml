@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2022-04-02T04:39:30Z</updated>
+  <updated>2022-04-02T05:39:52Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -46,6 +46,136 @@ Podcasts</a>, and <a href="https://podcasts.google.com/search/Ramsey%20theory">
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
       <updated>2022-04-02T01:29:22Z</updated>
+    </source>
+  </entry>
+
+  <entry xml:lang="en-US">
+    <id>https://rjlipton.wpcomstaging.com/?p=19850</id>
+    <link href="https://rjlipton.wpcomstaging.com/2022/04/01/an-ozone-hole-in-logic/" rel="alternate" type="text/html"/>
+    <title>An Ozone Hole in Logic</title>
+    <summary>Set Theory proved to be perpetually paradoxigenic… Poem and analysis src Mr. Apollinax might have made a good escort for Lofa Polir, had she lived a hundred years ago. The titular character of a poem written circa 1915 by Thomas Eliot was based on Bertrand Russell, whose 1901 paradox revealed a gaping inconsistency in set […]</summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>
+<font color="#0044cc"><br/>
+<em>Set Theory proved to be perpetually paradoxigenic…</em><br/>
+<font color="#000000"/></font></p><font color="#0044cc"><font color="#000000">
+<table class="image alignright">
+<tbody>
+<tr>
+<td>
+<a href="https://rjlipton.wpcomstaging.com/2022/04/01/an-ozone-hole-in-logic/bertrandrussellapollinax/" rel="attachment wp-att-19860"><img alt="" class="aligncenter wp-image-19860" height="178" src="https://i0.wp.com/rjlipton.wpcomstaging.com/wp-content/uploads/2022/04/BertrandRussellApollinax.jpg?resize=120%2C178&amp;ssl=1" width="120"/></a>
+</td>
+</tr>
+<tr>
+<td class="caption alignright"><font size="-2">Poem and analysis <a href="https://interestingliterature.com/2017/09/a-short-analysis-of-t-s-eliots-mr-apollinax/">src</a></font></td>
+</tr>
+</tbody>
+</table>
+<p>
+Mr. Apollinax might have made a good escort for Lofa Polir, had she lived a hundred years ago. The titular character of a <a href="https://interestingliterature.com/2017/09/a-short-analysis-of-t-s-eliots-mr-apollinax/">poem</a> written circa 1915 by Thomas Eliot was based on Bertrand Russell, whose 1901 <a href="https://en.wikipedia.org/wiki/Russell's_paradox">paradox</a> revealed a gaping inconsistency in set theory as it was then known. Russell spent much of the intervening years trying to repair the gap via <a href="https://en.wikipedia.org/wiki/Type_theory#History">type theory</a>.</p>
+<p>
+Today we present a recently-discovered inconsistency in the type theory of the <a href="https://en.wikipedia.org/wiki/Scala_(programming_language)">Scala</a> programming language, which forced a feature-chopping <a href="https://docs.scala-lang.org/scala3/reference/dropped-features/type-projection.html">revision</a> in its new version <a href="https://www.scala-lang.org/blog/2021/05/14/scala3-is-here.html">3.0</a>. Then, in a worldwide exclusive, we reveal a new theorem by Polir that explains why such inconsistencies are <em>inevitable</em>.</p>
+<p>
+Ernst Zermelo had already noticed the paradox in 1899 but brushed it off because his axiom system already evaded it. It is possible that Georg Cantor knew it in <a href="https://books.google.com/books?id=BtZM33PzV9UC&amp;pg=PA923&amp;lpg=PA923&amp;dq=Cantor+letter+to+Dedekind+and+Hilbert+about+inconsistency&amp;source=bl&amp;ots=hE28iI4IT4&amp;sig=ACfU3U2CMPDUFBheRaXGQcIMFngE-Iytdg&amp;hl=en&amp;sa=X&amp;ved=2ahUKEwj1j-7ej_T2AhXJY98KHd7WDuUQ6AF6BAgOEAM#v=onepage&amp;q=Cantor letter to Dedekind and Hilbert about inconsistency&amp;f=false">letters</a> in 1897 to Richard Dedekind and David Hilbert. I could call this a continuation of a theme we’ve often addressed about discoveries not being named for their first discoverers, but I will not, for this reason: The discover<b>ee</b> was Gottlob Frege, who immediately recognized that the treatise on set theory he was about to publish had been devastated by the paradox. And the person he heard that from, in June 1902, was Russell—not any of his compatriots.</p>
+<p>
+</p><p/><h2> The Inconsistency </h2><p/>
+<p/><p>
+The root of the inconsistency is allowing <em>projection</em> of an <em>abstract</em> type. Let’s explain the former concept with concrete types first. A standard way to represent trees and other graphs is by having a nested node class, for instance:</p>
+<p><code><br/>
+class BinaryTree[A &lt;: Comparable[A]] {</code></p>
+<p>   class Node(var left: Node, var item: A, var right: Node)</p>
+<p>   private var root: Node = null<br/>
+   //etc.<br/>
+}<br/>
+</p>
+<p>
+A key wrinkle of Scala is that if you have two different trees <tt>T1</tt> and <tt>T2</tt>, then <tt>T1.Node</tt> and <tt>T2.Node</tt> are separate types. This notion of <em>path-dependent types</em> enables the compiler to catch bugs where you might try to connect a node on one tree as a child of a node in the other tree. If there were just one <tt>BinaryTree.Node</tt> type, as is standard in Java for instance, then you could easily make this kind of bug and the compiler would not bat an eye.</p>
+<p>
+If you really do want to combine nodes from two different trees, however, you can do so via code using the projection type <tt>BinaryTree#Node</tt>. The hash sign # makes this defined to be the <i>supertype</i> of nodes of all possible binary trees. </p>
+<p>
+The <tt>[A &lt;: Comparable[A]]</tt> part means that the tree can hold any type <tt>A</tt> of data that extends a <tt>trait</tt> called <tt>Comparable</tt>, whose function is to mandate having a comparison function for <tt>A</tt> so that the tree can be kept sorted. The symbol <tt>&gt;:</tt> written the other way means supertype rather than subtype.</p>
+<p>
+We could try to make our binary tree class more versatile by making it more abstract. By itself it could be a <tt>trait</tt> that allows deferred implementations. It could try to define a more general notion of <tt>Node</tt> that might relate more directly to stored data, for instance strings or numbers. This is not to say such abstractions are necessarily well-motivated, but the point is this:</p>
+<ul>
+<li>
+The Scala compiler defines what is workable. <p/>
+</li><li>
+Its notion of workability is based on mathematical type theory. <p/>
+</li><li>
+Lots of abstract constructions are made workable to encourage creativity.
+</li></ul>
+<p>
+Workability is not supposed to lead to type errors, however. That is the unsoundness allowed in versions 2.x of Scala.</p>
+<p>
+</p><p/><h2> The Code </h2><p/>
+<p/><p>
+If you have a lot of time—time to read the longest <a href="https://rjlipton.wpcomstaging.com/2013/11/15/the-graph-of-math/">post</a> ever on this blog—then you can draw some motivation for the unsound code. That post shows how to represent the <a href="https://en.wikipedia.org/wiki/Von_Neumann-Bernays-Godel_set_theory">NBG</a> version of set theory, due to John von Neuman, Paul Bernays, and Kurt Gödel, as an infinite graph. At the top of the graph are nodes representing the class of all sets and various other expansive types, which are symbolized by <tt>V</tt> in the post. At the bottom is a node for the null set identified with <tt>O</tt>. We can think of them as representing “zones” for possible supertypes and subtypes of some types of interest, such as string and number. </p>
+<p>
+Aside from some abstract manipulation of types, the following code does nothing except compose two versions of the identity function, applied to a <tt>String</tt>. As you are welcome to try yourself, it compiles in Scala 2.x. But before you try to run it, you can ask yourself: exactly what number would the string “Hello World!” become?</p>
+<p>
+<code><br/>
+/** File "Unsound.scala", mod by KWR from the last example in<br/>
+    <a href="https://lptk.github.io/programming/2019/09/13/type-projection.html" rel="nofollow">https://lptk.github.io/programming/2019/09/13/type-projection.html</a><br/>
+ */<br/>
+object Unsound extends App {</code></p>
+<p>   trait VZone { type Node &gt;: String }<br/>
+   trait OZone { type Node &lt;: Double }</p>
+<p>   def liftup[A &lt;: VZone]: String =&gt; A#Node<br/>
+      = (x =&gt; x)<br/>
+   def godown[A &lt;: OZone]: A#Node =&gt; Double<br/>
+      = (x =&gt; x)</p>
+<p>   def hole[A &lt;: VZone with OZone]: String =&gt; Double<br/>
+      = (x =&gt; godown[A](liftup[A](x)))</p>
+<p>   println(hole("Hello World!"))<br/>
+}<br/>
+</p>
+<p>
+The point remains, however, that this program is accepted as a “theorem” in the logical theory underlying the Scala 2.x type system. That theory is thereby unsound.</p>
+<p>
+</p><p/><h2> Lofa Polir’s Theorem </h2><p/>
+<p/><p>
+A point we have been at pains to make is that this kind of happening is far from rare. Systems are proven secure and then break all the time. Creating more ways to write correct programs has created new ways to have bugs, even as the frequency of old kinds of bugs is reduced. As with the Earth’s ozone hole, the situation is not worsening but the problem persists.</p>
+<p>
+Dr. Polir’s new theorem not only explains why but also argues that we should be neither surprised nor dismayed by this state of affairs. It can be given the following intuitive statement:</p>
+<blockquote><p><b>Theorem 1</b> <em> There is a sound theory <b>A.F.</b> that can be represented as a complexity-bounded limit of inconsistent theories, but not as an effective limit of consistent theories. </em>
+</p></blockquote>
+<p/><p>
+The soundness is with respect to the standard model of arithmetic and includes every statement of arithmetic proved in set theory. The clever new idea in her proof is the manner of the proof itself: it formalizes and self-applies a criterion of <em>feasible correctness in the limit</em> for a sequence of incorrect proofs. </p>
+<p>
+The upshot is the following:</p>
+<blockquote><p><b> </b> <em> The most productive and feasible way to do mathematics is to design inconsistent theories and fix them incrementally, rather than to demand global correctness from the get-go. </em>
+</p></blockquote>
+<p/><p>
+Before Dr. Polir types up her paper, she has a request for readers of this blog: What should the initials <b>A.F.</b> of her theory stand for? The name “Arithmetical Foundations” is both hackneyed and taken. </p>
+<p>
+</p><p/><h2> Open Problems </h2><p/>
+<p/><p>
+What do you think Lofa’s <b>A.F.</b> stands for? </p>
+<p/><p><br/>
+[hand-fixing of content after posting while still April 1]</p></font></font></div>
+    </content>
+    <updated>2022-04-01T04:59:19Z</updated>
+    <published>2022-04-01T04:59:19Z</published>
+    <category term="All Posts"/>
+    <category term="Ideas"/>
+    <category term="Proofs"/>
+    <category term="April Fool's"/>
+    <category term="Bertrand Russell"/>
+    <category term="Lofa Polir"/>
+    <category term="Logic"/>
+    <category term="programming"/>
+    <category term="Scala"/>
+    <category term="type theory"/>
+    <author>
+      <name>KWRegan</name>
+    </author>
+    <source>
+      <id>https://rjlipton.wpcomstaging.com</id>
+      <logo>https://s0.wp.com/i/webclip.png</logo>
+      <link href="https://rjlipton.wpcomstaging.com/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
+      <subtitle>a personal view of the theory of computation</subtitle>
+      <title>Gödel's Lost Letter and P=NP</title>
+      <updated>2022-04-02T05:38:01Z</updated>
     </source>
   </entry>
 
@@ -114,7 +244,7 @@ Turing himself was also a pioneer in AI, of course.  He thought about how comput
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-04-02T04:37:37Z</updated>
+      <updated>2022-04-02T05:38:01Z</updated>
     </source>
   </entry>
 
@@ -699,7 +829,7 @@ Their physical artworks and architecture are harder to protect, though: “In th
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-04-02T04:37:26Z</updated>
+      <updated>2022-04-02T05:37:52Z</updated>
     </source>
   </entry>
 
@@ -726,7 +856,7 @@ Email: Aris.Filos-Ratsikas@liverpool.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-04-02T04:37:41Z</updated>
+      <updated>2022-04-02T05:38:04Z</updated>
     </source>
   </entry>
 
@@ -795,7 +925,7 @@ To begin scaffolding such frameworks, we can learn from the social sciences. For
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2022-04-02T04:38:48Z</updated>
+      <updated>2022-04-02T05:39:18Z</updated>
     </source>
   </entry>
 
@@ -906,7 +1036,7 @@ To begin scaffolding such frameworks, we can learn from the social sciences. For
       <link href="https://blog.simons.berkeley.edu" rel="alternate" type="text/html"/>
       <subtitle>What's New at the Simons Institute for the Theory of Computing.</subtitle>
       <title>Calvin Café: The Simons Institute Blog</title>
-      <updated>2022-04-02T04:38:46Z</updated>
+      <updated>2022-04-02T05:39:17Z</updated>
     </source>
   </entry>
 
@@ -1089,7 +1219,7 @@ Do these issues say anything about the difficulty of getting code right? We thin
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-04-02T04:37:38Z</updated>
+      <updated>2022-04-02T05:38:01Z</updated>
     </source>
   </entry>
 
@@ -1144,7 +1274,7 @@ Do these issues say anything about the difficulty of getting code right? We thin
       <link href="https://thmatters.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://thmatters.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theory Matters</title>
-      <updated>2022-04-02T04:37:59Z</updated>
+      <updated>2022-04-02T05:38:24Z</updated>
     </source>
   </entry>
 
@@ -1219,7 +1349,7 @@ Do these issues say anything about the difficulty of getting code right? We thin
       <link href="https://dstheory.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://dstheory.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Foundation of Data Science – Virtual Talk Series</title>
-      <updated>2022-04-02T04:39:21Z</updated>
+      <updated>2022-04-02T05:39:43Z</updated>
     </source>
   </entry>
 
@@ -1246,7 +1376,7 @@ Email: g.russello@auckland.ac.nz</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-04-02T04:37:41Z</updated>
+      <updated>2022-04-02T05:38:05Z</updated>
     </source>
   </entry>
 
@@ -1276,7 +1406,7 @@ Email: g.russello@auckland.ac.nz</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-04-02T04:37:27Z</updated>
+      <updated>2022-04-02T05:37:52Z</updated>
     </source>
   </entry>
 
@@ -1305,7 +1435,7 @@ We complement our theoretical study with some initial experiments that confirm o
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-04-02T04:37:27Z</updated>
+      <updated>2022-04-02T05:37:52Z</updated>
     </source>
   </entry>
 
@@ -1340,7 +1470,7 @@ We complement our theoretical study with some initial experiments that confirm o
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2022-04-02T04:37:32Z</updated>
+      <updated>2022-04-02T05:37:55Z</updated>
     </source>
   </entry>
 
@@ -1432,7 +1562,7 @@ We complement our theoretical study with some initial experiments that confirm o
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2022-04-02T04:38:04Z</updated>
+      <updated>2022-04-02T05:38:28Z</updated>
     </source>
   </entry>
 
@@ -1459,7 +1589,7 @@ Email: algo@tuhh.de</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-04-02T04:37:41Z</updated>
+      <updated>2022-04-02T05:38:04Z</updated>
     </source>
   </entry>
 
@@ -1486,7 +1616,7 @@ Email: klimefrem@gmail.com</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-04-02T04:37:41Z</updated>
+      <updated>2022-04-02T05:38:04Z</updated>
     </source>
   </entry>
 
@@ -1515,7 +1645,7 @@ Email: klimefrem@gmail.com</p></div>
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2022-04-02T04:38:47Z</updated>
+      <updated>2022-04-02T05:39:18Z</updated>
     </source>
   </entry>
 
@@ -1558,7 +1688,7 @@ Email: klimefrem@gmail.com</p></div>
       <link href="https://emanueleviola.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>by Manu</subtitle>
       <title>Thoughts</title>
-      <updated>2022-04-02T04:38:24Z</updated>
+      <updated>2022-04-02T05:38:47Z</updated>
     </source>
   </entry>
 
@@ -1722,34 +1852,7 @@ Can Neil’s zeta-function calculations insulate against any attempt at recursiv
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-04-02T04:37:37Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-jobs.org/2022/03/16/postdoc-at-sandia-national-labs-apply-by-march-31-2022/</id>
-    <link href="https://cstheory-jobs.org/2022/03/16/postdoc-at-sandia-national-labs-apply-by-march-31-2022/" rel="alternate" type="text/html"/>
-    <title>Postdoc at Sandia National Labs (apply by March 31, 2022)</title>
-    <summary>Sandia Labs is seeking a postdoc to work on quantum or quantum-inspired classical approximation, sublinear, or streaming algorithms, as part of a DOE-funded collaboration among several national labs and universities. We encourage theoretical computer scientists interested in quantum information but without prior expertise to apply. Website: https://far-qc.sandia.gov/job-opportunities/ Email: odparek@sandia.gov</summary>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>Sandia Labs is seeking a postdoc to work on quantum or quantum-inspired classical approximation, sublinear, or streaming algorithms, as part of a DOE-funded collaboration among several national labs and universities. We encourage theoretical computer scientists interested in quantum information but without prior expertise to apply.</p>
-<p>Website: <a href="https://far-qc.sandia.gov/job-opportunities/">https://far-qc.sandia.gov/job-opportunities/</a><br/>
-Email: odparek@sandia.gov</p></div>
-    </content>
-    <updated>2022-03-16T23:26:53Z</updated>
-    <published>2022-03-16T23:26:53Z</published>
-    <category term="Uncategorized"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-jobs.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-jobs.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-jobs.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-04-02T04:37:41Z</updated>
+      <updated>2022-04-02T05:38:01Z</updated>
     </source>
   </entry>
 </feed>
