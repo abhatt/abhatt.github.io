@@ -86,7 +86,7 @@ Stay up to date
 <a class="feedlink" href="" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a class="message" title="404: not found">Center for Computational Intractability</a>
 <br>
-<a class="feedlink" href="http://www.blogger.com/feeds/3722233/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
+<a class="feedlink" href="http://blog.computationalcomplexity.org/feeds/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://blog.computationalcomplexity.org/" title="Computational Complexity">Computational Complexity</a>
 <br>
 <a class="feedlink" href="https://11011110.github.io/blog/feed.xml" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at April 04, 2022 01:39 AM UTC</span>.
+Last updated <span class="datestr">at April 04, 2022 02:39 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -254,6 +254,104 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://11011110.github.io/blog/2022/04/03/dissection-into-rectangles">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/eppstein.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://11011110.github.io/blog/2022/04/03/dissection-into-rectangles.html">Dissection into rectangles and tensor rank</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://11011110.github.io/blog/" title="11011110">David Eppstein</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>It’s easy to cut a Greek cross into pieces that can be reassembled into a rectangle:</p>
+
+<p style="text-align: center;"><img width="60%" alt="Dissection of a Grek cross to a 4x5 rectangle" src="https://11011110.github.io/blog/assets/2022/cross2rect.svg" /></p>
+
+<p>Here’s another example. The three yellow rectangles below have dimensions <span style="white-space: nowrap;">\(2^{2/3}\times 1\),</span> <span style="white-space: nowrap;">\(2^{1/3}\times 2^{1/3}\),</span> <span style="white-space: nowrap;">and \(1\times 2^{2/3}\).</span> (The order of multiplication matters here!) Put them together, and you get the blue stealth aircraft shape. Can you cut this shape into pieces and reassemble them into a single rectangle?</p>
+
+<p style="text-align: center;"><img width="80%" alt="Union of three irrational rectangles" src="https://11011110.github.io/blog/assets/2022/trirect.svg" /></p>
+
+<p>The answer is yes; any polygon can be cut and reassembled into a rectangle, or into any other polygon of the same area. This is the <a href="https://en.wikipedia.org/wiki/Wallace%E2%80%93Bolyai%E2%80%93Gerwien_theorem">Wallace–Bolyai–Gerwien theorem</a>. But the Greek cross dissection above uses only axis-parallel cuts and translation of the pieces. To get a single rectangle from the stealth shape, you’re going to need a more general class of operations that cut it at odd angles and rotate the pieces. It’s impossible to make a rectangle from this shape using only axis-parallel cuts and translation. And even for the Greek cross, although you can make a rectangle as shown, it’s impossible to make a square using only axis-parallel cuts and translation.</p>
+
+<p>To see why, we need to understand the <a href="https://en.wikipedia.org/wiki/Dehn_invariant">Dehn invariant</a>. As usually defined, this is a value that can be determined for any three-dimensional polyhedron. It’s called an invariant because it stays unchanged when you cut up the polyhedron into polyhedral parts and reassemble the pieces into something else, allowing odd-angled cuts and rotations. In order for one polyhedron to have a dissection into another, they must both have the same volume and the same Dehn invariant. This can be used to show, for instance, that you cannot dissect a regular tetrahedron into a cube. But as several authors have described, a version of the same method also applies to axis-parallel dissections of orthogonal <span style="white-space: nowrap;">polygons.<sup id="fnref:s"><a href="https://11011110.github.io/blog/2022/04/03/dissection-into-rectangles.html#fn:s" class="footnote" rel="footnote">1</a></sup> <sup id="fnref:b"><a href="https://11011110.github.io/blog/2022/04/03/dissection-into-rectangles.html#fn:b" class="footnote" rel="footnote">2</a></sup></span></p>
+
+<p>To evaluate the Dehn invariant of an orthogonal polygon, the first step is to represent the polygon in Cartesian coordinates, and to find a <em>rational basis</em> for its coordinates, a system of numbers such that every coordinate has a unique representation as a linear combination of basis elements with rational-number coefficients. This is just a basis, in the usual meaning of the word from linear algebra, when we interpret the real numbers as being a vector space over the rational numbers. In the example of the stealth shape, we can use the same basis for both the <span style="white-space: nowrap;">\(x\)- and</span> <span style="white-space: nowrap;">\(y\)-coordinates,</span> the set of numbers <span style="white-space: nowrap;">\(\{1,2^{1/3},2^{2/3}\}\).</span> The choice of basis is arbitrary (as long as it can represent all coordinates, without any redundancy) and will affect the rest of the calculation but not the conclusions we draw from it. If we’re comparing two shapes, we can use a common basis that can represent the coordinates from both; it won’t hurt if some of the basis elements are only used for one of the two shapes. So for instance, if the Greek cross is made out of unit squares, the square we’d like to dissect it into has side length \(\sqrt5\) and we can use the basis \(\{1,\sqrt 5\}\) to compare the cross to the square.</p>
+
+<p>Next, we decompose the given shape into rectangles through its vertices (like the yellow rectangles that we’ve already used to decompose the stealth shape). Express the width and height of each rectangle as a rational combination of basis elements; in our example, each rectangle is just a product of two basis elements, but sometimes more complex combinations might be required. If we multiply the expression for the width of a rectangle by the expression for the height of a rectangle, we get an expression for the area of the whole rectangle as a sum of terms \(a\cdot b_x\cdot b_y\) where \(a\) is a rational number and \(b_x\) and \(b_y\) are <span style="white-space: nowrap;">\(x\)-basis</span> and <span style="white-space: nowrap;">\(y\)-basis</span> elements, respectively. Adding these expressions for every rectangle in the decomposition gives a similar expression for the area of the whole shape. Since we’re separating out the terms for each product of basis elements, it’s convenient to write it out as a matrix. For the Greek cross and same-area square, with the basis \(\{1,\sqrt 5\}\) for both <span style="white-space: nowrap;">\(x\) and \(y\),</span> we get the matrices</p>
+
+\[\begin{pmatrix} 5 &amp; 0 \\ 0 &amp; 0 \end{pmatrix} \qquad\text{and}\qquad
+\begin{pmatrix} 0 &amp; 0 \\ 0 &amp; 1 \end{pmatrix},\]
+
+<p>respectively. For the stealth shape, with the basis \(\{1,2^{1/3},2^{2/3}\}\) for both <span style="white-space: nowrap;">\(x\) and \(y\),</span> we get the matrix</p>
+
+\[\begin{pmatrix} 0 &amp; 0 &amp; 1 \\ 0 &amp; 1 &amp; 0 \\ 1 &amp; 0 &amp; 0 \end{pmatrix}.\]
+
+<p>That’s the Dehn invariant! Because the Greek cross and square have different invariants, they cannot be dissected into each other (for this restricted axis-parallel translation-only form of dissection). But what about the dissection of the stealth shape into a single rectangle? How can we apply this analysis when there are infinitely many possible rectangles to try?</p>
+
+<p>Here it’s convenient to move from the notion of bases and matrices to a more <a href="https://en.wikipedia.org/wiki/Coordinate-free">coordinate-free</a> formulation of the same thing using <a href="https://en.wikipedia.org/wiki/Tensor_(intrinsic_definition)">abstract tensors</a>. When we’re expressing the area of an \(x\times y\) rectangle as a product of rational linear combinations of basis elements, what we’re really doing is constructing the element \(x\otimes y\) of the <a href="https://en.wikipedia.org/wiki/Tensor_product">tensor product</a> <span style="white-space: nowrap;">\(\mathbb{R}\otimes_{\mathbb{Q}}\mathbb{R}\).</span> Then when we add the expressions arising from the decomposition into rectangles, to form a matrix describing the whole shape, this is just addition of these elements within the tensor product. The subscript \(\mathbb{Q}\) in the tensor notation corresponds to the fact that we’re interpreting real numbers as forming a vector space over the field \(\mathbb{Q}\) of rational numbers. (Some sources use a subscript \(\mathbb{Z}\) but this is not an important difference here.)</p>
+
+<p>One thing we know about matrices is that they have a <a href="https://en.wikipedia.org/wiki/Rank_(linear_algebra)">rank</a>, the dimension of the vector space generated by their rows or columns. But tensors also have a notion of rank. The rank of a tensor is the minimum number of terms needed to express it as a sum of products</p>
+
+\[x_1\otimes y_1+x_2\otimes y_2+\cdots,\]
+
+<p>where the \(x_i\) and \(y_i\) can be any elements of the spaces that are being tensored together (they are not required to be basis elements). For tensor products of three or more spaces, the rank is still defined in the same way, but it can get very tricky to calculate. This is a big part about why the time bounds for fast matrix multiplication are still so mysterious: they involve tensors of order three. But for the order-two tensor space \(\mathbb{R}\otimes_{\mathbb{Q}}\mathbb{R}\), we’re saved by linear algebra: the rank of a tensor of order two is just the rank of a matrix representing it, for any basis over the appropriate field <span style="white-space: nowrap;">(here \(\mathbb{Q}\)).</span></p>
+
+<p>Suppose that we could dissect a <span style="white-space: nowrap;">polygon \(P\),</span> using axis-parallel cuts and translations, into a collection of \(k\) rectangles. Then the sum of the tensor expressions for those rectangles would be an expression of the Dehn invariant <span style="white-space: nowrap;">of \(P\),</span> as a sum of \(k\) products. Therefore, the rank of the Dehn invariant of \(P\) would have to be at <span style="white-space: nowrap;">most \(k\).</span> But for our stealth shape, we know the rank: we have expressed its Dehn invariant as a matrix of rank three. Therefore, to dissect it into rectangles, we need at least three rectangles.</p>
+
+<p>Another use of the polyhedral Dehn invariant, besides dissection of one shape into another, involves tiling. Any polyhedron that tiles space must have Dehn invariant zero, and any polyhedron with Dehn invariant zero can be dissected into a different polyhedron that tiles space. For the axis-parallel polygonal Dehn invariant we’re looking at here, things don’t work out quite so neatly. The Greek cross can tile, but has nonzero Dehn invariant. More, any axis-parallel polygon can be cut into multiple rectangles, and these can tile space aperiodically by grouping them into rows of the same type of rectangle.</p>
+
+<p style="text-align: center;"><img width="65%" alt="Aperiodic tiling by three irrational rectangles" src="https://11011110.github.io/blog/assets/2022/trirect-row-tiling.svg" /></p>
+
+<p>So the Dehn invariant cannot be used to prove that such a thing is impossible, because it is always possible. If we could rotate pieces, we could also form these three rectangles into a single-piece axis-parallel hexagon that can tile the plane:</p>
+
+<p style="text-align: center;"><img width="80%" alt="Periodic tiling by a hexagon formed from three irrational rectangles" src="https://11011110.github.io/blog/assets/2022/trirect-flip-tiling.svg" /></p>
+
+<p>But this is not possible without rotation. Every periodic tiling of the plane has a <a href="https://en.wikipedia.org/wiki/Fundamental_domain">fundamental region</a> in the shape of an axis-parallel hexagon, like the hexagons in this periodic tiling.  If one or more copies of a polygon could be cut up by axis-parallel cuts and reassembled by translations to form a single polygon that can tile the plane periodically, it would also be possible to dissect copies of the polygon (possibly a larger number of copies of it) into an axis-parallel hexagon. But these hexagons have a Dehn invariant with rank at most two (they can be cut into two rectangles), while any number of copies of our stealth shape combine to have rank three (making more copies just multiplies the matrix by a scalar). Because the Dehn invariants have different ranks, no dissection is possible.</p>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:s">
+      <p>John Stillwell (1998), <em><a href="https://doi.org/10.1007/978-1-4612-0687-3">Numbers and Geometry</a></em>, Springer, p. 164. <a href="https://11011110.github.io/blog/2022/04/03/dissection-into-rectangles.html#fnref:s" class="reversefootnote">↩</a></p>
+    </li>
+    <li id="fn:b">
+      <p>David Benko (2007), “<a href="https://www.jstor.org/stable/27642302">A new approach to Hilbert’s third problem</a>”, <em>Amer. Math. Monthly</em> 114 (8): 665–676. <a href="https://11011110.github.io/blog/2022/04/03/dissection-into-rectangles.html#fnref:b" class="reversefootnote">↩</a></p>
+    </li>
+  </ol>
+</div>
+
+<p>(<a href="https://mathstodon.xyz/@11011110/108071296947021436">Discuss on Mastodon</a>)</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by David Eppstein <a href="https://11011110.github.io/blog/2022/04/03/dissection-into-rectangles.html"><span class="datestr">at April 03, 2022 06:45 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2608,64 +2706,6 @@ by shacharlovett <a href="https://cstheory-jobs.org/2022/03/20/ukraine-student-p
 
 <p class="date">
 by plustcs <a href="https://tcsplus.wordpress.com/2022/03/19/tcs-talk-wednesday-march-23-shuichi-hirahara-national-institute-of-informatics-japan/"><span class="datestr">at March 19, 2022 05:22 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://emanueleviola.wordpress.com/?p=998">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/viola.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://emanueleviola.wordpress.com/2022/03/17/focs-2022/">FOCS 2022</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://emanueleviola.wordpress.com" title="Thoughts">Emanuele Viola</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p>I am on the <a href="https://focs2022.eecs.berkeley.edu/cfp.html">FOCS 2022 </a>Program Committee, and I am overjoyed that the PC meeting will be virtual.  Hopefully, the days are over when the program chair can brush aside all cost-benefit considerations, impose their backyard on far-away scholars who need service items, and then splash their offspring at the welcome party.</p>
-
-
-
-<p>I am also overjoyed that we will be implementing double-blind reviews.  This issue has been discussed and ridiculed at length.  Admittedly, it makes it harder to adhere to Leonid Levin’s 1995 influential <em><a href="https://dl.acm.org/doi/10.1145/202840.606487">STOC Criteria</a></em>.  For example, if a reviewer wanted to trash a paper based on the fact that the authors are not in the position to judge their own work, now they’ll have to check online for talks or preprints to know who the authors are.  Given the volume of reviews, it’s reasonable to expect that in some cases the reviewer won’t be able to conclusively exclude that a letter-writer is among the authors.  In such a situation they can resort to writing a very long, thorough, and competent review whose most significant digit is the STOC/FOCS death sentence: <em>weak accept</em>.</p>
-
-
-
-<p>No, I actually do have something more constructive to say about this.  I was — as they say — privileged to serve on many NSF panels.  As an aside, it’s interesting that there the track-record of the investigators <em>is </em>a key factor in the decision; in fact, according to many including myself, it should carry even more weight, rather than forcing investigators to fill pages with made-up directions most of which won’t pan out.  But that’s another story; what is relevant for this post is that each panel begins with a quick “de-biasing” briefing, which I actually enjoy and from which I learnt something.  For example, there’s a classic experiment where the ratio of females hired as musicians increases if auditions hide the performer behind a tent and make them walk in on carpet so you can’t tell what shoes they are wearing.  Similar experiments exist that hide names from the folders of applicants, etc.  What I propose is to do a similar thing when reviewing papers.  That is, start with a de-biasing briefing: tell reviewers to ask themselves whether their attitude towards a paper would be different if:</p>
-
-
-
-<ol><li>The authors of this paper/previous relevant work were ultra-big shots, or</li><li>The authors of this paper/previous relevant work were hapless nobodies, or</li><li>The proofs in this paper could be simplified dramatically to the point that even I understand them, or</li><li>This result came with a super-complicated proof which I can’t even begin to follow, or</li></ol>
-
-
-
-<p>What other questions would be good to ask?</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by Manu <a href="https://emanueleviola.wordpress.com/2022/03/17/focs-2022/"><span class="datestr">at March 17, 2022 02:27 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
