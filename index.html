@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at May 12, 2022 05:38 PM UTC</span>.
+Last updated <span class="datestr">at May 12, 2022 06:21 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -465,6 +465,177 @@ by rjlipton <a href="https://rjlipton.wpcomstaging.com/2022/05/11/differential-p
 
 <p class="date">
 by gasarch (noreply@blogger.com) <a href="http://blog.computationalcomplexity.org/2022/05/queen-elizabeth-is-3rd-longest-reigning.html"><span class="datestr">at May 11, 2022 03:39 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://gradientscience.org/datamodels-2/">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/madry.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://gradientscience.org/datamodels-2/">Uncovering Brittleness with Datamodels</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://gradientscience.org/" title="gradient science">Gradient Science</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><a style="float: left; width: 45%;" href="https://arxiv.org/abs/2202.00622" class="bbutton">
+<i class="fas fa-file-pdf"></i>
+    Paper
+</a>
+<a style="float: left; width: 45%;" href="https://github.com/MadryLab/datamodels-data" class="bbutton">
+<i class="fab fa-github"></i>
+   Data
+</a>
+<br /></p>
+
+<p>In this blog post we use datamodels to identify and study a new form of model <em>brittleness.</em></p>
+
+<h2 id="recap-datamodels">Recap: Datamodels</h2>
+
+<p>In our <a href="https://gradientscience.org/datamodels-1/">last post</a>, we introduced datamodels: a framework for studying how models use training data to make predictions. While we summarize datamodels in short below, if you haven’t yet read about datamodels we recommend reading our <a href="https://gradientscience.org/datamodels-1/">last post</a> for the full picture.</p>
+
+<p>Consider a training set $S$ (e.g., a set of images and labels from a computer vision dataset), a learning algorithm $\mathcal{A}$ (e.g., training a deep neural network from scratch with SGD), and a target example $x$ (e.g., a test image and label from the same dataset). A <em>datamodel</em> for the target example $x$ is a parameterized function that takes as input a subset $S’$ of the original training set $S$, and predicts the outcome of training a model on $S’$ (using $\mathcal{A}$) and evaluating on $x$. In other words, a datamodel predicts how the choice of a specific training subset changes the final model prediction.</p>
+
+<p><img src="https://gradientscience.org/images/datamodels/datamodel_blogpost_figures.001.png" alt="A graphic showing a test image and a training set. Some of the training images are greyed out to indicate a subset S-prime of the training set. There is an arrow from the training set to a question asking, &quot;if i train a model on examples # 1, 3, 5, etc., how will the model behave on the given target example?&quot; This question is fed to the datamodel, which returns an estimate of what the output (e.g. loss) of a model trained on S-prime and evaluated on x would be." /></p>
+
+<p>Our <a href="https://gradientscience.org/datamodels-1/">last post</a> focused on constructing <em>linear</em> datamodels (one for each CIFAR-10 test image) that accurately predict the outcome of training a deep neural network from scratch on subsets of the CIFAR-10 training set.</p>
+
+<p>Today, we’ll use datamodels to investigate deep neural networks’ predictions. Specifically, we’ll introduce and measure <em>data-level brittleness</em>: how sensitive are model predictions to removing a small number of training set points?</p>
+
+<h2 id="data-level-brittleness-a-motivating-example">Data-level brittleness: a motivating example</h2>
+
+<p>Consider this image of a boat from the <a href="https://www.cs.toronto.edu/~kriz/cifar.html">CIFAR-10</a> test set:</p>
+
+<p><img width="120px" alt="An image of a boat from the CIFAR-10 test set" src="https://gradientscience.org/images/datamodels/Untitled.png" /></p>
+
+<p>A deep neural network (ResNet-9) trained on CIFAR-10 correctly classifies this example as a boat with <strong>71%</strong> (softmax) confidence. The classification is also “robust” in the sense that over different training runs (each with a different random initialization of the network, batch ordering, data augmentation, etc.), the trained model classifies this example correctly <strong>84%</strong> of the time.</p>
+
+<p>It turns out, however, that if we remove just the following nine images from the CIFAR-10 training set…</p>
+
+<p><img src="https://gradientscience.org/images/datamodels/datamodel_blogpost_figures.001%201.png" alt="Nine images from the CIFAR-10 training set that, when removed, induce misclassification of the boat example above." /></p>
+
+<p>…models trained with the exact same training procedure (applied to the remaining 49,991 images in the training set) correctly classify the boat only <strong>35%</strong> of the time! Furthermore, when we remove only 11 additional training images, the probability of correct classification decreases to merely <strong>10%</strong> (the accuracy of a <em>random</em> classifier!).</p>
+
+<p>Model behavior on this boat image exemplifies <em>data-level brittleness.</em> Models confidently and consistently output correct predictions, but these predictions hinge on a very small set of training examples. (One might hypothesize that in this case, brittleness stems from the fact that there are very few training examples of boats on land or grass.)</p>
+
+<h2 id="quantifying-brittleness-with-datamodels">Quantifying brittleness with datamodels</h2>
+
+<p>How do we actually measure data-level brittleness? In the example above, models misclassified the boat after we removed nine images. These were nine <em>specifically chosen</em> images, however: removing nine <em>randomly chosen</em> training images of boats does not at all degrade models’ probability of correctly classifying the boat image. Even removing the nine most <em>similar</em> training examples to the boat image (e.g., in terms of representation space distance) degrades this probability by only 4%.</p>
+
+<p>So, how do we find the “right” images to remove? Specifically, what we’re looking for is the smallest subset of the training set whose removal induces misclassification on average, i.e.,</p>
+
+<p>\begin{align}
+\tag{1}
+\label{eq:origobj}
+\min_{R \subset S} |R’|, \text{ such that }\mathbb{E}[\text{margin of a model
+trained on } S \setminus R \text{ on } x] \leq 0.
+\end{align}</p>
+
+<p>Unfortunately, problems like this (optimizing a black-box function over the space of all possible subsets of a large set) are computationally challenging to solve. In the worst case, to find the smallest set satisfying the above condition we would have to train several models for each possible training subset.</p>
+
+<p>This is where datamodels come in. Recall that for a target example $x$ (e.g., our  boat example from before), we can construct (read our <a href="https://gradientscience.org/datamodels-1/">previous post</a> to see how) a <em>datamodel</em> $g$ that, for any subset of the training set $S’$, returns an estimate:</p>
+
+<p>\begin{align}
+g(S’) \approx \mathbb{E}[\text{margin of a classifier trained on $S’$ when
+evaluated on $x$}].
+\end{align}</p>
+
+<p>(Here, the expectation is taken over training non-determinism.) Datamodel estimates can be highly accurate. For example, see the following graph of predicted average margin $g(S’)$ against true average margin (the RHS above) from our last post:</p>
+
+<p><img src="https://gradientscience.org/images/datamodels/Untitled%201.png" alt="A graph comparing true and datamodel-predicted outcomes of model training." /></p>
+
+<p>Datamodel predictiveness means we can (approximately) solve our earlier optimization problem (\eqref{eq:origobj}) by optimizing instead the <em>surrogate objective</em>:</p>
+
+<p>\begin{align}
+\tag{2}
+\label{eq:surrogate1}
+\min_{R \subset S} \vert R \vert \text{ such that } g(S \backslash R) \leq 0
+\end{align}</p>
+
+<p>Since $g(\cdot)$ is a simple (linear) function (see the drop-down below for more details), this new optimization problem is computationally easy to solve (and doesn’t involve training additional models).</p>
+
+<section class="container">
+<div>
+<div class="checkboxdiv">
+<input type="checkbox" id="ac-1" name="accordion-1" />
+<label for="ac-1"><span class="fas fa-chevron-right" id="titlespan"></span><strong> Why is it easy to solve?</strong> (Click to expand)</label>
+<article class="small">
+In our last post, we showed that for deep neural networks, datamodels that are linear with respect to the <em>presence</em> of each training image can suffice to accurately predict model behavior. In the linear datamodel regime, we parameterize our datamodel $g(\cdot)$ for a target example $x$ with a weight vector $w \in \mathbb{R}^{50,000}$ (where $50,000$ is the size of the training set), and the datamodel prediction $g(S’)$ is precisely:
+    
+\begin{align}
+    g(S’) = \mathbf{1}_{S’}^\top w,
+\end{align}
+
+where $\mathbf{1}_{S'}$ is a 50,000-dimensional indicator vector of $S'$ (i.e., taking on a value of one at index $i$ if the $i$-th training image is in $S'$, and zero otherwise).
+
+Here, solving the optimization problem \(\eqref{eq:surrogate1}\) corresponds to choosing $R$ as the training images that correspond to the largest indices of $w_i$.
+</article>
+</div>
+</div>
+</section>
+<p><br /></p>
+
+<p>After finding a subset $R$ that minimizes the surrogate objective above, we can verify that $R$ is an upper bound on the objective above by training a collection of models on the remaining training images $S \setminus R$, and checking to see that the target example is misclassified on average. We can <em>ensure</em> we actually get an upper bound on the size of the minimum $R$ by solving</p>
+
+<p>\begin{align}
+\min_{R \subset S} \vert R \vert \text{ such that } g(S \setminus R) \leq C,
+\end{align}</p>
+
+<p>where $C&lt;0$ is a threshold that we (very coarsely) search for using the verification procedure—if the image isn’t misclassified on average, we can decrease $C$.</p>
+
+<h2 id="looking-at-brittleness-in-aggregate">Looking at brittleness in aggregate</h2>
+
+<p>So far in this post, we’ve seen an example of data-level brittleness, and provided a datamodel-based method for estimating the brittleness of any given prediction. How brittle are model predictions as a whole?</p>
+
+<p>We use our datamodel-based approach to estimate the data-level brittleness of each image in (a random sample of) the CIFAR-10 test set. Specifically, for each test image, we estimate (and bound) the number of training images one would need to remove in order to flip models’ predictions on the test image. We plot the <em>cumulative distribution</em> of these estimates below: a point $(x, y)$ on the blue line below indicates that a $y$ fraction of test set predictions are brittle to the removal of at most $x$ training images.</p>
+
+<p><img src="https://gradientscience.org/images/datamodels/cifar_brittleness_combined_withflips_False.svg" alt="CDF of data-level brittleness" /></p>
+
+<p>It turns out that our motivating boat example is not so unusual. In fact, for around 20% of the CIFAR-10 test images it suffices to remove fewer than 60 training images to induce misclassification! Also, for around half of the test examples, it suffices to remove fewer than 250 training images (still only 0.5% of the training set).</p>
+
+<p>The other lines in the graph above illustrate just how hard it is to identify prediction brittleness via other means. Each one represents a different heuristic: a point $(x, y)$ on the line indicates that for a $y$-fraction of the test set, removing the $x$ most similar images to the target example (according to the corresponding heuristic) is necessary to flip models’ predictions. (See Appendix F.2 in our <a href="https://arxiv.org/abs/2202.00622">paper</a> for more details on these baselines!)</p>
+
+<h2 id="bonus-label-flipping-attacks">Bonus: Label-flipping attacks</h2>
+
+<p>One immediate consequence of the techniques we discovered in this blog post is the existence of strong <em>label-flipping</em> attacks. So far, we’ve looked exclusively at the result of removing training images—if we use the exact same technique but instead just flip the labels of the images we would have removed, we find more severe brittleness:</p>
+
+<p><img src="https://gradientscience.org/images/datamodels/cifar_brittleness_combined_withflips_True_True.svg" alt="flipping.png" /></p>
+
+<p>The dashed line above is the same as the blue line from earlier—the new solid blue line shows that for over half of the CIFAR-10 test images, we are able to induce misclassification by relabeling just 35 (target-specific) images!</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>In this post, we introduced a new notion of model brittleness, examined how to quantify it with datamodels, and demonstrated that a large fraction of predictions on the CIFAR-10 test set are quite brittle.</p>
+
+<p>Our results demonstrate one of many ways in which datamodels can be a useful proxy for end-to-end training. More broadly (and as we’ll see in our upcoming posts!), datamodels open the door to many other fine-grained analyses of model predictions.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="https://gradientscience.org/datamodels-2/"><span class="datestr">at May 11, 2022 12:00 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -2538,58 +2709,6 @@ In this survey we describe progress over the last decade or so in understanding 
 
 <p class="date">
 <a href="https://eccc.weizmann.ac.il/report/2022/065"><span class="datestr">at May 03, 2022 07:56 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://eccc.weizmann.ac.il/report/2022/064">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eccc.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="https://eccc.weizmann.ac.il/report/2022/064">TR22-064 |  Improved Low-Depth Set-Multilinear Circuit Lower Bounds | 
-
-	Deepanshu Kush, 
-
-	Shubhangi Saraf</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://eccc.weizmann.ac.il/" title="ECCC - Reports">ECCC papers</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-In this paper, we prove strengthened lower bounds for constant-depth set-multilinear formulas. More precisely, we show that over any field, there is an explicit polynomial $f$ in VNP defined over $n^2$ variables, and of degree $n$, such that any product-depth $\Delta$ set-multilinear formula computing $f$ has size at least $n^{\Omega \left( n^{1/\Delta}/\Delta\right)}$. The hard polynomial $f$ comes from the class of Nisan-Wigderson (NW) design-based polynomials. 
-
-Our lower bounds improve upon the recent work of Limaye, Srinivasan and Tavenas (STOC 2022), where a lower bound of the form $(\log n)^{\Omega (\Delta n^{1/\Delta})}$ was shown for the size of product-depth $\Delta$ set-multilinear formulas computing the iterated matrix multiplication (IMM) polynomial of the same degree and over the same number of variables as $f$. Moreover, our lower bounds are novel for any $\Delta\geq 2$.
-
-The precise quantitative expression in our lower bound is interesting also because the lower bounds we obtain are "sharp" in the sense that any asymptotic improvement would imply general set-multilinear circuit lower bounds via depth reduction results. 
-
-In the setting of general set-multilinear formulas, a lower bound of the form $n^{\Omega(\log n)}$ was already obtained by Raz (J. ACM 2009) for the more general model of multilinear formulas. The techniques of LST (which extend the techniques of the same authors in (FOCS 2021)) give a different route to set-multilinear formula lower bounds, and allow them to obtain a lower bound of the form $(\log n)^{\Omega(\log n)}$ for the size of general set-multilinear formulas computing the IMM polynomial. Our proof techniques are another variation on those of LST, and enable us to show an improved lower bound (matching that of Raz) of the form $n^{\Omega(\log n)}$, albeit for the same polynomial $f$ in VNP (the NW polynomial). As observed by LST, if the same $n^{\Omega(\log n)}$ size lower bounds for unbounded-depth set-multilinear formulas could be obtained for the IMM polynomial, then using the self-reducibility of IMM and using hardness escalation results, this would imply super-polynomial lower bounds for general algebraic formulas.</div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="https://eccc.weizmann.ac.il/report/2022/064"><span class="datestr">at May 03, 2022 07:37 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>

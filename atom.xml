@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2022-05-12T17:38:17Z</updated>
+  <updated>2022-05-12T18:21:49Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -46,7 +46,7 @@
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2022-05-12T17:37:37Z</updated>
+      <updated>2022-05-12T18:20:58Z</updated>
     </source>
   </entry>
 
@@ -76,7 +76,7 @@
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2022-05-12T17:37:57Z</updated>
+      <updated>2022-05-12T18:21:23Z</updated>
     </source>
   </entry>
 
@@ -137,7 +137,7 @@ We wish Avrim, Irit, Cynthia, Frank, Kobbi, and Adam congrats on their well dese
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-05-12T17:37:24Z</updated>
+      <updated>2022-05-12T18:20:45Z</updated>
     </source>
   </entry>
 
@@ -174,7 +174,157 @@ We wish Avrim, Irit, Cynthia, Frank, Kobbi, and Adam congrats on their well dese
       <link href="http://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2022-05-12T17:25:36Z</updated>
+      <updated>2022-05-12T18:01:55Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>https://gradientscience.org/datamodels-2/</id>
+    <link href="https://gradientscience.org/datamodels-2/" rel="alternate" type="text/html"/>
+    <title>Uncovering Brittleness with Datamodels</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p><a class="bbutton" href="https://arxiv.org/abs/2202.00622" style="float: left; width: 45%;">
+<i class="fas fa-file-pdf"/>
+    Paper
+</a>
+<a class="bbutton" href="https://github.com/MadryLab/datamodels-data" style="float: left; width: 45%;">
+<i class="fab fa-github"/>
+   Data
+</a>
+<br/></p>
+
+<p>In this blog post we use datamodels to identify and study a new form of model <em>brittleness.</em></p>
+
+<h2 id="recap-datamodels">Recap: Datamodels</h2>
+
+<p>In our <a href="https://gradientscience.org/datamodels-1/">last post</a>, we introduced datamodels: a framework for studying how models use training data to make predictions. While we summarize datamodels in short below, if you haven’t yet read about datamodels we recommend reading our <a href="https://gradientscience.org/datamodels-1/">last post</a> for the full picture.</p>
+
+<p>Consider a training set $S$ (e.g., a set of images and labels from a computer vision dataset), a learning algorithm $\mathcal{A}$ (e.g., training a deep neural network from scratch with SGD), and a target example $x$ (e.g., a test image and label from the same dataset). A <em>datamodel</em> for the target example $x$ is a parameterized function that takes as input a subset $S’$ of the original training set $S$, and predicts the outcome of training a model on $S’$ (using $\mathcal{A}$) and evaluating on $x$. In other words, a datamodel predicts how the choice of a specific training subset changes the final model prediction.</p>
+
+<p><img alt="A graphic showing a test image and a training set. Some of the training images are greyed out to indicate a subset S-prime of the training set. There is an arrow from the training set to a question asking, &quot;if i train a model on examples # 1, 3, 5, etc., how will the model behave on the given target example?&quot; This question is fed to the datamodel, which returns an estimate of what the output (e.g. loss) of a model trained on S-prime and evaluated on x would be." src="https://gradientscience.org/images/datamodels/datamodel_blogpost_figures.001.png"/></p>
+
+<p>Our <a href="https://gradientscience.org/datamodels-1/">last post</a> focused on constructing <em>linear</em> datamodels (one for each CIFAR-10 test image) that accurately predict the outcome of training a deep neural network from scratch on subsets of the CIFAR-10 training set.</p>
+
+<p>Today, we’ll use datamodels to investigate deep neural networks’ predictions. Specifically, we’ll introduce and measure <em>data-level brittleness</em>: how sensitive are model predictions to removing a small number of training set points?</p>
+
+<h2 id="data-level-brittleness-a-motivating-example">Data-level brittleness: a motivating example</h2>
+
+<p>Consider this image of a boat from the <a href="https://www.cs.toronto.edu/~kriz/cifar.html">CIFAR-10</a> test set:</p>
+
+<p><img alt="An image of a boat from the CIFAR-10 test set" src="https://gradientscience.org/images/datamodels/Untitled.png" width="120px"/></p>
+
+<p>A deep neural network (ResNet-9) trained on CIFAR-10 correctly classifies this example as a boat with <strong>71%</strong> (softmax) confidence. The classification is also “robust” in the sense that over different training runs (each with a different random initialization of the network, batch ordering, data augmentation, etc.), the trained model classifies this example correctly <strong>84%</strong> of the time.</p>
+
+<p>It turns out, however, that if we remove just the following nine images from the CIFAR-10 training set…</p>
+
+<p><img alt="Nine images from the CIFAR-10 training set that, when removed, induce misclassification of the boat example above." src="https://gradientscience.org/images/datamodels/datamodel_blogpost_figures.001%201.png"/></p>
+
+<p>…models trained with the exact same training procedure (applied to the remaining 49,991 images in the training set) correctly classify the boat only <strong>35%</strong> of the time! Furthermore, when we remove only 11 additional training images, the probability of correct classification decreases to merely <strong>10%</strong> (the accuracy of a <em>random</em> classifier!).</p>
+
+<p>Model behavior on this boat image exemplifies <em>data-level brittleness.</em> Models confidently and consistently output correct predictions, but these predictions hinge on a very small set of training examples. (One might hypothesize that in this case, brittleness stems from the fact that there are very few training examples of boats on land or grass.)</p>
+
+<h2 id="quantifying-brittleness-with-datamodels">Quantifying brittleness with datamodels</h2>
+
+<p>How do we actually measure data-level brittleness? In the example above, models misclassified the boat after we removed nine images. These were nine <em>specifically chosen</em> images, however: removing nine <em>randomly chosen</em> training images of boats does not at all degrade models’ probability of correctly classifying the boat image. Even removing the nine most <em>similar</em> training examples to the boat image (e.g., in terms of representation space distance) degrades this probability by only 4%.</p>
+
+<p>So, how do we find the “right” images to remove? Specifically, what we’re looking for is the smallest subset of the training set whose removal induces misclassification on average, i.e.,</p>
+
+<p>\begin{align}
+\tag{1}
+\label{eq:origobj}
+\min_{R \subset S} |R’|, \text{ such that }\mathbb{E}[\text{margin of a model
+trained on } S \setminus R \text{ on } x] \leq 0.
+\end{align}</p>
+
+<p>Unfortunately, problems like this (optimizing a black-box function over the space of all possible subsets of a large set) are computationally challenging to solve. In the worst case, to find the smallest set satisfying the above condition we would have to train several models for each possible training subset.</p>
+
+<p>This is where datamodels come in. Recall that for a target example $x$ (e.g., our  boat example from before), we can construct (read our <a href="https://gradientscience.org/datamodels-1/">previous post</a> to see how) a <em>datamodel</em> $g$ that, for any subset of the training set $S’$, returns an estimate:</p>
+
+<p>\begin{align}
+g(S’) \approx \mathbb{E}[\text{margin of a classifier trained on $S’$ when
+evaluated on $x$}].
+\end{align}</p>
+
+<p>(Here, the expectation is taken over training non-determinism.) Datamodel estimates can be highly accurate. For example, see the following graph of predicted average margin $g(S’)$ against true average margin (the RHS above) from our last post:</p>
+
+<p><img alt="A graph comparing true and datamodel-predicted outcomes of model training." src="https://gradientscience.org/images/datamodels/Untitled%201.png"/></p>
+
+<p>Datamodel predictiveness means we can (approximately) solve our earlier optimization problem (\eqref{eq:origobj}) by optimizing instead the <em>surrogate objective</em>:</p>
+
+<p>\begin{align}
+\tag{2}
+\label{eq:surrogate1}
+\min_{R \subset S} \vert R \vert \text{ such that } g(S \backslash R) \leq 0
+\end{align}</p>
+
+<p>Since $g(\cdot)$ is a simple (linear) function (see the drop-down below for more details), this new optimization problem is computationally easy to solve (and doesn’t involve training additional models).</p>
+
+<section class="container">
+<div>
+<div class="checkboxdiv">
+<input id="ac-1" name="accordion-1" type="checkbox"/>
+<label for="ac-1"><span class="fas fa-chevron-right" id="titlespan"/><strong> Why is it easy to solve?</strong> (Click to expand)</label>
+<article class="small">
+In our last post, we showed that for deep neural networks, datamodels that are linear with respect to the <em>presence</em> of each training image can suffice to accurately predict model behavior. In the linear datamodel regime, we parameterize our datamodel $g(\cdot)$ for a target example $x$ with a weight vector $w \in \mathbb{R}^{50,000}$ (where $50,000$ is the size of the training set), and the datamodel prediction $g(S’)$ is precisely:
+    
+\begin{align}
+    g(S’) = \mathbf{1}_{S’}^\top w,
+\end{align}
+
+where $\mathbf{1}_{S'}$ is a 50,000-dimensional indicator vector of $S'$ (i.e., taking on a value of one at index $i$ if the $i$-th training image is in $S'$, and zero otherwise).
+
+Here, solving the optimization problem \(\eqref{eq:surrogate1}\) corresponds to choosing $R$ as the training images that correspond to the largest indices of $w_i$.
+</article>
+</div>
+</div>
+</section>
+<p><br/></p>
+
+<p>After finding a subset $R$ that minimizes the surrogate objective above, we can verify that $R$ is an upper bound on the objective above by training a collection of models on the remaining training images $S \setminus R$, and checking to see that the target example is misclassified on average. We can <em>ensure</em> we actually get an upper bound on the size of the minimum $R$ by solving</p>
+
+<p>\begin{align}
+\min_{R \subset S} \vert R \vert \text{ such that } g(S \setminus R) \leq C,
+\end{align}</p>
+
+<p>where $C&lt;0$ is a threshold that we (very coarsely) search for using the verification procedure—if the image isn’t misclassified on average, we can decrease $C$.</p>
+
+<h2 id="looking-at-brittleness-in-aggregate">Looking at brittleness in aggregate</h2>
+
+<p>So far in this post, we’ve seen an example of data-level brittleness, and provided a datamodel-based method for estimating the brittleness of any given prediction. How brittle are model predictions as a whole?</p>
+
+<p>We use our datamodel-based approach to estimate the data-level brittleness of each image in (a random sample of) the CIFAR-10 test set. Specifically, for each test image, we estimate (and bound) the number of training images one would need to remove in order to flip models’ predictions on the test image. We plot the <em>cumulative distribution</em> of these estimates below: a point $(x, y)$ on the blue line below indicates that a $y$ fraction of test set predictions are brittle to the removal of at most $x$ training images.</p>
+
+<p><img alt="CDF of data-level brittleness" src="https://gradientscience.org/images/datamodels/cifar_brittleness_combined_withflips_False.svg"/></p>
+
+<p>It turns out that our motivating boat example is not so unusual. In fact, for around 20% of the CIFAR-10 test images it suffices to remove fewer than 60 training images to induce misclassification! Also, for around half of the test examples, it suffices to remove fewer than 250 training images (still only 0.5% of the training set).</p>
+
+<p>The other lines in the graph above illustrate just how hard it is to identify prediction brittleness via other means. Each one represents a different heuristic: a point $(x, y)$ on the line indicates that for a $y$-fraction of the test set, removing the $x$ most similar images to the target example (according to the corresponding heuristic) is necessary to flip models’ predictions. (See Appendix F.2 in our <a href="https://arxiv.org/abs/2202.00622">paper</a> for more details on these baselines!)</p>
+
+<h2 id="bonus-label-flipping-attacks">Bonus: Label-flipping attacks</h2>
+
+<p>One immediate consequence of the techniques we discovered in this blog post is the existence of strong <em>label-flipping</em> attacks. So far, we’ve looked exclusively at the result of removing training images—if we use the exact same technique but instead just flip the labels of the images we would have removed, we find more severe brittleness:</p>
+
+<p><img alt="flipping.png" src="https://gradientscience.org/images/datamodels/cifar_brittleness_combined_withflips_True_True.svg"/></p>
+
+<p>The dashed line above is the same as the blue line from earlier—the new solid blue line shows that for over half of the CIFAR-10 test images, we are able to induce misclassification by relabeling just 35 (target-specific) images!</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>In this post, we introduced a new notion of model brittleness, examined how to quantify it with datamodels, and demonstrated that a large fraction of predictions on the CIFAR-10 test set are quite brittle.</p>
+
+<p>Our results demonstrate one of many ways in which datamodels can be a useful proxy for end-to-end training. More broadly (and as we’ll see in our upcoming posts!), datamodels open the door to many other fine-grained analyses of model predictions.</p></div>
+    </summary>
+    <updated>2022-05-11T00:00:00Z</updated>
+    <published>2022-05-11T00:00:00Z</published>
+    <source>
+      <id>https://gradientscience.org/</id>
+      <author>
+        <name>Gradient Science</name>
+      </author>
+      <link href="https://gradientscience.org/" rel="alternate" type="text/html"/>
+      <link href="https://gradientscience.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Research highlights and perspectives on machine learning and optimization from MadryLab.</subtitle>
+      <title>gradient science</title>
+      <updated>2022-05-12T18:20:53Z</updated>
     </source>
   </entry>
 
@@ -789,7 +939,7 @@ Email: jn@di.ku.dk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-05-12T17:37:28Z</updated>
+      <updated>2022-05-12T18:20:47Z</updated>
     </source>
   </entry>
 
@@ -814,7 +964,7 @@ Email: jn@di.ku.dk</p></div>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2022-05-12T17:37:57Z</updated>
+      <updated>2022-05-12T18:21:24Z</updated>
     </source>
   </entry>
 
@@ -894,7 +1044,7 @@ Peter is still working on his problems. We wish him well on solving them and on 
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-05-12T17:37:25Z</updated>
+      <updated>2022-05-12T18:20:45Z</updated>
     </source>
   </entry>
 
@@ -969,7 +1119,7 @@ Peter is still working on his problems. We wish him well on solving them and on 
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2022-05-12T17:37:06Z</updated>
+      <updated>2022-05-12T18:20:19Z</updated>
     </source>
   </entry>
 
@@ -1044,7 +1194,7 @@ Peter is still working on his problems. We wish him well on solving them and on 
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2022-05-12T17:37:22Z</updated>
+      <updated>2022-05-12T18:20:43Z</updated>
     </source>
   </entry>
 
@@ -1068,7 +1218,7 @@ Peter is still working on his problems. We wish him well on solving them and on 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-05-12T17:37:17Z</updated>
+      <updated>2022-05-12T18:20:41Z</updated>
     </source>
   </entry>
 
@@ -1277,7 +1427,7 @@ Peter is still working on his problems. We wish him well on solving them and on 
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2022-05-12T17:37:37Z</updated>
+      <updated>2022-05-12T18:20:58Z</updated>
     </source>
   </entry>
 
@@ -1315,7 +1465,7 @@ Peter is still working on his problems. We wish him well on solving them and on 
       <link href="https://dstheory.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://dstheory.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Foundation of Data Science – Virtual Talk Series</title>
-      <updated>2022-05-12T17:38:12Z</updated>
+      <updated>2022-05-12T18:21:41Z</updated>
     </source>
   </entry>
 
@@ -1339,7 +1489,7 @@ Peter is still working on his problems. We wish him well on solving them and on 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-05-12T17:37:17Z</updated>
+      <updated>2022-05-12T18:20:41Z</updated>
     </source>
   </entry>
 
@@ -1369,7 +1519,7 @@ Peter is still working on his problems. We wish him well on solving them and on 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-05-12T17:37:17Z</updated>
+      <updated>2022-05-12T18:20:41Z</updated>
     </source>
   </entry>
 
@@ -1397,7 +1547,7 @@ A central open problem in this area is to design an efficient deterministic blac
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-05-12T17:37:17Z</updated>
+      <updated>2022-05-12T18:20:41Z</updated>
     </source>
   </entry>
 
@@ -1431,7 +1581,7 @@ Separately, for all threshold functions, we give optimal "bias-based" approximat
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-05-12T17:37:17Z</updated>
+      <updated>2022-05-12T18:20:41Z</updated>
     </source>
   </entry>
 
@@ -1468,7 +1618,7 @@ Separately, for all threshold functions, we give optimal "bias-based" approximat
       <link href="http://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
       <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
       <title>Computational Complexity</title>
-      <updated>2022-05-12T17:25:36Z</updated>
+      <updated>2022-05-12T18:01:55Z</updated>
     </source>
   </entry>
 
@@ -1535,7 +1685,7 @@ Bob, have a wonderful time being retired. And happy emeritus status.</p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-05-12T17:37:25Z</updated>
+      <updated>2022-05-12T18:20:45Z</updated>
     </source>
   </entry>
 
@@ -1625,37 +1775,7 @@ Bob, have a wonderful time being retired. And happy emeritus status.</p>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-05-12T17:37:17Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2022/064</id>
-    <link href="https://eccc.weizmann.ac.il/report/2022/064" rel="alternate" type="text/html"/>
-    <title>TR22-064 |  Improved Low-Depth Set-Multilinear Circuit Lower Bounds | 
-
-	Deepanshu Kush, 
-
-	Shubhangi Saraf</title>
-    <summary>In this paper, we prove strengthened lower bounds for constant-depth set-multilinear formulas. More precisely, we show that over any field, there is an explicit polynomial $f$ in VNP defined over $n^2$ variables, and of degree $n$, such that any product-depth $\Delta$ set-multilinear formula computing $f$ has size at least $n^{\Omega \left( n^{1/\Delta}/\Delta\right)}$. The hard polynomial $f$ comes from the class of Nisan-Wigderson (NW) design-based polynomials. 
-
-Our lower bounds improve upon the recent work of Limaye, Srinivasan and Tavenas (STOC 2022), where a lower bound of the form $(\log n)^{\Omega (\Delta n^{1/\Delta})}$ was shown for the size of product-depth $\Delta$ set-multilinear formulas computing the iterated matrix multiplication (IMM) polynomial of the same degree and over the same number of variables as $f$. Moreover, our lower bounds are novel for any $\Delta\geq 2$.
-
-The precise quantitative expression in our lower bound is interesting also because the lower bounds we obtain are "sharp" in the sense that any asymptotic improvement would imply general set-multilinear circuit lower bounds via depth reduction results. 
-
-In the setting of general set-multilinear formulas, a lower bound of the form $n^{\Omega(\log n)}$ was already obtained by Raz (J. ACM 2009) for the more general model of multilinear formulas. The techniques of LST (which extend the techniques of the same authors in (FOCS 2021)) give a different route to set-multilinear formula lower bounds, and allow them to obtain a lower bound of the form $(\log n)^{\Omega(\log n)}$ for the size of general set-multilinear formulas computing the IMM polynomial. Our proof techniques are another variation on those of LST, and enable us to show an improved lower bound (matching that of Raz) of the form $n^{\Omega(\log n)}$, albeit for the same polynomial $f$ in VNP (the NW polynomial). As observed by LST, if the same $n^{\Omega(\log n)}$ size lower bounds for unbounded-depth set-multilinear formulas could be obtained for the IMM polynomial, then using the self-reducibility of IMM and using hardness escalation results, this would imply super-polynomial lower bounds for general algebraic formulas.</summary>
-    <updated>2022-05-03T19:37:30Z</updated>
-    <published>2022-05-03T19:37:30Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2022-05-12T17:37:17Z</updated>
+      <updated>2022-05-12T18:20:41Z</updated>
     </source>
   </entry>
 </feed>
