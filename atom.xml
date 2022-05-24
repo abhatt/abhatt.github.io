@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2022-05-24T10:38:34Z</updated>
+  <updated>2022-05-24T11:29:23Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,179 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>https://differentialprivacy.org/privacy-doona/</id>
+    <link href="https://differentialprivacy.org/privacy-doona/" rel="alternate" type="text/html"/>
+    <title>Privacy Doona&amp;#58; Why We Should Hide Among The Clones</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>In this blog post, we will discuss a recent(ish) result of Feldman, McMillan, and Talwar <a href="https://arxiv.org/abs/2012.12803" title="Vitaly Feldman, Audra McMillan, Kunal Talwar. Hiding Among the Clones: A Simple and Nearly Optimal Analysis of Privacy Amplification by Shuffling. FOCS 2021"><strong>[FMT21]</strong></a>, which provides an improved and simple analysis of the so-called “amplification by shuffling” formally connecting local privacy (LDP) and shuffle privacy.<sup id="fnref:1"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:1" rel="footnote">1</a></sup> Now, I’ll assume the reader is familiar with both LDP and Shuffle DP: if not, a quick-and-dirty refresher (with less quick, and less dirty references) can be found <a href="https://differentialprivacy.org/\trustmodels">here</a>, and of course there is also Albert Cheu’s excellent survey on Shuffle DP <a href="https://arxiv.org/abs/2107.11839" title="Albert Cheu. Differential Privacy in the Shuffle Model: A Survey of Separations. arXiv 2021"><strong>[Cheu21]</strong></a>.</p>
+
+<p>I will also ignore most of the historical details, but it is worth mentioning that <a href="https://arxiv.org/abs/2012.12803" title="Vitaly Feldman, Audra McMillan, Kunal Talwar. Hiding Among the Clones: A Simple and Nearly Optimal Analysis of Privacy Amplification by Shuffling. FOCS 2021"><strong>[FMT21]</strong></a> is not the first paper on this “amplification by shuffling,” (which, for local reasons, I’ll just call a <em>privacy <a href="https://www.collinsdictionary.com/dictionary/english/doona">doona</a></em>) but rather is the culmination of a rather long line of work involving many cool ideas and papers, starting with <a href="https://arxiv.org/abs/1808.01394" title="Albert Cheu, Adam D. Smith, Jonathan Ullman, David Zeber, Maxim Zhilyaev. Distributed Differential Privacy via Shuffling. EUROCRYPT 2019"><strong>[CSUZZ19</strong></a>, <a href="https://arxiv.org/abs/1811.12469" title="&#xDA;lfar Erlingsson, Vitaly Feldman, Ilya Mironov, Ananth Raghunathan, Kunal Talwar, Abhradeep Thakurta. Amplification by Shuffling: From Local to Central Differential Privacy via Anonymity. SODA 2019"><strong>EFMRTT19]</strong></a>: I’d refer the reader to <strong>Table 1</strong> in <a href="https://arxiv.org/abs/2012.12803" title="Vitaly Feldman, Audra McMillan, Kunal Talwar. Hiding Among the Clones: A Simple and Nearly Optimal Analysis of Privacy Amplification by Shuffling. FOCS 2021"><strong>[FMT21]</strong></a> for an overview.</p>
+
+<p>Alright, now that the caveats are behind us, what <em>is</em> “amplification by shuffling”? In a nutshell, it is capturing the (false!) intuition that “anonymization provides privacy” (which, again, is false! Don’t do this!) and making it… less false. The idea is that while <em>anonymization does not provide in itself any meaningful privacy guarantee</em>, it can <em>amplify existing, rigorous privacy guarantee</em>. So if I start with a somewhat lousy LDP guarantee, but then all the messages sent by all users are completely anonymized, then my lousy LDP guarantee suddenly gets <em>much</em> stronger (roughly speaking, the \(\varepsilon\) parameter goes down with the square root of of the number of users involved). Which is wonderful! Let’s see what this means, quantitatively.</p>
+
+<h3 id="the-result-of-feldman-mcmillan-and-talwar">The result of Feldman, McMillan, and Talwar.</h3>
+<p>Here, we will focus on the simpler case of <em>noninteractive</em> protocols (one-shot messages from the users to the central server, no funny business with messages going back and forth); which is conceptually simpler to state and parse, still very rich and interesting, and, well, very relevant in practice (being the easiest and cheapest to deploy). If you want the results in their full glorious generality, though, they are in the paper.</p>
+
+<p>What the main theorem of <a href="https://arxiv.org/abs/2012.12803" title="Vitaly Feldman, Audra McMillan, Kunal Talwar. Hiding Among the Clones: A Simple and Nearly Optimal Analysis of Privacy Amplification by Shuffling. FOCS 2021"><strong>[FMT21]</strong></a> is saying for this noninteractive setting can then be stated as follows: if I have an <em>\(\varepsilon_L\)-locally private</em> (LDP) protocol for a task, where all \(n\) users pass their data through the same randomizer (algorithm) \(R\) and send the resulting message \(y_i \gets R(x_i)\), then just permuting the messages \(y_1\dots,y_n\) immediately gives an \((\varepsilon,\delta)\)-<em>shuffle</em> private protocol for the same task, for any pair \((\varepsilon,\delta)\) which satisfies
+<a name="eq:eps:epsL"/>
+\begin{equation}
+		\varepsilon \leq \log\left( 1+ 16\frac{e^{\varepsilon_{L}}-1}{e^{\varepsilon_{L}}+1}\sqrt{\frac{e^{\varepsilon_{L}}\log\frac{4}{\delta}}{n}}\right) \tag{1}
+\end{equation}
+as long as \(n \gg e^{\varepsilon_{L}}\log(1/\delta)\). That is quite a lot to parse, though: what does this actually <em>mean</em>?</p>
+
+<p><strong>First</strong>, the assumption that all users have the same randomizer (or at least cannot be distinguished by their randomizer) is quite natural: if they didn’t, then we wouldn’t be able to say anything in general, since the randomizer they use could just give away their identity completely. For instance, as an extreme case, the randomizer of user \(i\) could just append \(i\) to the message (it’s OK, still LDP!), and then shuffling achieves exactly nothing: we know who sent what. So OK, asking for all randomizers to be the same is not really a restriction.</p>
+
+<p><strong>Second</strong>, each user only sends one message, and this preserves its length (we just shuffled the messages, didn’t modify them!). So if you start with an LDP protocol with amazing features XYZ (e.g., the messages are \(1\)-bit long, or users don’t share a random seed, or the randomizers run in time \(O(1)\)), then the shuffle protocol enjoys exactly the same properties. (It only enjoys naturally some <em>robustness</em>, in the sense that if \(10\%\) if the \(n\) users maliciously deviate from the protocol, they can’t really jeopardize the privacy of the remaining \(90\%\) of users.<sup id="fnref:2"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:2" rel="footnote">2</a></sup> Which is… good.)</p>
+
+<p><strong>Third</strong>, this is inherently approximate DP. Here we started with pure LDP (you can also extend that to approximate LDP) and ended up with approximate Shuffle DP: this is not a mistake, that’s how it is. I am not a purist (erm) myself, and that looks more than good enough to me; but if you seek pure Shuffle DP, then this result is not the droid you’re looking for.</p>
+
+<p align="center">
+  <img alt="This is not the pure DP guarantee you are looking for." src="https://differentialprivacy.org/../images/droids-looking.png" width="50%"/>
+</p>
+<p><br/></p>
+
+<p>Alright, <em>what</em> is this guarantee stated in <a href="https://differentialprivacy.org/feed.xml#eq:eps:epsL">(1)</a> giving us? Let’s interpret the expression in <a href="https://differentialprivacy.org/feed.xml#eq:eps:epsL">(1)</a> in two parameter regimes, focusing on \(\varepsilon\) (fixing some small \(\delta&gt;0\)). If we start with \(\varepsilon_{L} \ll 1\) for our LDP randomizers \(R\), then a first-order Taylor expansion shows that we get
+\[
+		\varepsilon \approx \varepsilon_{L}\cdot 8\sqrt{\frac{\log\frac{4}{\delta}}{n}}
+\]
+so that <em>shuffling improved our privacy parameter by a factor \(\sqrt{n}\)</em>.<sup id="fnref:3"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:3" rel="footnote">3</a></sup> 😲 This is great! With more users, comes more privacy!</p>
+
+<p>But that was starting with small \(\varepsilon_{L}\), that is, already pretty good privacy guarantees for our LDP “building block” \(R\). What happens if we start with “somewhat lousy” privacy guarantees, that is, \(\varepsilon_{L} \gg 1\)? Do we get anything interesting then?
+Another Taylor expansion (everything is a Taylor expansion) shows us that, then,
+<a name="eq:epsL:ll:one"/>
+\[
+\begin{equation}
+		\varepsilon \approx \log\left( 1+ 8\sqrt{\frac{e^{\varepsilon_{L}}\log\frac{4}{\delta}}{n}}\right) \tag{2}
+\end{equation}
+\]
+or, put differently,
+<a name="eq:epsL:gg:one"/>
+\[
+\begin{equation}
+		\varepsilon \approx 8e^{\varepsilon_{L}/2}\sqrt{\frac{\log\frac{4}{\delta}}{n}} \tag{3}
+\end{equation}
+\]
+That’s a bit harder to interpret, but that seems… useful? It is: let us see how much, with a couple examples.</p>
+
+<h4 id="learning">Learning.</h4>
+<p>The first one is distribution learning, a.k.a. density estimation: you have \(n\) i.i.d. samples (one per user) from an unknown probability distribution \(\mathbf{p}\) over a discrete domain of size \(k\), and your goal is to output an estimate \(\widehat{\mathbf{p}}\) such that, with high (say, constant) probability, \(\mathbf{p}\) and \(\widehat{\mathbf{p}}\) are close in <em>total variation distance</em>:
+\[
+		\operatorname{TV}(\mathbf{p},\widehat{\mathbf{p}}) = \sup_{S\subseteq [k]} (\mathbf{p}(S) - \widehat{\mathbf{p}}(S) ) \leq \alpha
+\]
+(if total variation distance seems a bit mysterious, it’s exactly half the \(\ell_1\) distance between the probability mass functions). We know how to solve this problem in the non-private setting: \(n=\Theta\left( \frac{k}{\alpha^2} \right)\) samples are necessary and sufficient. We know how to solve this problem in the (central) DP setting: \(n=\Theta\left( \frac{k}{\alpha^2} + \frac{k}{\alpha\varepsilon} \right)\) samples are necessary and sufficient <a href="https://proceedings.neurips.cc/paper/2015/hash/2b3bf3eee2475e03885a110e9acaab61-Abstract.html" title="Ilias Diakonikolas, Moritz Hardt, Ludwig Schmidt. Differentially Private Learning of Structured Discrete Distributions. NeurIPS 2015"><strong>[DHS15]</strong></a>. We know how to solve this problem in the LDP setting: 
+<a name="eq:learning:ldp"/>
+\begin{equation}
+n=\Theta\left(\frac{k^2}{\alpha^2(e^\varepsilon-1)^2}+\frac{k^2}{\alpha^2e^\varepsilon}+\frac{k}{\alpha^2}\right) \tag{4}
+\end{equation}
+samples are necessary and sufficient <a href="http://proceedings.mlr.press/v89/acharya19a.html" title="Jayadev Acharya, Ziteng Sun, Huanyu Zhang. Hadamard Response: Estimating Distributions Privately, Efficiently, and with Little Communication. AISTATS 2019"><strong>[ASZ19]</strong></a> (note that the first term is just \(k/(\alpha^2\varepsilon^2)\) for small \(\varepsilon\)). Now, as they say in Mulan: <em>let’s make a shuffle DP algo out of you.</em></p>
+
+<p>If we want to achieve \((\varepsilon,\delta)\)-shuffle DP, we need to select \(\varepsilon_L\). Based on <a href="https://differentialprivacy.org/feed.xml#eq:epsL:ll:one">(2)</a> and <a href="https://differentialprivacy.org/feed.xml#eq:epsL:gg:one">(3)</a>, and ignoring pesky constants we will choose it so that
+<a name="eq:choice:epsL"/>
+\begin{equation}
+	 \varepsilon_{L} \approx \varepsilon \sqrt{\frac{n}{\log(1/\delta)}}  \quad\text{ or }\quad e^{\varepsilon_{L}} \approx \varepsilon^2 \cdot \frac{n}{\log(1/\delta)}\,. \tag{5}
+\end{equation}
+depending on whether \(\frac{\varepsilon^2 n}{\log(1/\delta)}\geq 1\). Plugging that back in <a href="https://differentialprivacy.org/feed.xml#eq:learning:ldp">(4)</a>, we see that the first case corresponds to the first term (small \(\varepsilon_{L}\)) and the second to the second term (\(\varepsilon_{L} \geq 1\)), and overall the condition on \(n\) for the original LDP algorithm to 
+successful learn the distribution becomes
+\[
+	n \gtrsim 
+	\frac{k^2}{\alpha^2(e^{\varepsilon_{L}}-1)^2}+\frac{k^2}{\alpha^2e^{\varepsilon_{L}}}+\frac{k}{\alpha^2}
+	\approx \frac{k^2\log(1/\delta)}{\alpha^2\varepsilon^2 n}+\frac{k^2\log(1/\delta)}{\alpha^2\varepsilon^2 n}+\frac{k}{\alpha^2} 
+	 \approx \frac{k^2\log(1/\delta)}{\alpha^2\varepsilon^2 n}+\frac{k}{\alpha^2}
+\]
+(where \(\gtrsim\) means “let’s ignore constants”). There is an \(n\) in the RHS as well, so reorganizing and handling the two terms separately the condition on \(n\) becomes
+\[
+	n \gtrsim \frac{k \sqrt{\log(1/\delta)}}{\alpha\varepsilon}+\frac{k}{\alpha^2}
+\]
+which… is great? We immediately get a sample complexity \(O\left(\frac{k}{\alpha^2}+\frac{k \sqrt{\log(1/\delta)}}{\alpha\varepsilon}\right)\) in the shuffle DP model, which (ignoring the \(\sqrt{\log(1/\delta)}\)) matches the one in the <em>central</em> DP setting!</p>
+
+<p><strong>tl;dr:</strong> Taking an optimal LDP algorithm and just shuffling the messages <em>immediately</em> gives an optimal shuffle DP algorithm, no extra work needed.</p>
+
+<h4 id="uniformity-testing">(Uniformity) Testing.</h4>
+<p>Alright, maybe it was a fluke? Let’s look at another “basic” problem close to my heart: we don’t want to learn the probability distribution \(\mathbf{p}\), just test whether it is actually <em>the</em> uniform distribution<sup id="fnref:4"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:4" rel="footnote">4</a></sup> \(\mathbf{u}\) on the domain \([k]={1,2,\dots,k}\). So if \(\mathbf{p} =\mathbf{u}\), you’ve got to say “yes” with probability at least \(2/3\), and if \(\operatorname{TV}(\mathbf{p},\mathbf{u})&gt;\alpha\), then you need to say “no” with probability at least \(2/3\).</p>
+
+<p>This is also well understood in the non-private setting (\(n=\Theta(\sqrt{k}/\alpha^2)\)) <a href="https://ieeexplore.ieee.org/document/4626074" title="Liam Paninski. A Coincidence-Based Test for Uniformity Given Very Sparsely Sampled Discrete Data. IEEE Trans. Inf. Theory 2008"><strong>[Paninski08]</strong></a> [see also <a href="https://ccanonne.github.io/survey-topics-dt.html}{my upcoming survey">my upcoming survey</a>], in the central DP setting (\(n=\Theta\left( \frac{\sqrt{k}}{\alpha^2} + \frac{\sqrt{k}}{\alpha\sqrt{\varepsilon}}+\frac{k^{1/3}}{\alpha^{4/3}\varepsilon^{2/3}} + \frac{1}{\alpha\varepsilon} \right)\)) <a href="https://arxiv.org/abs/1707.05128" title="Jayadev Acharya, Ziteng Sun, Huanyu Zhang. Differentially Private Testing of Identity and Closeness of Discrete Distributions. NeurIPS 2018"><strong>[ASZ18</strong></a>, <a href="https://arxiv.org/abs/1707.05497" title="Maryam Aliakbarpour, Ilias Diakonikolas, Ronitt Rubinfeld. Differentially Private Identity and Equivalence Testing of Discrete Distributions. ICML 2018"><strong>ADR18]</strong></a>, and in the LDP setting, where the result differs on whether the users can communicate or share a common random seed 
+<a name="eq:testing:ldp:publiccoin"/>
+\begin{equation}
+	n=\Theta\left( \frac{k}{\alpha^2(e^\varepsilon-1)^2} + \frac{k}{\alpha^2e^{\varepsilon/2}} + \frac{\sqrt{k}}{\alpha^2}\right) \tag{6}
+\end{equation} or not
+<a name="eq:testing:ldp:privatecoin"/> 
+\begin{equation}
+	n=\Theta\left( \frac{k^{3/2}}{\alpha^2(e^\varepsilon-1)^2} + \frac{k^{3/2}}{\alpha^2e^{\varepsilon}} + \frac{\sqrt{k}}{\alpha^2}\right) \tag{7}
+\end{equation}
+as established in a sequence of papers <a href="https://arxiv.org/abs/1812.11476" title="Inference under Information Constraints: Lower Bounds from Chi-Square Contraction. COLT 2019"><strong>[ACT19</strong></a>, <a href="https://arxiv.org/abs/1911.01452" title="Kareem Amin, Matthew Joseph, Jieming Mao. Pan-Private Uniformity Testing. COLT 2020"><strong>AJM20</strong></a>, <a href="https://arxiv.org/abs/2101.07981" title="Jayadev Acharya, Cl&#xE9;ment L. Canonne, Cody Freitag, Ziteng Sun, Himanshu Tyagi.  Inference Under Information Constraints III: Local Privacy Constraints. IEEE J. Sel. Areas Inf. Theory 2021"><strong>ACFST21</strong></a>, <a href="https://arxiv.org/abs/2007.10976" title="Jayadev Acharya, Cl&#xE9;ment L. Canonne, Yuhan Liu, Ziteng Sun, Himanshu Tyagi. Interactive Inference Under Information Constraints. IEEE Trans. Inf. Theory 2022"><strong>ACLST22</strong></a>, <a href="https://arxiv.org/abs/2108.08987" title="Cl&#xE9;ment L. Canonne, Hongyi Lyu. Uniformity Testing in the Shuffle Model: Simpler, Better, Faster. SOSA 2022"><strong>CL22]</strong></a>.</p>
+
+<p>Now, say you want an (\(\varepsilon,\delta)\)-shuffle DP algorithm for uniformity testing, but don’t want to design one from scratch (though it <em>is</em> possible to do so, and some did <a href="https://arxiv.org/abs/2004.09481" title="Victor Balcer, Albert Cheu, Matthew Joseph, Jieming Mao. Connecting Robust Shuffle Privacy and Pan-Privacy. SODA 2021"><strong>[BCJM21</strong></a>, <a href="https://arxiv.org/abs/2108.08987" title="Cl&#xE9;ment L. Canonne, Hongyi Lyu. Uniformity Testing in the Shuffle Model: Simpler, Better, Faster. SOSA 2022"><strong>CL22</strong></a>, <a href="https://arxiv.org/abs/2112.10032" title="Albert Cheu, Chao Yan. Pure Differential Privacy from Secure Intermediaries. arXiv 2021"><strong>CY21]</strong></a>). Let’s say you want to look at the “no-common-random-seed-shared-by-users” model (a.k.a. <em>private-coin</em> setting): so you stare at the corresponding LDP communication complexity, <a href="https://differentialprivacy.org/feed.xml#eq:testing:ldp:privatecoin">(7)</a>, and try to choose \(\varepsilon_L\) to start with before shuffling. This will be the same as in the learning example (i.e., <a href="https://differentialprivacy.org/feed.xml#eq:choice:epsL">(5)</a>): based on <a href="https://differentialprivacy.org/feed.xml#eq:epsL:ll:one">(2)</a> and <a href="https://differentialprivacy.org/feed.xml#eq:epsL:gg:one">(3)</a>, we will set
+\begin{equation}
+	 \varepsilon_{L} \approx \varepsilon \sqrt{\frac{n}{\log(1/\delta)}}  \quad\text{ or }\quad e^{\varepsilon_{L}} \approx \varepsilon^2 \cdot \frac{n}{\log(1/\delta)}\,.
+\end{equation}
+depending on whether \(\frac{\varepsilon^2 n}{\log(1/\delta)}\geq 1\). Plugging this back in <a href="https://differentialprivacy.org/feed.xml#eq:testing:ldp:privatecoin">(7)</a> and quickly checking which case corresponds to each term, we then easily get that for our algorithm to correctly solve the uniformity testing problem, it suffices that the sample complexity (number of users) \(n\) satisfies
+\[
+	n \gtrsim \frac{k^{3/2}}{\alpha^2(e^{\varepsilon_L}-1)^2} + \frac{k^{3/2}}{\alpha^2e^{\varepsilon_L}} + \frac{\sqrt{k}}{\alpha^2}
+	 \approx \frac{k^{3/2}\log(1/\delta)}{\alpha^2\varepsilon^2 n } + \frac{\sqrt{k}}{\alpha^2}
+\]
+which, reorganizing and solving for \(n\), means that it suffices to have 
+\[
+	n \gtrsim \frac{k^{3/4}\sqrt{\log(1/\delta)}}{\alpha\varepsilon} + \frac{\sqrt{k}}{\alpha^2}\,.
+\]
+And, <em>voilà</em>! Even better, we also have strong evidence to suspect that this sample complexity \(O\Big(\frac{k^{3/4}\sqrt{\log(1/\delta)}}{\alpha\varepsilon}+ \frac{\sqrt{k}}{\alpha^2}\Big)\) is tight among all private-coin algorithms.<sup id="fnref:5"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:5" rel="footnote">5</a></sup></p>
+
+<p>Now, if you wanted to look at <em>public-coin</em> shuffle DP protocols (with a common random seed available), then you would start with an optimal public-coin LDP algorithm (and look at <a href="https://differentialprivacy.org/feed.xml#eq:testing:ldp:publiccoin">(6)</a>), and setting \(\varepsilon_L\) the same way you’d get a shuffle DP algorithm with sample complexity
+\[
+n=O\Big(\frac{k^{2/3}\log^{1/3}(1/\delta)}{\alpha^{4/3}\varepsilon^{2/3}} + \frac{\sqrt{k\log(1/\delta)}}{\alpha\varepsilon}+ \frac{\sqrt{k}}{\alpha^2}\Big)
+\]
+which, well, is <em>also</em> strongly believed to be optimal!</p>
+
+<p><strong>tl;dr:</strong> Here again, taking an optimal off-the-shelf LDP algorithm and just shuffling the messages <em>immediately</em> gives an optimal shuffle DP algorithm, no extra work needed.</p>
+
+<h3 id="conclusion">Conclusion.</h3>
+<p>I hope the above convinced you of how useful this privacy amplification can be: from an optimal LDP algorithm, featuring any extra appealing characteristics you like, <em>just adding an extra shuffling step as postprocessing</em> yields an (often optimal? At least good) shuffle DP algorithm, <em>with the same characteristics</em> and built-in robustness against malicious users.</p>
+
+<p>All you need is to make sure that your starting point, the LDP algorithm satisfies a couple things: (1) all users have the same randomizer,<sup id="fnref:6"><a class="footnote" href="https://differentialprivacy.org/feed.xml#fn:6" rel="footnote">6</a></sup> and (2) it works in all regimes of \(\varepsilon\) (both high-privacy, \(\varepsilon \leq 1\), <em>and</em> low-privacy, \(\varepsilon \gg 1\)). Once you’ve got this, Bob’s your uncle! You get shuffle DP algorithms for free.</p>
+
+<p>It is not only appealing from a theoretical point of view, by the way! The authors of the paper worked hard to make their empirical analysis compelling as well, and their code is available <a href="https://github.com/apple/ml-shuffling-amplification">on GitHub</a> 📝. But more importantly, from a practitioner’s point of view, this means it is enough to design, implement, and test <em>one</em> algorithm (the LDP one we start with) to automatically get a trusted one in the shuffle DP model as well: this reduces the risks of bugs, security failures, the amount of work spending tuning, testing…</p>
+
+<p>So yes, whenever possible, we <em>should</em> hide among the clones!</p>
+
+<hr/>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p>The title of this post is a reference to the title of <a href="https://arxiv.org/abs/2012.12803" title="Vitaly Feldman, Audra McMillan, Kunal Talwar. Hiding Among the Clones: A Simple and Nearly Optimal Analysis of Privacy Amplification by Shuffling. FOCS 2021"><strong>[FMT21]</strong></a>, “Hiding Among The Clones,” and to the notion of <em>privacy blanket</em> introduced by Balle, Bell, Gascón, and Nissim <a href="https://link.springer.com/chapter/10.1007/978-3-030-26951-7_22" title="Borja Balle, James Bell, Adri&#xE0; Gasc&#xF3;n, Kobbi Nissim. The Privacy Blanket of the Shuffle Model. CRYPTO 2019"><strong>[BBGN19]</strong></a>. Intuitively, the “amplification by shuffling” paradigm can be seen as anonymizing the messages from local randomizers, whose message distribution can be mathematically decomposed as a mixture of “noise distribution not depending on the user’s input” and “distribution actually depending on their input.” As a result, each user randomly sends a message from the first or second distribution of the mixture.  But the shuffling then hides the informative messages (drawn from the second part of the mixture) among the non-informative (noise) ones: so the noise messages end up providing a “privacy blanket” in which sensitive information is safely and soundly wrapped. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:1">↩</a></p>
+    </li>
+    <li id="fn:2">
+      <p>More specifically, they can completely jeopardize the <em>utility</em> (accuracy) of the result, but in terms of privacy, all they can do is slightly reduce it: if \(10\%\) of users are malicious, the remaining \(90\%\) still get the privacy amplification of guarantee of <a href="https://differentialprivacy.org/feed.xml#eq:eps:epsL">(1)</a>, but with \(0.9n\) instead of \(n\). <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:2">↩</a></p>
+    </li>
+    <li id="fn:3">
+      <p>Of course, we started with a local privacy guarantee, and ended up with a shuffle privacy guarantee: so the two are incomparable, and one has to interpret this “amplification” in that context. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:3">↩</a></p>
+    </li>
+    <li id="fn:4">
+      <p>You can here replace uniform by any known distribution \(\mathbf{q}\) of your choosing, that doesn’t change the question (and result), but uniform is nice. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:4">↩</a></p>
+    </li>
+    <li id="fn:5">
+      <p>As long as one is happy with approximate DP. One can achieve that in pure DP as well, but it’s a bit more complicated <a href="https://arxiv.org/abs/2112.10032" title="Albert Cheu, Chao Yan. Pure Differential Privacy from Secure Intermediaries. arXiv 2021"><strong>[CY21]</strong></a>. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:5">↩</a></p>
+    </li>
+    <li id="fn:6">
+      <p>This is not such a big assumption usually, and there are somewhat-general ways to get to that using a logarithmic factor in the number of users. <a class="reversefootnote" href="https://differentialprivacy.org/feed.xml#fnref:6">↩</a></p>
+    </li>
+  </ol>
+</div></div>
+    </summary>
+    <updated>2022-05-24T15:45:00Z</updated>
+    <published>2022-05-24T15:45:00Z</published>
+    <author>
+      <name>Clément Canonne</name>
+    </author>
+    <source>
+      <id>https://differentialprivacy.org</id>
+      <link href="https://differentialprivacy.org" rel="alternate" type="text/html"/>
+      <link href="https://differentialprivacy.org/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Website for the differential privacy research community</subtitle>
+      <title>Differential Privacy</title>
+      <updated>2022-05-24T11:29:20Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>http://arxiv.org/abs/2205.10834</id>
@@ -1917,31 +2090,6 @@ Email: jn@di.ku.dk</p></div>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
       <updated>2022-05-24T10:37:30Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en">
-    <id>http://cstheory-events.org/2022/05/10/ideal-workshop-on-algorithms-for-massive-data-sets/</id>
-    <link href="https://cstheory-events.org/2022/05/10/ideal-workshop-on-algorithms-for-massive-data-sets/" rel="alternate" type="text/html"/>
-    <title>IDEAL Workshop on Algorithms for Massive Data Sets</title>
-    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">May 13, 2022 Northwestern University and Zoom https://www.ideal.northwestern.edu/events/massive-data-sets/ We are inviting you to attend the IDEAL Workshop on Algorithms for Massive Data Sets. The workshop will take place at Northwestern University on Friday, May 13. It will be in a hybrid format. If you are interested in participating in the workshop (in-person or remotely), please … <a class="more-link" href="https://cstheory-events.org/2022/05/10/ideal-workshop-on-algorithms-for-massive-data-sets/">Continue reading <span class="screen-reader-text">IDEAL Workshop on Algorithms for Massive Data Sets</span></a></div>
-    </summary>
-    <updated>2022-05-10T16:07:55Z</updated>
-    <published>2022-05-10T16:07:55Z</published>
-    <category term="workshop"/>
-    <author>
-      <name>shacharlovett</name>
-    </author>
-    <source>
-      <id>https://cstheory-events.org</id>
-      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
-      <link href="https://cstheory-events.org/feed/" rel="self" type="application/atom+xml"/>
-      <link href="https://cstheory-events.org" rel="alternate" type="text/html"/>
-      <link href="https://cstheory-events.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
-      <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
-      <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
-      <title>CS Theory Events</title>
-      <updated>2022-05-24T10:38:04Z</updated>
     </source>
   </entry>
 </feed>
