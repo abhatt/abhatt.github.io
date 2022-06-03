@@ -56,7 +56,7 @@ Stay up to date
 
 <h3>Blogs/feeds</h3>
 <div class="subscriptionlist">
-<a class="feedlink" href="http://aaronsadventures.blogspot.com/feeds/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
+<a class="feedlink" href="http://www.blogger.com/feeds/25562705/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://aaronsadventures.blogspot.com/" title="Adventures in Computation">Aaron Roth</a>
 <br>
 <a class="feedlink" href="https://adamsheffer.wordpress.com/feed/" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at June 03, 2022 12:21 PM UTC</span>.
+Last updated <span class="datestr">at June 03, 2022 12:38 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -254,6 +254,132 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://toc4fairness.org/?p=2149">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/fair.jpg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-US"><a class="entryheader" href="https://toc4fairness.org/practical-robust-and-equitable-uncertainty-estimation/">Practical, Robust, and Equitable Uncertainty Estimation</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://toc4fairness.org" title="TOC for Fairness">TOC for Fairness</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en-US">
+<p class="has-text-align-center"><em>This is a post about a new paper that is joint work with Bastani, Gupta, Jung, Noarov, and Ramalingam. The paper is here: <a href="https://arxiv.org/abs/2206.01067">https://arxiv.org/abs/2206.01067</a>  and here is a recording of a recent talk I gave about it at the Simons Foundation: <a href="https://www.simonsfoundation.org/event/robust-and-equitable-uncertainty-estimation/&amp;nbsp">https://www.simonsfoundation.org/event/robust-and-equitable-uncertainty-estimation/ </a></em></p>
+
+
+
+<p>Machine Learning is really good at making point predictions — but it sometimes makes mistakes. How should we think about which predictions we should trust? In other words, what is the right way to think about the uncertainty of particular predictions? Together with Osbert Bastani, Varun Gupta, Chris Jung, Georgy Noarov, and Ramya Ramalingam, we have some new work I’m really excited about. </p>
+
+
+
+<p>A natural way to quantify uncertainty is to predict a set of labels rather than a single one. Pick a degree of certainty — say 90%. For every prediction we make, we’d like to return the smallest set of labels that is guaranteed to contain the true label 90% of the time. These are “prediction sets”, and quantify uncertainty in a natural way: ideally, we will be sure about the correct label, and the prediction set will contain only a single label (the prediction we are certain about). But the larger our prediction set, the more our uncertainty, and the contents of the prediction set lets us know what exactly the model is uncertain about. </p>
+
+
+
+<figure class="wp-block-table"><table><tbody><tr><td class="has-text-align-center"><img src="https://i0.wp.com/toc4fairness.org/wp-content/uploads/2022/06/predictionset.png?resize=800%2C256&amp;ssl=1" style="width: 500px;" height="256" width="800" alt="" class="wp-image-2151" /><a href="https://www.blogger.com/blog/post/edit/25562705/4217158232171967686"></a></td></tr><tr><td class="has-text-align-center">An example of prediction sets for ImageNet. This example comes from a nice recent paper by Angelopoulos, Bates, Malik, and Jordan: <a href="https://arxiv.org/abs/2009.14193">https://arxiv.org/abs/2009.14193</a> </td></tr></tbody></table></figure>
+
+
+
+<p>But how can we do this? Conformal Prediction provides a particularly simple way. Here is an outline of the vanilla version of conformal prediction (there are plenty of variants): </p>
+
+
+
+<p>Step 1: Pick a (non)conformity score to measure how different a label y is from a prediction f(x). e.g. for a regression model we could choose $s(x,y) = |f(x)-y|$ — but lots of interesting work has been done recently to develop much fancier ones. A lot of the art of conformal prediction is in finding a good score function.</p>
+
+
+
+<p>Step 2: Find a threshold $\tau$ such that for a new example <img src="https://s0.wp.com/latex.php?latex=%28x%2Cy%29&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="(x,y)" class="latex" />, <img src="https://s0.wp.com/latex.php?latex=%5CPr%5Bs%28x%2Cy%29+%5Cleq+%5Ctau%5D+%3D+0.9&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="\Pr[s(x,y) \leq \tau] = 0.9" class="latex" />. An easy way to do this is using a holdout set. </p>
+
+
+
+<p>Step 3: On a new example <img src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="x" class="latex" />, given a point prediction <img src="https://s0.wp.com/latex.php?latex=f%28x%29&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="f(x)" class="latex" />, produce the prediction set <img src="https://s0.wp.com/latex.php?latex=P%28x%29+%3D+%5C%7By+%3A+s%28x%2Cy%29+%5Cleq+%5Ctau%5C%7D&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="P(x) = \{y : s(x,y) \leq \tau\}" class="latex" />. </p>
+
+
+
+<p>Thats it! Nice and simple. Check out <a href="https://arxiv.org/abs/2107.07511">this recent survey by Angelopolous and Bates</a> for an accessible introduction to conformal prediction. </p>
+
+
+
+<p>But a few things could go wrong. First, the technique of using a holdout set only works if the data is i.i.d. or more generally exchangable — i.e. the data distribution should be permutation invariant. But maybe its coming from some changing distribution. If the distribution has changed in an expected and well behaved way, there are some fixes that let you apply the same framework, but if not you are likely in trouble.</p>
+
+
+
+<figure class="wp-block-table aligncenter"><table><tbody><tr><td><img src="https://i0.wp.com/toc4fairness.org/wp-content/uploads/2022/06/nonexchangable-joke.png?resize=800%2C571&amp;ssl=1" style="width: 500px;" height="571" width="800" alt="" class="wp-image-2152" /><a href="https://blogger.googleusercontent.com/img/a/AVvXsEje9UBcYGyvVOkiIH_g3O2jlKIfGd5TVuVYOY_81duPMVJRrmTcZycrHumnMMpIp9O3EI4Ubf0dhYBb5dttrZEVWjD92C8qv1Xwmjdn1Y-5bfbzMBqcuTeBq_0ZZ78ymLgWp9kFRhI3f8eehSPv9TmyncWsFEqDHbMLF2JGhl6Y5Giqz5bIIA"></a></td></tr><tr><td>A joke about non-exchangable data</td></tr></tbody></table></figure>
+
+
+
+<p>Second, an average over everyone might not be what you care about. If we are in a personalized medicine setting, you might care about the reliability of predictions not just overall, but for women with a family history of diabetes and egg allergies — or whatever else you think is medically relevant about you as an individual.</p>
+
+
+
+<p>This is the problem that we want to solve: How to give prediction sets that cover their label 90% of the time even if we make no assumptions at all about the data generating process, and even if we care about coverage conditional on arbitrary intersecting subsets of the data.</p>
+
+
+
+<p>We want stronger guarantees in another way too. If you think about our goal, there is a way to cheat: 90% of the time, predict the (trivial) set of all labels. 10% of the time predict the empty set. This covers the real label 90% of the time, but is completely uninformative.</p>
+
+
+
+<p>To avoid this “solution”, we also ask that our predictions be threshold calibrated. Remember our prediction sets have the form <img src="https://s0.wp.com/latex.php?latex=P_t%28x%29+%3D+%5C%7By+%3A+s%28x%2Cy%29+%5Cleq+%5Ctau_t%5C%7D&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="P_t(x) = \{y : s(x,y) \leq \tau_t\}" class="latex" />. Now the threshold <img src="https://s0.wp.com/latex.php?latex=%5Ctau_t&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="\tau_t" class="latex" /> might be different every day. But we want 90% coverage even conditional on the value of <img src="https://s0.wp.com/latex.php?latex=%5Ctau_t&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="\tau_t" class="latex" />.</p>
+
+
+
+<p>This rules out cheating. Remarkably (I think!), for every set of groups specified ahead of time, we’re able to guarantee that even if the data is generated by an adversary, that our empirical coverage converges to 90% at the statistically optimal rate. Here is what that means:</p>
+
+
+
+<p>Pick a threshold <img src="https://s0.wp.com/latex.php?latex=%5Ctau&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="\tau" class="latex" /> and group <img src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="G" class="latex" />. Consider all <img src="https://s0.wp.com/latex.php?latex=n_%7B%5Ctau%2CG%7D&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="n_{\tau,G}" class="latex" /> rounds in which the example <img src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="x" class="latex" /> was in <img src="https://s0.wp.com/latex.php?latex=G&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="G" class="latex" />, and in which we predicted threshold <img src="https://s0.wp.com/latex.php?latex=%5Ctau&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="\tau" class="latex" />.  We promise that on this set, we cover 90% <img src="https://s0.wp.com/latex.php?latex=%5Cpm&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="\pm" class="latex" /> <img src="https://s0.wp.com/latex.php?latex=1%2F%5Csqrt%7Bn_%7B%5Ctau%2CG%7D%7D&amp;bg=ffffff&amp;fg=000&amp;s=0&amp;c=20201002" alt="1/\sqrt{n_{\tau,G}}" class="latex" /> of the labels. This is the best you could do even with a known distribution.</p>
+
+
+
+<p>The best thing is that the algorithm is super simple and practical. We had<a href="https://arxiv.org/abs/2101.01739"> a paper last year</a> that showed how to do much of this in theory — but the algorithm from that paper was not easily implementable (it involved solving an exponentially large linear program with a separation oracle).  But here is our new algorithm — it only involves doing a small amount of arithmetic for each prediction:</p>
+
+
+
+<figure class="wp-block-image"><a href="https://blogger.googleusercontent.com/img/a/AVvXsEh9AnXTAw_h8Z1DI2Ui3Usp0wYWLVHC7u0i8WR90J8WnysneaxXKUZvU9MQL30elKou4H1bZSoajYpYivZz6ztv3MwiDiOHImi6TXIJmaxWa0W-HRmDvbfFaQfOtpK-JISnbszduJz1YuwX_8IhUJweINzwirvtn1zFhNzCCaTRZHrEcAcQ-Q"><img src="https://blogger.googleusercontent.com/img/a/AVvXsEh9AnXTAw_h8Z1DI2Ui3Usp0wYWLVHC7u0i8WR90J8WnysneaxXKUZvU9MQL30elKou4H1bZSoajYpYivZz6ztv3MwiDiOHImi6TXIJmaxWa0W-HRmDvbfFaQfOtpK-JISnbszduJz1YuwX_8IhUJweINzwirvtn1zFhNzCCaTRZHrEcAcQ-Q" alt="" /></a></figure>
+
+
+
+<p>So we’re able to implement it and run a bunch of experiments. You can read about them in detail in the paper, but the upshot is that our new method is competitive with split conformal prediction even on “its own turf” — i.e. when the data really is drawn i.i.d. and we only care about marginal coverage — and really excels when the data comes from a more complicated source, or when we measure group-conditional coverage, which traditional methods tend to have much more trouble with. We run experiments on regression and classification tasks, on exchangeable data, under distribution shift, on real time series data, and on adversarial data orderings. Even when the data is i.i.d. and we only care about marginal coverage, our method has an important advantage over split conformal prediction — since we don’t need to preserve exchangability, we can use all of the data to train the underlying model, whereas split conformal prediction needs to reserve some fraction of it for a holdout set. The result is faster learning for our method, which results in smaller/more accurate prediction sets even without the complicating factors of groupwise coverage, threshold calibration or adversarial data!</p>
+
+
+
+<figure class="wp-block-image"><a href="https://blogger.googleusercontent.com/img/a/AVvXsEi_aZVJNKOwZAqvG8VakcezTF1GsazQ5tu-zh-UEMdNQKkQMtAWM0t4SD2qxqnLHzt9LVHlq-LpohdzzGTwVbmJyboe3qXdd6HBlkULcCWRWMCVgcDD6NcWZ1UMRR63nYS3GRReYei2bdat0WdJGvk6cbDezmXb59QwCRDbF8pOTJadJ6KWsQ"><img src="https://blogger.googleusercontent.com/img/a/AVvXsEi_aZVJNKOwZAqvG8VakcezTF1GsazQ5tu-zh-UEMdNQKkQMtAWM0t4SD2qxqnLHzt9LVHlq-LpohdzzGTwVbmJyboe3qXdd6HBlkULcCWRWMCVgcDD6NcWZ1UMRR63nYS3GRReYei2bdat0WdJGvk6cbDezmXb59QwCRDbF8pOTJadJ6KWsQ" alt="" /></a></figure>
+
+
+
+<figure class="wp-block-image"><a href="https://blogger.googleusercontent.com/img/a/AVvXsEj8Fz00pgB6ecV04-CrFtPrvPMp_g-csyIZ5A02Sjrizm9LAi8XGsL7G4nnTSojkNX8q9N5EmiRYlawVTwo9fP3qV_fErvIT19WYu3KReaZNDanVUDRTx9ZmS5rOfKgO_6o86wGESe3vheqsG6mLd6DKuomdV8GaQM3t3JIiHNkvaB1Sfbi5w"><img src="https://blogger.googleusercontent.com/img/a/AVvXsEj8Fz00pgB6ecV04-CrFtPrvPMp_g-csyIZ5A02Sjrizm9LAi8XGsL7G4nnTSojkNX8q9N5EmiRYlawVTwo9fP3qV_fErvIT19WYu3KReaZNDanVUDRTx9ZmS5rOfKgO_6o86wGESe3vheqsG6mLd6DKuomdV8GaQM3t3JIiHNkvaB1Sfbi5w" alt="" /></a></figure></div>
+
+
+
+
+
+
+
+<p class="date">
+by Aaron Roth <a href="https://toc4fairness.org/practical-robust-and-equitable-uncertainty-estimation/"><span class="datestr">at June 03, 2022 12:25 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -3658,64 +3784,6 @@ The conjecture suggests that there is no optimal proof system because undecidabl
 
 <p class="date">
 <a href="https://eccc.weizmann.ac.il/report/2022/076"><span class="datestr">at May 22, 2022 05:41 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://eccc.weizmann.ac.il/report/2022/075">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eccc.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="https://eccc.weizmann.ac.il/report/2022/075">TR22-075 |  Vanishing Spaces of Random Sets and Applications to Reed-Muller Codes | 
-
-	Prahladh Harsha, 
-
-	Siddharth Bhandari, 
-
-	Srikanth Srinivasan, 
-
-	Ramprasad Saptharishi</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://eccc.weizmann.ac.il/" title="ECCC - Reports">ECCC papers</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-We study the following natural question on random sets of points in $\mathbb{F}_2^m$:
-    
-
-Given a random set of $k$ points $Z=\{z_1, z_2, \dots, z_k\} \subseteq \mathbb{F}_2^m$, what is the dimension of the space of degree at most $r$ multilinear polynomials that vanish on all points in $Z$?
-
-
-We show that, for $r \leq \gamma m$ (where $\gamma &gt; 0$ is a small, absolute constant) and $k = (1-\epsilon) \cdot {m \choose {\leq r}}$ for any constant $\epsilon &gt; 0$, the space of degree at most $r$ multilinear polynomials vanishing on a random set $Z = \{z_1,\ldots, z_k\}$ has dimension exactly ${m \choose {\leq r}} - k$ with probability $1 - o(1)$. This bound shows that random sets have a much smaller space of degree at most $r$ multilinear polynomials vanishing on them, compared to the worst-case bound (due to Wei (IEEE Trans. Inform. Theory, 1991)) of ${m \choose{\leq r}} - {{\log_2 k}\choose {\leq r}} \gg {m\choose{\leq r}} - k$. 
-
-    Using this bound, we show that high-degree Reed-Muller codes ($\text{RM}(m,d)$ with $d &gt; (1-\gamma) m$) ``achieve capacity'' under the Binary Erasure Channel in the sense that, for any $\epsilon &gt; 0$, we can recover from $(1 - \epsilon) \cdot {m\choose {\leq m-d-1}}$ random erasures with probability $1 - o(1)$. This also implies that $\text{RM}(m,d)$ is also efficiently decodable from $\approx {m\choose {\leq m-(d/2)}}$ random errors for the same range of parameters.</div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="https://eccc.weizmann.ac.il/report/2022/075"><span class="datestr">at May 21, 2022 07:53 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
