@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at June 03, 2022 12:38 PM UTC</span>.
+Last updated <span class="datestr">at June 03, 2022 01:21 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -254,6 +254,48 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="tag:blogger.com,1999:blog-25562705.post-4217158232171967686">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/roth.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="http://aaronsadventures.blogspot.com/2022/06/practical-robust-and-equitable.html">Practical, Robust, and Equitable Uncertainty Estimation</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://aaronsadventures.blogspot.com/" title="Adventures in Computation">Aaron Roth</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p style="text-align: center;"><span lang="EN"><i>This is a post about a new paper that is joint work with Bastani, Gupta, Jung, Noarov, and Ramalingam. The paper is here: </i></span><span style="text-align: left;"><i><a href="https://arxiv.org/abs/2206.01067">https://arxiv.org/abs/2206.01067</a></i></span><span lang="EN"><i> and here is a recording of a recent talk I gave about it at the Simons Foundation: </i></span><span style="text-align: left;"><i><a href="http://aaronsadventures.blogspot.com/feeds/posts/This is a post about a new paper that is joint work with Bastani, Gupta, Jung, Noarov, and Ramalingam. The paper is here:   and here is a recording of me giving a talk about it: https://www.simonsfoundation.org/event/robust-and-equitable-uncertainty-estimation/">https://www.simonsfoundation.org/event/robust-and-equitable-uncertainty-estimation/ </a>. This is cross-posted to the <a href="https://toc4fairness.org/practical-robust-and-equitable-uncertainty-estimation/">TOC4Fairness Blog</a> (and this work comes out of the Simons Collaboration on the Theory of Algorithmic Fairness)</i></span></p><p><br /></p><p>Machine Learning is really good at making point predictions --- but it sometimes makes mistakes. How should we think about which predictions we should trust? In other words, what is the right way to think about the uncertainty of particular predictions? Together with Osbert Bastani, Varun Gupta, Chris Jung, Georgy Noarov, and Ramya Ramalingam, we have some new work I'm really excited about. </p> <p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"><span lang="EN">A natural way to quantify uncertainty is to predict a set of labels rather than a single one. Pick a degree of certainty --- say 90%. For every prediction we make, we'd like to return the smallest set of labels that is guaranteed to contain the true label 90% of the time. These are "prediction sets", and quantify uncertainty in a natural way: ideally, we will be sure about the correct label, and the prediction set will contain only a single label (the prediction we are certain about). But the larger our prediction set, the more our uncertainty, and the contents of the prediction set lets us know what exactly the model is uncertain about. </span></p><p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"><span lang="EN"></span></p><table cellpadding="0" align="center" style="margin-left: auto; margin-right: auto;" cellspacing="0" class="tr-caption-container"><tbody><tr><td style="text-align: center;"><a style="margin-left: auto; margin-right: auto;" href="https://blogger.googleusercontent.com/img/a/AVvXsEiM6gcqACKJ0qGQ_We9SiWjb_Mqiyh9rgb8SllcXpgzFFf0O5wJqHKogVUlEaX-Cssihkl9uzHLnsbiBzJIAze1AQXjdZpf1PUTK6GpGIyW-j_qoUSyDnx8SpRo9i2xBJJ3ynVdXuA5vkr70nxcFNcYKdJrIhOOI_4-imNOmif4QH_v4jJI0Q"><img width="320" alt="" src="https://blogger.googleusercontent.com/img/a/AVvXsEiM6gcqACKJ0qGQ_We9SiWjb_Mqiyh9rgb8SllcXpgzFFf0O5wJqHKogVUlEaX-Cssihkl9uzHLnsbiBzJIAze1AQXjdZpf1PUTK6GpGIyW-j_qoUSyDnx8SpRo9i2xBJJ3ynVdXuA5vkr70nxcFNcYKdJrIhOOI_4-imNOmif4QH_v4jJI0Q" height="103" /></a></td></tr><tr><td style="text-align: center;" class="tr-caption">An example of prediction sets for ImageNet. This example comes from a nice recent paper by Angelopoulos, Bates, Malik, and Jordan: <a href="https://arxiv.org/abs/2009.14193">https://arxiv.org/abs/2009.14193</a> </td></tr></tbody></table><span lang="EN"><br /></span><p></p> <p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"><span lang="EN">But how can we do this? Conformal Prediction provides a particularly simple way. Here is an outline of the vanilla version of conformal prediction (there are plenty of variants): </span></p><p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal">Step 1: Pick a (non)conformity score to measure how different a label y is from a prediction f(x). e.g. for a regression model we could choose $s(x,y) = |f(x)-y|$ --- but lots of interesting work has been done recently to develop much fancier ones. A lot of the art of conformal prediction is in finding a good score function.</p> <p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"><span lang="EN">Step 2: Find a threshold $\tau$ such that for a new example $(x,y)$, $\Pr[s(x,y) \leq \tau] = 0.9$. An easy way to do this is using a holdout set. </span></p><p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal">Step 3: On a new example $x$, given a point prediction $f(x)$, produce the prediction set $P(x) = \{y : s(x,y) \leq \tau\}$. </p><p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal">Thats it! Nice and simple. Check out <a href="https://arxiv.org/abs/2107.07511">this recent survey by Angelopolous and Bates</a> for an accessible introduction to conformal prediction. </p> <p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"><span lang="EN">But a few things could go wrong. First, the technique of using a holdout set only works if the data is i.i.d. or more generally exchangable --- i.e. the data distribution should be permutation invariant. But maybe its coming from some changing distribution. If the distribution has changed in an expected and well behaved way, there are some fixes that let you apply the same framework, but if not you are likely in trouble. </span></p><p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"><span lang="EN"></span></p><table cellpadding="0" align="center" style="margin-left: auto; margin-right: auto;" cellspacing="0" class="tr-caption-container"><tbody><tr><td style="text-align: center;"><a style="margin-left: auto; margin-right: auto;" href="https://blogger.googleusercontent.com/img/a/AVvXsEje9UBcYGyvVOkiIH_g3O2jlKIfGd5TVuVYOY_81duPMVJRrmTcZycrHumnMMpIp9O3EI4Ubf0dhYBb5dttrZEVWjD92C8qv1Xwmjdn1Y-5bfbzMBqcuTeBq_0ZZ78ymLgWp9kFRhI3f8eehSPv9TmyncWsFEqDHbMLF2JGhl6Y5Giqz5bIIA"><img width="320" alt="" src="https://blogger.googleusercontent.com/img/a/AVvXsEje9UBcYGyvVOkiIH_g3O2jlKIfGd5TVuVYOY_81duPMVJRrmTcZycrHumnMMpIp9O3EI4Ubf0dhYBb5dttrZEVWjD92C8qv1Xwmjdn1Y-5bfbzMBqcuTeBq_0ZZ78ymLgWp9kFRhI3f8eehSPv9TmyncWsFEqDHbMLF2JGhl6Y5Giqz5bIIA" height="228" /></a></td></tr><tr><td style="text-align: center;" class="tr-caption">A joke about non-exchangable data</td></tr></tbody></table><span lang="EN"><br /></span><p></p> <p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"><span lang="EN">Second, an average over everyone might not be what you care about. If we are in a personalized medicine setting, you might care about the reliability of predictions not just overall, but for women with a family history of diabetes and egg allergies --- or whatever else you think is medically relevant about you as an individual.</span></p> <p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"><span lang="EN">This is the problem that we want to solve: How to give prediction sets that cover their label 90% of the time even if we make no assumptions at all about the data generating process, and even if we care about coverage conditional on arbitrary intersecting subsets of the data. </span></p> <p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"><span lang="EN">We want stronger guarantees in another way too. If you think about our goal, there is a way to cheat: 90% of the time, predict the (trivial) set of all labels. 10% of the time predict the empty set. This covers the real label 90% of the time, but is completely uninformative. </span></p> <p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"><span lang="EN">To avoid this "solution", we also ask that our predictions be threshold calibrated. Remember our prediction sets have the form $P_t(x) = \{y : s(x,y) \leq \tau_t\}$. Now the threshold $\tau_t$ might be different every day. But we want 90% coverage even conditional on the value of $\tau_t$. </span></p> <p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"><span lang="EN">This rules out cheating. Remarkably (I think!), for every set of groups specified ahead of time, we're able to guarantee that even if the data is generated by an adversary, that our empirical coverage converges to 90% at the statistically optimal rate. Here is what that means:</span></p> <p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"><span lang="EN">Pick a threshold $\tau$ and group $G$. Consider all $n_{\tau,G}$ rounds in which the example $x$ was in $G$, and in which we predicted threshold $\tau$.<span>  </span>We promise that on this set, we cover 90% $\pm$ $1/\sqrt{n_{\tau,G}}$ of the labels. This is the best you could do even with a known distribution. </span></p><p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal">The best thing is that the algorithm is super simple and practical. We had<a href="https://arxiv.org/abs/2101.01739"> a paper last year</a> that showed how to do much of this in theory --- but the algorithm from that paper was not easily implementable (it involved solving an exponentially large linear program with a separation oracle).  But here is our new algorithm --- it only involves doing a small amount of arithmetic for each prediction:</p><p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"></p><div style="clear: both; text-align: center;" class="separator"><a style="margin-left: 1em; margin-right: 1em;" href="https://blogger.googleusercontent.com/img/a/AVvXsEh9AnXTAw_h8Z1DI2Ui3Usp0wYWLVHC7u0i8WR90J8WnysneaxXKUZvU9MQL30elKou4H1bZSoajYpYivZz6ztv3MwiDiOHImi6TXIJmaxWa0W-HRmDvbfFaQfOtpK-JISnbszduJz1YuwX_8IhUJweINzwirvtn1zFhNzCCaTRZHrEcAcQ-Q"><img width="301" alt="" src="https://blogger.googleusercontent.com/img/a/AVvXsEh9AnXTAw_h8Z1DI2Ui3Usp0wYWLVHC7u0i8WR90J8WnysneaxXKUZvU9MQL30elKou4H1bZSoajYpYivZz6ztv3MwiDiOHImi6TXIJmaxWa0W-HRmDvbfFaQfOtpK-JISnbszduJz1YuwX_8IhUJweINzwirvtn1zFhNzCCaTRZHrEcAcQ-Q" height="240" /></a></div>So we're able to implement it and run a bunch of experiments. You can read about them in detail in <a href="https://arxiv.org/abs/2206.01067">the paper</a>, but the upshot is that our new method is competitive with split conformal prediction even on "its own turf" --- i.e. when the data really is drawn i.i.d. and we only care about marginal coverage --- and really excels when the data comes from a more complicated source, or when we measure group-conditional coverage, which traditional methods tend to have much more trouble with. We run experiments on regression and classification tasks, on exchangeable data, under distribution shift, on real time series data, and on adversarial data orderings. Even when the data is i.i.d. and we only care about marginal coverage, our method has an important advantage over split conformal prediction --- since we don't need to preserve exchangability, we can use all of the data to train the underlying model, whereas split conformal prediction needs to reserve some fraction of it for a holdout set. The result is faster learning for our method, which results in smaller/more accurate prediction sets even without the complicating factors of groupwise coverage, threshold calibration or adversarial data!<p></p><p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"><br /></p><p style="line-height: 115%; margin-bottom: 10pt;" class="MsoNormal"></p><div style="clear: both; text-align: center;" class="separator"><a style="margin-left: 1em; margin-right: 1em;" href="https://blogger.googleusercontent.com/img/a/AVvXsEi_aZVJNKOwZAqvG8VakcezTF1GsazQ5tu-zh-UEMdNQKkQMtAWM0t4SD2qxqnLHzt9LVHlq-LpohdzzGTwVbmJyboe3qXdd6HBlkULcCWRWMCVgcDD6NcWZ1UMRR63nYS3GRReYei2bdat0WdJGvk6cbDezmXb59QwCRDbF8pOTJadJ6KWsQ"><img width="320" alt="" src="https://blogger.googleusercontent.com/img/a/AVvXsEi_aZVJNKOwZAqvG8VakcezTF1GsazQ5tu-zh-UEMdNQKkQMtAWM0t4SD2qxqnLHzt9LVHlq-LpohdzzGTwVbmJyboe3qXdd6HBlkULcCWRWMCVgcDD6NcWZ1UMRR63nYS3GRReYei2bdat0WdJGvk6cbDezmXb59QwCRDbF8pOTJadJ6KWsQ" height="103" /></a></div><div style="clear: both; text-align: center;" class="separator"><div style="clear: both; text-align: center;" class="separator"><a style="margin-left: 1em; margin-right: 1em;" href="https://blogger.googleusercontent.com/img/a/AVvXsEj8Fz00pgB6ecV04-CrFtPrvPMp_g-csyIZ5A02Sjrizm9LAi8XGsL7G4nnTSojkNX8q9N5EmiRYlawVTwo9fP3qV_fErvIT19WYu3KReaZNDanVUDRTx9ZmS5rOfKgO_6o86wGESe3vheqsG6mLd6DKuomdV8GaQM3t3JIiHNkvaB1Sfbi5w"><img width="320" alt="" src="https://blogger.googleusercontent.com/img/a/AVvXsEj8Fz00pgB6ecV04-CrFtPrvPMp_g-csyIZ5A02Sjrizm9LAi8XGsL7G4nnTSojkNX8q9N5EmiRYlawVTwo9fP3qV_fErvIT19WYu3KReaZNDanVUDRTx9ZmS5rOfKgO_6o86wGESe3vheqsG6mLd6DKuomdV8GaQM3t3JIiHNkvaB1Sfbi5w" height="112" /></a></div><br /><br /></div><br /><br /><br /><p></p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Aaron (noreply@blogger.com) <a href="http://aaronsadventures.blogspot.com/2022/06/practical-robust-and-equitable.html"><span class="datestr">at June 03, 2022 01:00 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -3736,54 +3778,6 @@ Email: A.Czumaj@warwick.ac.uk</p></div>
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-jobs.org/2022/05/22/professor-in-computer-science-and-mathematics-at-warwick-at-university-of-warwick-apply-by-june-1-2022/"><span class="datestr">at May 22, 2022 10:55 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://eccc.weizmann.ac.il/report/2022/076">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eccc.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="https://eccc.weizmann.ac.il/report/2022/076">TR22-076 |  Average-Case Hardness of Proving Tautologies and Theorems | 
-
-	Hunter Monroe</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://eccc.weizmann.ac.il/" title="ECCC - Reports">ECCC papers</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-We consolidate two widely believed conjectures about tautologies---no optimal proof system exists, and most require superpolynomial size proofs in any system---into a $p$-isomorphism-invariant condition satisfied by all paddable $\textbf{coNP}$-complete languages or none. The condition is: for any Turing machine (TM) $M$ accepting the language, $\textbf{P}$-uniform input families requiring superpolynomial time by $M$ exist (equivalent to the first conjecture) and appear with positive upper density in an enumeration of input families (implies the second). In that case, no such language is easy on average (in $\textbf{AvgP}$) for a distribution applying non-negligible weight to the hard families.
-
-The hardness of proving tautologies and theorems is likely related. Motivated by the fact that arithmetic sentences encoding "string $x$ is Kolmogorov random" are true but unprovable with positive density in a finitely axiomatized theory $\mathcal{T}$ (Calude and Jürgensen), we conjecture that any propositional proof system requires superpolynomial size proofs for a dense set of $\textbf{P}$-uniform families of tautologies encoding "there is no $\mathcal{T}$ proof of size $\leq t$ showing that string $x$ is Kolmogorov random". This implies the above condition.
-
-The conjecture suggests that there is no optimal proof system because undecidable theories help prove tautologies and do so more efficiently as axioms are added, and that constructing hard tautologies seems difficult because it is impossible to construct Kolmogorov random strings. Similar conjectures that computational blind spots are manifestations of noncomputability would resolve other open problems.</div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="https://eccc.weizmann.ac.il/report/2022/076"><span class="datestr">at May 22, 2022 05:41 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
