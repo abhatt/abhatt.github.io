@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2022-06-06T01:38:28Z</updated>
+  <updated>2022-06-06T02:21:40Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,75 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry>
+    <id>http://offconvex.github.io/2022/06/06/PGDL/</id>
+    <link href="http://offconvex.github.io/2022/06/06/PGDL/" rel="alternate" type="text/html"/>
+    <title>Predicting Generalization using GANs</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>A central problem of generalization theory is the following: <em>Given a training dataset and a deep net trained with that dataset, give a mathematical estimate of the test error.</em></p>
+
+<p>While this may seem useless to a practitioner (“why not just retain some holdout data for testing?”), this is of great interest to theorists trying to understand what properties of the net or the training algorithm lead to good generalization. Old posts on this blog such as <a href="http://www.offconvex.org/2018/02/17/generalization2/">this one</a> mentioned the difficulties in applying classic generalization theory to get estimates of generalization error even within a few orders of magnitude.</p>
+
+<p>This blog post is about the topic of a 
+ NeurIPS 20 competition <a href="https://sites.google.com/view/pgdl2020">Predicting Generalization in Deep Learning competition</a> which suggested using machine learning techniques to  understand network properties that promote generalization! Contestants are given datasets and a set of deep nets trained on these datasets using unknown techniques. The goal is to rank the trained nets according to generalization error. Contestants provide a python code that, given a training set and a trained net, outputs a scalar estimate of the generalization error. The contestant’s performance is computed using a ranking measure of how well their scalar score correlates with actual generalization. 
+ Several interesting ideas emerged from the competition, such as measuring networks’ resilience to distortions to the input; collecting specific statistics of hidden node activations; and measuring output consistency of identically structured networks but trained by SGD with different random seeds.</p>
+
+<p>This blog post describes our <a href="https://arxiv.org/abs/2111.14212">ICLR22 spotlight paper</a>, coauthored with Nikunj Saunshi and Arushi Gupta, that gives a surprisingly easy method to predict generalization using <a href="http://www.offconvex.org/2017/03/15/GANs/">Generative Adversarial Nets</a> or GANs.</p>
+
+<h2 id="predicting-generalization-using-gans">Predicting Generalization using GANs</h2>
+<p>Given a training dataset and a collection of nets trained using it, our method is very simple:</p>
+
+<blockquote>
+  <p><strong>Step 1)</strong> Train a Generative Adversarial Network (GAN) on the same training dataset a</p>
+
+  <p><strong>Step 2)</strong> Draw samples from the GAN generator to obtain a synthetic dataset.</p>
+
+  <p><strong>Step 3)</strong> For each classifier in the task, use its classification error on the synthetic data as our prediction for its true test error</p>
+</blockquote>
+
+<p>We find for a variety of image datasets that using pre-trained Studio-GANs directly downloaded from <a href="https://github.com/POSTECH-CVLab/PyTorch-StudioGAN">public repositories</a>, we obtain scores that would ‘‘not only outperforms other methods but blows them out of the water’’ (to cite one of the reviews for our paper), including the winning methods proposed at the PGDL competition (see Table 1 in the paper for quantitative results). Here we show plots of true test errors v.s. errors on the synthetic data, where we generate one synthetic dataset from a GAN trained on each dataset, and each dot in the figures represents a trained deep net classifier.</p>
+
+<p align="center"> <img src="http://www.offconvex.org/../assets/PGDL_linear_fit.jpg"/>  
+</p>
+
+<p>Not only is the correlation linear; it appears remarkably close to the $y=x$ fit! Also the trained deep net classifiers here belong to drastically different architecture families —including VGG, ResNet, DenseNet, ShuffleNet, PNASNet, and MobileNet— which don’t correspond to the discriminator of Studio-GAN.</p>
+
+<p>Frankly, this success at predicting generalization confounded the authors, some of whom had earlier shown that GANs <a href="http://www.offconvex.org/2017/07/06/GANs3/">do not learn the distribution well, and suffer from serious mode collapse</a>).</p>
+
+<p>Thus we conclude following three statements all appear to be true:</p>
+
+<blockquote>
+  <p><strong>Observation 1)</strong> GAN samples suffer from mode collapse (as detected by the <a href="http://www.offconvex.org/2017/07/06/GANs3/">birthday paradox test</a> and do not appear to be as diverse as the distribution of images the GANs was trained on.</p>
+</blockquote>
+
+<blockquote>
+  <p><strong>Observation 2)</strong> Training deep net classifiers using only GAN samples leads to poor performance. This is another evidence that GAN samples are poor substitutes for the real thing.</p>
+</blockquote>
+
+<blockquote>
+  <p><strong>Observation 3)</strong> Yet GAN samples are good enough to substitute for holdout data in giving a reasonable prediction of test performance.</p>
+</blockquote>
+
+<p>Note however that there is no inherent contradiction here. For instance, suppose the GAN’s distribution has limited diversity: it only knows how to generate a $10,000$  random images, as well as $1000$ minor variations of each of these images. So long as the  $10,000$ distinct images are like random draws from the full distribution, it could  predict generalization for a trained net reasonably well, even though a million image samples from the GAN would not suffice to replace ImageNet’s 1 million images for training a deep net from scratch. (In fact this scenario was predicted and to some extent verified by <a href="https://proceedings.mlr.press/v70/arora17a.html">our earlier work on why GANs may not be able to avoid mode collapse</a>.)</p>
+
+<p>We hope our work motivates further investigations of the power of real-life GANs and what can be done using samples from their distributions.</p>
+
+<p>(Aside: Of course, the field has now progressed beyond simple GANs to multimodal generators like <a href="https://openai.com/blog/dall-e/">DALL-E</a>, and it would be interesting to understand how the generated images there can be leveraged to predict generalization.)</p></div>
+    </summary>
+    <updated>2022-06-06T09:00:00Z</updated>
+    <published>2022-06-06T09:00:00Z</published>
+    <source>
+      <id>http://offconvex.github.io/</id>
+      <author>
+        <name>Off the Convex Path</name>
+      </author>
+      <link href="http://offconvex.github.io/" rel="alternate" type="text/html"/>
+      <link href="http://offconvex.github.io/feed.xml" rel="self" type="application/atom+xml"/>
+      <subtitle>Algorithms off the convex path.</subtitle>
+      <title>Off the convex path</title>
+      <updated>2022-06-06T02:21:06Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>http://arxiv.org/abs/2206.01192</id>
@@ -603,7 +672,7 @@ Timothy Chow emailed to challenge my assumption, asking what evidence I had that
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2022-06-06T01:38:27Z</updated>
+      <updated>2022-06-06T02:21:37Z</updated>
     </source>
   </entry>
 
@@ -683,7 +752,7 @@ Some of the talk titles have appeared while we were composing this post. Check o
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-06-06T01:37:27Z</updated>
+      <updated>2022-06-06T02:20:25Z</updated>
     </source>
   </entry>
 
@@ -715,7 +784,7 @@ As far as we are aware, this yields the first full \emph{characterization} of wh
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-06-06T01:37:23Z</updated>
+      <updated>2022-06-06T02:20:20Z</updated>
     </source>
   </entry>
 
@@ -754,7 +823,7 @@ solving a gap instance of a ``vector coloring" problem on a  hypergraph. Such a 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-06-06T01:37:23Z</updated>
+      <updated>2022-06-06T02:20:20Z</updated>
     </source>
   </entry>
 
@@ -787,7 +856,7 @@ Email: giulio.malavolta@mpi-sp.org</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-06-06T01:37:28Z</updated>
+      <updated>2022-06-06T02:20:27Z</updated>
     </source>
   </entry>
 
@@ -1564,7 +1633,7 @@ Email: monaldo.mastrolilli@idsia.ch</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-06-06T01:37:28Z</updated>
+      <updated>2022-06-06T02:20:27Z</updated>
     </source>
   </entry>
 
@@ -1757,7 +1826,7 @@ Can the abc ever be resolved? I wonder if there is some way to say suppose that 
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-06-06T01:37:27Z</updated>
+      <updated>2022-06-06T02:20:25Z</updated>
     </source>
   </entry>
 
@@ -1973,7 +2042,7 @@ Our result leverages several new ingredients, which may be of independent intere
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-06-06T01:37:23Z</updated>
+      <updated>2022-06-06T02:20:20Z</updated>
     </source>
   </entry>
 
@@ -2057,7 +2126,7 @@ Is this list with pointers helpful? It took a few minutes to form this list—ha
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-06-06T01:37:27Z</updated>
+      <updated>2022-06-06T02:20:25Z</updated>
     </source>
   </entry>
 
@@ -2085,7 +2154,7 @@ To mitigate these issues and develop a more robust theory of time-bounded Kolmog
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-06-06T01:37:23Z</updated>
+      <updated>2022-06-06T02:20:20Z</updated>
     </source>
   </entry>
 
@@ -2145,7 +2214,7 @@ This is an <a href="https://nautil.us/this-man-is-about-to-blow-up-mathematics-5
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-06-06T01:37:27Z</updated>
+      <updated>2022-06-06T02:20:25Z</updated>
     </source>
   </entry>
 
@@ -2223,7 +2292,7 @@ This is an <a href="https://nautil.us/this-man-is-about-to-blow-up-mathematics-5
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2022-06-06T01:37:25Z</updated>
+      <updated>2022-06-06T02:20:23Z</updated>
     </source>
   </entry>
 
@@ -2249,7 +2318,7 @@ Our proof method reveals two additional and curious features about M-Res: (i) MR
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-06-06T01:37:23Z</updated>
+      <updated>2022-06-06T02:20:20Z</updated>
     </source>
   </entry>
 
@@ -2288,7 +2357,7 @@ Our proof method reveals two additional and curious features about M-Res: (i) MR
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2022-06-06T01:37:57Z</updated>
+      <updated>2022-06-06T02:21:01Z</updated>
     </source>
   </entry>
 
@@ -2327,7 +2396,7 @@ $\bullet$ Towards answering a question of Linial,  Mendelson,   Schechtman, and 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-06-06T01:37:23Z</updated>
+      <updated>2022-06-06T02:20:20Z</updated>
     </source>
   </entry>
 
@@ -2356,7 +2425,7 @@ Our analysis relies on a generalization of the technique of canonincal monomials
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-06-06T01:37:23Z</updated>
+      <updated>2022-06-06T02:20:20Z</updated>
     </source>
   </entry>
 
@@ -2382,7 +2451,7 @@ Our result is based on a new form of small-set high dimensional expansion (SS-HD
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-06-06T01:37:23Z</updated>
+      <updated>2022-06-06T02:20:20Z</updated>
     </source>
   </entry>
 
@@ -2580,7 +2649,7 @@ which, well, is <em>also</em> strongly believed to be optimal!</p>
       <link href="https://cstheory-events.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Aggregator for CS theory workshops, schools, and so on</subtitle>
       <title>CS Theory Events</title>
-      <updated>2022-06-06T01:38:00Z</updated>
+      <updated>2022-06-06T02:21:13Z</updated>
     </source>
   </entry>
 
@@ -2737,7 +2806,7 @@ which, well, is <em>also</em> strongly believed to be optimal!</p>
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2022-06-06T01:37:37Z</updated>
+      <updated>2022-06-06T02:20:41Z</updated>
     </source>
   </entry>
 
@@ -2861,44 +2930,7 @@ Does this measure <img alt="{M}" class="latex" src="https://s0.wp.com/latex.php?
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-06-06T01:37:27Z</updated>
-    </source>
-  </entry>
-
-  <entry>
-    <id>tag:blogger.com,1999:blog-3722233.post-8785234285731310998</id>
-    <link href="http://blog.computationalcomplexity.org/feeds/8785234285731310998/comments/default" rel="replies" type="application/atom+xml"/>
-    <link href="http://blog.computationalcomplexity.org/2022/05/in-1960s-students-protested-vietnam.html#comment-form" rel="replies" type="text/html"/>
-    <link href="http://www.blogger.com/feeds/3722233/posts/default/8785234285731310998" rel="edit" type="application/atom+xml"/>
-    <link href="http://www.blogger.com/feeds/3722233/posts/default/8785234285731310998" rel="self" type="application/atom+xml"/>
-    <link href="http://blog.computationalcomplexity.org/2022/05/in-1960s-students-protested-vietnam.html" rel="alternate" type="text/html"/>
-    <title>In the 1960's students protested the Vietnam war!/In 1830 students protested... Math?</title>
-    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p> I was at SUNY Stonybrook for college 1976-1980. </p><p>I remember one student protest about a change to the calendar that (I think) would have us go home for winter break and then come back for finals.  I don't recall how that turned out. </p><p>However I had heard about the protests in the 1960's over the Vietnam war. Recall that there was a draft back then so college students were directly affected. </p><p>I was reading a book `<i>Everything you know is wrong'</i> which noted that some people thought the first time there were student protests was in the 1960's but this is not true. (Not quite as startling as finding out that a ships captain cannot perform weddings.) </p><p>It pointed to <i>The 1830 Conic Section Rebellion. </i>I quote Wikipedia (full entry is <a href="https://en.wikipedia.org/wiki/Conic_Sections_Rebellion">here</a>)</p><p><i>Prior to the introduction of blackboards, Yale students had been allowed to consult diagrams in their textbooks when solving geometry problems pertaining to conic sections – even on exams. When the students were no longer allowed to consult the text, but were instead required to draw their own diagrams on the blackboard, they refused to take the final exam. As a result forty-three of the ninety-six students – among them, Alfred Stille, and Andrew Calhoun, the son of John C. Calhoun (Vice Pres a the time) – were summarily expelled, and Yale authorities warned neighboring universities against admitting them.</i></p><p>Random Thoughts</p><p>1) From my 21st century prospective I am on the students side. It seems analogous to allowing students to use calculators-- which I do allow. </p><p>2) From my 21st century prospective the punishment seems unfair. </p><p>3) The notion of a school telling other schools to not admit student- I do not think this would happen now, and might even be illegal (anti-trust).</p><p>4) I am assuming  the students wanted to be able to consult their text out of some principle: we want to learn concepts not busy work.  And again, from my prospective I agree that it was busy work. </p><p>5) Since all of my thoughts are from a 21st century prospective, they may be incorrect, or at least not as transferable to the 1830 as I think. (Paradox: My ideas may not be as true as I think. But if I think that...) </p><p>6) I try to avoid giving busy work. When I teach Decidability and Undecidability I NEVER have the students actually write a Turing Machine that does something. In other cases I also try to make sure they never have to do drudge work.  And I might not even be right in the 21st century- some of my colleagues tell me its good for the students to get their hands dirty (perhaps just a little) with real TM to get a feel for the fact that they can do anything. </p><p>7) The only student protests I hear about nowadays are on political issues. Do you know of any student protests on issues of how they are tested or what the course requirements are, or something of that ilk? I can imagine my discrete math students marching with signs that say: </p><p>DOWN WITH INDUCTION!</p><p><br/></p><p><br/></p><p><br/></p><p><br/></p></div>
-    </content>
-    <updated>2022-05-23T02:52:00Z</updated>
-    <published>2022-05-23T02:52:00Z</published>
-    <author>
-      <name>gasarch</name>
-      <email>noreply@blogger.com</email>
-      <uri>http://www.blogger.com/profile/03004932739846901628</uri>
-    </author>
-    <source>
-      <id>tag:blogger.com,1999:blog-3722233</id>
-      <category term="typecast"/>
-      <category term="focs metacomments"/>
-      <author>
-        <name>Lance Fortnow</name>
-        <email>noreply@blogger.com</email>
-        <uri>http://www.blogger.com/profile/06752030912874378610</uri>
-      </author>
-      <link href="http://blog.computationalcomplexity.org/feeds/posts/default" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
-      <link href="http://www.blogger.com/feeds/3722233/posts/default" rel="self" type="application/atom+xml"/>
-      <link href="http://blog.computationalcomplexity.org/" rel="alternate" type="text/html"/>
-      <link href="http://pubsubhubbub.appspot.com/" rel="hub" type="text/html"/>
-      <link href="http://www.blogger.com/feeds/3722233/posts/default?start-index=26&amp;max-results=25" rel="next" type="application/atom+xml"/>
-      <subtitle>Computational Complexity and other fun stuff in math and computer science from Lance Fortnow and Bill Gasarch</subtitle>
-      <title>Computational Complexity</title>
-      <updated>2022-06-05T21:58:25Z</updated>
+      <updated>2022-06-06T02:20:25Z</updated>
     </source>
   </entry>
 </feed>
