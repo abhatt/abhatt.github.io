@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2022-06-20T16:38:39Z</updated>
+  <updated>2022-06-20T17:21:47Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,345 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en">
+    <id>http://windowsontheory.org/?p=8378</id>
+    <link href="https://windowsontheory.org/2022/06/20/the-uneasy-relationship-between-deep-learning-and-classical-statistics/" rel="alternate" type="text/html"/>
+    <title>The uneasy relationship between deep learning and (classical) statistics</title>
+    <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">An often-expressed sentiment is that deep learning (and machine learning in general) is “simply statistics,” in the sense that it uses different words to describe the same concepts statisticians have been studying for decades. In the 1990s, Rob Tibshirani wrote the following tongue-in-cheek “glossary”:: Something about this table resonates with me.  In fact, as anyone … <a class="more-link" href="https://windowsontheory.org/2022/06/20/the-uneasy-relationship-between-deep-learning-and-classical-statistics/">Continue reading <span class="screen-reader-text">The uneasy relationship between deep learning and (classical) statistics</span></a></div>
+    </summary>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>An often-expressed sentiment is that deep learning (and machine learning in general) is “simply statistics,” in the sense that it uses different words to describe the same concepts statisticians have been studying for decades. In the 1990s, Rob Tibshirani wrote the following tongue-in-cheek “glossary”::</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="300" src="https://lh3.googleusercontent.com/RauK9YOaLdTiw42nyAQHRuuV9nLfa-zKY49NgpOX1z0pDk0QSe77LQLtZHtAt575adehcZjv7Jbkg8FvXqLklGvprfBRzYaNSk-Q7EtIuV0Kda-5fgCqXLC1xCZuPWzeJAxIbQMCAj6mKMAfeA" width="442"/></figure></div>
+
+
+<p>Something about this table resonates with me.  In fact, as anyone using Pytorch knows, since Tibshiriani posted this table, many of the terms on the right have found broader use in the machine learning community. (And I do hope that statisticians’ grants and conferences have improved as well…)</p>
+
+
+
+<p>But thinking of deep learning purely in terms of statistics misses crucial aspects of its success. A better critique of deep learning is that <strong>it uses statistical terms to describe radically different concepts</strong>. In meme form, it is the “Princess Bride” meme on the right that is a better critique of deep learning than <a href="https://www.instagram.com/sandserifcomics/">sandserif</a>’s meme on the left. </p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="-107" src="https://lh6.googleusercontent.com/NNnn3c1UfSLSUSfQk6TdrbBHUarDnY9UKgEEUJ0DtEOi0LyREmCmMyIWbxmybd6uRD23Is5GHYeI5caxqKF3QQycm9tbiEuufcwzwDz8dmjWUIoBpG9v_S1pEIMStfoHkp64McsybsF_rLwxsg" width="-230"/><strong>Figure:</strong> I claim that the right critique of deep learning is not that it uses different words to describe old statistical terms, but rather that it uses these terms to describe a radically different process.</figure></div>
+
+
+<p/>
+
+
+
+<p><strong>This blog post: organization. </strong>In this post, I explain this point of view and why some of the most fundamental aspects of deep learning deviate radically from statistics and even from classical machine learning. In this somewhat long post, I’ll start by talking about the difference between <strong>explanation</strong> and <strong>prediction</strong> when fitting models to data. I’ll then discuss two “cartoons” of a learning process: <strong>fitting a statistical model</strong> using empirical risk minimization and <strong>teaching a math skill to a (human) student</strong>. I then discuss which one of those processes is a closer match to deep learning. Spoiler: while the math and code of deep learning is nearly identical to the first scenario (fitting a statistical model), I claim that a deeper level, some of deep learning’s most aspects are captured by the “teaching a skill to a student” scenario. I do not claim to have a full theory for deep learning. In fact,I strongly suspect such a theory doesn’t exist. Rather, I believe different aspects of deep learning are best understood from different lenses, and the statistical lens cannot provide the complete picture.</p>
+
+
+
+<p><em>Caveat:</em><strong> </strong> While I contrast deep learning with statistics in this post, I refer to “classical statistics” as it was studied in the past and explained in textbooks. Many statisticians are studying deep learning and going beyond classical methods, analogously to how physicists in the 20th century needed to expand the framework of classical physics. Indeed, the blurring of the lines between computer scientists and statisticians is a modern (and very welcome!) phenomenon that benefits us all. </p>
+
+
+
+<h2><strong>1) Predictions vs. explanations in model fitting.</strong></h2>
+
+
+
+<p>Scientists have fitted models to observations for thousands of years. For example, as mentioned in my <a href="https://windowsontheory.org/2022/05/03/philosophy-of-science-and-the-blockchain-a-book-review/">philosophy of science book review post</a>, the Egyptian astronomer Ptolemy came up with an ingenious model for the movement of the planets. Ptolemy’s model was geocentric (with planets rotating around the earth) but had a sequence of “knobs” (concretely, epicycles) that gave it excellent predictive accuracy. In contrast, Copernicus’ initial <em>heliocentric</em> model posited a circular orbit of planets around the sun. It was a simpler model than Ptolemy’s (with fewer “adjustable knobs”) and got the big picture right, but was <em>less accurate</em> in predicting observations. (Copernius later added his own epicycles so he could match Ptolemy’s performance.)</p>
+
+
+
+<p>Ptolemy’s and Copernicus’ models were incomparable. If you needed a “black box” for <strong>predictions</strong>, then Ptolemy’s geocentric model was superior. If you wanted a simple model into which you can “peer inside” and that could be the starting point for a theory to <strong>explain</strong> the movements of the stars, then Copernicus’ model was better. Indeed, eventually, Kepler refined Copernicus’ models to elliptical orbits and came up with his three laws of planetary movements, which enabled Newton to explain them using the same laws of gravity that apply here on earth. For that, it was crucial that the heliocentric model wasn’t simply a “black box” that provides predictions, but rather was given by simple mathematical equations with few “moving parts.” Over the years, astronomy continued to be an inspiration for developing statistical techniques. Gauss and Legendre (independently) <a href="https://www.jstor.org/stable/2240811">invented least-squares regression</a> around 1800 to predict the orbits of asteroids and other celestial bodies. Cauchy’s <a href="https://www.math.uni-bielefeld.de/documenta/vol-ismp/40_lemarechal-claude.pdf">1847 invention of gradient descent</a> was also motivated by astronomical predictions.</p>
+
+
+
+<p>In physics, you can (at least sometimes) “have it all” – find the “right” theory that achieves the best predictive accuracy and the best explanation for the data. This is captured by sentiments such as Occam’s Razor, which can be thought of as positing that simplicity, predictive power, and explanatory insights, are all aligned with one another. However, in many other fields, there is a tension between the twin goals of <strong>explanation</strong> (or, more generally, <strong>insight</strong>) and <strong>prediction</strong>. If you simply want to predict observations, then a “black box” could very well be best. On the other hand, if you want to extract insights such as a causal model, general principles, or significant features, then a simpler model that you can understand and interpret might be better. The right choice of model depends on its usage. Consider, for example, a dataset containing genetic expressions and a phenotype (say some disease) for many individuals. If your goal is to predict<strong> </strong>the chances of an individual getting sick, you want to use the best model for that task, regardless of how complex it is or how many genes it depends on. In contrast, if your goal is to identify a few genes for further investigation in a wet lab, a complicated black box would be of limited use, even if it’s highly accurate.</p>
+
+
+
+<p>This point was forcefully made in <a href="https://projecteuclid.org/journals/statistical-science/volume-16/issue-3/Statistical-Modeling--The-Two-Cultures-with-comments-and-a/10.1214/ss/1009213726.full">Leo Breiman’s famous 2001 essay on the two cultures of statistical modeling</a>. The “data modeling culture” focuses on simple generative models that <strong>explain</strong> the data. In contrast, the “algorithmic modeling culture” is agnostic on how the data is generated and focuses on finding models that <strong>predict </strong>the data, no matter how complex. Breiman argued that statistics was too dominated by the first culture, and this focus has <em>“</em><em>led to irrelevant theory and questionable scientific conclusions”</em> and <em>“prevented statisticians from working on exciting new problems.”</em></p>
+
+
+
+<p>Breiman’s paper was controversial, to say the least. Brad Efron responded to it by saying that, while he agreed with some points, <em>“at first glance, Leo Breiman’s stimulating paper looks like an argument against parsimony and scientific insight, and in favor of black boxes with lots of knobs to twiddle. At second glance, it still looks that way”</em> (see also <a href="https://www.stat.cmu.edu/~kass/papers/KassOnBreiman.pdf">Kass</a>). In a <a href="https://www.fox.temple.edu/wp-content/uploads/2021/07/Efron-2020-JASA-wdiscussion.pdf">more recent piece</a>, Efron graciously concedes that <em>“Breiman turned out to be more prescient than me: pure prediction algorithms have seized the statistical limelight in the twenty-first century, developing much along the lines Leo suggested.”</em></p>
+
+
+
+<h2><strong>2) Classical and modern predictive models.</strong></h2>
+
+
+
+<p>Machine learning, deep or not, stands firmly in Breiman’s second culture, with a focus on <strong>prediction</strong>. This culture has a long history.  For example, the following snippets from <a href="https://archive.org/details/patternclassific0000duda">Duda and Hart’s 1973 textbook</a> and <a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/j.1538-7305.1962.tb02426.x">Highleyman’s 1962 paper</a> would be very recognizable to deep learning practitioners today:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="305" src="https://lh6.googleusercontent.com/i79e0Q5uv1DWLfOVoy0MzuJMRCLpZEQQs44mlvyFBCYkYsyXqZByeg1XYsiZi-Jg7jxBcN_ZvDuNJxjgxuXN-qiDLWNSmAwDj-HsLvZHq_25jd5YgJW2g3DviYmwgHXrq9VLcxnKCDFI1Ww5hQ" width="671"/></figure></div>
+
+
+<p>Similarly, Highleyman’s handwritten characters dataset and the architecture <a href="https://ieeexplore.ieee.org/document/5219431">Chow (1962)</a>  used to fit it  (with ~58% accuracy) would also strike a chord with modern readers, see the <a href="https://mlstory.org/data.html">Hardt-Recht book</a> and their <a href="http://www.argmin.net/2021/10/20/highleyman/">blog post</a>.  </p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="297" src="https://lh6.googleusercontent.com/lHZ5yqJuR2K2_gfrAfwTkICu-ogBqYcdPyStrnLvO81ED0WxSbS5ZlObtTMy8WeNvfV7IbS2hpOz9ondLDAitLr77FT-apK4TG2jEEiiaajmGMtydWMYhMux6_pqh0M6nin7oo2LM6g700rPWQ" width="638"/></figure></div>
+
+
+<h2><strong>3) Why deep learning is different.</strong></h2>
+
+
+
+<p>In 1992, <a href="https://www.dam.brown.edu/people/documents/bias-variance.pdf">Geman, Bienenstock, and Doursat</a> wrote a pessimistic article about neural networks, arguing that <em>“current-generation feed-forward neural networks are largely inadequate for difficult problems in machine perception and machine learning”</em>. Specifically, they believed that general-purpose neural networks would not be successful in tackling difficult tasks, and the only way for them to succeed would be via hand-designed features. In their words: <em>“important properties must be built-in or “hard-wired” … not learned in any statistically meaningful way.”</em> In hindsight (which is always 20/20), Geman et al. were completely wrong (if anything, modern architectures such as transformers are even <em>more general</em> than the convolutional networks that existed at the time), but it is interesting to understand <em>why</em> they were wrong. </p>
+
+
+
+<p>I believe that the reason is that deep learning is genuinely different from other learning methods. A priori, it seems that deep learning is just one more predictive model, like nearest neighbors or random forests. It may have more “knobs,” but that seems to be a quantitative rather than qualitative difference. However, <a href="https://cse-robotics.engr.tamu.edu/dshell/cs689/papers/anderson72more_is_different.pdf">in the words of P.W. Andreson</a>, <strong>“more is different.”</strong>    In Physics, we often need a completely different theory once scale changes by several orders of magnitude, and the same holds in deep learning. The processes that underlie deep learning vs. classical models (parametric or not) are radically different, even if the equations (and Python code) look identical at a high level. </p>
+
+
+
+<p>To clarify this point, let’s consider two very different learning processes:<strong> fitting a statistical model</strong> and <strong>teaching math to a student</strong>.</p>
+
+
+
+<h3><strong>Scenario A: Fitting a statistical model</strong></h3>
+
+
+
+<p>Classically, fitting a statistical model to data corresponds to the following:</p>
+
+
+
+<ol><li>We observe some data <img alt="X,y" class="latex" src="https://s0.wp.com/latex.php?latex=X%2Cy&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. (Think of  <img alt="X" class="latex" src="https://s0.wp.com/latex.php?latex=X&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> as an <img alt="n\times p" class="latex" src="https://s0.wp.com/latex.php?latex=n%5Ctimes+p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> matrix and <img alt="y" class="latex" src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> as an <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> dimensional vector; think of the data as coming from a <strong>structure and noise</strong> model: each coordinate <img alt="y_i" class="latex" src="https://s0.wp.com/latex.php?latex=y_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is obtained as <img alt="f_0(x_i)+e_i" class="latex" src="https://s0.wp.com/latex.php?latex=f_0%28x_i%29%2Be_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> where <img alt="e_i" class="latex" src="https://s0.wp.com/latex.php?latex=e_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is the corresponding noise , using additive noise for simplicity, and <img alt="f_0" class="latex" src="https://s0.wp.com/latex.php?latex=f_0&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> as the “ground truth.”)</li><li>We fit a model <img alt="\hat{f}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7Bf%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to the data by running some <strong>optimization algorithm</strong> to minimize an <strong>empirical risk</strong> of <img alt="\hat{f}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7Bf%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. That is, we use optimization to (try to) find <img alt="\hat{f}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7Bf%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> that minimizes a quantity <img alt="L(\hat{f}) + R(\hat{f})" class="latex" src="https://s0.wp.com/latex.php?latex=L%28%5Chat%7Bf%7D%29+%2B+R%28%5Chat%7Bf%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> where <img alt="L(\cdot)" class="latex" src="https://s0.wp.com/latex.php?latex=L%28%5Ccdot%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is a loss term (capturing how close <img alt="\hat{f}(X)" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7Bf%7D%28X%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is to <img alt="y" class="latex" src="https://s0.wp.com/latex.php?latex=y&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>) and <img alt="R(\hat{f})" class="latex" src="https://s0.wp.com/latex.php?latex=R%28%5Chat%7Bf%7D%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is an optional regularization term (attempting to bias <img alt="\hat{f}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7Bf%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> toward simpler models under some measure). In convex settings, we generally don’t the model <img alt="\hat{f}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7Bf%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> </li><li>Our hope is that our model will have good <strong>population loss</strong>, in the sense that the <strong>generalization error/loss</strong>  <img alt="\mathbb{E} [L(\hat{f}(x),y)]" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathbb%7BE%7D+%5BL%28%5Chat%7Bf%7D%28x%29%2Cy%29%5D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is small (where this expectation is taken over the total population from which our data was drawn).</li></ol>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="-135" src="https://lh5.googleusercontent.com/j84eNgmOsBGbSDI3nbHRLMmKYP-fAqSSfkjX6eZOlndHm00xibwbMEfLcW4Yw58JpZK9bgzc1gFvTzsZsUPVC4r1pnpB_koZv1kBpn_L4dHQBWuVk5cDwwoAZj-nVlTRu1twjUh25ihRTDcglQ" width="-290"/><strong>Figure:</strong> <a href="https://www.fox.temple.edu/wp-content/uploads/2021/07/Efron-2020-JASA-wdiscussion.pdf">Effron’s</a> cartoon of recovering Newton’s first law from noisy observations.</figure></div>
+
+
+<p>This very general paradigm captures many settings, including least-squares linear regression, nearest neighbors,  neural network training, and more. In the classical statistical setup, we expect to observe the following: </p>
+
+
+
+<p><strong>Bias/variance tradeoff:</strong> Let <img alt="\mathcal{F}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> be the set of models that we optimize over. (If we are in the non-convex setting and/or have a regularizer term, we can let <img alt="\mathcal{F}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> be the set of such models that can be achieved by the algorithm with non-negligible probability, taking the effects of algorithm choice and regularizer into account.)  The <strong>bias</strong> of <img alt="\mathcal{F}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is the best approximation to the ground truth that can be achieved by an element <img alt="\hat{f} \in \mathcal{F}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7Bf%7D+%5Cin+%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. The larger the class <img alt="\mathcal{F}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, the smaller the bias, and it can be zero if <img alt="f_0 \in \mathcal{F}" class="latex" src="https://s0.wp.com/latex.php?latex=f_0+%5Cin+%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. However, the larger the class <img alt="\mathcal{F}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cmathcal%7BF%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, the more samples we would need to narrow down its members and hence the more <strong>variance</strong> in the model that the algorithm outputs. The overall <strong>generalization error</strong> is the sum of the bias term and the contribution from the variance. Hence statistical learning typically displays a <strong>bias/variance tradeoff,</strong> with a “goldilocks choice” of the right model complexity that minimizes the overall error.  Indeed, Geman et al. justified their pessimism on neural networks by saying that <em>“the fundamental limitations resulting from the bias-variance dilemma apply to all nonparametric inference models, including neural networks.” </em></p>
+
+
+
+<p><strong>More is not always better.</strong> In statistical learning, getting more features or data does not necessarily improve performance. For example, learning from data that contains many irrelevant features is more challenging. Similarly, learning from a mixture model, in which data comes from one of two distributions (e.g., <img alt="y=f_0(x)" class="latex" src="https://s0.wp.com/latex.php?latex=y%3Df_0%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and <img alt="y=f_1(x)" class="latex" src="https://s0.wp.com/latex.php?latex=y%3Df_1%28x%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>), is harder than learning each distribution independently. </p>
+
+
+
+<p><strong>Diminishing returns.</strong> In many settings, the number of data points needed to reduce the prediction noise to a level of <img alt="\epsilon" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cepsilon&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> scales as <img alt="k/\epsilon^2" class="latex" src="https://s0.wp.com/latex.php?latex=k%2F%5Cepsilon%5E2&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> for some parameter <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. In such cases, it takes about <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> samples to “get off the ground” but once we do so we face a regime of diminishing returns, whereby if it took <img alt="n" class="latex" src="https://s0.wp.com/latex.php?latex=n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> points to achieve (say) 90% accuracy, it will take roughly an additional <img alt="3n" class="latex" src="https://s0.wp.com/latex.php?latex=3n&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> points to increase accuracy to 95%. In general, as we increase our resources (whether data, model complexity, or computation) we expect to capture finer and finer distinctions rather than unlocking qualitatively new capabilities.</p>
+
+
+
+<p><strong>Strong dependence on loss, data.</strong> When fitting a model to high-dimensional data, small details can make a big difference. Statisticians know that choices such as an L1 or L2 regularizer matter, not to mention using completely different datasets (e.g., Wikipedia vs. Reddit). High-dimensional optimizers of different quantities will be very different from one another.</p>
+
+
+
+<p><strong>No natural “difficulty” of data points (at least in some settings)</strong>. Traditionally, we think of data points as sampled independently from some distribution. Though points closer to the decision boundary could be harder to classify, given the concentration-of-measure phenomena in high dimensions, we expect that most points would be of similar distance. Thus at least in classical data distributions, we don’t expect points to vary greatly in their difficulty level. However, mixture models can display such variance in difficulty level, and hence, unlike the other issues above, such variance would not be terribly surprising in the statistical setting.</p>
+
+
+
+<h3><strong>Scenario B: Learning math</strong></h3>
+
+
+
+<p>In contrast to the above, consider the setting of teaching a student some particular topic in mathematics (e.g., computing derivatives), by giving them general instructions, as well as exercises to work through. This is not a formally defined setting, but let’s consider some of its qualitative features:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="360" src="https://lh5.googleusercontent.com/FLZEzRfYsdYYku-FxQlt8r6oc9PAAXqaoGo5-R2ABxKoGB1hxUvJWiSYxt1weyqTJGujoGh1YhIAoE_2RuM-nzzSicDlpjDSFjAXeedX2schUZEb3VB7dWQirp4n1bt90Qz3_K5SlYHeg9zJ6w" width="567"/><strong>Figure: </strong>An exercise to learn a particular math skill from the <a href="https://www.ixl.com/math/calculus/find-derivatives-using-the-product-rule">IXL website</a>.</figure></div>
+
+
+<p/>
+
+
+
+<p><strong>Learning a skill, rather than approximating a distribution.</strong> In this setting, the student learns a <em>skill</em> rather than an estimator/predictor for some quantity. While defining “skill” is not a trivial task (and not one we’ll undertake in this blog post), it is a qualitatively different object. In particular, even if the function mapping exercises to solutions cannot be used as a “black box” to solve some related task X, we believe that the <strong>internal representations</strong> that the student develops while working through these problems can still be useful for X.</p>
+
+
+
+<p><strong>More is better.</strong> Generally, students that do more problems and problems of different types achieve better performance. A “mixture model” – doing some calculus problems and some algebra problems – does not hurt the student in their calculus performance and in fact, could only help.</p>
+
+
+
+<p><strong>“Grokking” or unlocking capabilities, moving to automatic representations.</strong> While at some point there are diminishing returns also when solving problems, students do seem to undergo several phases. There is a stage in which doing some problems helps a concept “click” and unlocks new capabilities. Also, as students repeat problems of a specific type, they seem to move their facilities and representations of these problems to a lower level, enabling certain automaticity with them that they didn’t have before.</p>
+
+
+
+<p><strong>Performance is partially independent of the loss and data.</strong> There is more than one way to teach mathematical concepts. Students who study with different books, educational approaches, or grading systems can eventually learn the same material and (as far as we can tell) similar internal representations of it.</p>
+
+
+
+<p><strong>Some problems are harder than others.</strong> In math exercises, we often see a strong correlation between how different students solve the same problem. There does seem to be an inherent difficulty level for a problem and a natural progression of difficulty that is optimal for learning. Indeed this is precisely what is being done by platforms such as <a href="https://www.ixl.com/">IXL</a>.</p>
+
+
+
+<h2><strong>4) Is deep learning more like statistical estimation or a student learning a skill?</strong></h2>
+
+
+
+<p>So, which of the above two metaphors more appropriately captures modern deep learning, and specifically the reasons why it is so successful? Statistical model fitting seems to correspond well to the math and the code. Indeed the canonical Pytorch training loop trains deep networks through empirical risk minimization as described above:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="182" src="https://lh4.googleusercontent.com/yf9rz1IV1Ac1LvzQPzh8rY3GLZpecxUtOjm-ITQRuWHb3vrPjDAd5BLUTitGPWlYAFtVR8Ou7a2JnsMIld33hPoe2QKeNXsQLySJIGbNgMCdvx0Vcr7No6cBHXxDClY1xvYNN6iBUJbX6bhEzA" width="402"/></figure></div>
+
+
+<p>However, on a deeper level, the relation between the two settings is not as clear. For concreteness, let us fix a particular learning task. Consider a classification algorithm that is trained using the method of “self-supervised learning + a linear probe” (what we called Self-Supervised + Simple or SSS in <a href="https://windowsontheory.org/2020/10/18/understanding-generalization-requires-rethinking-deep-learning/">our paper with Bansal and Kaplun</a>). Concretely, the algorithm is trained as follows:</p>
+
+
+
+<ol><li>Suppose that the data is a sequence <img alt="\{ (x_i,y_i) \}_{i=1..n}" class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7B+%28x_i%2Cy_i%29+%5C%7D_%7Bi%3D1..n%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> where <img alt="x_i \in \mathbb{R}^p " class="latex" src="https://s0.wp.com/latex.php?latex=x_i+%5Cin+%5Cmathbb%7BR%7D%5Ep+&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is some datapoint (say an image for concreteness) and <img alt="y_i" class="latex" src="https://s0.wp.com/latex.php?latex=y_i&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is a label.</li><li>We first find a deep neural network implementing <em>representation function</em> <img alt="\hat{r}:\mathbb{R}^p \rightarrow \mathbb{R}^d" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7Br%7D%3A%5Cmathbb%7BR%7D%5Ep+%5Crightarrow+%5Cmathbb%7BR%7D%5Ed&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>. This function is trained only using the datapoints <img alt="\{ x_1,\ldots, x_n \}" class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7B+x_1%2C%5Cldots%2C+x_n+%5C%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> and not using the labels by minimizing some type of a self-supervised loss function. Example of such loss functions are <em>reconstruction</em> or in-painting (recovering some part of the input <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> from another) or <em>contrastive learning</em> (finding <img alt="\hat{r}" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7Br%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> such that <img alt="\parallel \hat{r}(x)-\hat{r}(x') \parallel" class="latex" src="https://s0.wp.com/latex.php?latex=%5Cparallel+%5Chat%7Br%7D%28x%29-%5Chat%7Br%7D%28x%27%29+%5Cparallel&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is significantly smaller when <img alt="x,x'" class="latex" src="https://s0.wp.com/latex.php?latex=x%2Cx%27&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> are augmentations of the same datapoint than when they are two random points).  </li><li>We then use the full labeled data <img alt="\{ (x_i,y_i )" class="latex" src="https://s0.wp.com/latex.php?latex=%5C%7B+%28x_i%2Cy_i+%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> to fit a linear classifier <img alt="\hat{\ell}:\mathbb{R}^d \to \mathbb{R}^c" class="latex" src="https://s0.wp.com/latex.php?latex=%5Chat%7B%5Cell%7D%3A%5Cmathbb%7BR%7D%5Ed+%5Cto+%5Cmathbb%7BR%7D%5Ec&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> (where <img alt="c" class="latex" src="https://s0.wp.com/latex.php?latex=c&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> is the number of classes) that minimizes the cross-entropy loss. Our final classifier is the map <img alt="x \mapsto \mathrm{arg}\max \hat{\ell}(\hat{r}(x))" class="latex" src="https://s0.wp.com/latex.php?latex=x+%5Cmapsto+%5Cmathrm%7Barg%7D%5Cmax+%5Chat%7B%5Cell%7D%28%5Chat%7Br%7D%28x%29%29&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>.</li></ol>
+
+
+
+<p>Step 3 merely fits a linear classifier and so the “magic” happens in step 2 (self-supervised learning of a deep network). Some of the properties we see in self-supervised learning include:</p>
+
+
+
+<p><strong>Learning a skill rather than approximating a function. </strong>Self-supervised learning is not about approximating a function but rather learning representations that could be used in a variety of downstream tasks. For example, this is the dominant paradigm in natural language processing. Whether the downstream task is obtained through linear probe, fine tuning, or prompting is of secondary importance.</p>
+
+
+
+<p><strong>More is better.</strong> In self-supervised learning, representation quality improves with data quantity. We don’t suffer from mixing in several sources: in fact, the more diverse the data is, the better. </p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="246" src="https://lh3.googleusercontent.com/9bjInHmiYVAFGBmtD-I50K7UwTOCRvSa69OjdwwuezlkPjEZS-1_7gwfzS3_-MuLOwLjm_swX_D02L95Do8brDTQJe7TFmfijsykp4GhNvR4i0wx9AABlqKKTS6VrJaus6VsRUPbVL-76cJjGg" width="602"/><strong>Figure: </strong>Dataset for the <a href="https://arxiv.org/abs/2204.02311">Google PaLM model</a>.</figure></div>
+
+
+<p/>
+
+
+
+<p><strong>Unlocking capabilities.</strong> We have seen time and again discontinuous improvements in deep learning models as we scale resources (data, compute, model size). This has also <a href="https://arxiv.org/abs/2201.02177">been demonstrated</a> in some synthetic settings. </p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="389" src="https://lh5.googleusercontent.com/AkKwPPjyXXrmQ10_5yrAfhzhCjAeO9oWbQD2cXCgEarxyuSdb5dlZg6lSKFs0IJQ63njmlyDp14X-gRFaQgCQ0RLaBY8o5YgXl9-reba1XzOFJxn_QPSoaCgE4DlXFA8xfCyVWm7bXuWL5BMPg" width="723"/><strong>Figure: </strong>The <a href="https://arxiv.org/abs/2204.02311">PaLM model</a> displays some discontinuous improvements in some benchmarks as model size increases (with caveat of only three sizes in these plots), with some surprising capabilities unlocked such as explaining jokes.</figure></div>
+
+
+<p/>
+
+
+
+<p><strong>Performance is largely independent of loss or data</strong>. There is more than one self-supervised loss. Several contrastive and reconstruction losses have been used for images. For language models, we sometimes use one-sided reconstruction (predict next token) and sometimes masked models whose goal is to predict a masked input from both the left and right token. We can also use slightly different datasets. These can make differences in efficiency, but as long as we make “reasonable” choices, typically raw resources are more significant predictors of performance than the particular loss or dataset used.</p>
+
+
+
+<p><strong>Some instances are harder than others.</strong> This point is not specific to self-supervised learners. It does seem that data points have some inherent “difficulty level”. Indeed, we have several pieces of empirical evidence for the notion that different learning algorithms have a different “skill level” and different points have a different “difficulty level” (with the probability of classifier <img alt="f" class="latex" src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> classifying point <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> correctly being monotonically increasing with <img alt="f" class="latex" src="https://s0.wp.com/latex.php?latex=f&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>’s skill and monotonically decreasing with <img alt="x" class="latex" src="https://s0.wp.com/latex.php?latex=x&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>’s difficulty). The “skill vs. difficulty” paradigm is the cleanest explanation for the “accuracy on the line” phenomenon uncovered by <a href="https://arxiv.org/abs/1902.10811">Recht et al</a> and  <a href="https://arxiv.org/abs/2107.04649">Miller et al</a>. Our paper with Kaplun, Ghosh, Garg, and Nakkiran also shows how different inputs in datasets have an inherent “difficulty profile” that seems to be generally robust with respect to different model families.</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="372" src="https://lh5.googleusercontent.com/vqgciucsObFfbagqYE_AMDW-IFcVaRIThslLnoR5QpXEeb4q24IHMPitPGjRaIKsijNECy3el8e00QI6xh6STAA7LbNeAfmU16deO59P6Lq4hvNUS1aSRduynVxcF9r2bIGS4rZOMq5ZAmCqAA" width="591"/><strong>Figure: </strong><a href="https://share.streamlit.io/millerjohnp/linearfits_app/main/app.py">Miller et al’s graph</a> showing accuracy on the line phenomena for classifiers trained on CIFAR-10 and tested on CINIC-10.</figure></div>
+
+
+<p/>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="391" src="https://lh6.googleusercontent.com/cNFVOxR5avX184hU0mFY3_WTqfZhyD7n0Jqg7mcn36PkZk_835mx8fdXOMJTW5xt10EwnBblx480XdRBEcSRq5RSpPE6rYAr7R9PrBx8VCT54FAixyg3bXgxueRLWWdMKteLgiuAkuXrAcs5Eg" width="680"/><strong>Figure: </strong>Deconstruction of datasets into points from <a href="https://arxiv.org/abs/2202.09931">Kaplun and Ghosh et al</a> of different “difficulty profiles” for increasingly more resourced classifiers. The graphs at the top describe the different softmax probabilities for most likely classes as a function of the global accuracy of a classifier from a certain family indexed by training time. The pie charts at the bottom show the decomposition of different datasets into points of the varying types. Note that this decomposition is similar with respect to different neural architectures.</figure></div>
+
+
+<p/>
+
+
+
+<p><strong>Training as teaching.</strong> Training of modern large models seems much more like teaching a student than fitting a model to data, complete with “taking breaks” or trying different approaches when the student doesn’t get it or seems tired (training diverges). The <a href="https://github.com/facebookresearch/metaseq/tree/main/projects/OPT/chronicles">training logbook of Meta’s large model</a> is instructive- aside from issues with hardware, we can see interventions such as switching different optimization algorithms in the middle of training and even considering “hot swapping” the activation functions (GELU to RELU). The latter doesn’t make much sense if you think of model training as fitting data as opposed to learning representations. </p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="201" src="https://lh4.googleusercontent.com/ujboPOfONTtBdZypMX-flKhxBQWnvxhdGN_eVox8BXzHSJbGyk7qzTCTe-lE4aUKewvrEMaU9etWb8eis7KTNXsawJ1bR-mou7-EvF9n_VwTruJJWvqkd34BvON5-99DUof45skX7EOHfgljeg" width="548"/></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="152" src="https://lh6.googleusercontent.com/EFP7xVCiHMsAt_ZBGE1U10t6KCzWXRqI_KNOYOXE6KfUWBydmKILs3LB7LHEyAReTYLu9nSajqKUq0prSf7y_W8puRS0iymFznyYe07kPnDI3vVm6AQDcJnmp0WhV2W4J_lUbnNjU03tmCvnRg" width="634"/><strong>Figure:</strong> Excerpts from Meta’s training log</figure></div>
+
+
+<p/>
+
+
+
+<h2><strong>4.1) But what about supervised learning?</strong></h2>
+
+
+
+<p>Up to this point, we only discussed self-supervised learning, but the canonical example of deep learning- the one you teach first in a course- is still supervised learning. After all, deep learning’s “ImageNet moment” came with, well, ImageNet. Does anything we said above still apply to this setting?</p>
+
+
+
+<p>First, the emergence of supervised large-scale deep learning is to some extent a historical accident, aided by the availability of large high quality labeled datasets (i.e. ImageNet). One could imagine an alternative history in which deep learning first started showing breakthrough advances in Natural Language Processing via unsupervised learning, and only later transported into vision and supervised learning.</p>
+
+
+
+<p>Second,  we have some evidence that even though they use radically different loss functions, supervised and self-supervised learning behave similarly “under the hood.” Both often achieve the same performance, and in work with <a href="https://arxiv.org/abs/2106.07682">Bansal and Nakkiran</a>, we showed that they also learn similar internal representations. Concretely, for every <img alt="k \in \{1..d-1\}" class="latex" src="https://s0.wp.com/latex.php?latex=k+%5Cin+%5C%7B1..d-1%5C%7D&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/>, one can “stitch together” the first <img alt="k" class="latex" src="https://s0.wp.com/latex.php?latex=k&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> layers of a depth <img alt="d" class="latex" src="https://s0.wp.com/latex.php?latex=d&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> model that was trained via self-supervision with the last <img alt="d-k" class="latex" src="https://s0.wp.com/latex.php?latex=d-k&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> layers of a supervised model with little loss in performance. </p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="299" src="https://lh4.googleusercontent.com/b8aReNvFG6VNbi-tTsFB-WMov7HSF4T56CXm1eFMDHfmg4wmDAX_St76YqZWZU2EfMd4xyIPHSSzzs_QUkz5Jslor2l_8M23OKM_XghkF2IVHMW5ntHpxH05aWLT8i6UYZD3ZrBnLEg6ymTkqA" width="681"/><strong>Figure: </strong>Table from <a href="https://arxiv.org/abs/2006.10029">SimCLR v2 paper (Chen et al)</a>. Note the general similarity in performance between supervised learning, fine-tuned (100%) self-supervised, and self-supervised + linear probe.</figure></div>
+
+
+<p/>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="341" src="https://lh6.googleusercontent.com/nKpdayaNeS9IP7Vhu7QhDaTjUcgEZoAl3CbY9bmGZkV_YfcUL4rmRy1esz5824eheS5EbiPBl5pIaNJk4wZuJoAfEXB7rjyP3AVCFF_ke5mN4lQsI2MlvCV4ZBWJGIkeWA9WbtN89Z184fm69w" width="759"/><strong>Figure: </strong>Stitching a self supervised and a supervised model from <a href="https://arxiv.org/abs/2106.07682">Bansal et al</a>. Left: If the self-supervised is (say) <img alt="3\%" class="latex" src="https://s0.wp.com/latex.php?latex=3%5C%25&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> less accurate than the supervised model, then fully compatible representations would result in a stitching penalty of <img alt="p\cdot 3\%" class="latex" src="https://s0.wp.com/latex.php?latex=p%5Ccdot+3%5C%25&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> when <img alt="p" class="latex" src="https://s0.wp.com/latex.php?latex=p&amp;bg=ffffff&amp;fg=666666&amp;s=0&amp;c=20201002"/> fraction of layers come from the self-supervised model. If the models are completely incompatible then we expect accuracy to drop sharply as we stitch more models. Right: Actual results for stitching different self-supervised models. We also stitch a random network as a “sanity check”.</figure></div>
+
+
+<p/>
+
+
+
+<p>The advantage of self-supervised + simple models is that they can separate out the aspects of feature learning or “deep learning magic” (done by the deep representation function) from the statistical model fitting (done by the linear or other “simple” classifier on top of this representation).</p>
+
+
+
+<p>Finally, while this is more speculative, the fact that often “meta learning” seems to amount to learning representations (see <a href="https://arxiv.org/abs/1909.09157">Raghu et al.</a> and <a href="https://arxiv.org/abs/2206.03271">Mandi et. al.</a>)  can be considered as another piece of evidence that this is much of what’s going on, regardless of the objective that the model ostensibly optimizes. </p>
+
+
+
+<h2><strong>4.2) What about over parameterization?</strong></h2>
+
+
+
+<p>The reader may have noticed that I skipped over what is considered the canonical example of the disparity between the model of statistical learning and deep learning in practice: the absence of a “bias-variance tradeoff” (see Belkin et al.’s <a href="https://arxiv.org/abs/1812.11118">double descent</a>) and the ability of over-parameterized models to generalize well.</p>
+
+
+
+<p>There are two reasons I do not focus on this aspect. First, if supervised learning really does correspond to self-supervised + simple learning “under the hood” then that <a href="https://arxiv.org/abs/2010.08508">may explain its generalization ability</a>.  Second, I think that over parameterization is <em>not</em> crucial to deep learning’s success. Deep networks are special not because they are big compared to the number of samples but because they are big in absolute terms. Indeed, typically in unsupervised / self-supervised learning models are <em>not</em> over parameterized. Even for the very large language models, their datasets are larger still. This does not make their performance any less mysterious.</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img alt="" height="292" src="https://lh5.googleusercontent.com/BgGdDZHOPsPxw2-dYE49AS7Lc_Opwqmg19d0PAUVNX9vwSOadwVrQAingo1pXUOJ_o13v25QV_SFQU7qdtSBwGk05VsWwsIwyc2j8wcGBkZ9m3wWCyiOOwTynhF3zWFZFe1PmDJKCZgO1IDl4A" width="673"/><strong>Figure: </strong><a href="https://arxiv.org/abs/2010.08127">Nakkiran-Neyshabur-Sadghi’s</a> “deep bootstrap” paper demonstrates that modern architectures behave similarly in the “over parameterized” or “under sampled” regime (where models train for multiple epochs on limited data until over fitting: “real world” in the above figure) and “under parameterized” or “online” regime (where models train for a single epoch, seeing each sample only once: “ideal world” in the above figure). </figure></div>
+
+
+<p/>
+
+
+
+<h2><strong>Summary</strong></h2>
+
+
+
+<p>Statistical learning certainly plays a role in deep learning. However, despite using similar terms and code, thinking of deep learning as simply fitting a model with more knobs than classical models misses a lot of what is essential to its success. The human student metaphor is hardly perfect either. Like biological evolution, even though deep learning consists of many repeated applications of the same rule – gradient descent on empirical loss- it gives rise to highly complex outcomes. It seems that at different times different components of networks learn different things, including, representation learning, prediction fitting, implicit regularization, and pure noise. We are still searching for the right lens by which to ask questions about deep learning, let alone answer them.</p>
+
+
+
+<p><strong>Acknowledgments:</strong> Thanks to Lucas Janson and Preetum Nakkiran for comments on early versions of this blog post.</p></div>
+    </content>
+    <updated>2022-06-20T17:15:58Z</updated>
+    <published>2022-06-20T17:15:58Z</published>
+    <category term="Philosophizing"/>
+    <author>
+      <name>Boaz Barak</name>
+    </author>
+    <source>
+      <id>https://windowsontheory.org</id>
+      <logo>https://s0.wp.com/i/buttonw-com.png</logo>
+      <link href="https://windowsontheory.org/feed/" rel="self" type="application/atom+xml"/>
+      <link href="https://windowsontheory.org" rel="alternate" type="text/html"/>
+      <link href="https://windowsontheory.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
+      <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
+      <subtitle>A Research Blog</subtitle>
+      <title>Windows On Theory</title>
+      <updated>2022-06-20T17:20:42Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en">
     <id>http://lucatrevisan.wordpress.com/?p=4640</id>
@@ -57,7 +396,7 @@
       <link href="https://lucatrevisan.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>"Marge, I agree with you - in theory. In theory, communism works. In theory." -- Homer Simpson</subtitle>
       <title>in   theory</title>
-      <updated>2022-06-20T16:37:04Z</updated>
+      <updated>2022-06-20T17:20:10Z</updated>
     </source>
   </entry>
 
@@ -158,7 +497,7 @@ Can you suggest further notions in genealogy—without going into genetics—and
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-06-20T16:37:25Z</updated>
+      <updated>2022-06-20T17:20:32Z</updated>
     </source>
   </entry>
 
@@ -788,7 +1127,7 @@ Important note. This manuscript is based on an early preprint of report TR22-058
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-06-20T16:37:21Z</updated>
+      <updated>2022-06-20T17:20:26Z</updated>
     </source>
   </entry>
 
@@ -941,7 +1280,7 @@ constraint, and what are their computational limitation.
       <link href="https://theorydish.blog/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Stanford's CS Theory Research Blog</subtitle>
       <title>Theory Dish</title>
-      <updated>2022-06-20T16:38:17Z</updated>
+      <updated>2022-06-20T17:21:24Z</updated>
     </source>
   </entry>
 
@@ -1108,7 +1447,7 @@ constraint, and what are their computational limitation.
       <link href="https://kamathematics.wordpress.com/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://kamathematics.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Kamathematics</title>
-      <updated>2022-06-20T16:38:30Z</updated>
+      <updated>2022-06-20T17:21:36Z</updated>
     </source>
   </entry>
 
@@ -1167,7 +1506,7 @@ constraint, and what are their computational limitation.
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2022-06-20T16:37:48Z</updated>
+      <updated>2022-06-20T17:20:42Z</updated>
     </source>
   </entry>
 
@@ -1204,7 +1543,7 @@ constraint, and what are their computational limitation.
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2022-06-20T16:37:23Z</updated>
+      <updated>2022-06-20T17:20:30Z</updated>
     </source>
   </entry>
 
@@ -1250,7 +1589,7 @@ constraint, and what are their computational limitation.
       <link href="https://gilkalai.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>Gil Kalai's blog</subtitle>
       <title>Combinatorics and more</title>
-      <updated>2022-06-20T16:37:24Z</updated>
+      <updated>2022-06-20T17:20:30Z</updated>
     </source>
   </entry>
 
@@ -1317,7 +1656,7 @@ Email: crypto@cs.huji.ac.il</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-06-20T16:37:30Z</updated>
+      <updated>2022-06-20T17:20:34Z</updated>
     </source>
   </entry>
 
@@ -1423,7 +1762,7 @@ Email: crypto@cs.huji.ac.il</p></div>
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-06-20T16:37:21Z</updated>
+      <updated>2022-06-20T17:20:26Z</updated>
     </source>
   </entry>
 
@@ -1450,7 +1789,7 @@ Email: s.mukhopadhyay@sheffield.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-06-20T16:37:30Z</updated>
+      <updated>2022-06-20T17:20:34Z</updated>
     </source>
   </entry>
 
@@ -1477,7 +1816,7 @@ Email: s.mukhopadhyay@sheffield.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-06-20T16:37:30Z</updated>
+      <updated>2022-06-20T17:20:34Z</updated>
     </source>
   </entry>
 
@@ -1682,7 +2021,7 @@ What do you think?</p>
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-06-20T16:37:27Z</updated>
+      <updated>2022-06-20T17:20:32Z</updated>
     </source>
   </entry>
 
@@ -1756,36 +2095,6 @@ What do you think?</p>
       <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
       <title xml:lang="en-US">Shtetl-Optimized</title>
       <updated>2022-06-19T05:44:31Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-us">
-    <id>https://eccc.weizmann.ac.il/report/2022/087</id>
-    <link href="https://eccc.weizmann.ac.il/report/2022/087" rel="alternate" type="text/html"/>
-    <title>TR22-087 |  Depth-$d$ Threshold Circuits vs. Depth-$(d + 1)$ AND-OR Trees | 
-
-	Pooya Hatami, 
-
-	William Hoza, 
-
-	Avishay Tal, 
-
-	Roei Tell</title>
-    <summary>For $n \in \mathbb{N}$ and $d = o(\log \log n)$, we prove that there is a Boolean function $F$ on $n$ bits and a value $\gamma = 2^{-\Theta(d)}$ such that $F$ can be computed by a uniform depth-$(d + 1)$ $\text{AC}^0$ circuit with $O(n)$ wires, but $F$ cannot be computed by any depth-$d$ $\text{TC}^0$ circuit with $n^{1 + \gamma}$ wires. This bound matches the current state-of-the-art lower bounds for computing explicit functions by threshold circuits of depth $d &gt; 2$, which were previously known only for functions outside $\text{AC}^0$ such as the parity function. Furthermore, in our result, the $\text{AC}^0$ circuit computing $F$ is a monotone *read-once formula* (i.e., an AND-OR tree), and the lower bound holds even in the average-case setting with respect to advantage $n^{-\gamma}$.
-
-Our proof builds on the *random projection* procedure of Håstad, Rossman, Servedio, and Tan, which they used to prove the celebrated average-case depth hierarchy theorem for $\text{AC}^0$ (J. ACM, 2017). We show that under a modified version of their projection procedure, any depth-$d$ threshold circuit with $n^{1 + \gamma}$ wires simplifies to a near-trivial function, whereas an appropriately parameterized AND-OR tree of depth $d + 1$ maintains structure.</summary>
-    <updated>2022-06-12T02:57:47Z</updated>
-    <published>2022-06-12T02:57:47Z</published>
-    <source>
-      <id>https://eccc.weizmann.ac.il/</id>
-      <author>
-        <name>ECCC papers</name>
-      </author>
-      <link href="https://eccc.weizmann.ac.il/" rel="alternate" type="text/html"/>
-      <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
-      <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
-      <title>ECCC - Reports</title>
-      <updated>2022-06-20T16:37:21Z</updated>
     </source>
   </entry>
 </feed>
