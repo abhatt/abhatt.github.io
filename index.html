@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at June 27, 2022 02:38 PM UTC</span>.
+Last updated <span class="datestr">at June 27, 2022 03:21 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -254,6 +254,307 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://windowsontheory.org/?p=8429">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/wot.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en"><a class="entryheader" href="https://windowsontheory.org/2022/06/27/injecting-some-numbers-into-the-agi-debate/">Injecting some numbers into the AGI debate</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://windowsontheory.org" title="Windows On Theory">Windows on Theory</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en">
+<p><em>[Yet another <a href="https://windowsontheory.org/category/philosophizing/">“philosophizing”</a> post, but one with some actual numbers. –Boaz]</em></p>
+
+
+
+<p>Recently there have been many debates on “artificial general intelligence” (AGI) and whether or not we are close to achieving it by scaling up our current AI systems. In this post, I’d like to make this debate a bit more quantitative by trying to understand what “scaling” would entail. The calculations are very rough – think back of a post-it that is stuck on the back of an envelope. But I hope that this can be at least a starting point for making these questions more concrete.</p>
+
+
+
+<p>The first problem is that there is no agreement on what “artificial general intelligence” means.  People use this term to mean anything between the following possibilities: </p>
+
+
+
+<ol><li>Existence of a system that can meet benchmarks such as getting a perfect score on the SAT and IQ tests and passing a “Turing test.”  This is more or less the definition used by <a href="https://www.metaculus.com/questions/4815/date-of-first-agi-according-to-forecasters/">Metacalculus</a> (though they recently updated it to a <a href="https://www.metaculus.com/questions/5121/date-of-general-ai/">stricter version</a>).</li><li>Existence of a system that can replace many humans in terms of economic productivity. For concreteness, say that it can function as an above-average worker in many industries. (To sidestep the issue of robotics, we can restrict our attention to remote-only jobs.)</li><li>Large-scale deployment of AI, replacing or radically changing the nature of work of a large fraction of people. </li><li>More extreme scenarios such as consciousness, malice, and super-intelligence. For example, a system that is conscious/sentient enough to be awarded human rights and <a href="https://www.theguardian.com/technology/2022/jun/12/google-engineer-ai-bot-sentient-blake-lemoine">its own attorney</a>, or malicious enough to <a href="https://www.lesswrong.com/posts/uMQ3cqWDPHhjtiesc/agi-ruin-a-list-of-lethalities">order DNA off the Internet, build a nanofactory to construct a diamondoid bacteria riding on miniature rockets, so they enter the bloodstream of all humans and kills everyone instantly, while not being detected</a>.</li></ol>
+
+
+
+<p>I consider the first scenario– passing IQ tests or even a Turing test– more of a “parlor trick” than actual intelligence.  The history of artificial intelligence is one of <em>underestimating</em> future achievements on specific benchmarks, but also one of <em>overestimating</em> the broader implications of those benchmarks. Early AI researchers were not only wrong about how long it will take for a computer program to become the world chess champion, but they also wrongly assumed that such a program would have to be generally intelligent as well. In a 1970 interview, Minsky was <a href="https://www.sciencedirect.com/science/article/abs/pii/S0065245808604088">quoted</a> as saying that by the end of the 1970s, <em>“we will have a machine with the general intelligence of an average human being … able to read Shakespeare, grease a car, play office politics, tell a joke, have a fight. At that point, the machine will begin to educate itself with fantastic speed. In a few months, it will be at genius level, and a few months after, its powers will be incalculable…  In the interests of efficiency, cost-cutting, and speed of reaction, the Department of Defense may well be forced more and more to surrender human direction of military policies to machines.”</em> </p>
+
+
+
+<p>Brooks <a href="https://en.wikipedia.org/wiki/Moravec%27s_paradox">explains</a> that early AI researchers thought intelligence was “best characterized as the things that highly educated male scientists found challenging.” Since playing championship-level chess was hard for them, they couldn’t imagine a machine doing it without doing all other tasks that they considered more trivial. Getting a high SAT or IQ exam score is no more meaningful (for machines or humans) than doing well in chess. </p>
+
+
+
+<p>The fourth scenario is, at the moment, too speculative for quantitative discussion and hence less appropriate for this post  (though see the addendum below).  We will focus on the second and third scenarios, which are necessary stepping stones for the more extreme fourth option. For the sake of concreteness, I will make the optimistic assumption that “scale is all you need” to achieve either of these scenarios. I will then try to see our best estimates on <strong>how much scale</strong> and <strong>at what cost</strong>.</p>
+
+
+
+<p>The point of this post is not to argue that we will never achieve scenarios 2 or 3. Instead, it is to try to get quantitative estimates on challenges we would need to overcome to do so. I believe it is possible, but it would be more than just getting better hardware. </p>
+
+
+
+<p>This is a long post. If I had to <strong>TL;DR</strong> it, I would say that we have significant uncertainty on how much scale we need for AGI. Scaling to 10-100 Trillion parameters may well get us to Scenario 2 or something near. Still, training and (potentially) inference costs may be prohibitive to achieving the reliability and generality needed for actual deployment. Some challenges we face include:</p>
+
+
+
+<p><strong>(1)</strong> Maintaining long-term context without model size exploding.  </p>
+
+
+
+<p><strong>(2)</strong> Making training more efficient, particularly finding ways to train N-sized models at a near-linear cost instead of quadratic in N.</p>
+
+
+
+<p><strong>(3)</strong> Avoid running out of data, perhaps by using video/images and programmatically generated interactive simulations.</p>
+
+
+
+<p><strong>(4)</strong> Handling multi-step interactions without the interaction going “off the rails” and without needing to scale policy/value gradients to an unfeasible number of interactions (perhaps by using smaller RL-trained “verifier models” to choose between options produced by a large statically-trained model). </p>
+
+
+
+<p>This post is focused on quantitative issues rather than questions such as “consciousness” or the risks of AI. Those deserve a post of their own. See the addendum at the end for some more philosophical/speculative discussion.</p>
+
+
+
+<figure class="wp-block-image"><img src="https://lh6.googleusercontent.com/DZ5OdMGfgLPqoaYFgPjM3ih2tzYQOrKQlH1ObDsiMe7CxWvmgKL69sh8fZ0HtLva9DiPqo-hiA93xF-KpbqDzajMs43bDUm0fqIYPPtnkISlttkiqS3Ys4MbxTQkrMFb0U89GT-NtySEieACtg" alt="" /><strong>Figure:</strong> Largest occupations in the US according to <a href="https://www.bls.gov/oes/current/area_emp_chart/area_emp_chart.htm">BLS</a>, and a list of most popular remote-only postings from <a href="https://www.flexjobs.com/blog/post/10-best-telecommuting-jobs-with-no-location-requirement-v2/">FlexJobs</a>. Some of these, including health care aides, nurses, and teachers, are unlikely to be replaced by AI soon. The quality of current AI is also not the bottleneck in replacing retail salespersons, cashiers, and fast-food and counter workers.   Similarly, jobs such as laborers and material movers, which involve physical work in constantly changing environments, are unlikely to be cost-effective to automatize in the near future. </figure>
+
+
+
+<p></p>
+
+
+
+<h3><strong>Initial notes</strong></h3>
+
+
+
+<p>Since artificial intelligence exists in the virtual space, people often assume that we can clone it an arbitrary number of times. But modern AI systems have a highly non-trivial physical footprint. Current models require dozens of GPUs to store their parameters, and future ones would be even larger. Creating many copies of such systems is going to be challenging.</p>
+
+
+
+<p>Another common assumption is that by Moore’s law, if we manage to build a system at the level of (say) a sixth-grader, then in a year, we would have a virtual Einstein. However, often performance on a metric scale with the <strong>logarithm</strong> of the number of parameters (e.g., see Big-bench and Parti figures). So, perhaps a better assumption is that if we manage to build a virtual sixth-grader, then the following year, we would have a virtual seventh-grader.</p>
+
+
+
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/FAFhzz-aKnE_J6tYSgrt5PJSapIMUWZDWwdI-gqb1SwdKFE8TGQhcmNHWTXSt-SY4eKBDHbu-weP25MtVb8_FBu_cSCk1WAIoCkhsS_cQWMuLSxddSwgPN_it_4m1KP9SzH7IszegCZSVslxbg" alt="" /><strong>Figure:</strong> Performance of models on the BIG-bench tasks (<a href="https://arxiv.org/abs/2206.04615">Srivastava et al., 22</a>). Note that performance scales with the <strong>logarithm</strong> of the number of parameters. This is in contrast to power-law dependence on the number of parameters which is typically manifested for metrics that are close to saturation. For the JSON tasks, naive extrapolation from 10<sup>8</sup> to 10<sup>11 </sup>suggests an improvement of about 4 points per order of magnitude. However, the rapid growth exhibited by PaLM models suggests potentially better improvements. Jascha Sohl-Dikstein’s rough estimate is that 1-10 Trillion parameters would suffice for achieving expert performance in 80% of the tasks.</figure>
+
+
+
+<p></p>
+
+
+
+<figure class="wp-block-image"><img src="https://lh3.googleusercontent.com/6vJVDVTLakDJBXmOoVhQsFUuP0KFXFzjvZ3EucsNAayOsISu-Zh7v-hxuM5esA_6XxMjpV-1VUlxCjBwINGBQ5rZXN1ipG4q99hZ9cBK87nVbsSMXQU6U-DwqMKFgL4381RsxU77jHuLHV5Vdw" alt="" /><strong>Figure:</strong> Images generated by Google’s <a href="https://arxiv.org/abs/2206.10789">Parti model</a> (parameters refer to the main component of the model, ignoring the tokenizer and super-resolution modules). From left to right, models increase by factors of 2.1x, 5.3x, and 6.6x. On MS-COCO, these models’ Frechet Inception Distance (FID) scores were 14.1, 10.7, 8.1, and 7.23, respectively. </figure>
+
+
+
+<p></p>
+
+
+
+<figure class="wp-block-image"><img src="https://lh4.googleusercontent.com/NSML-IXUDXQIGhIfTJOjW7_X-Z7o0Vo7rs5NUKManJoyr7g-QXUWu6KPCXSCjk8qnXBEqX_hQV6V_cFG5MIR2o2Nyc6mLpnFDiYINaCI074aQFMp4E9uvGOIYZXhyAyP-vF9au4UzGwumzaAHA" alt="" /><strong>Figure: </strong>Figure 12 in Parti paper (<a href="https://arxiv.org/abs/2206.10789">Yu et al.</a>). Based on human evaluations, the 20B Parti model improved moderately on the 3B model in most aspects (20B output preferred by humans over 3B output in about 60% of the cases) and improved strongly in generating images for abstract concepts or containing writing and symbols (20B output preferred approximately 80% of the time). </figure>
+
+
+
+<p></p>
+
+
+
+<h2><strong>If scale is all you need, how much scale will we need?</strong></h2>
+
+
+
+<p>Let’s assume that we could reach the second scenario (proof of concept general AI system) by simply scaling up our current auto-regressive language models by a factor of X. What would be X?</p>
+
+
+
+<p><strong>Adaptivity. </strong>One crucial difference between the tasks we currently test language models on and general intelligence is <em>adaptivity</em>. A model that answers a question correctly with 95% probability is excellent. But with a 5% chance of error, such a model may go “off the rails” in a back-and-forth conversation with more than 20 steps. Adaptivity is one reason why robotics performance (even in <a href="https://svl.stanford.edu/igibson/">simulated virtual worlds</a>) still lags far behind humans. It is not so much that the physical environment is higher dimensional than the inputs to language models, but the fact that robots’ actions impact it (and unlike in the case of Chess, Go, or Atari, we don’t have an unlimited number of restarts and simulations). Navigating the social and technical environment of (even a virtual) workplace is no less challenging. Squeezing out that final performance (e.g., from 95% to 99%) is usually when power laws kick in, reducing error by a factor of k, requiring a multiplicative overhead of k to some power a&gt;1.</p>
+
+
+
+<p><strong>Context length.</strong> Another way to think of scaling is the length of the context window models keep.  To be useful in replacing a human worker, we don’t want to continuously simulate their first day at work. We want an employee that remembers what they did yesterday, last week, and last year. GPT-3 maintains a window of 2048 tokens, corresponding to roughly 1500 words or three pages of text. However, if you had to write a letter to your future self detailing everything they should remember from your interactions so far, it would likely be much longer. (Claude Fredericks, who may have been <a href="https://www.newyorker.com/magazine/2021/11/08/the-most-ambitious-diary-in-history-claude-fredericks">the most prolific diarist in history</a>, wrote a diary of approximately 65,000 pages.) </p>
+
+
+
+<p>Unfortunately, in standard transformer models, size grows <em>quadratically</em> with the context, which means that increasing the context by (say) a factor of 100 will require increasing model size by a factor of 10,000. However, several <a href="https://arxiv.org/abs/2009.06732">alternative transformer architectures</a> aim to achieve linear or near-linear model size scaling with the context.</p>
+
+
+
+<p><strong>Empirical scaling of performance.</strong> The recent <a href="https://arxiv.org/abs/2206.04615">BIG-bench paper</a> is perhaps the most comprehensive study of how large language models’ performance improves with scale. They assembled an extensive collection of tasks, each with a score normalized to (mostly) stay in the interval 0-100, with a score of zero corresponding to trivial (e.g., random) performance and a score of 100 corresponding to near-perfect performance (e.g., expert human). In many of these tasks, current models score lower than 20. We still don’t have enough data to know how truly large models behave. On the one hand, naive extrapolation suggests that we need many orders of magnitude for high performance (e.g., a score of 80 points or above). On the other hand, larger models such as <a href="https://arxiv.org/abs/2204.02311">Google PaLM</a> show evidence of “breakthrough capabilities”- performance growing super-linearly in the logarithm of size. It seems that to solve this benchmark fully, we would need at least a factor of 10 increase over the ½ Trillion parameter PaLM model.</p>
+
+
+
+<p><strong>Comparing with the brain.</strong> Another point of comparison could be the human brain. However, human brains and artificial neural networks have very different architectures, and we don’t know how many parameters correspond to a single neuron or synapse. Scott Alexander <a href="https://astralcodexten.substack.com/p/somewhat-contra-marcus-on-ai-scaling?s=r">quotes</a> <a href="https://blog.piekniewski.info/2018/08/28/fun-numbers-about-the-brain/">this estimate</a> of 100 trillion parameters on the brain’s size, which would correspond to a factor of 100-1,000 larger than current models. However, the estimate is rather hand-wavy, and even if it wasn’t, there is no reason to expect that artificial neural networks would have the same “ability per parameter” ratio as human brains. In particular, artificial neural networks appear to compensate for relatively weaker reasoning skills by ingesting a massive amount of data, and with data, the model size grows as well.</p>
+
+
+
+<p><strong>Bottom line.</strong> Overall, it seems that X will need to be at least 10-100, though this is an extremely rough estimate. Also, while an X Trillion model might be the “core” of a system replacing a human worker, it will not be the whole of it, and we are likely to need new ideas beyond scale for these other components. In particular, a model designed for back-and-forth interaction is unlikely to simply use an auto-regressive language model as a black box, not even with chain-of-thought reasoning.</p>
+
+
+
+<h2><strong>How much will it cost?</strong></h2>
+
+
+
+<p>Suppose that scaling our current models by a factor of X can achieve “AGI” in the sense of yielding a system that can be as productive as humans in a wide variety of professions (say all the top remote jobs in the list from <a href="https://www.flexjobs.com/blog/post/10-best-telecommuting-jobs-with-no-location-requirement-v2/">FlexJobs</a>). How much do we expect it to cost to (1) build a single system of this magnitude and (2) widely deploy it?</p>
+
+
+
+<p>The gap between a “proof of concept” to actual deployment can be pretty significant. For example, in 2007, CMU won the urban DARPA grand challenge, while in 2012, a Google autonomous car passed a driving test. Yet a decade later, we still don’t have a significant deployment of self-driving cars. Also, as described in the book (and film) <a href="https://www.nytimes.com/2016/09/06/books/on-being-black-female-math-whizzes-during-the-space-race.html">Hidden Figures</a>, despite Moore’s law starting in the 30s, NASA still employed <a href="https://www.history.com/news/human-computers-women-at-nasa">human computers</a> until the 1960s. </p>
+
+
+
+<p>For this post, I will make the optimistic (and unrealistic) assumption that the difference between proof-of-concept and deployments corresponds to the difference between the cost of <strong>training</strong> a system vs. the cost of doing <strong>inference</strong> on it.  If a system costs more than $100B to train, then it may never get built  (for comparison, the <a href="https://www.forbes.com/sites/alexknapp/2012/07/05/how-much-does-it-cost-to-find-a-higgs-boson/?sh=15872c173948">Large Hadron Collider</a> cost less than $5B to build). Similarly, a system costing $1000/hour to use is unlikely to replace human workers at scale. </p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img width="683" alt="" src="https://lh6.googleusercontent.com/SPIkvg3D8tlFQvQJ8OEjFpTRdVjZr9PUCYUuyHfEyZGEe9LJHm2hipFm4SnuNShKeoi3j-UMfc99RXpVUonmw94IE75MLIvsO5Ef81LJT5YTWxtAYN_Tw6TgldY-bN1-BfJnDLeZ5SJa-jUj7Q" height="479" /><strong>Figure:</strong> Moore’s law expressed in calculations per dollar per second. While Moore’s law started in the 1900s, and in earnest since the 1930s, up until the 1960s, some calculations were still being done by “human computers.” Graph by Steve Jurvetson based on Ray Kurzweil’s original graph.</figure></div>
+
+
+<p></p>
+
+
+
+<p>The costs below are calculated with today’s dollars and today’s hardware. Of course, improvements in hardware will translate to cheaper training and inference. However, we have neglected costs that can scale super-linearly with model size, including communication between nodes, managing massive clusters and more. I consider only <em>amortized</em> costs since those are what matter when training and serving models at scale.</p>
+
+
+
+<h3><strong>Cost of training</strong></h3>
+
+
+
+<p>There is no point in training a large model if you don’t train it for enough time. The performance advantages of larger models are realized by allowing them to train on more data without “saturating”. In the words of the <a href="https://arxiv.org/abs/2203.15556">Chinchilla</a> paper  “for every doubling of model size the number of training tokens should also be doubled.” (See also the <a href="https://arxiv.org/abs/2010.08127">deep bootstrap</a> paper). Hence the number of inferences applied using training also scales with the model size.  This means that if a model grows by a factor of X then both the cost of a single inference as well as the total number of inferences grow by about X, meaning that the cost of training grows by about X<sup>2</sup>.  In particular, we can expect training a model that is 100 times as large to cost 10,000 times more! </p>
+
+
+
+<p>There are <a href="https://lambdalabs.com/blog/demystifying-gpt-3/">differing</a> <a href="https://lastweekin.ai/p/gpt-3-is-no-longer-the-only-game#:~:text=Taken%20together%2C%20these%20factors%20mean,costly%20and%20difficult%20to%20train.">estimates</a> on how much ~100B parameter GPT3 model cost to train, but they range in the $5M-$20M, let’s say $5M in pure training costs for simplicity. (This would correspond to a cost of 5M$/500B = 10<sup>-5</sup> dollars per inference, which matches roughly with estimates below.)  An X Trillion model (which, like Chinchilla, but unlike PaLM, would be fully trained to max out its advantages) might cost a factor of 100X<sup>2</sup> more. For X=10, this would be a cost of $50B. For X=100, this would be 5 Trillion dollars!</p>
+
+
+
+<p>Clearly, finding a way to train N-sized models on N tokens using less than O(N<sup>2</sup>) steps (e.g., O(N log N) ) can be crucial for scaling larger models. Training larger language models also runs into the problem that we have nearly “maxed out” the available textual data. Modern models are already trained on hundreds of billions of words, but there is a limit to how much novel text can be produced by a planet of 8 billion people. (Though multimodal models that are also trained on video would have access to much more data.)</p>
+
+
+
+<h2><strong>Cost per inference</strong></h2>
+
+
+
+<p>Suppose that we have managed to train a large model of X Trillion parameters. How much do we expect inference to cost in dollars? In transformer architectures, the number of floating-point operations required to make a single model evaluation (i.e., inference) is roughly the same as the number of parameters.  </p>
+
+
+
+<figure class="wp-block-image"><img src="https://lh5.googleusercontent.com/6nN6SrxuKUYnW0cfxrOmcohET_FSmDrQqnQXNirPRwj95oAr0HAf6J6q6v_S8W4_gV6Efvu8fgflohbxbW66hjcmeOBzHKYK_6syfh0Sc19V0qVr_Sg7jaDICeEyM5U1tc4r2P1C6p38LJoWKQ" alt="" /><strong>Figure:</strong> Relation between the number of parameters and FLOPs, from  <a href="https://arxiv.org/abs/2109.05472">Desislavov et al</a>. Both axes are logarithmic. For transformers, the slope is very close to 1 (one FLOP per parameter), while for CNN’s it is roughly 0.8. </figure>
+
+
+
+<p></p>
+
+
+
+<p>Hence an X Trillion parameter model requires about X TerraFLOPs (TFLOPs). Nvidia’s A-100 GPUs claims peak performance of <a href="https://developer.nvidia.com/blog/nvidia-ampere-architecture-in-depth/">about 300</a> TFLOP/s. (The effects of using 16-bit precision and not achieving 100% utilization roughly cancel out.) Renting such a machine costs about $1/hour, so we can get about 300*3600 ~ 1M TFLOPs per dollar.  (This is up to order of magnitude and caring just about total FLOPs rather than wall-clock time; for careful calculations of inference <em>time,</em> see <a href="https://kipp.ly/blog/transformer-inference-arithmetic/">Carol Chen’s</a> and <a href="https://bounded-regret.ghost.io/how-fast-can-we-perform-a-forward-pass/">Jacob Steinhardt’s</a> blogs.)</p>
+
+
+
+<p>So far, this sounds great – we could make 10<sup>6</sup>/X<strong> </strong> inferences per dollar for an X trillion parameter model.  However, in the real world costs are much higher. The same Nvidia blog shows that A-100 can handle 6000 inferences/sec of the 340M parameter Bert Large. Since an X Trillion model is 3000X larger, that would correspond to 2/X inferences per second or 7200/X inferences per hour/dollar. The calculations above predict that the 0.2 Trillion parameter GPT-3 would be able to perform 7200*5~35K inferences per dollar. However, OpenAI charges <a href="https://openai.com/api/pricing/">6 cents per 1K tokens</a> (including input tokens!), which depending on the length of the input, can be only 10 inferences per dollar. <a href="https://pakodas.substack.com/p/estimating-gpt3-api-cost">Bhavsar</a> estimates GPT-3 can handle about 18K inferences per GPU hour. Overall it seems that 10<sup>4</sup>/X inferences per dollar is an optimistic estimate. </p>
+
+
+
+<p>However, the question is how many inferences we need to make per hour to simulate a human. The average person <a href="https://www.publicationcoach.com/ten-ways-to-write-a-better-speech/">apparently speaks</a> about 150 words (say 200 tokens) per minute. This would suggest we need about 200*60 ~ 10K inferences per hour to simulate a person. For an X Trillion sized model, that would cost $X per hour, which is not too bad if X is between 10 to 100.</p>
+
+
+
+<p>The above price point sounds pretty good but will likely be an underestimate.  First, to actually simulate a human, we need not just to simulate what they say but also what they <em>think</em>. So, to perform “chain of thought” reasoning, we would need to run an inference per word that is thought rather than a word that is uttered. We don’t know the speed of thought, but it will increase the number of inferences needed. Generally, to simulate a chain of reasoning of depth K, the number of inferences scales with K, even if the end result is just a single token. Second, to reach high reliability, it is likely that we will need to make Y inferences and use some mechanism to choose the best one out of these Y options. For example, <a href="https://arxiv.org/abs/2203.07814">AlphaCode</a> generates millions of possible solutions to programming challenges and filters them into 10 candidate ones. It is hard to estimate what Y would be in a workplace environment, but it seems that Y would be somewhere between 10 to 100.</p>
+
+
+
+<p><strong>Bottom line for inference cost. </strong>The estimates above suggest that an X Trillion parameter model would require about 10<sup>5</sup> to 10<sup>6</sup> inferences per hour to simulate a person, with a cost that ranges from $10X to $1000X per hour. This is already tight for X=10 and would be too much for X=100. However, it is not clear how many words/thoughts we need to simulate per given profession, so these estimates are very rough.</p>
+
+
+
+<p></p>
+
+
+
+<h2><strong>The bottom line</strong></h2>
+
+
+
+<p>While the estimates above should be taken with huge grains of salt, I believe that generally useful artificial intelligence can likely be achieved, but it will require more than sheer scale. While in principle a perfect next-word extender is also a perfect reinforcement learner, we may not be able to get close enough to perfection by scale alone. More than any particular conclusions, I hope that the debate can move from general philosophical arguments to quantitative questions that have numerical answers. </p>
+
+
+
+<p></p>
+
+
+
+<h2><strong>Addendum: The “C word” and existential risk.</strong></h2>
+
+
+
+<p>I tried to keep this post within the realms of calculations and away from philosophy. But given recent discussions and hype on whether AI systems can achieve “consciousness” or “sentience” and whether they pose a unique existential risk, I feel that I must address this at least briefly.  Readers allergic to philosophy and unjustified speculations can stop here. </p>
+
+
+
+<p>Consciousness is a tricky concept: the Stanford Encyclopedia of Philosophy entry lists <a href="https://plato.stanford.edu/entries/consciousness/#SpeTheCon">nine different specific theories</a> of consciousness, and there are more theories still. It is also intertwined with ethics: if we consider a creature to be conscious or sentient, then the boundaries of how we can treat it become an issue of ethics. I don’t think it’s the job of computer scientists (or any other scientists) to come up with a moral philosophy, and similarly, I don’t think defining consciousness falls in our domain.</p>
+
+
+
+<p>Historically, there seem to be two kinds of non-human entities which we considered conscious or sentient. One is animals, to which people have felt superior. The other is gods, to which people have felt inferior. Before we understood the causes of planetary movements, weather events, and other natural phenomena, we ascribed them to conscious actions by various gods. Since we couldn’t predict or explain these phenomena, our only attempt at controlling them was through prayer and sacrifice to the presumably conscious entity that controls them.</p>
+
+
+
+<p>Some discussions of potential future AI are reminiscent of those past gods. According to some, AI would be not just conscious but capricious and could (according to some, <a href="https://www.lesswrong.com/posts/uMQ3cqWDPHhjtiesc/agi-ruin-a-list-of-lethalities">would</a>)  ensure that “everybody on the face of the Earth suddenly falls over dead within the same second.” It is of course, possible to construct hypothetical scenarios in which an AI system managed to start a nuclear war or design a lethal virus. We’ve all read such books and seen such movies. It is also possible to construct scenarios where <em>humans</em> start a nuclear war or design a lethal virus. There are also many books and movies of the latter type. In fact, many AI “doomsday scenarios” don’t seem to require super-human levels of intelligence.   </p>
+
+
+
+<p>The truth is that the reason that our world hasn’t been destroyed so far is not that humans were not intelligent enough nor because we haven’t been malicious enough. First, throughout most of human history, we did not have technologies such as nuclear weapons and others with the potential to cause planet-scale destruction. Second, while imperfect, we have developed some institutions, including international bodies, the non-proliferation treaty, standards for biolabs, pandemic preparations, and more to keep some of these capabilities in check. Third, we were lucky. From climate change through pandemic preparation to nuclear disarmament, humanity should be doing much more to confront the risks and harms of our own making. But this is true independently of artificial intelligence. Just as with humans, my inclination with AI would not to try to make systems inherently moral or good (“aligned” in AI-speak) but rather use the <a href="https://en.wikipedia.org/wiki/Trust,_but_verify">“trust, but verify” </a>approach. One moral of computational complexity theory is that computationally weak agents can verify the computation of more powerful processes.</p>
+
+
+
+<p>Many of the calculations above show how “scaling up” is going to be non-trivial, and it is unlikely to see AI making restaurant reservations one day, and secretly ordering material over the net to build a world-destroying nano-technology lab the next one. Even if it’s possible for a large-scale model to “train itself” to improve performance, without needing additional outside data, that model would still incur the considerable computational costs for training that we computed above. </p>
+
+
+
+<p>In my previous post, I explained <a href="https://windowsontheory.org/2022/05/23/why-i-am-not-a-longtermist/">why I am not a “longtermist”</a>.  The above is why I don’t view an “AGI run amok” as a short-term existential risk. That doesn’t mean AI doesn’t have safety issues. AI is a new technology, and with any new technology come new risks. We don’t need science fiction to see real risks in both unintentional consequences of AI deployment such as discrimination and bias, as well as intentional consequences of deploying AI for weapons, surveillance, and social manipulation. I don’t think that debating the notion of consciousness and inventing doomsday scenarios is helpful for combatting any one of those.   </p>
+
+
+
+<p><strong>Acknowledgments: </strong>Thanks to Jascha Sohl-Dikstein for many useful comments on a draft of this blog post, and on how to interpret the results of the <a href="https://arxiv.org/abs/2206.04615">BIG-bench paper</a>.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Boaz Barak <a href="https://windowsontheory.org/2022/06/27/injecting-some-numbers-into-the-agi-debate/"><span class="datestr">at June 27, 2022 02:44 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2952,56 +3253,6 @@ by Gautam <a href="https://kamathematics.wordpress.com/2022/06/17/guest-post-col
 
 <p class="date">
 by Boaz Barak <a href="https://windowsontheory.org/2022/06/17/stocial-2022-guest-post-by-clement-canonne/"><span class="datestr">at June 17, 2022 02:42 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://gilkalai.wordpress.com/?p=22882">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/kalai.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://gilkalai.wordpress.com/2022/06/17/richard-stanley-enumerative-and-algebraic-combinatorics-in-the1960s-and-1970s/">Richard Stanley: Enumerative and Algebraic Combinatorics in the1960’s and 1970’s</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://gilkalai.wordpress.com" title="Combinatorics and more">Gil Kalai</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p></p>
-
-
-
-<p>In his comment to the previous post by Igor Pak, Joe Malkevitch referred us to a <a href="https://arxiv.org/abs/2105.07884">wonderful paper by Richard Stanley on enumerative and algebraic combinatorics in the 1960’s and 1970’s.</a> </p>
-
-
-
-<p>See also this post on Richard’s memories regarding the proof of the upper bound theorem for spheres <a href="https://gilkalai.wordpress.com/2013/09/10/how-the-proof-of-the-upper-bound-theorem-for-spheres-was-found/">Richard Stanley: How the Proof of the Upper Bound Theorem (for spheres) was Found</a>.</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by Gil Kalai <a href="https://gilkalai.wordpress.com/2022/06/17/richard-stanley-enumerative-and-algebraic-combinatorics-in-the1960s-and-1970s/"><span class="datestr">at June 17, 2022 05:57 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
