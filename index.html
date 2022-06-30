@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at June 30, 2022 05:38 PM UTC</span>.
+Last updated <span class="datestr">at June 30, 2022 06:21 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -289,6 +289,125 @@ Email: s.deharo@uva.nl</p></div>
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-jobs.org/2022/06/30/postdoc-at-the-institute-for-logic-language-and-computation-and-the-institute-for-information-law-at-the-university-of-amsterdam-apply-by-august-15-2022/"><span class="datestr">at June 30, 2022 09:54 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://gradientscience.org/failure-directions/">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/madry.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://gradientscience.org/failure-directions/">Distilling Model Failures as Directions in Latent Space</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://gradientscience.org/" title="gradient science">Gradient Science</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><a style="float: left; width: 45%;" href="https://arxiv.org/abs/2206.14754" class="bbutton">
+<i class="fas fa-file-pdf"></i>
+    Paper
+</a>
+<a style="float: left; width: 45%;" href="https://github.com/MadryLab/failure-directions" class="bbutton">
+<i class="fab fa-github"></i>
+   Code
+</a>
+<br /></p>
+
+<p><i>
+Deep learning models often exhibit <strong>consistent</strong> patterns of errors. These errors tend to correspond to hard subpopulations in the data they are deployed on. How can we go about detecting such hard subpopulations, and moreover doing so at scale? Our <a href="https://arxiv.org/abs/2206.14754">recent paper</a> is motivated by this very aim, and presents a framework for automatic distillation and surfacing of a model’s failure modes.
+</i></p>
+
+<p>Despite the success of deep learning models at a wide range of classification tasks, they are prone to failing—often by underperforming on “hard” subpopulations corresponding to inputs that were consistently mislabelled, corrupted, or simply underrepresented in the training set. This problem is exacerbated when, as is often the case in practice, deployment conditions deviate from the training distribution. In these cases, the model may have learned (spurious) correlations on the training set that are not predictive on the distribution it is deployed on.</p>
+
+<p>To make this more concrete, consider the task of predicting age (old vs young) based on the CelebA dataset of celebrity face images. It turns out that in this dataset, young women and old men are overrepresented, and thus a model trained on CelebA is likely to leverage the resulting correlation between age and gender in its predictions. Of course, as this correlation does not hold at large, this model would then struggle on inputs representing old women and young men.</p>
+
+<p><img src="https://gradientscience.org/assets/corr-errs/images/celeba_summary.png" style="width: 100%;" alt="CelebA-Summary" /></p>
+
+<p>How could we go about identifying these types of model errors? Specifically, for this case, how might we identify that it is the spurious age-gender correlation that is driving these failures?</p>
+
+<p>One option is to manually examine either the <a href="https://arxiv.org/abs/2005.11295">dataset</a> or the <a href="https://arxiv.org/abs/2205.04596">model itself</a> to identify specific failure modes. Such approaches, however, can be quite labor-intensive, and thus are difficult to scale. Alternatively, one can try to automatically identify and intervene on hard training examples, such as by directly <a href="https://arxiv.org/abs/2107.09044">upweighting inputs</a> that were misclassified early in training or <a href="https://arxiv.org/abs/1805.12317">training a second model</a> to adversarially identify misclassified instances. However, these approaches also do not fully hit the mark. Specifically, they are not designed to elicit simple, human-interpretable patterns that underlie hard subpopulations (even when these exist). Thus, while such methods are automatic (and certainly scalable), they do not necessarily translate into the type of understanding needed to remedy the underlying data problem.</p>
+
+<p>The framework developed in our <a href="https://arxiv.org/abs/2206.14754">recent work</a> intends to bridge this gap between scalability and interpretability. In particular, it enables us to surface subpopulations of hard examples with respect to a given model in a way that is not only automatic, but also naturally suggests an intervention meant to fix them.</p>
+
+<h2 id="capturing-failure-modes-as-latent-space-directions">Capturing Failure Modes as Latent Space Directions</h2>
+<p>At a high level, our approach aims to model failure modes as <em>directions</em> within a latent space. In the context of the CelebA example we described above, this would correspond to identifying a (separate) direction for each class (old/young) such that the easier examples (“old man”/”young women”) lie in one direction, and the harder examples (“old women”/”young man”) lie in the opposite one. As a result, each such direction would end up capturing the axis of the specific failure mode (here, gender) that the model struggles with.</p>
+
+<p>But how can we learn such a direction to begin with? The key intuition is that, whenever the pattern of errors we aim to capture corresponds to a global failure mode, such as a spurious correlation, the model will make these errors <em>consistently</em>. In other words, the incorrectly classified inputs will share features. As a result, we can capture the pattern behind these mistakes by training a classifier on the feature embedding, which <em>predicts</em> when the model is likely to make an error on a given input.</p>
+
+<p>More specifically, in our framework we train for each class (using a held-out validation set) a linear support vector machine (SVM) that predicts the errors of the original model. The decision boundary of this SVM then establishes a <em>hyperplane</em> separating the correct from the incorrect examples. Moreover, the vector orthogonal to this decision boundary (the normal vector of the hyperplane) represents the direction of the captured failure mode that we are seeking. Indeed, the more aligned an example is with the identified direction, the harder (or easier) the example was for the original model—this is exactly what we needed!</p>
+
+<p>Of course, to make sure this trained SVM can indeed capture the features shared by the errors, we need a suitable featurization for the inputs. In our (image) context, we use <a href="https://arxiv.org/pdf/2103.00020.pdf">CLIP</a>, which embeds both vision and language together using contrastive learning. (As we will see below, using this embedding space has the added benefit of enabling us to automatically caption the captured failure modes, too!)</p>
+
+<p><img src="https://gradientscience.org/assets/corr-errs/images/updated_summary_fig.png" style="width: 100%;" alt="Summary" /></p>
+<div class="footnote">
+Given our original model, for each class (here, ``old"), we train a SVM on a shared vision/language latent space to predict whether the original model would have classified an input correctly. We then extract a direction (in gray) for the captured failure mode, as the vector orthogonal to the corresponding learned hyperplane. Since the original model struggles on ``old female" faces, the SVM learns to use gender to separate the incorrect (shown in red) vs. correct (shown in green) examples.
+</div>
+
+<p><strong>Identifying the gender spurious correlation in CelebA</strong>: Let’s return to our example of identifying age for CelebA faces in the presence of a spurious correlation with gender, and apply our framework as described above. The plot below depicts the fraction of test images within each class that are of the minority gender when ordering the images by either their SVM decision value, or by our baseline of using the model’s confidences. We can see that the SVM directions indeed capture the gender-age spurious association, as intended.</p>
+
+<p><img src="https://gradientscience.org/assets/corr-errs/figures/combined_frac_plot.png" style="width: 100%;" alt="CelebAPerformance" /></p>
+<div class="footnote">
+The fraction of test images for each class that are of the minority gender when ordering the images by either their SVM decision value or by the model’s confidences. The SVM flags a larger fraction of “incorrect" examples from the minority gender.
+</div>
+
+<h3 id="interpreting-the-extracted-failure-mode">Interpreting the extracted failure mode</h3>
+<p>Now that we’ve distilled the model’s failure modes as directions within the latent space, how can we understand what these failure modes entail exactly?</p>
+
+<p><strong>Most Aligned Examples.</strong> One approach is to simply surface the examples whose normalized embeddings are most aligned (or anti-aligned) with the extracted direction. These are the images with the most positive or negative SVM <em>decision value</em> (which is proportional to the signed distance from the decision boundary). In doing so, we surface the prototypical examples representing the “most correct” and “most incorrect” examples.</p>
+
+<p><strong>Automatic Captioning.</strong> We can, however, go one step further by automatically captioning the extracted failure mode, leveraging the fact that the SVM was trained on a shared vision/language embedding space. Recall that CLIP embeds both images <em>and</em> language into the same latent space. Thus, just as we surfaced the most aligned <em>images</em> above, we can surface the most aligned <em>captions</em> (from some pre-specified set of captions) whose normalized text embedding matches the extracted direction. More details can be found in our <a href="https://arxiv.org/abs/2206.14754">paper</a>.</p>
+
+<p>Both techniques are shown below on our running CelebA example. As we can see, images farthest from the SVM decision boundary indeed exemplify the hardest (“old woman”) or the easiest (“old man”) examples. The captions also reflect the corresponding categories.</p>
+
+<p><img src="https://gradientscience.org/assets/corr-errs/figures/celeba_most_extreme_examples.png" style="width: 100%;" alt="CelebA-Examples" /></p>
+
+<h2 id="man-with-a-fish-discovering-failure-modes-in-the-imagenet-dataset">Man with a Fish: Discovering Failure Modes in the ImageNet Dataset</h2>
+<p>In the CelebA example we were considering so far, the dataset contained a <em>known</em>, planted spurious correlation (i.e., gender). How will our framework fare when this is not necessarily the case? To study this, let’s apply our framework to the ImageNet dataset (and see our <a href="https://arxiv.org/abs/2206.14754">paper</a> for more examples).</p>
+
+<p>What does our framework flag? A broad range of interpretable failure modes—from color biases (e.g., the model struggles on red wolves with white winter coats) to reliance on co-occurring objects (e.g., the model more easily classifies the tench fish in the presence of a person).</p>
+
+<div style="overflow: auto; text-align: center;" id="bias_examples_widget"></div>
+<div class="footnote">
+     Images and captions with the most positive or negative SVM decision values for a given ImageNet class. (Click the thumbnails on the left to explore)
+</div>
+
+<p>Are the flagged subpopulations actually challenging for the original model? To check this, we would ideally compare the difference in test accuracy between the “easy” and “hard” subpopulations proposed by our framework. For example, in the above example of the tench fish, we would hope that tenches described by the “easy” caption (“a photo of an orange fish with a person”) have a higher accuracy on held-out examples than those described by the “hard” caption (“a photo of a close-up fish”).</p>
+
+<p>However, we do not have annotations for the sub-groups of ImageNet necessary to execute this measurement directly. Still, as a proxy, we can use the CLIP shared vision/language embedding space to <em>approximate</em> these sub-group accuracies. So, for example, to evaluate the model’s performance on people with orange fish, we simply check its accuracy on the images whose CLIP embeddings are closest (in cosine distance) to the embedded SVM caption “a photo of an orange fish with a person”.</p>
+
+<p>Performing this kind of evaluation for all the 1000 of ImageNet classes, we find that the original model’s accuracy on the images closest to the “hard caption” is consistently (and significantly) lower than those closest to the “easy caption.” In other words, our framework successfully surfaces the patterns of failure modes. Furthermore, as we describe in the <a href="https://arxiv.org/abs/2206.14754">paper</a>, these surfaced patterns guide effective interventions too.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>In this post, we introduced a framework for automatically identifying and captioning coherent subpopulations that are especially hard, or easy, for a given model to classify. In particular, our framework harnesses (linear) classifiers to distill the model’s failure modes as meaningful directions in the latent space. Our framework was able to surface challenging subpopulations in widely used datasets such as ImageNet: check out our <a href="https://arxiv.org/abs/2206.14754">paper</a> for even more examples (and datasets)!</p>
+
+<p>Overall, we view our methodology as a first step toward building a toolkit for scalable dataset exploration and debiasing—we believe, however, that there is much more to do. For example, we consider only relatively straightforward data interventions (such as upweighting and filtering). Can we come up with more sophisticated interventions to improve the model’s performance on the identified subpopulations? In particular, given all the recent enormous progress on text-to-image generation, one especially  promising approach to explore here could be to generate new data that is tailored to the model’s weaknesses (for example, by using <a href="https://cdn.openai.com/papers/dall-e-2.pdf">DALL-E 2</a> or <a href="https://arxiv.org/pdf/2205.11487.pdf">ImageGen</a>).</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="https://gradientscience.org/failure-directions/"><span class="datestr">at June 30, 2022 12:00 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -3305,59 +3424,6 @@ by Gil Kalai <a href="https://gilkalai.wordpress.com/2022/06/17/richard-stanley-
 
 <p class="date">
 by Gil Kalai <a href="https://gilkalai.wordpress.com/2022/06/16/how-i-chose-enumerative-combinatorics/"><span class="datestr">at June 16, 2022 11:38 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://bit-player.org/?p=2477">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/hayes.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-US"><a class="entryheader" href="http://bit-player.org/2022/jotto">Jotto</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://bit-player.org" title="bit-player">bit-player</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en-US">
-<p>A day or two after publishing my <a href="http://bit-player.org/2022/words-for-the-wordle-weary">TL;DR on Wordle algorithms</a>, I stumbled on a remarkable paper that neatly summarizes all the main ideas. The remarkable part is that the paper was written 50 years before Wordle was invented!</p>
-<p>The paper is “<a href="https://dspace.mit.edu/handle/1721.1/6192">Information Theory and the Game of Jotto</a>,” issued in August of 1971 as Artificial Intelligence Memo No. 28 from the AI Lab at MIT. The author was Michael D. Beeler, known to me mainly as one of the three principal authors of <a href="https://dspace.mit.edu/bitstream/handle/1721.1/6086/AIM-239.pdf">HAKMEM</a> (the others were Bill Gosper and Rich Schroeppel). Beeler later worked at Bolt, Baranek, and Newman, an MIT spinoff.</p>
-<p><a href="https://en.wikipedia.org/wiki/Jotto">Wikipedia</a> tells me that Jotto was invented in 1955 by Morton M. Rosenfeld as a game for two players. As in Wordle, you try to discover a secret word by submitting guess words and getting feedback about how close you have come to the target. The big difference is that JOTTO’s feedback offers only a crude measure of closeness. You learn the number of letters in your guess word that match one of the letters in the target word. You get no indication of <em>which</em> letters match, or whether they are in the correct positions.</p>
-<p>The unit of measure for closeness is the jot. Beeler gives the example of playing GLASS against SMILE, which earns a closeness score of two jots, since there are matches for the letter L and for one S. Unlike the Wordle feedback rule, this scoring scheme is symmetric: The score remains the same if you switch the roles of guess and target word.</p>
-<p>A defect of the game, in my view, is that you can max out the score at five jots and still not know the target word. For example, when a five-jot score tells you that the letters of the target are {A, E, G, L, R}, the word could be GLARE, LAGER, LARGE, or REGAL. Your only way to pin down the answer is to guess them in sequence.</p>
-<p>Beeler’s main topic is not how the game proceeds between human players but how a computer can be programmed to take the role of a player. He reports that “A JOTTO program has existed for a couple of years at MIT’s A.I. Lab,” meaning it was created sometime in the late 1960s. He says nothing about who wrote this program. I’m going to make the wild surmise that Beeler himself might have been the author, particularly given his intimate knowledge of the program’s innards.</p>
-<p>Here’s the crucial passage, lifted directly from the memo:</p>
-<p><img src="http://bit-player.org/wp-content/uploads/2022/06/Beeler-block-quote-on-JOTTO.png" height="217" width="640" alt="Beeler block quote on JOTTO" border="0" class="centered" /></p>
-<p>The strategy described here—maximizing the information gain from each guess—is exactly what’s recommended for Wordle. But where Wordle divvies up the potential target words into \(3^5 = 243\) subsets, the JOTTO scoring rule defines only six categories (0 through 5 jots). As a result, the maximum possible information gain is only about 2.6 bits in JOTTO, compared with almost 8 bits in Wordle. </p>
-<p>Beeler also recognized a limitation of this “greedy” strategy. “It is conceivable that the test word with the highest expectation at the current point in the game has a good chance of getting us to a point where we will NOT have any particularly good test words available . . . I am indebted to Bill Gosper for pointing out this possibility; the computation required, however, is impractical, and besides, the program seems to do acceptably as is.”</p>
-<p>The JOTTO program was written in the assembly language of the <a href="http://bitsavers.org/pdf/dec/_Books/Bell-ComputerEngineering.pdf">PDP-6 and PDP-10 family of machines</a> from the Digital Equipment Corporation, which were much loved in that era at MIT. (Beeler praises the instruction set as “very symmetrical, complete, powerful and easy to think in.”) But however elegant the architecture, physical resources were cramped, with a maximum memory capacity of about one megabyte. Nevertheless, Beeler found room for the program itself, for a dictionary of about 7,000 words, and for tables of precomputed responses to the first two or three guesses.</p>
-<p>Humbling.</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by Brian Hayes <a href="http://bit-player.org/2022/jotto"><span class="datestr">at June 15, 2022 05:50 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
