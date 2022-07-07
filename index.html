@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at July 07, 2022 05:38 PM UTC</span>.
+Last updated <span class="datestr">at July 07, 2022 06:21 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -1753,6 +1753,116 @@ The fraction of test images for each class that are of the minority gender when 
 
 <p class="date">
 <a href="https://gradientscience.org/failure-directions/"><span class="datestr">at June 30, 2022 12:00 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://gradientscience.org/bias-transfer/">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/madry.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://gradientscience.org/bias-transfer/">When does Bias Transfer in Transfer Learning?</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://gradientscience.org/" title="gradient science">Gradient Science</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><a style="float: left; width: 45%;" href="https://arxiv.org/abs/2207.02842" class="bbutton">
+<i class="fas fa-file-pdf"></i>
+    Paper
+</a>
+<a style="float: left; width: 45%;" href="https://github.com/MadryLab/bias-transfer" class="bbutton">
+<i class="fab fa-github"></i>
+   Code
+</a>
+<br /></p>
+
+<p>Suppose we want to train a classifier to distinguish between dogs and cats given a labeled dataset of photos. Having read about the perils of training on biased or otherwise suboptimal data, we comb through our collection of labeled images and carefully eliminate problems like <a href="https://arxiv.org/abs/1904.08818">spurious correlations</a> or <a href="https://arxiv.org/abs/1906.02659">under-represented subgroups</a>. So, for example, finding that most cats in the dataset were photographed indoors while most dogs were photographed outdoors, we collect more outdoor cat photos and indoor dog photos.</p>
+
+<p>The result is a carefully curated dataset that we can now use to train our classifier. Unfortunately, there is a problem: our dataset is small, so training on it yields a poorly performing model. But, fortunately, we know what to do! To get a better classifier, we go online and <a href="https://github.com/rwightman/pytorch-image-models">download</a> (or <a href="https://aws.amazon.com/rekognition/">pay for</a>) a pre-trained model, i.e., a model that’s been trained on a much larger dataset like <a href="https://image-net.org/index.php">ImageNet-1K</a> or <a href="https://ai.googleblog.com/2017/07/revisiting-unreasonable-effectiveness.html">JFT-300</a>. We’ll then use transfer learning to adapt this pre-trained model (the “source model”) to our dataset (the “target dataset”). Transfer learning from a pre-trained model in this way results in a model that performs much better on our target task than one trained on it from scratch.</p>
+
+<p>This seems like great news—we get a much better performance at little cost! But there is a potential wrinkle: pre-trained models turn out to have a variety of undesirable biases. For example, they can disproportionately rely on <a href="https://arxiv.org/abs/1811.12231">texture</a>, on <a href="https://arxiv.org/abs/2006.09994">image background</a>, or on <a href="https://papers.nips.cc/paper/2019/hash/97af07a14cacba681feacf3012730892-Abstract.html">object location/orientation</a>. These biases even arise in production-level pretrained models—Amazon’s Rekognition, for example, <a href="https://news.mit.edu/2018/study-finds-gender-skin-type-bias-artificial-intelligence-systems-0212">performs disparately across races and genders</a>. Could these biases show up in our target model, despite our careful curation of our target dataset?</p>
+
+<p>In our most recent <a href="https://arxiv.org/abs/2207.02842">work</a>, we find that biases from pre-trained models indeed tend to “transfer”, i.e., they can manifest themselves in the resulting model. In particular, we study this “bias transfer” through the lens of the following questions:</p>
+
+<ol type="a">
+  <li>When can bias transfer happen? What is the effect of the pre-training dataset, the transfer learning algorithm, and the target dataset on this bias transfer? Moreover, can we avoid bias transfer altogether by intervening on our target dataset?
+</li>
+  <li>Does bias transfer actually happen in practice? For example, suppose we pre-train a model on the ImageNet-1K dataset and use transfer learning to adapt it to CIFAR-10. Can we pinpoint concrete biases of the resulting model that are not present when we train on CIFAR-10 from scratch?</li>
+</ol>
+
+<p>We’ll dive into some of these questions below (see our paper for a more thorough treatment).</p>
+
+<h2 id="when-does-bias-transfer-occur">(When) does bias transfer occur?</h2>
+<p>Let us consider a simple experiment. We take the ImageNet-1K dataset (a popular pre-training dataset for transfer learning), and add a small yellow square to every image of a dog in its training set:
+<img src="https://gradientscience.org/assets/bias-transfer/images/yellowsquare_only.jpg" style="width: 25%; margin-top: 1em; margin-bottom: 1em;" alt="Yellow Square" /></p>
+
+<p>As expected, training on this dataset yields a model that is highly sensitive to the presence of yellow squares. Indeed, when the yellow square is planted on images of other (non-dog) objects, the model predicts a dog class 44% of the time (as opposed to 2% for a standard ImageNet model)!</p>
+
+<p>We now want to use this yellow square sensitivity as a (simple) example of a bias in a pre-trained model. Specifically, to study the possibility of bias transfer, we apply transfer learning to obtain models for a variety of target tasks using both this biased model and a standard ImageNet model as the point of start. We then examine whether transfer learning from the biased model leads to a significantly higher sensitivity to yellow squares. (Note that none of the target datasets have any of these yellow squares at all.)</p>
+
+<p><img src="https://gradientscience.org/assets/bias-transfer/images/yellowsquare.jpg" style="width: 100%;" alt="Yellow Square Summary" /></p>
+
+<p>As we find, models that are transferred from the biased pre-trained network were significantly more sensitive to the presence of our yellow square. This happened consistently across two transfer learning techniques (fixed-feature and full-network transfer learning) and a variety of datasets we considered.  For example, below, we plot the attack success rate (ASR)—the probability that introducing a yellow square into a random image will flip a model’s prediction—for models transferred from both the biased (Spurious) model and standard (Non-Spurious) model:</p>
+
+<p><img src="https://gradientscience.org/assets/bias-transfer/images/mega_vary_dataset.jpg" style="width: 100%;" alt="Vary Dataset" />
+</p>
+
+<p>However, what happens if we try to more carefully design the target dataset to specifically counter bias transfer? For example, if in this case we’re worried that our pre-trained model has a bias associating the yellow square with the “dog” classes, we might put an extra effort and alter the target dataset to make sure that (a) the yellow square is also present in some of the images but (b) its presence is not correlated with any of the classes.  So, is using such a “de-biased” target dataset enough to avoid bias transfer?</p>
+
+<p>Turns out that the answer is: it depends! Specifically, we find that when using a particular kind of transfer learning (full-network transfer learning), adding the backdoor trigger to the target dataset indeed mitigates bias transfer. However, when using the fixed-feature transfer learning, the transferred model still contains the bias—even when 10% of the target dataset contains (uncorrelated) yellow squares.</p>
+
+<p><img src="https://gradientscience.org/assets/bias-transfer/images/debias_mega.jpg" style="width: 100%; margin-left: 0; margin-right: 0;" alt="Debias Dataset" />
+</p>
+
+<p>So overall, not only does bias transfer across various datasets and transfer learning settings, it also might be non-trivial (at least in the fixed-feature transfer learning setting) to remedy this bias transfer even when we are aware of the possibility of that bias and try to explicitly de-bias the target dataset.</p>
+
+<h2 id="bias-transfer-in-the-wild">Bias Transfer in the Wild</h2>
+<p>Ok, so we know now that bias transfer <em>can</em> happen—at least when there’s a significant bias planted in the source pre-trained model. But in practice, source datasets will rarely have a feature as consistent and predictive as a planted yellow square we considered above. Can biases naturally occurring in common image datasets transfer as well?</p>
+
+<p>It turns out that the answer here is: yes, too! For instance, let’s consider a (rather unsurprising) bias arising in the widely-used ImageNet dataset: a circular yellow shape is predictive for the “tennis ball” class. (See our <a href="https://arxiv.org/abs/2207.02842">paper</a> for many other examples and datasets.) Indeed, as we can see below, if we overlay a yellow circle on any ImageNet image, the model becomes more likely to output “tennis ball:”</p>
+
+<div style="overflow: auto; text-align: center;" id="bias_examples_widget"></div>
+<div class="footnote">
+    Shift in ImageNet predictions when we apply an intervention, such as overlaying a tennis ball on the image. Click through the thumbnails on the left to see more interventions.
+</div>
+
+<p>Now, what happens if we use transfer learning to obtain a model for a target task, such as CIFAR-10 from  a pre-trained ImageNet model containing this yellow circle -&gt; “tennis ball” bias? Even though CIFAR-10 does not contain the yellow circle -&gt; “tennis ball” bias, this bias still persists in the resulting transfer-learned model! In particular, when we evaluate our model on CIFAR-10 test set images overlaid with a yellow circle, the model fine-tuned from a pre-trained ImageNet model is far more sensitive to that signal than a CIFAR-10 model trained from scratch. Indeed, there is an overall skew of the output class distribution for the transfer-learned model, in contrast to an almost uniform output class distribution of the model trained from scratch.</p>
+
+<div style="overflow: auto; text-align: center;" id="cifar_examples_widget"></div>
+<div class="footnote">
+    Shift in CIFAR-10 predictions after applying an intervention when either training from scratch or transferring from a biased source model. We consider fixed-feature (left) or full-network (right) fine-tuning. The models which were pre-trained on a biased model are more sensitive to the intervention than those trained from scratch. 
+</div>
+
+<h2 id="conclusions">Conclusions</h2>
+<p>In this post, we discussed our <a href="https://arxiv.org/abs/2207.02842">recent work</a> that demonstrates that biases that exist in pretrained models can persist even if these models are adapted to target datasets which do not contain these biases. It is thus important to understand the biases of the pre-trained models one uses for transfer learning, even if the task these models were pre-trained on do not seem relevant to the target task we want to solve. This prudence is particularly key in the context of high-stakes real-world machine learning applications that often suffer from data scarcity and tend to use transfer learning as a remedy for that.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="https://gradientscience.org/bias-transfer/"><span class="datestr">at June 30, 2022 12:00 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -3458,68 +3568,6 @@ Nakamoto’s consensus protocol works in a permissionless model, where nodes can
 
 <p class="date">
 by Boaz Barak <a href="https://windowsontheory.org/2022/06/20/the-uneasy-relationship-between-deep-learning-and-classical-statistics/"><span class="datestr">at June 20, 2022 05:15 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="http://lucatrevisan.wordpress.com/?p=4640">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/trevisan.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en"><a class="entryheader" href="https://lucatrevisan.wordpress.com/2022/06/20/workshop-on-fairness-in-ai/">Workshop on Fairness in AI</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://lucatrevisan.wordpress.com" title="in   theory">Luca Trevisan</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content" lang="en">
-<p>Next Monday, June 27, I am organizing a workshop on issues around fairness, bias and discrimination in AI and Machine Learning.</p>
-
-
-
-<p>Here is a <a href="https://lucatrevisan.github.io/fai.html">link to the program</a>. Remote participation is possible (link in the website), and in-person participation is free but we ask people to register so we can print badges and order the appropriate number of coffee breaks.</p>
-
-
-
-<p>This workshop is being organized in partnership with <a href="https://www.edge-glbt.it/">EDGE</a>, an Italian NGO that works on LGBT rights, and it is the first event of their initiative “A+I: Algoritmi + Inclusivi”, which will feature an awareness campaign and a series of video interviews that will start after the summer.</p>
-
-
-
-<p>In next week’s workshop, Oreste Pollicino from Bocconi will talk about the perspective of the legal community around algorithmic discrimination, Symeon Papadopoulos from ITI Patras will give a survey on issues of fairness in image processing and image understanding, Sanghamitra Dutta from J.P. Morgan AI will talk about how to use the theory of causality to reason about fairness, Debora Nozza and Dirk Hovy from Bocconi will talk about issues of fairness in language models and natural language processing, and Omer Reingold from Stanford and Cynthia Dwork from Harvard will talk about modeling and achieving fairness in prediction models.</p>
-
-
-
-<p>The last morning session will be a panel discussion moderated by Damiano Terziotti from EDGE about perspectives from the social sciences and from outside academia. It will feature, among others, <a href="https://en.wikipedia.org/wiki/Brando_Benifei">Brando Benifei</a>, a member of the EU parliament who has played a leading role in the <a href="https://en.wikipedia.org/wiki/Artificial_Intelligence_Act">2021 draft EU regulations on AI</a>. The other panel members are Alessandro Bonaita, who is a data science lead in Generali (Italy’s largest insurance company), Luisella Giani, who is leading a technology consulting branch of Oracle for Europe, Middle East and Africa, Cinzia Maiolini, who is in the national secretariat of CGIL, an Italian Union, and Massimo Airoldi from the University of Milan.</p>
-
-
-
-<p>If you are in or near Milan next week, come to what is shaping up to be a memorable event!</p></div>
-
-
-
-
-
-
-
-<p class="date">
-by luca <a href="https://lucatrevisan.wordpress.com/2022/06/20/workshop-on-fairness-in-ai/"><span class="datestr">at June 20, 2022 11:36 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
