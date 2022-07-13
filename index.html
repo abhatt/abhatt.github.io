@@ -86,7 +86,7 @@ Stay up to date
 <a class="feedlink" href="" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a class="message" title="404: not found">Center for Computational Intractability</a>
 <br>
-<a class="feedlink" href="http://blog.computationalcomplexity.org/feeds/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
+<a class="feedlink" href="http://www.blogger.com/feeds/3722233/posts/default" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
 <a href="http://blog.computationalcomplexity.org/" title="Computational Complexity">Computational Complexity</a>
 <br>
 <a class="feedlink" href="https://11011110.github.io/blog/feed.xml" title="subscribe"> <img src="images/feed-icon.png" width=20 height=20 alt="(feed)" class="feedicon" border=0></a> 
@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at July 13, 2022 04:22 PM UTC</span>.
+Last updated <span class="datestr">at July 13, 2022 04:38 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -465,6 +465,133 @@ by Scott <a href="https://scottaaronson.blog/?p=6552"><span class="datestr">at J
 
 <p class="date">
 by gasarch (noreply@blogger.com) <a href="http://blog.computationalcomplexity.org/2022/07/review-of-engines-of-cognition-essays.html"><span class="datestr">at July 12, 2022 01:22 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://gradientscience.org/data-transfer/">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/madry.png">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="https://gradientscience.org/data-transfer/">A Data-Based Perspective on Transfer Learning</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://gradientscience.org/" title="gradient science">Gradient Science</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p><a style="float: left; width: 45%;" href="https://arxiv.org/abs/2207.05739" class="bbutton">
+<i class="fas fa-file-pdf"></i>
+    Paper
+</a>
+<a style="float: left; width: 45%;" href="https://github.com/MadryLab/data-transfer" class="bbutton">
+<i class="fab fa-github"></i>
+   Code
+</a>
+<br />
+<i>
+In our latest paper, we present a framework for pinpointing the impact of the source datasets in transfer learning. Our framework enables us to improve transfer learning performance by removing source datapoints that are detrimental for a specific target task. It also unlocks various other capabilities, such as debugging transfer learning failures, automatically identifying granular subpopulations in the target dataset, and detecting data leakage between source and target datasets. 
+</i></p>
+
+<p>Transfer learning is a widely utilized technique for adapting a model trained on a source dataset to improve performance on a downstream target task. Used in applications ranging from <a href="https://arxiv.org/abs/2101.06871">radiology</a>, <a href="https://openaccess.thecvf.com/content_cvpr_2017_workshops/w13/papers/Kim_End-To-End_Ego_Lane_CVPR_2017_paper.pdf">autonomous driving</a>, to <a href="https://arxiv.org/abs/1510.00098">satellite imagery analysis</a>, the transfer learning paradigm also fuels the recent emergence of large vision and language models trained on enormous amounts of data, such as <a href="https://openai.com/blog/clip/">CLIP</a> or <a href="https://gradientscience.org/feed.xml">GPT-3</a>.</p>
+
+<p>Why is transfer learning so effective though? And, in particular, what drives transfer learning performance? Definitely, much depends on the properties of the source model, i.e., the model trained on the source dataset. For example, recent works highlight the impact of the model’s <a href="https://arxiv.org/abs/2101.06871">architecture</a>, <a href="https://arxiv.org/abs/1805.08974">accuracy</a>, <a href="https://arxiv.org/abs/2007.08489">adversarial vulnerability</a>, and <a href="https://arxiv.org/abs/1905.05901">training procedure</a>.</p>
+
+<p>But, in addition to the source model, it is hard to not expect the source dataset to play a major role as well. Indeed, several works have shown that increasing the size of the dataset usually <a href="https://arxiv.org/abs/1912.11370">boosts transfer learning performance</a>. <a href="https://arxiv.org/abs/1811.07056">Others</a> have found that limiting the source dataset to images that are relevant to the target task can help as well. So: what is the exact role of the source dataset in transfer learning?</p>
+
+<p>In our most <a href="https://arxiv.org/abs/2207.05739">recent paper</a>, we present a framework for pinpointing the impact of the source dataset on the downstream predictions in transfer learning. This framework draws inspiration from techniques such as <a href="https://arxiv.org/abs/2008.03703">influence functions</a> and <a href="https://arxiv.org/abs/2202.00622">datamodels</a> and it enables us, in particular, to automatically identify source datapoints that—positively or negatively—impact transfer learning performance.</p>
+
+<p>We’ll now walk through how we calculate the influence of the source dataset in transfer learning, and then demonstrate how our framework can be used to:</p>
+
+<ul type="a">
+  <li>Boost transfer learning performance by removing detrimental source datapoints;</li>
+  <li>Automatically extract granular subpopulations in the target dataset by projecting the  class hierarchy of the source dataset onto it; and</li>
+  <li>Surface pathologies such as source-target data leakage and misleading or mislabelled source datapoints.</li>
+</ul>
+
+<h2 id="computing-the-influence-of-the-source-dataset">Computing the Influence of the Source Dataset</h2>
+
+<p>How to pinpoint the relationship between the source dataset’s composition and the model’s downstream predictions? We build here on the <a href="https://arxiv.org/abs/2008.03703">influence functions</a> and <a href="https://arxiv.org/abs/2202.00622">datamodels</a> methodology (check out our <a href="https://gradientscience.org/datamodels-1/">previous post</a> for a deeper dive into these) to study the counterfactual effect of removing source datapoints on the target model’s predictions. However, unlike in the standard supervised setting in which the focus is on individual datapoints, here we focus on removing entire classes. This is motivated by the fact that we expect the removal of entire classes to have a more measurable impact on the features learned by the source model (and thus the resulting model’s predictions).</p>
+
+<p>So, at a high level, we first train a large number of models on random subsets of classes in the source dataset, and fine-tune them on the target task. Then we compute the influence of a source class on a target example by simply measuring the average difference in the model’s performance on a given target example when the class was included versus excluded from the source dataset. A positive influence value thus means that including the class improved the model’s performance on that example, while a negative value indicates that the class was detrimental to the correctness of the corresponding model’s prediction.</p>
+
+<h2 id="identifying-the-most-influential-classes-of-the-source-dataset">Identifying the Most Influential Classes of the Source Dataset</h2>
+<p>Now that we’ve calculated these influences, how can we use them to study transfer learning? First, let’s take a look at the ranking of the most positively and negatively influencing classes for a variety of target tasks. We first look at the influences from different ImageNet classes to the entire CIFAR-10 test set:</p>
+
+<p><img src="https://gradientscience.org/assets/data-transfer/images/most_influencing_classes.png" style="width: 100%; margin-left: 0; margin-right: 0;" alt="Most influential" />
+</p>
+
+<p>Note that in the most positive source classes tend to semantically overlap with the classes in the target dataset. For example, tailed frog and sorrel horse have the most positive influence for the CIFAR-10 dataset, which contains the classes frog and horse.</p>
+
+<p>Also, the plot above suggests that there is a number of source classes, such as bookshop or jigsaw puzzle, whose inclusion actually hurts the overall transfer learning performance. So what happens if we indeed remove these classes from the source dataset? Well, as one might hope, they do boost the transfer learning performance on a variety of downstream image classification:</p>
+
+<p><img src="https://gradientscience.org/assets/data-transfer/images/main_counterfactual_exp.png" style="width: 100%; margin-left: 0; margin-right: 0;" alt="Counterfactual main" /></p>
+<div class="footnote">
+Target task accuracies after removing the most positively or negatively influential ImageNet classes from the source dataset.
+</div>
+
+<p>In fact, we can get an accuracy boost of nearly 2.5% on CIFAR-10 (as compared to what one gets from pre-training with the full ImageNet dataset).</p>
+
+<h2 id="leveraging-influences-to-study-transfer-learning">Leveraging Influences to Study Transfer Learning</h2>
+
+<p>Above, we used our framework to pinpoint the most influential—be it positively or negatively— classes for transfer learning. Here, we’ll discuss how our framework provides us with a broader set of tools for studying transfer learning, including: (1) debugging transfer learning failures, (2) automatically extracting granular subpopulations in the target dataset, and (3) detecting data leakage between source and target datasets.</p>
+
+<h3 id="1--debugging-the-failures-of-the-transferred-model">(1)  Debugging the failures of the transferred model</h3>
+<p>Suppose our transferred model wrongly predicts the dog image displayed in the figure below—it labels it as a horse. Can we use our framework to understand why our model is making this mistake? Yes! The influences we computed enable us to identify the source class sorrel horse as one having a strong (and the strongest) negative influence on our image of interest. This suggests that the features learned by the source model due to the presence of this class might be the culprit here. Indeed, once we remove the sorrel horse class from the source dataset, our model now makes the correct prediction on our dog image much more frequently (with respect to the randomness of the training procedure).</p>
+
+<div style="overflow: auto; text-align: center;" id="debug_examples_widget"></div>
+<div class="footnote">
+Identifying highly negatively influencing source classes can explain why our transfer learning model made a mistake (middle). Once we remove the most negatively influencing class from the source dataset, the model predicts the correct label more frequently (right). Click through the thumbnails on the left to see more examples!
+</div>
+
+
+
+<h3 id="2-automatically-extracting-granular-subpopulations-in-the-target-dataset">(2) Automatically extracting granular subpopulations in the target dataset</h3>
+<p>Imagine you want to find all the images of ostriches in the CIFAR-10 dataset. However, the problem is that CIFAR-10 does not contain any subpopulation annotations that could help with this task and having to manually look for ostriches among all the images in the bird class is not a very appealing alternative. Our framework allows us to do something much more scalable!</p>
+
+<p>Indeed, as we already observed, the most positively influencing source classes usually semantically overlap with the images in the target dataset they influence the most. In fact, this goes further: the target images which are most influenced by a given source class tend to share relevant salient features too. So, to identify our ostrich subpopulation in CIFAR-10, we just need to look at all the images that are most influenced by the source class “ostrich”! Below we display some of the CIFAR-10 images identified in this way.</p>
+
+<div style="overflow: auto; text-align: center;" id="subpop_examples_widget"></div>
+<div class="footnote">
+The CIFAR-10 images which are most positively influenced by a particular ImageNet class. Click through the thumbnails on the left to see more examples!
+</div>
+
+<h3 id="3-detecting-data-leakage-and-misleading-source-dataset-examples">(3) Detecting data-leakage and misleading source dataset examples</h3>
+<p>Thus far, we have focused on the role of classes in the source dataset in transfer learning. But we can also compute the influences of specific source examples on the transferred model’s predictions. This turns out to enable us to isolate, in particular, instances of data leakage and misleading examples in the source dataset.</p>
+
+<p>Indeed, below, we display ImageNet training examples that are highly influential on CIFAR-10 test examples. The source images that have a highly positive influence are often identical copies of images from the target task (just at a higher resolution)—a clear example of data leakage. On the other hand, images that have a high negative influence tend to be the ones that are misleading, mislabeled, or otherwise surprising.  For example, the presence of the (amusing) ImageNet image of a flying lawnmower (see below) hurts the performance on a CIFAR-10 image of a regular (but similarly shaped) airplane.</p>
+
+<p><img src="https://gradientscience.org/assets/data-transfer/images/detect_leakage.png" style="width: 100%; margin-left: 0; margin-right: 0;" alt="Detect leakage" />
+</p>
+
+<h3 id="conclusions">Conclusions</h3>
+<p>In this post, we described a new framework for pinpointing the impact of the source dataset in transfer learning. Our framework allows one to improve the transfer learning performance on a range of downstream tasks by identifying and removing source datapoints that are detrimental. Furthermore, by using our framework one can automatically extract granular subpopulations in the target dataset by leveraging the fine-grained class hierarchy of the source dataset, better understand how the errors of the model on the downstream task are rooted in the source dataset, and detect potential data leakage from the source to the downstream dataset. We believe our framework provides a new perspective on transfer learning by highlighting the role of the source dataset in the transfer learning pipeline and gives us a toolkit for performing a fine-grained analysis of it.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="https://gradientscience.org/data-transfer/"><span class="datestr">at July 12, 2022 12:00 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
@@ -2726,48 +2853,6 @@ August 1-5, 2022 MIT https://fodsi.us/sublinear.html Foundations of Data Science
 
 <p class="date">
 by shacharlovett <a href="https://cstheory-events.org/2022/06/29/workshop-on-sublinear-algorithms/"><span class="datestr">at June 29, 2022 10:55 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="tag:blogger.com,1999:blog-3722233.post-3356810276237520801">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/gasarch.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="http://blog.computationalcomplexity.org/2022/06/a-gadget-for-3-colorings.html">A Gadget for 3-Colorings</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://blog.computationalcomplexity.org/" title="Computational Complexity">Computational Complexity</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p>Following up on Bill's <a href="https://blog.computationalcomplexity.org/2022/06/counting-number-of-3-colorings-of-graph.html">post earlier this week</a> on counting the number of 3-colorings, <a href="https://www.bbk.ac.uk/our-staff/profile/9044528/steven-noble">Steven Noble</a> emailed us with some updated information. The first proof that counting 3-colorings is #P-complete is in a <a href="https://doi.org/10.1137/0607036">1986 paper</a> by Nati Linial. That proof uses a Turing reduction using polynomials based on posets.</p><p>Steven points to a <a href="https://ora.ox.ac.uk/objects/uuid:52070098-14fa-4cf1-ae6e-9f9ce6a626d8">1994 thesis</a> of James Annan under the direction of Dominic Welsh at Oxford that gives the gadget construction that I so tried and failed to do in Bill's post.</p><div style="clear: both; text-align: center;" class="separator"><a style="margin-left: 1em; margin-right: 1em;" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiQlZ3z-rTCsgF-c7yTH6CuPV6eUG5aFEZjaFFEiy_Z1mjB0EedHG3DsqJtRqWLaSvA6tC2ALi4G-r3GTgI_4ErkfpITXGIr7gNcXUEZtuBUjYdBfyYfN2EyV5zv0j7e5SEJ7YnlUyqLpuO01WF6xVyOIOXTldVJJ9-ps5rqUaa25SVdb6-Rg/s925/3col%20gadget.png"><img width="400" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiQlZ3z-rTCsgF-c7yTH6CuPV6eUG5aFEZjaFFEiy_Z1mjB0EedHG3DsqJtRqWLaSvA6tC2ALi4G-r3GTgI_4ErkfpITXGIr7gNcXUEZtuBUjYdBfyYfN2EyV5zv0j7e5SEJ7YnlUyqLpuO01WF6xVyOIOXTldVJJ9-ps5rqUaa25SVdb6-Rg/w400-h370/3col%20gadget.png" border="0" height="370" /></a></div><div style="text-align: left;"></div>Think of color 0 as false and color 1 as true and use this gadget in place of the OR-gadgets in the regular NP-complete proof of 3-coloring. I checked all eight values of a, b and c and the gadget works as promised.<div><br /></div><div><a href="https://en.wikipedia.org/wiki/James_Annan">James Annan</a> later became a climate scientist and co-founded <a href="https://bskiesresearch.wordpress.com/">Blue Skies Research</a> in the UK. </div><div><br /></div><div><div>Steven also noted that counting 2-colorings is easy, because for each connected component, there are either 0 or 2 colorings.</div></div></div>
-
-
-
-
-
-
-
-<p class="date">
-by Lance Fortnow (noreply@blogger.com) <a href="http://blog.computationalcomplexity.org/2022/06/a-gadget-for-3-colorings.html"><span class="datestr">at June 28, 2022 04:52 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
