@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at July 15, 2022 07:38 AM UTC</span>.
+Last updated <span class="datestr">at July 15, 2022 08:22 AM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -254,6 +254,264 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="http://offconvex.github.io/2022/07/15/imp-reg-htf-cnn/">
+<div class="entryheader">
+<span class="face">
+	<img class="face" src="images/convex.jpeg">
+</span>
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3><a class="entryheader" href="http://offconvex.github.io/2022/07/15/imp-reg-htf-cnn/">Implicit Regularization in Hierarchical Tensor Factorization and Deep Convolutional Networks</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="http://offconvex.github.io/" title="Off the convex path">Off the Convex Path</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content">
+<p>The ability of large neural networks to generalize is commonly believed to stem from an implicit regularization — a tendency of gradient-based optimization towards predictors of low complexity.
+A lot of effort has gone into theoretically formalizing this intuition.
+Tackling modern neural networks head-on can be quite difficult, so existing analyses often focus on simplified models as stepping stones.
+Among these, matrix and tensor factorizations have attracted significant attention due to their correspondence to linear neural networks and certain shallow non-linear convolutional networks, respectively. 
+Specifically, they were shown to exhibit an implicit tendency towards low matrix and tensor ranks, respectively.</p>
+
+<p>This post overviews a recent <a href="https://arxiv.org/abs/2201.11729">ICML 2022 paper</a> with <a href="https://asafmaman101.github.io/">Asaf Maman</a> and <a href="http://www.cohennadav.com/">Nadav Cohen</a>, in which we draw closer to practical deep learning by analyzing <em>hierarchical tensor factorization</em>, a model equivalent to certain <em>deep non-linear</em> convolutional networks. 
+We find that, analogously to matrix and tensor factorizations, the implicit regularization in hierarchical tensor factorization strives to lower a notion of rank (called hierarchical tensor rank).
+This turns out to have surprising implications on the origin of locality in convolutional networks, inspiring a practical method (explicit regularization scheme) for improving their performance on tasks with long-range dependencies.</p>
+
+<h2 id="background-matrix-and-tensor-factorizations">Background: Matrix and Tensor Factorizations</h2>
+
+<p>To put our work into context, let us briefly go over existing dynamical characterizations of implicit regularization in matrix and tensor factorizations.
+In both cases they suggest an incremental learning process that leads to low rank solutions (for respective notions of rank). We will then see how these characterizations transfer to the considerably richer hierarchical tensor factorization.</p>
+
+<h3 id="matrix-factorization-incremental-matrix-rank-learning">Matrix factorization: Incremental matrix rank learning</h3>
+<p><em>Matrix factorization</em> is arguably the most extensively studied model in the context of implicit regularization. 
+Indeed, it was already discussed in four previous posts (<a href="https://www.offconvex.org/2021/07/08/imp-reg-tf/">1</a>, <a href="https://www.offconvex.org/2020/11/27/reg_dl_not_norm/">2</a>, <a href="http://www.offconvex.org/2019/07/10/trajectories-linear-nets/">3</a>, <a href="http://www.offconvex.org/2019/06/03/trajectories/">4</a>), but for completeness we will present it once more. 
+Consider the task of minimizing a loss $\mathcal{L}_M : \mathbb{R}^{D, D’} \to \mathbb{R}$ over matrices, e.g. $\mathcal{L}_M$ can be a matrix completion loss — mean squared error over observed entries from some ground truth matrix. 
+Matrix factorization refers to parameterizing the solution $W_M \in \mathbb{R}^{D, D’}$ as a product of $L$ matrices, and minimizing the resulting objective using <em>gradient descent (GD)</em>:</p>
+<div style="text-align: center;">
+\[
+    \min\nolimits_{W^{(1)}, \ldots, W^{(L)}} \mathcal{L}_M \big ( W_M \big ) := \mathcal{L}_M \big ( W^{(1)} \cdots W^{(L)} \big ) ~.
+\]
+</div>
+<p>Essentially, matrix factorization amounts to applying a linear neural network (fully connected neural network with no non-linearity) for minimizing $\mathcal{L}_M$. 
+We can explicitly constrain the matrix rank of $W_M$ by limiting the shared dimensions of the weight matrices $\{ W^{(l)} \}_l$. However, from an implicit regularization standpoint, the most interesting case is where rank is unconstrained. 
+In this case there is no explicit regularization, and the kind of solution we get is determined implicitly by the parameterization and the optimization algorithm.</p>
+
+<p>Although it was initially conjectured that GD (with small initialization and step size) over matrix factorization minimizes a norm (see the seminal work of <a href="https://arxiv.org/abs/1705.09280">Gunasekar et al. 2017</a>), recent evidence points towards an implicit matrix rank minimization (see <a href="https://arxiv.org/abs/1905.13655">Arora et al. 2019</a>; <a href="https://arxiv.org/abs/1904.13262">Gidel et al. 2019</a>; <a href="https://arxiv.org/abs/2005.06398">Razin &amp; Cohen 2020</a>; <a href="https://arxiv.org/abs/2011.13772">Chou et al. 2020</a>; <a href="https://arxiv.org/abs/2012.09839">Li et al. 2021</a>).
+In particular, <a href="https://arxiv.org/abs/1905.13655">Arora et al. 2019</a> characterized the dynamics of $W_M$’s singular values throughout optimization:</p>
+
+<blockquote>
+  <p><strong>Theorem (informal; <a href="https://arxiv.org/abs/1905.13655">Arora et al. 2019</a>):</strong>
+Gradient flow (GD with infinitesimal step size) over matrix factorization initialized near zero leads the $r$’th singular value of $W_M$, denoted $\sigma_M^{(r)} (t)$, to evolve by:
+[ 
+    \color{brown}{\frac{d}{dt} \sigma_M^{(r)} (t) \propto \sigma_M^{(r)} (t)^{2 - 2/L}} ~.
+]</p>
+</blockquote>
+
+<p>As can be seen from the theorem above, singular values evolve at a rate proportional to their size exponentiated by $2 - 2 / L$. This means that they are subject to a momentum-like effect, by which they move slower when small and faster when large. 
+When initializing near the origin (as commonly done in practice), we therefore expect singular values to progress slowly at first, and then, upon reaching a certain threshold, to quickly rise until convergence. 
+<strong>These dynamics create an incremental learning process that promotes solutions with few large singular values and many small ones, i.e. low matrix rank solutions</strong>.
+In their paper, <a href="https://arxiv.org/abs/1905.13655">Arora et al. 2019</a> support this qualitative explanation through theoretical illustrations and empirical evaluations. 
+For example, the following plot reproduces one of their experiments:</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/imp_reg_htf/mf_dyn_blog.png" style="width: 380px; padding-bottom: 0px; padding-top: 0px;" />
+<br />
+<i><b>Figure 1:</b> 
+Dynamics of singular values during GD over matrix factorization <br /> — incremental learning leads to low matrix rank.
+</i>
+</div>
+<p><br />
+We note that the incremental matrix rank learning phenomenon was later on used to prove exact matrix rank minimization, under certain technical conditions (<a href="https://arxiv.org/abs/2012.09839">Li et al. 2021</a>).</p>
+
+<h3 id="tensor-factorization-incremental-tensor-rank-learning">Tensor factorization: Incremental tensor rank learning</h3>
+
+<p>Despite the significant interest in matrix factorization, as a theoretical surrogate for deep learning its practical relevance is rather limited. 
+It corresponds to linear neural networks, and thus misses non-linearity — a crucial aspect of modern neural networks.
+As was mentioned in a <a href="https://www.offconvex.org/2021/07/08/imp-reg-tf/">previous post</a>, by moving from matrix (two-dimensional array) to tensor (multi-dimensional array) factorizations it is possible to address this limitation.</p>
+
+<p>A classical scheme for factorizing tensors, named CANDECOMP/PARAFAC (CP), parameterizes a tensor as a sum of outer products (for more details on this scheme, see <a href="http://www.kolda.net/publication/TensorReview.pdf">this excellent survey</a>).
+Given a loss $\mathcal{L}_T : \mathbb{R}^{D_1, \ldots, D_N} \to \mathbb{R}$ over $N$-dimensional tensors, e.g. $\mathcal{L}_T$ can be a tensor completion loss, we simply refer by <em>tensor factorization</em> to parameterizing the solution $\mathcal{W}_T \in \mathbb{R}^{D_1, \ldots, D_N}$ as a CP factorization, and minimizing the resulting objective via GD:</p>
+<div style="text-align: center;">
+\[
+    \min\nolimits_{ \{ \mathbf{w}_r^n \}_{r , n} } \mathcal{L}_T \big ( \mathcal{W}_T \big ) := \mathcal{L}_T \big (  {\textstyle \sum}_{r = 1}^R \mathbf{w}_r^1 \otimes \cdots \otimes \mathbf{w}_r^N \big) ~.
+\]
+</div>
+<p>Each term $\mathbf{w}_r^{(1)} \otimes \cdots \otimes \mathbf{w}_r^{(N)}$ in the sum is called a <em>component</em>, and $\otimes$ stands for outer product.
+The concept of rank naturally extends from matrices to tensors.
+For a given tensor $\mathcal{W}$, its <em>tensor rank</em> is defined to be the minimal number of components (i.e. of outer product summands) $R$ required for CP parameterization to express it.
+Note that we can explicitly constrain the tensor rank of $\mathcal{W}_T$ by limiting the number of components $R$.
+But, since our interest lies in implicit regularization, we consider the case where $R$ is large enough for any tensor to be expressed.</p>
+
+<p>Similarly to how matrix factorization captures linear neural networks, tensor factorization is equivalent to certain <em>shallow non-linear</em> convolutional networks (with multiplicative non-linearity).
+This equivalence was discussed in a couple of previous posts (<a href="https://www.offconvex.org/2020/11/27/reg_dl_not_norm/">1</a>, <a href="https://www.offconvex.org/2021/07/08/imp-reg-tf/">2</a>), for the exact details behind it feel free to check out the preliminaries section of <a href="https://arxiv.org/abs/2201.11729">our paper</a> and references therein.
+The bottom line is that tensor factorization takes us one step closer to practical neural networks.</p>
+
+<p>Motivated by the incremental learning dynamics in matrix factorization, in a <a href="https://arxiv.org/abs/2102.09972">previous paper</a> (see accompanying <a href="https://www.offconvex.org/2021/07/08/imp-reg-tf/">blog post</a>) we analyzed the behavior of component norms during optimization of tensor factorization:</p>
+
+<blockquote>
+  <p><strong>Theorem (informal; <a href="https://arxiv.org/abs/2102.09972">Razin et al. 2021</a>):</strong>
+Gradient flow over tensor factorization initialized near zero leads the $r$’th component norm, $\sigma_T^{(r)} (t) := || \mathbf{w}_r^1 (t) \otimes \cdots \otimes \mathbf{w}_r^N (t) ||$, to evolve by:
+[ 
+    \color{brown}{\frac{d}{dt} \sigma_T^{(r)} (t) \propto \sigma_T^{(r)} (t)^{2 - 2/N}} ~.
+]</p>
+</blockquote>
+
+<p>The dynamics of component norms in tensor factorization are structurally identical to those of singular values in matrix factorization.
+Accordingly, we get a momentum-like effect that attenuates the movement of small component norms and accelerates that of large ones.
+This suggests that, <strong>in analogy with matrix factorization, when initializing near zero components tend to be learned incrementally, resulting in a bias towards low tensor rank</strong>.
+The following plot empirically demonstrates this phenomenon:</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/imp_reg_htf/tf_dyn_blog.png" style="width: 380px; padding-bottom: 0px; padding-top: 0px;" />
+<br />
+<i><b>Figure 2:</b> 
+Dynamics of component norms during GD over tensor factorization <br /> — incremental learning leads to low tensor rank.
+</i>
+</div>
+<p><br />
+Continuing with the analogy to matrix factorization, the incremental tensor rank learning phenomenon formed the basis for proving exact tensor rank minimization, under certain technical conditions (<a href="https://arxiv.org/abs/2102.09972">Razin et al. 2021</a>).</p>
+
+<h2 id="hierarchical-tensor-factorization">Hierarchical Tensor Factorization</h2>
+
+<p>Tensor factorization took us beyond linear predictors, yet it still lacks a critical feature of modern neural networks — depth (recall that it corresponds to <em>shallow</em> non-linear convolutional networks).
+A natural extension that accounts for both non-linearity and depth is <em>hierarchical tensor factorization</em> — our protagonist — which corresponds to certain <em>deep</em> non-linear convolutional networks (with multiplicative non-linearity).
+This equivalence is actually not new, and has facilitated numerous analyses of expressive power in deep learning (see <a href="https://arxiv.org/abs/1705.02302">this survey</a> for a high-level overview).</p>
+
+<p>As opposed to tensor factorization, which is a simple construct dating back to at least the early 20’th century (<a href="https://onlinelibrary.wiley.com/doi/10.1002/sapm192761164">Hitchcock 1927</a>), hierarchical tensor factorization was formally introduced only recently (<a href="https://link.springer.com/article/10.1007/s00041-009-9094-9">Hackbusch &amp; Kuhn 2009</a>), and is much more elaborate.
+Its exact definition is rather technical (the interested reader can find it in <a href="https://arxiv.org/abs/2201.11729">our paper</a>).
+For our current purpose it suffices to know that a hierarchical tensor factorization consists of multiple local tensor factorizations, whose components we call the <em>local components</em> of the hierarchical factorization.</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/imp_reg_htf/tf_htf_cnn_blog.png" style="width: 900px; padding-bottom: 15px; padding-top: 10px;" />
+<br />
+<i><b>Figure 3:</b> 
+Tensor factorization, which is a sum of components (outer products), <br /> corresponds to a shallow non-linear convolutional neural network (CNN).
+<br /> Hierarchical tensor factorization, which consists of multiple local tensor <br /> factorizations, corresponds to a deep non-linear CNN.
+</i>
+</div>
+<p><br />
+In contrast to matrices, which have a single standard definition for rank, tensors posses several different definitions for rank.
+Hierarchical tensor factorizations induce their own such notion, known as <em>hierarchical tensor rank</em>.
+Basically, if a tensor can be represented through hierarchical tensor factorization with few local components, then it has low hierarchical tensor rank.
+This stands in direct analogy with tensor rank, which is low if the tensor can be represented through tensor factorization with few components.</p>
+
+<p>Seeing that the implicit regularization in matrix and tensor factorizations leads to low matrix and tensor ranks, respectively, in <a href="https://arxiv.org/abs/2201.11729">our paper</a> we investigated whether the implicit regularization in hierarchical tensor factorization leads to low hierarchical tensor rank. 
+That is, whether GD (with small initialization and step size) over hierarchical tensor factorization learns solutions that can be represented with few local components.
+Turns out it does.</p>
+
+<h2 id="dynamical-analysis-incremental-hierarchical-tensor-rank-learning">Dynamical Analysis: Incremental Hierarchical Tensor Rank Learning</h2>
+
+<p>At the heart of our analysis is the following dynamical characterization for local component norms during optimization of hierarchical tensor factorization:</p>
+
+<blockquote>
+  <p><strong>Theorem (informal):</strong>
+Gradient flow over hierarchical tensor factorization initialized near zero leads the $r$’th local component norm in a local tensor factorization, denoted $\sigma_H^{(r)} (t)$, to evolve by:
+[ 
+    \color{brown}{\frac{d}{dt} \sigma_H^{(r)} (t) \propto \sigma_H^{(r)} (t)^{2 - 2/K}} ~,
+]
+where $K$ is the number of axes of the local tensor factorization.</p>
+</blockquote>
+
+<p>This should really feel like deja vu, as these <strong>dynamics are structurally identical to those of singular values in matrix factorization and component norms in tensor factorization!</strong>
+Again, we have a momentum-like effect, by which local component norms move slower when small and faster when large.
+As a result, <strong>when initializing near zero local components tend to be learned incrementally, yielding a bias towards low hierarchical tensor rank</strong>.
+In <a href="https://arxiv.org/abs/2201.11729">the paper</a> we provide theoretical and empirical demonstrations of this phenomenon.
+For example, the following plot shows the evolution of local component norms at some local tensor factorization under GD:</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/imp_reg_htf/htf_dyn_blog.png" style="width: 380px; padding-bottom: 0px; padding-top: 0px;" />
+<br />
+<i><b>Figure 4:</b> 
+Dynamics of local component norms during GD over hierarchical <br /> tensor factorization — incremental learning leads to low hierarchical tensor rank.
+</i>
+</div>
+<p><br /></p>
+
+<h2 id="practical-implication-countering-locality-in-convolutional-networks-via-explicit-regularization">Practical Implication: Countering Locality in Convolutional Networks via Explicit Regularization</h2>
+
+<p>We saw that in hierarchical tensor factorization GD leads to solutions of low hierarchical tensor rank.
+But what does this even mean for the associated convolutional networks?</p>
+
+<p>Hierarchical tensor rank is known (<a href="https://arxiv.org/abs/1605.06743">Cohen &amp; Shashua 2017</a>) to measure the strength of long-range dependencies modeled by a network.
+In the context of image classification, e.g., it quantifies how well we take into account dependencies between distant patches of pixels.</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/imp_reg_htf/local_vs_non_local_dep.png" style="width: 430px; padding-bottom: 8px; padding-top: 8px;" />
+<br />
+<i><b>Figure 5:</b> 
+Illustration of short-range (local) vs. long-range dependencies in image data.
+</i>
+</div>
+<p><br />
+<strong>The implicit regularization towards low hierarchical tensor rank in hierarchical tensor factorization therefore translates to an implicit regularization towards <em>locality</em> in the corresponding convolutional networks</strong>.
+At first this may not seem surprising, since convolutional networks typically struggle or completely fail to learn tasks entailing long-range dependencies.
+However, conventional wisdom attributes this failure to expressive properties (i.e. to an inability of convolutional networks to realize functions modeling long-range dependencies), suggesting that addressing the problem requires modifying the architecture.
+Our analysis, on the other hand, reveals that implicit regularization also plays a role: it is not just a matter of expressive power, the optimization algorithm is implicitly pushing towards local solutions.
+Inspired by this observation, we asked:</p>
+
+<blockquote>
+  <p><strong>Question:</strong>
+Is it possible to improve the performance of modern convolutional networks on long-range tasks via explicit regularization (without modifying their architecture)?</p>
+</blockquote>
+
+<p>To explore this prospect, <strong>we designed explicit regularization that counteracts locality by promoting high hierarchical tensor rank (i.e. long-range dependencies)</strong>.
+Then, through a series of controlled experiments, <strong>we confirmed that it can greatly improve the performance of modern convolutional networks (e.g. ResNets) on long-range tasks</strong>.</p>
+
+<p>For example, the following plot displays test accuracies achieved by a ResNet on an image classification benchmark, in which it is possible to control the spatial range of dependencies required to model.
+When increasing the range of dependencies, the test accuracy obtained by an unregularized network substantially deteriorates, reaching performance no better than random guessing.
+As evident from the plot, our regularization closes the gap between short- and long-range tasks, significantly boosting generalization on the latter.</p>
+
+<div style="text-align: center;">
+<img src="http://www.offconvex.org/assets/imp_reg_htf/pathfinder_resnet18_with_reg_blog.png" style="width: 430px; padding-bottom: 0px; padding-top: 0px;" />
+<br />
+<i><b>Figure 6:</b> 
+Specialized explicit regularization promoting high hierarchical tensor rank (i.e. long-range dependencies between image regions) can counter the locality of convolutional networks, significantly improving their performance on long-range tasks.
+</i>
+</div>
+<p><br /></p>
+
+<h2 id="concluding-thoughts">Concluding Thoughts</h2>
+<p>Looking forward, there are two main takeaways from our work:</p>
+
+<ol>
+  <li>
+    <p>Across three different neural network types (equivalent to matrix, tensor, and hierarchical tensor factorizations), we have an architecture-dependant notion of rank that is implicitly lowered. Moreover, the underlying mechanism for this implicit regularization is identical in all cases. This leads us to believe that implicit regularization towards low rank may be a general phenomenon. If true, finding notions of rank lowered for different architectures can facilitate an understanding of generalization in deep learning.</p>
+  </li>
+  <li>
+    <p>Our findings imply that the tendency of modern convolutional networks towards locality may largely be due to implicit regularization, and not an inherent limitation of expressive power as often believed. More broadly, they showcase that deep learning architectures considered suboptimal for certain tasks can be greatly improved through a right choice of explicit regularization. 
+Theoretical understanding of implicit regularization may be key to discovering such regularizers.</p>
+  </li>
+</ol>
+
+<p><strong><em><a href="https://noamrazin.github.io/">Noam Razin</a></em></strong></p></div>
+
+
+
+
+
+
+
+<p class="date">
+<a href="http://offconvex.github.io/2022/07/15/imp-reg-htf-cnn/"><span class="datestr">at July 15, 2022 09:00 AM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -2741,62 +2999,6 @@ $$\mathbf{NTISP}[T, S] \subseteq \mathbf{ITIME}[\tilde{O}(\log(T) S^2 + n)].$$</
 
 <p class="date">
 <a href="https://eccc.weizmann.ac.il/report/2022/093"><span class="datestr">at July 03, 2022 07:09 AM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="https://eccc.weizmann.ac.il/report/2022/092">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/eccc.png">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3 lang="en-us"><a class="entryheader" href="https://eccc.weizmann.ac.il/report/2022/092">TR22-092 |  On correlation bounds against polynomials | 
-
-	Emanuele Viola, 
-
-	Peter Ivanov, 
-
-	Liam Pavlovic</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="https://eccc.weizmann.ac.il/" title="ECCC - Reports">ECCC papers</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-We study the fundamental challenge of exhibiting explicit functions that have small correlation with low-degree polynomials over $\mathbb{F}_{2}$. Our main contributions include:
-
-1. In STOC 2020, CHHLZ introduced a new technique to prove correlation bounds. Using their technique they established new correlation bounds for low-degree polynomials. They conjectured that their technique generalizes to higher degree polynomials as well. We give a counterexample to their conjecture, in fact ruling out weaker parameters and showing what they prove is essentially the best possible. 
-
-2. We advocate an alternative approach for proving correlation bounds with the central “mod functions,” consisting of proving two steps: (I) the polynomials that maximize correlation are symmetric, and (II) symmetric polynomials have small correlation. Contrary to related results in the literature, we conjecture that (I) is true. We argue that this approach is not affected by existing “barrier results.”
-
-3. We prove our conjecture for quadratic polynomials. Specifically, we determine the maximum possible correlation between quadratic polynomials modulo 2 and the functions $(x_{1},\dots,x_{n})\to z^{\sum x_{i}}$ for any $z$ on the complex unit circle; and show that it is achieved by symmetric polynomials. To obtain our results we develop a new proof technique: we express correlation in terms of directional derivatives and analyze it by slowly restricting the direction.
-
-4. We make partial progress on the conjecture for cubic polynomials, in particular proving tight correlation bounds for cubic polynomials whose degree-3 part is symmetric.</div>
-
-
-
-
-
-
-
-<p class="date">
-<a href="https://eccc.weizmann.ac.il/report/2022/092"><span class="datestr">at July 02, 2022 10:57 AM UTC</span></a>
 </p>
 <div class="comments">
 </div>
