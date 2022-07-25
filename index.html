@@ -246,7 +246,7 @@ Maintained by <A href="https://www.comp.nus.edu.sg/~arnab/">Arnab Bhattacharyya<
 </p>
 
 <p>
-Last updated <span class="datestr">at July 25, 2022 01:38 PM UTC</span>.
+Last updated <span class="datestr">at July 25, 2022 02:21 PM UTC</span>.
 <p>
 Powered by<br>
 <a href="http://www.intertwingly.net/code/venus/planet/"><img src="images/planet.png" alt="Planet Venus" border="0"></a>
@@ -254,6 +254,347 @@ Powered by<br>
 </div>
 <div class="maincontent">
 <h1 align=center>Theory of Computing Blog Aggregator</h1>
+
+
+
+
+
+
+
+
+<div class="channelgroup">
+<div class="entrygroup" 
+	id="https://francisbach.com/?p=6741">
+<div class="entryheader">
+<div class="entryheadertextcontainer">
+<div class="entryheadertext">
+<h3 lang="en-US"><a class="entryheader" href="https://francisbach.com/rethinking-sgd-noise/">Rethinking SGD’s noise</a></h3>
+<p style="text-indent: 1.0em;">from 
+<a class="entryheader" href="https://francisbach.com" title="Machine Learning Research Blog">Francis Bach</a>
+<p>
+</div>
+</div>
+</div>
+<div class="entry">
+<div class="content" lang="en-US">
+<p class="has-text-align-justify">It seemed a bit unfair to devote a blog to machine learning (ML) without talking about its current core algorithm: stochastic gradient descent (SGD). Indeed, SGD has become, year after year, the basic foundation of many algorithms used for large-scale ML problems.  However, the history of stochastic approximation is much older than that of ML: its first study by Robbins and Monro [<a href="https://projecteuclid.org/journals/annals-of-mathematical-statistics/volume-22/issue-3/A-Stochastic-Approximation-Method/10.1214/aoms/1177729586.full" target="_blank" rel="noreferrer noopener">1</a>] dates back to 1951. Their aim was to find the zeros of a function that can only be accessed through noisy measurements; and this set-up was applied (and studied!) later on for many problems [<a href="https://link.springer.com/book/9783540606994" target="_blank" rel="noreferrer noopener">2</a>]. Stochastic gradient descent, in its most general definition, is simply the application of the Robbins and Monro’s procedure to find the zeros of the <em>gradient</em> of a function \(f\).</p>
+
+
+
+<p class="has-text-align-justify">In this post, I will try to show that the instance of SGD used to solve modern ML problems carries rich particularities. In particular, we will put emphasis on the difference between the under and overparametrised regimes. To provide prototypical representations of these, we will try to cast the typical dynamics of each regime as a known stochastic process.</p>
+
+
+
+<h2 class="has-text-align-left" id="fun-and-useful-facts-and-common-mistakes">General set-up</h2>
+
+
+
+<p class="has-text-align-justify justify-text"><strong>Stochastic approximation.</strong> At each time \(t \in \mathbb{N}\) of the procedure, let us suppose that we only have access to an unbiased estimate of the gradient, \(\nabla f_t\), of a function \(f\) we want to minimise. More formally this means that given the information of the first \(t-1\) steps, denoted by \(\mathcal{F}_{t-1}\), the estimate we get at time \(t\) is centred around the true gradient: \(\displaystyle \mathbb{E}\left[ \nabla f_t (\theta_{t-1}) | \mathcal{F}_{t-1} \right] = \nabla f (\theta_{t-1})\). Then, the SGD iterates with step-sizes \((\gamma_t)_{t \in \mathbb{N}}\), and initialised at \(\theta_{t=0} = \theta_0\), write $$\theta_t = \theta_{t-1} – \gamma_t \nabla f_t (\theta_{t-1}).$$ To put the emphasis on the noise induced by the noisy estimates of the true gradient, we prefer sometimes to rephrase the recursion in term of the conditional zero-mean noise sequence \(\varepsilon_t = \nabla f – \nabla f_t\). $$\theta_t = \theta_{t-1} – \gamma_t \nabla f (\theta_{t-1}) + \gamma_t\varepsilon_t(\theta_{t-1}).$$ As we will see later, to analyse this discrete time stochastic dynamics, we crucially need to understand the behaviour of \((\varepsilon_t)_{t \in \mathbb{N}}\).</p>
+
+
+
+<p class="has-text-align-justify"><strong>Supervised learning reformulation</strong>. This general recursion can be applied to many settings and fits particularly well to the supervised learning framework. In this case, the function to minimise is the empirical risk $$\mathcal{R}_n(\theta)=\mathbb{E}_{(X,Y)\sim\widehat{\rho}_n}\left[\ell((X,Y), \theta)\right] = \frac{1}{n}\sum_{i=1}^n \ell((x_i,y_i), \theta),$$ where \(\widehat{\rho}_n:= \frac{1}{n}\sum_{i=1}^n \delta_{(x_i,y_i)}\) is the empirical measure associated to the samples \((x_i, y_i)_{1 \leqslant i \leqslant n}\). We can derive an unbiased estimate \(\nabla_\theta \ell((x_{i_t},y_{i_t}), \theta)\) of its gradient where \((i_t)_t\) is the sequence of uniformly sampled indices over \(\{1,…,n\}\). The recursion reads: $$\theta_t = \theta_{t-1} – \gamma_t \nabla_\theta \ell((x_{i_t},y_{i_t}), \theta_{t-1}).$$ However, one of the real power of SGD is that it can be seen as a direct <em>stochastic</em> gradient method to optimise the true risk [<a href="https://proceedings.neurips.cc/paper/2007/hash/0d3180d672e08b4c5312dcdafdf6ef36-Abstract.html" target="_blank" rel="noreferrer noopener">3</a>]. Indeed, recall that the true risk is \(\mathcal{R}(\theta) = \mathbb{E}_\rho\left[\ell((X,Y), \theta)\right]\) and consider an input/output sample pair \((x_i,y_i)\) drawn from \(\rho\). Now, \(\ell((x_i,y_i), \theta)\) is an unbiased estimate of the true risk \(\mathcal{R}(\theta)\) such that \(\nabla_\theta \ell((x_i,y_i), \theta)\) is an unbiased estimate of its  gradient. Hence, if we denote \(\mathcal{F}_t = \sigma((x_i,y_i), \ i\leqslant t)\), then the stochastic gradient descent optimises \(\mathcal{R}\) as long as new points \((x,y)\) are added in the data set  $$\theta_t = \theta_{t-1} – \gamma_t \nabla_\theta \ell((x_t,y_t), \theta_{t-1}).$$ This reveals the real strength of SGD against other types of gradient descent algorithm: beyond its low computational cost, as long as we use <em>unseen data</em>, SGD optimises <em>directly</em> <em>the true risk</em> although it is an <em>a priori</em> unknown function. As a consequence, the SGD algorithm, when using only fresh samples, cannot overfit the dataset and does not need any regularisation.</p>
+
+
+
+<h2 id="matrix-functions">The noise of SGD in practical ML setting</h2>
+
+
+
+<p class="has-text-align-justify">The story outlined in the previous paragraph has been very popular to explain the success of SGD. However, nowadays, the number of samples is usually way smaller than the number of iterations performed, i.e. \(t \gg n\): several <em>epochs</em> are made over the dataset and the fact that SGD is a stochastic approximation algorithm that minimises directly the true risk doesn’t hold any longer. Hence, from now on, let us set the <strong>data to \(n\) input/output pairs</strong> \((x_i,y_i)_{1 \leqslant i \leqslant n}\). </p>
+
+
+
+<p class="has-text-align-justify">First, let us briefly present certain crucial properties of SGD in this setting (see also the nice paper [<a href="https://arxiv.org/pdf/2105.01650.pdf" target="_blank" rel="noreferrer noopener">8</a>] for more details). We take a parameterised family of predictors \(\{x \mapsto h(\theta,x), \ \text{for } \theta \in \Theta\}\), and assume that \(\ell\) is the square-loss. The empirical risk classically writes \(\mathcal{R}_n(\theta)= \frac{1}{2n}\sum_{i=1}^n (h(\theta,x_i)\, – y_i)^2\) and the SGD recursion can be rewritten as $$ \theta_t = \theta_{t-1} – \gamma \nabla \mathcal{R}_n (\theta_{t-1}) + \gamma \varepsilon_t(\theta_{t-1}), $$ where \(\varepsilon_t(\theta)\) is the noise term at time \(t\), which writes $$ \varepsilon_t(\theta):= \frac{1}{n} \sum_{j = 1}^n r_j(\theta) \nabla_\theta h(\theta, x_j)\, – r_{i_t}(\theta) \nabla_\theta h(\theta, x_{i_t}), $$ where for all \(i \in \{1,…,n \}\), we define the \(i\)-th residual \(r_i(\theta) = h(\theta,x_i)\, – y_i\). Note that while the expression written requires that the loss is the square-loss, the conclusions of this section extend to different losses (such as the logistic).</p>
+
+
+
+<p class="has-text-align-justify"><strong>Multiplicative noise and additive noise.</strong> Let us call \(\theta^*\) any vector belonging to the set of critical points of the loss \(\mathcal{R}_n\), that is \(\nabla \mathcal{R}_n(\theta^*) = 0\) (note that, in the convex case, it is exactly the set of global minima of the loss). We say that we are in the <strong>“overparametrised” regime</strong> if there exists at least one interpolator which fits the data set, i.e. if there exists \(\theta^*\) such that \(R_n( \theta^*)=0\). Otherwise, we say that we are in the <strong>“underparametrised” regime</strong>. We now decompose the noise as the sum of two different noises, that will contribute differently to the dynamics: $$\varepsilon_t(\theta) = \underbrace{\varepsilon_t(\theta)\, – \varepsilon_t(\theta^*) }_{\text{Multiplicative noise}} +  \underbrace{\varepsilon_t(\theta^*)}_{\text{Additive noise}}. $$ If \(\varepsilon_t\) is \(L\)-Lipshitz continuous, which can be verified for instance if we use the squared loss, the term \(\varepsilon_t(\theta)\, – \varepsilon_t(\theta^*) \) converges to \(0\) when \(\theta\) approaches \(\theta^*\). This motivates the “multiplicative” denomination of this term. On the contrary, remark that the additive noise does not depend on the state of the dynamics, i.e. it is independent of \(\theta_t\). Notably, in the overparametrised regime, taking \(\theta^*\) as an interpolator, we see that \(\varepsilon_t(\theta^*)=0\): there is no additive noise in this case! This is part of the explanation of the very different optimisation dynamics observed in the underparametrised and overparametrised regimes [<a href="https://proceedings.mlr.press/v89/vaswani19a.html" target="_blank" rel="noreferrer noopener">14</a>, <a href="https://proceedings.mlr.press/v80/ma18a.html" target="_blank" rel="noreferrer noopener">15</a>].</p>
+
+
+
+<p class="has-text-align-justify">As an illustration of these two distinct regimes, consider a least-squares problem: $$ \mathcal{R}_n(\theta)= \frac{1}{2n}\sum_{i=1}^n \big(\langle \theta,x_i\rangle\, – y_i\big)^2.$$ In the overparametrised setting, which typically requires that \(d \geqslant n\), where \(d\) is the dimension of the inputs, it is possible to interpolate the dataset and the noise vanishes at optimum. On the opposite, in any underparametrised setting, the global minimum of the loss function is strictly positive, and the noise’s variance is always lower-bounded: the presence of additive noise totally changes the nature of the dynamics as shown by the following pictures.</p>
+
+
+
+<div class="wp-container-3 wp-block-columns">
+<div class="wp-container-1 wp-block-column is-vertically-aligned-top"><div class="wp-block-image justify-text">
+<figure class="aligncenter size-full"><img width="720" alt="" src="https://francisbach.com/wp-content/uploads/2022/07/SGD_first-1.gif" class="wp-image-7442" height="480" /></figure></div></div>
+
+
+
+<div class="wp-container-2 wp-block-column is-vertically-aligned-center"><div class="wp-block-image justify-text">
+<figure class="aligncenter size-full"><img width="720" alt="" src="https://francisbach.com/wp-content/uploads/2022/07/SGD_noise_scale-1.gif" class="wp-image-7441" height="480" /></figure></div></div>
+</div>
+
+
+
+<div class="wp-container-5 is-vertical wp-block-group">
+<div class="wp-container-4 is-vertical wp-block-group">
+<p class="has-text-align-justify"><span style="text-decoration: underline;">Left:</span> Iterates of SGD for underparametrised (blue) and overparametrised (orange) regimes. The ellipses represent different level sets of \(\mathcal{R}_n\). Inputs \((x_i)_{i\leqslant n}\) are the same in the two models: centred Gaussian with anisotropic covariance (\(n=100,\ d = 2\)). In the underparametrised setting, the outputs have been generated randomly, and there is no interpolator of the dataset, whereas in the overparametrised problem, we generated the outputs according to \(Y = X \theta^* \), where \(\theta^*\) is the unique global minimum of the first setup and hereby of the second as well.</p>
+
+
+
+<p class="has-text-align-justify"><span style="text-decoration: underline;">Right:</span> The \(\ell_2\)-norm of the SGD noise in \(\mathrm{log}\)-scale along iterations in the underparametrised (blue) and overparametrised (orange) regimes. In the underparametrised regime, the noise stays constant after \(\sim 75\) iterations, whereas the intensity of the noise goes to \(0\) linearly over the iterates.</p>
+</div>
+
+
+
+<p></p>
+
+
+
+<p></p>
+</div>
+
+
+
+<p class="has-text-align-justify"><strong>Noise geometry.</strong> Another important fact to stress concerning the noise \(\varepsilon_t(\theta)\) is that, at state \(\theta\), it belongs to a specific linear space: \(\text{span}\{\nabla_\theta h(\theta, x_1), …, \nabla_\theta h(\theta, x_n) \}\). To provide an intuition on how restrictive it can be, consider once again our favourite linear model: in this case, \(\nabla_\theta h(\theta, x_i)=x_i\) and \(\varepsilon_t(\theta)\) belongs to \(\text{span}\{x_1, …, x_n \}\), which is a space of dimension at most \(n\). In the overparametrised case, this is a strict subspace of \(\mathbb{R}^d\): noise is degenerate in \(d-n\) directions! On the contrary, in the underparametrised setting, as \(d \leqslant n\) there is no specificity at this level.</p>
+
+
+
+<div class="wp-container-12 wp-block-group"><div class="wp-block-group__inner-container">
+<div class="wp-container-11 wp-block-columns">
+<div class="wp-container-10 wp-block-column">
+<div class="wp-container-9 wp-block-columns">
+<div class="wp-container-8 wp-block-column">
+<div class="wp-container-7 wp-block-columns are-vertically-aligned-top">
+<div class="wp-container-6 wp-block-column is-vertically-aligned-top"><div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img width="442" alt="" src="https://francisbach.com/wp-content/uploads/2022/07/Geometric_bias-1024x691.png" class="wp-image-7090" height="297" />3D picture showing the geometric bias of SGD: in the least-squares setting, the iterates (red lines) stay in the affine space \(\theta_0 + \text{span}(x_i)\). The contours represent different levels set of the loss highlighting the translational invariance along the null space \(\text{Ker}(X)\).</figure></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></div>
+
+
+
+<h2 id="positivity-of-lowner-matrices">SGD as a Markov chain</h2>
+
+
+
+<p class="has-text-align-justify">In this section, we develop a different point of view on the general SGD algorithm, that also provides helpful intuition: we try to understand its dynamics through a Markov chain interpretation.</p>
+
+
+
+<p class="has-text-align-justify">The first key to understand the behaviour of SGD is that, with constant step-sizes \(\gamma_t = \gamma\), the iterates define an homogeneous <a href="https://en.wikipedia.org/wiki/Markov_chain" target="_blank" rel="noreferrer noopener">Markov chain</a> [<a href="https://link.springer.com/book/10.1007/978-1-4471-3267-7" target="_blank" rel="noreferrer noopener">4</a>]. Let us recall the SGD recursion to keep it next to us.$$ \theta_t = \theta_{t-1} – \gamma\nabla \mathcal{R}_n (\theta_{t-1}) + \gamma\varepsilon_t(\theta_{t-1}). $$ This point of view induces a natural question: <em>does the distribution of the iterates converge to some limit we can characterise?</em> This will again depend on the regime: under or overparametrised. Roughly, for the former, with a constant step size \(\gamma\), the distribution will converge to a stationary distribution with a strictly positive variance (e.g. a Gaussian centred around \(\theta^*\) at scale \(\gamma^{1/2}\) [<a href="https://epubs.siam.org/doi/10.1137/0324039" target="_blank" rel="noreferrer noopener">5</a>]). Less understood is the fact that, for the latter, it will converge to a Dirac distribution \(\delta_{ \theta^*}\), with \(\theta^*\) being one <strong>specific interpolator</strong>, that will depend on the precise structure of the algorithm  (initialisation, set-size, architecture of the model… more details on this will be discussed in a future blog post)!</p>
+
+
+
+<p class="has-text-align-justify"><strong>The underparametrised case.</strong> Recall that in this case, the additive noise is nondegenerate. Hence, the gradient and noise parts of the dynamics cannot cancel simultaneously and under some mild assumption on \(\mathcal{R}_n\), the dynamics equilibrates after a certain time: formally this means that the distribution of the iterates \((\theta_t)_{t \geqslant 0}\) converges to an invariant distribution \(\pi^\gamma\). Hence the question: <em>how far is \(\pi^\gamma\) from \(\delta_{\theta^*}\)</em>? Giving a general and precise answer to this question is not trivial, and more importantly, it depends heavily on the multiplicative part of the noise. For now, let us stick with some common modelling to study the recursion: we make the assumption that the noise does not depend on the current iterate \(\theta\) (multiplicative part is \(0\)). In this case, it has been shown that the iterates of SGD have Gaussian fluctuations around \(\theta^*\) at scale \(\gamma^{1/2}\) [<a href="https://epubs.siam.org/doi/10.1137/0324039" target="_blank" rel="noreferrer noopener">5</a>]. From this point of view, the smaller \(\gamma\), the closer to \(\theta^*\) we get and this justifies a known variance reduction technique: decaying step-sizes. Another technique to reduce the variance is to resort to averaging. Once again, to explain this, ergodic theorems for Markov chains [<a href="https://link.springer.com/book/10.1007/978-1-4471-3267-7" target="_blank" rel="noreferrer noopener">4</a>] give us an important insight: the time-mean \(\bar{\theta}_t = \frac{1}{t+1} \sum_{i = 0}^t \theta_i\) converges to \(\bar{\theta}_\gamma = \mathbb{E}_{\pi^\gamma} [\theta]\) almost surely. Furthermore, some magic happens with the quadratic case, as we can show that \(\bar{\theta}_\gamma = \theta^*\), which implies,  as a direct application of the strong law of large numbers, that \(\bar{\theta}_t\) converges almost surely to \(\theta^*\), and proves that averaging the iterates is relevant [<a href="https://papers.nips.cc/paper/2011/hash/40008b9a5380fcacce3976bf7c08af5b-Abstract.html" target="_blank" rel="noreferrer noopener">6</a>].</p>
+
+
+
+<div class="wp-container-15 wp-block-columns">
+<div class="wp-container-13 wp-block-column is-vertically-aligned-top"><div class="wp-block-image justify-text">
+<figure class="aligncenter size-full"><img width="720" alt="" src="https://francisbach.com/wp-content/uploads/2022/07/Large_gamma_comparison-1.gif" class="wp-image-7446" height="480" /></figure></div></div>
+
+
+
+<div class="wp-container-14 wp-block-column"><div class="wp-block-image justify-text">
+<figure class="aligncenter size-full"><img width="720" alt="" src="https://francisbach.com/wp-content/uploads/2022/07/Medium_gamma_comparison-1.gif" class="wp-image-7448" height="480" /></figure></div></div>
+</div>
+
+
+
+<div class="wp-container-18 wp-block-columns">
+<div class="wp-container-16 wp-block-column is-vertically-aligned-top"><div class="wp-block-image justify-text">
+<figure class="aligncenter size-full"><img width="720" alt="" src="https://francisbach.com/wp-content/uploads/2022/07/Small_gamma_comparison-4.gif" class="wp-image-7447" height="480" /></figure></div></div>
+
+
+
+<div class="wp-container-17 wp-block-column">
+<p class="has-text-align-justify">Here is a series of plots corresponding to different step-sizes \(\gamma\) showing the dynamics of plain SGD (blue), averaged SGD (red) and step-sizes decay at \(1/\sqrt{t}\) rate (orange)  in an underparametrised setting (\(n=100\), \(d=2\)). Plain SGD is always faster that the other two methods but the larger the \(\gamma\) the larger the variance at optimum is.</p>
+</div>
+</div>
+
+
+
+<p class="has-text-align-justify">Note also that the same analysis can be done in the convex, yet nonquadratic case, indeed, in <a href="https://projecteuclid.org/journals/annals-of-statistics/volume-48/issue-3/Bridging-the-gap-between-constant-step-size-stochastic-gradient-descent/10.1214/19-AOS1850.full" target="_blank" rel="noreferrer noopener">[7]</a> the authors showed that the order of magnitude of the distance between \(\bar{\theta}_\gamma\) and \({\theta}^*\) is \(\gamma^2\).</p>
+
+
+
+<p class="has-text-align-justify"><strong>The overparametrised case.</strong> We have seen in the previous section that both the scale of noise and the geometry are affected in this case. The effect of the geometry is a little bit difficult to handle at a general level and we will detail its role in specific examples (see below and in the next blog post to come). Concerning the scale, we have seen that the noise vanishes at a global optimum and that the closer to a global optimum, the smaller the intensity of the noise is. Hence, global optima are fixed points of the dynamics, and under technical assumptions (e.g. local attractiveness), it can be shown the dynamics eventually converge to one of them [<a href="https://arxiv.org/pdf/2105.01650.pdf" target="_blank" rel="noreferrer noopener">8</a>, <a href="https://proceedings.neurips.cc/paper/2021/hash/b4a0e0fbaa9f16d8947c49f4e610b549-Abstract.html" target="_blank" rel="noreferrer noopener">9</a>]. In this case, the nature of the dynamics is very different from the previous one: the distribution of the iterates \((\theta_t)_{t \geqslant 0}\) converges to \(\delta_{\theta^*}\) where \(\theta^*\) is a random variable in the set of interpolators! Remarkably, no variance reduction technique are required for convergence towards a global minimum!</p>
+
+
+
+<h2 id="characterizing-all-matrix-monotone-functions">The stochastic gradient flow and the least-squares example</h2>
+
+
+
+<p class="has-text-align-justify justify-text"><strong>Continuous time model of SGD.</strong> Continuous time counterparts of (discrete) numerical optimisation methods and Markov chains are well-worn subjects in applied mathematics and have found applications in machine learning in particular. Indeed, in recent years, gradient descent has been actively studied through <a href="https://francisbach.com/gradient-flows/" target="_blank" rel="noreferrer noopener">gradient flows</a>, which have led to convergence results for neural networks discussed in previous <a href="https://francisbach.com/gradient-descent-neural-networks-global-convergence/">blog</a> <a href="https://francisbach.com/gradient-descent-for-wide-two-layer-neural-networks-implicit-bias/" target="_blank" rel="noreferrer noopener">posts</a>. However, due to its stochasticity, SGD cannot be properly modelled as a deterministic flow. An interesting and natural approach is to consider stochastic differential equations (SDEs) $$ d \theta_t = b(t,\theta_t) d t + \sigma(t,\theta_t)d B_t, $$ where \((B_t)_{t \geqslant 0}\) is a standard Brownian motion [<a href="https://link.springer.com/book/10.1007/978-3-642-14394-6" target="_blank" rel="noreferrer noopener">10</a>]. In order to accurately represent the SGD dynamics, the drift term \(b\) and the noise \(\sigma\) should meet the following requirements:</p>
+
+
+
+<div class="wp-container-19 is-vertical wp-block-group">
+<p class="has-text-align-justify justify-text">(i) The drift term \(b\) should match the negative full gradient: \(b=-\nabla \mathcal{R}_n\).</p>
+
+
+
+<p>(ii) The noise covariance \(\sigma\sigma^\top(t,\theta)\) should match \(\gamma\mathbb{E}[ \varepsilon_t(\theta_t) \varepsilon_t(\theta_t)^\top | \theta_t = \theta ]\).</p>
+
+
+
+<p>(iii) The noise at state \(\theta\) should belong to \(\text{span}\{\nabla_\theta h(\theta, x_1), …, \nabla_\theta h(\theta, x_n) \}\).</p>
+
+
+
+<p>\({\color{white} f} \)</p>
+</div>
+
+
+
+<p class="has-text-align-justify">Points (i) and (ii) imply that the SGD recursion corresponds in fact to the Euler-Maruyama discretisation with step-size \(\gamma\) of the SDE [<a href="https://jmlr.org/papers/v20/17-526.html" target="_blank" rel="noreferrer noopener">11</a>]. Hence, the SDE and the discrete models match perfectly for infinitesimal step-sizes (up to first order terms in \(\gamma\)) and the model is said to be <em>consistent</em>. Point (iii) states a geometrical property of the SGD noise and is of crucial importance for a proper modelisation.</p>
+
+
+
+<p class="has-text-align-justify"><strong>The least-squares model.</strong> Consider once again our favourite least-squares model $$\mathcal{R}_n(\theta)= \frac{1}{2n}\sum_{i=1}^n (\langle \theta,x_i\rangle\, – y_i)^2,$$ and let \(X:= [x_1, …, x_n]^\top \in \mathbb{R}^{n \times d}\) be the data matrix and \(y = [y_1, …, y_n]^\top \in \mathbb{R}^n\) the vector of outputs. Let us explicitly write the SDE model in this case: the drift corresponds to the gradient \(b(\theta)=- \frac{1}{n}X^\top (X\theta – y) \) and it is simple linear algebra to calculate the covariance of the noise (see also [<a href="https://proceedings.mlr.press/v119/ali20a.html" target="_blank" rel="noreferrer noopener">19</a>, Remark 4])$$ \sigma \sigma^\top(\theta) =  \frac{\gamma}{n} X^\top \left(\textrm{diag}\left[ \big(\langle \theta, x_i\rangle\, – y_i\big)^2 \right]_{i=1}^n – \frac{1}{n}  \left[ \big(\langle \theta, x_i\rangle\, – y_i\big)\big(\langle \theta, x_j\rangle\, – y_j\big) \right]_{i,j=1}^n  \right) X. $$ To simplify a bit this analysis let us neglect the residual term of order \(1/n^2\) and assume that the residuals \(\langle \theta, x_i\rangle – y_i\), are approximately equal across all the samples of the data set: \(\textrm{diag}\left[ \left(\langle \theta, x_i\rangle\, – y_i\right)^2 \right]_{i=1}^n \simeq \frac{1}{n}\|X \theta\, – y\|^2 I_n \). Then the SDE model writes: $$d \theta_t =\, – \frac{1}{n}X^\top (X\theta_t\, – y) d t + \frac{\sqrt{\gamma}}{n} \| X\theta_t -y \| X^\top d B_t. $$ As stressed before, notice that there is an important difference between the under and overparametrised regimes: in the former, the noise spans all \(\mathbb{R}^d\) and as there exists \(\sigma &gt; 0\) such that \(\| X\theta_t -y \| \geqslant \sigma \), the noise is non degenerate in every direction. Instead, in the overparametrised regime, the noise vanishes at a global optimum \(\theta^*\) and is degenerate in the directions of \([\mathrm{range} (X^\top)]^\perp = \mathrm{Ker} (X)\). As also noticed in [<a href="https://proceedings.mlr.press/v119/ali20a.html" target="_blank" rel="noreferrer noopener">19</a>], this will result in important differences in term of the processes’ behaviour! In the rest of the post, let us denote \(\theta^{\text{LS}}:= X^\dagger y\), where \(X^\dagger\) is the pseudo inverse of \(X\). It corresponds to the ordinary least-square estimator in the underparametrised regime and the projection of \(0\) into \(\mathrm{Ker} (X)\) in the overparametrised setting.</p>
+
+
+
+<p class="has-text-align-justify"><strong>The underparametrised regime and the multivariate <a href="https://en.wikipedia.org/wiki/Ornstein%E2%80%93Uhlenbeck_process" target="_blank" rel="noreferrer noopener">Ornstein–Uhlenbeck process</a>.</strong> As written before, let us consider a model where the residuals scale like the best possible fit, i.e.  \(\frac{1}{\sqrt{n}}\| X\theta_t -y \| \simeq \sigma \). The dynamics reads: $$ d \theta_t =\, – \frac{1}{n}X^\top (X\theta_t\, – y) d t + \sqrt{\frac{\gamma}{n}} \sigma  X^\top d B_t. $$ This can be viewed as a <em>multivariate <a href="https://en.wikipedia.org/wiki/Ornstein%E2%80%93Uhlenbeck_process" target="_blank" rel="noreferrer noopener">Ornstein–Uhlenbeck process</a></em> for which we can show the following convergence result: the law \(\pi_t\) of \(\theta_t\) converges to \(\pi^\gamma\), a Gaussian distribution of mean \(\theta^{\text{LS}}\) and covariance \(\frac{\gamma \sigma^2}{2} I_d\): $$\lim_{t \to \infty} \pi_t =\mathcal{N} \left( \theta^{\text{LS}}, \frac{\gamma \sigma^2}{2} I_d \right).$$ From this, as for the Markov chain interpretation, we can nicely interpret the need to decrease step-sizes to \(0\) in order to concentrate to \(\theta^{\text{LS}}\). Similarly, note that the ergodic theorem gives you automatically that the time average of \(\theta_t\) goes to \(\theta^{\text{LS}}\) as $$\qquad \qquad \qquad \lim_{t \to \infty} \frac{1}{t}\int_0^t \theta_s ds = \mathbb{E}[\pi^\gamma]=\theta^{\text{LS}}, \qquad \text{almost surely}.$$ Besides its nice interpretation as a Ornstein-Uhlenbeck process, we illustrate below the predictive power of the SDE model to understand the SGD dynamics.</p>
+
+
+
+<div class="wp-container-22 wp-block-columns">
+<div class="wp-container-20 wp-block-column is-vertically-aligned-top"><div class="wp-block-image justify-text">
+<figure class="aligncenter size-full"><img width="720" alt="" src="https://francisbach.com/wp-content/uploads/2022/07/SGD_SDE_under-1.gif" class="wp-image-7449" height="480" /></figure></div></div>
+
+
+
+<div class="wp-container-21 wp-block-column"><div class="wp-block-image justify-text">
+<figure class="aligncenter size-full"><img width="720" alt="" src="https://francisbach.com/wp-content/uploads/2022/07/hist-2.gif" class="wp-image-7444" height="480" /></figure></div></div>
+</div>
+
+
+
+<div class="wp-container-25 wp-block-group"><div class="wp-block-group__inner-container">
+<div class="wp-container-24 wp-block-group"><div class="wp-block-group__inner-container">
+<div class="wp-container-23 is-vertical wp-block-group">
+<p class="has-text-align-justify"><span style="text-decoration: underline;">Left</span>: \(10\) realisations of SGD in blue-like colours (corresponding to \(10\) different random sampling sequences), next to \(10\) realisations of the SDE model in red-like colours  (corresponding to \(10\) different realisations of the Brownian motion). </p>
+
+
+
+<p class="has-text-align-justify"><span style="text-decoration: underline;">Right</span>: A histogram of snap-shots of the SGD dynamics (marginal along the first coordinate) at increasing time intervals that show the convergence (by ergodicity) to the predicted Gaussian \(\mathcal{N}(\theta^{\text{LS}}, \gamma \sigma^2/2)\) ! </p>
+</div>
+</div></div>
+</div></div>
+
+
+
+<p></p>
+
+
+
+<p class="has-text-align-justify justify-text"><strong>The overparametrised regime and the <a href="https://en.wikipedia.org/wiki/Geometric_Brownian_motion" target="_blank" rel="noreferrer noopener">geometric Brownian motion</a></strong>. We take back our SDE model, initialise it at \(\theta_0 = 0\), but now we are extra careful that the noise cancels at any interpolator \(\theta^*\). We will show that despite being a random process, the dynamics with constant \(\gamma &gt; 0\) converges almost surely to \(\theta^{\text{LS}}\). To do so let us consider the evolution of the  squared difference \(\eta_t = \|\theta_t – \theta^{\text{LS}}\|^2\). Thanks to <a href="https://en.wikipedia.org/wiki/It%C3%B4_calculus" target="_blank" rel="noreferrer noopener">Itô calculus</a> (chain rule for stochastic processes), $$\begin{aligned} d \eta_t &amp;= 2 \langle d \theta_t, \theta_t – \theta^{\text{LS}} \rangle + \frac{\gamma}{n^2} \mathrm{tr} (X^\top X) \| X (\theta_t – \theta^{\text{LS}}) \|^2   dt \\ &amp;=  2\left( \gamma \mathrm{tr} \left(n^{-1}X^\top X\right) – 2 \right) \mathcal{R}_n(\theta_t) dt + 4\sqrt{\gamma}\mathcal{R}_n(\theta_t) dW_t, \end{aligned} $$ where \((W_t)_{t \geqslant 0}\) is a one dimensional Brownian motion (see details of this calculation at the end of the post). To simplify the calculation set the step-size such that \(\gamma \mathrm{tr} (n^{-1}X^\top X) = 1\) (note that we retrieve here the usual step-size for least-squares SGD [<a href="https://proceedings.mlr.press/v38/defossez15.html" target="_blank" rel="noreferrer noopener">16</a>]). Noting \(\mu_t = \frac{2\mathcal{R}_n(\theta_t)}{\eta_t}\) and \(\nu_t = \frac{4\sqrt{\gamma}\mathcal{R}_n(\theta_t)}{\eta_t}\), the dynamics of \((\eta_t)_{t \geqslant 0}\) follows $$d  \eta_t =  -\mu_t  \eta_t dt + \nu_t \eta_t dW_t, $$ Furthermore, as \(\theta_t – \theta^{\text{LS}} \in \mathrm{span} (X^\top)\) , we have \(\mu\cdot \eta_t\leqslant 2 \mathcal{R}_n(\theta_t) \leqslant L\cdot \eta_t\), where \(\mu\) and \(L\) stand respectively for the minimum and maximum eigenvalues of \(\frac{1}{n}XX^\top\). Hence, the behaviour of \((\eta_t)_{t \geqslant 0}\) is approximately the same as that of the solution to the following SDE: $$d  S_t =  -\mu  S_t dt + \nu S_t dW_t, $$ for \(\nu \simeq 4 L \sqrt{\gamma}\). That is, the dynamics of \((\|\theta_t – \theta^{\text{LS}}\|^2)_{t \geqslant 0}\) is approximately the one of a <a href="https://en.wikipedia.org/wiki/Geometric_Brownian_motion" target="_blank" rel="noreferrer noopener">Geometric Brownian Motion</a> (GBO), a.k.a. the process underlying the <a href="https://en.wikipedia.org/wiki/Black%E2%80%93Scholes_model" target="_blank" rel="noreferrer noopener">Black-Scholes model</a>! Hence, to understand SGD in the overparametrised regime, one “simply” need to study the properties of the GBO. It is known that in fact there is an explicit solution of this SDE $$ S_t =  S_0 \exp\left( -\left(\mu + \frac{\nu^2}{2}\right) t  + \nu W_t\right). $$ Hence, for all \(t&gt;0\), \(S_t\) is distributed according to a log-normal random variable with mean \(\mathbb{E}(S_t) = S_0 e^{- \mu t}\) and variance \(\text{var}(S_t) = S_0^2 e^{- 2\mu t} (e^{\nu^2 t} – 1)\). Furthermore, it is a nice application to the <a href="https://en.wikipedia.org/wiki/Law_of_the_iterated_logarithm" target="_blank" rel="noreferrer noopener">law of the iterated logarithm</a> for the Brownian motion to show that  $$ \qquad \qquad \qquad \lim_{t \to \infty} S_t = 0, \qquad \text{almost surely!} $$ The almost sure convergence of \((\theta_t)_{t \geqslant 0}\) to \(\theta^{\text{LS}}\) is in stark contrast with the limiting behaviour we have seen in the underparametrised setting. Remarkably, the process does not require any variance reduction to converge to a specific point. Note also that among all the possible interpolators the process could have converged to, the process in fact goes almost surely to \(\theta^{\text{LS}}\). This selection of the minimum norm interpolator [<a href="https://openreview.net/forum?id=Sy8gdB9xx" target="_blank" rel="noreferrer noopener">12</a>], known as the implicit bias of the process  will be the core of a next blog post (for more complex architectures).</p>
+
+
+
+<p>As in the underparametrised case, below are two plots showing the typical behaviour of the SGD dynamics as a GBO.</p>
+
+
+
+<div class="wp-container-28 wp-block-columns">
+<div class="wp-container-26 wp-block-column is-vertically-aligned-top"><div class="wp-block-image justify-text">
+<figure class="aligncenter size-full"><img width="720" alt="" src="https://francisbach.com/wp-content/uploads/2022/07/SGD_SDE_over-1.gif" class="wp-image-7445" height="480" /></figure></div></div>
+
+
+
+<div class="wp-container-27 wp-block-column"><div class="wp-block-image justify-text">
+<figure class="aligncenter size-full"><img width="720" alt="" src="https://francisbach.com/wp-content/uploads/2022/07/Geometric_brownian-1.gif" class="wp-image-7443" height="480" /></figure></div></div>
+</div>
+
+
+
+<div class="wp-container-29 is-vertical wp-block-group">
+<p><span style="text-decoration: underline;">Left</span>: \(10\) realisations of SGD in blue-like colours (corresponding to \(10\) different random sampling sequences), next to \(10\) realisations of the SDE model in red-like colours (corresponding to \(10\) different realisations of the Brownian motion). </p>
+
+
+
+<p><span style="text-decoration: underline;">Right</span>: The exponential convergence of  \(\eta_t = \|\theta_t – \theta^{\text{LS}}\|^2\) to \(0\) for the \(10\) realisations of SGD and the SDE (in log-scale).</p>
+
+
+
+<p></p>
+
+
+
+<p></p>
+</div>
+
+
+
+<h2 id="conclusion">Conclusion</h2>
+
+
+
+<p class="has-text-align-justify">In this blog post, I have tried to show that despite the old legacy inherited from the stochastic approximation literature, the particularities of the noise of the stochastic gradient descent in machine learning contexts necessitate a fresh look.  This specificity strikes the most in modern overparametrised models as the noise can be largely degenerate, both (i) in direction (which I called <em>noise geometry</em>), and (ii) in scale, as its variance is dominated by the loss and hence vanishes at a global optimum. In fact I have tried to show that SDE models can be a relevant framework to shed light on typical behaviours of stochastic learning dynamics: for overparametrised architectures, they differentiate from the <a href="https://en.wikipedia.org/wiki/Langevin_dynamics" target="_blank" rel="noreferrer noopener">overdamped Langevin diffusion model</a>, and act as multiplicative noise dynamics like the geometric brownian motion.</p>
+
+
+
+<p class="has-text-align-justify">Besides, as it is believed that stochasticity plays a role in the generalisation performances of optimisation algorithms [<a href="https://arxiv.org/pdf/1609.04836.pdf" target="_blank" rel="noreferrer noopener">13</a>], there is a need to consider its action precisely. Yet, grasping its overall nature appears to be particularly hard as it mixes properties from the model’s architecture, the data’s distribution and the loss. In a following post, I will try to analyse some simple non-convex models where we can show that the SGD-noise drives the dynamics to possibly “good for generalisation” regions [<a href="https://proceedings.neurips.cc/paper/2021/hash/f4661398cb1a3abd3ffe58600bf11322-Abstract.html" target="_blank" rel="noreferrer noopener">17</a>,<a href="https://proceedings.mlr.press/v178/vivien22a.html" target="_blank" rel="noreferrer noopener">18</a>].<br /><br /><strong>Acknowledgements</strong>. I would like to thank Scott Pesme and Etienne Boursier for fruitful discussions, and especially <a href="https://open.spotify.com/track/1r6EJWSoh9Kzn6L38BhYS6?si=b352952e9bac4420" target="_blank" rel="noreferrer noopener">Nicolas Le Hir</a> for proofreading this blog post and making good clarifying suggestions.</p>
+
+
+
+<h2 id="references">References</h2>
+
+
+
+<div class="wp-container-40 is-vertical wp-block-group">
+<div class="wp-container-39 is-vertical wp-block-group">
+<div class="wp-container-38 is-vertical wp-block-group">
+<div class="wp-container-37 wp-block-group"><div class="wp-block-group__inner-container">
+<div class="wp-container-36 is-vertical wp-block-group">
+<div class="wp-container-35 is-vertical wp-block-group">
+<div class="wp-container-34 is-vertical wp-block-group">
+<div class="wp-container-33 is-vertical wp-block-group">
+<div class="wp-container-32 is-vertical wp-block-group">
+<div class="wp-container-31 is-vertical wp-block-group">
+<div class="wp-container-30 is-vertical wp-block-group">
+<p class="justify-text">[1] Herbert Robbins and Sutton Monro. <a href="https://projecteuclid.org/journals/annals-of-mathematical-statistics/volume-22/issue-3/A-Stochastic-Approximation-Method/10.1214/aoms/1177729586.full" target="_blank" rel="noreferrer noopener">A Stochastic Approximation Method</a>. The Annals of Mathematical Statistics, 22 (3): 400 – 407, September, 1951.<br />[2] Marie Duflo. <a href="https://link.springer.com/book/9783540606994" target="_blank" rel="noreferrer noopener">Algorithmes stochastiques</a>. Volume 23 of Mathématiques &amp; Applications (Berlin) [Mathematics &amp; Applications]. Springer-Verlag, Berlin, 1996<br />[3] Léon Bottou and Olivier Bousquet. <a href="https://proceedings.neurips.cc/paper/2007/hash/0d3180d672e08b4c5312dcdafdf6ef36-Abstract.html" target="_blank" rel="noreferrer noopener">The Tradeoffs of Large Scale Learning</a>, In Advances in Neural Information Processing Systems, vol.20, 161-168, 2008.<br />[4] Sean P.Meyn and Richard L. Tweedie. <a href="https://link.springer.com/book/10.1007/978-1-4471-3267-7" target="_blank" rel="noreferrer noopener">Markov Chains and Stochastic Stability.</a> Springer, London, 1993.<br />[5] Georg Ch. Pflug. <a href="https://epubs.siam.org/doi/10.1137/0324039" target="_blank" rel="noreferrer noopener">Stochastic minimization with constant step-size: asymptotic laws</a>. SIAM Journal on Control and Optimization, 24(4):655–666, 1986.<br />[6] Francis Bach and Eric Moulines. <a href="https://papers.nips.cc/paper/2011/hash/40008b9a5380fcacce3976bf7c08af5b-Abstract.html" target="_blank" rel="noreferrer noopener">Non-asymptotic analysis of stochastic approximation algorithms for machine learning.</a> In Advances in Neural Information Processing Systems (NIPS), 2011.<br />[7] Aymeric Dieuleveut, Alain Durmus and Francis Bach. <a href="https://projecteuclid.org/journals/annals-of-statistics/volume-48/issue-3/Bridging-the-gap-between-constant-step-size-stochastic-gradient-descent/10.1214/19-AOS1850.full" target="_blank" rel="noreferrer noopener">Bridging the gap between constant step size stochastic gradient descent and Markov chains.</a> The Annals of Statistics, 48 (3): 1348 – 1382, June 2020.<br />[8] Stephan Wojtowytsch. <a href="https://arxiv.org/pdf/2105.01650.pdf" target="_blank" rel="noreferrer noopener">Stochastic gradient descent with noise of machine learning type.</a> Part I: Discrete time analysis Technical Report, arXiv-2105.01650, 2021.<br />[9] Aditya Varre, Loucas Pillaud-Vivien and Nicolas Flammarion. <a href="https://proceedings.neurips.cc/paper/2021/hash/b4a0e0fbaa9f16d8947c49f4e610b549-Abstract.html" target="_blank" rel="noreferrer noopener">Last iterate convergence of SGD for Least-Squares in the Interpolation regime.</a> Advances in Neural Information Processing Systems 34, 21581-21591, 2021.<br />[10] Bernt Øksendal. <a href="https://link.springer.com/content/pdf/10.1007/978-3-642-14394-6_5.pdf" target="_blank" rel="noreferrer noopener">Stochastic Differential Equations: An Introduction with Applications</a>, 6th edition. Springer, New York, 2003.<br />[11] Qianxiao Li, Cheng Tai, and Weinan E. <a href="https://jmlr.org/papers/v20/17-526.html" target="_blank" rel="noreferrer noopener">Stochastic modified equations and dynamics of stochastic gradient algorithms i: Mathematical foundations.</a> Journal of Machine Learning Research, 20(40):1–47, 2019.<br />[12] Chiyuan Zhang, Samy Bengio, Moritz Hardt, Benjamin Recht, and Oriol Vinyals. <a href="https://openreview.net/forum?id=Sy8gdB9xx" target="_blank" rel="noreferrer noopener">Understanding deep learning requires rethinking generalization</a>. In International Conference on Learning Representations, 2017.<br />[13] Nitish Shirish Keskar, Dheevatsa Mudigere, Jorge Nocedal, Mikhail Smelyanskiy, and Ping Tak Peter Tang. <a href="https://arxiv.org/pdf/1609.04836.pdf" target="_blank" rel="noreferrer noopener">On large-batch training for deep learning: Generalization gap and sharp minima.</a> In International Conference on Learning Representations, 2017.[8] Stephan Wojtowytsch. <a href="https://arxiv.org/pdf/2105.01650.pdf" target="_blank" rel="noreferrer noopener">Stochastic gradient descent with noise of machine learning type.</a> Part I: Discrete time analysis Technical Report, arXiv-2105.01650, 2021.<br />[14] Sharan Vaswani, Francis Bach and Mark Schmidt. <a href="https://proceedings.mlr.press/v89/vaswani19a.html" target="_blank" rel="noreferrer noopener">Fast and Faster Convergence of SGD for Over-Parameterized Models and an Accelerated Perceptron</a>. Proceedings of the Twenty-Second International Conference on Artificial Intelligence and Statistics, PMLR 89:1195-1204, 2019.<br />[15] Siyuan Ma, Raef Bassily and Mikhail Belkin. <a href="https://proceedings.mlr.press/v80/ma18a.html" target="_blank" rel="noreferrer noopener">The Power of Interpolation: Understanding the Effectiveness of SGD in Modern Over-parametrized Learning</a>. Proceedings of the 35th International Conference on Machine Learning, PMLR 80:3325-3334, 2018.<br />[16] Alexandre Defossez and Francis Bach. <a href="https://proceedings.mlr.press/v38/defossez15.html" target="_blank" rel="noreferrer noopener">Averaged Least-Mean-Squares: Bias-Variance Trade-offs and Optimal Sampling Distributions.</a> Proceedings of the Eighteenth International Conference on Artificial Intelligence and Statistics, PMLR 38:205-213, 2015.<br />[17] Scott Pesme, Loucas Pillaud-Vivien and Nicolas Flammarion. <a href="https://proceedings.neurips.cc/paper/2021/hash/f4661398cb1a3abd3ffe58600bf11322-Abstract.html" target="_blank" rel="noreferrer noopener">Implicit bias of SGD for diagonal linear networks: a provable benefit of stochasticity.</a> In Advances in Neural Information Processing Systems 34, 29218-29230, 2021.<br />[18] Loucas Pillaud Vivien, Julien Reygner and Nicolas Flammarion. <a href="https://proceedings.mlr.press/v178/vivien22a.html" target="_blank" rel="noreferrer noopener">Label noise (stochastic) gradient descent implicitly solves the Lasso for quadratic parametrisation.</a> Proceedings of Thirty Fifth Conference on Learning Theory, PMLR 178:2127-2159, 2022.<br />[19] Alnur Ali, Edgar Dobriban and Ryan Tibshirani. <a href="https://proceedings.mlr.press/v119/ali20a.html" target="_blank" rel="noreferrer noopener">The Implicit Regularization of Stochastic Gradient Flow for Least Squares</a>. Proceedings of the 37th International Conference on Machine Learning, PMLR 119:233-244, 2020.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+</div>
+</div>
+
+
+
+<p class="justify-text"></p>
+
+
+
+<h2>Details on the evolution equation of \(\eta_t = \|\theta_t – \theta^{\text{LS}}\|^2\).</h2>
+
+
+
+<p></p>
+
+
+
+<p class="has-text-align-justify">Recall that the evolution of the iterates is given by the SDE: $$ d \theta_t =\, – \frac{1}{n}X^\top (X\theta_t\, – y) d t + \frac{\sqrt{\gamma}}{n} \| X\theta_t -y \| X^\top d B_t. $$ Then by <a href="https://en.wikipedia.org/wiki/It%C3%B4_calculus" target="_blank" rel="noreferrer noopener">Itô calculus</a>, we have $$\begin{aligned} d \eta_t &amp;= 2 \langle d \theta_t, \theta_t – \theta^{\text{LS}} \rangle + \frac{\gamma}{n^2} \mathrm{tr} (X^\top X) \| X (\theta_t – \theta^{\text{LS}}) \|^2   dt \\ &amp;= -\frac{2}{n} \langle X^\top (X\theta_t\, – y), \theta_t – \theta^{\text{LS}} \rangle dt + 2 \sqrt{\frac{2\gamma}{n}} \sqrt{\mathcal{R}_n(\theta_t)} \langle X^\top d B_t, \theta_t – \theta^{\text{LS}} \rangle \\ &amp; \hspace{6.5cm}+ 2\gamma \mathrm{tr} (n^{-1}X^\top X) \mathcal{R}_n(\theta_t)   dt. \end{aligned}$$ Since,  \(\theta^{\text{LS}}\) is an interpolator, i.e \(X \theta^{\text{LS}} = y\), the first term corresponds to $$ -\frac{2}{n}\langle X^\top (X\theta_t\, – y), \theta_t – \theta^{\text{LS}} \rangle = -\frac{2}{n}\langle X(\theta_t – \theta^{\text{LS}}), X(\theta_t – \theta^{\text{LS}}) \rangle = -4 \mathcal{R}_n(\theta_t).$$ For the second term, note that \(\langle X^\top d B_t, \theta_t – \theta^{\text{LS}} \rangle = \langle d B_t, X(\theta_t – \theta^{\text{LS}}) \rangle\), and by <a href="https://almostsuremath.com/2010/04/13/levys-characterization-of-brownian-motion/" target="_blank" rel="noreferrer noopener">Lévy’s Characterization of Brownian Motion</a>, the local martingale $$ W_t = \int_0^t \frac{\langle d B_s, X(\theta_s – \theta^{\text{LS}})\rangle}{\|X(\theta_s – \theta^{\text{LS}})\|} $$ is in fact a one dimensional Brownian motion. Hence, $$ \langle X^\top d B_t, \theta_t – \theta^{\text{LS}} \rangle = \|X(\theta_s – \theta^{\text{LS}})\| dW_t = \sqrt{2 n \mathcal{R}_n(\theta_t)}dW_t,$$ and finally, $$ d \eta_t = -4 \mathcal{R}_n(\theta_t) dt + 4 \sqrt{\gamma} \mathcal{R}_n(\theta_t) d W_t + 2 \gamma \mathrm{tr} (n^{-1}X^\top X) \mathcal{R}_n(\theta_t)   dt,$$ which gives the claimed result of the main text.</p></div>
+
+
+
+
+
+
+
+<p class="date">
+by Loucas Pillaud-Vivien <a href="https://francisbach.com/rethinking-sgd-noise/"><span class="datestr">at July 25, 2022 01:32 PM UTC</span></a>
+</p>
+<div class="comments">
+</div>
+</div>
+</div>
+
 
 
 
@@ -3024,48 +3365,6 @@ by Gil Kalai <a href="https://gilkalai.wordpress.com/2022/07/06/icm-2022-awardin
 
 <p class="date">
 by Lance Fortnow (noreply@blogger.com) <a href="http://blog.computationalcomplexity.org/2022/07/the-highland-park-shooting.html"><span class="datestr">at July 06, 2022 12:29 PM UTC</span></a>
-</p>
-<div class="comments">
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="channelgroup">
-<div class="entrygroup" 
-	id="tag:blogger.com,1999:blog-27705661.post-6277315808840696386">
-<div class="entryheader">
-<span class="face">
-	<img class="face" src="images/aceto.jpeg">
-</span>
-<div class="entryheadertextcontainer">
-<div class="entryheadertext">
-<h3><a class="entryheader" href="http://processalgebra.blogspot.com/2022/07/icalp-and-eatcs-turn-50.html">ICALP and the EATCS turn 50</a></h3>
-<p style="text-indent: 1.0em;">from 
-<a class="entryheader" href="http://processalgebra.blogspot.com/" title="Process Algebra Diary">Luca Aceto</a>
-<p>
-</div>
-</div>
-</div>
-<div class="entry">
-<div class="content">
-<p>These days, our colleagues at IRIF are hosting <a href="https://icalp2022.irif.fr/" target="_blank">ICALP 2022</a> in Paris. This is the 49th edition of the ICALP conference, which turns 50 since its first instalment was held in 1972. ICALP was the first conference of the, then newly founded, <a href="https://eatcs.org/" target="_blank">European Association for Theoretical Computer Science (EATCS)</a>.The rest is history and I let any readers this post might have draw their own conclusions on the role that the EATCS and ICALP have played in supporting the development of theoretical computer science. (Admittedly, my opinions on both the EATCS and ICALP are very biased.) </p><p>The <a href="https://icalp2022.irif.fr/?page_id=42" target="_blank">scientific programme of ICALP 2022</a> is mouthwatering as usual, thanks to the work done by the authors of submitted papers, Mikołaj Bojańczyk and David Woodruff (PC chairs), and their PCs. I encourage everyone to read the papers that are being presented at the conference.</p><p>The main purpose of this post, however, is to alert the readers of this blog that ICALP 2022 also hosts an <a href="https://icalp2022.irif.fr/?page_id=1111" target="_blank">exhibition to celebrate EATCS/ICALP at 50</a> and theoretical computer science at large. If you are in Paris, you can attend the exhibition in person. Otherwise, you can visit it virtually <a href="https://icalp2022.irif.fr/?page_id=1111" target="_blank">here</a>. (See also the posters in <a href="https://drive.google.com/file/d/1L7wLDYyDCNfSCvnNA8jWZiMb3BRLy14k/view" target="_blank">one PDF file</a>.)<br /></p><p>I had the honour to take part in the preparation of the material for that exhibition, which was led by Sandrine Cadet and Sylvain Schmitz. I learnt a lot from all the other colleagues in the committee for the exhibition. </p><p>As part of that work, I asked <a href="https://www.pilucrescenzi.it/" target="_blank">Pierluigi Crescenzi</a> whether he'd be willing to carry out a graph and data mining analysis of ICALP vis-a-vis other major conferences in theoretical computer science based on DBLP data. Pierluigi's work went well beyond the call of duty and is summarised in <a href="https://slides.com/piluc/icalp-50?token=fl3BBJ8j" target="_blank">this presentation</a>. I trust that you'll find the results of the analysis by Pierluigi and three of his students at the <a href="https://sites.google.com/gssi.it/csgssi" target="_blank">Gran Sasso Science Institute</a> very interesting. If you have any suggestions for expanding that analysis further, please write it in the comment section. </p><p>Let me close by wishing the EATCS and ICALP a happy 50th birthday, and a great scientific and social event to all the colleagues who are attending ICALP 2022. <br /></p></div>
-
-
-
-
-
-
-
-<p class="date">
-by Luca Aceto (noreply@blogger.com) <a href="http://processalgebra.blogspot.com/2022/07/icalp-and-eatcs-turn-50.html"><span class="datestr">at July 05, 2022 06:13 PM UTC</span></a>
 </p>
 <div class="comments">
 </div>
