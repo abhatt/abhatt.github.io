@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:planet="http://planet.intertwingly.net/" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no"><access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
   <title>Theory of Computing Blog Aggregator</title>
-  <updated>2022-07-27T23:00:54Z</updated>
+  <updated>2022-07-27T23:21:35Z</updated>
   <generator uri="http://intertwingly.net/code/venus/">Venus</generator>
   <author>
     <name>Arnab Bhattacharyya, Suresh Venkatasubramanian</name>
@@ -10,6 +10,219 @@
   <id>http://www.cstheory-feed.org/atom.xml</id>
   <link href="http://www.cstheory-feed.org/atom.xml" rel="self" type="application/atom+xml"/>
   <link href="http://www.cstheory-feed.org/" rel="alternate"/>
+
+  <entry xml:lang="en-US">
+    <id>https://scottaaronson.blog/?p=6599</id>
+    <link href="https://scottaaronson.blog/?p=6599" rel="alternate" type="text/html"/>
+    <link href="https://scottaaronson.blog/?p=6599#comments" rel="replies" type="text/html"/>
+    <link href="https://scottaaronson.blog/?feed=atom&amp;p=6599" rel="replies" type="application/atom+xml"/>
+    <title xml:lang="en-US">On black holes, holography, the Quantum Extended Church-Turing Thesis, fully homomorphic encryption, and brain uploading</title>
+    <summary xml:lang="en-US">I promise you: this post is going to tell a scientifically coherent story that involves all five topics listed in the title. Not one can be omitted. My story starts with a Zoom talk that the one and only Lenny Susskind delivered for the Simons Institute for Theory of Computing back in May. There followed […]</summary>
+    <content type="xhtml" xml:lang="en-US"><div xmlns="http://www.w3.org/1999/xhtml"><figure class="wp-block-image size-large"><img alt="" src="https://www.scottaaronson.com/alice.jpg"/></figure>
+
+
+
+<p>I promise you: this post is going to tell a scientifically coherent story that involves <em>all five topics </em>listed in the title.  Not one can be omitted.</p>
+
+
+
+<p>My story starts with a <a href="https://www.youtube.com/watch?v=1CpzigpEJnU">Zoom talk</a> that the one and only <a href="https://en.wikipedia.org/wiki/Leonard_Susskind">Lenny Susskind</a> delivered for the Simons Institute for Theory of Computing back in May.  There followed a panel discussion involving Lenny, Edward Witten, Geoffrey Penington, Umesh Vazirani, and your humble shtetlmaster.</p>
+
+
+
+<p>Lenny’s talk led up to a gedankenexperiment involving an observer, Alice, who bravely jumps into a specially-prepared black hole, in order to see the answer to a certain computational problem in her final seconds before being ripped to shreds near the singularity.  Drawing on earlier work by <a href="https://arxiv.org/abs/1910.14646">Bouland, Fefferman, and Vazirani</a>, Lenny speculated that the computational problem could be exponentially hard even for a (standard) quantum computer.  Despite this, Lenny repeatedly insisted—indeed, he asked me again to stress here—that he was <em>not</em> claiming to violate the <a href="https://quantumcomputing.stackexchange.com/questions/6088/what-precisely-is-the-quantum-extended-church-turing-thesis">Quantum Extended Church-Turing Thesis</a> (QECTT), the statement that all of nature can be efficiently simulated by a standard quantum computer.  Instead, he was simply investigating how the QECTT needs to be <em>formulated</em> in order to be a true statement.</p>
+
+
+
+<p>I didn’t understand this, to put it mildly.  If what Lenny was saying was right—i.e., if the infalling observer could see the answer to a computational problem not in <a href="https://en.wikipedia.org/wiki/BQP">BQP</a>, or Bounded-Error Quantum Polynomial-Time—then why <em>shouldn’t</em> we call that a violation of the QECTT?  Just like we call Shor’s quantum factoring algorithm a likely violation of the <em>classical</em> Extended Church-Turing Thesis, the thesis saying that nature can be efficiently simulated by a classical computer?  Granted, you don’t have to <em>die</em> in order to run Shor’s algorithm, as you do to run Lenny’s experiment.  But why should such implementation details matter from the lofty heights of computational complexity?</p>
+
+
+
+<p>Alas, not only did Lenny never answer that in a way that made sense to me, he kept trying to shift the focus from real, physical black holes to “silicon spheres” made of qubits, which would be programmed to <em>simulate</em> the process of Alice jumping into the black hole (in a dual boundary description).  Say what?  Granting that Lenny’s silicon spheres, being quantum computers under another name, could clearly be simulated in BQP, wouldn’t this still leave the question about the computational powers of observers who jump into <em>actual</em> black holes—i.e., the question that we presumably cared about in the first place?</p>
+
+
+
+<p>Confusing me even further, Witten seemed almost dismissive of the idea that Lenny’s gedankenexperiment raised any new issue for the QECTT—that is, any issue that wouldn’t already have been present in a universe without gravity.  But as to Witten’s reasons, the most I understood from his remarks was that he was worried about various “engineering” issues with implementing Lenny’s gedankenexperiment, involving gravitational backreaction and the like.  Ed Witten, now suddenly the practical guy!  I couldn’t even isolate the crux of disagreement between Susskind and Witten, since after all, they <em>agreed</em> (bizarrely, from my perspective) that the QECTT wasn’t violated.  Why wasn’t it?</p>
+
+
+
+<p>Anyway, shortly afterward I <a href="https://scottaaronson.blog/?p=6457">attended the 28th Solvay Conference in Brussels</a>, where one of the central benefits I got—besides seeing friends after a long COVID absence and eating some amazing chocolate mousse—was a <em>dramatically</em> clearer understanding of the issues in Lenny’s gedankenexperiment.  I owe this improved understanding to conversations with many people at Solvay, but above all Daniel Gottesman and Daniel Harlow.  Lenny himself wasn’t there, other than in spirit, but I ran the Daniels’ picture by him afterwards and he assented to all of its essentials.</p>
+
+
+
+<p>The Daniels’ picture is what I want to explain in this post.  Needless to say, I take sole responsibility for any errors in my presentation, as I <em>also</em> take sole responsibility for not understanding (or rather: not doing the work to translate into terms that I understood) what Susskind and Witten had said to me before.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<p>The first thing you need to understand about Lenny’s gedankenexperiment is that it takes place entirely in the context of <a href="https://en.wikipedia.org/wiki/AdS/CFT_correspondence">AdS/CFT</a>: the famous holographic duality between two types of physical theories that look wildly different.  Here AdS stands for <em>anti-de-Sitter</em>: a quantum theory of gravity describing a D-dimensional universe with a negative cosmological constant (i.e. hyperbolic geometry), one where black holes can form and evaporate and so forth.  Meanwhile, CFT stands for <em>conformal field theory</em>: a quantum field theory, with no apparent gravity (and hence no black holes), that lives on the (D-1)-dimensional boundary of the D-dimensional AdS space.  The staggering claim of AdS/CFT is that every physical question about the AdS bulk can be translated into an equivalent question about the CFT boundary, and vice versa, with a one-to-one mapping from states to states and observables to observables.  So in that sense, they’re actually the <em>same</em> theory, just viewed in two radically different ways.  AdS/CFT originally came out of string theory, but then <a href="https://www.math.columbia.edu/~woit/wordpress/?p=12981">notoriously</a> “swallowed its parent,” to the point where nowadays, if you go to what are still called “string theory” meetings, you’re liable to hear <em>vastly</em> more discussion of AdS/CFT than of actual strings.</p>
+
+
+
+<p>Thankfully, the story I want to tell won’t depend on fine details of how AdS/CFT works.  Nevertheless, <em>you can’t just ignore the AdS/CFT part</em> as some technicality, in order to get on with the vivid tale of Alice jumping into a black hole, hoping to learn the answer to a beyond-BQP computational problem in her final seconds of existence.  The reason you can’t ignore it is that the whole beyond-BQP computational problem we’ll be talking about, involves the <em>translation</em> (or “dictionary”) between the AdS bulk and the CFT boundary.  If you like, then, it’s actually the chasm between bulk and boundary that plays the starring role in this story.  The more familiar chasm <em>within</em> the bulk, between the interior of a black hole and its exterior (the two separated by an <a href="https://en.wikipedia.org/wiki/Event_horizon">event horizon</a>), plays only a subsidiary role: that of causing the AdS/CFT dictionary to become exponentially complex, as far as anyone can tell.</p>
+
+
+
+<p>Pause for a minute.  Previously I led you to believe that we’d be talking about an actual observer Alice, jumping into an actual physical black hole, and whether Alice could see the answer to a problem that’s intractable even for quantum computers in her last moments before hitting the singularity, and if so whether we should take that to refute the Quantum Extended Church-Turing Thesis.  What I’m saying now is so wildly at variance with that picture, that it had to be repeated to me about 10 times before I understood it.  Once I did understand, I then had to repeat it to <em>others</em> about 10 times before <em>they</em> understood.  And I don’t care if people ridicule me for that admission—how slow Scott and his friends must be, compared to string theorists!—because my only goal right now is to get <em>you</em> to understand it.</p>
+
+
+
+<p>To say it again: Lenny has <em>not</em> proposed a way for Alice to surpass the complexity-theoretic power of quantum computers, even for a brief moment, by crossing the event horizon of a black hole.  If <em>that</em> was Alice’s goal when she jumped into the black hole, then alas, she probably sacrificed her life for nothing!  As far as anyone knows, Alice’s experiences, even after crossing the event horizon, ought to continue to be described extremely well by general relativity and quantum field theory (at least until she nears the singularity and dies), and therefore ought to be simulatable in BQP.  Granted, we don’t actually <em>know</em> this—you can call it an open problem if you like—but it seems like a reasonable guess.</p>
+
+
+
+<p>In that case, though, what beyond-BQP problem was Lenny talking about, and what does it have to do with black holes?  Building on the <a href="https://arxiv.org/abs/1910.14646">Bouland-Fefferman-Vazirani paper</a>, Lenny was interested in a class of problems of the following form: Alice is given as input a pure quantum state |ψ⟩, which encodes a boundary CFT state, which is dual to an AdS bulk universe that contains a black hole.  Alice’s goal is, by examining |ψ⟩, to learn something about what’s <em>inside</em> the black hole.  For example: does the black hole interior contain “shockwaves,” and if so how many and what kind?  Does it contain a wormhole, connecting it to a different black hole in another universe?  If so, what’s the volume of that wormhole?  (Not the first question <em>I</em> would ask either, but bear with me.)</p>
+
+
+
+<p>Now, when I say Alice is “given” the state |ψ⟩, this could mean several things: she could just be physically given a collection of <em>n</em> qubits.  Or, she could be given a gigantic table of 2<sup><em>n</em></sup> amplitudes.  Or, as a third possibility, she could be given a description of a quantum circuit that prepares |ψ⟩, say from the all-0 initial state |0<sup><em>n</em></sup>⟩.  Each of these possibilities leads to a different complexity-theoretic picture, and the differences are extremely interesting to <em>me</em>, so that’s what I mostly focused on in my remarks in the panel discussion after Lenny’s talk.  But it won’t matter much for the story I want to tell in this post.</p>
+
+
+
+<p>However |ψ⟩ is given to Alice, the prediction of AdS/CFT is that |ψ⟩ encodes everything there is to know about the AdS bulk, <em>including</em> whatever is inside the black hole—but, and this is crucial, the information about what’s inside the black hole will be <em>pseudorandomly scrambled</em>.  In other words, it works like this: whatever simple thing you’d like to know about parts of the bulk that <em>aren’t</em> hidden behind event horizons—is there a star over here? some gravitational lensing over there? etc.—it seems that you could not only learn it by measuring |ψ⟩, but learn it <em>in polynomial time</em>, the dictionary between bulk and boundary being computationally efficient in that case.  (As with almost everything else in this subject, even <em>that</em> hasn’t been rigorously proven, though my postdoc Jason Pollack and I made <a href="https://www.scottaaronson.com/talks/discretebulk.pdf">some progress</a> this past spring by proving a piece of it.)  On the other hand, as soon as you want to know what’s <em>inside</em> an event horizon, the fact that there are no probes that an “observer at infinity” could apply to find out, seems to translate into the requisite measurements on |ψ⟩ being exponentially complex to apply.  (Technically, you’d have to measure an ensemble of poly(<em>n</em>) identical copies of |ψ⟩, but I’ll ignore that in what follows.)</p>
+
+
+
+<p>In more detail, the relevant part of |ψ⟩ turns into a pseudorandom, scrambled mess: a mess that it’s plausible that no polynomial-size quantum circuit could even distinguish from the maximally mixed state.  So, while in principle the information is all there in |ψ⟩, getting it out seems as hard as various well-known problems in symmetric-key cryptography, if not literally NP-hard.  This is <em>way</em> beyond what we expect even a quantum computer to be able to do efficiently: indeed, after 30 years of quantum algorithms research, the best quantum speedup we know for this sort of task is typically just the quadratic speedup from Grover’s algorithm.</p>
+
+
+
+<p>So now you understand why there was some hope that Alice, by jumping into a black hole, could solve a problem that’s exponentially hard for quantum computers!  Namely because, once she’s inside the black hole, she can just<em> see</em> the shockwaves, or the volume of the wormhole, or whatever, and no longer faces the exponentially hard task of decoding that information from |ψ⟩.  It’s as if the black hole has <em>solved the problem for her</em>, by physically instantiating the otherwise exponentially complex transformation between the bulk and boundary descriptions of |ψ⟩.</p>
+
+
+
+<p>Having now gotten your hopes up, the next step in the story is to destroy them.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<p>Here’s the fundamental problem: |ψ⟩ does <em>not</em> represent the CFT dual of a bulk universe that contains the black hole with the shockwaves or whatever, <em>and that also contains Alice herself, floating outside the black hole, and being given |ψ⟩ as an input.</em>  Indeed, it’s unclear what the latter state would even mean: how do we get around the circularity in its definition?  How do we avoid an infinite regress, where |ψ⟩ would have to encode a copy of |ψ⟩ which would have to encode a copy of … and so on forever?  Furthermore, who created this |ψ⟩ to give to Alice?  We don’t normally imagine that an “input state” contains a complete description of the body and brain of the person whose job it is to learn the output.</p>
+
+
+
+<p>By contrast, a scenario that we <em>can</em> define without circularity is this: Alice is given (via physical qubits, a giant table of amplitudes, an obfuscated quantum circuit, or whatever) a pure quantum state |ψ⟩, which represents the CFT dual of a hypothetical universe containing a black hole.  Alice wants to learn what shockwaves or wormholes are inside the black hole, a problem plausibly conjectured not to have any ordinary polynomial-size quantum circuit that takes copies of |ψ⟩ as input.  To “solve” the problem, Alice sets into motion the following sequence of events:</p>
+
+
+
+<ol><li>Alice scans and uploads her own brain into a quantum computer, presumably destroying the original meat brain in the process!  The QC represents Alice, who now exists only virtually, via a state |φ⟩.</li><li>The QC performs entangling operations on |φ⟩ and |ψ⟩, which correspond to inserting Alice into the bulk of the universe described by |ψ⟩, and then having her fall into the black hole.</li><li>Now in simulated form, “Alice” (or so we assume, depending on our philosophical position) has the subjective experience of falling into the black hole and observing what’s inside.  <em>Success!</em>  Given |ψ⟩ as input, we’ve now caused “Alice” (for some definition of “Alice”) to have observed the answer to the beyond-BQP computational problem.</li></ol>
+
+
+
+<p>In the panel discussion, I now model Susskind as having proposed scenario 1-3, Witten as going along with 1-2 but rejecting 3 or not wanting to discuss it, and me as having made valid points about the computational complexity of simulating Alice’s experience in 1-3, yet while being radically mistaken about what the scenario <em>was</em> (I still thought an actual black hole was involved).</p>
+
+
+
+<p>An obvious question is whether, having learned the answer, “Alice” can now get the answer back out to the “real, original” world.  Alas, the expectation is that this would require exponential time.  Why?  Because otherwise, this whole process would’ve constituted a subexponential-time algorithm for distinguishing random from pseudorandom states using an “ordinary” quantum computer!  Which is conjectured not to exist.</p>
+
+
+
+<p>And what about Alice herself?  In polynomial time, could she return from “the Matrix,” back to a real-world biological body?  Sure she could, in principle—if, for example, the entire quantum computation were run in reverse.  But notice that reversing the computation would <em>also</em> make Alice forget the answer to the problem!  Which is not at all a coincidence: if the problem is outside BQP, then in general, Alice can know the answer <em>only</em> while she’s “inside the Matrix.”</p>
+
+
+
+<p>Now that hopefully everything is crystal-clear and we’re all on the same page, what can we say about this scenario?  In particular: <em>should</em> it cause us to reject or modify the QECTT itself?</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<p>Daniel Gottesman, I thought, offered a brilliant reductio ad absurdum of the view that the simulated black hole scenario should count as a refutation of the QECTT.  Well, he didn’t <em>call</em> it a “reductio,” but I will.</p>
+
+
+
+<p>For the reductio, let’s forget not only about quantum gravity but even about quantum mechanics itself, and go all the way back to classical computer science.  A <a href="https://en.wikipedia.org/wiki/Homomorphic_encryption">fully homomorphic encryption scheme</a>, the <a href="https://crypto.stanford.edu/craig/craig-thesis.pdf">first example</a> of which was discovered by Craig Gentry 15 years ago, lets you do arbitrary computations on encrypted data without ever needing to decrypt it.  It has both an encryption key, for encrypting the original plaintext data, and a separate decryption key, for decrypting the final answer.</p>
+
+
+
+<p>Now suppose Alice has some homomorphically encrypted top-secret emails, which she’d like to read.  She has the encryption key (which is public), but not the decryption key.</p>
+
+
+
+<p><em>If</em> the homomorphic encryption scheme is secure against quantum computers—as the schemes discovered by Gentry and later researchers currently appear to be—and <em>if</em> the QECTT is true, then Alice’s goal is obviously infeasible: decrypting the data will take her exponential time.</p>
+
+
+
+<p>Now, however, a classical version of Lenny comes along, and explains to Alice that she simply needs to do the following:</p>
+
+
+
+<ol><li>Upload her own brain state into a classical computer, destroying the “meat” version in the process (who needed it?).</li><li>Using the known encryption key, homomorphically encrypt a computer program that simulates (and thereby, we presume, <em>enacts</em>) Alice’s consciousness.</li><li>Using the homomorphically encrypted Alice-brain, <em>together with</em> the homomorphically encrypted input data, do the homomorphic computations that simulate the process of Alice’s brain reading the top-secret emails.</li></ol>
+
+
+
+<p>The claim would now be that, <em>inside the homomorphic encryption</em>, the simulated Alice has the subjective experience of reading the emails in the clear.  Aha, therefore she “broke” the homomorphic encryption scheme!  Therefore, assuming that the scheme was secure even against quantum computers, the QECTT must be false!</p>
+
+
+
+<p>According to Gottesman, this is almost perfectly analogous to Lenny’s black hole scenario.  In particular, they share the property that “encryption is easy but decryption is hard.”   Once she’s uploaded her brain, Alice can efficiently <em>enter</em> the homomorphically encrypted world to see the solution to a hard problem, just like she can efficiently <em>enter</em> the black hole world to do the same.  In both cases, however, getting <em>back</em> to her normal world with the answer would then take Alice exponential time.  Note that in the latter case, the difficulty is <em>not</em> so much about “escaping from a black hole,” as it is about inverting the AdS/CFT dictionary.</p>
+
+
+
+<p>Going further, we can regard the AdS/CFT dictionary as, itself, an <em>example</em> of a fully homomorphic encryption scheme—in this case, of course, one where the ciphertexts are quantum states.  This strikes me as potentially an important insight about AdS/CFT itself, even if that wasn’t Gottesman’s intention.  It complements many other recent connections between AdS/CFT and theoretical computer science, including the <a href="https://arxiv.org/abs/1411.7041">view of AdS/CFT as a quantum error-correcting code</a>, and the <a href="https://arxiv.org/pdf/1604.00354">connection between AdS/CFT and the Max-Flow/Min-Cut Theorem</a> (see also my <a href="https://www.scottaaronson.com/talks/discretebulk.pdf">talk</a> about my work with Jason Pollack).</p>
+
+
+
+<p>So where’s the reductio?  Well, when it’s put so starkly, I suspect that not many would regard Gottesman’s classical homomorphic encryption scenario as a “real” challenge to the QECTT.  Or rather, people might say: yes, this raises fascinating questions for the philosophy of mind, but at any rate, we’re no longer talking about <em>physics</em>.  Unlike with (say) quantum computing, no new <em>physical</em> phenomenon is being brought to light that lets an otherwise intractable computational problem be solved.  Instead, it’s all about the <em>user herself</em>, about Alice, and which physical systems get to count as instantiating her.</p>
+
+
+
+<p>It’s like, imagine Alice at the computer store, weighing which laptop to buy.  Besides weight, battery life, and price, she definitely does care about processing power.  She might even consider a quantum computer, if one is available.  Maybe even a computer with a black hole, wormhole, or closed timelike curve inside: as long as it gives the answers she wants, what does she care about the innards?  But a computer whose normal functioning would (pessimistically) kill her or (optimistically) radically change her own nature, trapping her in a simulated universe that she can escape only by forgetting the computer’s output?  Yeah, I don’t envy the computer salesman.</p>
+
+
+
+<p>Anyway, if we’re going to say this about the homomorphic encryption scenario, then shouldn’t we say the same about the simulated black hole scenario?  Again, from an “external” perspective, all that’s happening is a giant BQP computation.  Anything beyond BQP that we consider to be happening, depends on adopting the standpoint of an observer who “jumps into the homomorphic encryption on the CFT boundary”—at which point, it would seem, we’re no longer talking about physics but about philosophy of mind.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<p>So, that was the story!  I promised you that it would integrally involve black holes, holography, the Quantum Extended Church-Turing Thesis, fully homomorphic encryption, <em>and</em> brain uploading, and I hope to have delivered on my promise.</p>
+
+
+
+<p>Of course, while this blog post has forever cleared up all philosophical confusions about AdS/CFT and the Quantum Extended Church-Turing Thesis, many questions of a more technical nature remain open.  For example: what about the original scenario?  <em>can</em> we argue that the experiences of bulk observers can be simulated in BQP, even when those observers jump into black holes?  Also, what can we say about the complexity class of problems to which the simulated Alice can learn the answers?  Could she even solve NP-complete problems in polynomial time this way, or at least invert one-way functions?  More broadly, what’s the power of “BQP with an oracle for applying the AdS/CFT dictionary”—once or multiple times, in one direction or both directions?</p>
+
+
+
+<p>Lenny himself described his gedankenexperiment as exploring the power of a new complexity class that he called “JI/poly,” where the JI stands for “Jumping In” (to a black hole, that is).  The nomenclature is transparently ridiculous—“/poly” means “with polynomial-size advice,” which we’re <em>not</em> talking about here—and I’ve argued in this post that the “JI” is rather misleading as well.  If Alice is “jumping” anywhere, it’s not into a black hole <em>per se</em>, but into a quantum computer that simulates a CFT that’s dual to a bulk universe containing a black hole.</p>
+
+
+
+<p>In a broader sense, though, to contemplate these questions at all is clearly to “jump in” to … <em>something</em>.  It’s old hat by now that one can start in physics and end up in philosophy: what else is the quantum measurement problem, or the Boltzmann brain problem, or anthropic cosmological puzzles like whether (all else equal) we’re a hundred times as likely to find ourselves in a universe with a hundred times as many observers?  More recently, it’s also become commonplace that one can start in physics and end in computational complexity theory: quantum computing itself is the example par excellence, but over the past decade, the <a href="https://arxiv.org/abs/1301.4504">Harlow-Hayden argument</a> about decoding Hawking radiation and the <a href="https://arxiv.org/abs/1509.07876">complexity = action proposal</a> have made clear that it can happen even in quantum gravity.</p>
+
+
+
+<p>Lenny’s new gedankenexperiment, however, is the first case I’ve seen where you start out in physics, and end up embroiled in some of the hardest questions of philosophy of mind and computational complexity theory <em>simultaneously</em>.</p></div>
+    </content>
+    <updated>2022-07-27T22:54:34Z</updated>
+    <published>2022-07-27T22:54:34Z</published>
+    <category scheme="https://scottaaronson.blog" term="Complexity"/>
+    <category scheme="https://scottaaronson.blog" term="Metaphysical Spouting"/>
+    <category scheme="https://scottaaronson.blog" term="Quantum"/>
+    <author>
+      <name>Scott</name>
+      <uri>http://www.scottaaronson.com</uri>
+    </author>
+    <source>
+      <id>https://scottaaronson.blog/?feed=atom</id>
+      <icon>https://scottaaronson.blog/wp-content/uploads/2021/10/cropped-Jacket-32x32.gif</icon>
+      <link href="https://scottaaronson.blog" rel="alternate" type="text/html"/>
+      <link href="https://scottaaronson.blog/?feed=atom" rel="self" type="application/atom+xml"/>
+      <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
+      <title xml:lang="en-US">Shtetl-Optimized</title>
+      <updated>2022-07-27T22:54:34Z</updated>
+    </source>
+  </entry>
 
   <entry xml:lang="en-us">
     <id>https://eccc.weizmann.ac.il/report/2022/109</id>
@@ -36,7 +249,7 @@ Along the way, we provide multiple characterizations of the Fourier coefficients
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-07-27T22:58:19Z</updated>
+      <updated>2022-07-27T23:20:15Z</updated>
     </source>
   </entry>
 
@@ -66,7 +279,7 @@ Along the way, we provide multiple characterizations of the Fourier coefficients
       <link href="https://tcsplus.wordpress.com/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A carbon-free dissemination of ideas across the globe.</subtitle>
       <title>TCS+</title>
-      <updated>2022-07-27T22:59:34Z</updated>
+      <updated>2022-07-27T23:21:02Z</updated>
     </source>
   </entry>
 
@@ -539,7 +752,7 @@ Email: standa.zivny@cs.ox.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-07-27T22:58:41Z</updated>
+      <updated>2022-07-27T23:20:27Z</updated>
     </source>
   </entry>
 
@@ -566,7 +779,7 @@ Email: j.hage@hw.ac.uk</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-07-27T22:58:41Z</updated>
+      <updated>2022-07-27T23:20:27Z</updated>
     </source>
   </entry>
 
@@ -892,7 +1105,7 @@ Email: j.hage@hw.ac.uk</p></div>
       <link href="https://francisbach.com" rel="alternate" type="text/html"/>
       <subtitle>Francis Bach</subtitle>
       <title>Machine Learning Research Blog</title>
-      <updated>2022-07-27T23:00:48Z</updated>
+      <updated>2022-07-27T23:21:31Z</updated>
     </source>
   </entry>
 
@@ -955,7 +1168,7 @@ At the core of our proof techniques is a new notion of feasible hard-core set, w
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-07-27T22:58:19Z</updated>
+      <updated>2022-07-27T23:20:15Z</updated>
     </source>
   </entry>
 
@@ -979,7 +1192,7 @@ At the core of our proof techniques is a new notion of feasible hard-core set, w
       <link href="https://toc4fairness.org" rel="alternate" type="text/html"/>
       <subtitle>a simons collaboration project</subtitle>
       <title>TOC for Fairness</title>
-      <updated>2022-07-27T23:00:51Z</updated>
+      <updated>2022-07-27T23:21:33Z</updated>
     </source>
   </entry>
 
@@ -1111,7 +1324,7 @@ At the core of our proof techniques is a new notion of feasible hard-core set, w
       <link href="https://scottaaronson.blog/?feed=atom" rel="self" type="application/atom+xml"/>
       <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
       <title xml:lang="en-US">Shtetl-Optimized</title>
-      <updated>2022-07-27T00:08:06Z</updated>
+      <updated>2022-07-27T22:54:34Z</updated>
     </source>
   </entry>
 
@@ -1178,7 +1391,7 @@ On the technical side, many classical techniques used in the analysis of Boolean
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-07-27T22:58:19Z</updated>
+      <updated>2022-07-27T23:20:15Z</updated>
     </source>
   </entry>
 
@@ -1215,7 +1428,7 @@ We also study the gap version of the $\mathrm{SparseShift}_R$ and show the follo
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-07-27T22:58:19Z</updated>
+      <updated>2022-07-27T23:20:15Z</updated>
     </source>
   </entry>
 
@@ -1320,7 +1533,7 @@ We also study the gap version of the $\mathrm{SparseShift}_R$ and show the follo
       <link href="https://scottaaronson.blog/?feed=atom" rel="self" type="application/atom+xml"/>
       <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
       <title xml:lang="en-US">Shtetl-Optimized</title>
-      <updated>2022-07-27T00:08:06Z</updated>
+      <updated>2022-07-27T22:54:34Z</updated>
     </source>
   </entry>
 
@@ -1383,7 +1596,7 @@ We also study the gap version of the $\mathrm{SparseShift}_R$ and show the follo
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-07-27T22:58:19Z</updated>
+      <updated>2022-07-27T23:20:15Z</updated>
     </source>
   </entry>
 
@@ -1409,7 +1622,7 @@ This improves the lower bound $\Omega(\log n/\log\log n)$  that is proved in~[16
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-07-27T22:58:19Z</updated>
+      <updated>2022-07-27T23:20:15Z</updated>
     </source>
   </entry>
 
@@ -1636,7 +1849,7 @@ Can we really build mathematical looms for helping us generate proofs at high le
       <link href="https://rjlipton.wpcomstaging.com" rel="alternate" type="text/html"/>
       <subtitle>a personal view of the theory of computation</subtitle>
       <title>Gödel's Lost Letter and P=NP</title>
-      <updated>2022-07-27T22:58:37Z</updated>
+      <updated>2022-07-27T23:20:21Z</updated>
     </source>
   </entry>
 
@@ -1663,7 +1876,7 @@ Email: career@casa.rub.de</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-07-27T22:58:41Z</updated>
+      <updated>2022-07-27T23:20:27Z</updated>
     </source>
   </entry>
 
@@ -1702,7 +1915,7 @@ Our main technical contribution is a novel analysis of random walks which may be
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-07-27T22:58:19Z</updated>
+      <updated>2022-07-27T23:20:15Z</updated>
     </source>
   </entry>
 
@@ -2038,7 +2251,7 @@ On the algorithmic side, we show that range avoidance for $NC^0_2$ circuits can 
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-07-27T22:58:19Z</updated>
+      <updated>2022-07-27T23:20:15Z</updated>
     </source>
   </entry>
 
@@ -2065,7 +2278,7 @@ Email: sohler@cs.uni-koeln.de</p></div>
       <link href="https://cstheory-jobs.org/osd.xml" rel="search" type="application/opensearchdescription+xml"/>
       <link href="https://cstheory-jobs.org/?pushpress=hub" rel="hub" type="text/html"/>
       <title>Theoretical Computer Science Jobs</title>
-      <updated>2022-07-27T22:58:41Z</updated>
+      <updated>2022-07-27T23:20:27Z</updated>
     </source>
   </entry>
 
@@ -2095,7 +2308,7 @@ In this paper, we prove a near-cubic lower bound of $n \geq \widetilde{\Omega}(k
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-07-27T22:58:19Z</updated>
+      <updated>2022-07-27T23:20:15Z</updated>
     </source>
   </entry>
 
@@ -2127,7 +2340,7 @@ In this paper, we prove a near-cubic lower bound of $n \geq \widetilde{\Omega}(k
       <link href="https://example.com/feeds/reports/" rel="self" type="application/atom+xml"/>
       <subtitle>Latest Reports published at https://eccc.weizmann.ac.il</subtitle>
       <title>ECCC - Reports</title>
-      <updated>2022-07-27T22:58:19Z</updated>
+      <updated>2022-07-27T23:20:15Z</updated>
     </source>
   </entry>
 
@@ -2181,72 +2394,7 @@ In this paper, we prove a near-cubic lower bound of $n \geq \widetilde{\Omega}(k
       <link href="https://windowsontheory.org/?pushpress=hub" rel="hub" type="text/html"/>
       <subtitle>A Research Blog</subtitle>
       <title>Windows On Theory</title>
-      <updated>2022-07-27T22:59:01Z</updated>
-    </source>
-  </entry>
-
-  <entry xml:lang="en-US">
-    <id>https://scottaaronson.blog/?p=6552</id>
-    <link href="https://scottaaronson.blog/?p=6552" rel="alternate" type="text/html"/>
-    <link href="https://scottaaronson.blog/?p=6552#comments" rel="replies" type="text/html"/>
-    <link href="https://scottaaronson.blog/?feed=atom&amp;p=6552" rel="replies" type="application/atom+xml"/>
-    <title xml:lang="en-US">Choosing a new comment policy</title>
-    <summary xml:lang="en-US">Update (July 13): I was honored to read this post by my friend Boaz Barak. Update (July 14): By now, comments on this post allegedly from four CS professors — namely, Josh Alman, Aloni Cohen, Rana Hanocka, and Anna Farzindar — as well as from the graduate student “BA,” have been unmasked as from impersonator(s). […]</summary>
-    <content type="xhtml" xml:lang="en-US"><div xmlns="http://www.w3.org/1999/xhtml"><p><strong>Update (July 13):</strong> I was honored to read <a href="https://windowsontheory.org/2022/07/13/my-friend-scott-aaronson/">this post</a> by my friend Boaz Barak.</p>
-
-
-
-<p><strong>Update (July 14):</strong> By now, comments on this post allegedly from four CS professors  — namely, Josh Alman, Aloni Cohen, Rana Hanocka, and Anna Farzindar — as well as from the graduate student “BA,” <em>have been unmasked as from impersonator(s)</em>.</p>
-
-
-
-<p>I’ve been the target of a motivated attack-troll (or multiple trolls, but I now believe just one) who knows about the CS community. This might be the single weirdest thing that’s happened to me in 17 years of blogging, surpassing even the legendary <a href="https://scottaaronson.blog/?p=277">Ricoh printer episode</a> of 2007.  It obviously underscores the need for a new, stricter comment policy, which is what this whole post was about.</p>
-
-
-
-<hr class="wp-block-separator has-alpha-channel-opacity"/>
-
-
-
-<p>Yesterday and today, both my work and my enjoyment of the James Webb images were interrupted by an anonymous troll, who used the <em>Shtetl-Optimized</em> comment section to heap <a href="https://scottaaronson.blog/?p=6546#comment-1941041">libelous abuse</a> on me—derailing an anodyne quantum computing discussion to opine at length about how I’m a disgusting creep who surely, probably, maybe has lewd thoughts about his female students.  Unwisely or not, I allowed it all to appear, and replied to all of it.  I had a few reasons: I wanted to prove that I’m now strong enough to withstand bullying that might once have driven me to suicide.  I wanted, frankly, many readers to come to my defense (thanks to those who did!).  I at least wanted readers to <em>see</em> firsthand what I now regularly deal with: the emotional price of maintaining this blog.  Most of all, I wanted my feminist, social-justice-supporting readers to either explicitly endorse or (hopefully) explicitly repudiate the unambiguous harassment that was now being gleefully committed in their name.</p>
-
-
-
-<p>Then, though, the same commenter upped the ante further, by heaping misogynistic abuse on my wife <a href="https://www.cs.utexas.edu/~danama/">Dana</a>—while <em>still</em>, ludicrously and incongruously, cloaking themselves in the rhetoric of social justice.  Yes: apparently the woke, feminist thing to do is now to rate female computer scientists on their looks.</p>
-
-
-
-<p>Let me be blunt: I cannot continue to write <em>Shtetl-Optimized</em> while dealing with regular harassment of me and my family.  At the same time, I’m also determined not to “surrender to the terrorists.”  So, I’m weighing the following options:</p>
-
-
-
-<ul><li>Close comments except to commenters who provide a real identity—e.g., a full real name, a matching email address, a website.</li><li>Move to Substack, and then allow only commenters who’ve signed up.</li><li>Hire someone to pre-screen comments for me, and delete ones that are abusive or harassing (to me or others) before I even see them.  (Any volunteers??)</li><li>Make the comment sections for readers only, eliminating any expectation that I’ll participate.</li></ul>
-
-
-
-<p>One thing that’s clear is that the status quo will not continue.  I can’t “just delete” harassing or abusive comments, because the trolls have gotten too good at triggering me, and they will continue to weaponize my openness and my ethic of responding to all possible arguments against me.</p>
-
-
-
-<p>So, regular readers: what do you prefer?</p></div>
-    </content>
-    <updated>2022-07-12T20:47:43Z</updated>
-    <published>2022-07-12T20:47:43Z</published>
-    <category scheme="https://scottaaronson.blog" term="Announcements"/>
-    <category scheme="https://scottaaronson.blog" term="Obviously I'm Not Defending Aaronson"/>
-    <category scheme="https://scottaaronson.blog" term="Self-Referential"/>
-    <author>
-      <name>Scott</name>
-      <uri>http://www.scottaaronson.com</uri>
-    </author>
-    <source>
-      <id>https://scottaaronson.blog/?feed=atom</id>
-      <icon>https://scottaaronson.blog/wp-content/uploads/2021/10/cropped-Jacket-32x32.gif</icon>
-      <link href="https://scottaaronson.blog" rel="alternate" type="text/html"/>
-      <link href="https://scottaaronson.blog/?feed=atom" rel="self" type="application/atom+xml"/>
-      <subtitle xml:lang="en-US">The Blog of Scott Aaronson</subtitle>
-      <title xml:lang="en-US">Shtetl-Optimized</title>
-      <updated>2022-07-27T00:08:06Z</updated>
+      <updated>2022-07-27T23:20:40Z</updated>
     </source>
   </entry>
 </feed>
