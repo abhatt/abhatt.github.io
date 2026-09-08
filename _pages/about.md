@@ -31,5 +31,4 @@ statistics, causal inference and discovery, and algorithms for big data.
 **Office:** MB1.14, Mathematical Sciences Building  
 University of Warwick, Coventry CV4 7AL, United Kingdom.
 
-
 [Twitter / X](https://twitter.com/abhatt2)
