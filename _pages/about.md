@@ -1,8 +1,10 @@
 ---
-layout: about
+nav: true
+nav_order: 1
 title: Home
+layout: about
 permalink: /
-subtitle: Associate Professor · Department of Computer Science · University of Warwick
+subtitle:
 
 profile: false
 selected_papers: false
