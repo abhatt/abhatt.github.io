@@ -1,6 +1,5 @@
 ---
-nav: true
-nav_order: 1
+nav: false
 title: Home
 layout: about
 permalink: /
@@ -25,6 +24,15 @@ My research lies at the intersection of the foundations of artificial
 intelligence and theoretical computer science. I develop algorithms
 for learning from data, with particular interests in high-dimensional
 statistics, causal inference and discovery, and algorithms for big data.
+
+## News
+
+- **September 2026:** I am refreshing this website, including the research and publications pages.
+
+<!-- Add new items above the existing ones, newest first. For example:
+- **Month Year:** A short update, with an optional [link](https://example.com).
+Keep around five recent items here. Replace the website update with your own news.
+-->
 
 ## Contact
 
