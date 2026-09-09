@@ -25,7 +25,7 @@ intelligence and theoretical computer science. I develop algorithms
 for learning from data, with particular interests in high-dimensional
 statistics, causal inference and discovery, and algorithms for big data.
 
-[CV (PDF)]({{ '/assets/pdf/cur_cv.pdf' | relative_url }})
+[CV (PDF)]({{ '/assets/pdf/cur-cv.pdf' | relative_url }})
 
 ## News
 
