@@ -40,6 +40,6 @@ I am immensely proud of the talented and energetic students and researchers I ha
 - **[Sutanu Gayen](https://www.comp.nus.edu.sg/~sutanu/)** · NUS, postdoc, 2019–2022 → IIT Kanpur (faculty).
 - **[Vo Thanh Vinh](https://dblp.org/pid/222/7878.html)** · NUS, research assistant and postdoc, 2021–2023.
 - **[Themis Gouleakis](https://www.mit.edu/~tgoule/)** · NUS, postdoc, 2021–2024 → NTU (faculty).
-- **[Dimitrios Myrisiotis](https://dimyrisiotis.github.io/)** · NUS, postdoc, 2021–present.
+- **[Dimitrios Myrisiotis](https://dimyrisiotis.github.io/)** · NUS, postdoc, 2021–2025 → Great Bay University (faculty).
 - **[Esty Kelman](https://dblp.org/pid/254/1897.html)** · NUS, postdoc, 2021–2022 → Boston University and MIT (postdoc).
-- **[Naganand Yadati](https://naganandy.github.io/)** · NUS, postdoc, 2022–2024.
+- **[Naganand Yadati](https://naganandy.github.io/)** · NUS, postdoc, 2022–2024 → IIIT Bangalore (faculty).
