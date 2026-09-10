@@ -43,4 +43,3 @@ I am immensely proud of the talented and energetic students and researchers I ha
 - **Indranil Bhattacharya** · IISc, MSc, 2014–2016.
 - **Anurita Mathur** · IISc, MSc, 2014–2016.
 - **Ashish Kumar Sen** · IISc, MTech, 2016–2017.
-
