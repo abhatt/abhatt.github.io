@@ -1,11 +1,14 @@
 ---
 nav: false
 title: Home
-layout: profiles
+layout: about
 permalink: /
 subtitle:
 
-profile: false
+profile:
+  align: right
+  image: arnab_formal.jpg
+  image_circular: false
 selected_papers: false
 social: false
 
@@ -16,12 +19,19 @@ latest_posts:
   enabled: false
 ---
 
-profiles:
+I am an Associate Professor in the
+[Department of Computer Science](https://warwick.ac.uk/fac/sci/dcs/)
+at the [University of Warwick](https://warwick.ac.uk/).
 
-- align: right
-  image: arnab_formal.jpg
-  content: about_myself.md
-  image_circular: false # crops the image to make it circular
+My research lies at the intersection of the foundations of artificial
+intelligence and theoretical computer science. I develop algorithms
+for learning from data, with particular interests in high-dimensional
+statistics, causal inference and discovery, and algorithms for big data.
+
+I am part of the [Foundations of AI & ML](https://warwick.ac.uk/fac/sci/dcs/research/fam/)
+research group. I am also a co-director of the [ELLIS Oxford Unit](https://www.ellis.ox.ac.uk/home).
+
+[CV (PDF)]({{ '/assets/pdf/cur-cv.pdf' | relative_url }})
 
 ## News
 
