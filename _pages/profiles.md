@@ -24,7 +24,7 @@ I am immensely proud of the talented and energetic students and researchers I ha
 - **[Philips George John](https://philips-george.github.io/)** · NUS, PhD, 2020–2026.
 - **[Yuhao Wang](https://yohannawang.com/)** · NUS, PhD, 2021–2025 → Amazon (Applied Scientist).
 - **[Davin Choo](https://cxjdavin.github.io/)** · NUS, PhD, 2021–2024 → Harvard (postdoc) → NUS (faculty).
-- **Barath Ashok**.
+- **Barath Ashok**. Warwick, PhD, 2025 - Present.
 
 ### Former Master's Students
 
