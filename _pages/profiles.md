@@ -43,3 +43,7 @@ I am immensely proud of the talented and energetic students and researchers I ha
 - **Indranil Bhattacharya** · IISc, MSc, 2014–2016.
 - **Anurita Mathur** · IISc, MSc, 2014–2016.
 - **Ashish Kumar Sen** · IISc, MTech, 2016–2017.
+
+![Group members in Singapore, February 2021]({{ '/assets/img/student-group-nus.jpg' | relative_url }})
+
+<small>From left to right: Yuhao, Vinh, Philips, Vipul, Sutanu, Arnab. Singapore (Feb, 2021)</small>
