@@ -66,13 +66,8 @@ nav_order: 2
   }
 </style>
 
-<img
-class="research-banner"
-src="{{ '/assets/img/bamboo.png' | relative_url }}"
-alt="A tree with aerial roots reaching toward the ground, evoking the growth of a research programme."
-loading="eager"
-
->
+![A tree with aerial roots reaching toward the ground, evoking the growth of a research programme.]({{ '/assets/img/bamboo.png' | relative_url }})
+{: .research-banner }
 
 <div class="research-columns">
   <div class="research-publications">
