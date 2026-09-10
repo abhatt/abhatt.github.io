@@ -7,7 +7,7 @@ subtitle:
 
 profile:
   align: right
-  image: arnab_formal.JPG
+  image: arnab_casual.jpg
   image_circular: false
 selected_papers: false
 social: false
