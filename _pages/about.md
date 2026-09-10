@@ -46,4 +46,6 @@ Keep around five recent items here. Replace the website update with your own new
 **Office:** MB1.14, Mathematical Sciences Building  
 University of Warwick, Coventry CV4 7AL, United Kingdom.
 
+**Office Hours:** Please contact me directly to arrange suitable meeting times.
+
 [Twitter / X](https://twitter.com/abhatt2)
