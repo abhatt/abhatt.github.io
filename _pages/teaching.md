@@ -2,7 +2,7 @@
 layout: page
 permalink: /teaching/
 title: Teaching
-description: Algorithms, probability, and the foundations of computing.
+description: Foundations of algorithms and learning.
 nav: true
 nav_order: 3
 ---

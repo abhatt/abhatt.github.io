@@ -25,11 +25,14 @@ intelligence and theoretical computer science. I develop algorithms
 for learning from data, with particular interests in high-dimensional
 statistics, causal inference and discovery, and algorithms for big data.
 
+I am part of the [Foundations of AI & ML][https://warwick.ac.uk/fac/sci/dcs/research/fam/]
+research group. I am also a co-director of the [ELLIS Oxford Unit](https://www.ellis.ox.ac.uk/home).
+
 [CV (PDF)]({{ '/assets/pdf/cur-cv.pdf' | relative_url }})
 
 ## News
 
-- **September 2026:** I am refreshing this website, including the research and publications pages.
+- **September 2026:** Finally getting around to refreshing this website!
 
 <!-- Add new items above the existing ones, newest first. For example:
 - **Month Year:** A short update, with an optional [link](https://example.com).
