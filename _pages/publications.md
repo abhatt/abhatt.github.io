@@ -74,9 +74,6 @@ nav_order: 2
   }
 </style>
 
-![A tree with aerial roots, illustrating the growth of a research programme.]({{ '/assets/img/bamboo.png' | relative_url }})
-{: .research-banner }
-
 <div class="research-columns">
   <div class="research-publications">
     <h2 class="publications-heading">Publications</h2>
