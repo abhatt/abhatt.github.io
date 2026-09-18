@@ -87,6 +87,7 @@ nav_order: 2
     <h2 id="professional-activities-title">Professional Activities</h2>
     <p>Some events and reading groups I have organized:</p>
     <ul>
+      <li><a href="https://warwick.ac.uk/fac/sci/dcs/events/fairs/">FAIRS 2026</a></li>
       <li><a href="https://algorithmiclearningtheory.org/alt2023/">ALT 2023</a></li>
       <li><a href="{{ '/assets/research/causalityrg/causalityrg.html' | relative_url }}">Causality &amp; Algorithms Virtual Reading Group</a></li>
       <li><a href="https://events.csa.iisc.ac.in/LAC15/">Symposium on Learning, Algorithms and Complexity</a></li>
