@@ -35,6 +35,8 @@ research group. I am also a co-director of the [ELLIS Oxford Unit](https://www.e
 
 ## News
 
+- **October 2026:** Inaugural <a href="https://warwick.ac.uk/fac/sci/dcs/events/fairs">FAIRS@Warwick event</a>.
+
 - **September 2026:** Finally getting around to refreshing this website!
 
 <!-- Add new items above the existing ones, newest first. For example:
